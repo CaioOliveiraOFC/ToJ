@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from toj_source.math_operations import percentage
+
 class Player:
 
     def __init__(self, nick_name):
@@ -7,6 +9,10 @@ class Player:
         self.level = 1
         self.xp_points = 0
         self.isalive = True
+        self.avg_damage = (self._ST + self._MG) // 3
+
+    def get_avg_damage(self):
+        return self.avg_damage
 
     def get_isalive(self):
         return self.isalive
@@ -52,12 +58,12 @@ class Player:
                 self.set_xp_points(self.xp_points - self.need_to_up())
                 self.level += 1
                 if self.get_classname() == 'Warrior':
-                    self._HP += self._HP * 27 // 100
-                    self._MP += self._MP * 27 // 100
-                    self._ST += self._HP * 25 // 100
-                    self._AG += self._AG * 24 // 100
-                    self._MG += self._MG * 24 // 100
-                    self._DF += self._DF * 25 // 100
+                    self._HP += percentage(27, self._HP, False)
+                    self._MP += percentage(27, self._MP, False)
+                    self._ST += percentage(25, self._ST, False)
+                    self._AG += percentage(24, self._AG, False)
+                    self._MG += percentage(24, self._MG, False)
+                    self._DF += percentage(25, self._DF, False)
                     self.base_HP = self._HP
                     self.base_MP = self._MP
                     self.base_ST = self._ST
@@ -65,12 +71,12 @@ class Player:
                     self.base_MG = self._MG
                     self.base_DF = self._DF
                 elif self.get_classname() == 'Mage':
-                    self._HP += self._HP * 27 // 100
-                    self._MP += self._MP * 29 // 100
-                    self._ST += self._HP * 23 // 100
-                    self._AG += self._AG * 24 // 100
-                    self._MG += self._MG * 27 // 100
-                    self._DF += self._DF * 23 // 100
+                    self._HP += percentage(27, self._HP, False)
+                    self._MP += percentage(29, self._MP, False)
+                    self._ST += percentage(23, self._ST, False)
+                    self._AG += percentage(24, self._AG, False)
+                    self._MG += percentage(27, self._MG, False)
+                    self._DF += percentage(23, self._DF, False)
                     self.base_HP = self._HP
                     self.base_MP = self._MP
                     self.base_ST = self._ST
@@ -78,12 +84,12 @@ class Player:
                     self.base_MG = self._MG
                     self.base_DF = self._DF
                 elif self.get_classname() == 'Rogue':
-                    self._HP += self._HP * 28 // 100
-                    self._MP += self._MP * 27 // 100
-                    self._ST += self._HP * 24 // 100
-                    self._AG += self._AG * 27 // 100
-                    self._MG += self._MG * 24 // 100
-                    self._DF += self._DF * 23 // 100
+                    self._HP += percentage(28, self._HP, False)
+                    self._MP += percentage(27, self._MP, False)
+                    self._ST += percentage(24, self._ST, False)
+                    self._AG += percentage(27, self._AG, False)
+                    self._MG += percentage(24, self._MG, False)
+                    self._DF += percentage(23, self._DF, False)
                     self.base_HP = self._HP
                     self.base_MP = self._MP
                     self.base_ST = self._ST
@@ -96,7 +102,6 @@ class Player:
                 break
 
     def need_to_next(self):
-        # self.need_to_up() - self.get_xp_points()
         operation = self.need_to_up() - self.get_xp_points()
         return operation if operation > 0 else 0
 
@@ -149,15 +154,19 @@ class Player:
         percent_of_bar = (self.get_HP() * 100) // self.base_HP // 10
         if percent_of_bar <= 0:
             printable = ''.join(hp_bar)
-            return f'|{printable}|'
+            return f'|{printable}| {self._HP} HP points'
         else:
             for char in range(percent_of_bar):
                 hp_bar[char] = "[#]"
                 printable = ''.join(hp_bar)
             return f'|{printable}| {self._HP} HP points'
 
+    def rest(self):
+        self._HP, self._MP, self._ST = self.base_HP, self.base_MP, self.base_ST
+        self._AG, self._MG, self._DF = self.base_AG, self.base_MG, self.base_DF
 
 class Warrior(Player):
+
     base_HP, base_MP, base_ST = 104, 89, 103
     base_AG, base_MG, base_DF = 60, 10, 30
 
@@ -208,8 +217,12 @@ class Warrior(Player):
 
 class Mage(Player):
 
+    base_HP, base_MP, base_ST = 96, 100, 32
+    base_AG, base_MG, base_DF = 54, 100, 23
+
     def __init__(self, nick_name):
-        self._HP, self._MP, self._ST, self._AG, self._MG, self._DF = 96, 100, 32, 54, 100, 20
+        self._HP, self._MP, self._ST = Mage.base_HP, Mage.base_MP, Mage.base_ST
+        self._AG, self._MG, self._DF = Mage.base_AG, Mage.base_MG, Mage.base_DF
         super().__init__(nick_name)
 
     def get_classname(self):
@@ -254,8 +267,12 @@ class Mage(Player):
 
 class Rogue(Player):
 
+    base_HP, base_MP, base_ST = 99, 30, 63
+    base_AG, base_MG, base_DF = 65, 66, 20
+
     def __init__(self, nick_name):
-        self._HP, self._MP, self._ST, self._AG, self._MG, self._DF = 99, 30, 63, 65, 66, 20
+        self._HP, self._MP, self._ST = Mage.base_HP, Mage.base_MP, Mage.base_ST
+        self._AG, self._MG, self._DF = Mage.base_AG, Mage.base_MG, Mage.base_DF
         super().__init__(nick_name)
 
     def get_classname(self):
@@ -299,6 +316,7 @@ class Rogue(Player):
 
 
 class Monster:
+
     base_HP, base_MP, base_ST = 45, 15, 30
     base_AG, base_MG, base_DF = 35, 30, 10
 
