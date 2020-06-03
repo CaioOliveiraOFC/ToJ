@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-from random import choice, shuffle
-
-
 class Player:
 
     def __init__(self, nick_name):
@@ -10,15 +7,9 @@ class Player:
         self.level = 1
         self.xp_points = 0
         self.isalive = True
-        self.base_HP = self._HP
-        self.base_MP = self._MP
-        self.base_ST = self._ST
-        self.base_AG = self._AG
-        self.base_MG = self._MG
-        self.base_DF = self._DF
 
     def get_isalive(self):
-        return isalive
+        return self.isalive
 
     def set_isalive(self, state=True):
         if state != True and state != False:
@@ -46,15 +37,14 @@ class Player:
     def get_level(self):
         return self.level
 
+    def set_level(self, new_level):
+        self.level = new_level
+
     def need_to_up(self):
-        if self.level == 1:
-            need_to_up = 100
-            return need_to_up
-        else:
-            need_to_up = 0
-            for each_level in range(1, self.level):
-                need_to_up += (2 ** each_level) * 100
-            return need_to_up
+        need_to_up: int = 0
+        for each_level in range(1, self.level):
+            need_to_up += (2 ** each_level) * 100
+        return need_to_up if self.level != 1 else 100
 
     def level_up(self):
         while True:
@@ -106,7 +96,9 @@ class Player:
                 break
 
     def need_to_next(self):
-        return self.need_to_up() - self.get_xp_points()
+        # self.need_to_up() - self.get_xp_points()
+        operation = self.need_to_up() - self.get_xp_points()
+        return operation if operation > 0 else 0
 
     def show_level_bar(self):
         level_bar = ['[ ]' for x in range(10)]
@@ -136,21 +128,7 @@ class Player:
         print(f'your magic in {self.get_classname()} class has: {self._MG} points')
         print(f'your defense in {self.get_classname()} class has: {self._DF} points')
 
-    def attack(self, defender):
-        # attack = [0 for x in range((defender._AG - (20//100)) // 100)]
-        # fail_attack = [1 for x in range(self._AG * 10//100)]
-        # mix = attack[:] + fail_attack[:]
-        # attack_prob = [choice(mix) for x in range(10)]
-        # shuffle(attack_prob)
-        # if choice(attack_prob) == 0:
-        damage = abs((self._ST * 10 // 100) + (self._MG * 10 // 100) - (defender._DF * 5 // 100))
-        defender._HP -= damage
-        print(f"{self.nick_name} deal {damage} of damage in {defender.nick_name}", end=', ')
-        print(f"Now {defender.nick_name} have {defender._HP} of HP")
-        # else:
-        #    print(f'{self.nick_name} has missed the attack!!')
-
-    def show_HP_bar(self):
+    def show_hp_bar(self):
         printable = str()
         hp_bar = ['[ ]' for x in range(10)]
         percent_of_bar = (self.get_HP() * 100) // self.base_HP // 10
@@ -165,11 +143,27 @@ class Player:
             print(f"{self.get_nick_name()} have {self.get_HP()} HP points: ")
             print(f'|{printable}|')
 
+    def get_hp_bar(self):
+        printable = str()
+        hp_bar = ['[ ]' for x in range(10)]
+        percent_of_bar = (self.get_HP() * 100) // self.base_HP // 10
+        if percent_of_bar <= 0:
+            printable = ''.join(hp_bar)
+            return f'|{printable}|'
+        else:
+            for char in range(percent_of_bar):
+                hp_bar[char] = "[#]"
+                printable = ''.join(hp_bar)
+            return f'|{printable}| {self._HP} HP points'
+
 
 class Warrior(Player):
+    base_HP, base_MP, base_ST = 104, 89, 103
+    base_AG, base_MG, base_DF = 60, 10, 30
 
     def __init__(self, nick_name):
-        self._HP, self._MP, self._ST, self._AG, self._MG, self._DF = 104, 89, 103, 60, 10, 23
+        self._HP, self._MP, self._ST = Warrior.base_HP, Warrior.base_MP, Warrior.base_ST
+        self._AG, self._MG, self._DF = Warrior.base_AG, Warrior.base_MG, Warrior.base_DF
         super().__init__(nick_name)
 
     def get_classname(self):
@@ -305,28 +299,46 @@ class Rogue(Player):
 
 
 class Monster:
+    base_HP, base_MP, base_ST = 45, 15, 30
+    base_AG, base_MG, base_DF = 35, 30, 10
 
-    base_HP, base_MP, base_ST, = 45, 15, 31
-    base_AG, base_MG, base_DF = 34, 33, 10
-
-    def __init__(self, name):
-        self.name = name
-        self.level = 1
-        for atr in range(self.level):
-            self._HP += (Monster.base_HP * (5 / 100)) + Monster.base_HP
-            self._MP += (Monster.base_MP * (5 / 100)) + Monster.base_MP
-            self._ST += (Monster.base_ST * (5 / 100)) + Monster.base_ST
-            self._AG += (Monster.base_AG * (5 / 100)) + Monster.base_AG
-            self._MG += (Monster.base_MG * (5 / 100)) + Monster.base_MG
-            self._DF += (Monster.base_DF * (5 / 100)) + Monster.base_DF
+    def __init__(self, nick_name, mob_level):
+        self.nick_name = nick_name
+        self.level = mob_level
+        self.isalive = True
+        self._HP = Monster.base_HP
+        self._MP = Monster.base_MP
+        self._ST = Monster.base_ST
+        self._AG = Monster.base_AG
+        self._MG = Monster.base_MG
+        self._DF = Monster.base_DF
+        for level in range(self.level):
+            self._HP += 5
+            self._MP += 5
+            self._ST += 5
+            self._AG += 5
+            self._MG += 5
+            self._DF += 5
 
     def show_attributes(self):
-        print(f"your helth in {self.name} class has: {self._HP} points")
-        print(f"your mana in {self.name} class has: {self._MP} points")
-        print(f'your strength in {self.name} class has: {self._ST} points')
-        print(f'your agility in {self.name} class has: {self._AG} points')
-        print(f'your magic in {self.name} class has: {self._MG} points')
-        print(f'your defense in {self.name} class has: {self._DF} points')
+        print(f"{self.nick_name} Monster has: {self._HP} HP points")
+        print(f"{self.nick_name} Monster has: {self._HP} MP points")
+        print(f"{self.nick_name} Monster has: {self._HP} ST points")
+        print(f"{self.nick_name} Monster has: {self._HP} AG points")
+        print(f"{self.nick_name} Monster has: {self._HP} MG points")
+        print(f"{self.nick_name} Monster has: {self._HP} DF points")
+
+    def get_level(self):
+        return self.level
+
+    def set_isalive(self, state):
+        self.isalive = state
+
+    def get_isalive(self):
+        return self.isalive
+
+    def set_level(self, new_level):
+        self.level = new_level
 
     def get_HP(self):
         return self._HP
@@ -337,7 +349,7 @@ class Monster:
     def get_ST(self):
         return self._ST
 
-    def get_AG(self):
+    def get_ag(self):
         return self._AG
 
     def get_MG(self):
