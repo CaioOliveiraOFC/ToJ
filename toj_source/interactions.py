@@ -1,35 +1,64 @@
 from random import choice
-from time import sleep
-from os import system, name
-
+from toj_source.math_operations import percentage
+from toj_source.classes import get_hp_bar, get_status_table
 
 def fight(fighter1, fighter2):
     fighters = [fighter1, fighter2]
     order = choose_first(fighters)
     first = f'{order["Attacker"].nick_name} attacks first'
+    battle_status1 = f'BATTLE STATUS'
+    battle_status2 = f'{fighter1.nick_name} VERSUS {fighter2.nick_name}'
+    battle_status3 = get_status_table(order["Attacker"], order["Defensor"])
+    line(100, '=')
+    print(f'{battle_status1:^100}')
+    print(f'{battle_status2:^100}')
     print(f'{first:^100}')
-    while True:
-        #sleep(3)
-        line(100)
-        attack(order["Attacker"], order["Defensor"], fighters)
-        defensor_dead = check_if_died(order['Defensor'])
-        line(100)
-        if defensor_dead:
+    print(f'{order["Attacker"].nick_name:^50} {order["Defensor"].nick_name:^50}')
+    print(f'{battle_status3:^100}')
+    line(100, '=')
+    if is_computer_fight(fighters):
+        while True:
             line(100)
-            winner = f'The {order["Attacker"].nick_name} WIN!!!'
-            print(f'{winner:^100}')
+            attack(order["Attacker"], order["Defensor"], fighters)
             line(100)
+            died = check_if_died(order["Defensor"])
+            if died:
+                line(100, '=')
+                winner = f'{order["Attacker"].nick_name} WINS!!!'
+                print(f'{winner:^100}')
+                line(100, '=')
+                if order["Attacker"].my_type() == 'Human':
+                    spoils = award_xp(order["Defensor"], order["Attacker"])
+                    order["Attacker"].add_xp_points(spoils)
+                    order["Attacker"].rest()
+                    print1 = f'Congratulations {order["Attacker"].nick_name}, you won {spoils} XP'
+                    line(100, '=')
+                    print(f"{print1:^100}")
+                    line(100, '=')
+                    battle_status1 = f'BATTLE STATUS'
+                    battle_status2 = f'{fighter1.nick_name} VERSUS {fighter2.nick_name}'
+                    order["Attacker"].level_up()
+                    print('\n\n')
+                    order["Defensor"].restart()
+                else:
+                    order["Defensor"].rest()
+                    order["Attacker"].restart()
+                break
+            order = switch_attacker(order)
+    else:
+        while True:
+            print('PLEASE DO NOT RUN THIS LOOP')
             break
-        order = switch_attacker(order)
 
 
 def attack(attacker, defender, entts):
-    damage = abs((attacker._ST * 10 // 100) + (attacker._MG * 10 // 100) - (defender._DF * 5 // 100))
-    defender._HP -= damage
+    debuffs = percentage(5, defender.get_df(), False) + percentage(5, defender.get_ag(), False)
+    damage = abs(attacker.avg_damage - debuffs)
+    defender._hp -= damage
     printable = f'{attacker.nick_name:^} deal {damage} damage in {defender.nick_name}'
     print(f"{printable:^100}")
     print(f"{entts[0].nick_name:^50} {entts[1].nick_name:^50}")
-    print(f'''{attacker.get_hp_bar():<40} X {defender.get_hp_bar():50}''')
+    print(f'''{get_hp_bar(entts[0]):<40} X {get_hp_bar(entts[1]):50}''')
 
 
 def choose_first(fighters):
@@ -40,7 +69,7 @@ def choose_first(fighters):
 
 
 def check_if_died(figther):
-    if figther._HP <= 0:
+    if figther.get_hp() <= 0:
         figther.set_isalive(False)
     return True if not figther.isalive else False
 
@@ -51,9 +80,19 @@ def switch_attacker(order_dict):
     return {"Attacker": new_attacker, "Defensor": new_defensor}
 
 
-def line(size=15):
-    print('-' * size)
+def is_computer_fight(fighters):
+    return (fighters[0].my_type() == 'Human' and fighters[1].my_type() == 'COM') or \
+           (fighters[1].my_type() == 'Human' and fighters[0].my_type() == 'COM')
 
 
-def clear_screen():
-    system('cls' if name == 'nt' else 'clear')
+def award_xp(monster, player):
+    award = abs(monster.get_level() - player.get_level()) + 50 * monster.get_level()
+    return award
+
+
+def line(size=15, simbol='-'):
+    print(f'{simbol}' * size)
+
+
+if __name__=="__main__":
+    pass
