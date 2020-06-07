@@ -23,12 +23,12 @@ def main():
                 7: 'Thanos'}
 
         mob1 = Monster(mobs[1], 1)
-        mob2 = Monster(mobs[2], 1)
-        mob3 = Monster(mobs[3], 1)
-        mob4 = Monster(mobs[4], 1)
-        mob5 = Monster(mobs[5], 4)
-        mob6 = Monster(mobs[6], 6)
-        mob7 = Monster(mobs[7], 3)
+        mob2 = Monster(mobs[2], 2)
+        mob3 = Monster(mobs[3], 4)
+        mob4 = Monster(mobs[4], 6)
+        mob5 = Monster(mobs[5], 8)
+        mob6 = Monster(mobs[6], 16)
+        mob7 = Monster(mobs[7], 32)
 
         # Each instance is a entity
         entities = [player1,
@@ -40,12 +40,7 @@ def main():
         line()
         print('Fight example')
         line()
-        fight(player1, mob4)
-        fight(player1, mob4)
-        fight(player1, mob4)
-        fight(player1, mob4)
-        fight(player1, mob4)
-        fight(player1, mob4)
+        fight(player2, player1)
 
 
 main()

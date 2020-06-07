@@ -1,6 +1,6 @@
 from random import choice
 from toj_source.math_operations import percentage
-from toj_source.classes import get_hp_bar, get_status_table
+from toj_source.classes import get_hp_bar
 
 def fight(fighter1, fighter2):
     fighters = [fighter1, fighter2]
@@ -8,13 +8,11 @@ def fight(fighter1, fighter2):
     first = f'{order["Attacker"].nick_name} attacks first'
     battle_status1 = f'BATTLE STATUS'
     battle_status2 = f'{fighter1.nick_name} VERSUS {fighter2.nick_name}'
-    battle_status3 = get_status_table(order["Attacker"], order["Defensor"])
     line(100, '=')
     print(f'{battle_status1:^100}')
     print(f'{battle_status2:^100}')
     print(f'{first:^100}')
     print(f'{order["Attacker"].nick_name:^50} {order["Defensor"].nick_name:^50}')
-    print(f'{battle_status3:^100}')
     line(100, '=')
     if is_computer_fight(fighters):
         while True:
@@ -35,10 +33,7 @@ def fight(fighter1, fighter2):
                     line(100, '=')
                     print(f"{print1:^100}")
                     line(100, '=')
-                    battle_status1 = f'BATTLE STATUS'
-                    battle_status2 = f'{fighter1.nick_name} VERSUS {fighter2.nick_name}'
                     order["Attacker"].level_up()
-                    print('\n\n')
                     order["Defensor"].restart()
                 else:
                     order["Defensor"].rest()
@@ -47,14 +42,25 @@ def fight(fighter1, fighter2):
             order = switch_attacker(order)
     else:
         while True:
-            print('PLEASE DO NOT RUN THIS LOOP')
-            break
+            line(100)
+            attack(order["Attacker"], order["Defensor"], fighters)
+            line(100)
+            died = check_if_died(order["Defensor"])
+            if died:
+                line(100, '=')
+                winner = f'{order["Attacker"].nick_name} WINS!!!'
+                print(f'{winner:^100}')
+                line(100, '=')
+                order["Defensor"].rest()
+                order["Attacker"].rest()
+                break
+            order = switch_attacker(order)
 
 
 def attack(attacker, defender, entts):
-    debuffs = percentage(5, defender.get_df(), False) + percentage(5, defender.get_ag(), False)
+    debuffs = percentage(10, defender.get_df(), False) + percentage(5, defender.get_ag(), False)
     damage = abs(attacker.avg_damage - debuffs)
-    defender._hp -= damage
+    defender.reduce_hp(damage)
     printable = f'{attacker.nick_name:^} deal {damage} damage in {defender.nick_name}'
     print(f"{printable:^100}")
     print(f"{entts[0].nick_name:^50} {entts[1].nick_name:^50}")
@@ -86,7 +92,7 @@ def is_computer_fight(fighters):
 
 
 def award_xp(monster, player):
-    award = abs(monster.get_level() - player.get_level()) + 50 * monster.get_level()
+    award = ((70 * monster.get_level()) - (player.get_level() * 10)) // 2
     return award
 
 
@@ -94,5 +100,5 @@ def line(size=15, simbol='-'):
     print(f'{simbol}' * size)
 
 
-if __name__=="__main__":
+if __name__ == '__main__':
     pass

@@ -23,6 +23,9 @@ class Player:
             raise ValueError("Expected True or False")
         self.isalive = bool(state)
 
+    def reduce_hp(self, quantty):
+        self._hp -= quantty
+
     @staticmethod
     def my_type():
         return 'Human'
@@ -57,7 +60,7 @@ class Player:
     def need_to_up(self):
         need_to_up: int = 0
         for each_level in range(1, self.level):
-            need_to_up += (2 ** each_level) * 100
+            need_to_up += (2 ** each_level) * 70
         return need_to_up if self.level != 1 else 100
 
     def level_up(self):
@@ -306,13 +309,18 @@ class Monster:
         self._mg = Monster.base_mg
         self._df = Monster.base_df
         for level in range(self.level):
-            self._hp += 5
-            self._mp += 5
+            self._hp += 10
+            self._mp += 10
             self._st += 5
             self._ag += 5
             self._mg += 5
-            self._df += 5
+            self._df += 10
+            self.base_hp, self.base_mp, self.base_st = self._hp, self._mp, self._st
+            self.base_ag, self.base_mg, self.base_df = self._ag, self._mg, self._df
         self.avg_damage = (self._st + self._mg) // 2
+
+    def reduce_hp(self, quantty):
+        self._hp -= quantty
 
     @staticmethod
     def my_type():
