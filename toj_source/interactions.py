@@ -1,6 +1,6 @@
-from random import choice
+from random import choice, randrange
 from toj_source.math_operations import percentage
-from toj_source.classes import get_hp_bar
+from toj_source.classes import get_hp_bar, compare
 
 def fight(fighter1, fighter2):
     fighters = [fighter1, fighter2]
@@ -12,7 +12,8 @@ def fight(fighter1, fighter2):
     print(f'{battle_status1:^100}')
     print(f'{battle_status2:^100}')
     print(f'{first:^100}')
-    print(f'{order["Attacker"].nick_name:^50} {order["Defensor"].nick_name:^50}')
+    line(100, '=')
+    compare(fighter1, fighter2)
     line(100, '=')
     if is_computer_fight(fighters):
         while True:
@@ -26,17 +27,23 @@ def fight(fighter1, fighter2):
                 print(f'{winner:^100}')
                 line(100, '=')
                 if order["Attacker"].my_type() == 'Human':
-                    spoils = award_xp(order["Defensor"], order["Attacker"])
+                    order["Attacker"].win()
+                    spoils = award_xp(order["Defensor"])
                     order["Attacker"].add_xp_points(spoils)
                     order["Attacker"].rest()
                     print1 = f'Congratulations {order["Attacker"].nick_name}, you won {spoils} XP'
+                    print2 = f'{order["Attacker"].get_level_bar()}'
                     line(100, '=')
                     print(f"{print1:^100}")
+                    print(f'{print2:^100}')
                     line(100, '=')
+                    print(f'You have {order["Attacker"].get_xp_points()} xp points'.center(100))
                     order["Attacker"].level_up()
                     order["Defensor"].restart()
+                    order["Attacker"].add_kill_streak()
                 else:
                     order["Defensor"].rest()
+                    order["Defensor"].reset_kill_streak()
                     order["Attacker"].restart()
                 break
             order = switch_attacker(order)
@@ -49,22 +56,40 @@ def fight(fighter1, fighter2):
             if died:
                 line(100, '=')
                 winner = f'{order["Attacker"].nick_name} WINS!!!'
+                order["Attacker"].win()
                 print(f'{winner:^100}')
                 line(100, '=')
                 order["Defensor"].rest()
+                order["Defensor"].reset_kill_streak()
                 order["Attacker"].rest()
+                order["Attacker"].add_kill_streak()
                 break
             order = switch_attacker(order)
 
 
 def attack(attacker, defender, entts):
-    debuffs = percentage(10, defender.get_df(), False) + percentage(5, defender.get_ag(), False)
-    damage = abs(attacker.avg_damage - debuffs)
-    defender.reduce_hp(damage)
-    printable = f'{attacker.nick_name:^} deal {damage} damage in {defender.nick_name}'
-    print(f"{printable:^100}")
-    print(f"{entts[0].nick_name:^50} {entts[1].nick_name:^50}")
-    print(f'''{get_hp_bar(entts[0]):<40} X {get_hp_bar(entts[1]):50}''')
+    debuffs = percentage(30, defender.get_df(), False)
+    if debuffs > attacker.get_avg_damage():
+        damage = attacker.get_avg_damage()
+    else:
+        damage = attacker.get_avg_damage() - debuffs
+    critical_value = percentage(96, damage, False)
+    chosed_for_debf = randrange(90, 101)
+    damage = percentage(chosed_for_debf, damage, False)
+    miss = defender.get_ag() - percentage(5, attacker.get_ag(), False)
+    chosed_for_hit = randrange(1, 99)
+    if chosed_for_hit >= miss:
+        defender.reduce_hp(damage)
+        critical = ''
+        if damage >= critical_value:
+            critical = ' a critical damage!!'
+        print(f'{attacker.nick_name:^} deal {damage} damage in {defender.nick_name}{critical}'.center(100))
+        print(f"{entts[0].nick_name:^50} {entts[1].nick_name:^50}".center(100))
+        print(f'{get_hp_bar(entts[0]):<40} X {get_hp_bar(entts[1]):50}'.center(100))
+    else:
+        print(f'{attacker.nick_name} has missed the attack'.center(100).center(100))
+        print(f"{entts[0].nick_name:^50} {entts[1].nick_name:^50}".center(100))
+        print(f'{get_hp_bar(entts[0]):<40} X {get_hp_bar(entts[1]):50}'.center(100))
 
 
 def choose_first(fighters):
@@ -91,8 +116,18 @@ def is_computer_fight(fighters):
            (fighters[1].my_type() == 'Human' and fighters[0].my_type() == 'COM')
 
 
-def award_xp(monster, player):
-    award = ((70 * monster.get_level()) - (player.get_level() * 10)) // 2
+def award_xp(monster):
+    award = (30 * monster.get_level())
+    if monster.get_level() >= 10:
+        award += percentage(10, award, False)
+    elif monster.get_level() >= 20:
+        award += percentage(15, award, False)
+    elif monster.get_level() >= 30:
+        award += percentage(20, award, False)
+    else:
+        award += percentage(25, award, False)
+    choosed = randrange(90, 101)
+    award = percentage(choosed, award, False)
     return award
 
 

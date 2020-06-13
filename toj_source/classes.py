@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from toj_source.math_operations import percentage
+from toj_source.weapons import *
 
 
 class Player:
@@ -10,7 +11,28 @@ class Player:
         self.level = 1
         self.xp_points = 0
         self.isalive = True
-        self.avg_damage = (self._st + self._mg) // 2
+        self.avg_damage = (self._st + self._mg) // 3
+        self.kill_streak = 0
+        self.wins = 0
+        self.has_gun = False
+
+    def set_has_hun(self, state=True):
+        try:
+            self.has_gun = state
+        except ValueError:
+            self.has_gun = False
+
+    def win(self):
+        self.wins += 1
+
+    def get_kill_streak(self):
+        return self.kill_streak
+
+    def add_kill_streak(self):
+        self.kill_streak += 1
+
+    def reset_kill_streak(self):
+        self.kill_streak = 0
 
     def get_avg_damage(self):
         return self.avg_damage
@@ -29,15 +51,6 @@ class Player:
     @staticmethod
     def my_type():
         return 'Human'
-
-    def dead_or_alive(self):
-        """
-        -----> Return string Dead or Alive
-        """
-        return "alive" if self.isalive else "dead"
-
-    def show_alive_state(self):
-        return f"{self.get_nick_name()} is {self.dead_or_alive()}"
 
     def set_xp_points(self, amount):
         self.xp_points = amount
@@ -59,57 +72,83 @@ class Player:
 
     def need_to_up(self):
         need_to_up: int = 0
-        for each_level in range(1, self.level):
-            need_to_up += (2 ** each_level) * 70
-        return need_to_up if self.level != 1 else 100
+        if self.level == 1:
+            need_to_up = self.level + 7 * 10
+        else:
+            for each_level in range(1, self.level):
+                need_to_up += (self.level + 7) * 10
+        return need_to_up
 
-    def level_up(self):
+    @staticmethod
+    def xp_for_level(level):
+        xp_to_level = 0
+        need_to_up = 0
+        if level == 1:
+            xp_to_level = (level + 7) * 10
+        else:
+            for each_level in range(1, level-1):
+                need_to_up += (level + 7) * 10
+                xp_to_level += need_to_up
+        return xp_to_level
+
+    def level_up(self, show=True):
         while True:
             if self.get_xp_points() >= self.need_to_up():
                 self.set_xp_points(self.xp_points - self.need_to_up())
                 self.level += 1
                 if self.get_classname() == 'Warrior':
-                    self._hp += percentage(27, self._hp, False)
-                    self._mp += percentage(27, self._mp, False)
-                    self._st += percentage(25, self._st, False)
-                    self._ag += percentage(24, self._ag, False)
-                    self._mg += percentage(24, self._mg, False)
-                    self._df += percentage(25, self._df, False)
+                    self._hp += percentage(17, self._hp, False)
+                    self._mp += percentage(14, self._mp, False)
+                    self._st += percentage(13, self._st, False)
+                    self._ag += 1
+                    if self._ag >= 91:
+                        self._ag = 90
+                    self._mg += percentage(12, self._mg, False)
+                    self._df += percentage(13, self._df, False)
                     self.base_hp = self._hp
                     self.base_mp = self._mp
                     self.base_st = self._st
                     self.base_ag = self._ag
                     self.base_mg = self._mg
                     self.base_df = self._df
+                    self.avg_damage = (self._st + self._mg) // 3
                 elif self.get_classname() == 'Mage':
-                    self._hp += percentage(27, self._hp, False)
-                    self._mp += percentage(29, self._mp, False)
-                    self._st += percentage(23, self._st, False)
-                    self._ag += percentage(24, self._ag, False)
-                    self._mg += percentage(27, self._mg, False)
-                    self._df += percentage(23, self._df, False)
+                    self._hp += percentage(17, self._hp, False)
+                    self._mp += percentage(17, self._mp, False)
+                    self._st += percentage(11, self._st, False)
+                    self._ag += 1
+                    if self._ag >= 91:
+                        self._ag = 90
+                    self._mg += percentage(15, self._mg, False)
+                    self._df += percentage(11, self._df, False)
                     self.base_hp = self._hp
                     self.base_mp = self._mp
                     self.base_st = self._st
                     self.base_ag = self._ag
                     self.base_mg = self._mg
                     self.base_df = self._df
+                    self.avg_damage = (self._st + self._mg) // 3
                 elif self.get_classname() == 'Rogue':
-                    self._hp += percentage(28, self._hp, False)
-                    self._mp += percentage(27, self._mp, False)
-                    self._st += percentage(24, self._st, False)
-                    self._ag += percentage(27, self._ag, False)
-                    self._mg += percentage(24, self._mg, False)
-                    self._df += percentage(23, self._df, False)
+                    self._hp += percentage(14, self._hp, False)
+                    self._mp += percentage(14, self._mp, False)
+                    self._st += percentage(14, self._st, False)
+                    self._ag += 1
+                    if self._ag >= 96:
+                        self._ag = 95
+                    self._mg += percentage(12, self._mg, False)
+                    self._df += percentage(11, self._df, False)
                     self.base_hp = self._hp
                     self.base_mp = self._mp
                     self.base_st = self._st
                     self.base_ag = self._ag
                     self.base_mg = self._mg
                     self.base_df = self._df
-                print(f"Level up! now you are level: {self.level}")
+                    self.avg_damage = (self._st + self._mg) // 3
+                if show:
+                    print(f"Level up! now you are level: {self.level}".center(100))
             else:
-                print(f"You need more xp points! reach: {self.need_to_up()}")
+                if show:
+                    print(f"You need more xp points! reach: {self.need_to_up()}".center(100))
                 break
 
     def need_to_next(self):
@@ -118,7 +157,10 @@ class Player:
 
     def get_level_bar(self):
         level_bar = ['[ ]' for x in range(10)]
-        percent_of_bar = ((self.get_xp_points() * 100) // self.need_to_up()) // 10
+        try:
+            percent_of_bar = ((self.get_xp_points() * 100) // self.need_to_up()) // 10
+        except ZeroDivisionError:
+            percent_of_bar = self.get_xp_points() * 100 // 10
         printable = str()
         if percent_of_bar == 0:
             printable = ''.join(level_bar)
@@ -139,11 +181,28 @@ class Player:
         self._ag, self._mg, self._df = self.base_ag, self.base_mg, self.base_df
         self.set_isalive()
 
+    def equip_a_gun(self, arm):
+        if not arm.is_equiped():
+            if arm.get_wp_level() <= self.get_level():
+                if self.get_classname() in arm.classes:
+                    self.has_gun = True
+                    self._mg += arm.get_mg()
+                    self._st += arm.get_st()
+                    self._ag += arm.get_ag()
+                    self.avg_damage += arm.avg_dmg
+                    print(f'Congratulations {self.get_nick_name()} now you have {arm.name}'.center(100))
+                else:
+                    print(f'You need to be {"or".join(arm.get_lst_class())}'.center(100))
+            else:
+                print(f'You need level -> {arm.get_wp_level()} to use this weapon'.center(100))
+        else:
+            print('Someone is using this gun'.center(100))
+
 
 class Warrior(Player):
 
-    base_hp, base_mp, base_st = 104, 89, 103
-    base_ag, base_mg, base_df = 60, 10, 30
+    base_hp, base_mp, base_st = 104, 89, 104
+    base_ag, base_mg, base_df = 3, 30, 30
 
     def __init__(self, nick_name):
         self._hp, self._mp, self._st = Warrior.base_hp, Warrior.base_mp, Warrior.base_st
@@ -194,7 +253,7 @@ class Warrior(Player):
 class Mage(Player):
 
     base_hp, base_mp, base_st = 96, 100, 32
-    base_ag, base_mg, base_df = 54, 100, 23
+    base_ag, base_mg, base_df = 3, 100, 23
 
     def __init__(self, nick_name):
         self._hp, self._mp, self._st = Mage.base_hp, Mage.base_mp, Mage.base_st
@@ -244,8 +303,8 @@ class Mage(Player):
 
 class Rogue(Player):
 
-    base_hp, base_mp, base_st = 99, 30, 63
-    base_ag, base_mg, base_df = 65, 66, 20
+    base_hp, base_mp, base_st = 99, 30, 67
+    base_ag, base_mg, base_df = 7, 66, 20
 
     def __init__(self, nick_name):
         self._hp, self._mp, self._st = Rogue.base_hp, Rogue.base_mp, Rogue.base_st
@@ -295,12 +354,15 @@ class Rogue(Player):
 
 class Monster:
 
-    base_hp, base_mp, base_st = 45, 15, 30
-    base_ag, base_mg, base_df = 35, 30, 10
+    base_hp, base_mp, base_st = 100, 40, 55
+    base_ag, base_mg, base_df = 3, 50, 30
 
-    def __init__(self, nick_name, mob_level):
+    def __init__(self, nick_name, mob_level=1):
         self.nick_name = nick_name
-        self.level = mob_level
+        if mob_level == 0:
+            self.level = 1
+        else:
+            self.level = mob_level
         self.isalive = True
         self._hp = Monster.base_hp
         self._mp = Monster.base_mp
@@ -308,16 +370,44 @@ class Monster:
         self._ag = Monster.base_ag
         self._mg = Monster.base_mg
         self._df = Monster.base_df
-        for level in range(self.level):
-            self._hp += 10
-            self._mp += 10
-            self._st += 5
-            self._ag += 5
-            self._mg += 5
-            self._df += 10
-            self.base_hp, self.base_mp, self.base_st = self._hp, self._mp, self._st
-            self.base_ag, self.base_mg, self.base_df = self._ag, self._mg, self._df
-        self.avg_damage = (self._st + self._mg) // 2
+        if 10 > self.level >= 1:
+            for level in range(self.level):
+                self._hp += percentage(10, self._hp, False)
+                self._mp += percentage(8, self._mp, False)
+                self._st += percentage(8, self._st, False)
+                self._ag += 1
+                self._mg += percentage(8, self._mg, False)
+                self._df += percentage(10, self._df, False)
+                self.base_hp, self.base_mp, self.base_st = self._hp, self._mp, self._st
+                self.base_ag, self.base_mg, self.base_df = self._ag, self._mg, self._df
+            self.avg_damage = (self._st + self._mg) // 3
+        elif 20 > self.level >= 10:
+            for level in range(self.level):
+                self._hp += percentage(11, self._hp, False)
+                self._mp += percentage(11, self._mp, False)
+                self._st += percentage(11, self._st, False)
+                self._ag += 1
+                self._mg += percentage(11, self._mg, False)
+                self._df += percentage(13, self._df, False)
+                self.base_hp, self.base_mp, self.base_st = self._hp, self._mp, self._st
+                self.base_ag, self.base_mg, self.base_df = self._ag, self._mg, self._df
+            self.avg_damage = (self._st + self._mg) // 3
+        else:
+            for level in range(self.level):
+                self._hp += percentage(15, self._hp, False)
+                self._mp += percentage(15, self._mp, False)
+                self._st += percentage(15, self._st, False)
+                self._ag += 1
+                if self._ag >= 61:
+                    self._ag = 60
+                self._mg += percentage(14, self._mg, False)
+                self._df += percentage(15, self._df, False)
+                self.base_hp, self.base_mp, self.base_st = self._hp, self._mp, self._st
+                self.base_ag, self.base_mg, self.base_df = self._ag, self._mg, self._df
+            self.avg_damage = (self._st + self._mg) // 3
+
+    def get_avg_damage(self):
+        return self.avg_damage
 
     def reduce_hp(self, quantty):
         self._hp -= quantty
@@ -423,23 +513,16 @@ def get_hp_bar(entt):
                 break
         return f'|{printable}| {entt.get_hp()} HP points'
 
-def get_info(entity_to_get):
-    return f"""your helth in {entity_to_get.get_classname()} class has: {entity_to_get.get_hp()} points
-    your mana in {entity_to_get.get_classname()} class has: {entity_to_get.get_mp()} points
-    your strength in {entity_to_get.get_classname()} class has: {entity_to_get.get_st()} points
-    your agility in {entity_to_get.get_classname()} class has: {entity_to_get.get_ag()} points
-    your magic in {entity_to_get.get_classname()} class has: {entity_to_get.get_mg()} points
-    your defense in {entity_to_get.get_classname()} class has: {entity_to_get.get_df()} points"""
-
-def get_status_table(attacker, defender):
-    return f'''
-    [HP] {attacker.get_hp()} x [HP] {defender.get_hp()}
-    [MP] {attacker.get_mp()} x [MP] {defender.get_mp()}    
-    [ST] {attacker.get_st()} x [ST] {defender.get_st()}
-    [AG] {attacker.get_ag()} x [AG] {defender.get_ag()}
-    [MG] {attacker.get_mg()} x [MG] {defender.get_mg()}
-    [DF] {attacker.get_df()} x [DF] {defender.get_df()}
-    '''
+def compare(ennt1, ennt2):
+    print(f'Class |{ennt1.get_classname()} X {ennt2.get_classname()}| Class'.center(102))
+    print(f'Level |{ennt1.get_level():<4} X {ennt2.get_level():>4}| Level'.center(100))
+    print(f"AVG |{ennt1.avg_damage:<5} X {ennt2.avg_damage:>5}| AVG".center(100))
+    print(f"HP |{ennt1.get_hp():<5} X {ennt2.get_hp():>5}| HP".center(100))
+    print(f'MP |{ennt1.get_mp():<5} X {ennt2.get_mp():>5}| MP'.center(100))
+    print(f'ST |{ennt1.get_st():<5} X {ennt2.get_st():>5}| ST'.center(100))
+    print(f'AG |{ennt1.get_ag():<5} X {ennt2.get_ag():>5}| AG'.center(100))
+    print(f'MG |{ennt1.get_mg():<5} X {ennt2.get_mg():>5}| MG'.center(100))
+    print(f'DF |{ennt1.get_df():<5} X {ennt2.get_df():>5}| DF'.center(100))
 
 
 if __name__ == '__main__':

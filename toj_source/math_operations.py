@@ -4,3 +4,4 @@ def percentage(percent, whole, remainder=True):
     else:
         operation = (percent * whole) // 100
     return operation
+
