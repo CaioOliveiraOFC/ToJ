@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from toj_source.math_operations import percentage
-from toj_source.weapons import *
 
 
 class Player:
@@ -14,13 +13,9 @@ class Player:
         self.avg_damage = (self._st + self._mg) // 3
         self.kill_streak = 0
         self.wins = 0
-        self.has_gun = False
-
-    def set_has_hun(self, state=True):
-        try:
-            self.has_gun = state
-        except ValueError:
-            self.has_gun = False
+        self.inventory = {"Weapon": None,
+                          "Helmet": None, "Body": None,
+                          "Legs": None, "Shoes": None}
 
     def win(self):
         self.wins += 1
@@ -86,7 +81,7 @@ class Player:
         if level == 1:
             xp_to_level = (level + 7) * 10
         else:
-            for each_level in range(1, level-1):
+            for each_level in range(1, level - 1):
                 need_to_up += (level + 7) * 10
                 xp_to_level += need_to_up
         return xp_to_level
@@ -181,26 +176,41 @@ class Player:
         self._ag, self._mg, self._df = self.base_ag, self.base_mg, self.base_df
         self.set_isalive()
 
-    def equip_a_gun(self, arm):
-        if not arm.is_equiped():
-            if arm.get_wp_level() <= self.get_level():
-                if self.get_classname() in arm.classes:
-                    self.has_gun = True
-                    self._mg += arm.get_mg()
-                    self._st += arm.get_st()
-                    self._ag += arm.get_ag()
-                    self.avg_damage += arm.avg_dmg
-                    print(f'Congratulations {self.get_nick_name()} now you have {arm.name}'.center(100))
+    def equip_a_gun(self, gun):
+        if not gun.is_equipped():
+            if gun.get_wp_level() <= self.get_level():
+                if self.get_classname() in gun.classes:
+                    self._mg += gun.get_mg()
+                    self._st += gun.get_st()
+                    self._ag += gun.get_ag()
+                    self.avg_damage += gun.avg_dmg
+                    gun.set_equipped()
+                    self.inventory["Weapon"] = gun.name
+                    print(f'Congratulations {self.get_nick_name()} now you have {gun.name}'.center(100))
                 else:
-                    print(f'You need to be {"or".join(arm.get_lst_class())}'.center(100))
+                    print(f'You need to be {"or".join(gun.get_lst_class())}'.center(100))
             else:
-                print(f'You need level -> {arm.get_wp_level()} to use this weapon'.center(100))
+                print(f'You need level -> {gun.get_wp_level()} to use this weapon'.center(100))
         else:
             print('Someone is using this gun'.center(100))
 
+    def equip_a_armor(self, ar):
+        if not ar.is_equipped():
+            if ar.get_ar_level() <= self.get_level():
+                if self.get_classname() in ar.classes:
+                    self._df += ar.get_df()
+                    ar.set_equipped()
+                    self.inventory[ar.in_space()] = ar.name
+                    print(f'Congratulations {self.get_nick_name()} now you have: {ar.name}'.center(100))
+                else:
+                    print(f'You need to be {"or".join(ar.get_lst_class())}'.center(100))
+            else:
+                print(f'You need level -> {ar.get_ar_level()} to use this armor'.center(100))
+        else:
+            print(f'Someone is using this armor'.center(100))
+
 
 class Warrior(Player):
-
     base_hp, base_mp, base_st = 104, 89, 104
     base_ag, base_mg, base_df = 3, 30, 30
 
@@ -251,7 +261,6 @@ class Warrior(Player):
 
 
 class Mage(Player):
-
     base_hp, base_mp, base_st = 96, 100, 32
     base_ag, base_mg, base_df = 3, 100, 23
 
@@ -302,7 +311,6 @@ class Mage(Player):
 
 
 class Rogue(Player):
-
     base_hp, base_mp, base_st = 99, 30, 67
     base_ag, base_mg, base_df = 7, 66, 20
 
@@ -353,7 +361,6 @@ class Rogue(Player):
 
 
 class Monster:
-
     base_hp, base_mp, base_st = 100, 40, 55
     base_ag, base_mg, base_df = 3, 50, 30
 
@@ -473,6 +480,7 @@ class Monster:
         self._ag, self._mg, self._df = self.base_ag, self.base_mg, self.base_df
         self.set_isalive()
 
+
 def show_hp_bar(entt):
     """
     ------> Print the HP bar of the entt
@@ -491,6 +499,7 @@ def show_hp_bar(entt):
             printable = ''.join(hp_bar)
         print(f"{entt.get_nick_name()} have {entt.get_hp()} HP points: ")
         print(f'|{printable}|')
+
 
 def get_hp_bar(entt):
     """
@@ -512,6 +521,7 @@ def get_hp_bar(entt):
             except IndexError:
                 break
         return f'|{printable}| {entt.get_hp()} HP points'
+
 
 def compare(ennt1, ennt2):
     print(f'Class |{ennt1.get_classname()} X {ennt2.get_classname()}| Class'.center(102))

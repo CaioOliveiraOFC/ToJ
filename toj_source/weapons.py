@@ -4,7 +4,7 @@ class Weapon:
         self.name = name
         self.wp_level = wp_level
         self.avg_dmg = avg_dmg
-        self.equiped = False
+        self.equipped = False
 
     def get_wp_level(self):
         return self.wp_level
@@ -12,23 +12,11 @@ class Weapon:
     def get_name(self):
         return self.name
 
-    def give_bonus(self, entity):
-        pass
+    def is_equipped(self):
+        return self.equipped
 
-    def get_st(self):
-        return self._st
-
-    def get_mg(self):
-        return self._mg
-
-    def get_ag(self):
-        return self._ag
-
-    def is_equiped(self):
-        return self.equiped
-
-    def set_equiped(self):
-        self.equiped = True
+    def set_equipped(self):
+        self.equipped = True
 
 class Axe(Weapon):
 
@@ -49,6 +37,15 @@ class Axe(Weapon):
     def type():
         return 'Axe'
 
+    def get_st(self):
+        return self._st
+
+    def get_mg(self):
+        return self._mg
+
+    def get_ag(self):
+        return self._ag
+
 class Sword(Weapon):
 
     base_st, base_mg, base_ag = 6, 6, 2
@@ -67,6 +64,15 @@ class Sword(Weapon):
     @staticmethod
     def type():
         return 'Sword'
+
+    def get_st(self):
+        return self._st
+
+    def get_mg(self):
+        return self._mg
+
+    def get_ag(self):
+        return self._ag
 
 class Staff(Weapon):
 
@@ -87,6 +93,15 @@ class Staff(Weapon):
     def type():
         return 'Staff'
 
+    def get_st(self):
+        return self._st
+
+    def get_mg(self):
+        return self._mg
+
+    def get_ag(self):
+        return self._ag
+
 class Knife(Weapon):
 
     base_st, base_mg, base_ag = 4, 4, 4
@@ -105,6 +120,15 @@ class Knife(Weapon):
     @staticmethod
     def type():
         return 'Knife'
+
+    def get_st(self):
+        return self._st
+
+    def get_mg(self):
+        return self._mg
+
+    def get_ag(self):
+        return self._ag
 
 def get_wp_attr(wp):
     print(f'Name -> {wp.get_name()}'.center(100))
