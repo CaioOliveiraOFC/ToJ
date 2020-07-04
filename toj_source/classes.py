@@ -4,7 +4,6 @@ from toj_source.math_operations import percentage
 
 
 class Player:
-
     def __init__(self, nick_name):
         self.nick_name = nick_name
         self.level = 1
@@ -13,9 +12,21 @@ class Player:
         self.avg_damage = (self._st + self._mg) // 3
         self.kill_streak = 0
         self.wins = 0
-        self.inventory = {"Weapon": None,
-                          "Helmet": None, "Body": None,
-                          "Legs": None, "Shoes": None}
+        self.coins = 0
+        self.skill_points = 0
+        self.inventory = {"Weapon": None, "Helmet": None,
+                          "Body": None, "Legs": None,
+                          "Shoes": None}
+        self.skills = {1: None, 2: None, 3: None, 4: None}
+
+    def get_coins(self):
+        return self.coins
+
+    def set_coins(self, amount):
+        self.coins = amount
+
+    def receive_coins(self, amount):
+        self.coins += amount
 
     def win(self):
         self.wins += 1
@@ -87,6 +98,7 @@ class Player:
         return xp_to_level
 
     def level_up(self, show=True):
+        self.skill_points += 3
         while True:
             if self.get_xp_points() >= self.need_to_up():
                 self.set_xp_points(self.xp_points - self.need_to_up())
@@ -241,23 +253,23 @@ class Warrior(Player):
     def get_df(self):
         return self._df
 
-    def set_hp(self, new_HP):
-        self._hp = new_HP
+    def set_hp(self, new_hp):
+        self._hp = new_hp
 
-    def set_mp(self, new_MP):
-        self._mp = new_MP
+    def set_mp(self, new_mp):
+        self._mp = new_mp
 
-    def set_st(self, new_ST):
-        self._st = new_ST
+    def set_st(self, new_st):
+        self._st = new_st
 
-    def set_ag(self, new_AG):
-        self._ag = new_AG
+    def set_ag(self, new_ag):
+        self._ag = new_ag
 
-    def set_mg(self, new_MG):
-        self._mg = new_MG
+    def set_mg(self, new_mg):
+        self._mg = new_mg
 
-    def set_df(self, new_DF):
-        self._df = new_DF
+    def set_df(self, new_df):
+        self._df = new_df
 
 
 class Mage(Player):
@@ -291,23 +303,23 @@ class Mage(Player):
     def get_df(self):
         return self._df
 
-    def set_hp(self, new_HP):
-        self._hp = new_HP
+    def set_hp(self, new_hp):
+        self._hp = new_hp
 
-    def set_mp(self, new_MP):
-        self._mp = new_MP
+    def set_mp(self, new_mp):
+        self._mp = new_mp
 
-    def set_st(self, new_ST):
-        self._st = new_ST
+    def set_st(self, new_st):
+        self._st = new_st
 
-    def set_ag(self, new_AG):
-        self._ag = new_AG
+    def set_ag(self, new_ag):
+        self._ag = new_ag
 
-    def set_mg(self, new_MG):
-        self._mg = new_MG
+    def set_mg(self, new_mg):
+        self._mg = new_mg
 
-    def set_df(self, new_DF):
-        self._df = new_DF
+    def set_df(self, new_df):
+        self._df = new_df
 
 
 class Rogue(Player):
@@ -341,23 +353,23 @@ class Rogue(Player):
     def get_df(self):
         return self._df
 
-    def set_hp(self, new_HP):
-        self._hp = new_HP
+    def set_hp(self, new_hp):
+        self._hp = new_hp
 
-    def set_mp(self, new_MP):
-        self._mp = new_MP
+    def set_mp(self, new_mp):
+        self._mp = new_mp
 
-    def set_st(self, new_ST):
-        self._st = new_ST
+    def set_st(self, new_st):
+        self._st = new_st
 
-    def set_ag(self, new_AG):
-        self._ag = new_AG
+    def set_ag(self, new_ag):
+        self._ag = new_ag
 
-    def set_mg(self, new_MG):
-        self._mg = new_MG
+    def set_mg(self, new_mg):
+        self._mg = new_mg
 
-    def set_df(self, new_DF):
-        self._df = new_DF
+    def set_df(self, new_df):
+        self._df = new_df
 
 
 class Monster:
@@ -457,23 +469,23 @@ class Monster:
     def get_df(self):
         return self._df
 
-    def set_hp(self, new_HP):
-        self._hp = new_HP
+    def set_hp(self, new_hp):
+        self._hp = new_hp
 
-    def set_mp(self, new_MP):
-        self._mp = new_MP
+    def set_mp(self, new_mp):
+        self._mp = new_mp
 
-    def set_st(self, new_ST):
-        self._st = new_ST
+    def set_st(self, new_st):
+        self._st = new_st
 
-    def set_ag(self, new_AG):
-        self._ag = new_AG
+    def set_ag(self, new_ag):
+        self._ag = new_ag
 
-    def set_mg(self, new_MG):
-        self._mg = new_MG
+    def set_mg(self, new_mg):
+        self._mg = new_mg
 
-    def set_df(self, new_DF):
-        self._df = new_DF
+    def set_df(self, new_df):
+        self._df = new_df
 
     def restart(self):
         self._hp, self._mp, self._st = self.base_hp, self.base_mp, self.base_st

@@ -1,10 +1,11 @@
 class Weapon:
 
-    def __init__(self, name, wp_level, avg_dmg):
+    def __init__(self, name, wp_level, avg_dmg, cost=0):
         self.name = name
         self.wp_level = wp_level
         self.avg_dmg = avg_dmg
         self.equipped = False
+        self.cost = cost
 
     def get_wp_level(self):
         return self.wp_level
@@ -18,8 +19,8 @@ class Weapon:
     def set_equipped(self):
         self.equipped = True
 
-class Axe(Weapon):
 
+class Axe(Weapon):
     base_st, base_mg, base_ag = 10, 2, 2
 
     def __init__(self, name, add_st=0, add_mg=0, add_ag=0, wp_level=1):
@@ -46,8 +47,8 @@ class Axe(Weapon):
     def get_ag(self):
         return self._ag
 
-class Sword(Weapon):
 
+class Sword(Weapon):
     base_st, base_mg, base_ag = 6, 6, 2
 
     def __init__(self, name, add_st=0, add_mg=0, add_ag=0, wp_level=1):
@@ -74,8 +75,8 @@ class Sword(Weapon):
     def get_ag(self):
         return self._ag
 
-class Staff(Weapon):
 
+class Staff(Weapon):
     base_st, base_mg, base_ag = 2, 10, 2
 
     def __init__(self, name, add_st=0, add_mg=0, add_ag=0, wp_level=1):
@@ -102,8 +103,8 @@ class Staff(Weapon):
     def get_ag(self):
         return self._ag
 
-class Knife(Weapon):
 
+class Knife(Weapon):
     base_st, base_mg, base_ag = 4, 4, 4
 
     def __init__(self, name, add_st=0, add_mg=0, add_ag=0, wp_level=1):
@@ -129,6 +130,7 @@ class Knife(Weapon):
 
     def get_ag(self):
         return self._ag
+
 
 def get_wp_attr(wp):
     print(f'Name -> {wp.get_name()}'.center(100))

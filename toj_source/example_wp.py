@@ -5,7 +5,9 @@ from toj_source.interactions import line, fight
 from toj_source.weapons import Axe, Staff
 from toj_source.armor import *
 
+
 def main():
+
     if __name__ == '__main__':
 
         player1 = Warrior('Player1')

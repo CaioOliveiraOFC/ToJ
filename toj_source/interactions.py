@@ -2,19 +2,19 @@ from random import choice, randrange
 from toj_source.math_operations import percentage
 from toj_source.classes import get_hp_bar, compare
 
+
 def fight(fighter1, fighter2):
     fighters = [fighter1, fighter2]
     order = choose_first(fighters)
-    first = f'{order["Attacker"].nick_name} attacks first'
-    battle_status1 = f'BATTLE STATUS'
-    battle_status2 = f'{fighter1.nick_name} VERSUS {fighter2.nick_name}'
     line(100, '=')
-    print(f'{battle_status1:^100}')
-    print(f'{battle_status2:^100}')
-    print(f'{first:^100}')
+    print(f'BATTLE STATUS'.center(100))
+    print(f'{fighter1.nick_name} VERSUS {fighter2.nick_name}'.center(100))
+    print(f'{order["Attacker"].nick_name} attacks first'.center(100))
     line(100, '=')
     compare(fighter1, fighter2)
     line(100, '=')
+    print(f"{order['Attacker'].nick_name:^50} {order['Defensor'].nick_name:^50}".center(100))
+    print(f'{get_hp_bar(order["Attacker"]):<40} X {get_hp_bar(order["Defensor"]):50}'.center(100))
     if is_computer_fight(fighters):
         while True:
             line(100)
@@ -73,7 +73,7 @@ def attack(attacker, defender, entts):
         damage = attacker.get_avg_damage()
     else:
         damage = attacker.get_avg_damage() - debuffs
-    critical_value = percentage(96, damage, False)
+    critical_value = percentage(98, damage, False)
     chosed_for_debf = randrange(90, 101)
     damage = percentage(chosed_for_debf, damage, False)
     miss = defender.get_ag() - percentage(5, attacker.get_ag(), False)
@@ -121,11 +121,11 @@ def award_xp(monster):
     if monster.get_level() >= 10:
         award += percentage(10, award, False)
     elif monster.get_level() >= 20:
-        award += percentage(15, award, False)
-    elif monster.get_level() >= 30:
         award += percentage(20, award, False)
+    elif monster.get_level() >= 30:
+        award += percentage(30, award, False)
     else:
-        award += percentage(25, award, False)
+        award += percentage(40, award, False)
     choosed = randrange(90, 101)
     award = percentage(choosed, award, False)
     return award

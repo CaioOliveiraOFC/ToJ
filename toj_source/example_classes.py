@@ -19,6 +19,7 @@ def main():
         player1.level_up(False)
         player2 = Rogue('Player2')
         player2.set_xp_points(6120)
+        player2.set_ag(60)
         player2.level_up(False)
         player3 = Mage('Player3')
         player3.set_xp_points(6120)
@@ -51,12 +52,11 @@ def main():
         line(100)
         mobs = [mob1, mob2, mob3, mob4,
                 mob5, mob6, mob7, mob8,
-                mob9, mob10]
+                mob9, mob10, mob11, mob12]
+
         players = [player1, player2, player3]
 
-        for mob in mobs:
-            for player in players:
-                fight(player, mob)
+        fight(player1, player2)
 
         line(100, simbol="=")
         for player in players:
