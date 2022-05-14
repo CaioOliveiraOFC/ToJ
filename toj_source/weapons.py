@@ -1,4 +1,5 @@
 class Weapon:
+    # This is the base class for all weapons
 
     def __init__(self, name, wp_level, avg_dmg, cost=0):
         self.name = name
@@ -8,19 +9,25 @@ class Weapon:
         self.cost = cost
 
     def get_wp_level(self):
+        # Returns the weapon's level
         return self.wp_level
 
     def get_name(self):
+        # Returns the weapon's name
         return self.name
 
     def is_equipped(self):
+        # Returns whether the weapon is equipped or not
         return self.equipped
 
     def set_equipped(self):
+        # Sets the weapon as equipped
         self.equipped = True
 
 
 class Axe(Weapon):
+    # This is the class for axes
+    # The name of those methods are pretty self-explanatory
     base_st, base_mg, base_ag = 10, 2, 2
 
     def __init__(self, name, add_st=0, add_mg=0, add_ag=0, wp_level=1):

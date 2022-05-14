@@ -3,7 +3,7 @@
 from toj_source import *
 
 
-def main():
+eef main():
     if __name__ == '__main__':
         pass
 

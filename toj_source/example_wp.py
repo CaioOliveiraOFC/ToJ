@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from toj_source.classes import *
-from toj_source.interactions import line, fight
-from toj_source.weapons import Axe, Staff
-from toj_source.armor import *
+from classes import *
+from interactions import line, fight
+from weapons import Axe, Staff
+from armor import *
 
 
 def main():
