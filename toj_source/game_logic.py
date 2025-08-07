@@ -1,91 +1,100 @@
 #!/usr/bin/env python3
 
-# This progam is a game where you have to fight against the Evil Wizard
-# The player has to defeat him and save the world
-# The player has to choose a class and a name
-# The player has to fight against the monsters
-
-
-from classes import *
-from interactions import *
-from weapons import *
+from .classes import Warrior, Mage, Rogue, Monster, show_status
+from .interactions import fight, menu, screen_clear
 from time import sleep
 
-def main_menu():
-    menu(("Start", "See current stats", "Exit"), "What do you want to do?")
+def create_player():
+    """
+    Função para criar o personagem do jogador.
+    """
+    while True:
+        player_c_selection = input("Por favor, selecione uma classe: [guerreiro, mago, ladino] ").lower()
+        if player_c_selection in ["guerreiro", "mago", "ladino"]:
+            break
+        print("Classe inválida. Por favor, tente novamente.")
+
+    while True:
+        player_name_selection = input("Por favor, selecione um nome: ")
+        if player_name_selection.strip(): # Garante que o nome não seja vazio
+            break
+        print("O nome não pode estar em branco.")
+
+    if player_c_selection == "guerreiro":
+        return Warrior(player_name_selection)
+    elif player_c_selection == "mago":
+        return Mage(player_name_selection)
+    elif player_c_selection == "ladino":
+        return Rogue(player_name_selection)
 
 def main():
-    # Creating a new player
-    try:
-        player_C_selection = input("please, select a class: [warrior; mage; rogue] ")
-        player_name_selection = input("please, select a name: ")
-        if player_C_selection in ["warrior", "mage", "rogue"]:
-            if player_C_selection == "warrior":
-                pier = Warrior(player_name_selection)
-            elif player_C_selection == "mage":
-                pier = Mage(player_name_selection)
-            elif player_C_selection == "rogue":
-                pier = Rogue(player_name_selection)
-    except ValueError:
-        print("Please, select a valid class")
-    except TypeError:
-        print("Please, select a valid class")
+    """
+    Função principal que executa o jogo.
+    """
+    # Criando um novo jogador
+    pier = create_player()
     screen_clear()
 
-    # Greating the player
-    print(f"Welcome to the game {pier.nick_name}")
+    # Saudando o jogador
+    print(f"Bem-vindo ao jogo, {pier.nick_name}!")
     sleep(1)
-    print("You have been selected to the world of the game")
+    print("Você foi escolhido para o mundo do jogo.")
     sleep(1)
-    print("You have to fight against the Evil Wizard")
+    print("Você tem que lutar contra o Mago Maligno.")
     sleep(1)
-    print("You have to defeat him and save the world")
+    print("Você tem que derrotá-lo e salvar o mundo.")
     
-    print("Are you ready to start? [y/n]")
-    answer = input()
-    if answer == "y":
-        print("Let's go!")
-        sleep(2)
-        screen_clear()
-    elif answer == "n":
-        print("Goodbye")
+    while True:
+        answer = input("Você está pronto para começar? [s/n] ").lower()
+        if answer in ["s", "n"]:
+            break
+        print("Resposta inválida.")
+
+    if answer == "n":
+        print("Adeus!")
         exit()
 
-    # Creating a new enemy
-    enemy1 = Monster("Wolf", 1)
-    enemy2 = Monster("Goblin", 2)
-    enemy3 = Monster("Troll", 3)
-    enemy4 = Monster("Skeleton", 4)
-    enemy4 = Monster("Dragon", 20)
-    enemy5 = Monster("Evil wizard", 30)
-    enemy6 = Monster("Black Knight", 50)
+    print("Vamos lá!")
+    sleep(2)
     screen_clear()
 
-# Main game loop
+    # Corrigido: Cada inimigo em uma variável diferente
+    enemy1 = Monster("Lobo", 1)
+    enemy2 = Monster("Goblin", 2)
+    enemy3 = Monster("Troll", 3)
+    enemy4 = Monster("Esqueleto", 4)
+    enemy5 = Monster("Dragão", 20)
+    enemy6 = Monster("Mago Maligno", 30)
+    enemy7 = Monster("Cavaleiro Negro", 50)
+
+    # Loop principal do jogo
     while True:
-        main_menu()
-        answer = int(input())
-        if answer == 1:
-           print('The first fight is against the wolf')
-           print("A very weak opponent (I hope)")
-           sleep(2)
-            
-           fight(pier, enemy1)
-        elif answer == 2:
-           while True:
-               screen_clear()
-               show_status(pier)
+        menu(("Lutar", "Ver status", "Sair"), "O que você quer fazer?")
+        try:
+            answer = int(input("> "))
+            if answer == 1:
+               print('A primeira luta é contra o lobo.')
+               print("Um oponente muito fraco (espero).")
                sleep(2)
-               print("Press y to continue back to the menu")
-               if input() == "y":
+               fight(pier, enemy1)
+               # Adicionar lógica para próximas lutas aqui
+            elif answer == 2:
+               while True:
+                   screen_clear()
+                   show_status(pier)
+                   sleep(1)
+                   if input("Pressione Enter para voltar ao menu..."):
+                       pass
                    screen_clear()
                    break
-           continue
-        elif answer == 3:
-            
-           exit()
-
-        break # for safety
-
-if __name__ == '__main__':
-    main()
+            elif answer == 3:
+               print("Obrigado por jogar!")
+               exit()
+            else:
+                print("Opção inválida.")
+                sleep(1)
+        except ValueError:
+            print("Entrada inválida. Por favor, insira um número.")
+            sleep(1)
+        
+        screen_clear()
