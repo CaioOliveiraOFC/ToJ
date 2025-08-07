@@ -1,6 +1,7 @@
 class Weapon:
-    # This is the base class for all weapons
-
+    """
+    Classe base para todas as armas.
+    """
     def __init__(self, name, wp_level, avg_dmg, cost=0):
         self.name = name
         self.wp_level = wp_level
@@ -9,33 +10,26 @@ class Weapon:
         self.cost = cost
 
     def get_wp_level(self):
-        # Returns the weapon's level
         return self.wp_level
 
     def get_name(self):
-        # Returns the weapon's name
         return self.name
 
     def is_equipped(self):
-        # Returns whether the weapon is equipped or not
         return self.equipped
 
     def set_equipped(self):
-        # Sets the weapon as equipped
         self.equipped = True
 
-
 class Axe(Weapon):
-    # This is the class for axes
-    # The name of those methods are pretty self-explanatory
     base_st, base_mg, base_ag = 10, 2, 2
 
     def __init__(self, name, add_st=0, add_mg=0, add_ag=0, wp_level=1):
-        self.name = name
         self._st = Axe.base_st + add_st
         self._mg = Axe.base_mg + add_mg
         self._ag = Axe.base_ag + add_ag
         self.classes = ["Warrior"]
+        # Corrigido: self.name é definido no super().__init__()
         super().__init__(name, wp_level, avg_dmg=(self._st + self._mg) // 2)
 
     def get_lst_class(self):
@@ -54,12 +48,10 @@ class Axe(Weapon):
     def get_ag(self):
         return self._ag
 
-
 class Sword(Weapon):
     base_st, base_mg, base_ag = 6, 6, 2
 
     def __init__(self, name, add_st=0, add_mg=0, add_ag=0, wp_level=1):
-        self.name = name
         self._st = Sword.base_st + add_st
         self._mg = Sword.base_mg + add_mg
         self._ag = Sword.base_ag + add_ag
@@ -82,12 +74,10 @@ class Sword(Weapon):
     def get_ag(self):
         return self._ag
 
-
 class Staff(Weapon):
     base_st, base_mg, base_ag = 2, 10, 2
 
     def __init__(self, name, add_st=0, add_mg=0, add_ag=0, wp_level=1):
-        self.name = name
         self._st = Staff.base_st + add_st
         self._mg = Staff.base_mg + add_mg
         self._ag = Staff.base_ag + add_ag
@@ -110,12 +100,10 @@ class Staff(Weapon):
     def get_ag(self):
         return self._ag
 
-
 class Knife(Weapon):
     base_st, base_mg, base_ag = 4, 4, 4
 
     def __init__(self, name, add_st=0, add_mg=0, add_ag=0, wp_level=1):
-        self.name = name
         self._st = Knife.base_st + add_st
         self._mg = Knife.base_mg + add_mg
         self._ag = Knife.base_ag + add_ag
@@ -138,18 +126,16 @@ class Knife(Weapon):
     def get_ag(self):
         return self._ag
 
-
 def get_wp_attr(wp):
-    print(f'Name -> {wp.get_name()}'.center(100))
+    print(f'Nome -> {wp.get_name()}'.center(100))
     classes = ', '.join(wp.get_lst_class())
-    print(f'Type -> {wp.type()}'.center(100))
+    print(f'Tipo -> {wp.type()}'.center(100))
     print(f'Classes -> {classes}'.center(100))
-    print(f'Level -> {wp.wp_level}'.center(100))
-    print(f'AVG -> {wp.avg_dmg}'.center(100))
-    print(f'ST -> {wp.get_st()}'.center(100))
-    print(f'MG -> {wp.get_mg()}'.center(100))
-    print(f'AG -> {wp.get_ag()}'.center(100))
-
+    print(f'Nível -> {wp.wp_level}'.center(100))
+    print(f'Dano Médio -> {wp.avg_dmg}'.center(100))
+    print(f'Força -> {wp.get_st()}'.center(100))
+    print(f'Magia -> {wp.get_mg()}'.center(100))
+    print(f'Agilidade -> {wp.get_ag()}'.center(100))
 
 if __name__ == '__main__':
     pass
