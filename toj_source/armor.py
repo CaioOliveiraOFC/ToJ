@@ -1,5 +1,7 @@
 class Armor:
-
+    """
+    Classe base para todas as armaduras.
+    """
     def __init__(self, name, ar_level):
         self.name = name
         self.ar_level = ar_level
@@ -21,7 +23,9 @@ class Armor:
         return self.ar_level
 
 class Shoes(Armor):
-
+    """
+    Classe para a armadura do tipo Sapatos.
+    """
     base_df = 10
 
     def __init__(self, name, add_df=0, ar_level=1):
@@ -40,10 +44,14 @@ class Shoes(Armor):
         return self._df
 
 class Legs(Armor):
-    base_df = 10
+    """
+    Classe para a armadura do tipo Calças.
+    """
+    base_df = 12 # Valor base de defesa para calças
 
     def __init__(self, name, add_df=0, ar_level=1):
-        self._df = Shoes.base_df + add_df
+        # Corrigido: Usando a base_df da própria classe Legs
+        self._df = Legs.base_df + add_df
         self.classes = ['Warrior', 'Rogue', 'Mage']
         super().__init__(name, ar_level)
 
@@ -58,10 +66,14 @@ class Legs(Armor):
         return self._df
 
 class Helmet(Armor):
-    base_df = 10
+    """
+    Classe para a armadura do tipo Capacete.
+    """
+    base_df = 8 # Valor base de defesa para capacetes
 
     def __init__(self, name, add_df=0, ar_level=1):
-        self._df = Shoes.base_df + add_df
+        # Corrigido: Usando a base_df da própria classe Helmet
+        self._df = Helmet.base_df + add_df
         self.classes = ['Warrior', 'Rogue', 'Mage']
         super().__init__(name, ar_level)
 
@@ -76,11 +88,14 @@ class Helmet(Armor):
         return self._df
 
 class Body(Armor):
-
-    base_df = 10
+    """
+    Classe para a armadura do tipo Peitoral.
+    """
+    base_df = 15 # Valor base de defesa para peitorais
 
     def __init__(self, name, add_df=0, ar_level=1):
-        self._df = Shoes.base_df + add_df
+        # Corrigido: Usando a base_df da própria classe Body
+        self._df = Body.base_df + add_df
         self.classes = ['Warrior', 'Rogue', 'Mage']
         super().__init__(name, ar_level)
 
