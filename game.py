@@ -3,49 +3,76 @@
 import random
 from time import sleep
 from toj_source.classes import Warrior, Mage, Rogue, Monster
-# Importa a função get_key do novo local
 from toj_source.interactions import fight, screen_clear, get_key
 from toj_source.map import MapOfGame
+from toj_source.items import Potion, Weapon, Armor
 
-def character_creation():
+
+def safe_get_key(valid_keys=None, allow_escape=True):
     """
-    Lida com o processo de criação do personagem, incluindo nome e classe.
+    Lê uma tecla com segurança.
+    - Se valid_keys for None, retorna qualquer tecla.
+    - Se valid_keys for lista, retorna apenas se estiver nela.
+    - ESC (\x1b) retorna None se allow_escape=True.
     """
-    screen_clear()
-    print("--- Criação de Personagem ---")
-    
     while True:
-        player_name = input("Digite o nome do seu herói: ")
-        if player_name.strip():
-            break
-        print("O nome não pode estar em branco.")
+        key = get_key()
+        if not key:
+            continue  # ignora None ou vazio
+        key = key.lower()
+        if allow_escape and key == '\x1b':
+            return None
+        if valid_keys is None or key in valid_keys:
+            return key
 
+
+def inventory_menu(player):
+    """Exibe e gerencia o inventário do jogador."""
     while True:
         screen_clear()
-        print(f"Nome do Herói: {player_name}")
-        print("\nEscolha a sua classe:")
-        print("1. Guerreiro - Forte e resistente.")
-        print("2. Mago - Mestre das artes arcanas.")
-        print("3. Ladino - Ágil e especialista em ataques rápidos.")
-        
-        print("> ", end="", flush=True)
-        choice = get_key()
-        print(choice) # Mostra a tecla pressionada para o utilizador
+        print("--- Inventário ---")
+        print("\nEquipamento:")
+        for slot, item in player.equipment.items():
+            item_name = item.name if item else "Vazio"
+            print(f"- {slot}: {item_name}")
 
-        if choice == '1':
-            return Warrior(player_name)
-        elif choice == '2':
-            return Mage(player_name)
-        elif choice == '3':
-            return Rogue(player_name)
+        print("\nMochila:")
+        if not player.inventory:
+            print("- Vazia")
         else:
-            print("Opção inválida.")
-            sleep(1)
+            for i, item in enumerate(player.inventory, 1):
+                print(f"{i}. {item.name} - {item.description}")
+
+        print("\nEscolha um item da mochila para (E)quipar/(U)sar, ou (S)air (ESC para voltar).")
+
+        choice = safe_get_key(
+            valid_keys=[str(i) for i in range(1, len(player.inventory) + 1)] + ['s']
+        )
+
+        if choice is None or choice == 's':
+            break
+
+        if choice.isdigit():
+            item_index = int(choice) - 1
+            if 0 <= item_index < len(player.inventory):
+                selected_item = player.inventory[item_index]
+                print(f"\nO que fazer com {selected_item.name}? (E)quipar / (U)sar (ESC para voltar)")
+                action = safe_get_key(valid_keys=['e', 'u'])
+                if action is None:
+                    continue
+                if action == 'e':
+                    player.equip(selected_item)
+                    sleep(1.5)
+                elif action == 'u':
+                    if isinstance(selected_item, Potion):
+                        player.use_potion(selected_item)
+                        sleep(1.5)
+                    else:
+                        print("Este item não pode ser usado.")
+                        sleep(1)
+
 
 def start_game(player):
-    """
-    Inicia o loop principal do jogo com o personagem criado.
-    """
     dungeon_level = 1
     while True:
         screen_clear()
@@ -70,54 +97,72 @@ def start_game(player):
             print("Use 'w', 'a', 's', 'd' para se mover. Encontre a saída 'X' para avançar.")
             game_map.draw_map()
 
-            print("\nMova-se (w/a/s/d) ou 'q' para sair: ", end="", flush=True)
-            move = get_key().lower()
+            print("\nMova-se (w/a/s/d), (i)nventário ou 'q' para sair (ESC para voltar): ")
+            move = safe_get_key(valid_keys=['w', 'a', 's', 'd', 'i', 'q'])
 
-            if move == 'q':
-                print("\nVocê desistiu da sua jornada...")
+            if move is None or move == 'q':
                 return
-
-            if move in ['w', 'a', 's', 'd']:
+            elif move == 'i':
+                inventory_menu(player)
+            elif move in ['w', 'a', 's', 'd']:
                 collided_object = game_map.move_player(move)
-                
+
                 if isinstance(collided_object, Monster):
-                    screen_clear()
-                    print(f"Você encontrou um {collided_object.nick_name} selvagem!")
-                    input("Pressione Enter para começar a batalha...")
                     fight(player, collided_object)
                     input("Pressione Enter para continuar sua jornada...")
-                
+
                 elif collided_object == 'level_complete':
-                    print("\nVocê encontrou a saída! Preparando para o próximo nível...")
                     dungeon_level += 1
-                    input("Pressione Enter para descer mais fundo na masmorra.1..")
                     break
-            else:
-                pass
+
+
+def character_creation():
+    screen_clear()
+    print("--- Criação de Personagem ---")
+
+    while True:
+        player_name = input("Digite o nome do seu herói: ")
+        if player_name.strip():
+            break
+        print("O nome não pode estar em branco.")
+
+    while True:
+        screen_clear()
+        print(f"Nome do Herói: {player_name}")
+        print("\nEscolha a sua classe:")
+        print("1. Guerreiro\n2. Mago\n3. Ladino")
+        choice = safe_get_key(valid_keys=['1', '2', '3'])
+        if choice == '1':
+            return Warrior(player_name)
+        elif choice == '2':
+            return Mage(player_name)
+        elif choice == '3':
+            return Rogue(player_name)
+
 
 def main():
-    """
-    Função principal que exibe o menu e direciona o fluxo do jogo.
-    """
+    """Função principal que exibe o menu e direciona o fluxo do jogo."""
     while True:
         screen_clear()
         print("=== Bem-vindo ao The Tales of the Journey ===")
         print("\n1. Novo Jogo")
         print("2. Sair")
-        
-        print("> ", end="", flush=True)
-        choice = get_key()
-        print(choice) # Mostra a tecla pressionada
+        print("9. MODO DE TESTE (Herói Nível 50)")
+
+        choice = safe_get_key(valid_keys=['1', '2', '9'])
+        if choice is None or choice == '2':
+            print("\nObrigado por jogar!")
+            break
 
         if choice == '1':
             player = character_creation()
             start_game(player)
-        elif choice == '2':
-            print("Obrigado por jogar!")
-            break
-        else:
-            print("Opção inválida.")
-            sleep(1)
+        elif choice == '9':
+            player = Warrior("Tester")
+            player.set_level(50)
+            input(f"\nHerói de teste '{player.nick_name}' criado no nível 50. Pressione Enter para começar.")
+            start_game(player)
+
 
 if __name__ == '__main__':
     main()
