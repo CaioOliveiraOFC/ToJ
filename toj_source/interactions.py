@@ -3,8 +3,8 @@ import platform
 from random import choice, randrange
 from time import sleep
 from .math_operations import percentage
-# CORREÇÃO: A função 'compare' foi movida para este ficheiro, então não é mais importada.
 from .classes import get_hp_bar
+from .items import get_loot, Potion
 
 def get_key():
     """
@@ -16,12 +16,9 @@ def get_key():
         import msvcrt
         while True:
             key = msvcrt.getch()
-            # Teclas especiais no Windows (como setas) enviam dois bytes.
-            # O primeiro é b'\xe0' ou b'\x00'. Nós os ignoramos.
             if key in [b'\xe0', b'\x00']:
-                msvcrt.getch() # Lê e descarta o segundo byte da tecla especial.
-                continue # Pede a próxima tecla, ignorando a especial.
-            # Se a tecla for válida, descodifica e retorna.
+                msvcrt.getch()
+                continue
             return key.decode('utf-8')
     except ImportError:
         # Para Unix-like (Linux, macOS)
@@ -51,7 +48,10 @@ def display_battle_ui(player, monster):
     print(f"MP: {player.get_mp()}/{player.base_mp:<18}")
     line()
 
-def perform_attack(attacker, defender, base_damage):
+def perform_attack(attacker, defender, base_damage, skill_name=""):
+    """Executa a lógica de um único ataque e imprime o resultado."""
+    crit_chance = 25 if hasattr(attacker, 'get_classname') and attacker.get_classname() == 'Rogue' and skill_name == "Ataque Furtivo" else 10
+    
     hit_chance = 85 + (attacker.get_ag() - defender.get_ag())
     if randrange(1, 101) > hit_chance:
         print(f"{attacker.get_nick_name()} errou o ataque!")
@@ -61,15 +61,80 @@ def perform_attack(attacker, defender, base_damage):
     defense_reduction = defender.get_df() // 2
     damage = max(1, base_damage - defense_reduction)
     
-    is_critical = randrange(1, 101) <= 10
+    is_critical = randrange(1, 101) <= crit_chance
     if is_critical:
         damage *= 2
 
     defender.reduce_hp(damage)
     
     critical_msg = " ATAQUE CRÍTICO!" if is_critical else ""
-    print(f"{attacker.get_nick_name()} causou {damage} de dano em {defender.nick_name}.{critical_msg}")
+    print(f"{attacker.get_nick_name()} causou {damage} de dano em {defender.get_nick_name()}.{critical_msg}")
     sleep(1.5)
+
+def use_skill(caster, target, skill):
+    """Processa o uso de uma habilidade e seus efeitos."""
+    print(f"{caster.get_nick_name()} usa {skill.name}!")
+    sleep(1)
+    caster.reduce_mp(skill.mana_cost)
+
+    if skill.effect_type == 'damage':
+        perform_attack(caster, target, skill.value, skill.name)
+    
+    elif skill.effect_type == 'heal':
+        heal_amount = skill.value
+        caster._hp = min(caster.base_hp, caster.get_hp() + heal_amount)
+        print(f"{caster.get_nick_name()} recupera {heal_amount} de HP!")
+        sleep(1.5)
+
+    elif skill.effect_type == 'status':
+        if randrange(1, 101) <= skill.chance:
+            target.active_effects[skill.value] = {'duration': skill.duration}
+            print(f"{target.get_nick_name()} está sob o efeito de {skill.value}!")
+        else:
+            print("O efeito falhou!")
+        sleep(1.5)
+
+    elif skill.effect_type == 'buff':
+        caster.active_buffs[skill.name] = {'value': skill.value, 'duration': skill.duration}
+        print(f"{caster.get_nick_name()} recebe o buff {skill.name}!")
+        sleep(1.5)
+
+def handle_turn_effects(entity):
+    """Aplica e gere os efeitos de status no início do turno."""
+    effects_to_remove = []
+    buffs_to_remove = []
+    skipped_turn = False
+
+    for effect, data in list(entity.active_effects.items()):
+        if effect == 'poison':
+            poison_damage = 5
+            entity.reduce_hp(poison_damage)
+            print(f"{entity.get_nick_name()} sofre {poison_damage} de dano de veneno.")
+        
+        if effect == 'frozen':
+            print(f"{entity.get_nick_name()} está congelado e não pode se mover!")
+            skipped_turn = True
+
+        data['duration'] -= 1
+        if data['duration'] <= 0:
+            effects_to_remove.append(effect)
+    
+    for buff, data in list(entity.active_buffs.items()):
+        data['duration'] -= 1
+        if data['duration'] <= 0:
+            buffs_to_remove.append(buff)
+
+    for effect in effects_to_remove:
+        del entity.active_effects[effect]
+        print(f"O efeito {effect} em {entity.get_nick_name()} passou.")
+    for buff in buffs_to_remove:
+        del entity.active_buffs[buff]
+        print(f"O buff {buff} em {entity.get_nick_name()} acabou.")
+    
+    if any([effects_to_remove, buffs_to_remove, 'poison' in entity.active_effects]):
+        sleep(1.5)
+        
+    return skipped_turn
 
 def compare_opponents(ennt1, ennt2):
     """ Esta função imprime uma comparação lado a lado dos status de duas entidades. """
@@ -87,12 +152,10 @@ def compare_opponents(ennt1, ennt2):
     print('-'*line_width)
 
 def fight(player, monster):
-    """Sistema de luta baseado em turnos com recompensas detalhadas."""
     player.rest()
     
     screen_clear()
     print("--- Início da Batalha ---".center(50))
-    # CORREÇÃO: Chama a função 'compare_opponents' que agora está neste ficheiro.
     compare_opponents(player, monster)
     input("Pressione Enter para começar a batalha...")
     
@@ -106,21 +169,25 @@ def fight(player, monster):
         defender = turn_order[(attacker_index + 1) % 2]
         
         display_battle_ui(player, monster)
-        print(f"É a vez de {attacker.get_nick_name()} atacar.")
+        print(f"É a vez de {attacker.get_nick_name()}.")
         sleep(1)
+
+        if handle_turn_effects(attacker):
+            attacker_index = (attacker_index + 1) % 2
+            continue
 
         if attacker.my_type() == 'Human':
             action_taken = False
             while not action_taken:
                 display_battle_ui(player, monster)
-                print("Escolha sua ação:\n1. Ataque Normal\n2. Habilidades\n3. Tentar Fugir")
-                print("> ", end="", flush=True)
-                choice = get_key()
-                print(choice)
+                print("Escolha sua ação:\n1. Ataque Normal\n2. Habilidades\n3. Usar Item\n4. Tentar Fugir")
+                
+                choice = safe_get_key(valid_keys=['1', '2', '3', '4'])
 
                 if choice == '1':
                     perform_attack(player, monster, player.get_avg_damage())
                     action_taken = True
+                
                 elif choice == '2':
                     if not player.skills:
                         print("Você não tem habilidades para usar!")
@@ -134,25 +201,47 @@ def fight(player, monster):
                             print(f"{key}. {skill.name} (Custo: {skill.mana_cost} MP)")
                         print("0. Voltar")
                         
-                        print("> ", end="", flush=True)
-                        skill_choice = get_key()
-                        print(skill_choice)
+                        skill_keys = [str(k) for k in player.skills.keys()] + ['0']
+                        skill_choice = safe_get_key(skill_keys)
 
                         if skill_choice == '0': break
-                        if skill_choice.isdigit() and int(skill_choice) in player.skills:
+                        
+                        if skill_choice and skill_choice.isdigit() and int(skill_choice) in player.skills:
                             chosen_skill = player.skills[int(skill_choice)]
                             if player.get_mp() >= chosen_skill.mana_cost:
-                                player.reduce_mp(chosen_skill.mana_cost)
-                                perform_attack(player, monster, chosen_skill.damage)
+                                use_skill(player, monster, chosen_skill)
                                 action_taken = True
                                 break
                             else:
                                 print("Mana insuficiente!")
                                 sleep(1)
-                        else:
-                            print("Habilidade inválida.")
-                            sleep(1)
+                
                 elif choice == '3':
+                    potions = [item for item in player.inventory if isinstance(item, Potion)]
+                    if not potions:
+                        print("Você não tem poções para usar!")
+                        sleep(1)
+                        continue
+                    
+                    while True:
+                        display_battle_ui(player, monster)
+                        print("Escolha uma poção para usar:")
+                        for i, potion in enumerate(potions, 1):
+                            print(f"{i}. {potion.name} - {potion.description}")
+                        print("0. Voltar")
+
+                        potion_keys = [str(i) for i in range(1, len(potions) + 1)] + ['0']
+                        potion_choice = safe_get_key(potion_keys)
+
+                        if potion_choice == '0': break
+
+                        if potion_choice and potion_choice.isdigit():
+                            player.use_potion(potions[int(potion_choice) - 1])
+                            action_taken = True
+                            sleep(1.5)
+                            break
+                
+                elif choice == '4':
                     if randrange(0, 2) == 0:
                         print("Você conseguiu fugir da batalha!")
                         sleep(2)
@@ -160,10 +249,8 @@ def fight(player, monster):
                         return
                     else:
                         print("A fuga falhou!")
+                        sleep(1.5)
                         action_taken = True
-                else:
-                    print("Ação inválida.")
-                    sleep(1)
         else:
             perform_attack(monster, player, monster.get_avg_damage())
 
@@ -173,19 +260,28 @@ def fight(player, monster):
             
         attacker_index = (attacker_index + 1) % 2
 
-    # --- Fim da Batalha ---
-    display_battle_ui(player, monster)
     xp_base_reward = 50 * monster.level
-
     if not player.get_isalive():
         print("Você foi derrotado...")
         pity_xp = xp_base_reward // 10
-        print(f"Você ganhou {pity_xp} de XP de consolação.")
         player.add_xp_points(pity_xp)
     else:
         print(f"Você derrotou {monster.nick_name}!")
-        print(f"Você ganhou {xp_base_reward} de XP.")
         player.add_xp_points(xp_base_reward)
-        
+        dropped_item = get_loot()
+        if dropped_item:
+            player.add_item_to_inventory(dropped_item)
     player.level_up(show=True)
     player.rest()
+
+def safe_get_key(valid_keys=None, allow_escape=True):
+    """Função auxiliar para a função fight, para não precisar importá-la de game.py"""
+    while True:
+        key = get_key()
+        if not key:
+            continue
+        key = key.lower()
+        if allow_escape and key == '\x1b':
+            return None
+        if valid_keys is None or key in valid_keys:
+            return key
