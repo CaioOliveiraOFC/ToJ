@@ -1,128 +1,191 @@
 import os
 import platform
 from random import choice, randrange
-from .math_operations import percentage
-from .classes import get_hp_bar, compare
 from time import sleep
+from .math_operations import percentage
+# CORREÇÃO: A função 'compare' foi movida para este ficheiro, então não é mais importada.
+from .classes import get_hp_bar
+
+def get_key():
+    """
+    Lê um único pressionamento de tecla do usuário, ignorando teclas especiais (como setas)
+    que causam erros no Windows.
+    """
+    try:
+        # Para Windows
+        import msvcrt
+        while True:
+            key = msvcrt.getch()
+            # Teclas especiais no Windows (como setas) enviam dois bytes.
+            # O primeiro é b'\xe0' ou b'\x00'. Nós os ignoramos.
+            if key in [b'\xe0', b'\x00']:
+                msvcrt.getch() # Lê e descarta o segundo byte da tecla especial.
+                continue # Pede a próxima tecla, ignorando a especial.
+            # Se a tecla for válida, descodifica e retorna.
+            return key.decode('utf-8')
+    except ImportError:
+        # Para Unix-like (Linux, macOS)
+        import sys, tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
 
 def screen_clear():
-    """
-    Limpa a tela do terminal de forma compatível com Windows, Linux e macOS.
-    """
-    if platform.system() == "Windows":
-        os.system('cls')
-    else:
-        os.system('clear')
+    os.system('cls' if platform.system() == 'Windows' else 'clear')
 
-def fight(fighter1, fighter2):
-    fighters = [fighter1, fighter2]
-    order = choose_first(fighters)
-    line(100, '=')
-    print('STATUS DA BATALHA'.center(100))
-    print(f'{fighter1.nick_name} VERSUS {fighter2.nick_name}'.center(100))
-    print(f'{order["Attacker"].nick_name} ataca primeiro'.center(100))
-    line(100, '=')
-    
-    compare(fighter1, fighter2)
-    line(100, '=')
-    
-    is_pvp = not is_computer_fight(fighters)
+def line(size=50, simbol='-'):
+    print(simbol * size)
 
-    while True:
-        print(f"{order['Attacker'].nick_name:^50} {order['Defensor'].nick_name:^50}".center(100))
-        print(f'{get_hp_bar(order["Attacker"]):<50} X {get_hp_bar(order["Defensor"]):>50}'.center(100))
-        input("Pressione Enter para o próximo turno...")
-        line(100)
-        attack(order["Attacker"], order["Defensor"], fighters)
-        line(100)
-        
-        if check_if_died(order["Defensor"]):
-            line(100, '=')
-            winner = f'{order["Attacker"].nick_name} VENCEU!!!'
-            print(f'{winner:^100}')
-            line(100, '=')
-            
-            order["Attacker"].win()
-            order["Attacker"].add_kill_streak()
-            order["Attacker"].rest()
-            
-            if not is_pvp and order["Attacker"].my_type() == 'Human':
-                spoils = award_xp(order["Defensor"])
-                order["Attacker"].add_xp_points(spoils)
-                print1 = f'Parabéns {order["Attacker"].nick_name}, você ganhou {spoils} XP'
-                print2 = f'{order["Attacker"].get_level_bar()}'
-                line(100, '=')
-                print(f"{print1:^100}")
-                print(f'{print2:^100}')
-                line(100, '=')
-                print(f'Você tem {order["Attacker"].get_xp_points()} pontos de xp'.center(100))
-                order["Attacker"].level_up(show=True)
-            
-            order["Defensor"].rest()
-            order["Defensor"].reset_kill_streak()
-            break
-            
-        order = switch_attacker(order)
+def display_battle_ui(player, monster):
+    screen_clear()
+    print("=== BATALHA ===")
+    print(f"{player.get_nick_name():<20}   VS   {monster.nick_name:>20}")
+    player_hp_bar = get_hp_bar(player)
+    monster_hp_bar = get_hp_bar(monster)
+    print(f"{player_hp_bar:<23}  {monster_hp_bar:>23}")
+    print(f"MP: {player.get_mp()}/{player.base_mp:<18}")
+    line()
 
-def attack(attacker, defender, entts):
-    # Lógica de ataque simplificada e mais clara
-    # Chance de acerto baseada na agilidade
-    hit_chance = 75 + (attacker.get_ag() - defender.get_ag())
+def perform_attack(attacker, defender, base_damage):
+    hit_chance = 85 + (attacker.get_ag() - defender.get_ag())
     if randrange(1, 101) > hit_chance:
-        print(f'{attacker.nick_name} errou o ataque!'.center(100))
+        print(f"{attacker.get_nick_name()} errou o ataque!")
+        sleep(1.5)
         return
 
-    # Cálculo do dano
-    base_damage = attacker.get_avg_damage()
-    defense_reduction = percentage(50, defender.get_df(), False) # Defesa reduz 50% do seu valor em dano
-    damage = max(1, base_damage - defense_reduction) # Garante pelo menos 1 de dano
-
-    # Chance de crítico
-    critical_chance = 5 + (attacker.get_ag() // 10) # 5% de base + bônus de agilidade
-    is_critical = randrange(1, 101) <= critical_chance
+    defense_reduction = defender.get_df() // 2
+    damage = max(1, base_damage - defense_reduction)
+    
+    is_critical = randrange(1, 101) <= 10
     if is_critical:
         damage *= 2
-        
+
     defender.reduce_hp(damage)
     
-    critical_msg = ' um ataque CRÍTICO!!' if is_critical else ''
-    print(f'{attacker.nick_name} causou {damage} de dano em {defender.nick_name}{critical_msg}'.center(100))
+    critical_msg = " ATAQUE CRÍTICO!" if is_critical else ""
+    print(f"{attacker.get_nick_name()} causou {damage} de dano em {defender.nick_name}.{critical_msg}")
+    sleep(1.5)
 
-def choose_first(fighters):
-    attacker = choice(fighters)
-    defensor = fighters[1] if fighters[0] == attacker else fighters[0]
-    return {"Attacker": attacker, "Defensor": defensor}
+def compare_opponents(ennt1, ennt2):
+    """ Esta função imprime uma comparação lado a lado dos status de duas entidades. """
+    line_width = 50
+    print('VS'.center(line_width))
+    print(f'{ennt1.get_nick_name():^24} | {ennt2.get_nick_name():^24}'.center(line_width))
+    print('-'*line_width)
+    print(f'Nível: {ennt1.get_level():<18} | Nível: {ennt2.level:<18}')
+    print(f'HP: {ennt1.get_hp()}/{ennt1.base_hp:<20} | HP: {ennt2.get_hp()}/{ennt2.base_hp:<20}')
+    print(f'MP: {ennt1.get_mp()}/{ennt1.base_mp:<20} | MP: {ennt2.get_mp()}/{ennt2.base_mp:<20}')
+    print(f'Força: {ennt1.get_st():<16} | Força: {ennt2.get_st():<16}')
+    print(f'Agilidade: {ennt1.get_ag():<13} | Agilidade: {ennt2.get_ag():<13}')
+    print(f'Magia: {ennt1.get_mg():<17} | Magia: {ennt2.get_mg():<17}')
+    print(f'Defesa: {ennt1.get_df():<16} | Defesa: {ennt2.get_df():<16}')
+    print('-'*line_width)
 
-def check_if_died(figther):
-    if figther.get_hp() <= 0:
-        figther.set_isalive(False)
-    return not figther.get_isalive()
-
-def switch_attacker(order_dict):
-    return {"Attacker": order_dict["Defensor"], "Defensor": order_dict["Attacker"]}
-
-def is_computer_fight(fighters):
-    return 'COM' in [f.my_type() for f in fighters]
-
-def award_xp(monster):
-    # Lógica de XP corrigida
-    award = (30 * monster.get_level())
-    if monster.get_level() >= 50:
-        award += percentage(50, award, False)
-    elif monster.get_level() >= 30:
-        award += percentage(30, award, False)
-    elif monster.get_level() >= 20:
-        award += percentage(20, award, False)
-    elif monster.get_level() >= 10:
-        award += percentage(10, award, False)
+def fight(player, monster):
+    """Sistema de luta baseado em turnos com recompensas detalhadas."""
+    player.rest()
     
-    choosed = randrange(90, 101)
-    return percentage(choosed, award, False)
+    screen_clear()
+    print("--- Início da Batalha ---".center(50))
+    # CORREÇÃO: Chama a função 'compare_opponents' que agora está neste ficheiro.
+    compare_opponents(player, monster)
+    input("Pressione Enter para começar a batalha...")
+    
+    turn_order = [player, monster]
+    if player.get_ag() < monster.get_ag():
+        turn_order = [monster, player]
 
-def line(size=15, simbol='-'):
-    print(f'{simbol}' * size)
+    attacker_index = 0
+    while player.get_isalive() and monster.isalive:
+        attacker = turn_order[attacker_index]
+        defender = turn_order[(attacker_index + 1) % 2]
+        
+        display_battle_ui(player, monster)
+        print(f"É a vez de {attacker.get_nick_name()} atacar.")
+        sleep(1)
 
-def menu(list_of_itens, msg):
-    print(f'{msg}')
-    for i, item in enumerate(list_of_itens, 1):
-        print(f'{i}-{item}')
+        if attacker.my_type() == 'Human':
+            action_taken = False
+            while not action_taken:
+                display_battle_ui(player, monster)
+                print("Escolha sua ação:\n1. Ataque Normal\n2. Habilidades\n3. Tentar Fugir")
+                print("> ", end="", flush=True)
+                choice = get_key()
+                print(choice)
+
+                if choice == '1':
+                    perform_attack(player, monster, player.get_avg_damage())
+                    action_taken = True
+                elif choice == '2':
+                    if not player.skills:
+                        print("Você não tem habilidades para usar!")
+                        sleep(1)
+                        continue
+                    
+                    while True:
+                        display_battle_ui(player, monster)
+                        print("Escolha uma habilidade:")
+                        for key, skill in player.skills.items():
+                            print(f"{key}. {skill.name} (Custo: {skill.mana_cost} MP)")
+                        print("0. Voltar")
+                        
+                        print("> ", end="", flush=True)
+                        skill_choice = get_key()
+                        print(skill_choice)
+
+                        if skill_choice == '0': break
+                        if skill_choice.isdigit() and int(skill_choice) in player.skills:
+                            chosen_skill = player.skills[int(skill_choice)]
+                            if player.get_mp() >= chosen_skill.mana_cost:
+                                player.reduce_mp(chosen_skill.mana_cost)
+                                perform_attack(player, monster, chosen_skill.damage)
+                                action_taken = True
+                                break
+                            else:
+                                print("Mana insuficiente!")
+                                sleep(1)
+                        else:
+                            print("Habilidade inválida.")
+                            sleep(1)
+                elif choice == '3':
+                    if randrange(0, 2) == 0:
+                        print("Você conseguiu fugir da batalha!")
+                        sleep(2)
+                        player.rest()
+                        return
+                    else:
+                        print("A fuga falhou!")
+                        action_taken = True
+                else:
+                    print("Ação inválida.")
+                    sleep(1)
+        else:
+            perform_attack(monster, player, monster.get_avg_damage())
+
+        if defender.get_hp() <= 0:
+            defender.set_isalive(False)
+            break
+            
+        attacker_index = (attacker_index + 1) % 2
+
+    # --- Fim da Batalha ---
+    display_battle_ui(player, monster)
+    xp_base_reward = 50 * monster.level
+
+    if not player.get_isalive():
+        print("Você foi derrotado...")
+        pity_xp = xp_base_reward // 10
+        print(f"Você ganhou {pity_xp} de XP de consolação.")
+        player.add_xp_points(pity_xp)
+    else:
+        print(f"Você derrotou {monster.nick_name}!")
+        print(f"Você ganhou {xp_base_reward} de XP.")
+        player.add_xp_points(xp_base_reward)
+        
+    player.level_up(show=True)
+    player.rest()

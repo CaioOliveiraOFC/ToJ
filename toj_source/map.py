@@ -1,128 +1,109 @@
 #!/usr/bin/env python3.10
 
 import random
-import os
-import sys
 
-if os.name == 'nt':
-    import msvcrt
-else:
-    import tty
-    import termios
+# Dicionário com códigos de cores ANSI para o terminal
+COLORS = {
+    "red": "\033[91m",
+    "green": "\033[92m",
+    "yellow": "\033[93m",
+    "reset": "\033[0m"
+}
 
-class MapGameWithPhases:
-    def __init__(self, height=20, width=40, wall_density=0.1):
+class MapOfGame:
+    """
+    Esta classe gere a criação, exibição e interação com o mapa do jogo,
+    incluindo jogador, inimigos e a saída da masmorra.
+    """
+    def __init__(self, height, width):
         self.height = height
         self.width = width
-        self.wall_density = wall_density
-        self.phase = 1
         self.grid = []
-        self.player_pos = None
-        self.goal_pos = None
-        self._generate_phase()
+        self.player_pos = {'y': 0, 'x': 0}
+        self.exit_pos = {'y': 0, 'x': 0}
+        self.enemies_pos = {}
 
-    def _generate_phase(self):
-        """
-        Gera uma nova fase com mapa, jogador e objetivo.
-        """
-        self.grid = []
+    def _get_random_empty_spot(self):
+        """Encontra e retorna uma posição vazia aleatória ('.') no mapa."""
+        while True:
+            y = random.randint(1, self.height - 2)
+            x = random.randint(1, self.width - 2)
+            if self.grid[y][x] == '.':
+                return y, x
+
+    def generate_map(self, percent_of_walls=0.2):
+        """Gera uma nova grade de mapa com paredes e espaços vazios."""
+        self.grid = [['.' for _ in range(self.width)] for _ in range(self.height)]
         for y in range(self.height):
-            row = []
             for x in range(self.width):
-                if x == 0 or y == 0 or x == self.width - 1 or y == self.height - 1:
-                    row.append('#')  # Borda sempre fechada
-                else:
-                    row.append('#' if random.random() < self.wall_density else '.')
-            self.grid.append(row)
+                if y == 0 or y == self.height - 1 or x == 0 or x == self.width - 1:
+                    self.grid[y][x] = '#'  # Paredes nas bordas
+                elif random.random() < percent_of_walls:
+                    self.grid[y][x] = '#'  # Paredes internas
 
-        self.player_pos = self._place_random('.', avoid_border=True)
-        self.goal_pos = self._place_random('.', only_border=True)
-        self._set_tile(self.goal_pos, 'X')
+    def place_player(self):
+        """Coloca o jogador em um local aleatório no mapa."""
+        y, x = self._get_random_empty_spot()
+        self.player_pos['y'], self.player_pos['x'] = y, x
 
-    def _place_random(self, target_char, only_border=False, avoid_border=False):
-        attempts = 0
-        while attempts < 10000:
-            y = random.randint(0, self.height - 1)
-            x = random.randint(0, self.width - 1)
+    def place_exit(self):
+        """Coloca a saída 'X' no canto mais distante do jogador."""
+        player_y, player_x = self.player_pos['y'], self.player_pos['x']
+        
+        # Determina o canto oposto
+        exit_y = self.height - 2 if player_y < self.height / 2 else 1
+        exit_x = self.width - 2 if player_x < self.width / 2 else 1
+        
+        self.grid[exit_y][exit_x] = 'X'
+        self.exit_pos = {'y': exit_y, 'x': exit_x}
 
-            if only_border and not (x == 1 or y == 1 or x == self.width - 2 or y == self.height - 2):
-                attempts += 1
-                continue
-            if avoid_border and (x <= 1 or y <= 1 or x >= self.width - 2 or y >= self.height - 2):
-                attempts += 1
-                continue
+    def place_enemy(self, enemy_obj):
+        """Coloca um inimigo em um local aleatório."""
+        y, x = self._get_random_empty_spot()
+        self.enemies_pos[(y, x)] = enemy_obj
 
-            if self.grid[y][x] == target_char:
-                return (y, x)
-            attempts += 1
-        return (1, 1)  # fallback
-
-    def _get_tile(self, pos):
-        y, x = pos
-        return self.grid[y][x]
-
-    def _set_tile(self, pos, value):
-        y, x = pos
-        self.grid[y][x] = value
+    def draw_map(self):
+        """Desenha o mapa no console com cores."""
+        for y, row in enumerate(self.grid):
+            display_row = []
+            for x, tile in enumerate(row):
+                char = tile
+                if y == self.player_pos['y'] and x == self.player_pos['x']:
+                    char = f"{COLORS['green']}@{COLORS['reset']}"
+                elif (y, x) in self.enemies_pos:
+                    char = f"{COLORS['red']}&{COLORS['reset']}"
+                elif tile == 'X':
+                    char = f"{COLORS['yellow']}X{COLORS['reset']}"
+                display_row.append(char)
+            print(' '.join(display_row))
 
     def move_player(self, direction):
-        dyx = {
-            'W': (-1, 0),
-            'S': (1, 0),
-            'A': (0, -1),
-            'D': (0, 1)
-        }
-        direction = direction.upper()
-        if direction not in dyx:
-            return
-        dy, dx = dyx[direction]
-        new_y = self.player_pos[0] + dy
-        new_x = self.player_pos[1] + dx
+        """
+        Move o jogador, verifica colisões e retorna o resultado da ação.
+        Retorna: 'level_complete', um objeto Monstro, ou None.
+        """
+        py, px = self.player_pos['y'], self.player_pos['x']
+        ny, nx = py, px
 
-        if self.grid[new_y][new_x] in ['.', 'X']:
-            if (new_y, new_x) == self.goal_pos:
-                self.phase += 1
-                self._generate_phase()
-                return
-            self.player_pos = (new_y, new_x)
+        if direction == 'w': ny -= 1
+        elif direction == 's': ny += 1
+        elif direction == 'a': nx -= 1
+        elif direction == 'd': nx += 1
 
-    def draw(self):
-        os.system('cls' if os.name == 'nt' else 'clear')
-        for y in range(self.height):
-            row = ''
-            for x in range(self.width):
-                if (y, x) == self.player_pos:
-                    row += '@ '
-                else:
-                    row += self.grid[y][x] + ' '
-            print(row)
-        print(f"\nFase: {self.phase} | Use W A S D para mover. Q para sair.")
+        # Verifica colisão com parede
+        if self.grid[ny][nx] == '#':
+            return None
 
+        # Verifica se chegou na saída
+        if ny == self.exit_pos['y'] and nx == self.exit_pos['x']:
+            return 'level_complete'
 
-def get_key():
-    if os.name == 'nt':
-        return msvcrt.getch().decode('utf-8').upper()
-    else:
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setraw(fd)
-            ch = sys.stdin.read(1).upper()
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        return ch
+        # Verifica colisão com inimigo
+        if (ny, nx) in self.enemies_pos:
+            enemy_collided = self.enemies_pos.pop((ny, nx))
+            self.player_pos = {'y': ny, 'x': nx}
+            return enemy_collided
 
-
-def main():
-    game = MapGameWithPhases()
-    while True:
-        game.draw()
-        key = get_key()
-        if key == 'Q':
-            print("Jogo encerrado.")
-            break
-        game.move_player(key)
-
-
-if __name__ == '__main__':
-    main()
+        # Move o jogador
+        self.player_pos = {'y': ny, 'x': nx}
+        return None
