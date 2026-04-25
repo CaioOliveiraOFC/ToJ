@@ -32,14 +32,26 @@ class MapOfGame:
                 return y, x
 
     def generate_map(self, percent_of_walls=0.2):
-        """Gera uma nova grade de mapa com paredes e espaços vazios."""
-        self.grid = [['.' for _ in range(self.width)] for _ in range(self.height)]
-        for y in range(self.height):
-            for x in range(self.width):
-                if y == 0 or y == self.height - 1 or x == 0 or x == self.width - 1:
-                    self.grid[y][x] = '#'  # Paredes nas bordas
-                elif random.random() < percent_of_walls:
-                    self.grid[y][x] = '#'  # Paredes internas
+        """Gera o mapa usando Random Walk garantindo que todas as áreas vazias estejam conectadas."""
+        self.grid = [['#' for _ in range(self.width)] for _ in range(self.height)]
+        
+        target_empty = int((self.width - 2) * (self.height - 2) * (1.0 - percent_of_walls))
+        
+        y = self.height // 2
+        x = self.width // 2
+        self.grid[y][x] = '.'
+        empty_count = 1
+        
+        while empty_count < target_empty:
+            direction = random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
+            ny = y + direction[0]
+            nx = x + direction[1]
+            
+            if 1 <= ny < self.height - 1 and 1 <= nx < self.width - 1:
+                y, x = ny, nx
+                if self.grid[y][x] == '#':
+                    self.grid[y][x] = '.'
+                    empty_count += 1
 
     def place_player(self):
         """Coloca o jogador em um local aleatório no mapa."""
@@ -47,15 +59,24 @@ class MapOfGame:
         self.player_pos['y'], self.player_pos['x'] = y, x
 
     def place_exit(self):
-        """Coloca a saída 'X' no canto mais distante do jogador."""
+        """Coloca a saída 'X' no piso vazio mais distante do jogador."""
         player_y, player_x = self.player_pos['y'], self.player_pos['x']
         
-        # Determina o canto oposto
-        exit_y = self.height - 2 if player_y < self.height / 2 else 1
-        exit_x = self.width - 2 if player_x < self.width / 2 else 1
+        max_dist = -1
+        best_pos = None
         
-        self.grid[exit_y][exit_x] = 'X'
-        self.exit_pos = {'y': exit_y, 'x': exit_x}
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.grid[y][x] == '.':
+                    dist = abs(y - player_y) + abs(x - player_x)
+                    if dist > max_dist:
+                        max_dist = dist
+                        best_pos = (y, x)
+        
+        if best_pos:
+            exit_y, exit_x = best_pos
+            self.grid[exit_y][exit_x] = 'X'
+            self.exit_pos = {'y': exit_y, 'x': exit_x}
 
     def place_enemy(self, enemy_obj):
         """Coloca um inimigo em um local aleatório."""
@@ -107,3 +128,20 @@ class MapOfGame:
         # Move o jogador
         self.player_pos = {'y': ny, 'x': nx}
         return None
+
+    def get_map_state(self):
+        """Retorna um dicionário com o estado atual do mapa para salvamento."""
+        # Serializar enemies_pos para salvar. (y, x) -> {nick_name, level}
+        enemies_serializable = {
+            f"{y},{x}": {"nick_name": enemy.nick_name, "level": enemy.level}
+            for (y, x), enemy in self.enemies_pos.items()
+        }
+        
+        return {
+            "height": self.height,
+            "width": self.width,
+            "grid": self.grid,
+            "player_pos": self.player_pos,
+            "exit_pos": self.exit_pos,
+            "enemies_pos": enemies_serializable
+        }

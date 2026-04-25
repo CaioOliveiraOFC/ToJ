@@ -3,6 +3,11 @@
 from .math_operations import percentage
 from .skills import warrior_skills, mage_skills, rogue_skills
 from .items import Item, Weapon, Armor
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+
+console = Console()
 
 class Player:
     def __init__(self, nick_name):
@@ -59,11 +64,30 @@ class Player:
         self.rest()
 
     def use_potion(self, potion):
-        self._hp += potion.heal_amount
-        if self._hp > self.base_hp:
-            self._hp = self.base_hp
+        if potion.potion_type == "Health":
+            self._hp += potion.effect_value
+            if self._hp > self.base_hp:
+                self._hp = self.base_hp
+            msg = f"Você usou {potion.name} e recuperou {potion.effect_value} de HP."
+        elif potion.potion_type == "Mana":
+            self._mp += potion.effect_value
+            if self._mp > self.base_mp:
+                self._mp = self.base_mp
+            msg = f"Você usou {potion.name} e recuperou {potion.effect_value} de MP."
+        elif potion.potion_type == "Strength":
+            self.active_buffs["Força Aumentada"] = {'value': potion.effect_value, 'duration': 3}
+            msg = f"Você usou {potion.name}. Força aumentada em {potion.effect_value} por 3 turnos!"
+        elif potion.potion_type == "Defense":
+            self.active_buffs["Defesa Aumentada"] = {'value': potion.effect_value, 'duration': 3}
+            msg = f"Você usou {potion.name}. Defesa aumentada em {potion.effect_value} por 3 turnos!"
+        elif potion.potion_type == "Agility":
+            self.active_buffs["Agilidade Aumentada"] = {'value': potion.effect_value, 'duration': 3}
+            msg = f"Você usou {potion.name}. Agilidade aumentada em {potion.effect_value} por 3 turnos!"
+        else:
+            msg = f"Você usou {potion.name}, mas não teve efeito aparente."
+
         self.inventory.remove(potion)
-        print(f"Você usou {potion.name} e recuperou {potion.heal_amount} de HP.")
+        print(msg)
 
     def rest(self):
         self._hp = self.base_hp
@@ -207,3 +231,41 @@ def get_hp_bar(entt):
     percent_of_bar = min(percent_of_bar, 10)
     hp_bar_fill = "[#]" * percent_of_bar; hp_bar_empty = "[ ]" * (10 - percent_of_bar)
     return f'|{hp_bar_fill}{hp_bar_empty}| {entt.get_hp()}/{entt.base_hp} HP'
+
+def show_status(entity):
+    """Exibe os status detalhados de uma entidade usando Rich para uma estética premium."""
+    title = f"Status de {entity.get_nick_name()}"
+    
+    table = Table(show_header=False, expand=True, border_style="cyan")
+    table.add_column("Atributo", style="bold white")
+    table.add_column("Valor", style="bold yellow")
+    
+    # Get class name safely
+    if hasattr(entity, 'get_classname'):
+        class_name = entity.get_classname()
+    elif hasattr(entity, 'my_type') and entity.my_type() == 'COM':
+        class_name = 'Monstro'
+    else:
+        class_name = 'Desconhecido'
+        
+    table.add_row("Classe", class_name)
+    
+    level = entity.get_level() if hasattr(entity, 'get_level') else getattr(entity, 'level', 'N/A')
+    table.add_row("Nível", str(level))
+    
+    if hasattr(entity, 'xp_points'):
+        table.add_row("XP", f"{entity.xp_points} / {entity.need_to_up()}")
+        table.add_row("Falta para Up", f"{entity.need_to_next()}")
+    
+    table.add_row("HP", f"[red]{entity.get_hp()}[/red] / [red]{entity.base_hp}[/red]")
+    table.add_row("MP", f"[blue]{entity.get_mp()}[/blue] / [blue]{entity.base_mp}[/blue]")
+    table.add_row("Força", str(entity.get_st()))
+    table.add_row("Magia", str(entity.get_mg()))
+    table.add_row("Agilidade", str(entity.get_ag()))
+    table.add_row("Defesa", str(entity.get_df()))
+    table.add_row("Dano Médio", str(entity.get_avg_damage()))
+    
+    if hasattr(entity, 'coins'):
+        table.add_row("Moedas", f"[yellow]{entity.coins}[/yellow]")
+    
+    console.print(Panel(table, title=f"[bold green]{title}[/bold green]", border_style="green", expand=False))

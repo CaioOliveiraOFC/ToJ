@@ -5,7 +5,7 @@ from .items import ALL_ITEMS # Dicionário central de itens
 
 SAVE_FILE = "savegame.json"
 
-def save_game(player, dungeon_level):
+def save_game(player, dungeon_level, map_state=None):
     """Salva o estado atual do jogo num ficheiro JSON."""
     
     # Converte os objetos de item em nomes para poderem ser guardados
@@ -20,7 +20,8 @@ def save_game(player, dungeon_level):
         "coins": player.coins,
         "inventory": inventory_names,
         "equipment": equipment_names,
-        "dungeon_level": dungeon_level
+        "dungeon_level": dungeon_level,
+        "map_state": map_state
     }
 
     try:
@@ -33,7 +34,7 @@ def save_game(player, dungeon_level):
 def load_game():
     """Carrega o estado do jogo a partir de um ficheiro JSON."""
     if not os.path.exists(SAVE_FILE):
-        return None, None
+        return None, None, None
 
     try:
         with open(SAVE_FILE, 'r') as f:
@@ -50,7 +51,7 @@ def load_game():
         elif player_class_name == "Rogue":
             player = Rogue(player_name)
         else:
-            return None, None # Classe desconhecida
+            return None, None, None # Classe desconhecida
 
         # Define o nível e os status do jogador
         player.set_level(save_data["level"])
@@ -69,13 +70,14 @@ def load_game():
                 player.equip(item_to_equip)
         
         dungeon_level = save_data["dungeon_level"]
+        map_state = save_data.get("map_state", None)
         
         print("\nJogo carregado com sucesso!")
-        return player, dungeon_level
+        return player, dungeon_level, map_state
 
     except Exception as e:
         print(f"\nOcorreu um erro ao carregar o jogo: {e}")
-        return None, None
+        return None, None, None
 
 def check_save_file():
     """Verifica se o ficheiro de save existe."""
