@@ -1,4 +1,5 @@
 import random
+import copy
 
 # Rarity system
 RARITY_MULTIPLIERS = {
@@ -116,5 +117,5 @@ def get_loot():
     A raridade do item pode influenciar a chance de drop ou os atributos do item.
     """
     if random.randint(1, 100) <= 30: # 30% de chance de drop
-        return random.choice(loot_table)
+        return copy.copy(random.choice(loot_table))
     return None

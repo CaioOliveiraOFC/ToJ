@@ -98,10 +98,18 @@ class Player:
         
     def get_stat(self, stat):
         base_value = getattr(self, f"base_{stat}")
+        # Skills ativas
         if stat == 'st' and 'Grito de Guerra' in self.active_buffs:
-            return base_value + self.active_buffs['Grito de Guerra']['value']
+            base_value += self.active_buffs['Grito de Guerra']['value']
         if stat == 'ag' and 'Cortina de Fumaça' in self.active_buffs:
-            return base_value + self.active_buffs['Cortina de Fumaça']['value']
+            base_value += self.active_buffs['Cortina de Fumaça']['value']
+        # Poções de buff (Força Aumentada, Defesa Aumentada, Agilidade Aumentada)
+        if stat == 'st' and 'Força Aumentada' in self.active_buffs:
+            base_value += self.active_buffs['Força Aumentada']['value']
+        if stat == 'df' and 'Defesa Aumentada' in self.active_buffs:
+            base_value += self.active_buffs['Defesa Aumentada']['value']
+        if stat == 'ag' and 'Agilidade Aumentada' in self.active_buffs:
+            base_value += self.active_buffs['Agilidade Aumentada']['value']
         return base_value
 
     def reduce_hp(self, quantty): self._hp -= quantty
@@ -206,8 +214,17 @@ class Monster:
         self._hp, self.base_hp = self.base_hp, self.base_hp; self._mp, self.base_mp = self.base_mp, self.base_mp
         self._st, self.base_st = self.base_st, self.base_st; self._ag, self.base_ag = self.base_ag, self.base_ag
         self._mg, self.base_mg = self.base_mg, self.base_mg; self._df, self.base_df = self.base_df, self.base_df
-        for _ in range(self.level): self._hp += percentage(10, self._hp, False)
-        self.base_hp = self._hp; self.avg_damage = (self._st + self._mg) // 3
+        # Aplica scaling linear de HP por nível (sem compounding)
+        from .math_operations import calculate_monster_hp, calculate_monster_strength, calculate_monster_defense, calculate_monster_magic
+        self._hp = calculate_monster_hp(self.level)
+        self.base_hp = self._hp
+        self._st = calculate_monster_strength(self.level)
+        self.base_st = self._st
+        self._df = calculate_monster_defense(self.level)
+        self.base_df = self._df
+        self._mg = calculate_monster_magic(self.level)
+        self.base_mg = self._mg
+        self.avg_damage = (self._st + self._mg) // 3
         self.active_effects = {}; self.active_buffs = {}
     def get_avg_damage(self): return self.avg_damage
     def reduce_hp(self, quantty): self._hp -= quantty

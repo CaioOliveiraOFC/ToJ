@@ -2,7 +2,8 @@
 
 import random
 from .classes import Warrior, Mage, Rogue, Monster, show_status
-from .interactions import fight, menu, screen_clear
+from .interactions import fight, menu
+from .utils import clear_screen
 from time import sleep
 
 def create_player():
@@ -87,7 +88,7 @@ def main():
     """
     # Criando um novo jogador
     pier = create_player()
-    screen_clear()
+    clear_screen()
 
     # Saudando o jogador
     print(f"Bem-vindo ao jogo, {pier.nick_name}!")
@@ -110,7 +111,7 @@ def main():
 
     print("Vamos lá!")
     sleep(2)
-    screen_clear()
+    clear_screen()
 
     # Corrigido: Cada inimigo em uma variável diferente
     enemy1 = Monster("Lobo", 1)
@@ -134,12 +135,12 @@ def main():
                # Adicionar lógica para próximas lutas aqui
             elif answer == 2:
                while True:
-                   screen_clear()
+                   clear_screen()
                    show_status(pier)
                    sleep(1)
                    if input("Pressione Enter para voltar ao menu..."):
                        pass
-                   screen_clear()
+                   clear_screen()
                    break
             elif answer == 3:
                print("Obrigado por jogar!")
@@ -151,4 +152,4 @@ def main():
             print("Entrada inválida. Por favor, insira um número.")
             sleep(1)
         
-        screen_clear()
+        clear_screen()

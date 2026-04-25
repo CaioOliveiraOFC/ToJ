@@ -92,9 +92,15 @@ class MapOfGame:
                 if y == self.player_pos['y'] and x == self.player_pos['x']:
                     char = f"{COLORS['green']}@{COLORS['reset']}"
                 elif (y, x) in self.enemies_pos:
-                    char = f"{COLORS['red']}&{COLORS['reset']}"
+                    enemy = self.enemies_pos[(y, x)]
+                    if getattr(enemy, 'is_boss', False):
+                        char = f"\033[95mB{COLORS['reset']}"
+                    else:
+                        char = f"{COLORS['red']}&{COLORS['reset']}"
                 elif tile == 'X':
                     char = f"{COLORS['yellow']}X{COLORS['reset']}"
+                elif tile == 'D':  # Adicionado para corpos de inimigos mortos
+                    char = f"{COLORS['red']}D{COLORS['reset']}"
                 display_row.append(char)
             print(' '.join(display_row))
 
@@ -111,9 +117,15 @@ class MapOfGame:
         elif direction == 'a': nx -= 1
         elif direction == 'd': nx += 1
 
-        # Verifica colisão com parede
+        # Verifica colisão com parede ou limite do mapa
+        if ny < 0 or ny >= self.height or nx < 0 or nx >= self.width:
+            return None
         if self.grid[ny][nx] == '#':
             return None
+        # Permite que o jogador passe por cima de corpos mortos
+        if self.grid[ny][nx] == 'D':
+            self.player_pos = {'y': ny, 'x': nx}
+            return None # Não há colisão significativa, apenas move o jogador
 
         # Verifica se chegou na saída
         if ny == self.exit_pos['y'] and nx == self.exit_pos['x']:
@@ -122,11 +134,13 @@ class MapOfGame:
         # Verifica colisão com inimigo
         if (ny, nx) in self.enemies_pos:
             enemy_collided = self.enemies_pos.pop((ny, nx))
+            self.grid[ny][nx] = 'D'  # Marca a posição onde o inimigo morreu com um 'D'
             self.player_pos = {'y': ny, 'x': nx}
             return enemy_collided
 
-        # Move o jogador
-        self.player_pos = {'y': ny, 'x': nx}
+        # Move o jogador se o caminho estiver livre ('.')
+        if self.grid[ny][nx] == '.':
+            self.player_pos = {'y': ny, 'x': nx}
         return None
 
     def get_map_state(self):
@@ -145,3 +159,19 @@ class MapOfGame:
             "exit_pos": self.exit_pos,
             "enemies_pos": enemies_serializable
         }
+
+    def load_map_state(self, map_state):
+        """Carrega o estado do mapa a partir de um dicionário."""
+        from .classes import Monster 
+        
+        self.height = map_state["height"]
+        self.width = map_state["width"]
+        self.grid = map_state["grid"]
+        self.player_pos = map_state["player_pos"]
+        self.exit_pos = map_state["exit_pos"]
+        
+        self.enemies_pos = {}
+        for pos_str, enemy_data in map_state["enemies_pos"].items():
+            y, x = map(int, pos_str.split(','))
+            monster = Monster(enemy_data["nick_name"], enemy_data["level"])
+            self.enemies_pos[(y, x)] = monster

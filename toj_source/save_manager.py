@@ -20,6 +20,8 @@ def save_game(player, dungeon_level, map_state=None):
         "coins": player.coins,
         "inventory": inventory_names,
         "equipment": equipment_names,
+        "active_buffs": player.active_buffs,
+        "active_effects": player.active_effects,
         "dungeon_level": dungeon_level,
         "map_state": map_state
     }
@@ -69,6 +71,10 @@ def load_game():
                     player.inventory.remove(item_to_equip)
                 player.equip(item_to_equip)
         
+        # Carrega active_buffs e active_effects
+        player.active_buffs = save_data.get("active_buffs", {})
+        player.active_effects = save_data.get("active_effects", {})
+
         dungeon_level = save_data["dungeon_level"]
         map_state = save_data.get("map_state", None)
         

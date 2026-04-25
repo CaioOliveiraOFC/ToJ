@@ -66,16 +66,27 @@ class AutoTester:
             bar = '=' * filled + '-' * (bar_len - filled)
             real_print(f"\rProgresso Simulação: [{bar}] {pct}% (Lvl {level}/20)", end="", flush=True)
             
+            # Se valid_keys é None, qualquer tecla é válida (ex: "pressione qualquer tecla")
+            # Retorna imediatamente sem loop
+            if valid_keys is None:
+                return 'a'
+            
             choice = None
-            if valid_keys and 'w' in valid_keys and self.current_map:
+            if 'w' in valid_keys and self.current_map:
+                # Menu de movimentação do mapa
                 choice = self.decide_map_move()
-            elif valid_keys and '1' in valid_keys and '4' in valid_keys:
+            elif '1' in valid_keys and '4' in valid_keys:
+                # Menu de combate — sempre ataca
                 self.metrics["combats"] += 1
-                choice = '1' 
-            elif valid_keys and 'x' in valid_keys:
+                choice = '1'
+            elif '1' in valid_keys and '0' in valid_keys:
+                # Submenu de skills ou poções — volta (0)
+                choice = '0'
+            elif 'x' in valid_keys:
+                # Inventário — sai
                 choice = 'x'
             else:
-                choice = valid_keys[0] if valid_keys else 'a'
+                choice = valid_keys[0]
                 
             if choice == self.last_key:
                 self.consecutive_key_count += 1
@@ -142,34 +153,70 @@ class AutoTester:
             self.generate_report(real_print)
 
     def decide_map_move(self):
-        """Inteligência Greedy (gulosa) para achar o inimigo ou saída mais próxima."""
-        if not self.current_map: return random.choice(['w', 'a', 's', 'd'])
+        """BFS para encontrar o caminho real livre de paredes até o inimigo ou saída mais próxima."""
+        if not self.current_map:
+            return random.choice(['w', 'a', 's', 'd'])
+
         py, px = self.current_map.player_pos['y'], self.current_map.player_pos['x']
-        
+        grid = self.current_map.grid
+
         pos = (py, px)
         self.position_history.append(pos)
         if len(self.position_history) > 100:
             self.position_history.pop(0)
-            
+
         if self.position_history.count(pos) > 20:
             raise TimeoutException(f"Stopped because bot is trapped or oscillating at position {pos}.")
-        
-        targets = list(self.current_map.enemies_pos.keys())
+
+        # Determinar todos os alvos (inimigos + saída)
+        targets = set(self.current_map.enemies_pos.keys())
         if self.current_map.exit_pos:
-            targets.append((self.current_map.exit_pos['y'], self.current_map.exit_pos['x']))
-            
-        if not targets: return random.choice(['w', 'a', 's', 'd'])
-            
-        closest = min(targets, key=lambda t: abs(t[0]-py) + abs(t[1]-px))
-        ty, tx = closest
-        
-        moves = []
-        if ty < py and self.current_map.grid[py-1][px] != '#': moves.append('w')
-        if ty > py and self.current_map.grid[py+1][px] != '#': moves.append('s')
-        if tx < px and self.current_map.grid[py][px-1] != '#': moves.append('a')
-        if tx > px and self.current_map.grid[py][px+1] != '#': moves.append('d')
-        
-        return random.choice(moves) if moves else random.choice(['w', 'a', 's', 'd'])
+            targets.add((self.current_map.exit_pos['y'], self.current_map.exit_pos['x']))
+
+        if not targets:
+            return random.choice(['w', 'a', 's', 'd'])
+
+        # BFS a partir do jogador para encontrar o caminho mais curto até qualquer alvo
+        from collections import deque
+        queue = deque()
+        queue.append((py, px, []))  # (y, x, caminho de moves até aqui)
+        visited = {(py, px)}
+
+        dir_map = {
+            (-1, 0): 'w',
+            (1, 0):  's',
+            (0, -1): 'a',
+            (0, 1):  'd',
+        }
+
+        while queue:
+            cy, cx, path = queue.popleft()
+
+            # Se chegou num alvo, retornar o primeiro passo do caminho
+            if (cy, cx) in targets and (cy, cx) != (py, px):
+                return path[0] if path else random.choice(['w', 'a', 's', 'd'])
+
+            for (dy, dx), move in dir_map.items():
+                ny, nx = cy + dy, cx + dx
+
+                # Checar limites
+                if not (0 <= ny < len(grid) and 0 <= nx < len(grid[0])):
+                    continue
+
+                if (ny, nx) in visited:
+                    continue
+
+                tile = grid[ny][nx]
+                # Tiles passáveis: vazio, morte de inimigo, saída, posição de inimigo
+                if tile == '#':
+                    continue
+
+                visited.add((ny, nx))
+                queue.append((ny, nx, path + [move]))
+
+        # BFS não encontrou nenhum alvo (mapa totalmente bloqueado) — move aleatório
+        return random.choice(['w', 'a', 's', 'd'])
+
 
     def generate_report(self, real_print):
         import os

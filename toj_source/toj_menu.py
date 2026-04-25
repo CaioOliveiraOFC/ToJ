@@ -8,10 +8,12 @@ from rich.table import Table
 from rich.text import Text
 from time import sleep
 
+from .save_manager import load_game
+from .utils import clear_screen
+
 console = Console()
 
-def clear_screen():
-    s('cls' if s('echo %OS%') == 'Windows_NT' else 'clear')
+
 
 def typewriter_effect(text: str, style: str = "white", speed: float = 0.04, return_text: bool = False) -> Text | None:
     """Exibe texto com um efeito de máquina de escrever ou retorna o texto estilizado."""
@@ -54,7 +56,105 @@ def splash_screen():
 
     console.print("\n") # Espaço antes do prompt
     console.print(Panel(Text("Pressione [bold green]ENTER[/bold green] para começar sua aventura...", justify="center", style="bold yellow"), border_style="yellow", width=80))
-    input("") # Espera pelo Enter
+    console.input("") # Espera pelo Enter (changed from input(""))
+
+def game_over_screen(player_name="Aventureiro"):
+    clear_screen()
+    f = Figlet(font='doom', justify='center')
+    game_over_art = f.renderText('GAME OVER')
+
+    # Enhanced Game Over Panel
+    panel_content = Text(game_over_art, justify="center", style="bold red")
+    panel_content.append("\n\n")
+    panel_content.append(Text(f"A MORTE TE ALCANÇOU, {player_name.upper()}!", justify="center", style="bold red"))
+    panel_content.append("\n")
+    panel_content.append(Text("Seu legado se perde nas sombras...", justify="center", style="dim white"))
+    
+    console.print(Panel(
+        panel_content,
+        title="[bold red]-- Fim da Jornada --[/bold red]",
+        border_style="bold red",
+        subtitle="[italic]A escuridão prevaleceu...[/italic]",
+        width=console.width
+    ))
+    
+    console.print(Panel(
+        Text("Toda jornada tem um fim, mas a lenda... a lenda pode recomeçar.", justify="center", style="italic white"),
+        border_style="dim white"
+    ))
+    sleep(3)
+    console.print(Panel(
+        Text("Pressione [bold green]ENTER[/bold green] para retornar ao menu principal...", justify="center", style="bold yellow"),
+        border_style="yellow"
+    ))
+    console.input("") # Changed from input("")
+
+def display_final_stats(level: int, actions: int, battles: int, crashes: int):
+    clear_screen()
+    console.print(Panel(
+        Text("RELATÓRIO DA JORNADA", justify="center", style="bold green"),
+        title="[bold green]-- Jornada Concluída! --[/bold green]",
+        border_style="green",
+        subtitle="Detalhes de sua aventura em Eldoria.",
+        width=console.width
+    ))
+
+    stats_table = Table(show_header=False, expand=True, box=None)
+    stats_table.add_column("Métrica", style="bold cyan", justify="right")
+    stats_table.add_column("Valor", style="yellow")
+
+    stats_table.add_row("Nível Final Alcançado:", str(level))
+    stats_table.add_row("Ações Tomadas:", str(actions))
+    stats_table.add_row("Total de Batalhas:", str(battles))
+    stats_table.add_row("Falhas Críticas (Crashes):", "[red]" + str(crashes) + "[/red]" if crashes > 0 else "[green]" + str(crashes) + "[/green]")
+    
+    console.print(Panel(stats_table, border_style="blue", title="[bold blue]Estatísticas da Aventura[/bold blue]"))
+
+    console.print(Panel(
+        Text("Obrigado por jogar Tales of the Journey! Esperamos vê-lo novamente.", justify="center", style="italic dim white"),
+        border_style="dim white"
+    ))
+    sleep(3)
+    console.print(Panel(
+        Text("Pressione [bold green]ENTER[/bold green] para continuar...", justify="center", style="bold yellow"),
+        border_style="yellow"
+    ))
+    console.input("") # Changed from input("")
+
+def options_menu():
+    while True:
+        clear_screen()
+        console.print(Panel(Text("OPÇÕES DO JOGO", justify="center", style="bold cyan"), border_style="cyan", subtitle="Ajuste sua experiência."))
+        
+        options_map = {
+            "1": "Volume (não implementado)",
+            "2": "Dificuldade (não implementado)",
+            "3": "Voltar ao Menu Principal"
+        }
+
+        options_table = Table(show_header=False, expand=True, highlight=True, row_styles=["none", "dim"])
+        options_table.add_column("Opção", style="bold blue", justify="right")
+        options_table.add_column("Descrição", style="cyan")
+
+        for key, value in options_map.items():
+            options_table.add_row(key, value)
+        
+        console.print(options_table)
+        console.print("\n")
+        
+        choice = console.input("[bold green]Sua escolha:[/bold green] ")
+        
+        if choice == '1':
+            console.print(Panel(Text("Função de Volume ainda não implementada.", justify="center", style="yellow"), border_style="yellow"))
+            sleep(1.5)
+        elif choice == '2':
+            console.print(Panel(Text("Função de Dificuldade ainda não implementada.", justify="center", style="yellow"), border_style="yellow"))
+            sleep(1.5)
+        elif choice == '3':
+            break
+        else:
+            console.print(Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="bold red"), border_style="red"))
+            sleep(1.5)
 
 def main_menu():
     while True:
@@ -64,8 +164,10 @@ def main_menu():
         menu_options = {
             "1": "Iniciar Nova Jornada",
             "2": "Carregar Aventura",
-            "3": "Opções do Jogo",
-            "4": "Sair do Jogo"
+            "4": "Opções do Jogo",
+            "5": "Sair do Jogo",
+            "6": "MODO DE AUTO-TESTE (BOT)",
+            "7": "MODO DE TESTE (Herói Nível 50)"
         }
 
         table = Table(show_header=False, expand=True, highlight=True, row_styles=["none", "dim"])
@@ -83,17 +185,25 @@ def main_menu():
         if choice == '1':
             console.print(Panel(Text("Adentrando as sombras da nova jornada...", justify="center", style="green"), border_style="green"))
             sleep(1.5)
-            # Aqui seria a chamada para a criação de personagem/início do jogo
+            return 'new_game'
         elif choice == '2':
-            console.print(Panel(Text("Revisitando memórias antigas... (não implementado)", justify="center", style="yellow"), border_style="yellow"))
+            console.print(Panel(Text("Revisitando memórias antigas...", justify="center", style="yellow"), border_style="yellow"))
             sleep(1.5)
-        elif choice == '3':
-            console.print(Panel(Text("Configurando o seu destino... (não implementado)", justify="center", style="yellow"), border_style="yellow"))
-            sleep(1.5)
+            return 'load_game'
         elif choice == '4':
+            options_menu() # Call the new options menu
+        elif choice == '5':
             console.print(Panel(Text("Até que a escuridão nos encontre novamente, aventureiro!", justify="center", style="red"), border_style="red"))
             sleep(1.5)
-            break
+            return 'quit'
+        elif choice == '6':
+            console.print(Panel(Text("Iniciando a simulação...", justify="center", style="magenta"), border_style="magenta"))
+            sleep(1.5)
+            return 'auto_test'
+        elif choice == '7':
+            console.print(Panel(Text("Iniciando MODO DE TESTE com herói nível 50...", justify="center", style="magenta"), border_style="magenta"))
+            sleep(1.5)
+            return 'test_hero'
         else:
             console.print(Panel(Text("Um erro em sua escolha, aventureiro. Tente novamente.", justify="center", style="bold red"), border_style="red"))
             sleep(1.5)
@@ -101,3 +211,6 @@ def main_menu():
 if __name__ == '__main__':
     splash_screen()
     main_menu()
+    # For testing game over and final stats:
+    # game_over_screen("Tester")
+    # display_final_stats(level=6, actions=299, battles=68, crashes=0)

@@ -41,7 +41,6 @@
 **Domínio exclusivo (leitura + escrita):**
 - `toj_source/toj_menu.py`
 - `toj_source/interactions.py`
-- `toj_source/guesser.py`
 
 **Pode LER (nunca escrever):**
 - Qualquer arquivo, para contexto de narrativa.

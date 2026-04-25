@@ -2,9 +2,11 @@ import os
 import platform
 from random import choice, randrange
 from time import sleep
-from .math_operations import percentage
-from .classes import get_hp_bar
+from .math_operations import percentage, calculate_monster_xp_reward
+from .classes import get_hp_bar, Player # Added Player import
 from .items import get_loot, Potion
+from .shop import Shop
+from .utils import clear_screen, safe_get_key
 
 from rich.console import Console
 from rich.panel import Panel
@@ -14,36 +16,6 @@ from rich import print as rprint
 
 console = Console()
 
-def get_key():
-    """
-    Lê um único pressionamento de tecla do usuário, ignorando teclas especiais (como setas)
-    que causam erros no Windows.
-    """
-    try:
-        # Para Windows
-        import msvcrt
-        while True:
-            key = msvcrt.getch()
-            if key in [b'\xe0', b'\x00']:
-                msvcrt.getch()
-                continue
-            return key.decode('utf-8')
-    except ImportError:
-        # Para Unix-like (Linux, macOS)
-        import sys, tty, termios
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setraw(sys.stdin.fileno())
-            ch = sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        return ch
-
-def screen_clear():
-    os.system('cls' if platform.system() == 'Windows' else 'clear')
-
-# Removed the 'line' function as it will be replaced by rich components.
 
 def menu(options, prompt):
     """Exibe um menu de opções usando Rich para uma interface consistente e premium."""
@@ -60,7 +32,7 @@ def menu(options, prompt):
     console.print("=" * console.width, style="dim white")
 
 def display_battle_ui(player, monster):
-    screen_clear()
+    console.clear() # Replaced screen_clear()
     
     # Battle Title
     console.print(Panel(Text("=== BATALHA ===", justify="center", style="bold red"), border_style="red"))
@@ -200,12 +172,12 @@ def compare_opponents(ennt1, ennt2):
     console.print("=" * console.width, style="dim white") # Separator line
 
 def fight(player, monster):
-    player.rest()
     
-    screen_clear()
+    console.clear() # Replaced screen_clear()
     console.print(Panel(Text("--- Início da Batalha ---", justify="center", style="bold green"), border_style="green"))
     compare_opponents(player, monster)
-    console.input(Panel(Text.from_markup("Pressione [bold green]ENTER[/bold green] para começar a batalha...", justify="center", style="yellow"), border_style="yellow"))
+    console.input(f"Pressione [bold green]ENTER[/bold green] para começar a batalha...") # Modified to rich text within input, or use panel for the prompt
+
     
     turn_order = [player, monster]
     if player.get_ag() < monster.get_ag():
@@ -335,13 +307,16 @@ def fight(player, monster):
             
         attacker_index = (attacker_index + 1) % 2
 
-    xp_base_reward = 50 * monster.level
+    xp_base_reward = calculate_monster_xp_reward(monster.level)
+    if getattr(monster, 'is_boss', False):
+        from toj_source.math_operations import calculate_mini_boss_xp_reward
+        xp_base_reward = calculate_mini_boss_xp_reward(monster.level)
     if not player.get_isalive():
         console.print(Panel(Text("Você foi derrotado...", justify="center", style="bold red"), border_style="red"))
         pity_xp = xp_base_reward // 10
         player.add_xp_points(pity_xp)
     else:
-        console.print(Panel(Text.from_markup(f"Você derrotou [bold magenta]{monster.nick_name}[/bold magenta]!", justify="center", style="bold green"), border_style="green"))
+        console.print(Panel(Text.from_markup(f"Você derrotou [bold magenta]{monster.nick_name}[/bold magenta]!", justify="center", style='bold green'), border_style='green'))
         player.add_xp_points(xp_base_reward)
         dropped_item = get_loot()
         if dropped_item:
@@ -350,14 +325,143 @@ def fight(player, monster):
     player.level_up(show=True)
     player.rest()
 
-def safe_get_key(valid_keys=None, allow_escape=True):
-    """Função auxiliar para a função fight, para não precisar importá-la de game.py"""
+def shop_menu(player: Player, shop: Shop, dungeon_level: int):
+    """
+    Exibe a interface da loja, permitindo ao jogador comprar e vender itens.
+    """
     while True:
-        key = get_key()
-        if not key:
-            continue
-        key = key.lower()
-        if allow_escape and key == '\x1b':
-            return None
-        if valid_keys is None or key in valid_keys:
-            return key
+        console.clear()
+        console.print(Panel(
+            Text("Bem-vindo à Loja do Mercador!", justify="center", style="bold green"),
+            border_style="green",
+            subtitle=f"Seu Ouro: [bold yellow]{player.coins}[/bold yellow]"
+        ))
+
+        shop_options = {
+            "1": "Comprar Itens",
+            "2": "Vender Itens",
+            "3": "Sair da Loja"
+        }
+
+        options_table = Table(show_header=False, expand=True, highlight=True, row_styles=["none", "dim"])
+        options_table.add_column("Opção", style="bold blue", justify="right")
+        options_table.add_column("Descrição", style="cyan")
+
+        for key, value in shop_options.items():
+            options_table.add_row(key, value)
+        
+        console.print(options_table)
+        console.print("\n")
+
+        choice = safe_get_key(valid_keys=['1', '2', '3'])
+
+        if choice == '1':
+            # Buy items
+            while True:
+                console.clear()
+                console.print(Panel(
+                    Text("Itens à Venda", justify="center", style="bold cyan"),
+                    border_style="cyan",
+                    subtitle=f"Seu Ouro: [bold yellow]{player.coins}[/bold yellow]"
+                ))
+
+                items_for_sale = shop.get_available_items(dungeon_level)
+                if not items_for_sale:
+                    console.print(Panel(Text("O mercador não tem nada para vender no momento.", justify="center", style="dim white"), border_style="dim white"))
+                    sleep(1.5)
+                    break
+
+                item_table = Table(show_header=True, expand=True, border_style="dim white")
+                item_table.add_column("ID", style="bold blue")
+                item_table.add_column("Item", style="cyan")
+                item_table.add_column("Preço", style="yellow", justify="right")
+                item_table.add_column("Descrição", style="dim white")
+
+                for i, item_data in enumerate(items_for_sale, 1):
+                    item = item_data["item"]
+                    price = item_data["price"]
+                    item_table.add_row(str(i), item.name, str(price), getattr(item, 'description', 'Sem descrição'))
+                item_table.add_row("0", "Voltar", "", "")
+
+                console.print(item_table)
+                console.print("\n")
+
+                item_choices = [str(i) for i in range(1, len(items_for_sale) + 1)] + ['0']
+                item_choice = safe_get_key(valid_keys=item_choices)
+
+                if item_choice == '0':
+                    break
+                
+                try:
+                    chosen_item_id = int(item_choice)
+                    chosen_item_data = items_for_sale[chosen_item_id - 1]
+                    item_to_buy = chosen_item_data["item"]
+                    price = chosen_item_data["price"]
+                    
+                    if player.coins >= price:
+                        if shop.buy_item(player, item_to_buy, dungeon_level):
+                            console.print(Panel(Text(f"Você comprou [bold green]{item_to_buy.name}[/bold green] por [bold yellow]{price}[/bold yellow] ouro.", justify="center", style="green"), border_style="green"))
+                    else:
+                        console.print(Panel(Text("Você não tem ouro suficiente para comprar este item.", justify="center", style="red"), border_style="red"))
+                    sleep(1.5)
+
+                except (ValueError, IndexError):
+                    console.print(Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="red"), border_style="red"))
+                    sleep(1.5)
+
+        elif choice == '2':
+            # Sell items
+            while True:
+                console.clear()
+                console.print(Panel(
+                    Text("Seus Itens para Venda", justify="center", style="bold magenta"),
+                    border_style="magenta",
+                    subtitle=f"Seu Ouro: [bold yellow]{player.coins}[/bold yellow]"
+                ))
+
+                if not player.inventory:
+                    console.print(Panel(Text("Você não tem itens para vender.", justify="center", style="dim white"), border_style="dim white"))
+                    sleep(1.5)
+                    break
+
+                player_inventory_table = Table(show_header=True, expand=True, border_style="dim white")
+                player_inventory_table.add_column("ID", style="bold blue")
+                player_inventory_table.add_column("Item", style="cyan")
+                player_inventory_table.add_column("Preço Venda", style="yellow", justify="right")
+                player_inventory_table.add_column("Descrição", style="dim white")
+
+                for i, item in enumerate(player.inventory, 1):
+                    sell_price = int(shop.get_price(item, dungeon_level) * 0.5)
+                    player_inventory_table.add_row(str(i), item.name, str(sell_price), getattr(item, 'description', 'Sem descrição'))
+                player_inventory_table.add_row("0", "Voltar", "", "")
+
+                console.print(player_inventory_table)
+                console.print("\n")
+
+                sell_choices = [str(i) for i in range(1, len(player.inventory) + 1)] + ['0']
+                sell_choice = safe_get_key(valid_keys=sell_choices)
+
+                if sell_choice == '0':
+                    break
+
+                try:
+                    chosen_item_id = int(sell_choice)
+                    item_to_sell = player.inventory[chosen_item_id - 1]
+                    
+                    sell_price = int(shop.get_price(item_to_sell, dungeon_level) * 0.5)
+                    if shop.sell_item(player, item_to_sell, dungeon_level):
+                        console.print(Panel(Text(f"Você vendeu [bold green]{item_to_sell.name}[/bold green] por [bold yellow]{sell_price}[/bold yellow] ouro.", justify="center", style="green"), border_style="green"))
+                    sleep(1.5)
+
+                except (ValueError, IndexError):
+                    console.print(Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="red"), border_style="red"))
+                    sleep(1.5)
+
+        elif choice == '3':
+            console.print(Panel(Text("Você se despede do mercador e volta à aventura.", justify="center", style="dim white"), border_style="dim white"))
+            sleep(1.5)
+            break
+
+        else:
+            console.print(Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="bold red"), border_style="red"))
+            sleep(1.5)
