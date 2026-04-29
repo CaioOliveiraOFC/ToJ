@@ -1,2 +1,23 @@
-reports/
+# Ambiente virtual
 .venv/
+venv/
+ 
+# Variáveis de ambiente (NUNCA commitar chaves de API)
+.env
+.env.*
+ 
+# Cache do Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+ 
+# Dados gerados
+savegame.json
+reports/
+ 
+# IDEs
+.idea/
+.vscode/
+*.swp
+ 
