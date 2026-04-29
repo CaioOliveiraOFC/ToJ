@@ -1,17 +1,30 @@
 from __future__ import annotations
 
 import random
+from typing import Any
 
+from src.data.loader import load_monsters_data
 from src.entities.monsters import Monster
 from src.mechanics.math_operations import (
     calculate_monster_defense,
     calculate_monster_hp,
     calculate_monster_magic,
     calculate_monster_strength,
- )
+)
+
+
+def _get_monsters_data() -> dict[str, Any]:
+    """Carrega e retorna os dados de monstros do JSON."""
+    return load_monsters_data()
 
 
 def create_monster(nick_name: str, level: int) -> Monster:
+    """
+    Cria uma instância de Monster com stats calculados.
+
+    O código Python atua como injetor de dependências, aplicando
+    as fórmulas de escalonamento sobre os dados base.
+    """
     lvl = max(1, int(level))
     return Monster(
         nick_name,
@@ -25,43 +38,53 @@ def create_monster(nick_name: str, level: int) -> Monster:
 
 def generate_monsters_for_level(dungeon_level: int) -> list[Monster]:
     """
-    Gerador procedural (migrado de `src/engine/game_logic.py`).
+    Gerador procedural que lê definições do JSON.
 
-    Importante: este módulo existe para centralizar a geração de conteúdo.
-    A lógica antiga continua existindo onde estava; esta é a versão equivalente.
+    O comportamento permanece idêntico à versão anterior,
+    mas os dados (nomes, thresholds) agora vêm de src/data/monsters.json.
     """
+    data = _get_monsters_data()
+    gen = data["generation"]
+    categories = data["categories"]
 
     monsters: list[Monster] = []
 
-    base_num_monsters = 2
-    num_monsters_scaling = dungeon_level // 3
-    num_monsters = max(1, base_num_monsters + num_monsters_scaling)
+    base_num = gen["base_count"]
+    scaling = dungeon_level // gen["scaling_per_3_levels"]
+    num_monsters = max(gen["min_monsters"], base_num + scaling)
 
-    monster_types: dict[str, list[str]] = {
-        "common": ["Goblin", "Orc", "Esqueleto", "Zumbi"],
-        "uncommon": ["Aranha Gigante", "Lobo Mal", "Serpente Venenosa"],
-        "rare": ["Minotauro", "Gárgula", "Cavaleiro Corrompido"],
-        "boss": ["Dragão Jovem", "Lich Menor"],
-    }
+    level_variation = gen["level_variation"]
+    boss_chance = gen["boss_spawn_chance"]
 
     for _ in range(num_monsters):
-        monster_level = max(1, dungeon_level + random.randint(-2, 3))
+        monster_level = max(
+            1, dungeon_level + random.randint(level_variation[0], level_variation[1])
+        )
 
-        if dungeon_level < 5:
-            chosen_type = random.choice(monster_types["common"])
-        elif 5 <= dungeon_level < 10:
-            chosen_type = random.choice(monster_types["common"] + monster_types["uncommon"])
-        elif 10 <= dungeon_level < 20:
-            chosen_type = random.choice(monster_types["uncommon"] + monster_types["rare"])
-        else:
-            if random.random() < 0.1 and dungeon_level > 20:
-                chosen_type = random.choice(monster_types["boss"])
-                monster_level += 5
-            else:
-                chosen_type = random.choice(monster_types["rare"])
+        chosen_type = _select_monster_type(dungeon_level, categories, boss_chance)
 
-        monster_name = f"{chosen_type} Nv.{monster_level}"
+        if chosen_type == "boss":
+            monster_level += categories["boss"].get("level_bonus", 0)
+
+        base_name = random.choice(categories[chosen_type]["names"])
+        monster_name = f"{base_name} Nv.{monster_level}"
         monsters.append(create_monster(monster_name, monster_level))
 
     return monsters
+
+
+def _select_monster_type(
+    dungeon_level: int, categories: dict[str, Any], boss_chance: float
+) -> str:
+    """Seleciona o tipo de monstro baseado no nível da masmorra."""
+    if dungeon_level < 5:
+        return "common"
+    elif 5 <= dungeon_level < 10:
+        return random.choice(["common", "uncommon"])
+    elif 10 <= dungeon_level < 20:
+        return random.choice(["uncommon", "rare"])
+    else:
+        if random.random() < boss_chance and dungeon_level >= categories["boss"]["min_level"]:
+            return "boss"
+        return "rare"
 

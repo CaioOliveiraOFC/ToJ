@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 
+from time import sleep
+
 from pyfiglet import Figlet
-from os import system as s
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
-from time import sleep
 
-from src.storage.save_manager import load_game
 from src.ui.utils import clear_screen
 
 console = Console()
@@ -69,7 +68,7 @@ def game_over_screen(player_name="Aventureiro"):
     panel_content.append(Text(f"A MORTE TE ALCANÇOU, {player_name.upper()}!", justify="center", style="bold red"))
     panel_content.append("\n")
     panel_content.append(Text("Seu legado se perde nas sombras...", justify="center", style="dim white"))
-    
+
     console.print(Panel(
         panel_content,
         title="[bold red]-- Fim da Jornada --[/bold red]",
@@ -77,7 +76,7 @@ def game_over_screen(player_name="Aventureiro"):
         subtitle="[italic]A escuridão prevaleceu...[/italic]",
         width=console.width
     ))
-    
+
     console.print(Panel(
         Text("Toda jornada tem um fim, mas a lenda... a lenda pode recomeçar.", justify="center", style="italic white"),
         border_style="dim white"
@@ -107,7 +106,7 @@ def display_final_stats(level: int, actions: int, battles: int, crashes: int):
     stats_table.add_row("Ações Tomadas:", str(actions))
     stats_table.add_row("Total de Batalhas:", str(battles))
     stats_table.add_row("Falhas Críticas (Crashes):", "[red]" + str(crashes) + "[/red]" if crashes > 0 else "[green]" + str(crashes) + "[/green]")
-    
+
     console.print(Panel(stats_table, border_style="blue", title="[bold blue]Estatísticas da Aventura[/bold blue]"))
 
     console.print(Panel(
@@ -125,7 +124,7 @@ def options_menu():
     while True:
         clear_screen()
         console.print(Panel(Text("OPÇÕES DO JOGO", justify="center", style="bold cyan"), border_style="cyan", subtitle="Ajuste sua experiência."))
-        
+
         options_map = {
             "1": "Volume (não implementado)",
             "2": "Dificuldade (não implementado)",
@@ -138,12 +137,12 @@ def options_menu():
 
         for key, value in options_map.items():
             options_table.add_row(key, value)
-        
+
         console.print(options_table)
         console.print("\n")
-        
+
         choice = console.input("[bold green]Sua escolha:[/bold green] ")
-        
+
         if choice == '1':
             console.print(Panel(Text("Função de Volume ainda não implementada.", justify="center", style="yellow"), border_style="yellow"))
             sleep(1.5)
@@ -160,7 +159,7 @@ def main_menu():
     while True:
         clear_screen()
         console.print(Panel(Text("MENU PRINCIPAL", justify="center", style="bold magenta"), border_style="magenta", subtitle="Escolha seu destino, aventureiro."))
-        
+
         menu_options = {
             "1": "Iniciar Nova Jornada",
             "2": "Carregar Aventura",
@@ -176,12 +175,12 @@ def main_menu():
 
         for key, value in menu_options.items():
             table.add_row(key, value)
-        
+
         console.print(table)
         console.print("\n")
-        
+
         choice = console.input("[bold green]Sua escolha, mortal:[/bold green] ")
-        
+
         if choice == '1':
             console.print(Panel(Text("Adentrando as sombras da nova jornada...", justify="center", style="green"), border_style="green"))
             sleep(1.5)

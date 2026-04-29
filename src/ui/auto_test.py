@@ -1,10 +1,8 @@
 import builtins
-import time
 import random
 from unittest.mock import patch
+
 from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
 
 
 class VictoryException(Exception): pass
@@ -28,49 +26,48 @@ class AutoTester:
         self.position_history = []
 
     def run_test(self, player):
-        import os
         import io
-        from datetime import datetime
+
         import main as main_mod
         from src.engine.map import MapOfGame
-        
+
         self.player_ref = player
         self.log_buffer = io.StringIO()
         self.mock_console = Console(file=self.log_buffer, force_terminal=False, color_system=None)
         real_print = builtins.print
-        
+
         original_draw = MapOfGame.draw_map
         def mocked_draw(map_self):
             self.current_map = map_self
             # Grava o mapa no buffer de log (simulação realista)
             original_draw(map_self)
             return None
-            
+
         def mocked_safe_get_key(valid_keys=None, allow_escape=True):
             self.metrics["actions"] += 1
-            
+
             level = self.player_ref.get_level() if self.player_ref else 1
-            
+
             # Condição de Vitória (Level 20)
             if level >= 20:
                 raise VictoryException("Nível 20 atingido!")
-                
+
             # Limite de Ações (Hard Cap de segurança)
             if self.metrics["actions"] > 50000:
                 raise TimeoutException("Limite de 50.000 ações atingido (Loop infinito evitado).")
-                
+
             # Verbose ProgressBar
             pct = min(100, int((level / 20) * 100))
             bar_len = 20
             filled = int((pct / 100) * bar_len)
             bar = '=' * filled + '-' * (bar_len - filled)
             real_print(f"\rProgresso Simulação: [{bar}] {pct}% (Lvl {level}/20)", end="", flush=True)
-            
+
             # Se valid_keys é None, qualquer tecla é válida (ex: "pressione qualquer tecla")
             # Retorna imediatamente sem loop
             if valid_keys is None:
                 return 'a'
-            
+
             choice = None
             if 'w' in valid_keys and self.current_map:
                 # Menu de movimentação do mapa
@@ -87,32 +84,30 @@ class AutoTester:
                 choice = 'x'
             else:
                 choice = valid_keys[0]
-                
+
             if choice == self.last_key:
                 self.consecutive_key_count += 1
                 if self.consecutive_key_count >= 100:
                     raise TimeoutException(f"Stopped because pressed '{choice}' 100 times consecutively (bot is completely stuck).")
             else:
                 self.consecutive_key_count = 1
-                
+
             self.last_key = choice
             return choice
-            
+
         def mocked_input(prompt=""): return ""
         def mocked_console_input(console_self, prompt="", **kwargs): return ""
-        
-        def mocked_print(*args, **kwargs): 
+
+        def mocked_print(*args, **kwargs):
             kwargs['file'] = self.log_buffer
             real_print(*args, **kwargs)
-            
+
         original_console_print = Console.print
-        def mocked_console_print(console_self, *args, **kwargs): 
+        def mocked_console_print(console_self, *args, **kwargs):
             original_console_print(self.mock_console, *args, **kwargs)
-            
+
         def mocked_sleep(*args, **kwargs): pass
 
-        import src.engine.game_logic
-        import src.ui.toj_menu
 
         self.patchers.extend([
             patch("main.safe_get_key", side_effect=mocked_safe_get_key),
@@ -130,21 +125,21 @@ class AutoTester:
             patch("src.engine.game_logic.sleep", side_effect=mocked_sleep, create=True),
             patch("src.ui.toj_menu.sleep", side_effect=mocked_sleep, create=True),
         ])
-        
+
         # Inicia a simulação silenciosa
         real_print("\nIniciando Simulação em Background (Target: Lvl 20)...")
         real_print("O terminal ficará parado, calculando na velocidade máxima...\n")
-        
+
         for p in self.patchers:
             p.start()
-        
+
         try:
             main_mod.start_game(player)
         except VictoryException:
             pass # Simulação terminou com sucesso!
         except TimeoutException as te:
             self.metrics["errors"].append(f"Última Opção Selecionada: '{self.last_key}'\n{str(te)}")
-        except Exception as e:
+        except Exception:
             import traceback
             self.metrics["crashes"] += 1
             error_msg = f"Última Opção Selecionada: '{self.last_key}'\n{traceback.format_exc()}"
@@ -224,43 +219,43 @@ class AutoTester:
     def generate_report(self, real_print):
         import os
         from datetime import datetime
-        
+
         if not os.path.exists("reports"):
             os.makedirs("reports")
-            
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"reports/sim_report_{timestamp}.txt"
-        
+
         final_level = self.player_ref.get_level() if self.player_ref else 0
-        
+
         with open(filename, "w", encoding="utf-8") as f:
             f.write("="*50 + "\n")
-            f.write(f"  RELATÓRIO DE SIMULAÇÃO AUTO-TEST  \n")
+            f.write("  RELATÓRIO DE SIMULAÇÃO AUTO-TEST  \n")
             f.write("="*50 + "\n")
-            f.write(f"Contexto do Agente de Teste:\n")
-            f.write(f"- Alvo Principal: Chegar vivo ao Level 20.\n")
-            f.write(f"- Limite de Hard Cap: 50.000 ações permitidas.\n")
-            f.write(f"- Objetivo: Verificar integridade de código (Crashes) e progressão/balanceamento da XP.\n")
+            f.write("Contexto do Agente de Teste:\n")
+            f.write("- Alvo Principal: Chegar vivo ao Level 20.\n")
+            f.write("- Limite de Hard Cap: 50.000 ações permitidas.\n")
+            f.write("- Objetivo: Verificar integridade de código (Crashes) e progressão/balanceamento da XP.\n")
             f.write("-" * 50 + "\n")
             f.write(f"Data/Hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"Nível Final Alcançado: {final_level}/20\n")
             f.write(f"Ações Simuladas: {self.metrics['actions']}\n")
             f.write(f"Lutas (aprox): {self.metrics['combats']}\n")
             f.write(f"Crashes: {self.metrics['crashes']}\n\n")
-            
+
             if self.metrics["errors"]:
                 f.write("="*50 + "\n")
                 f.write("  LOG DE ERROS (TRACEBACKS)  \n")
                 f.write("="*50 + "\n")
                 for err in self.metrics["errors"]:
                     f.write(err + "\n")
-            
+
             f.write("\n" + "="*50 + "\n")
             f.write("  LOG DE INTERFACE CAPTURADO  \n")
             f.write("="*50 + "\n")
             if self.log_buffer:
                 f.write(self.log_buffer.getvalue())
-                    
-        real_print(f"\nSimulação Finalizada!")
+
+        real_print("\nSimulação Finalizada!")
         real_print(f"Relatório Completo gerado com sucesso em: {filename}")
         builtins.input("\nPressione Enter para retornar ao menu principal...")

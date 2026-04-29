@@ -5,7 +5,8 @@ venv/
 # Variáveis de ambiente (NUNCA commitar chaves de API)
 .env
 .env.*
- 
+.env*
+
 # Cache do Python
 __pycache__/
 *.py[cod]

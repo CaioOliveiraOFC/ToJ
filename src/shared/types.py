@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,4 +54,28 @@ class GameEvent:
     payload: dict[str, Any] = field(default_factory=dict)
     source: str | None = None
     ts: float | None = None
+
+
+class MapState(TypedDict):
+    """Estado serializável do mapa para persistência."""
+
+    height: int
+    width: int
+    grid: list[list[str]]
+    player_pos: dict[str, int]
+    exit_pos: dict[str, int]
+    enemies_pos: list[dict[str, Any]]
+
+
+@dataclass(frozen=True, slots=True)
+class SaveData:
+    """DTO para dados de save do jogo."""
+
+    player_class: str
+    player_name: str
+    level: int
+    xp: int
+    coins: int
+    dungeon_level: int
+    map_state: MapState | None = None
 

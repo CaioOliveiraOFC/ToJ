@@ -1,0 +1,189 @@
+{
+  "description": "Definições de itens para o sistema de loot e loja",
+  "version": "1.0",
+  "rarity_multipliers": {
+    "Common": 1.0,
+    "Rare": 1.15,
+    "Epic": 1.32,
+    "Legendary": 1.52
+  },
+  "drop_chance_percent": 30,
+  "items": {
+    "weapons": [
+      {
+        "id": "espada_curta",
+        "name": "Espada Curta",
+        "description": "Uma espada básica e confiável.",
+        "base_damage": 5,
+        "rarity": "Common"
+      },
+      {
+        "id": "cajado_simples",
+        "name": "Cajado Simples",
+        "description": "Um cajado de madeira para iniciantes.",
+        "base_damage": 3,
+        "rarity": "Common"
+      },
+      {
+        "id": "adaga_agil",
+        "name": "Adaga Ágil",
+        "description": "Uma adaga leve, perfeita para ataques rápidos.",
+        "base_damage": 4,
+        "rarity": "Common"
+      },
+      {
+        "id": "espada_longa_rara",
+        "name": "Espada Longa Rara",
+        "description": "Uma espada bem balanceada, com um brilho sutil.",
+        "base_damage": 8,
+        "rarity": "Rare"
+      },
+      {
+        "id": "machado_de_batalha_epico",
+        "name": "Machado de Batalha Épico",
+        "description": "Um machado pesado que causa grande estrago.",
+        "base_damage": 12,
+        "rarity": "Epic"
+      },
+      {
+        "id": "arco_lendario",
+        "name": "Arco Lendário",
+        "description": "Um arco antigo, dizem que nunca erra o alvo.",
+        "base_damage": 15,
+        "rarity": "Legendary"
+      }
+    ],
+    "armors": [
+      {
+        "id": "elmo_de_couro",
+        "name": "Elmo de Couro",
+        "description": "Proteção simples para a cabeça.",
+        "base_defense": 2,
+        "slot": "Helmet",
+        "rarity": "Common"
+      },
+      {
+        "id": "peitoral_de_ferro",
+        "name": "Peitoral de Ferro",
+        "description": "Oferece boa proteção para o torso.",
+        "base_defense": 5,
+        "slot": "Body",
+        "rarity": "Common"
+      },
+      {
+        "id": "botas_de_couro_raras",
+        "name": "Botas de Couro Raras",
+        "description": "Botas leves que oferecem alguma proteção.",
+        "base_defense": 3,
+        "slot": "Shoes",
+        "rarity": "Rare"
+      },
+      {
+        "id": "perneiras_de_placa_epicas",
+        "name": "Perneiras de Placa Épicas",
+        "description": "Proteção pesada para as pernas.",
+        "base_defense": 7,
+        "slot": "Legs",
+        "rarity": "Epic"
+      }
+    ],
+    "potions": [
+      {
+        "id": "pocao_de_cura_pequena",
+        "name": "Poção de Cura Pequena",
+        "description": "Restaura uma pequena quantidade de vida.",
+        "base_effect_value": 50,
+        "potion_type": "Health",
+        "rarity": "Common"
+      },
+      {
+        "id": "pocao_de_cura_media",
+        "name": "Poção de Cura Média",
+        "description": "Restaura uma quantidade moderada de vida.",
+        "base_effect_value": 100,
+        "potion_type": "Health",
+        "rarity": "Rare"
+      },
+      {
+        "id": "pocao_de_mana_pequena",
+        "name": "Poção de Mana Pequena",
+        "description": "Restaura uma pequena quantidade de mana.",
+        "base_effect_value": 30,
+        "potion_type": "Mana",
+        "rarity": "Common"
+      },
+      {
+        "id": "pocao_de_forca",
+        "name": "Poção de Força",
+        "description": "Aumenta temporariamente o dano em 15%. (Efeito: +15)",
+        "base_effect_value": 15,
+        "potion_type": "Strength",
+        "rarity": "Rare"
+      },
+      {
+        "id": "pocao_de_defesa",
+        "name": "Poção de Defesa",
+        "description": "Aumenta temporariamente a defesa em 10. (Efeito: +10)",
+        "base_effect_value": 10,
+        "potion_type": "Defense",
+        "rarity": "Rare"
+      },
+      {
+        "id": "pocao_de_agilidade",
+        "name": "Poção de Agilidade",
+        "description": "Aumenta temporariamente a agilidade em 20%. (Efeito: +20)",
+        "base_effect_value": 20,
+        "potion_type": "Agility",
+        "rarity": "Epic"
+      },
+      {
+        "id": "pocao_de_cura_epica",
+        "name": "Poção de Cura Épica",
+        "description": "Restaura uma grande quantidade de vida.",
+        "base_effect_value": 200,
+        "potion_type": "Health",
+        "rarity": "Epic"
+      },
+      {
+        "id": "pocao_de_cura_maior",
+        "name": "Poção de Cura Maior",
+        "description": "Restaura uma grande quantidade de vida. Muito potente.",
+        "base_effect_value": 400,
+        "potion_type": "Health",
+        "rarity": "Legendary"
+      },
+      {
+        "id": "pocao_de_mana_maior",
+        "name": "Poção de Mana Maior",
+        "description": "Restaura uma grande quantidade de mana.",
+        "base_effect_value": 150,
+        "potion_type": "Mana",
+        "rarity": "Epic"
+      },
+      {
+        "id": "elixir_da_potencia",
+        "name": "Elixir da Potência",
+        "description": "Aumenta significativamente o atributo de força por um tempo.",
+        "base_effect_value": 30,
+        "potion_type": "Strength",
+        "rarity": "Epic"
+      },
+      {
+        "id": "elixir_da_resiliencia",
+        "name": "Elixir da Resiliência",
+        "description": "Aumenta significativamente o atributo de defesa por um tempo.",
+        "base_effect_value": 20,
+        "potion_type": "Defense",
+        "rarity": "Epic"
+      },
+      {
+        "id": "pocao_da_velocidade",
+        "name": "Poção da Velocidade",
+        "description": "Aumenta drasticamente o atributo de agilidade por um tempo.",
+        "base_effect_value": 40,
+        "potion_type": "Agility",
+        "rarity": "Legendary"
+      }
+    ]
+  }
+}

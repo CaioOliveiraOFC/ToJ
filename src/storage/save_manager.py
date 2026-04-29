@@ -1,14 +1,15 @@
 import json
 import os
-from src.entities.heroes import Warrior, Mage, Rogue
+
 from src.content.items import ALL_ITEMS  # Dicionário central de itens
-from src.content.skills import warrior_skills, mage_skills, rogue_skills
+from src.content.skills import mage_skills, rogue_skills, warrior_skills
+from src.entities.heroes import Mage, Rogue, Warrior
 
 SAVE_FILE = "savegame.json"
 
 def save_game(player, dungeon_level, map_state=None):
     """Salva o estado atual do jogo num ficheiro JSON."""
-    
+
     # Converte os objetos de item em nomes para poderem ser guardados
     inventory_names = [item.name for item in player.inventory]
     equipment_names = {slot: item.name if item else None for slot, item in player.equipment.items()}
@@ -46,7 +47,7 @@ def load_game():
         # Cria a instância do jogador com base na classe guardada
         player_class_name = save_data["player_class"]
         player_name = save_data["player_name"]
-        
+
         if player_class_name == "Warrior":
             player = Warrior(player_name)
             player.learnable_skills = warrior_skills
@@ -66,7 +67,7 @@ def load_game():
 
         # Reconstrói o inventário e o equipamento a partir dos nomes
         player.inventory = [ALL_ITEMS[name] for name in save_data["inventory"]]
-        
+
         for slot, item_name in save_data["equipment"].items():
             if item_name:
                 item_to_equip = ALL_ITEMS[item_name]
@@ -74,14 +75,14 @@ def load_game():
                 if item_to_equip in player.inventory:
                     player.inventory.remove(item_to_equip)
                 player.equip(item_to_equip)
-        
+
         # Carrega active_buffs e active_effects
         player.active_buffs = save_data.get("active_buffs", {})
         player.active_effects = save_data.get("active_effects", {})
 
         dungeon_level = save_data["dungeon_level"]
         map_state = save_data.get("map_state", None)
-        
+
         print("\nJogo carregado com sucesso!")
         return player, dungeon_level, map_state
 

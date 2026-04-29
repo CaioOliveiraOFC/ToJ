@@ -1,4 +1,3 @@
-from src.mechanics.math_operations import percentage
 
 
 class Spell:

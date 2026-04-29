@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-from src.entities.heroes import Warrior, Mage, Rogue
-from src.content.factories.monsters import create_monster
-from src.engine.loop import fight
-from src.ui.screens import menu
-from src.ui.renderer import show_status
-from src.ui.utils import clear_screen
-from src.content.skills import mage_skills, rogue_skills, warrior_skills
 from time import sleep
+
+from src.content.factories.monsters import create_monster
+from src.content.skills import mage_skills, rogue_skills, warrior_skills
+from src.engine.loop import fight
+from src.entities.heroes import Mage, Rogue, Warrior
+from src.ui.renderer import show_status
+from src.ui.screens import menu
+from src.ui.utils import clear_screen
+
 
 def create_player():
     """
@@ -54,7 +56,7 @@ def main():
     print("Você tem que lutar contra o Mago Maligno.")
     sleep(1)
     print("Você tem que derrotá-lo e salvar o mundo.")
-    
+
     while True:
         answer = input("Você está pronto para começar? [s/n] ").lower()
         if answer in ["s", "n"]:
@@ -107,5 +109,5 @@ def main():
         except ValueError:
             print("Entrada inválida. Por favor, insira um número.")
             sleep(1)
-        
+
         clear_screen()

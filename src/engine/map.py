@@ -34,19 +34,19 @@ class MapOfGame:
     def generate_map(self, percent_of_walls=0.2):
         """Gera o mapa usando Random Walk garantindo que todas as áreas vazias estejam conectadas."""
         self.grid = [['#' for _ in range(self.width)] for _ in range(self.height)]
-        
+
         target_empty = int((self.width - 2) * (self.height - 2) * (1.0 - percent_of_walls))
-        
+
         y = self.height // 2
         x = self.width // 2
         self.grid[y][x] = '.'
         empty_count = 1
-        
+
         while empty_count < target_empty:
             direction = random.choice([(0, 1), (0, -1), (1, 0), (-1, 0)])
             ny = y + direction[0]
             nx = x + direction[1]
-            
+
             if 1 <= ny < self.height - 1 and 1 <= nx < self.width - 1:
                 y, x = ny, nx
                 if self.grid[y][x] == '#':
@@ -61,10 +61,10 @@ class MapOfGame:
     def place_exit(self):
         """Coloca a saída 'X' no piso vazio mais distante do jogador."""
         player_y, player_x = self.player_pos['y'], self.player_pos['x']
-        
+
         max_dist = -1
         best_pos = None
-        
+
         for y in range(self.height):
             for x in range(self.width):
                 if self.grid[y][x] == '.':
@@ -72,7 +72,7 @@ class MapOfGame:
                     if dist > max_dist:
                         max_dist = dist
                         best_pos = (y, x)
-        
+
         if best_pos:
             exit_y, exit_x = best_pos
             self.grid[exit_y][exit_x] = 'X'
@@ -150,7 +150,7 @@ class MapOfGame:
             f"{y},{x}": {"nick_name": enemy.nick_name, "level": enemy.level}
             for (y, x), enemy in self.enemies_pos.items()
         }
-        
+
         return {
             "height": self.height,
             "width": self.width,
@@ -163,13 +163,13 @@ class MapOfGame:
     def load_map_state(self, map_state):
         """Carrega o estado do mapa a partir de um dicionário."""
         from src.content.factories.monsters import create_monster
-        
+
         self.height = map_state["height"]
         self.width = map_state["width"]
         self.grid = map_state["grid"]
         self.player_pos = map_state["player_pos"]
         self.exit_pos = map_state["exit_pos"]
-        
+
         self.enemies_pos = {}
         for pos_str, enemy_data in map_state["enemies_pos"].items():
             y, x = map(int, pos_str.split(','))

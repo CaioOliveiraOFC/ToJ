@@ -6,7 +6,7 @@ class Skill:
     effect_type: 'damage', 'heal', 'status', 'buff'
     target: 'enemy', 'self'
     """
-    def __init__(self, name, mana_cost, level_required, description, 
+    def __init__(self, name, mana_cost, level_required, description,
                  effect_type, target, value=0, duration=0, chance=100):
         self.name = name
         self.mana_cost = mana_cost

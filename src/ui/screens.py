@@ -1,25 +1,31 @@
-"""Telas, menus e fluxos interativos (Rich + `prompts`)."""
+"""Funções puras de renderização de telas (Rich apenas, sem lógica de fluxo).
+
+Toda lógica de interação (loops, input) foi movida para engine/shop_flow.py e engine/inventory_flow.py.
+"""
 
 from __future__ import annotations
 
 from time import sleep
+from typing import TYPE_CHECKING
 
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from src.content.items import Potion
-from src.content.shop import Shop
-from src.entities.heroes import Player
+from src.content.items import Armor, Potion, Weapon
 from src.ui import renderer
-from src.ui.prompts import safe_get_key
+
+if TYPE_CHECKING:
+    from src.entities.base import Entity
+    from src.entities.heroes import Player
+    from src.entities.monsters import Monster
 
 
 def menu(options: tuple[str, ...] | list[str], prompt: str) -> None:
     renderer.render_menu(options, prompt)
 
 
-def render_fight_intro(player, monster) -> None:
+def render_fight_intro(player: "Player", monster: "Monster") -> None:
     renderer.console.clear()
     renderer.console.print(
         Panel(Text("--- Início da Batalha ---", justify="center", style="bold green"), border_style="green")
@@ -28,7 +34,7 @@ def render_fight_intro(player, monster) -> None:
     renderer.render_battle_start_prompt()
 
 
-def render_turn_banner(attacker) -> None:
+def render_turn_banner(attacker: "Entity") -> None:
     color = "blue" if attacker.my_type() == "Human" else "magenta"
     renderer.console.print(
         Panel(
@@ -43,7 +49,7 @@ def render_turn_banner(attacker) -> None:
     sleep(1)
 
 
-def render_battle_frame(player, monster) -> None:
+def render_battle_frame(player: "Player", monster: "Monster") -> None:
     renderer.render_battle_frame(player, monster)
 
 
@@ -66,7 +72,7 @@ def render_battle_no_skills_message() -> None:
     )
 
 
-def render_skill_select_panel(player) -> None:
+def render_skill_select_panel(player: "Player") -> None:
     skill_table = Table(show_header=False, expand=True, border_style="dim white")
     skill_table.add_column("Chave", style="bold blue", justify="right")
     skill_table.add_column("Habilidade", style="cyan")
@@ -108,9 +114,12 @@ def render_battle_invalid_potion_message() -> None:
     )
 
 
-def render_post_battle(player, monster) -> None:
+def render_post_battle(player: "Player", monster: "Monster") -> None:
     from src.content.factories.loot import get_loot
-    from src.mechanics.math_operations import calculate_mini_boss_xp_reward, calculate_monster_xp_reward
+    from src.mechanics.math_operations import (
+        calculate_mini_boss_xp_reward,
+        calculate_monster_xp_reward,
+    )
 
     xp_base_reward = calculate_monster_xp_reward(monster.level)
     if getattr(monster, "is_boss", False):
@@ -152,182 +161,269 @@ def render_post_battle(player, monster) -> None:
     player.rest()
 
 
-def shop_menu(player: Player, shop: Shop, dungeon_level: int) -> None:
-    """Interface da loja (Rich + teclas)."""
-    while True:
-        renderer.console.clear()
+# =============================================================================
+# LOJA - Funções puras de renderização
+# =============================================================================
+
+
+def render_shop_main(shop: object, player_coins: int) -> None:
+    """Renderiza a tela principal da loja."""
+
+    renderer.console.clear()
+    renderer.console.print(
+        Panel(
+            Text("Bem-vindo à Loja do Mercador!", justify="center", style="bold green"),
+            border_style="green",
+            subtitle=f"Seu Ouro: [bold yellow]{player_coins}[/bold yellow]",
+        )
+    )
+
+    shop_options = {"1": "Comprar Itens", "2": "Vender Itens", "3": "Sair da Loja"}
+
+    options_table = Table(show_header=False, expand=True, highlight=True, row_styles=["none", "dim"])
+    options_table.add_column("Opção", style="bold blue", justify="right")
+    options_table.add_column("Descrição", style="cyan")
+
+    for key, value in shop_options.items():
+        options_table.add_row(key, value)
+
+    renderer.console.print(options_table)
+    renderer.console.print("\n")
+
+
+def render_shop_buy_menu(items_for_sale: list[dict], player_coins: int) -> None:
+    """Renderiza o menu de compra de itens."""
+    renderer.console.clear()
+    renderer.console.print(
+        Panel(
+            Text("Itens à Venda", justify="center", style="bold cyan"),
+            border_style="cyan",
+            subtitle=f"Seu Ouro: [bold yellow]{player_coins}[/bold yellow]",
+        )
+    )
+
+    if not items_for_sale:
         renderer.console.print(
             Panel(
-                Text("Bem-vindo à Loja do Mercador!", justify="center", style="bold green"),
-                border_style="green",
-                subtitle=f"Seu Ouro: [bold yellow]{player.coins}[/bold yellow]",
+                Text("O mercador não tem nada para vender no momento.", justify="center", style="dim white"),
+                border_style="dim white",
             )
         )
+        sleep(1.5)
+        return
 
-        shop_options = {"1": "Comprar Itens", "2": "Vender Itens", "3": "Sair da Loja"}
+    item_table = Table(show_header=True, expand=True, border_style="dim white")
+    item_table.add_column("ID", style="bold blue")
+    item_table.add_column("Item", style="cyan")
+    item_table.add_column("Preço", style="yellow", justify="right")
+    item_table.add_column("Descrição", style="dim white")
 
-        options_table = Table(show_header=False, expand=True, highlight=True, row_styles=["none", "dim"])
-        options_table.add_column("Opção", style="bold blue", justify="right")
-        options_table.add_column("Descrição", style="cyan")
+    for i, item_data in enumerate(items_for_sale, 1):
+        item = item_data["item"]
+        price = item_data["price"]
+        item_table.add_row(str(i), item.name, str(price), getattr(item, "description", "Sem descrição"))
+    item_table.add_row("0", "Voltar", "", "")
 
-        for key, value in shop_options.items():
-            options_table.add_row(key, value)
+    renderer.console.print(item_table)
+    renderer.console.print("\n")
 
-        renderer.console.print(options_table)
-        renderer.console.print("\n")
 
-        choice = safe_get_key(valid_keys=["1", "2", "3"])
+def render_shop_purchase_success(item_name: str, price: int) -> None:
+    """Renderiza mensagem de compra bem-sucedida."""
+    renderer.console.print(
+        Panel(
+            Text(
+                f"Você comprou [bold green]{item_name}[/bold green] por [bold yellow]{price}[/bold yellow] ouro.",
+                justify="center",
+                style="green",
+            ),
+            border_style="green",
+        )
+    )
+    sleep(1.5)
 
-        if choice == "1":
-            while True:
-                renderer.console.clear()
-                renderer.console.print(
-                    Panel(
-                        Text("Itens à Venda", justify="center", style="bold cyan"),
-                        border_style="cyan",
-                        subtitle=f"Seu Ouro: [bold yellow]{player.coins}[/bold yellow]",
-                    )
-                )
 
-                items_for_sale = shop.get_available_items(dungeon_level)
-                if not items_for_sale:
-                    renderer.console.print(
-                        Panel(
-                            Text("O mercador não tem nada para vender no momento.", justify="center", style="dim white"),
-                            border_style="dim white",
-                        )
-                    )
-                    sleep(1.5)
-                    break
+def render_shop_insufficient_gold() -> None:
+    """Renderiza mensagem de ouro insuficiente."""
+    renderer.console.print(
+        Panel(
+            Text("Você não tem ouro suficiente para comprar este item.", justify="center", style="red"),
+            border_style="red",
+        )
+    )
+    sleep(1.5)
 
-                item_table = Table(show_header=True, expand=True, border_style="dim white")
-                item_table.add_column("ID", style="bold blue")
-                item_table.add_column("Item", style="cyan")
-                item_table.add_column("Preço", style="yellow", justify="right")
-                item_table.add_column("Descrição", style="dim white")
 
-                for i, item_data in enumerate(items_for_sale, 1):
-                    item = item_data["item"]
-                    price = item_data["price"]
-                    item_table.add_row(str(i), item.name, str(price), getattr(item, "description", "Sem descrição"))
-                item_table.add_row("0", "Voltar", "", "")
+def render_shop_sell_menu(
+    inventory: list, shop: object, dungeon_level: int, player_coins: int
+) -> None:
+    """Renderiza o menu de venda de itens."""
+    renderer.console.clear()
+    renderer.console.print(
+        Panel(
+            Text("Seus Itens para Venda", justify="center", style="bold magenta"),
+            border_style="magenta",
+            subtitle=f"Seu Ouro: [bold yellow]{player_coins}[/bold yellow]",
+        )
+    )
 
-                renderer.console.print(item_table)
-                renderer.console.print("\n")
+    if not inventory:
+        renderer.console.print(
+            Panel(Text("Você não tem itens para vender.", justify="center", style="dim white"), border_style="dim white")
+        )
+        sleep(1.5)
+        return
 
-                item_choices = [str(i) for i in range(1, len(items_for_sale) + 1)] + ["0"]
-                item_choice = safe_get_key(valid_keys=item_choices)
+    player_inventory_table = Table(show_header=True, expand=True, border_style="dim white")
+    player_inventory_table.add_column("ID", style="bold blue")
+    player_inventory_table.add_column("Item", style="cyan")
+    player_inventory_table.add_column("Preço Venda", style="yellow", justify="right")
+    player_inventory_table.add_column("Descrição", style="dim white")
 
-                if item_choice == "0":
-                    break
+    for i, item in enumerate(inventory, 1):
+        sell_price = int(shop.get_price(item, dungeon_level) * 0.5)
+        player_inventory_table.add_row(str(i), item.name, str(sell_price), getattr(item, "description", "Sem descrição"))
+    player_inventory_table.add_row("0", "Voltar", "", "")
 
-                try:
-                    chosen_item_id = int(item_choice)
-                    chosen_item_data = items_for_sale[chosen_item_id - 1]
-                    item_to_buy = chosen_item_data["item"]
-                    price = chosen_item_data["price"]
+    renderer.console.print(player_inventory_table)
+    renderer.console.print("\n")
 
-                    if player.coins >= price:
-                        if shop.buy_item(player, item_to_buy, dungeon_level):
-                            renderer.console.print(
-                                Panel(
-                                    Text(
-                                        f"Você comprou [bold green]{item_to_buy.name}[/bold green] por [bold yellow]{price}[/bold yellow] ouro.",
-                                        justify="center",
-                                        style="green",
-                                    ),
-                                    border_style="green",
-                                )
-                            )
-                    else:
-                        renderer.console.print(
-                            Panel(
-                                Text("Você não tem ouro suficiente para comprar este item.", justify="center", style="red"),
-                                border_style="red",
-                            )
-                        )
-                    sleep(1.5)
 
-                except (ValueError, IndexError):
-                    renderer.console.print(
-                        Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="red"), border_style="red")
-                    )
-                    sleep(1.5)
+def render_shop_sell_success(item_name: str, sell_price: int) -> None:
+    """Renderiza mensagem de venda bem-sucedida."""
+    renderer.console.print(
+        Panel(
+            Text(
+                f"Você vendeu [bold green]{item_name}[/bold green] por [bold yellow]{sell_price}[/bold yellow] ouro.",
+                justify="center",
+                style="green",
+            ),
+            border_style="green",
+        )
+    )
+    sleep(1.5)
 
-        elif choice == "2":
-            while True:
-                renderer.console.clear()
-                renderer.console.print(
-                    Panel(
-                        Text("Seus Itens para Venda", justify="center", style="bold magenta"),
-                        border_style="magenta",
-                        subtitle=f"Seu Ouro: [bold yellow]{player.coins}[/bold yellow]",
-                    )
-                )
 
-                if not player.inventory:
-                    renderer.console.print(
-                        Panel(Text("Você não tem itens para vender.", justify="center", style="dim white"), border_style="dim white")
-                    )
-                    sleep(1.5)
-                    break
+def render_shop_invalid_choice() -> None:
+    """Renderiza mensagem de escolha inválida na loja."""
+    renderer.console.print(
+        Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="red"), border_style="red")
+    )
+    sleep(1.5)
 
-                player_inventory_table = Table(show_header=True, expand=True, border_style="dim white")
-                player_inventory_table.add_column("ID", style="bold blue")
-                player_inventory_table.add_column("Item", style="cyan")
-                player_inventory_table.add_column("Preço Venda", style="yellow", justify="right")
-                player_inventory_table.add_column("Descrição", style="dim white")
 
-                for i, item in enumerate(player.inventory, 1):
-                    sell_price = int(shop.get_price(item, dungeon_level) * 0.5)
-                    player_inventory_table.add_row(str(i), item.name, str(sell_price), getattr(item, "description", "Sem descrição"))
-                player_inventory_table.add_row("0", "Voltar", "", "")
+def render_shop_farewell() -> None:
+    """Renderiza mensagem de despedida da loja."""
+    renderer.console.print(
+        Panel(
+            Text("Você se despede do mercador e volta à aventura.", justify="center", style="dim white"),
+            border_style="dim white",
+        )
+    )
+    sleep(1.5)
 
-                renderer.console.print(player_inventory_table)
-                renderer.console.print("\n")
 
-                sell_choices = [str(i) for i in range(1, len(player.inventory) + 1)] + ["0"]
-                sell_choice = safe_get_key(valid_keys=sell_choices)
+# =============================================================================
+# INVENTÁRIO - Funções puras de renderização
+# =============================================================================
 
-                if sell_choice == "0":
-                    break
 
-                try:
-                    chosen_item_id = int(sell_choice)
-                    item_to_sell = player.inventory[chosen_item_id - 1]
+def render_inventory_main(player: "Player") -> None:
+    """Renderiza a tela principal do inventário."""
+    renderer.console.clear()
 
-                    sell_price = int(shop.get_price(item_to_sell, dungeon_level) * 0.5)
-                    if shop.sell_item(player, item_to_sell, dungeon_level):
-                        renderer.console.print(
-                            Panel(
-                                Text(
-                                    f"Você vendeu [bold green]{item_to_sell.name}[/bold green] por [bold yellow]{sell_price}[/bold yellow] ouro.",
-                                    justify="center",
-                                    style="green",
-                                ),
-                                border_style="green",
-                            )
-                        )
-                    sleep(1.5)
+    # Criação do painel principal do inventário
+    renderer.console.print(Panel(
+        Text("Mochila e Equipamentos", justify="center", style="bold green"),
+        border_style="green",
+        subtitle=f"Ouro: [bold yellow]{player.coins}[/bold yellow]"
+    ))
 
-                except (ValueError, IndexError):
-                    renderer.console.print(
-                        Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="red"), border_style="red")
-                    )
-                    sleep(1.5)
+    renderer.show_status(player)
 
-        elif choice == "3":
-            renderer.console.print(
-                Panel(
-                    Text("Você se despede do mercador e volta à aventura.", justify="center", style="dim white"),
-                    border_style="dim white",
-                )
-            )
-            sleep(1.5)
-            break
+    # Equipamentos
+    equip_table = Table(title="[bold cyan]--- Equipamento ---[/bold cyan]", show_header=False, expand=True, border_style="dim cyan")
+    equip_table.add_column("Slot", style="bold blue")
+    equip_table.add_column("Item", style="cyan")
 
+    for slot, item in player.equipment.items():
+        if item:
+            equip_table.add_row(slot.capitalize(), item.name)
         else:
-            renderer.console.print(
-                Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="bold red"), border_style="red")
-            )
-            sleep(1.5)
+            equip_table.add_row(slot.capitalize(), "[dim]Vazio[/dim]")
+
+    renderer.console.print(equip_table)
+    renderer.console.print("\n")
+
+    # Itens na Mochila
+    inv_table = Table(title="[bold magenta]--- Itens na Mochila ---[/bold magenta]", show_header=True, expand=True, border_style="dim magenta")
+    inv_table.add_column("ID", style="bold blue", justify="right")
+    inv_table.add_column("Item", style="cyan")
+    inv_table.add_column("Tipo", style="yellow")
+
+    if not player.inventory:
+        renderer.console.print(Panel(Text("Sua mochila está vazia.", justify="center", style="dim white"), border_style="dim white"))
+    else:
+        for i, item in enumerate(player.inventory):
+            inv_table.add_row(str(i + 1), item.name, item.__class__.__name__)
+        renderer.console.print(inv_table)
+
+    renderer.console.print("\n[dim white](número do item)[/dim white] selecionar | [dim white](x)[/dim white] sair do inventário")
+
+
+def render_inventory_item_details(item: object, is_equipped: bool) -> None:
+    """Renderiza os detalhes de um item do inventário."""
+    renderer.console.clear()
+
+    details_table = Table(show_header=False, expand=True, border_style="dim yellow")
+    details_table.add_column("Atributo", style="bold cyan")
+    details_table.add_column("Valor", style="white")
+
+    details_table.add_row("Nome", item.name)
+    if hasattr(item, 'description'):
+        details_table.add_row("Descrição", item.description)
+    details_table.add_row("Tipo", item.__class__.__name__)
+
+    if isinstance(item, Weapon):
+        details_table.add_row("Dano", str(item.damage))
+    elif isinstance(item, Armor):
+        details_table.add_row("Defesa", str(item.defense))
+    elif isinstance(item, Potion):
+        details_table.add_row("Tipo de Efeito", getattr(item, 'potion_type', 'Desconhecido'))
+        details_table.add_row("Poder de Efeito", f"+{getattr(item, 'effect_value', 0)}")
+
+    renderer.console.print(Panel(details_table, title="[bold yellow]Detalhes do Item[/bold yellow]", border_style="yellow"))
+
+    # Ações
+    action_table = Table(show_header=False, expand=True, border_style="dim white")
+
+    if isinstance(item, Potion):
+        action_table.add_row("[bold blue]u[/bold blue]", "Usar Poção")
+
+    if isinstance(item, (Weapon, Armor)):
+        if is_equipped:
+            action_table.add_row("[bold blue]e[/bold blue]", "Desequipar Item")
+        else:
+            action_table.add_row("[bold blue]e[/bold blue]", "Equipar Item")
+
+    action_table.add_row("[bold blue]c[/bold blue]", "Cancelar")
+
+    renderer.console.print(Panel(action_table, title="[bold cyan]Opções[/bold cyan]", border_style="cyan"))
+
+
+def render_inventory_item_used(item_name: str) -> None:
+    """Renderiza mensagem de item usado."""
+    renderer.console.print(Panel(f"Você usou [bold green]{item_name}[/bold green].", border_style="green"))
+    sleep(1.5)
+
+
+def render_inventory_item_equipped(item_name: str) -> None:
+    """Renderiza mensagem de item equipado."""
+    renderer.console.print(Panel(f"Você equipou [bold green]{item_name}[/bold green].", border_style="green"))
+    sleep(1.5)
+
+
+def render_inventory_item_unequipped(item_name: str) -> None:
+    """Renderiza mensagem de item desequipado."""
+    renderer.console.print(Panel(f"Você desequipou [bold yellow]{item_name}[/bold yellow].", border_style="yellow"))
+    sleep(1.5)

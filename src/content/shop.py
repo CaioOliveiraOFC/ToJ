@@ -1,5 +1,5 @@
-import math
-from src.content.items import ALL_ITEMS, RARITY_MULTIPLIERS, Potion, Weapon, Armor
+from src.content.items import ALL_ITEMS, RARITY_MULTIPLIERS, Armor, Potion, Weapon
+
 
 class Shop:
     """Representa a loja do jogo onde o jogador pode comprar itens."""
@@ -31,10 +31,10 @@ class Shop:
     def get_available_items(self, dungeon_level):
         """Retorna uma lista de itens disponíveis para compra na loja, com seus preços."""
         available_items = []
-        
+
         # Determine which items are available based on dungeon level
         # For simplicity, early levels have common/rare, later levels add epic/legendary
-        
+
         if dungeon_level < 5:
             shop_item_names = [
                 "Espada Curta", "Cajado Simples", "Adaga Ágil",
@@ -59,13 +59,13 @@ class Shop:
                 "Armadura de Dragão Épica", "Luvas de Ouro Épicas", "Escudo Torre Épico",
                 "Poção de Cura Épica", "Poção de Mana Épica", "Elixir da Grande Potência", "Elixir da Suprema Resiliência", "Poção da Velocidade"
             ]
-        
+
         for item_name in shop_item_names:
             item = ALL_ITEMS.get(item_name)
             if item:
                 price = self.get_price(item, dungeon_level)
                 available_items.append({"item": item, "price": price})
-        
+
         return available_items
 
     def buy_item(self, player, item_to_buy, dungeon_level):
@@ -134,7 +134,7 @@ if __name__ == "__main__":
             print(f"Compra bem-sucedida! Gold restante: {player.gold}")
         else:
             print(f"Falha na compra. Gold restante: {player.gold}")
-        
+
         # Test selling
         print("\n--- Test Selling ---")
         print(f"Inventário do jogador: {[item.name for item in player.inventory.items]}")
