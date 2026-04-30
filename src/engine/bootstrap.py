@@ -10,12 +10,11 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from src.content.items import Armor, Potion, Weapon
-from src.engine.game_logic import create_player
 from src.engine.loop import start_game
 from src.entities.heroes import Warrior
 from src.storage.save_manager import load_game
 from src.ui.auto_test import AutoTester
-from src.ui.toj_menu import main_menu
+from src.ui.toj_menu import character_creation_flow, main_menu
 
 if TYPE_CHECKING:
     pass
@@ -42,7 +41,7 @@ def run_main_loop() -> None:
         menu_choice = main_menu()
 
         if menu_choice == "new_game":
-            player = create_player()
+            player = character_creation_flow()
             if player:
                 start_game(player, 1)
         elif menu_choice == "load_game":

@@ -1,6 +1,6 @@
 """Funções puras de renderização de telas (Rich apenas, sem lógica de fluxo).
 
-Toda lógica de interação (loops, input) foi movida para engine/shop_flow.py e engine/inventory_flow.py.
+Toda lógica de interação (loops, input) está em ui/shop_flow.py e ui/inventory_flow.py.
 """
 
 from __future__ import annotations
@@ -445,7 +445,6 @@ def render_dungeon_status(
     dungeon_level: int, hp: int, max_hp: int, mp: int, max_mp: int
 ) -> None:
     """Renderiza o status da masmorra na parte superior da tela."""
-    from rich.text import Text
     status_text = (
         f"Masmorra Nível {dungeon_level} | "
         f"Herói: @ | Inimigos: & | Saída: X | "

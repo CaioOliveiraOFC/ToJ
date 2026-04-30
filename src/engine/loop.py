@@ -10,7 +10,7 @@ from src.content.factories.loot import get_loot
 from src.content.factories.monsters import create_monster, generate_monsters_for_level
 from src.content.items import Potion
 from src.engine.events import EventBus
-from src.engine.inventory_flow import run_inventory_flow
+from src.ui.inventory_flow import run_inventory_flow
 from src.engine.map import MapOfGame
 from src.entities.monsters import Monster
 from src.mechanics import combat as combat_mech

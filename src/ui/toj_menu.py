@@ -8,6 +8,9 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from src.engine.game_logic import create_player_from_data
+from src.ui.prompts import safe_get_key
+from src.ui.screens import menu
 from src.ui.utils import clear_screen
 
 console = Console()
@@ -154,6 +157,59 @@ def options_menu():
         else:
             console.print(Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="bold red"), border_style="red"))
             sleep(1.5)
+
+def character_creation_flow():
+    """
+    Fluxo de criação de personagem - coleta classe e nome via UI.
+    
+    Returns:
+        Instância do herói criado ou None se cancelado
+    """
+    class_map = {
+        "1": "warrior",
+        "2": "mage",
+        "3": "rogue",
+    }
+    
+    # Seleção de classe
+    while True:
+        clear_screen()
+        menu(("Guerreiro", "Mago", "Ladino"), "Escolha sua classe:")
+        choice = safe_get_key(valid_keys=["1", "2", "3", "0"])
+        if choice in class_map:
+            class_key = class_map[choice]
+            break
+        if choice == "0":
+            return None
+    
+    # Seleção de nome
+    clear_screen()
+    player_name = _prompt_for_name()
+    if not player_name:
+        return None
+    
+    # Criação via engine
+    return create_player_from_data(class_key, player_name)
+
+
+def _prompt_for_name() -> str | None:
+    """Solicita o nome do jogador via camada de UI."""
+    console.print(Panel(
+        Text("Digite o nome do seu herói:", justify="center", style="bold cyan"),
+        border_style="cyan"
+    ))
+    console.print("[dim](Pressione ESC para cancelar)[/dim]\n")
+    
+    name = console.input("[bold green]Nome:[/bold green] ").strip()
+    if not name:
+        console.print(Panel(
+            Text("Nome não pode estar em branco.", style="red"),
+            border_style="red"
+        ))
+        safe_get_key(allow_escape=False)
+        return _prompt_for_name()
+    return name
+
 
 def main_menu():
     while True:

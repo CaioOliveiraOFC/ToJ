@@ -5,22 +5,60 @@
     "common": {
       "weight": 60,
       "min_level": 1,
-      "names": ["Goblin", "Orc", "Esqueleto", "Zumbi"]
+      "names": [
+        "Goblin", "Orc", "Esqueleto", "Zumbi", "Rato Gigante", 
+        "Morcego Vampiro", "Slime Verde", "Bandido", "Cultista", 
+        "Aranha das Cavernas", "Kobold", "Lobo Faminto", "Carniçal Menor", 
+        "Besouro Gigante", "Ladrão de Túmulos", "Espectro Fraco", 
+        "Gosma Ácida", "Centopeia Gigante", "Verme da Terra", 
+        "Corvo Sanguinário", "Javali Selvagem", "Sapo Mutante", 
+        "Múmia Desgastada", "Espadachim Esqueleto", "Goblin Arqueiro", 
+        "Rato da Peste", "Cão Sarnento", "Elemental da Poeira", 
+        "Pária Corrompido", "Saqueador"
+      ]
     },
     "uncommon": {
       "weight": 25,
       "min_level": 5,
-      "names": ["Aranha Gigante", "Lobo Mal", "Serpente Venenosa"]
+      "names": [
+        "Aranha Gigante", "Lobo Mal", "Serpente Venenosa", "Orc Guerreiro", 
+        "Hobgoblin", "Harpia", "Homem-Lagarto", "Warg", "Aparição", 
+        "Aranha Viúva-Negra", "Troll das Cavernas", "Esqueleto Encouraçado", 
+        "Cultista Fanático", "Sombra", "Mímico", "Carniçal Voraz", 
+        "Basilisco Jovem", "Elemental do Fogo Menor", "Elemental da Água Menor", 
+        "Escorpião Gigante", "Gosma Tóxica", "Urso Coruja", "Javali Atroz", 
+        "Caçador Furtivo", "Centauro Batedor", "Banshee Menor", 
+        "Espectro Uivante", "Verme da Areia", "Gárgula Desperta", 
+        "Lobo Invernal", "Sanguessuga Gigante", "Ente Corrompido"
+      ]
     },
     "rare": {
       "weight": 12,
       "min_level": 10,
-      "names": ["Minotauro", "Gárgula", "Cavaleiro Corrompido"]
+      "names": [
+        "Minotauro", "Gárgula", "Cavaleiro Corrompido", "Troll da Montanha", 
+        "Ogre", "Manticora", "Vampiro", "Golem de Pedra", "Wyvern", 
+        "Banshee", "Dullahan", "Quimera", "Elemental do Fogo Majestoso", 
+        "Treant Corrompido", "Assassino das Sombras", "Lich Aprendiz", 
+        "Dragão Menor", "Verme da Morte", "Gigante da Colina", "Naga", 
+        "Demônio Menor", "Súcubo", "Íncubo", "Golem de Ferro", 
+        "Titã de Gelo Jovem", "Hidra Jovem", "Esfinge", "Necromante", 
+        "Cavaleiro da Morte", "Anomalia Arcana", "Devorador de Mentes Menor"
+      ]
     },
     "boss": {
       "weight": 3,
       "min_level": 20,
-      "names": ["Dragão Jovem", "Lich Menor"],
+      "names": [
+        "Dragão Jovem", "Lich Menor", "Rei Goblin", "Lorde Vampiro", 
+        "Demônio Maior", "Dragão Ancião", "Behemoth", "Golem de Adamantium", 
+        "Arquimago Corrompido", "Tirano das Sombras", "Leviatã", 
+        "Fênix Negra", "Titã Ancião", "Rainha das Aranhas", 
+        "Cavaleiro do Apocalipse", "Rei Esqueleto", "Hidra Ancestral", 
+        "Devorador de Mundos", "Avatar da Destruição", "Mestre das Ilusões", 
+        "Colosso de Pedra Escura", "Senhor da Peste", "Imperador Orc", 
+        "Dragão Zumbi"
+      ],
       "level_bonus": 5
     }
   },

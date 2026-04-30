@@ -71,23 +71,3 @@ def calculate_mini_boss_xp_reward(dungeon_level):
     xp_scaling_per_level = 25 # More aggressive XP scaling, adjusted
     return base_xp_reward + (mini_boss_effective_level - 1) * xp_scaling_per_level
 
-if __name__ == "__main__":
-    # Test monster scaling
-    print("--- Monster Scaling Tests ---")
-    for level in range(1, 10):
-        print(f"Level {level}: HP={calculate_monster_hp(level)}, Str={calculate_monster_strength(level)}, Def={calculate_monster_defense(level)}, Mag={calculate_monster_magic(level)}")
-
-    # Test mini-boss scaling
-    print("\n--- Mini-Boss Scaling Tests (for dungeon_level) ---")
-    for d_level in range(5, 16, 5): # Test at dungeon levels 5, 10, 15
-        print(f"Dungeon Level {d_level} (Mini-Boss Effective Level {d_level+2}): HP={calculate_mini_boss_hp(d_level)}, Str={calculate_mini_boss_strength(d_level)}, Def={calculate_mini_boss_defense(d_level)}, Mag={calculate_mini_boss_magic(d_level)}, XP={calculate_mini_boss_xp_reward(d_level)}")
-
-    # Test XP Curve
-    print("\n--- XP Curve Tests ---")
-    for level in range(1, 10):
-        print(f"To reach Level {level+1}: {calculate_xp_for_next_level(level)} XP")
-
-    # Test Monster XP Reward
-    print("\n--- Monster XP Reward Tests ---")
-    for level in range(1, 10):
-        print(f"Level {level} Monster XP Reward: {calculate_monster_xp_reward(level)} XP")
