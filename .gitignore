@@ -1,0 +1,25 @@
+# Ambiente virtual
+.venv/
+venv/
+ 
+# Variáveis de ambiente (NUNCA commitar chaves de API)
+.env
+.env.*
+.env*
+.venv/
+
+# Cache do Python
+__pycache__*
+*.py[cod]
+*.pyo
+*.pyd
+.ruff_cache/
+
+# Dados gerados
+savegame.json
+reports/
+
+# IDEs
+.idea/
+.vscode/
+*.swp

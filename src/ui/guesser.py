@@ -1,0 +1,1 @@
+# Arquivo deletado - minigame removido.
