@@ -6,13 +6,14 @@ venv/
 .env
 .env.*
 .env*
+.ruff_cache/
 
 # Cache do Python
-__pycache__/
+__pycache__*
 *.py[cod]
 *.pyo
 *.pyd
- 
+
 # Dados gerados
 savegame.json
 reports/

@@ -6,12 +6,12 @@ import random
 from time import sleep
 from typing import TYPE_CHECKING
 
+from src.content.factories.loot import get_loot
 from src.content.factories.monsters import create_monster, generate_monsters_for_level
 from src.content.items import Potion
 from src.engine.events import EventBus
 from src.engine.inventory_flow import run_inventory_flow
 from src.engine.map import MapOfGame
-from src.engine.shop_flow import run_shop_flow
 from src.entities.monsters import Monster
 from src.mechanics import combat as combat_mech
 from src.mechanics.combat import PublishFn
@@ -20,6 +20,8 @@ from src.mechanics.math_operations import (
     calculate_mini_boss_hp,
     calculate_mini_boss_magic,
     calculate_mini_boss_strength,
+    calculate_mini_boss_xp_reward,
+    calculate_monster_xp_reward,
 )
 from src.shared import combat_topics as topics
 from src.shared.constants import (
@@ -190,7 +192,20 @@ def run_fight(
 
             attacker_index = (attacker_index + 1) % 2
 
-        screens.render_post_battle(player, monster)
+        # Processar lógica de pós-batalha (engine layer)
+        xp_gained, player_won, dropped_item, level_up_msgs = process_post_battle(
+            player, monster
+        )
+
+        # Renderizar resultados (UI layer)
+        screens.render_post_battle(
+            player_name=player.get_nick_name(),
+            monster_name=monster.get_nick_name(),
+            xp_gained=xp_gained,
+            player_won=player_won,
+            dropped_item_name=getattr(dropped_item, 'name', None) if dropped_item else None,
+            level_up_messages=level_up_msgs,
+        )
     finally:
         cleanup_ui()
 
@@ -202,6 +217,51 @@ def fight(
 ) -> None:
     """Alias legível para `run_fight` (compatível com chamadas antigas)."""
     run_fight(player, monster, rng=rng)
+
+
+def process_post_battle(
+    player: "Player", monster: "Monster"
+) -> tuple[int, bool, object | None, list[str]]:
+    """
+    Processa a lógica de pós-combate (XP, loot, level up, rest).
+
+    Esta função pertence à camada de engine - ela pode importar de
+    mechanics/ e content/, e pode mutar estado de entidades.
+
+    Retorna tupla com:
+    - xp_gained: quantidade de XP ganhada
+    - player_won: True se jogador venceu, False se foi derrotado
+    - dropped_item: item dropado ou None
+    - level_up_messages: lista de mensagens de level up (strings)
+    """
+    # Cálculo de XP base
+    xp_base_reward = calculate_monster_xp_reward(monster.level)
+    if getattr(monster, "is_boss", False):
+        xp_base_reward = calculate_mini_boss_xp_reward(monster.level)
+
+    player_won = player.get_isalive()
+    dropped_item = None
+
+    if not player_won:
+        # Jogador derrotado - XP de piedade (10%)
+        pity_xp = xp_base_reward // 10
+        player.add_xp_points(pity_xp)
+        xp_gained = pity_xp
+    else:
+        # Jogador venceu - XP completo e loot
+        player.add_xp_points(xp_base_reward)
+        xp_gained = xp_base_reward
+        dropped_item = get_loot()
+        if dropped_item:
+            player.add_item_to_inventory(dropped_item)
+
+    # Level up e rest (apenas se jogador vivo)
+    level_up_messages: list[str] = []
+    if player_won:
+        level_up_messages = player.level_up(show=True)
+        player.rest()
+
+    return xp_gained, player_won, dropped_item, level_up_messages
 
 
 def start_game(
@@ -250,24 +310,25 @@ def start_game(
 
         while True:
             clear_screen()
-            print(f"Masmorra Nível {dungeon_level} | Herói: @ | Inimigos: & | Saída: X | HP: {player.get_hp()}/{player.base_hp} | MP: {player.get_mp()}/{player.base_mp}")
-            print("Use 'w', 'a', 's', 'd' para mover.")
-            game_map.draw_map()
+            screens.render_dungeon_status(
+                dungeon_level, player.get_hp(), player.base_hp,
+                player.get_mp(), player.base_mp
+            )
+            map_lines = game_map.draw_map()
+            screens.render_map(map_lines)
+            screens.render_dungeon_controls()
 
-            print("\n(i)nventário | (p)ara Salvar | (q) para Sair")
             move = safe_get_key(valid_keys=['w', 'a', 's', 'd', 'i', 'q', 'p'])
 
             if move is None or move == 'q':
                 save_game(player, dungeon_level, game_map.get_map_state())
-                print("Jogo salvo automaticamente ao sair.")
-                sleep(1.5)
+                screens.render_game_saved("Jogo salvo automaticamente ao sair.")
                 return
             elif move == 'i':
                 run_inventory_flow(player)
             elif move == 'p':
                 save_game(player, dungeon_level, game_map.get_map_state())
-                print("Jogo salvo!")
-                sleep(1.5)
+                screens.render_game_saved()
             elif move in ['w', 'a', 's', 'd']:
                 collided_object = game_map.move_player(move)
 
@@ -279,12 +340,11 @@ def start_game(
                     # After defeating a monster, update the map grid to reflect the empty space
                     game_map.grid[game_map.player_pos['y']][game_map.player_pos['x']] = '.'
 
-                    print("Pressione qualquer tecla para continuar sua jornada...")
+                    screens.render_continue_prompt()
                     safe_get_key(allow_escape=False)
 
                 elif collided_object == 'level_complete':
-                    print(f"Você completou a Masmorra Nível {dungeon_level}!")
-                    print("Pressione qualquer tecla para avançar para o próximo nível...")
+                    screens.render_level_complete(dungeon_level)
                     safe_get_key(allow_escape=False)
                     dungeon_level += 1
                     initial_map_state = None

@@ -114,51 +114,63 @@ def render_battle_invalid_potion_message() -> None:
     )
 
 
-def render_post_battle(player: "Player", monster: "Monster") -> None:
-    from src.content.factories.loot import get_loot
-    from src.mechanics.math_operations import (
-        calculate_mini_boss_xp_reward,
-        calculate_monster_xp_reward,
-    )
+def render_post_battle(
+    player_name: str,
+    monster_name: str,
+    xp_gained: int,
+    player_won: bool,
+    dropped_item_name: str | None,
+    level_up_messages: list[str],
+) -> None:
+    """
+    Renderiza tela de pós-batalha (puramente visual - dumb UI).
 
-    xp_base_reward = calculate_monster_xp_reward(monster.level)
-    if getattr(monster, "is_boss", False):
-        xp_base_reward = calculate_mini_boss_xp_reward(monster.level)
-
-    if not player.get_isalive():
+    Todos os dados (XP ganho, loot, mensagens) devem ser calculados
+    e passados pela camada de engine. Esta função apenas exibe.
+    """
+    if not player_won:
         renderer.console.print(
             Panel(Text("Você foi derrotado...", justify="center", style="bold red"), border_style="red")
         )
-        pity_xp = xp_base_reward // 10
-        player.add_xp_points(pity_xp)
     else:
         renderer.console.print(
             Panel(
                 Text.from_markup(
-                    f"Você derrotou [bold magenta]{monster.get_nick_name()}[/bold magenta]!",
+                    f"Você derrotou [bold magenta]{monster_name}[/bold magenta]!",
                     justify="center",
                     style="bold green",
                 ),
                 border_style="green",
             )
         )
-        player.add_xp_points(xp_base_reward)
-        dropped_item = get_loot()
-        if dropped_item:
-            renderer.console.print(
-                Panel(
-                    Text.from_markup(
-                        f"Você encontrou [bold yellow]{dropped_item.name}[/bold yellow]!",
-                        justify="center",
-                        style="yellow",
-                    ),
-                    border_style="yellow",
-                    width=80,
-                )
-            )
 
-    player.level_up(show=True)
-    player.rest()
+    # Exibir XP ganhado
+    renderer.console.print(
+        Panel(
+            Text(f"XP ganho: {xp_gained}", justify="center", style="cyan"),
+            border_style="cyan",
+        )
+    )
+
+    # Exibir loot se houver
+    if dropped_item_name:
+        renderer.console.print(
+            Panel(
+                Text.from_markup(
+                    f"Você encontrou [bold yellow]{dropped_item_name}[/bold yellow]!",
+                    justify="center",
+                    style="yellow",
+                ),
+                border_style="yellow",
+                width=80,
+            )
+        )
+
+    # Exibir mensagens de level up
+    for msg in level_up_messages:
+        renderer.console.print(
+            Panel(Text(msg, justify="center", style="bold blue"), border_style="blue")
+        )
 
 
 # =============================================================================
@@ -427,3 +439,54 @@ def render_inventory_item_unequipped(item_name: str) -> None:
     """Renderiza mensagem de item desequipado."""
     renderer.console.print(Panel(f"Você desequipou [bold yellow]{item_name}[/bold yellow].", border_style="yellow"))
     sleep(1.5)
+
+
+def render_dungeon_status(
+    dungeon_level: int, hp: int, max_hp: int, mp: int, max_mp: int
+) -> None:
+    """Renderiza o status da masmorra na parte superior da tela."""
+    from rich.text import Text
+    status_text = (
+        f"Masmorra Nível {dungeon_level} | "
+        f"Herói: @ | Inimigos: & | Saída: X | "
+        f"HP: {hp}/{max_hp} | MP: {mp}/{max_mp}"
+    )
+    renderer.console.print(Text(status_text, style="bold cyan"))
+    renderer.console.print(Text("Use 'w', 'a', 's', 'd' para mover.", style="dim"))
+
+
+def render_dungeon_controls() -> None:
+    """Renderiza os controles disponíveis no mapa."""
+    renderer.console.print("\n[dim](i)nventário | (p)ara Salvar | (q) para Sair[/dim]")
+
+
+def render_game_saved(message: str = "Jogo salvo!") -> None:
+    """Renderiza mensagem de confirmação de salvamento."""
+    renderer.console.print(Panel(Text(message, justify="center", style="green"), border_style="green"))
+    sleep(1.5)
+
+
+def render_level_complete(dungeon_level: int) -> None:
+    """Renderiza mensagem de conclusão de nível."""
+    renderer.console.print(Panel(
+        Text(f"Você completou a Masmorra Nível {dungeon_level}!", justify="center", style="bold green"),
+        border_style="green"
+    ))
+    renderer.console.print(Panel(
+        Text("Pressione qualquer tecla para avançar para o próximo nível...", justify="center", style="yellow"),
+        border_style="yellow"
+    ))
+
+
+def render_continue_prompt() -> None:
+    """Renderiza prompt para continuar jornada."""
+    renderer.console.print(Panel(
+        Text("Pressione qualquer tecla para continuar sua jornada...", justify="center", style="yellow"),
+        border_style="yellow"
+    ))
+
+
+def render_map(map_lines: list[str]) -> None:
+    """Renderiza as linhas do mapa no console."""
+    for line in map_lines:
+        renderer.console.print(line)

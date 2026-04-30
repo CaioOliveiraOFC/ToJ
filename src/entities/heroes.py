@@ -33,16 +33,18 @@ class Player(Entity):
         self.active_effects: dict[str, object] = {}
         self.active_buffs: dict[str, dict[str, object]] = {}
 
-    def add_item_to_inventory(self, item: object) -> None:
+    def add_item_to_inventory(self, item: object) -> str | None:
+        """Adiciona item ao inventário e retorna mensagem de confirmação."""
         if item:
             self.inventory.append(item)
-            print(f"Você obteve: {getattr(item, 'name', 'Item')}!")
+            return f"Você obteve: {getattr(item, 'name', 'Item')}!"
+        return None
 
-    def equip(self, item_to_equip: object) -> None:
+    def equip(self, item_to_equip: object) -> str | None:
+        """Equipa um item e retorna mensagem de confirmação."""
         slot = getattr(item_to_equip, "slot", None)
         if not slot or slot not in self.equipment:
-            print(f"{getattr(item_to_equip, 'name', 'Item')} não pode ser equipado.")
-            return
+            return f"{getattr(item_to_equip, 'name', 'Item')} não pode ser equipado."
         if self.equipment[slot]:
             self.unequip(slot)
         self.inventory.remove(item_to_equip)
@@ -51,23 +53,25 @@ class Player(Entity):
             self.avg_damage += int(getattr(item_to_equip, "damage_bonus", 0))
         else:
             self.base_df += int(getattr(item_to_equip, "defense_bonus", 0))
-        print(f"{getattr(item_to_equip, 'name', 'Item')} equipado.")
         self.rest()
+        return f"{getattr(item_to_equip, 'name', 'Item')} equipado."
 
-    def unequip(self, slot: str) -> None:
+    def unequip(self, slot: str) -> str | None:
+        """Desequipa um item e retorna mensagem de confirmação."""
         item_to_unequip = self.equipment.get(slot)
         if not item_to_unequip:
-            return
+            return None
         if slot == "Weapon":
             self.avg_damage -= int(getattr(item_to_unequip, "damage_bonus", 0))
         else:
             self.base_df -= int(getattr(item_to_unequip, "defense_bonus", 0))
         self.equipment[slot] = None
         self.inventory.append(item_to_unequip)
-        print(f"{getattr(item_to_unequip, 'name', 'Item')} desequipado.")
         self.rest()
+        return f"{getattr(item_to_unequip, 'name', 'Item')} desequipado."
 
-    def use_potion(self, potion: object) -> None:
+    def use_potion(self, potion: object) -> str:
+        """Usa uma poção e retorna mensagem descrevendo o efeito."""
         potion_type = getattr(potion, "potion_type", None)
         effect_value = int(getattr(potion, "effect_value", 0))
         potion_name = getattr(potion, "name", "Poção")
@@ -95,7 +99,7 @@ class Player(Entity):
             msg = f"Você usou {potion_name}, mas não teve efeito aparente."
 
         self.inventory.remove(potion)
-        print(msg)
+        return msg
 
     def rest(self) -> None:
         self._hp = self.base_hp
@@ -129,28 +133,36 @@ class Player(Entity):
         if self.isalive:
             self.xp_points += amount
 
-    def level_up(self, show: bool = True) -> None:
+    def level_up(self, show: bool = True) -> list[str]:
+        """Processa level up e retorna lista de mensagens para exibição."""
         needed_xp = self.need_to_up()
         leveled_up = False
+        messages: list[str] = []
         while self.xp_points >= needed_xp:
             leveled_up = True
             self.xp_points -= needed_xp
             self.level += 1
             if show:
-                print(f"Level up! Agora você está no nível: {self.level}!".center(100))
+                messages.append(f"Level up! Agora você está no nível: {self.level}!")
             self._update_stats_on_level_up()
-            self.learn_new_skills(show)
+            skill_msgs = self.learn_new_skills(show)
+            messages.extend(skill_msgs)
             needed_xp = self.need_to_up()
         if leveled_up and show:
-            print(f"Você precisa de {self.need_to_next()} XP para o próximo nível.".center(100))
+            messages.append(f"Você precisa de {self.need_to_next()} XP para o próximo nível.")
+        return messages
 
-    def learn_new_skills(self, show: bool = True) -> None:
+    def learn_new_skills(self, show: bool = True) -> list[str]:
+        """Aprende novas habilidades e retorna lista de mensagens."""
+        messages: list[str] = []
         for level, skill in self.learnable_skills.items():
             if self.level >= level and skill not in self.skills.values():
                 new_skill_key = len(self.skills) + 1
                 self.skills[new_skill_key] = skill
                 if show:
-                    print(f"Nova habilidade aprendida: {getattr(skill, 'name', 'Habilidade')}!".center(100))
+                    skill_name = getattr(skill, 'name', 'Habilidade')
+                    messages.append(f"Nova habilidade aprendida: {skill_name}!")
+        return messages
 
     def _update_stats_on_level_up(self) -> None:
         class_name = self.get_classname()
@@ -172,14 +184,15 @@ class Player(Entity):
     def need_to_up(self) -> int:
         return int(100 * (self.level**1.5))
 
-    def set_level(self, target_level: int) -> None:
+    def set_level(self, target_level: int) -> str:
+        """Define o nível do jogador e retorna mensagem de confirmação."""
         self.level = 1
         for _ in range(target_level - 1):
             self.level += 1
             self._update_stats_on_level_up()
             self.learn_new_skills(show=False)
         self.rest()
-        print(f"{self.nick_name} foi definido para o nível {self.level}.")
+        return f"{self.nick_name} foi definido para o nível {self.level}."
 
 
 class Warrior(Player):

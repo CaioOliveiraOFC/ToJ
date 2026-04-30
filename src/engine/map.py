@@ -1,6 +1,15 @@
 #!/usr/bin/env python3.10
+"""Lógica de mapa, geração procedural e movimentação."""
+
+from __future__ import annotations
 
 import random
+from typing import TYPE_CHECKING
+
+from src.content.factories.monsters import create_monster
+
+if TYPE_CHECKING:
+    pass
 
 # Dicionário com códigos de cores ANSI para o terminal
 COLORS = {
@@ -32,7 +41,7 @@ class MapOfGame:
                 return y, x
 
     def generate_map(self, percent_of_walls=0.2):
-        """Gera o mapa usando Random Walk garantindo que todas as áreas vazias estejam conectadas."""
+        """Gera o mapa usando Random Walk garantindo conectividade."""
         self.grid = [['#' for _ in range(self.width)] for _ in range(self.height)]
 
         target_empty = int((self.width - 2) * (self.height - 2) * (1.0 - percent_of_walls))
@@ -83,10 +92,15 @@ class MapOfGame:
         y, x = self._get_random_empty_spot()
         self.enemies_pos[(y, x)] = enemy_obj
 
-    def draw_map(self):
-        """Desenha o mapa no console com cores."""
+    def draw_map(self) -> list[str]:
+        """Gera representação do mapa como lista de strings para renderização pela UI.
+
+        Retorna lista de strings onde cada string representa uma linha do mapa.
+        A renderização visual é responsabilidade da camada UI (renderer/screens).
+        """
+        lines: list[str] = []
         for y, row in enumerate(self.grid):
-            display_row = []
+            display_row: list[str] = []
             for x, tile in enumerate(row):
                 char = tile
                 if y == self.player_pos['y'] and x == self.player_pos['x']:
@@ -102,7 +116,8 @@ class MapOfGame:
                 elif tile == 'D':  # Adicionado para corpos de inimigos mortos
                     char = f"{COLORS['red']}D{COLORS['reset']}"
                 display_row.append(char)
-            print(' '.join(display_row))
+            lines.append(' '.join(display_row))
+        return lines
 
     def move_player(self, direction):
         """
@@ -112,10 +127,14 @@ class MapOfGame:
         py, px = self.player_pos['y'], self.player_pos['x']
         ny, nx = py, px
 
-        if direction == 'w': ny -= 1
-        elif direction == 's': ny += 1
-        elif direction == 'a': nx -= 1
-        elif direction == 'd': nx += 1
+        if direction == 'w':
+            ny -= 1
+        elif direction == 's':
+            ny += 1
+        elif direction == 'a':
+            nx -= 1
+        elif direction == 'd':
+            nx += 1
 
         # Verifica colisão com parede ou limite do mapa
         if ny < 0 or ny >= self.height or nx < 0 or nx >= self.width:
@@ -160,10 +179,8 @@ class MapOfGame:
             "enemies_pos": enemies_serializable
         }
 
-    def load_map_state(self, map_state):
+    def load_map_state(self, map_state: dict) -> None:
         """Carrega o estado do mapa a partir de um dicionário."""
-        from src.content.factories.monsters import create_monster
-
         self.height = map_state["height"]
         self.width = map_state["width"]
         self.grid = map_state["grid"]

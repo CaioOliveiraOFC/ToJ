@@ -7,9 +7,11 @@ from src.entities.heroes import Mage, Rogue, Warrior
 
 SAVE_FILE = "savegame.json"
 
-def save_game(player, dungeon_level, map_state=None):
-    """Salva o estado atual do jogo num ficheiro JSON."""
+def save_game(player, dungeon_level, map_state=None) -> dict:
+    """Salva o estado atual do jogo num ficheiro JSON.
 
+    Retorna dict com 'success': bool e 'message': str para exibição pela UI.
+    """
     # Converte os objetos de item em nomes para poderem ser guardados
     inventory_names = [item.name for item in player.inventory]
     equipment_names = {slot: item.name if item else None for slot, item in player.equipment.items()}
@@ -31,12 +33,16 @@ def save_game(player, dungeon_level, map_state=None):
     try:
         with open(SAVE_FILE, 'w') as f:
             json.dump(save_data, f, indent=4)
-        print("\nJogo salvo com sucesso!")
+        return {"success": True, "message": "Jogo salvo com sucesso!"}
     except Exception as e:
-        print(f"\nOcorreu um erro ao salvar o jogo: {e}")
+        return {"success": False, "message": f"Ocorreu um erro ao salvar o jogo: {e}"}
 
-def load_game():
-    """Carrega o estado do jogo a partir de um ficheiro JSON."""
+def load_game() -> tuple:
+    """Carrega o estado do jogo a partir de um ficheiro JSON.
+
+    Retorna (player, dungeon_level, map_state) ou (None, None, None) em caso de erro.
+    A mensagem de status deve ser exibida pela UI chamadora.
+    """
     if not os.path.exists(SAVE_FILE):
         return None, None, None
 
@@ -58,7 +64,7 @@ def load_game():
             player = Rogue(player_name)
             player.learnable_skills = rogue_skills
         else:
-            return None, None, None # Classe desconhecida
+            return None, None, None  # Classe desconhecida
 
         # Define o nível e os status do jogador
         player.set_level(save_data["level"])
@@ -83,11 +89,9 @@ def load_game():
         dungeon_level = save_data["dungeon_level"]
         map_state = save_data.get("map_state", None)
 
-        print("\nJogo carregado com sucesso!")
         return player, dungeon_level, map_state
 
-    except Exception as e:
-        print(f"\nOcorreu um erro ao carregar o jogo: {e}")
+    except Exception:
         return None, None, None
 
 def check_save_file():
