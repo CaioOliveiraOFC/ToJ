@@ -6,6 +6,10 @@ from typing import Any
 from src.data.loader import load_monsters_data
 from src.entities.monsters import Monster
 from src.mechanics.math_operations import (
+    calculate_mini_boss_defense,
+    calculate_mini_boss_hp,
+    calculate_mini_boss_magic,
+    calculate_mini_boss_strength,
     calculate_monster_defense,
     calculate_monster_hp,
     calculate_monster_magic,
@@ -87,4 +91,26 @@ def _select_monster_type(
         if random.random() < boss_chance and dungeon_level >= categories["boss"]["min_level"]:
             return "boss"
         return "rare"
+
+
+def create_boss_for_level(dungeon_level: int) -> Monster:
+    """Cria mini-boss com stats escalados para o nível de masmorra.
+
+    Args:
+        dungeon_level: Nível atual da masmorra.
+
+    Returns:
+        Instância de Monster configurada como mini-boss.
+    """
+    boss_level = dungeon_level + 2
+    boss = Monster(
+        nick_name=f"Chefe Nv.{boss_level}",
+        mob_level=boss_level,
+        hp=calculate_mini_boss_hp(dungeon_level),
+        st=calculate_mini_boss_strength(dungeon_level),
+        df=calculate_mini_boss_defense(dungeon_level),
+        mg=calculate_mini_boss_magic(dungeon_level),
+    )
+    boss.is_boss = True  # atributo público, ok fora de entities/
+    return boss
 

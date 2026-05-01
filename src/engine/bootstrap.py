@@ -10,6 +10,7 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from src.content.items import Armor, Potion, Weapon
+from src.engine.game_logic import create_player_from_data
 from src.engine.loop import start_game
 from src.entities.heroes import Warrior
 from src.storage.save_manager import load_game
@@ -41,9 +42,12 @@ def run_main_loop() -> None:
         menu_choice = main_menu()
 
         if menu_choice == "new_game":
-            player = character_creation_flow()
-            if player:
-                start_game(player, 1)
+            result = character_creation_flow()
+            if result:
+                class_key, player_name = result
+                player = create_player_from_data(class_key, player_name)
+                if player:
+                    start_game(player, 1)
         elif menu_choice == "load_game":
             player, dungeon_level, map_state = load_game()
             if player:

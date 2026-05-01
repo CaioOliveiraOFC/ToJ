@@ -8,7 +8,6 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from src.engine.game_logic import create_player_from_data
 from src.ui.prompts import safe_get_key
 from src.ui.screens import menu
 from src.ui.utils import clear_screen
@@ -158,19 +157,20 @@ def options_menu():
             console.print(Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="bold red"), border_style="red"))
             sleep(1.5)
 
-def character_creation_flow():
+def character_creation_flow() -> tuple[str, str] | None:
     """
     Fluxo de criação de personagem - coleta classe e nome via UI.
-    
+
     Returns:
-        Instância do herói criado ou None se cancelado
+        Tupla (class_key, player_name) ou None se cancelado.
+        A criação da entidade Player deve ser feita pela engine.
     """
     class_map = {
         "1": "warrior",
         "2": "mage",
         "3": "rogue",
     }
-    
+
     # Seleção de classe
     while True:
         clear_screen()
@@ -181,15 +181,15 @@ def character_creation_flow():
             break
         if choice == "0":
             return None
-    
+
     # Seleção de nome
     clear_screen()
     player_name = _prompt_for_name()
     if not player_name:
         return None
-    
-    # Criação via engine
-    return create_player_from_data(class_key, player_name)
+
+    # Retorna dados brutos - a engine fará a criação da entidade
+    return class_key, player_name
 
 
 def _prompt_for_name() -> str | None:

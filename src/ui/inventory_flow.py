@@ -44,19 +44,19 @@ def _run_item_action_flow(player: "Player", item: object) -> None:
 
         if action_choice == "u":
             if isinstance(item, Potion):
-                player.use_potion(item)
-                screens.render_inventory_item_used(item.name)
+                msg = player.use_potion(item)
+                screens.render_inventory_item_used(msg or item.name)
                 break
         elif action_choice == "e":
             if isinstance(item, (Weapon, Armor)):
                 if is_equipped:
                     slot = _find_equipped_slot(player, item)
                     if slot:
-                        player.unequip(slot)
-                        screens.render_inventory_item_unequipped(item.name)
+                        msg = player.unequip(slot)
+                        screens.render_inventory_item_unequipped(msg or item.name)
                 else:
-                    player.equip(item)
-                    screens.render_inventory_item_equipped(item.name)
+                    msg = player.equip(item)
+                    screens.render_inventory_item_equipped(msg or item.name)
                 break
         elif action_choice == "c":
             break

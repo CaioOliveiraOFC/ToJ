@@ -28,7 +28,7 @@ class AutoTester:
     def run_test(self, player):
         import io
 
-        import main as main_mod
+        from src.engine.loop import start_game
         from src.engine.map import MapOfGame
 
         self.player_ref = player
@@ -110,7 +110,7 @@ class AutoTester:
 
 
         self.patchers.extend([
-            patch("main.safe_get_key", side_effect=mocked_safe_get_key),
+            patch("src.engine.loop.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.ui.prompts.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.engine.loop.wait_enter_to_continue", side_effect=lambda: None),
             patch("builtins.input", side_effect=mocked_input),
@@ -118,11 +118,9 @@ class AutoTester:
             patch("rich.console.Console.input", side_effect=mocked_console_input, autospec=True),
             patch("rich.console.Console.print", side_effect=mocked_console_print, autospec=True),
             patch("src.engine.map.MapOfGame.draw_map", side_effect=mocked_draw, autospec=True),
-            patch("main.sleep", side_effect=mocked_sleep, create=True),
-            patch("src.ui.screens.sleep", side_effect=mocked_sleep, create=True),
             patch("src.engine.loop.sleep", side_effect=mocked_sleep, create=True),
+            patch("src.ui.screens.sleep", side_effect=mocked_sleep, create=True),
             patch("src.ui.combat_event_handlers.sleep", side_effect=mocked_sleep, create=True),
-            patch("src.engine.game_logic.sleep", side_effect=mocked_sleep, create=True),
             patch("src.ui.toj_menu.sleep", side_effect=mocked_sleep, create=True),
         ])
 
@@ -134,7 +132,7 @@ class AutoTester:
             p.start()
 
         try:
-            main_mod.start_game(player)
+            start_game(player)
         except VictoryException:
             pass # Simulação terminou com sucesso!
         except TimeoutException as te:

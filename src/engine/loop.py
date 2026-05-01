@@ -7,7 +7,7 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from src.content.factories.loot import get_loot
-from src.content.factories.monsters import create_monster, generate_monsters_for_level
+from src.content.factories.monsters import create_boss_for_level, create_monster, generate_monsters_for_level
 from src.content.items import Potion
 from src.engine.events import EventBus
 from src.ui.inventory_flow import run_inventory_flow
@@ -16,10 +16,6 @@ from src.entities.monsters import Monster
 from src.mechanics import combat as combat_mech
 from src.mechanics.combat import PublishFn
 from src.mechanics.math_operations import (
-    calculate_mini_boss_defense,
-    calculate_mini_boss_hp,
-    calculate_mini_boss_magic,
-    calculate_mini_boss_strength,
     calculate_mini_boss_xp_reward,
     calculate_monster_xp_reward,
 )
@@ -291,18 +287,7 @@ def start_game(
 
             # Gerar Mini-Chefe a cada 5 níveis
             if dungeon_level % 5 == 0:
-                boss_level = dungeon_level + 2
-                boss = create_monster(f"Chefe Nv.{boss_level}", boss_level)
-                boss.is_boss = True
-                boss.base_hp = calculate_mini_boss_hp(dungeon_level)
-                boss._hp = boss.base_hp
-                boss.base_st = calculate_mini_boss_strength(dungeon_level)
-                boss._st = boss.base_st
-                boss.base_df = calculate_mini_boss_defense(dungeon_level)
-                boss._df = boss.base_df
-                boss.base_mg = calculate_mini_boss_magic(dungeon_level)
-                boss._mg = boss.base_mg
-                boss.avg_damage = (boss._st + boss._mg) // 3
+                boss = create_boss_for_level(dungeon_level)
                 monsters_to_place.append(boss)
 
             for monster in monsters_to_place:
