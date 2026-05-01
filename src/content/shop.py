@@ -1,4 +1,24 @@
-from src.content.items import ALL_ITEMS, RARITY_MULTIPLIERS, Armor, Potion, Weapon
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from src.content.items import ALL_ITEMS, Armor, Potion, Weapon
+from src.shared.constants import (
+    ARMOR_PRICE_MULTIPLIER,
+    BASE_SHOP_PRICE,
+    POTION_PRICE_MULTIPLIER,
+    RARITY_MULTIPLIERS,
+    SELL_PRICE_FACTOR,
+    SHOP_DUNGEON_LEVEL_SCALING_DIVISOR,
+    WEAPON_PRICE_MULTIPLIER,
+)
+
+if TYPE_CHECKING:
+    from src.entities.heroes import Player
+
+# Type aliases
+ShopItem = dict[str, object]
+AvailableItems = list[ShopItem]
 
 
 class Shop:
@@ -7,28 +27,27 @@ class Shop:
     def __init__(self):
         pass
 
-    def get_price(self, item, dungeon_level):
+    def get_price(self, item: object, dungeon_level: int) -> int:
         """Calcula o preço de um item baseado em sua raridade e nível da dungeon."""
-        base_price = 10 # Base price for a common item
+        base_price = BASE_SHOP_PRICE
 
         # Adjust base price based on item type
         if isinstance(item, Potion):
-            base_price = item.base_effect_value * 2 # Potions are priced based on their effect
+            base_price = item.base_effect_value * POTION_PRICE_MULTIPLIER
         elif isinstance(item, Weapon):
-            base_price = item.base_damage * 10
+            base_price = item.base_damage * WEAPON_PRICE_MULTIPLIER
         elif isinstance(item, Armor):
-            base_price = item.base_defense * 10
+            base_price = item.base_defense * ARMOR_PRICE_MULTIPLIER
 
         # Apply rarity multiplier
         price = base_price * RARITY_MULTIPLIERS.get(item.rarity, 1.0)
 
         # Further adjust price based on dungeon level for higher-tier items
-        # This makes items more expensive but also potentially better quality in higher levels
-        price *= (1 + (dungeon_level / 20)) # Small scaling with dungeon level
+        price *= (1 + (dungeon_level / SHOP_DUNGEON_LEVEL_SCALING_DIVISOR))
 
         return int(price)
 
-    def get_available_items(self, dungeon_level):
+    def get_available_items(self, dungeon_level: int) -> AvailableItems:
         """Retorna uma lista de itens disponíveis para compra na loja, com seus preços."""
         available_items = []
 
@@ -68,29 +87,25 @@ class Shop:
 
         return available_items
 
-    def buy_item(self, player, item_to_buy, dungeon_level):
+    def buy_item(self, player: "Player", item_to_buy: object, dungeon_level: int) -> bool:
         """
         Permite ao jogador comprar um item da loja.
         Retorna True se a compra for bem-sucedida, False caso contrário.
         """
         price = self.get_price(item_to_buy, dungeon_level)
-        if player.coins >= price:
-            player.coins -= price
-            player.inventory.append(item_to_buy)
+        if player.spend_coins(price):
+            player.add_item_to_inventory(item_to_buy)
             return True
-        else:
-            return False
+        return False
 
-    def sell_item(self, player, item_to_sell, dungeon_level):
+    def sell_item(self, player: "Player", item_to_sell: object, dungeon_level: int) -> bool:
         """
         Permite ao jogador vender um item para a loja.
         Retorna True se a venda for bem-sucedida, False caso contrário.
         """
-        if item_to_sell in player.inventory:
-            sell_price = int(self.get_price(item_to_sell, dungeon_level) * 0.5)
-            player.coins += sell_price
-            player.inventory.remove(item_to_sell)
+        if player.remove_item_from_inventory(item_to_sell):
+            sell_price = int(self.get_price(item_to_sell, dungeon_level) * SELL_PRICE_FACTOR)
+            player.earn_coins(sell_price)
             return True
-        else:
-            return False
+        return False
 

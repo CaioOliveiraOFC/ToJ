@@ -44,20 +44,20 @@ def splash_screen():
 
     # Animação do título
     console.print(Panel(Text(ascii_art, justify="center", style="bold dark_red"), border_style="red", width=console.width))
-    sleep(1.5)
+    sleep(0.5)
 
     console.print("\n") # Espaço após o título
 
     # Animação da história com typewriter effect e Panels
     for line in story_text:
         typewriter_effect(line, style="italic cyan", speed=0.03, return_text=False)
-        sleep(0.5) # Short pause after typing
+        sleep(0.2) # Short pause after typing
         console.print(Panel(Text(line, justify="center", style="italic cyan"), border_style="dim white", width=80))
-        sleep(1.5) # Pausa para leitura do painel completo
+        sleep(0.5) # Pausa para leitura do painel completo
 
     console.print("\n") # Espaço antes do prompt
-    console.print(Panel(Text("Pressione [bold green]ENTER[/bold green] para começar sua aventura...", justify="center", style="bold yellow"), border_style="yellow", width=80))
-    console.input("") # Espera pelo Enter (changed from input(""))
+    console.print(Panel(Text("Pressione [bold green]qualquer tecla[/bold green] para começar sua aventura...", justify="center", style="bold yellow"), border_style="yellow", width=80))
+    safe_get_key(allow_escape=False)
 
 def game_over_screen(player_name="Aventureiro"):
     clear_screen()
@@ -83,12 +83,12 @@ def game_over_screen(player_name="Aventureiro"):
         Text("Toda jornada tem um fim, mas a lenda... a lenda pode recomeçar.", justify="center", style="italic white"),
         border_style="dim white"
     ))
-    sleep(3)
+    sleep(0.8)
     console.print(Panel(
-        Text("Pressione [bold green]ENTER[/bold green] para retornar ao menu principal...", justify="center", style="bold yellow"),
+        Text("Pressione [bold green]qualquer tecla[/bold green] para retornar ao menu principal...", justify="center", style="bold yellow"),
         border_style="yellow"
     ))
-    console.input("") # Changed from input("")
+    safe_get_key(allow_escape=False)
 
 def display_final_stats(level: int, actions: int, battles: int, crashes: int):
     clear_screen()
@@ -115,12 +115,12 @@ def display_final_stats(level: int, actions: int, battles: int, crashes: int):
         Text("Obrigado por jogar Tales of the Journey! Esperamos vê-lo novamente.", justify="center", style="italic dim white"),
         border_style="dim white"
     ))
-    sleep(3)
+    sleep(0.8)
     console.print(Panel(
-        Text("Pressione [bold green]ENTER[/bold green] para continuar...", justify="center", style="bold yellow"),
+        Text("Pressione [bold green]qualquer tecla[/bold green] para continuar...", justify="center", style="bold yellow"),
         border_style="yellow"
     ))
-    console.input("") # Changed from input("")
+    safe_get_key(allow_escape=False)
 
 def options_menu():
     while True:
@@ -143,19 +143,19 @@ def options_menu():
         console.print(options_table)
         console.print("\n")
 
-        choice = console.input("[bold green]Sua escolha:[/bold green] ")
+        choice = safe_get_key(valid_keys=["1", "2", "3"])
 
         if choice == '1':
             console.print(Panel(Text("Função de Volume ainda não implementada.", justify="center", style="yellow"), border_style="yellow"))
-            sleep(1.5)
+            sleep(0.4)
         elif choice == '2':
             console.print(Panel(Text("Função de Dificuldade ainda não implementada.", justify="center", style="yellow"), border_style="yellow"))
-            sleep(1.5)
+            sleep(0.4)
         elif choice == '3':
             break
         else:
             console.print(Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="bold red"), border_style="red"))
-            sleep(1.5)
+            sleep(0.4)
 
 def character_creation_flow() -> tuple[str, str] | None:
     """
@@ -235,33 +235,33 @@ def main_menu():
         console.print(table)
         console.print("\n")
 
-        choice = console.input("[bold green]Sua escolha, mortal:[/bold green] ")
+        choice = safe_get_key(valid_keys=["1", "2", "4", "5", "6", "7"])
 
         if choice == '1':
             console.print(Panel(Text("Adentrando as sombras da nova jornada...", justify="center", style="green"), border_style="green"))
-            sleep(1.5)
+            sleep(0.4)
             return 'new_game'
         elif choice == '2':
             console.print(Panel(Text("Revisitando memórias antigas...", justify="center", style="yellow"), border_style="yellow"))
-            sleep(1.5)
+            sleep(0.4)
             return 'load_game'
         elif choice == '4':
             options_menu() # Call the new options menu
         elif choice == '5':
             console.print(Panel(Text("Até que a escuridão nos encontre novamente, aventureiro!", justify="center", style="red"), border_style="red"))
-            sleep(1.5)
+            sleep(0.4)
             return 'quit'
         elif choice == '6':
             console.print(Panel(Text("Iniciando a simulação...", justify="center", style="magenta"), border_style="magenta"))
-            sleep(1.5)
+            sleep(0.4)
             return 'auto_test'
         elif choice == '7':
             console.print(Panel(Text("Iniciando MODO DE TESTE com herói nível 50...", justify="center", style="magenta"), border_style="magenta"))
-            sleep(1.5)
+            sleep(0.4)
             return 'test_hero'
         else:
             console.print(Panel(Text("Um erro em sua escolha, aventureiro. Tente novamente.", justify="center", style="bold red"), border_style="red"))
-            sleep(1.5)
+            sleep(0.4)
 
 if __name__ == '__main__':
     splash_screen()

@@ -9,16 +9,35 @@ from __future__ import annotations
 from time import sleep
 from typing import TYPE_CHECKING
 
-from src.content.items import Armor, Potion, Weapon
+from src.content.items import ALL_ITEMS, Armor, Potion, Weapon
+from src.content.skills import mage_skills, rogue_skills, warrior_skills
 from src.engine.game_logic import create_player_from_data
 from src.engine.loop import start_game
-from src.entities.heroes import Warrior
+from src.entities.heroes import Mage, Rogue, Warrior
 from src.storage.save_manager import load_game
-from src.ui.auto_test import AutoTester
 from src.ui.toj_menu import character_creation_flow, main_menu
+
+# Import condicional - AutoTester foi movido para fora da camada UI
+try:
+    from tests.auto_test import AutoTester
+except ImportError:
+    AutoTester = None  # type: ignore
 
 if TYPE_CHECKING:
     pass
+
+# Registries para injeção de dependências no load_game
+PLAYER_FACTORY = {
+    "Warrior": Warrior,
+    "Mage": Mage,
+    "Rogue": Rogue,
+}
+
+SKILLS_REGISTRY = {
+    "Warrior": warrior_skills,
+    "Mage": mage_skills,
+    "Rogue": rogue_skills,
+}
 
 
 def _create_test_hero() -> Warrior:
@@ -49,16 +68,23 @@ def run_main_loop() -> None:
                 if player:
                     start_game(player, 1)
         elif menu_choice == "load_game":
-            player, dungeon_level, map_state = load_game()
+            player, dungeon_level, map_state = load_game(
+                item_registry=ALL_ITEMS,
+                player_factory=PLAYER_FACTORY,
+                skills_registry=SKILLS_REGISTRY
+            )
             if player:
                 start_game(player, dungeon_level, map_state)
         elif menu_choice == "quit":
             break
         elif menu_choice == "auto_test":
+            if AutoTester is None:
+                print("AutoTester não disponível.")
+                continue
             player = Warrior("TestBot")
             tester = AutoTester()
             tester.run_test(player)
         elif menu_choice == "test_hero":
             player = _create_test_hero()
-            sleep(1)
+            sleep(0.5)
             start_game(player)

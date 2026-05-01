@@ -4,12 +4,21 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src.content.items import Armor, Potion, Weapon
 from src.ui import screens
 from src.ui.prompts import safe_get_key
 
 if TYPE_CHECKING:
     from src.entities.heroes import Player
+
+
+def _is_potion(item: object) -> bool:
+    """Verifica se o item é uma poção via duck typing."""
+    return hasattr(item, "potion_type") or hasattr(item, "effect_value")
+
+
+def _is_equipment(item: object) -> bool:
+    """Verifica se o item é equipável (arma ou armadura) via duck typing."""
+    return hasattr(item, "damage") or hasattr(item, "defense")
 
 
 def run_inventory_flow(player: "Player") -> None:
@@ -43,20 +52,20 @@ def _run_item_action_flow(player: "Player", item: object) -> None:
         action_choice = safe_get_key(valid_keys=action_options, allow_escape=False)
 
         if action_choice == "u":
-            if isinstance(item, Potion):
+            if _is_potion(item):
                 msg = player.use_potion(item)
-                screens.render_inventory_item_used(msg or item.name)
+                screens.render_inventory_item_used(msg or getattr(item, "name", "item"))
                 break
         elif action_choice == "e":
-            if isinstance(item, (Weapon, Armor)):
+            if _is_equipment(item):
                 if is_equipped:
                     slot = _find_equipped_slot(player, item)
                     if slot:
                         msg = player.unequip(slot)
-                        screens.render_inventory_item_unequipped(msg or item.name)
+                        screens.render_inventory_item_unequipped(msg or getattr(item, "name", "item"))
                 else:
                     msg = player.equip(item)
-                    screens.render_inventory_item_equipped(msg or item.name)
+                    screens.render_inventory_item_equipped(msg or getattr(item, "name", "item"))
                 break
         elif action_choice == "c":
             break
@@ -82,10 +91,10 @@ def _build_action_options(item: object, is_equipped: bool) -> list[str]:
     """Constrói a lista de opções de ação disponíveis para o item."""
     options = []
 
-    if isinstance(item, Potion):
+    if _is_potion(item):
         options.append("u")
 
-    if isinstance(item, (Weapon, Armor)):
+    if _is_equipment(item):
         options.append("e")
 
     options.append("c")

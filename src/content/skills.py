@@ -1,22 +1,52 @@
 #!/usr/bin/env python3
 
 class Skill:
+    """Classe base para habilidades com tipos de efeito, alvos e durações.
+
+    Args:
+        name: Nome da habilidade.
+        mana_cost: Custo de mana para usar a habilidade.
+        level_required: Nível necessário para aprender a habilidade.
+        description: Descrição da habilidade.
+        effect_type: Tipo de efeito ('damage', 'heal', 'status', 'buff').
+        target: Alvo da habilidade ('enemy', 'self').
+        value: Valor do efeito (dano, cura ou aumento de status).
+        duration: Duração do efeito em turnos (0 para efeitos instantâneos).
+        chance: Chance de aplicar efeito de status (0-100).
+
+    Attributes:
+        name: Nome da habilidade.
+        mana_cost: Custo de mana.
+        level_required: Nível necessário.
+        description: Descrição da habilidade.
+        effect_type: Tipo de efeito.
+        target: Alvo da habilidade.
+        value: Valor do efeito.
+        duration: Duração em turnos.
+        chance: Chance de aplicar efeito (%).
     """
-    Classe base para habilidades, agora com tipos de efeito, alvos e durações.
-    effect_type: 'damage', 'heal', 'status', 'buff'
-    target: 'enemy', 'self'
-    """
-    def __init__(self, name, mana_cost, level_required, description,
-                 effect_type, target, value=0, duration=0, chance=100):
-        self.name = name
-        self.mana_cost = mana_cost
-        self.level_required = level_required
-        self.description = description
-        self.effect_type = effect_type
-        self.target = target
-        self.value = value      # Para dano, cura ou aumento de status
-        self.duration = duration  # Para efeitos que duram vários turnos
-        self.chance = chance      # Chance de aplicar um efeito de status (ex: 80 para 80%)
+
+    def __init__(
+        self,
+        name: str,
+        mana_cost: int,
+        level_required: int,
+        description: str,
+        effect_type: str,
+        target: str,
+        value: int | str = 0,
+        duration: int = 0,
+        chance: int = 100
+    ) -> None:
+        self.name: str = name
+        self.mana_cost: int = mana_cost
+        self.level_required: int = level_required
+        self.description: str = description
+        self.effect_type: str = effect_type
+        self.target: str = target
+        self.value: int | str = value
+        self.duration: int = duration
+        self.chance: int = chance
 
 # --- Habilidades de Guerreiro ---
 warrior_skills = {

@@ -8,6 +8,17 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from src.shared import combat_topics as T
+from src.shared.constants import (
+    BASE_HIT_CHANCE,
+    CRIT_CHANCE_DEFAULT,
+    CRIT_CHANCE_HIGH,
+    CRIT_DAMAGE_MULTIPLIER,
+    DEFENSE_REDUCTION_DIVISOR,
+    FLEE_RANGE_MAX,
+    PERCENTAGE_RANGE_MAX,
+    PERCENTAGE_RANGE_MIN,
+    POISON_DAMAGE_PER_TICK,
+)
 from src.shared.types import CombatResult, GameEvent
 
 PublishFn = Callable[[str, GameEvent], None] | None
@@ -51,15 +62,15 @@ def resolve_physical_attack(
     r = _rng(rng)
 
     crit_chance = (
-        25
+        CRIT_CHANCE_HIGH
         if hasattr(attacker, "get_classname")
         and attacker.get_classname() == "Rogue"
         and skill_name == "Ataque Furtivo"
-        else 10
+        else CRIT_CHANCE_DEFAULT
     )
 
-    hit_chance = 85 + (attacker.get_ag() - defender.get_ag())
-    if r.randrange(1, 101) > hit_chance:
+    hit_chance = BASE_HIT_CHANCE + (attacker.get_ag() - defender.get_ag())
+    if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > hit_chance:
         miss = CombatResult(
             attacker_id=attacker.get_nick_name(),
             defender_id=defender.get_nick_name(),
@@ -77,12 +88,12 @@ def resolve_physical_attack(
         )
         return miss
 
-    defense_reduction = defender.get_df() // 2
+    defense_reduction = defender.get_df() // DEFENSE_REDUCTION_DIVISOR
     damage = max(1, int(base_damage) - int(defense_reduction))
 
-    is_critical = r.randrange(1, 101) <= crit_chance
+    is_critical = r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= crit_chance
     if is_critical:
-        damage *= 2
+        damage *= CRIT_DAMAGE_MULTIPLIER
 
     defender.take_damage(damage)
     dead = defender.get_hp() <= 0
@@ -149,7 +160,7 @@ def apply_skill(
         return out
 
     if skill.effect_type == "status":
-        if r.randrange(1, 101) <= int(skill.chance):
+        if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= int(skill.chance):
             target.active_effects[str(skill.value)] = {"duration": int(skill.duration)}
             out = SkillApplyResult(
                 kind="status",
@@ -214,13 +225,12 @@ def process_turn_start_effects(
 
     for effect, data in list(getattr(entity, "active_effects", {}).items()):
         if effect == "poison":
-            poison_damage = 5
-            entity.take_damage(poison_damage)
+            entity.take_damage(POISON_DAMAGE_PER_TICK)
             _emit(
                 publish,
                 T.COMBAT_TURN_EFFECT,
                 type_="turn_effect",
-                payload={"entity": entity, "kind": "poison_tick", "damage": poison_damage},
+                payload={"entity": entity, "kind": "poison_tick", "damage": POISON_DAMAGE_PER_TICK},
             )
         if effect == "frozen":
             _emit(
@@ -266,4 +276,4 @@ def process_turn_start_effects(
 
 def roll_flee_success(*, rng: random.Random | None = None) -> bool:
     r = _rng(rng)
-    return r.randrange(0, 2) == 0
+    return r.randrange(0, FLEE_RANGE_MAX) == 0

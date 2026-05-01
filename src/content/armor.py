@@ -1,118 +1,176 @@
-RARITY_MULTIPLIERS = {
-    "Common": 1.0,
-    "Rare": 1.15,
-    "Epic": 1.32, # ~1.15 * 1.15
-    "Legendary": 1.52, # ~1.15 * 1.15 * 1.15
-}
+"""
+Definições de armaduras - fornecem apenas dados base/conteúdo.
+
+A lógica de cálculo de defesa efetiva (aplicação de multiplicadores de raridade,
+buffs, etc.) é responsabilidade da camada entities/.
+"""
+
 
 class Armor:
-    """
-    Classe base para todas as armaduras.
-    """
-    def __init__(self, name, rarity="Common"):
-        self.name = name
-        self.rarity = rarity
-        self.equipped = False
+    """Classe base para todas as armaduras.
 
-    def get_name(self):
+    Fornece apenas dados base; cálculo de defesa efetiva é feito por entities/.
+
+    Args:
+        name: Nome da armadura.
+        rarity: Raridade da armadura (default: "Common").
+        base_defense: Defesa base da armadura (default: 0).
+        bonus_defense: Bônus de defesa adicional (default: 0).
+
+    Attributes:
+        name: Nome da armadura.
+        rarity: Raridade da armadura.
+        equipped: Indica se a armadura está equipada.
+        base_defense: Defesa base da armadura.
+        bonus_defense: Bônus de defesa adicional.
+    """
+
+    def __init__(self, name: str, rarity: str = "Common", base_defense: int = 0, bonus_defense: int = 0) -> None:
+        self.name: str = name
+        self.rarity: str = rarity
+        self.equipped: bool = False
+        self.base_defense: int = base_defense
+        self.bonus_defense: int = bonus_defense
+
+    def get_name(self) -> str:
+        """Retorna o nome da armadura."""
         return self.name
 
-    def get_rarity(self):
+    def get_rarity(self) -> str:
+        """Retorna a raridade da armadura."""
         return self.rarity
 
-    def is_equipped(self):
+    def is_equipped(self) -> bool:
+        """Retorna True se a armadura está equipada."""
         return self.equipped
 
-    def set_equipped(self):
+    def set_equipped(self) -> None:
+        """Marca a armadura como equipada."""
         self.equipped = True
 
+    def get_base_defense(self) -> int:
+        """Retorna a defesa base (sem multiplicadores de raridade)."""
+        return self.base_defense + self.bonus_defense
+
+
 class Shoes(Armor):
-    """
-    Classe para a armadura do tipo Sapatos.
-    """
-    base_df = 10
+    """Classe para a armadura do tipo Sapatos.
 
-    def __init__(self, name, add_df=0, rarity="Common"):
-        super().__init__(name, rarity)
-        self._base_df_value = Shoes.base_df + add_df
-        self._df = int(self._base_df_value * RARITY_MULTIPLIERS[rarity])
-        self.classes = ['Warrior', 'Rogue', 'Mage']
+    Args:
+        name: Nome dos sapatos.
+        add_df: Bônus de defesa adicional (default: 0).
+        rarity: Raridade dos sapatos (default: "Common").
+    """
 
-    def get_lst_class(self):
+    SLOT_BASE_DEFENSE: int = 10
+
+    def __init__(self, name: str, add_df: int = 0, rarity: str = "Common") -> None:
+        super().__init__(
+            name=name,
+            rarity=rarity,
+            base_defense=Shoes.SLOT_BASE_DEFENSE,
+            bonus_defense=add_df
+        )
+        self.classes: list[str] = ['Warrior', 'Rogue', 'Mage']
+
+    def get_lst_class(self) -> list[str]:
+        """Retorna a lista de classes que podem usar este item."""
         return self.classes
 
     @staticmethod
-    def in_space():
+    def in_space() -> str:
+        """Retorna o slot de equipamento."""
         return 'Shoes'
 
-    def get_df(self):
-        return self._df
 
 class Legs(Armor):
-    """
-    Classe para a armadura do tipo Calças.
-    """
-    base_df = 12
+    """Classe para a armadura do tipo Calças.
 
-    def __init__(self, name, add_df=0, rarity="Common"):
-        super().__init__(name, rarity)
-        self._base_df_value = Legs.base_df + add_df
-        self._df = int(self._base_df_value * RARITY_MULTIPLIERS[rarity])
-        self.classes = ['Warrior', 'Rogue', 'Mage']
+    Args:
+        name: Nome das calças.
+        add_df: Bônus de defesa adicional (default: 0).
+        rarity: Raridade das calças (default: "Common").
+    """
 
-    def get_lst_class(self):
+    SLOT_BASE_DEFENSE: int = 12
+
+    def __init__(self, name: str, add_df: int = 0, rarity: str = "Common") -> None:
+        super().__init__(
+            name=name,
+            rarity=rarity,
+            base_defense=Legs.SLOT_BASE_DEFENSE,
+            bonus_defense=add_df
+        )
+        self.classes: list[str] = ['Warrior', 'Rogue', 'Mage']
+
+    def get_lst_class(self) -> list[str]:
+        """Retorna a lista de classes que podem usar este item."""
         return self.classes
 
     @staticmethod
-    def in_space():
+    def in_space() -> str:
+        """Retorna o slot de equipamento."""
         return 'Legs'
 
-    def get_df(self):
-        return self._df
 
 class Helmet(Armor):
-    """
-    Classe para a armadura do tipo Capacete.
-    """
-    base_df = 8
+    """Classe para a armadura do tipo Capacete.
 
-    def __init__(self, name, add_df=0, rarity="Common"):
-        super().__init__(name, rarity)
-        self._base_df_value = Helmet.base_df + add_df
-        self._df = int(self._base_df_value * RARITY_MULTIPLIERS[rarity])
-        self.classes = ['Warrior', 'Rogue', 'Mage']
+    Args:
+        name: Nome do capacete.
+        add_df: Bônus de defesa adicional (default: 0).
+        rarity: Raridade do capacete (default: "Common").
+    """
 
-    def get_lst_class(self):
+    SLOT_BASE_DEFENSE: int = 8
+
+    def __init__(self, name: str, add_df: int = 0, rarity: str = "Common") -> None:
+        super().__init__(
+            name=name,
+            rarity=rarity,
+            base_defense=Helmet.SLOT_BASE_DEFENSE,
+            bonus_defense=add_df
+        )
+        self.classes: list[str] = ['Warrior', 'Rogue', 'Mage']
+
+    def get_lst_class(self) -> list[str]:
+        """Retorna a lista de classes que podem usar este item."""
         return self.classes
 
     @staticmethod
-    def in_space():
+    def in_space() -> str:
+        """Retorna o slot de equipamento."""
         return 'Helmet'
 
-    def get_df(self):
-        return self._df
 
 class Body(Armor):
-    """
-    Classe para a armadura do tipo Peitoral.
-    """
-    base_df = 15
+    """Classe para a armadura do tipo Peitoral.
 
-    def __init__(self, name, add_df=0, rarity="Common"):
-        super().__init__(name, rarity)
-        self._base_df_value = Body.base_df + add_df
-        self._df = int(self._base_df_value * RARITY_MULTIPLIERS[rarity])
-        self.classes = ['Warrior', 'Rogue', 'Mage']
+    Args:
+        name: Nome do peitoral.
+        add_df: Bônus de defesa adicional (default: 0).
+        rarity: Raridade do peitoral (default: "Common").
+    """
 
-    def get_lst_class(self):
+    SLOT_BASE_DEFENSE: int = 15
+
+    def __init__(self, name: str, add_df: int = 0, rarity: str = "Common") -> None:
+        super().__init__(
+            name=name,
+            rarity=rarity,
+            base_defense=Body.SLOT_BASE_DEFENSE,
+            bonus_defense=add_df
+        )
+        self.classes: list[str] = ['Warrior', 'Rogue', 'Mage']
+
+    def get_lst_class(self) -> list[str]:
+        """Retorna a lista de classes que podem usar este item."""
         return self.classes
 
     @staticmethod
-    def in_space():
+    def in_space() -> str:
+        """Retorna o slot de equipamento."""
         return 'Body'
-
-    def get_df(self):
-        return self._df
 
 # --- Definição das Armaduras do Jogo ---
 

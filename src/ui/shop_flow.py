@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src.content.shop import Shop
 from src.ui import screens
 from src.ui.prompts import safe_get_key
 
@@ -12,12 +11,16 @@ if TYPE_CHECKING:
     from src.entities.heroes import Player
 
 
-def run_shop_flow(player: "Player", dungeon_level: int) -> None:
+def run_shop_flow(player: "Player", shop: object, dungeon_level: int) -> None:
     """
     Orquestra o fluxo completo da loja.
     Separa a lógica de interação (engine) da renderização (ui/screens).
+
+    Args:
+        player: O jogador atual.
+        shop: Instância da loja (injetada pela camada engine).
+        dungeon_level: Nível atual da masmorra.
     """
-    shop = Shop()
 
     while True:
         screens.render_shop_main(shop, player.coins)
@@ -33,7 +36,7 @@ def run_shop_flow(player: "Player", dungeon_level: int) -> None:
             break
 
 
-def _run_buy_flow(player: "Player", shop: Shop, dungeon_level: int) -> None:
+def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
     """Fluxo de compra de itens."""
     while True:
         items_for_sale = shop.get_available_items(dungeon_level)
@@ -63,7 +66,7 @@ def _run_buy_flow(player: "Player", shop: Shop, dungeon_level: int) -> None:
             screens.render_shop_invalid_choice()
 
 
-def _run_sell_flow(player: "Player", shop: Shop, dungeon_level: int) -> None:
+def _run_sell_flow(player: "Player", shop: object, dungeon_level: int) -> None:
     """Fluxo de venda de itens."""
     while True:
         screens.render_shop_sell_menu(player.inventory, shop, dungeon_level, player.coins)

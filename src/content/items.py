@@ -1,41 +1,92 @@
-# Rarity system
-RARITY_MULTIPLIERS = {
-    "Common": 1.0,
-    "Rare": 1.15,
-    "Epic": 1.32, # ~1.15 * 1.15
-    "Legendary": 1.52, # ~1.15 * 1.15 * 1.15
-}
+from src.shared.constants import RARITY_MULTIPLIERS
+
 
 class Item:
-    """Classe base para todos os itens do jogo."""
-    def __init__(self, name, description, rarity="Common"):
-        self.name = name
-        self.description = description
-        self.rarity = rarity
+    """Classe base para todos os itens do jogo.
+
+    Args:
+        name: Nome do item.
+        description: Descrição do item.
+        rarity: Raridade do item (default: "Common").
+
+    Attributes:
+        name: Nome do item.
+        description: Descrição do item.
+        rarity: Raridade do item.
+    """
+
+    def __init__(self, name: str, description: str, rarity: str = "Common") -> None:
+        self.name: str = name
+        self.description: str = description
+        self.rarity: str = rarity
 
 class Weapon(Item):
-    """Classe para itens que são armas."""
-    def __init__(self, name, description, base_damage, rarity="Common"):
+    """Classe para itens que são armas.
+
+    Args:
+        name: Nome da arma.
+        description: Descrição da arma.
+        base_damage: Dano base da arma.
+        rarity: Raridade da arma (default: "Common").
+
+    Attributes:
+        base_damage: Dano base da arma.
+        damage_bonus: Bônus de dano calculado baseado na raridade.
+        slot: Slot de equipamento (sempre "Weapon").
+    """
+
+    def __init__(self, name: str, description: str, base_damage: int, rarity: str = "Common") -> None:
         super().__init__(name, description, rarity)
-        self.base_damage = base_damage
-        self.damage_bonus = int(base_damage * RARITY_MULTIPLIERS[rarity])
-        self.slot = "Weapon"
+        self.base_damage: int = base_damage
+        self.damage_bonus: int = int(base_damage * RARITY_MULTIPLIERS[rarity])
+        self.slot: str = "Weapon"
 
 class Armor(Item):
-    """Classe para itens que são armaduras. Esta é uma representação genérica para itens que podem ser lootados, a implementação detalhada da armadura está em armor.py."""
-    def __init__(self, name, description, base_defense, slot, rarity="Common"):
+    """Classe para itens que são armaduras.
+
+    Esta é uma representação genérica para itens que podem ser lootados.
+    A implementação detalhada da armadura está em armor.py.
+
+    Args:
+        name: Nome da armadura.
+        description: Descrição da armadura.
+        base_defense: Defesa base da armadura.
+        slot: Slot de equipamento (ex: "Helmet", "Body", "Legs", "Shoes").
+        rarity: Raridade da armadura (default: "Common").
+
+    Attributes:
+        base_defense: Defesa base da armadura.
+        defense_bonus: Bônus de defesa calculado baseado na raridade.
+        slot: Slot de equipamento.
+    """
+
+    def __init__(self, name: str, description: str, base_defense: int, slot: str, rarity: str = "Common") -> None:
         super().__init__(name, description, rarity)
-        self.base_defense = base_defense
-        self.defense_bonus = int(base_defense * RARITY_MULTIPLIERS[rarity])
-        self.slot = slot # Ex: "Helmet", "Body", etc.
+        self.base_defense: int = base_defense
+        self.defense_bonus: int = int(base_defense * RARITY_MULTIPLIERS[rarity])
+        self.slot: str = slot
 
 class Potion(Item):
-    """Classe para itens consumíveis, como poções."""
-    def __init__(self, name, description, base_effect_value, potion_type="Health", rarity="Common"):
+    """Classe para itens consumíveis, como poções.
+
+    Args:
+        name: Nome da poção.
+        description: Descrição da poção.
+        base_effect_value: Valor base do efeito da poção.
+        potion_type: Tipo da poção (ex: "Health", "Mana", "Strength", "Defense", "Agility").
+        rarity: Raridade da poção (default: "Common").
+
+    Attributes:
+        potion_type: Tipo do efeito da poção.
+        base_effect_value: Valor base do efeito.
+        effect_value: Valor do efeito calculado baseado na raridade.
+    """
+
+    def __init__(self, name: str, description: str, base_effect_value: int, potion_type: str = "Health", rarity: str = "Common") -> None:
         super().__init__(name, description, rarity)
-        self.potion_type = potion_type # Ex: "Health", "Mana", "Strength", "Defense", "Agility"
-        self.base_effect_value = base_effect_value
-        self.effect_value = int(base_effect_value * RARITY_MULTIPLIERS[rarity])
+        self.potion_type: str = potion_type
+        self.base_effect_value: int = base_effect_value
+        self.effect_value: int = int(base_effect_value * RARITY_MULTIPLIERS[rarity])
 
 # --- Definição dos Itens do Jogo ---
 

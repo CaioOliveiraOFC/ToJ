@@ -7,24 +7,17 @@ import random
 from typing import TYPE_CHECKING
 
 from src.content.factories.monsters import create_monster
+from src.shared.constants import DEFAULT_WALL_PERCENTAGE, MAP_BORDER_OFFSET
 
 if TYPE_CHECKING:
     pass
-
-# Dicionário com códigos de cores ANSI para o terminal
-COLORS = {
-    "red": "\033[91m",
-    "green": "\033[92m",
-    "yellow": "\033[93m",
-    "reset": "\033[0m"
-}
 
 class MapOfGame:
     """
     Esta classe gere a criação, exibição e interação com o mapa do jogo,
     incluindo jogador, inimigos e a saída da masmorra.
     """
-    def __init__(self, height, width):
+    def __init__(self, height: int, width: int):
         self.height = height
         self.width = width
         self.grid = []
@@ -32,15 +25,15 @@ class MapOfGame:
         self.exit_pos = {'y': 0, 'x': 0}
         self.enemies_pos = {}
 
-    def _get_random_empty_spot(self):
+    def _get_random_empty_spot(self) -> tuple[int, int]:
         """Encontra e retorna uma posição vazia aleatória ('.') no mapa."""
         while True:
-            y = random.randint(1, self.height - 2)
-            x = random.randint(1, self.width - 2)
+            y = random.randint(MAP_BORDER_OFFSET, self.height - 2)
+            x = random.randint(MAP_BORDER_OFFSET, self.width - 2)
             if self.grid[y][x] == '.':
                 return y, x
 
-    def generate_map(self, percent_of_walls=0.2):
+    def generate_map(self, percent_of_walls: float = DEFAULT_WALL_PERCENTAGE) -> None:
         """Gera o mapa usando Random Walk garantindo conectividade."""
         self.grid = [['#' for _ in range(self.width)] for _ in range(self.height)]
 
@@ -56,18 +49,18 @@ class MapOfGame:
             ny = y + direction[0]
             nx = x + direction[1]
 
-            if 1 <= ny < self.height - 1 and 1 <= nx < self.width - 1:
+            if MAP_BORDER_OFFSET <= ny < self.height - 1 and MAP_BORDER_OFFSET <= nx < self.width - 1:
                 y, x = ny, nx
                 if self.grid[y][x] == '#':
                     self.grid[y][x] = '.'
                     empty_count += 1
 
-    def place_player(self):
+    def place_player(self) -> None:
         """Coloca o jogador em um local aleatório no mapa."""
         y, x = self._get_random_empty_spot()
         self.player_pos['y'], self.player_pos['x'] = y, x
 
-    def place_exit(self):
+    def place_exit(self) -> None:
         """Coloca a saída 'X' no piso vazio mais distante do jogador."""
         player_y, player_x = self.player_pos['y'], self.player_pos['x']
 
@@ -87,16 +80,17 @@ class MapOfGame:
             self.grid[exit_y][exit_x] = 'X'
             self.exit_pos = {'y': exit_y, 'x': exit_x}
 
-    def place_enemy(self, enemy_obj):
+    def place_enemy(self, enemy_obj: object) -> None:
         """Coloca um inimigo em um local aleatório."""
         y, x = self._get_random_empty_spot()
         self.enemies_pos[(y, x)] = enemy_obj
 
     def draw_map(self) -> list[str]:
-        """Gera representação do mapa como lista de strings para renderização pela UI.
+        """Gera representação pura do mapa como lista de strings para renderização pela UI.
 
-        Retorna lista de strings onde cada string representa uma linha do mapa.
-        A renderização visual é responsabilidade da camada UI (renderer/screens).
+        Retorna lista de strings onde cada string representa uma linha do mapa
+        com caracteres puros (sem formatação visual). A UI (renderer/screens) é
+        responsável por aplicar cores e estilos.
         """
         lines: list[str] = []
         for y, row in enumerate(self.grid):
@@ -104,22 +98,22 @@ class MapOfGame:
             for x, tile in enumerate(row):
                 char = tile
                 if y == self.player_pos['y'] and x == self.player_pos['x']:
-                    char = f"{COLORS['green']}@{COLORS['reset']}"
+                    char = '@'
                 elif (y, x) in self.enemies_pos:
                     enemy = self.enemies_pos[(y, x)]
                     if getattr(enemy, 'is_boss', False):
-                        char = f"\033[95mB{COLORS['reset']}"
+                        char = 'B'
                     else:
-                        char = f"{COLORS['red']}&{COLORS['reset']}"
+                        char = '&'
                 elif tile == 'X':
-                    char = f"{COLORS['yellow']}X{COLORS['reset']}"
-                elif tile == 'D':  # Adicionado para corpos de inimigos mortos
-                    char = f"{COLORS['red']}D{COLORS['reset']}"
+                    char = 'X'
+                elif tile == 'D':
+                    char = 'D'
                 display_row.append(char)
             lines.append(' '.join(display_row))
         return lines
 
-    def move_player(self, direction):
+    def move_player(self, direction: str) -> str | object | None:
         """
         Move o jogador, verifica colisões e retorna o resultado da ação.
         Retorna: 'level_complete', um objeto Monstro, ou None.
@@ -162,7 +156,7 @@ class MapOfGame:
             self.player_pos = {'y': ny, 'x': nx}
         return None
 
-    def get_map_state(self):
+    def get_map_state(self) -> dict:
         """Retorna um dicionário com o estado atual do mapa para salvamento."""
         # Serializar enemies_pos para salvar. (y, x) -> {nick_name, level}
         enemies_serializable = {

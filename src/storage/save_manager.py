@@ -1,13 +1,25 @@
+from __future__ import annotations
+
 import json
 import os
+from typing import TYPE_CHECKING
 
-from src.content.items import ALL_ITEMS  # Dicionário central de itens
-from src.content.skills import mage_skills, rogue_skills, warrior_skills
-from src.entities.heroes import Mage, Rogue, Warrior
+if TYPE_CHECKING:
+    from src.entities.heroes import Player
 
 SAVE_FILE = "savegame.json"
 
-def save_game(player, dungeon_level, map_state=None) -> dict:
+# Type aliases para clareza
+ItemRegistry = dict[str, object]
+SkillRegistry = dict[int, object]
+PlayerFactory = type["Player"]
+SaveResult = dict[str, bool | str]
+
+def save_game(
+    player: "Player",
+    dungeon_level: int,
+    map_state: dict | None = None
+) -> SaveResult:
     """Salva o estado atual do jogo num ficheiro JSON.
 
     Retorna dict com 'success': bool e 'message': str para exibição pela UI.
@@ -37,8 +49,17 @@ def save_game(player, dungeon_level, map_state=None) -> dict:
     except Exception as e:
         return {"success": False, "message": f"Ocorreu um erro ao salvar o jogo: {e}"}
 
-def load_game() -> tuple:
+def load_game(
+    item_registry: ItemRegistry,
+    player_factory: dict[str, PlayerFactory],
+    skills_registry: dict[str, SkillRegistry]
+) -> tuple["Player" | None, int | None, dict | None]:
     """Carrega o estado do jogo a partir de um ficheiro JSON.
+
+    Args:
+        item_registry: Dicionário mapeando nomes de itens para instâncias (ALL_ITEMS).
+        player_factory: Dicionário mapeando nomes de classes para classes de heróis.
+        skills_registry: Dicionário mapeando nomes de classes para registries de skills.
 
     Retorna (player, dungeon_level, map_state) ou (None, None, None) em caso de erro.
     A mensagem de status deve ser exibida pela UI chamadora.
@@ -54,17 +75,12 @@ def load_game() -> tuple:
         player_class_name = save_data["player_class"]
         player_name = save_data["player_name"]
 
-        if player_class_name == "Warrior":
-            player = Warrior(player_name)
-            player.learnable_skills = warrior_skills
-        elif player_class_name == "Mage":
-            player = Mage(player_name)
-            player.learnable_skills = mage_skills
-        elif player_class_name == "Rogue":
-            player = Rogue(player_name)
-            player.learnable_skills = rogue_skills
-        else:
+        player_class = player_factory.get(player_class_name)
+        if not player_class:
             return None, None, None  # Classe desconhecida
+
+        player = player_class(player_name)
+        player.learnable_skills = skills_registry.get(player_class_name, {})
 
         # Define o nível e os status do jogador
         player.set_level(save_data["level"])
@@ -72,11 +88,11 @@ def load_game() -> tuple:
         player.coins = save_data["coins"]
 
         # Reconstrói o inventário e o equipamento a partir dos nomes
-        player.inventory = [ALL_ITEMS[name] for name in save_data["inventory"]]
+        player.inventory = [item_registry[name] for name in save_data["inventory"]]
 
         for slot, item_name in save_data["equipment"].items():
             if item_name:
-                item_to_equip = ALL_ITEMS[item_name]
+                item_to_equip = item_registry[item_name]
                 # Remove o item do inventário antes de equipar para evitar duplicados
                 if item_to_equip in player.inventory:
                     player.inventory.remove(item_to_equip)
@@ -94,6 +110,6 @@ def load_game() -> tuple:
     except Exception:
         return None, None, None
 
-def check_save_file():
+def check_save_file() -> bool:
     """Verifica se o ficheiro de save existe."""
     return os.path.exists(SAVE_FILE)

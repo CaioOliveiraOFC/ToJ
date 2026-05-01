@@ -18,13 +18,13 @@ class EventSink(Protocol):
 def _on_physical_strike(ev: GameEvent) -> None:
     p = ev.payload
     renderer.render_physical_strike_result(p["attacker"], p["defender"], p["strike"])
-    sleep(1.5)
+    sleep(0.8)
 
 
 def _on_skill_cast(ev: GameEvent) -> None:
     p = ev.payload
     renderer.render_skill_cast_banner(p["caster"], p["skill"])
-    sleep(1.0)
+    sleep(0.5)
 
 
 def _on_skill_outcome(ev: GameEvent) -> None:
@@ -35,19 +35,19 @@ def _on_skill_outcome(ev: GameEvent) -> None:
 
     if result.kind == "damage" and result.strike is not None:
         renderer.render_physical_strike_result(caster, target, result.strike)
-        sleep(1.5)
+        sleep(0.8)
     elif result.kind == "heal":
         renderer.render_heal_result(caster, result.heal_amount)
-        sleep(1.5)
+        sleep(0.8)
     elif result.kind == "status":
         if result.status_success:
             renderer.render_status_apply(target, str(result.status_effect))
         else:
             renderer.render_status_failed()
-        sleep(1.5)
+        sleep(0.8)
     elif result.kind == "buff":
         renderer.render_buff_applied(caster, str(result.buff_name))
-        sleep(1.5)
+        sleep(0.8)
 
 
 def _on_turn_effect(ev: GameEvent) -> None:
@@ -62,17 +62,17 @@ def _on_turn_effect(ev: GameEvent) -> None:
         renderer.render_turn_effect_message(entity, ("effect_expired", str(p["name"])))
     elif kind == "buff_expired":
         renderer.render_turn_effect_message(entity, ("buff_expired", str(p["name"])))
-    sleep(1.5)
+    sleep(0.6)
 
 
 def _on_flee_result(ev: GameEvent) -> None:
     success = bool(ev.payload.get("success"))
     if success:
         renderer.render_flee_success_message()
-        sleep(2.0)
+        sleep(1.0)
     else:
         renderer.render_flee_failed_message()
-        sleep(1.5)
+        sleep(0.8)
 
 
 def register_combat_ui_handlers(sink: EventSink) -> Callable[[], None]:

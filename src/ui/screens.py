@@ -12,7 +12,6 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from src.content.items import Armor, Potion, Weapon
 from src.ui import renderer
 
 if TYPE_CHECKING:
@@ -46,7 +45,7 @@ def render_turn_banner(attacker: "Entity") -> None:
             border_style="blue",
         )
     )
-    sleep(1)
+    sleep(0.5)
 
 
 def render_battle_frame(player: "Player", monster: "Monster") -> None:
@@ -95,13 +94,13 @@ def render_battle_no_potions_message() -> None:
     )
 
 
-def render_potion_select_panel(potions: list[Potion]) -> None:
+def render_potion_select_panel(potions: list[object]) -> None:
     potion_table = Table(show_header=False, expand=True, border_style="dim white")
     potion_table.add_column("Chave", style="bold blue", justify="right")
     potion_table.add_column("Poção", style="cyan")
     potion_table.add_column("Descrição", style="dim white")
     for i, potion in enumerate(potions, 1):
-        potion_table.add_row(str(i) + ".", potion.name, potion.description)
+        potion_table.add_row(str(i) + ".", getattr(potion, "name", "?"), getattr(potion, "description", ""))
     potion_table.add_row("0.", "Voltar", "")
     renderer.console.print(
         Panel(potion_table, title="[bold yellow]Escolha uma poção[/bold yellow]", border_style="yellow")
@@ -221,7 +220,7 @@ def render_shop_buy_menu(items_for_sale: list[dict], player_coins: int) -> None:
                 border_style="dim white",
             )
         )
-        sleep(1.5)
+        sleep(0.8)
         return
 
     item_table = Table(show_header=True, expand=True, border_style="dim white")
@@ -252,7 +251,7 @@ def render_shop_purchase_success(item_name: str, price: int) -> None:
             border_style="green",
         )
     )
-    sleep(1.5)
+    sleep(0.8)
 
 
 def render_shop_insufficient_gold() -> None:
@@ -263,7 +262,7 @@ def render_shop_insufficient_gold() -> None:
             border_style="red",
         )
     )
-    sleep(1.5)
+    sleep(0.8)
 
 
 def render_shop_sell_menu(
@@ -283,7 +282,7 @@ def render_shop_sell_menu(
         renderer.console.print(
             Panel(Text("Você não tem itens para vender.", justify="center", style="dim white"), border_style="dim white")
         )
-        sleep(1.5)
+        sleep(0.8)
         return
 
     player_inventory_table = Table(show_header=True, expand=True, border_style="dim white")
@@ -313,7 +312,7 @@ def render_shop_sell_success(item_name: str, sell_price: int) -> None:
             border_style="green",
         )
     )
-    sleep(1.5)
+    sleep(0.8)
 
 
 def render_shop_invalid_choice() -> None:
@@ -321,7 +320,7 @@ def render_shop_invalid_choice() -> None:
     renderer.console.print(
         Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="red"), border_style="red")
     )
-    sleep(1.5)
+    sleep(0.8)
 
 
 def render_shop_farewell() -> None:
@@ -332,7 +331,7 @@ def render_shop_farewell() -> None:
             border_style="dim white",
         )
     )
-    sleep(1.5)
+    sleep(0.8)
 
 
 # =============================================================================
@@ -340,21 +339,23 @@ def render_shop_farewell() -> None:
 # =============================================================================
 
 
-def render_inventory_main(player: "Player") -> None:
-    """Renderiza a tela principal do inventário."""
-    renderer.console.clear()
-
-    # Criação do painel principal do inventário
-    renderer.console.print(Panel(
+def _create_inventory_header_panel(player: "Player") -> Panel:
+    """Cria o painel de cabeçalho do inventário."""
+    return Panel(
         Text("Mochila e Equipamentos", justify="center", style="bold green"),
         border_style="green",
         subtitle=f"Ouro: [bold yellow]{player.coins}[/bold yellow]"
-    ))
+    )
 
-    renderer.show_status(player)
 
-    # Equipamentos
-    equip_table = Table(title="[bold cyan]--- Equipamento ---[/bold cyan]", show_header=False, expand=True, border_style="dim cyan")
+def _create_equipment_table(player: "Player") -> Table:
+    """Cria a tabela de equipamentos do jogador."""
+    equip_table = Table(
+        title="[bold cyan]--- Equipamento ---[/bold cyan]",
+        show_header=False,
+        expand=True,
+        border_style="dim cyan"
+    )
     equip_table.add_column("Slot", style="bold blue")
     equip_table.add_column("Item", style="cyan")
 
@@ -364,23 +365,68 @@ def render_inventory_main(player: "Player") -> None:
         else:
             equip_table.add_row(slot.capitalize(), "[dim]Vazio[/dim]")
 
-    renderer.console.print(equip_table)
-    renderer.console.print("\n")
+    return equip_table
 
-    # Itens na Mochila
-    inv_table = Table(title="[bold magenta]--- Itens na Mochila ---[/bold magenta]", show_header=True, expand=True, border_style="dim magenta")
+
+def _create_inventory_table(player: "Player") -> Table | None:
+    """Cria a tabela de itens na mochila. Retorna None se o inventário estiver vazio."""
+    if not player.inventory:
+        return None
+
+    inv_table = Table(
+        title="[bold magenta]--- Itens na Mochila ---[/bold magenta]",
+        show_header=True,
+        expand=True,
+        border_style="dim magenta"
+    )
     inv_table.add_column("ID", style="bold blue", justify="right")
     inv_table.add_column("Item", style="cyan")
     inv_table.add_column("Tipo", style="yellow")
 
-    if not player.inventory:
-        renderer.console.print(Panel(Text("Sua mochila está vazia.", justify="center", style="dim white"), border_style="dim white"))
+    for i, item in enumerate(player.inventory):
+        inv_table.add_row(str(i + 1), item.name, item.__class__.__name__)
+
+    return inv_table
+
+
+def _render_empty_inventory_message() -> None:
+    """Renderiza mensagem de inventário vazio."""
+    renderer.console.print(
+        Panel(
+            Text("Sua mochila está vazia.", justify="center", style="dim white"),
+            border_style="dim white"
+        )
+    )
+
+
+def _render_inventory_controls() -> None:
+    """Renderiza os controles de navegação do inventário."""
+    renderer.console.print(
+        "\n[dim white](número do item)[/dim white] selecionar | "
+        "[dim white](x)[/dim white] sair do inventário"
+    )
+
+
+def render_inventory_main(player: "Player") -> None:
+    """Renderiza a tela principal do inventário."""
+    renderer.console.clear()
+
+    # Cabeçalho
+    renderer.console.print(_create_inventory_header_panel(player))
+    renderer.show_status(player)
+
+    # Equipamentos
+    renderer.console.print(_create_equipment_table(player))
+    renderer.console.print("\n")
+
+    # Inventário
+    inv_table = _create_inventory_table(player)
+    if inv_table is None:
+        _render_empty_inventory_message()
     else:
-        for i, item in enumerate(player.inventory):
-            inv_table.add_row(str(i + 1), item.name, item.__class__.__name__)
         renderer.console.print(inv_table)
 
-    renderer.console.print("\n[dim white](número do item)[/dim white] selecionar | [dim white](x)[/dim white] sair do inventário")
+    _render_inventory_controls()
 
 
 def render_inventory_item_details(item: object, is_equipped: bool) -> None:
@@ -396,23 +442,26 @@ def render_inventory_item_details(item: object, is_equipped: bool) -> None:
         details_table.add_row("Descrição", item.description)
     details_table.add_row("Tipo", item.__class__.__name__)
 
-    if isinstance(item, Weapon):
+    # Duck typing: verifica atributos específicos em vez de importar classes de content/
+    if hasattr(item, 'damage'):
         details_table.add_row("Dano", str(item.damage))
-    elif isinstance(item, Armor):
+    elif hasattr(item, 'defense'):
         details_table.add_row("Defesa", str(item.defense))
-    elif isinstance(item, Potion):
+    elif hasattr(item, 'potion_type') or hasattr(item, 'effect_value'):
         details_table.add_row("Tipo de Efeito", getattr(item, 'potion_type', 'Desconhecido'))
         details_table.add_row("Poder de Efeito", f"+{getattr(item, 'effect_value', 0)}")
 
     renderer.console.print(Panel(details_table, title="[bold yellow]Detalhes do Item[/bold yellow]", border_style="yellow"))
 
-    # Ações
+    # Ações - duck typing para identificar tipo de item
     action_table = Table(show_header=False, expand=True, border_style="dim white")
+    is_weapon_or_armor = hasattr(item, 'damage') or hasattr(item, 'defense')
+    is_potion = hasattr(item, 'potion_type') or hasattr(item, 'effect_value')
 
-    if isinstance(item, Potion):
+    if is_potion:
         action_table.add_row("[bold blue]u[/bold blue]", "Usar Poção")
 
-    if isinstance(item, (Weapon, Armor)):
+    if is_weapon_or_armor:
         if is_equipped:
             action_table.add_row("[bold blue]e[/bold blue]", "Desequipar Item")
         else:
@@ -426,19 +475,19 @@ def render_inventory_item_details(item: object, is_equipped: bool) -> None:
 def render_inventory_item_used(item_name: str) -> None:
     """Renderiza mensagem de item usado."""
     renderer.console.print(Panel(f"Você usou [bold green]{item_name}[/bold green].", border_style="green"))
-    sleep(1.5)
+    sleep(0.8)
 
 
 def render_inventory_item_equipped(item_name: str) -> None:
     """Renderiza mensagem de item equipado."""
     renderer.console.print(Panel(f"Você equipou [bold green]{item_name}[/bold green].", border_style="green"))
-    sleep(1.5)
+    sleep(0.8)
 
 
 def render_inventory_item_unequipped(item_name: str) -> None:
     """Renderiza mensagem de item desequipado."""
     renderer.console.print(Panel(f"Você desequipou [bold yellow]{item_name}[/bold yellow].", border_style="yellow"))
-    sleep(1.5)
+    sleep(0.8)
 
 
 def render_dungeon_status(
@@ -462,7 +511,7 @@ def render_dungeon_controls() -> None:
 def render_game_saved(message: str = "Jogo salvo!") -> None:
     """Renderiza mensagem de confirmação de salvamento."""
     renderer.console.print(Panel(Text(message, justify="center", style="green"), border_style="green"))
-    sleep(1.5)
+    sleep(0.8)
 
 
 def render_level_complete(dungeon_level: int) -> None:
