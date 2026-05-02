@@ -18,8 +18,11 @@ from src.entities.monsters import Monster
 from src.mechanics import combat as combat_mech
 from src.mechanics.combat import PublishFn
 from src.mechanics.math_operations import (
+    calculate_mini_boss_coin_reward,
     calculate_mini_boss_xp_reward,
+    calculate_monster_coin_reward,
     calculate_monster_xp_reward,
+    generate_essence_multiplier,
 )
 from src.shared import combat_topics as topics
 from src.shared.constants import (
@@ -31,6 +34,7 @@ from src.shared.constants import (
     MIN_WALL_PERCENT,
     WALL_PERCENT_PER_LEVEL,
 )
+
 from src.shared.types import GameEvent
 from src.storage.save_manager import save_game
 from src.ui import screens
@@ -210,6 +214,8 @@ def _render_battle_results(
     player_won: bool,
     dropped_item: object | None,
     level_up_msgs: list[str],
+    coins_gained: int,
+    essence_multiplier: float = 1.0,
 ) -> None:
     """Renderiza os resultados da batalha."""
     screens.render_post_battle(
@@ -219,6 +225,8 @@ def _render_battle_results(
         player_won=player_won,
         dropped_item_name=getattr(dropped_item, 'name', None) if dropped_item else None,
         level_up_messages=level_up_msgs,
+        coins_gained=coins_gained,
+        essence_multiplier=essence_multiplier,
     )
 
 
@@ -226,6 +234,7 @@ def run_fight(
     player: "Player",
     monster: "Monster",
     rng: random.Random | None = None,
+    essence_multiplier: float = 1.0,
 ) -> None:
     """Loop principal de batalha: mecânica publica eventos; UI reage via inscrições no bus."""
     rng = rng or random.Random()
@@ -243,10 +252,13 @@ def run_fight(
         if player_fled:
             return
 
-        xp_gained, player_won, dropped_item, level_up_msgs = process_post_battle(
-            player, monster
+        xp_gained, player_won, dropped_item, level_up_msgs, coins_gained = process_post_battle(
+            player, monster, essence_multiplier
         )
-        _render_battle_results(player, monster, xp_gained, player_won, dropped_item, level_up_msgs)
+        _render_battle_results(
+            player, monster, xp_gained, player_won, dropped_item,
+            level_up_msgs, coins_gained, essence_multiplier
+        )
     finally:
         cleanup_ui()
 
@@ -255,16 +267,19 @@ def fight(
     player: "Player",
     monster: "Monster",
     rng: random.Random | None = None,
+    essence_multiplier: float = 1.0,
 ) -> None:
     """Alias legível para `run_fight` (compatível com chamadas antigas)."""
-    run_fight(player, monster, rng=rng)
+    run_fight(player, monster, rng=rng, essence_multiplier=essence_multiplier)
 
 
 def process_post_battle(
-    player: "Player", monster: "Monster"
-) -> tuple[int, bool, object | None, list[str]]:
+    player: "Player",
+    monster: "Monster",
+    essence_multiplier: float = 1.0,
+) -> tuple[int, bool, object | None, list[str], int]:
     """
-    Processa a lógica de pós-combate (XP, loot, level up, rest).
+    Processa a lógica de pós-combate (XP, loot, moedas, level up, rest).
 
     Esta função pertence à camada de engine - ela pode importar de
     mechanics/ e content/, e pode mutar estado de entidades.
@@ -274,24 +289,36 @@ def process_post_battle(
     - player_won: True se jogador venceu, False se foi derrotado
     - dropped_item: item dropado ou None
     - level_up_messages: lista de mensagens de level up (strings)
+    - coins_gained: quantidade de moedas ganhadas
     """
     # Cálculo de XP base
     xp_base_reward = calculate_monster_xp_reward(monster.level)
     if getattr(monster, "is_boss", False):
         xp_base_reward = calculate_mini_boss_xp_reward(monster.level)
 
+    # Cálculo de moedas
+    coins_base_reward = calculate_monster_coin_reward(monster.level)
+    if getattr(monster, "is_boss", False):
+        coins_base_reward = calculate_mini_boss_coin_reward(monster.level)
+
     player_won = player.get_isalive()
     dropped_item = None
+    coins_gained = 0
 
     if not player_won:
-        # Jogador derrotado - XP de piedade (10%)
-        pity_xp = xp_base_reward // 10
+        # Jogador derrotado - XP e moedas de piedade (10%)
+        pity_xp = int((xp_base_reward // 10) * essence_multiplier)
+        pity_coins = coins_base_reward // 10
         player.add_xp_points(pity_xp)
+        player.earn_coins(pity_coins)
         xp_gained = pity_xp
+        coins_gained = pity_coins
     else:
-        # Jogador venceu - XP completo e loot
-        player.add_xp_points(xp_base_reward)
-        xp_gained = xp_base_reward
+        # Jogador venceu - XP, moedas e loot completo
+        xp_gained = int(xp_base_reward * essence_multiplier)
+        player.add_xp_points(xp_gained)
+        player.earn_coins(coins_base_reward)
+        coins_gained = coins_base_reward
         dropped_item = get_loot()
         if dropped_item:
             player.add_item_to_inventory(dropped_item)
@@ -302,7 +329,7 @@ def process_post_battle(
         level_up_messages = player.level_up(show=True)
         player.rest()
 
-    return xp_gained, player_won, dropped_item, level_up_messages
+    return xp_gained, player_won, dropped_item, level_up_messages, coins_gained
 
 
 def _calculate_map_dimensions(dungeon_level: int) -> tuple[int, int]:
@@ -324,6 +351,7 @@ def _setup_dungeon_map(
     dungeon_level: int,
     initial_map_state: dict | None,
     start_level: int,
+    player: "Player",
 ) -> MapOfGame:
     """Configura o mapa da masmorra (novo ou carregado)."""
     map_height, map_width = _calculate_map_dimensions(dungeon_level)
@@ -336,7 +364,7 @@ def _setup_dungeon_map(
         game_map.generate_map(percent_of_walls=wall_percent)
         game_map.place_player()
         game_map.place_exit()
-        monsters_to_place = generate_monsters_for_level(dungeon_level)
+        monsters_to_place = generate_monsters_for_level(dungeon_level, player.level)
 
         # Gerar Mini-Chefe a cada 5 níveis
         if dungeon_level % 5 == 0:
@@ -353,12 +381,13 @@ def _render_dungeon_screen(
     player: "Player",
     dungeon_level: int,
     game_map: MapOfGame,
+    essence_multiplier: float = 1.0,
 ) -> None:
     """Renderiza a tela principal da masmorra."""
     clear_screen()
     screens.render_dungeon_status(
         dungeon_level, player.get_hp(), player.base_hp,
-        player.get_mp(), player.base_mp
+        player.get_mp(), player.base_mp, essence_multiplier
     )
     map_lines = game_map.draw_map()
     screens.render_map(map_lines)
@@ -370,6 +399,7 @@ def _handle_player_movement(
     game_map: MapOfGame,
     dungeon_level: int,
     move: str,
+    essence_multiplier: float = 1.0,
 ) -> str | None:
     """
     Processa o movimento do jogador.
@@ -380,7 +410,7 @@ def _handle_player_movement(
     collided_object = game_map.move_player(move)
 
     if isinstance(collided_object, Monster):
-        fight(player, collided_object)
+        fight(player, collided_object, essence_multiplier=essence_multiplier)
         if not player.get_isalive():
             game_over_screen(player.get_nick_name())
             return "player_died"
@@ -402,6 +432,7 @@ def _handle_player_input(
     player: "Player",
     game_map: MapOfGame,
     dungeon_level: int,
+    essence_multiplier: float = 1.0,
 ) -> str | None:
     """
     Processa o input do jogador.
@@ -420,7 +451,7 @@ def _handle_player_input(
         save_game(player, dungeon_level, game_map.get_map_state())
         screens.render_game_saved()
     elif move in ['w', 'a', 's', 'd']:
-        return _handle_player_movement(player, game_map, dungeon_level, move)
+        return _handle_player_movement(player, game_map, dungeon_level, move, essence_multiplier)
 
     return None
 
@@ -433,13 +464,19 @@ def start_game(
     """Loop principal do jogo: exploração de masmorras e combate."""
     dungeon_level = start_level
     shop = Shop()
+    essence_multiplier = 1.0  # Valor padrão ao carregar save
+
     while True:
-        game_map = _setup_dungeon_map(dungeon_level, initial_map_state, start_level)
+        game_map = _setup_dungeon_map(dungeon_level, initial_map_state, start_level, player)
+
+        # Gerar novo multiplicador apenas ao criar novo andar (não ao carregar)
+        if not (initial_map_state and dungeon_level == start_level):
+            essence_multiplier = generate_essence_multiplier()
 
         while True:
-            _render_dungeon_screen(player, dungeon_level, game_map)
+            _render_dungeon_screen(player, dungeon_level, game_map, essence_multiplier)
 
-            result = _handle_player_input(player, game_map, dungeon_level)
+            result = _handle_player_input(player, game_map, dungeon_level, essence_multiplier)
 
             if result == "quit":
                 return

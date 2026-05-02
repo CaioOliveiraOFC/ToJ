@@ -19,6 +19,7 @@ from src.shared.constants import (
     ROGUE_BASE_MG,
     ROGUE_BASE_MP,
     ROGUE_BASE_ST,
+    ROGUE_HP_GROWTH_PERCENT,
     ROGUE_ST_GROWTH_PERCENT,
     WARRIOR_BASE_AG,
     WARRIOR_BASE_DF,
@@ -31,7 +32,6 @@ from src.shared.constants import (
     XP_BASE_COST,
     XP_EXPONENT,
 )
-
 
 def percentage(percent: int, whole: int, remainder: bool = True) -> int | float:
     """Calcula a porcentagem de um valor.
@@ -80,6 +80,7 @@ class Player(Entity):
         self.wins = 0
         self.coins = 0
         self.skill_points = 0
+        self.unspent_attribute_points: int = 0
         self.inventory: list[object] = []
         self.equipment = {
             "Weapon": None,
@@ -302,6 +303,8 @@ class Player(Entity):
     def learn_new_skills(self, show: bool = True) -> list[str]:
         """Aprende novas habilidades disponíveis no nível atual.
 
+        Suporta tanto skills individuais quanto listas de skills por nível.
+
         Args:
             show: Se True, inclui mensagens de novas habilidades (default: True).
 
@@ -309,13 +312,17 @@ class Player(Entity):
             Lista de mensagens sobre habilidades aprendidas.
         """
         messages: list[str] = []
-        for level, skill in self.learnable_skills.items():
-            if self.level >= level and skill not in self.skills.values():
-                new_skill_key = len(self.skills) + 1
-                self.skills[new_skill_key] = skill
-                if show:
-                    skill_name = getattr(skill, 'name', 'Habilidade')
-                    messages.append(f"Nova habilidade aprendida: {skill_name}!")
+        for level, skill_or_list in self.learnable_skills.items():
+            if self.level >= level:
+                # Suportar tanto Skill individual quanto list[Skill]
+                skills_at_level = skill_or_list if isinstance(skill_or_list, list) else [skill_or_list]
+                for skill in skills_at_level:
+                    if skill not in self.skills.values():
+                        new_skill_key = len(self.skills) + 1
+                        self.skills[new_skill_key] = skill
+                        if show:
+                            skill_name = getattr(skill, 'name', 'Habilidade')
+                            messages.append(f"Nova habilidade aprendida: {skill_name}!")
         return messages
 
     def _update_stats_on_level_up(self) -> None:
@@ -328,6 +335,7 @@ class Player(Entity):
             self.base_mp += int(percentage(MAGE_MP_GROWTH_PERCENT, self.base_mp, False))
             self.base_mg += int(percentage(MAGE_MG_GROWTH_PERCENT, self.base_mg, False))
         elif class_name == "Rogue":
+            self.base_hp += int(percentage(ROGUE_HP_GROWTH_PERCENT, self.base_hp, False))
             self.base_st += int(percentage(ROGUE_ST_GROWTH_PERCENT, self.base_st, False))
             self.base_ag = min(self.base_ag + ROGUE_AGILITY_INCREMENT, AGILITY_CAP)
         self.avg_damage = (self.base_st + self.base_mg) // DAMAGE_FORMULA_DIVISOR

@@ -17,6 +17,53 @@ from src.mechanics.math_operations import (
 )
 
 
+def calculate_scaled_monster_level(
+    dungeon_level: int,
+    player_level: int,
+) -> int:
+    """
+    Calcula o nível do monstro com base no dungeon_level e player_level.
+    
+    Implementa as regras de escalonamento inteligente:
+    - 70% de chance: nível base (dungeon_level)
+    - 25% de chance: nível base + 1
+    - 5% de chance: nível base + 2
+    
+    Aplica as regras de segurança (anti-RNG injusto):
+    - Nível do inimigo nunca ultrapassa dungeon_level + 3
+    - Se player_level <= 3, nível do inimigo nunca > player_level + 2
+    - Se dungeon_level == 1, nível do inimigo nunca >= 4
+    
+    Args:
+        dungeon_level: Nível atual da masmorra.
+        player_level: Nível atual do jogador.
+    
+    Returns:
+        Nível do monstro calculado com segurança.
+    """
+    base_level = dungeon_level
+    
+    # Aplicar probabilidades: 70%, 25%, 5%
+    population = [base_level, base_level + 1, base_level + 2]
+    weights = [70, 25, 5]
+    monster_level = random.choices(population, weights=weights, k=1)[0]
+    
+    # Aplicar regras de segurança
+    # Regra 1: Nunca ultrapassa dungeon_level + 3
+    monster_level = min(monster_level, dungeon_level + 3)
+    
+    # Regra 2: Se player_level <= 3, nunca > player_level + 2
+    if player_level <= 3:
+        monster_level = min(monster_level, player_level + 2)
+    
+    # Regra 3: Se dungeon_level == 1, nunca >= 4
+    if dungeon_level == 1:
+        monster_level = min(monster_level, 3)
+    
+    # Garantir nível mínimo de 1
+    return max(1, monster_level)
+
+
 def _get_monsters_data() -> dict[str, Any]:
     """Carrega e retorna os dados de monstros do JSON."""
     return load_monsters_data()
@@ -40,12 +87,20 @@ def create_monster(nick_name: str, level: int) -> Monster:
     )
 
 
-def generate_monsters_for_level(dungeon_level: int) -> list[Monster]:
+def generate_monsters_for_level(dungeon_level: int, player_level: int = 1) -> list[Monster]:
     """
-    Gerador procedural que lê definições do JSON.
+    Gerador procedural que lê definições do JSON com escalonamento inteligente.
 
-    O comportamento permanece idêntico à versão anterior,
-    mas os dados (nomes, thresholds) agora vêm de src/data/monsters.json.
+    Utiliza a função calculate_scaled_monster_level para gerar monstros
+    com níveis apropriados ao dungeon_level, respeitando as regras de
+    probabilidade e segurança.
+
+    Args:
+        dungeon_level: Nível atual da masmorra.
+        player_level: Nível atual do jogador (default: 1).
+
+    Returns:
+        Lista de monstros gerados com níveis escalados.
     """
     data = _get_monsters_data()
     gen = data["generation"]
@@ -57,13 +112,11 @@ def generate_monsters_for_level(dungeon_level: int) -> list[Monster]:
     scaling = dungeon_level // gen["scaling_per_3_levels"]
     num_monsters = max(gen["min_monsters"], base_num + scaling)
 
-    level_variation = gen["level_variation"]
     boss_chance = gen["boss_spawn_chance"]
 
     for _ in range(num_monsters):
-        monster_level = max(
-            1, dungeon_level + random.randint(level_variation[0], level_variation[1])
-        )
+        # Usar a nova lógica de escalonamento inteligente
+        monster_level = calculate_scaled_monster_level(dungeon_level, player_level)
 
         chosen_type = _select_monster_type(dungeon_level, categories, boss_chance)
 

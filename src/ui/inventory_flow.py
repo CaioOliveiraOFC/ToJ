@@ -18,7 +18,7 @@ def _is_potion(item: object) -> bool:
 
 def _is_equipment(item: object) -> bool:
     """Verifica se o item é equipável (arma ou armadura) via duck typing."""
-    return hasattr(item, "damage") or hasattr(item, "defense")
+    return hasattr(item, "slot")
 
 
 def run_inventory_flow(player: "Player") -> None:

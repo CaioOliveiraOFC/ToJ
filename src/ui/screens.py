@@ -120,11 +120,13 @@ def render_post_battle(
     player_won: bool,
     dropped_item_name: str | None,
     level_up_messages: list[str],
+    coins_gained: int = 0,
+    essence_multiplier: float = 1.0,
 ) -> None:
     """
     Renderiza tela de pós-batalha (puramente visual - dumb UI).
 
-    Todos os dados (XP ganho, loot, mensagens) devem ser calculados
+    Todos os dados (XP ganho, loot, moedas, mensagens) devem ser calculados
     e passados pela camada de engine. Esta função apenas exibe.
     """
     if not player_won:
@@ -143,10 +145,15 @@ def render_post_battle(
             )
         )
 
-    # Exibir XP ganhado
+    # Exibir XP e moedas ganhadas com multiplicador
+    mult_text = f" (×{essence_multiplier})" if essence_multiplier != 1.0 else ""
+    rewards_text = f"XP ganho: [bold cyan]{xp_gained}{mult_text}[/bold cyan]"
+    if coins_gained > 0:
+        rewards_text += f" | Moedas: [bold yellow]{coins_gained}[/bold yellow]"
+
     renderer.console.print(
         Panel(
-            Text(f"XP ganho: {xp_gained}", justify="center", style="cyan"),
+            Text.from_markup(rewards_text, justify="center"),
             border_style="cyan",
         )
     )
@@ -443,10 +450,10 @@ def render_inventory_item_details(item: object, is_equipped: bool) -> None:
     details_table.add_row("Tipo", item.__class__.__name__)
 
     # Duck typing: verifica atributos específicos em vez de importar classes de content/
-    if hasattr(item, 'damage'):
-        details_table.add_row("Dano", str(item.damage))
-    elif hasattr(item, 'defense'):
-        details_table.add_row("Defesa", str(item.defense))
+    if hasattr(item, 'damage_bonus'):
+        details_table.add_row("Dano", str(item.damage_bonus))
+    elif hasattr(item, 'defense_bonus'):
+        details_table.add_row("Defesa", str(item.defense_bonus))
     elif hasattr(item, 'potion_type') or hasattr(item, 'effect_value'):
         details_table.add_row("Tipo de Efeito", getattr(item, 'potion_type', 'Desconhecido'))
         details_table.add_row("Poder de Efeito", f"+{getattr(item, 'effect_value', 0)}")
@@ -455,7 +462,7 @@ def render_inventory_item_details(item: object, is_equipped: bool) -> None:
 
     # Ações - duck typing para identificar tipo de item
     action_table = Table(show_header=False, expand=True, border_style="dim white")
-    is_weapon_or_armor = hasattr(item, 'damage') or hasattr(item, 'defense')
+    is_weapon_or_armor = hasattr(item, 'slot')
     is_potion = hasattr(item, 'potion_type') or hasattr(item, 'effect_value')
 
     if is_potion:
@@ -491,12 +498,21 @@ def render_inventory_item_unequipped(item_name: str) -> None:
 
 
 def render_dungeon_status(
-    dungeon_level: int, hp: int, max_hp: int, mp: int, max_mp: int
+    dungeon_level: int, hp: int, max_hp: int, mp: int, max_mp: int,
+    essence_multiplier: float = 1.0,
 ) -> None:
     """Renderiza o status da masmorra na parte superior da tela."""
+    # Determina a cor do multiplicador baseado no valor
+    if essence_multiplier < 0.8:
+        mult_color = "red"
+    elif essence_multiplier > 1.5:
+        mult_color = "green"
+    else:
+        mult_color = "yellow"
+
     status_text = (
         f"Masmorra Nível {dungeon_level} | "
-        f"Herói: @ | Inimigos: & | Saída: X | "
+        f"Multiplicador: [{mult_color}]{essence_multiplier}x[/] | "
         f"HP: {hp}/{max_hp} | MP: {mp}/{max_mp}"
     )
     renderer.console.print(Text(status_text, style="bold cyan"))

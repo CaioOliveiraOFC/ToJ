@@ -5,23 +5,32 @@ Todas as constantes são importadas de src.shared.constants.
 
 from __future__ import annotations
 
+import random
+
 from src.shared.constants import (
+    ESSENCE_MULT_MAX,
+    ESSENCE_MULT_MIN,
+    ESSENCE_MULT_NORMAL_MEAN,
+    ESSENCE_MULT_NORMAL_STD,
     MINI_BOSS_BASE_DEFENSE,
     MINI_BOSS_BASE_HP,
     MINI_BOSS_BASE_MAGIC,
     MINI_BOSS_BASE_STRENGTH,
     MINI_BOSS_BASE_XP_REWARD,
+    MINI_BOSS_COIN_MULTIPLIER,
     MINI_BOSS_DEFENSE_SCALING_PER_LEVEL,
     MINI_BOSS_HP_SCALING_PER_LEVEL,
     MINI_BOSS_LEVEL_BONUS,
     MINI_BOSS_MAGIC_SCALING_PER_LEVEL,
     MINI_BOSS_STRENGTH_SCALING_PER_LEVEL,
     MINI_BOSS_XP_SCALING_PER_LEVEL,
+    MONSTER_BASE_COIN_REWARD,
     MONSTER_BASE_DEFENSE,
     MONSTER_BASE_HP,
     MONSTER_BASE_MAGIC,
     MONSTER_BASE_STRENGTH,
     MONSTER_BASE_XP_REWARD,
+    MONSTER_COIN_SCALING_PER_LEVEL,
     MONSTER_DEFENSE_SCALING_PER_LEVEL,
     MONSTER_HP_SCALING_PER_LEVEL,
     MONSTER_MAGIC_SCALING_PER_LEVEL,
@@ -197,4 +206,41 @@ def calculate_mini_boss_xp_reward(dungeon_level: int) -> int:
     """
     effective_level = _calculate_mini_boss_effective_level(dungeon_level)
     return MINI_BOSS_BASE_XP_REWARD + (effective_level - 1) * MINI_BOSS_XP_SCALING_PER_LEVEL
+
+
+def calculate_monster_coin_reward(monster_level: int) -> int:
+    """Calcula a recompensa de moedas por derrotar um monstro.
+
+    Args:
+        monster_level: Nível do monstro derrotado.
+
+    Returns:
+        Quantidade de moedas a ser concedida.
+    """
+    return MONSTER_BASE_COIN_REWARD + (monster_level - 1) * MONSTER_COIN_SCALING_PER_LEVEL
+
+
+def calculate_mini_boss_coin_reward(dungeon_level: int) -> int:
+    """Calcula a recompensa de moedas por derrotar um mini-boss.
+
+    Args:
+        dungeon_level: Nível atual da masmorra.
+
+    Returns:
+        Quantidade de moedas a ser concedida pela vitória.
+    """
+    base_reward = calculate_monster_coin_reward(dungeon_level + MINI_BOSS_LEVEL_BONUS)
+    return base_reward * MINI_BOSS_COIN_MULTIPLIER
+
+
+def generate_essence_multiplier() -> float:
+    """Gera multiplicador de Essência para o andar usando distribuição gaussiana truncada.
+
+    Returns:
+        Multiplicador entre ESSENCE_MULT_MIN e ESSENCE_MULT_MAX, arredondado para 1 casa.
+        Valores intermediários são mais prováveis que extremos.
+    """
+    value = random.gauss(ESSENCE_MULT_NORMAL_MEAN, ESSENCE_MULT_NORMAL_STD)
+    clamped = max(ESSENCE_MULT_MIN, min(ESSENCE_MULT_MAX, value))
+    return round(clamped, 1)
 
