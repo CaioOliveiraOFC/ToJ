@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from src.entities.base import Entity
 from src.shared.constants import (
     AGILITY_CAP,
@@ -12,7 +14,7 @@ from src.shared.constants import (
     MAGE_BASE_ST,
     MAGE_MG_GROWTH_PERCENT,
     MAGE_MP_GROWTH_PERCENT,
-    ROGUE_AGILITY_INCREMENT,
+    ROGUE_AGILITY_GROWTH_PERCENT,
     ROGUE_BASE_AG,
     ROGUE_BASE_DF,
     ROGUE_BASE_HP,
@@ -32,6 +34,10 @@ from src.shared.constants import (
     XP_BASE_COST,
     XP_EXPONENT,
 )
+
+if TYPE_CHECKING:
+    from src.content.passives import PassiveCard
+    from src.content.skills_loader import SkillCard
 
 def percentage(percent: int, whole: int, remainder: bool = True) -> int | float:
     """Calcula a porcentagem de um valor.
@@ -89,10 +95,11 @@ class Player(Entity):
             "Legs": None,
             "Shoes": None,
         }
-        self.skills: dict[int, object] = {}
-        self.learnable_skills: dict[int, object] = {}
+        self.skills: dict[int, SkillCard] = {}
+        self.initial_skills_learned: int = 0
         self.active_effects: dict[str, object] = {}
         self.active_buffs: dict[str, dict[str, object]] = {}
+        self.passives: list[PassiveCard] = []
 
     def add_item_to_inventory(self, item: object) -> str | None:
         """Adiciona item ao inventário.
@@ -256,6 +263,38 @@ class Player(Entity):
             base_value += int(self.active_buffs["Agilidade Aumentada"]["value"])
         return base_value
 
+    def add_passive(self, passive: PassiveCard) -> str:
+        self.passives.append(passive)
+        self._apply_passive_stats(passive)
+        return f"Passiva adquirida: {passive.name}!"
+
+    def _apply_passive_stats(self, passive: PassiveCard) -> None:
+        effect_type = passive.effect_type
+        value = int(passive.effect_value)
+
+        if effect_type == "max_hp":
+            self.base_hp += value
+        elif effect_type == "max_mp":
+            self.base_mp += value
+        elif effect_type == "strength":
+            self.base_st += value
+            self.avg_damage = (self.base_st + self.base_mg) // DAMAGE_FORMULA_DIVISOR
+        elif effect_type == "defense":
+            self.base_df += value
+        elif effect_type == "agility":
+            self.base_ag = min(self.base_ag + value, AGILITY_CAP)
+
+    def add_passive_load(self, passive: PassiveCard) -> None:
+        self.passives.append(passive)
+        self._apply_passive_stats(passive)
+
+    def get_passive_bonus(self, effect_type: str) -> float:
+        return sum(
+            float(p.effect_value)
+            for p in self.passives
+            if p.effect_type == effect_type
+        )
+
     @staticmethod
     def my_type() -> str:
         """Retorna o tipo da entidade."""
@@ -275,19 +314,18 @@ class Player(Entity):
             self.xp_points += amount
 
     def level_up(self, show: bool = True) -> list[str]:
-        """Processa level up quando XP é suficiente.
+        """Processa um level up quando XP é suficiente.
 
         Args:
             show: Se True, retorna mensagens de exibição (default: True).
 
         Returns:
             Lista de mensagens sobre level up e novas habilidades.
+            Retorna lista vazia se não houver XP suficiente.
         """
         needed_xp = self.need_to_up()
-        leveled_up = False
         messages: list[str] = []
-        while self.xp_points >= needed_xp:
-            leveled_up = True
+        if self.xp_points >= needed_xp:
             self.xp_points -= needed_xp
             self.level += 1
             if show:
@@ -295,35 +333,47 @@ class Player(Entity):
             self._update_stats_on_level_up()
             skill_msgs = self.learn_new_skills(show)
             messages.extend(skill_msgs)
-            needed_xp = self.need_to_up()
-        if leveled_up and show:
-            messages.append(f"Você precisa de {self.need_to_next()} XP para o próximo nível.")
+            if show:
+                messages.append(f"Você precisa de {self.need_to_next()} XP para o próximo nível.")
         return messages
 
     def learn_new_skills(self, show: bool = True) -> list[str]:
-        """Aprende novas habilidades disponíveis no nível atual.
-
-        Suporta tanto skills individuais quanto listas de skills por nível.
+        """Aprende skills iniciais uma por nível (níveis 1-4).
 
         Args:
-            show: Se True, inclui mensagens de novas habilidades (default: True).
+            show: Se True, inclui mensagens de novas habilidades.
 
         Returns:
             Lista de mensagens sobre habilidades aprendidas.
         """
         messages: list[str] = []
-        for level, skill_or_list in self.learnable_skills.items():
-            if self.level >= level:
-                # Suportar tanto Skill individual quanto list[Skill]
-                skills_at_level = skill_or_list if isinstance(skill_or_list, list) else [skill_or_list]
-                for skill in skills_at_level:
-                    if skill not in self.skills.values():
-                        new_skill_key = len(self.skills) + 1
-                        self.skills[new_skill_key] = skill
-                        if show:
-                            skill_name = getattr(skill, 'name', 'Habilidade')
-                            messages.append(f"Nova habilidade aprendida: {skill_name}!")
+        # Apenas aprende skills iniciais nos níveis 1-4, uma por nível
+        if 1 <= self.level <= 4 and self.initial_skills_learned < self.level:
+            from src.content.skills_loader import get_initial_skills
+            initial_skills = get_initial_skills(self.get_classname())
+            while self.initial_skills_learned < self.level and self.initial_skills_learned < len(initial_skills):
+                skill = initial_skills[self.initial_skills_learned]
+                new_key = self.initial_skills_learned + 1
+                self.skills[new_key] = skill
+                self.initial_skills_learned += 1
+                if show:
+                    messages.append(f"Nova habilidade aprendida: {skill.name}!")
         return messages
+
+    def add_skill_with_replacement(self, new_skill: "SkillCard", replace_key: int) -> str:
+        """Adiciona nova skill substituindo uma existente na chave especificada.
+
+        Args:
+            new_skill: A nova skill a ser adicionada.
+            replace_key: A chave da skill a ser substituída.
+
+        Returns:
+            Mensagem de confirmação.
+        """
+        old_skill = self.skills.get(replace_key)
+        self.skills[replace_key] = new_skill
+        old_name = old_skill.name if old_skill else "Nenhuma"
+        return f"Skill {old_name} substituída por {new_skill.name}!"
 
     def _update_stats_on_level_up(self) -> None:
         """Atualiza atributos base ao subir de nível (método interno)."""
@@ -337,7 +387,7 @@ class Player(Entity):
         elif class_name == "Rogue":
             self.base_hp += int(percentage(ROGUE_HP_GROWTH_PERCENT, self.base_hp, False))
             self.base_st += int(percentage(ROGUE_ST_GROWTH_PERCENT, self.base_st, False))
-            self.base_ag = min(self.base_ag + ROGUE_AGILITY_INCREMENT, AGILITY_CAP)
+            self.base_ag = min(int(self.base_ag * (1 + ROGUE_AGILITY_GROWTH_PERCENT / 100)), AGILITY_CAP)
         self.avg_damage = (self.base_st + self.base_mg) // DAMAGE_FORMULA_DIVISOR
         self.rest()
 
@@ -359,6 +409,8 @@ class Player(Entity):
             Mensagem de confirmação.
         """
         self.level = 1
+        self.skills.clear()
+        self.initial_skills_learned = 0
         for _ in range(target_level - 1):
             self.level += 1
             self._update_stats_on_level_up()
@@ -430,6 +482,12 @@ class Warrior(Player):
         """Retorna a defesa com buffs aplicados."""
         return self.get_stat("df")
 
+    def get_avg_damage(self) -> int:
+        """Fórmula Warrior: favorece Força."""
+        st = self.get_st()
+        mg = self.get_mg()
+        return (int(st * 2) + int(mg)) // 4
+
 
 class Mage(Player):
     """Classe Mago - focada em magia e MP alto.
@@ -494,6 +552,12 @@ class Mage(Player):
         """Retorna a defesa com buffs aplicados."""
         return self.get_stat("df")
 
+    def get_avg_damage(self) -> int:
+        """Fórmula Mage: ataque físico fraco, favorece Magia."""
+        st = self.get_st()
+        mg = self.get_mg()
+        return (int(st) + int(mg * 2)) // 5
+
 
 class Rogue(Player):
     """Classe Ladino - focada em agilidade e ataques rápidos.
@@ -557,5 +621,11 @@ class Rogue(Player):
     def get_df(self) -> int:
         """Retorna a defesa com buffs aplicados."""
         return self.get_stat("df")
+
+    def get_avg_damage(self) -> int:
+        """Fórmula Rogue: usa AG como identidade."""
+        st = self.get_st()
+        ag = self.get_ag()
+        return (int(st * 1.2) + int(ag * 1.8)) // 3
 
 

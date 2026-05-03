@@ -554,3 +554,172 @@ def render_map(map_lines: list[str]) -> None:
     """Renderiza as linhas do mapa no console."""
     for line in map_lines:
         renderer.console.print(line)
+
+
+def render_passive_selection(choices: list) -> None:
+    """Renderiza as 3 cartas de passivas para escolha."""
+    rarity_colors = {
+        "Common": "white",
+        "Rare": "blue",
+        "Epic": "magenta",
+        "Legendary": "yellow",
+    }
+    renderer.console.clear()
+    renderer.console.print(
+        Panel(
+            Text("Escolha uma Passiva Permanente", justify="center", style="bold cyan"),
+            border_style="cyan",
+        )
+    )
+    for i, card in enumerate(choices, 1):
+        color = rarity_colors.get(getattr(card, "rarity", "Common"), "white")
+        category = getattr(card, "category", "")
+        rarity = getattr(card, "rarity", "")
+        name = getattr(card, "name", "?")
+        description = getattr(card, "description", "")
+        renderer.console.print(
+            Panel(
+                Text.from_markup(
+                    f"[bold {color}]{name}[/bold {color}]\n"
+                    f"[dim]{description}[/dim]"
+                ),
+                title=f"[bold]{i}. [{rarity}] [{category}][/bold]",
+                border_style=color,
+            )
+        )
+
+
+def render_passive_acquired(message: str) -> None:
+    """Renderiza confirmação de passiva adquirida."""
+    renderer.console.print(
+        Panel(Text(message, justify="center", style="bold green"), border_style="green")
+    )
+    sleep(1.5)
+
+
+def render_skill_selection(choices: list) -> None:
+    """Renderiza as 3 cartas de skills para escolha."""
+    rarity_colors = {
+        "Common": "white",
+        "Rare": "blue",
+        "Epic": "magenta",
+        "Legendary": "yellow",
+    }
+    renderer.console.clear()
+    renderer.console.print(
+        Panel(
+            Text("Escolha uma Habilidade", justify="center", style="bold cyan"),
+            border_style="cyan",
+        )
+    )
+    for i, card in enumerate(choices, 1):
+        color = rarity_colors.get(getattr(card, "rarity", "Common"), "white")
+        name = getattr(card, "name", "?")
+        rarity = getattr(card, "rarity", "")
+        mana_cost = getattr(card, "mana_cost", 0)
+        effect_type = getattr(card, "effect_type", "")
+        effect_value = getattr(card, "effect_value", 0)
+        description = getattr(card, "description", "")
+
+        # Mostra o valor do efeito de forma legível
+        if effect_type == "damage":
+            effect_text = f"Dano: {effect_value}"
+        elif effect_type == "heal":
+            effect_text = f"Cura: {effect_value}"
+        elif effect_type == "buff":
+            effect_text = f"Buff: +{effect_value}"
+        elif effect_type == "status":
+            effect_text = f"Status: {effect_value}"
+        else:
+            effect_text = str(effect_value)
+
+        renderer.console.print(
+            Panel(
+                Text.from_markup(
+                    f"[bold {color}]{name}[/bold {color}]\n"
+                    f"[dim]Custo: {mana_cost} MP | {effect_text}[/dim]\n"
+                    f"[dim]{description}[/dim]"
+                ),
+                title=f"[bold]{i}. [{rarity}][/bold]",
+                border_style=color,
+            )
+        )
+    renderer.console.print(
+        Panel(
+            Text("Pressione 0 para cancelar", justify="center", style="dim"),
+            border_style="dim"
+        )
+    )
+
+
+
+def render_skill_replacement_choice(player: "Player", new_skill: object) -> None:
+    """Renderiza a nova skill e pede para escolher qual das 4 atuais substituir."""
+    rarity_colors = {
+        "Common": "white",
+        "Rare": "blue",
+        "Epic": "magenta",
+        "Legendary": "yellow",
+    }
+    renderer.console.clear()
+
+    # Mostra a nova skill
+    rarity = getattr(new_skill, "rarity", "Common")
+    color_new = rarity_colors.get(rarity, "white")
+    renderer.console.print(
+        Panel(
+            Text.from_markup(
+                f"[bold]Nova Habilidade:[/bold]\n"
+                f"[bold {color_new}]{new_skill.name}[/bold {color_new}]\n"
+                f"[dim]Custo: {new_skill.mana_cost} MP | {new_skill.description}[/dim]"
+            ),
+            title="[bold green]Nova Skill[/bold green]",
+            border_style="green",
+        )
+    )
+
+    # Mostra as 4 skills atuais
+    renderer.console.print(
+        Panel(
+            Text("Escolha qual skill substituir (1-4) ou 0 para cancelar:", justify="center", style="bold yellow"),
+            border_style="yellow",
+        )
+    )
+
+    skill_keys = [k for k in player.skills if k <= 4]
+    for key in sorted(skill_keys):
+        skill = player.skills[key]
+        rarity = getattr(skill, "rarity", "Common")
+        color = rarity_colors.get(rarity, "white")
+        renderer.console.print(
+            Panel(
+                Text.from_markup(
+                    f"[bold {color}]{key}. {skill.name}[/bold {color}]\n"
+                    f"[dim]Custo: {skill.mana_cost} MP | {skill.description}[/dim]"
+                ),
+                border_style=color,
+            )
+        )
+
+    renderer.console.print(
+        Panel(
+            Text("0. Cancelar", justify="left", style="dim"),
+            border_style="dim",
+        )
+    )
+
+
+def render_skill_acquired(message: str) -> None:
+    """Renderiza confirmação de skill adquirida/substituída."""
+    renderer.console.print(
+        Panel(Text(message, justify="center", style="bold green"), border_style="green")
+    )
+    sleep(1.5)
+
+
+def render_skill_not_replaced() -> None:
+    """Renderiza mensagem de que a skill não foi substituída."""
+    renderer.console.print(
+        Panel(Text("Skill não substituída.", justify="center", style="bold yellow"), border_style="yellow")
+    )
+    sleep(1.0)

@@ -20,10 +20,8 @@ O ToJ foi desenhado seguindo princípios de alta coesão e baixo acoplamento:
 - ✅ **[SPRINT 0] Saneamento e Contratos** — `main.py` limpo; `shared/constants.py` e `shared/types.py` criados; `pyproject.toml` com ruff/mypy configurados. **Débitos:** `print()` direto ainda presente em `entities/`, `engine/game_logic.py`, `engine/map.py` e `storage/`; `main.py` ainda excede 30 linhas; import lazy em `map.py#load_map_state`.
 - ✅ **[SPRINT 1] O Sistema Nervoso** — `EventBus` implementado; combate publica eventos; UI reage via handlers inscritos. **Débito:** `ui/screens.py#render_post_battle` contém lógica de negócio (XP, loot) e importa ilegalmente de `mechanics/` e `content/`.
 - ✅ **[SPRINT 2] Motor de Conteúdo** — Dados de monstros e itens migrados para `src/data/monsters.json` e `src/data/items.json`; fábricas refatoradas para JSON; `src/data/loader.py` como utilitário central.
-- 📅 **[SPRINT 3] Game Feel (UX Visual)** — Pausas dramáticas e feedback visual dinâmico baseado em porcentagem de vida.
-- 📅 **[SPRINT 4] Expansão de Features** — Status Effects (Veneno, Atordoamento, Sangramento) e fundação do modo Arena.
 
-> Consulte `SPRINTS.md` para o detalhamento completo de tarefas de cada sprint.
+> Consulte `TASK.md` para o detalhamento completo de tarefas de cada sprint.
 
 ---
 

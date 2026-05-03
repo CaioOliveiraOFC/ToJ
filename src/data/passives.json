@@ -1,0 +1,273 @@
+{
+  "description": "Catálogo de passivas permanentes para escolhas de nível",
+  "version": "1.0",
+  "rarity_weights": {
+    "Common": 60,
+    "Rare": 28,
+    "Epic": 10,
+    "Legendary": 2
+  },
+  "passives": [
+    {
+      "id": "coracao_ferro",
+      "name": "Coração de Ferro",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+15 HP máximo",
+      "effect_type": "max_hp",
+      "effect_value": 15
+    },
+    {
+      "id": "mente_serena",
+      "name": "Mente Serena",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+10 MP máximo",
+      "effect_type": "max_mp",
+      "effect_value": 10
+    },
+    {
+      "id": "musculos_aco",
+      "name": "Músculos de Aço",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+3 Força",
+      "effect_type": "strength",
+      "effect_value": 3
+    },
+    {
+      "id": "pele_grossa",
+      "name": "Pele Grossa",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+3 Defesa",
+      "effect_type": "defense",
+      "effect_value": 3
+    },
+    {
+      "id": "passos_leves",
+      "name": "Passos Leves",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+2 Agilidade",
+      "effect_type": "agility",
+      "effect_value": 2
+    },
+    {
+      "id": "sorte_iniciante",
+      "name": "Sorte de Principiante",
+      "category": "Recursos",
+      "rarity": "Common",
+      "description": "+10% bônus de essência",
+      "effect_type": "essence_bonus",
+      "effect_value": 10
+    },
+    {
+      "id": "olho_aguia",
+      "name": "Olho de Águia",
+      "category": "Combate",
+      "rarity": "Common",
+      "description": "+5% chance de crítico",
+      "effect_type": "crit_chance",
+      "effect_value": 5
+    },
+    {
+      "id": "sangue_guerreiro",
+      "name": "Sangue de Guerreiro",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+25 HP máximo",
+      "effect_type": "max_hp",
+      "effect_value": 25
+    },
+    {
+      "id": "reserva_arcana",
+      "name": "Reserva Arcana",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+20 MP máximo",
+      "effect_type": "max_mp",
+      "effect_value": 20
+    },
+    {
+      "id": "essencia_fluida",
+      "name": "Essência Fluída",
+      "category": "Stats",
+      "rarity": "Rare",
+      "description": "+40 HP máximo",
+      "effect_type": "max_hp",
+      "effect_value": 40
+    },
+    {
+      "id": "furia_berserker",
+      "name": "Fúria Berserker",
+      "category": "Stats",
+      "rarity": "Rare",
+      "description": "+8 Força",
+      "effect_type": "strength",
+      "effect_value": 8
+    },
+    {
+      "id": "maos_midas",
+      "name": "Mãos de Midas",
+      "category": "Recursos",
+      "rarity": "Rare",
+      "description": "+20% ouro dropado",
+      "effect_type": "gold_drop_bonus",
+      "effect_value": 20
+    },
+    {
+      "id": "bebida_deuses",
+      "name": "Bebida dos Deuses",
+      "category": "Recursos",
+      "rarity": "Rare",
+      "description": "Poções curam +15%",
+      "effect_type": "potion_heal_bonus",
+      "effect_value": 15
+    },
+    {
+      "id": "reflexos_rapidos",
+      "name": "Reflexos Rápidos",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "+8% chance de esquiva",
+      "effect_type": "dodge_chance",
+      "effect_value": 8
+    },
+    {
+      "id": "escudo_fe",
+      "name": "Escudo da Fé",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "+5% redução de dano",
+      "effect_type": "damage_reduction",
+      "effect_value": 5
+    },
+    {
+      "id": "essencia_viva",
+      "name": "Essência Viva",
+      "category": "Recursos",
+      "rarity": "Rare",
+      "description": "+20% bônus de essência",
+      "effect_type": "essence_bonus",
+      "effect_value": 20
+    },
+    {
+      "id": "lamina_afiada",
+      "name": "Lâmina Afiada",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "+10% chance de crítico",
+      "effect_type": "crit_chance",
+      "effect_value": 10
+    },
+    {
+      "id": "bencao_divina",
+      "name": "Bênção Divina",
+      "category": "Stats",
+      "rarity": "Epic",
+      "description": "+70 HP máximo",
+      "effect_type": "max_hp",
+      "effect_value": 70
+    },
+    {
+      "id": "toque_dragao",
+      "name": "Toque do Dragão",
+      "category": "Stats",
+      "rarity": "Epic",
+      "description": "+15 Força",
+      "effect_type": "strength",
+      "effect_value": 15
+    },
+    {
+      "id": "fome_batalha",
+      "name": "Fome de Batalha",
+      "category": "Recursos",
+      "rarity": "Epic",
+      "description": "+35% bônus de essência",
+      "effect_type": "essence_bonus",
+      "effect_value": 35
+    },
+    {
+      "id": "punho_atordoante",
+      "name": "Punho Atordoante",
+      "category": "Combate",
+      "rarity": "Epic",
+      "description": "+12% chance de atordoar",
+      "effect_type": "stun_chance",
+      "effect_value": 12
+    },
+    {
+      "id": "sede_sangue",
+      "name": "Sede de Sangue",
+      "category": "Combate",
+      "rarity": "Epic",
+      "description": "+18% chance de crítico",
+      "effect_type": "crit_chance",
+      "effect_value": 18
+    },
+    {
+      "id": "pele_adamantio",
+      "name": "Pele de Adamântio",
+      "category": "Combate",
+      "rarity": "Epic",
+      "description": "+15% redução de dano",
+      "effect_type": "damage_reduction",
+      "effect_value": 15
+    },
+    {
+      "id": "alma_eterna",
+      "name": "Alma Eterna",
+      "category": "Stats",
+      "rarity": "Epic",
+      "description": "+100 HP máximo",
+      "effect_type": "max_hp",
+      "effect_value": 100
+    },
+    {
+      "id": "lamina_lendaria",
+      "name": "Lâmina Lendária",
+      "category": "Combate",
+      "rarity": "Legendary",
+      "description": "+30% chance de crítico",
+      "effect_type": "crit_chance",
+      "effect_value": 30
+    },
+    {
+      "id": "imortalidade",
+      "name": "Imortalidade Momentânea",
+      "category": "Combate",
+      "rarity": "Legendary",
+      "description": "Ignora morte 1 vez por combate",
+      "effect_type": "death_ignore",
+      "effect_value": 1
+    },
+    {
+      "id": "essencia_pura",
+      "name": "Essência Pura",
+      "category": "Recursos",
+      "rarity": "Legendary",
+      "description": "+60% bônus de essência",
+      "effect_type": "essence_bonus",
+      "effect_value": 60
+    },
+    {
+      "id": "fortuna_absoluta",
+      "name": "Fortuna Absoluta",
+      "category": "Recursos",
+      "rarity": "Legendary",
+      "description": "+50% ouro dropado",
+      "effect_type": "gold_drop_bonus",
+      "effect_value": 50
+    },
+    {
+      "id": "coracao_tita",
+      "name": "Coração de Titã",
+      "category": "Stats",
+      "rarity": "Legendary",
+      "description": "+200 HP máximo",
+      "effect_type": "max_hp",
+      "effect_value": 200
+    }
+  ]
+}

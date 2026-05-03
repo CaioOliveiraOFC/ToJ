@@ -1,4 +1,7 @@
-"""Orquestração de fluxos de jogo (ex.: combate) — motor de escolhas; UI via EventBus + `screens.render_*` / `prompts`."""
+"""Orquestração de fluxos de jogo (ex.: combate).
+
+Motor de escolhas; UI via EventBus + `screens.render_*` / `prompts`.
+"""
 
 from __future__ import annotations
 
@@ -7,12 +10,14 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from src.content.factories.loot import get_loot
-from src.content.factories.monsters import create_boss_for_level, create_monster, generate_monsters_for_level
+from src.content.factories.monsters import (
+    create_boss_for_level,
+    generate_monsters_for_level,
+)
 from src.content.items import Potion
+from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.engine.events import EventBus
-from src.ui.inventory_flow import run_inventory_flow
-from src.ui.shop_flow import run_shop_flow
 from src.engine.map import MapOfGame
 from src.entities.monsters import Monster
 from src.mechanics import combat as combat_mech
@@ -34,12 +39,14 @@ from src.shared.constants import (
     MIN_WALL_PERCENT,
     WALL_PERCENT_PER_LEVEL,
 )
-
 from src.shared.types import GameEvent
 from src.storage.save_manager import save_game
 from src.ui import screens
 from src.ui.combat_event_handlers import register_combat_ui_handlers
+from src.ui.inventory_flow import run_inventory_flow
+from src.ui.passive_flow import run_passive_selection_flow
 from src.ui.prompts import safe_get_key
+from src.ui.shop_flow import run_shop_flow
 from src.ui.toj_menu import game_over_screen
 from src.ui.utils import clear_screen
 
@@ -131,7 +138,11 @@ def _run_human_battle_turn(
                 if publish:
                     publish(
                         topics.COMBAT_FLEE_RESULT,
-                        GameEvent(type="flee_result", payload={"success": True}, source="engine.loop"),
+                        GameEvent(
+                            type="flee_result",
+                            payload={"success": True},
+                            source="engine.loop",
+                        ),
                     )
                 player.rest()
                 return "flee"
@@ -241,6 +252,7 @@ def run_fight(
     bus = EventBus()
     cleanup_ui = register_combat_ui_handlers(bus)
     publish = bus.publish
+    level_before = player.get_level()
 
     try:
         screens.render_fight_intro(player, monster)
@@ -252,13 +264,36 @@ def run_fight(
         if player_fled:
             return
 
-        xp_gained, player_won, dropped_item, level_up_msgs, coins_gained = process_post_battle(
+        xp_gained, player_won, dropped_item, level_up_msgs, coins_gained, levels_gained = process_post_battle(
             player, monster, essence_multiplier
         )
         _render_battle_results(
             player, monster, xp_gained, player_won, dropped_item,
             level_up_msgs, coins_gained, essence_multiplier
         )
+
+        if player_won and levels_gained > 0:
+            # Para cada nível ganho, oferecer escolhas na ordem: passiva primeiro, depois skill
+            for lvl in range(level_before + 1, player.get_level() + 1):
+                # Escolha de passiva
+                choices = generate_passive_choices(count=3)
+                run_passive_selection_flow(player, choices)
+
+                # Escolha de skill (apenas níveis ímpares >= 5)
+                if lvl >= 5 and lvl % 2 == 1:
+                    from src.content.skills_loader import generate_skill_choices
+                    from src.ui.skill_flow import (
+                        run_skill_selection_flow,
+                        run_skill_selection_with_replacement,
+                    )
+
+                    player_skill_ids = [s.id for s in player.skills.values()]
+                    skill_choices = generate_skill_choices(
+                        player.get_classname(), lvl, player_skill_ids, count=3
+                    )
+                    chosen_skill = run_skill_selection_flow(player, skill_choices)
+                    if chosen_skill:
+                        run_skill_selection_with_replacement(player, chosen_skill)
     finally:
         cleanup_ui()
 
@@ -277,7 +312,7 @@ def process_post_battle(
     player: "Player",
     monster: "Monster",
     essence_multiplier: float = 1.0,
-) -> tuple[int, bool, object | None, list[str], int]:
+) -> tuple[int, bool, object | None, list[str], int, int]:
     """
     Processa a lógica de pós-combate (XP, loot, moedas, level up, rest).
 
@@ -285,12 +320,15 @@ def process_post_battle(
     mechanics/ e content/, e pode mutar estado de entidades.
 
     Retorna tupla com:
-    - xp_gained: quantidade de XP ganhada
+    - xp_gained: quantidade de XP ganha
     - player_won: True se jogador venceu, False se foi derrotado
     - dropped_item: item dropado ou None
     - level_up_messages: lista de mensagens de level up (strings)
-    - coins_gained: quantidade de moedas ganhadas
+    - coins_gained: quantidade de moedas ganhas
+    - levels_gained: quantidade de níveis ganhos
     """
+    level_before = player.get_level()
+
     # Cálculo de XP base
     xp_base_reward = calculate_monster_xp_reward(monster.level)
     if getattr(monster, "is_boss", False):
@@ -306,7 +344,6 @@ def process_post_battle(
     coins_gained = 0
 
     if not player_won:
-        # Jogador derrotado - XP e moedas de piedade (10%)
         pity_xp = int((xp_base_reward // 10) * essence_multiplier)
         pity_coins = coins_base_reward // 10
         player.add_xp_points(pity_xp)
@@ -314,7 +351,6 @@ def process_post_battle(
         xp_gained = pity_xp
         coins_gained = pity_coins
     else:
-        # Jogador venceu - XP, moedas e loot completo
         xp_gained = int(xp_base_reward * essence_multiplier)
         player.add_xp_points(xp_gained)
         player.earn_coins(coins_base_reward)
@@ -323,13 +359,32 @@ def process_post_battle(
         if dropped_item:
             player.add_item_to_inventory(dropped_item)
 
-    # Level up e rest (apenas se jogador vivo)
     level_up_messages: list[str] = []
     if player_won:
-        level_up_messages = player.level_up(show=True)
+        xp_gained = int(xp_base_reward * essence_multiplier)
+        player.add_xp_points(xp_gained)
+        player.earn_coins(coins_base_reward)
+        coins_gained = coins_base_reward
+        dropped_item = get_loot()
+        if dropped_item:
+            player.add_item_to_inventory(dropped_item)
+    else:
+        xp_gained = 0
+        coins_gained = 0
+
+    level_up_messages: list[str] = []
+    levels_gained = 0
+    if player_won:
+        # Processa um level up por vez para permitir escolhas apropriadas
+        while True:
+            msgs = player.level_up(show=True)
+            if not msgs:
+                break
+            level_up_messages.extend(msgs)
+            levels_gained += 1
         player.rest()
 
-    return xp_gained, player_won, dropped_item, level_up_messages, coins_gained
+    return xp_gained, player_won, dropped_item, level_up_messages, coins_gained, levels_gained
 
 
 def _calculate_map_dimensions(dungeon_level: int) -> tuple[int, int]:

@@ -19,6 +19,11 @@ def _load_json(filename: str) -> dict[str, Any]:
         return json.load(f)
 
 
+def load_json(filename: str) -> dict[str, Any]:
+    """Carrega um arquivo JSON do diretório de dados (público)."""
+    return _load_json(filename)
+
+
 def load_monsters_data() -> dict[str, Any]:
     """Carrega os dados de definição de monstros."""
     return _load_json("monsters.json")

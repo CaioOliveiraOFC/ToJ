@@ -4,15 +4,21 @@
 ---
 
 ## Sessão Atual
-**ID:** TASK-001
+
+**ID:** TASK-002
 **Data:** 02/05/2026
 **Status:** ✅ Concluída
+**Depende de:** TASK-001 concluída (Multiplicador de Essência implementado)
+
+---
+
+**EM MANUTENÇÃO** — Tarefas seguintes (TASK-003+) suspensas por prioridade urgente. Retomar quando instruído.
 
 ---
 
 ## Objetivo
 
-Implementar o **Multiplicador de Essência por Andar** — o primeiro elemento do novo Game Design que diferencia o TOJ de um RPG genérico. Ao entrar em cada novo andar, um multiplicador aleatório é gerado e exibido no HUD. Toda a Essência (XP) recebida naquele andar é afetada por ele.
+Implementar o **Sistema de Cartas de Passivas de Nível** — o coração da diferenciação de builds no TOJ. Ao subir de nível, o jogador escolhe **1 entre 3 passivas permanentes** exibidas em formato de cartas. Passivas se acumulam sem limite e persistem na run inteira (e na Arena, no futuro).
 
 ---
 
@@ -20,143 +26,539 @@ Implementar o **Multiplicador de Essência por Andar** — o primeiro elemento d
 
 Do `GAME_DESIGN.md`:
 
-> "O Multiplicador de Essência é re-gerado a cada novo andar da masmorra. O valor é exibido claramente para o jogador (ex: 'Andar 5 — Multiplicador 2.1x'). O multiplicador varia de 0.5x a 3.0x, com valores intermediários tendendo à normalidade."
+> "Ao acumular Essência suficiente: Stats base aumentam automaticamente, pontos de atributo são concedidos, e o jogador escolhe **1 entre 3 Passivas Permanentes** exibidas em formato de cartas."
 
-O multiplicador deve ser visível no HUD do mapa e influenciar diretamente o XP concedido em `process_post_battle()`.
+> **Taxonomia de Passivas:**
+> - **[Stats]:** Ex: "+15 HP", "+10 MP".
+> - **[Recursos]:** Ex: "+20% ouro dropado", "Poções curam +15%".
+> - **[Combate]:** Ex: "10% chance de atordoar", "+5% esquiva".
+
+> **Regras:** Raridades (Comum, Raro, Épico, Lendário). Acúmulo permitido sem limite.
+
+---
+
+## Grafo de Dependências (leia antes de tocar em qualquer arquivo)
+
+```
+shared/          → sem dependências
+entities/        → shared/ apenas
+mechanics/       → entities/, shared/
+content/         → entities/, mechanics/, shared/   ← PassiveCard mora aqui
+storage/         → content/, entities/, shared/
+engine/          → content/, mechanics/, entities/, storage/, shared/
+ui/              → content/, shared/  (NUNCA engine/ ou mechanics/ diretamente)
+```
+
+**Regra crítica desta task:** `mechanics/combat.py` **não importa** `PassiveCard`. Recebe bônus já calculados como parâmetros. `content/passives.py` é a única fonte da verdade sobre passivas.
 
 ---
 
 ## Arquivos que serão tocados
 
-| Arquivo | O que muda |
-|---|---|
-| `src/shared/constants.py` | Adicionar constantes: `ESSENCE_MULT_MIN`, `ESSENCE_MULT_MAX`, `ESSENCE_MULT_NORMAL_MEAN`, `ESSENCE_MULT_NORMAL_STD` |
-| `src/engine/loop.py` | Gerar multiplicador ao iniciar cada andar; passar para `process_post_battle()`; passar para `render_dungeon_status()` |
-| `src/mechanics/math_operations.py` | Nova função `generate_essence_multiplier() -> float` com distribuição gaussiana truncada |
-| `src/ui/screens.py` | Atualizar `render_dungeon_status()` para exibir o multiplicador com cor baseada no valor |
+| Arquivo | Ação | O que muda |
+|---|---|---|
+| `src/data/passives.json` | **CRIAR** | Catálogo de passivas em JSON |
+| `src/content/passives.py` | **CRIAR** | `PassiveCard` + loader + gerador de escolhas |
+| `src/ui/passive_flow.py` | **CRIAR** | Fluxo de interação de seleção de cartas |
+| `src/shared/constants.py` | Modificar | Pesos de raridade de passivas |
+| `src/entities/heroes.py` | Modificar | `self.passives`, `add_passive()`, `_apply_passive_stats()` |
+| `src/engine/loop.py` | Modificar | Integrar escolha de passivas após render de pós-batalha |
+| `src/mechanics/combat.py` | Modificar | Consultar bônus de passivas via helpers sem importar PassiveCard |
+| `src/storage/save_manager.py` | Modificar | Salvar/carregar passivas por ID |
+| `src/ui/screens.py` | Modificar | `render_passive_selection()` |
 
 **Arquivos que NÃO devem ser tocados:**
-- `src/entities/` (nenhuma mudança de estado de entidade)
-- `src/storage/save_manager.py` (o multiplicador é volátil, não persiste no save)
+- `src/entities/base.py`
+- `src/engine/map.py`
 - `src/ui/renderer.py`
-- Qualquer arquivo de `content/`
+- `src/content/items.py`, `src/content/armor.py`, `src/content/skills.py`
+- `src/content/factories/` (nenhum arquivo)
 
 ---
 
 ## Especificação Técnica
 
-### 1. Constantes (`src/shared/constants.py`)
+### 1. `src/data/passives.json`
 
-```python
-# Multiplicador de Essência por Andar
-ESSENCE_MULT_MIN = 0.5
-ESSENCE_MULT_MAX = 3.0
-ESSENCE_MULT_NORMAL_MEAN = 1.2   # Centro da curva gaussiana
-ESSENCE_MULT_NORMAL_STD = 0.5    # Desvio padrão (controla variação)
+```json
+{
+  "description": "Catálogo de passivas permanentes para escolhas de nível",
+  "version": "1.0",
+  "rarity_weights": {
+    "Common": 60,
+    "Rare": 28,
+    "Epic": 10,
+    "Legendary": 2
+  },
+  "passives": [
+    {
+      "id": "coracao_ferro",
+      "name": "Coração de Ferro",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+15 HP máximo",
+      "effect_type": "max_hp",
+      "effect_value": 15
+    }
+  ]
+}
 ```
 
-### 2. Gerador (`src/mechanics/math_operations.py`)
+Criar com as seguintes passivas (mínimo 5 por raridade, cobrindo todos os `effect_type`):
+
+| ID | Nome | Categoria | Raridade | effect_type | effect_value |
+|---|---|---|---|---|---|
+| `coracao_ferro` | Coração de Ferro | Stats | Common | `max_hp` | 15 |
+| `mente_serena` | Mente Serena | Stats | Common | `max_mp` | 10 |
+| `musculos_aco` | Músculos de Aço | Stats | Common | `strength` | 3 |
+| `pele_grossa` | Pele Grossa | Stats | Common | `defense` | 3 |
+| `passos_leves` | Passos Leves | Stats | Common | `agility` | 2 |
+| `sorte_iniciante` | Sorte de Principiante | Recursos | Common | `essence_bonus` | 10 |
+| `olho_aguia` | Olho de Águia | Combate | Common | `crit_chance` | 5 |
+| `sangue_guerreiro` | Sangue de Guerreiro | Stats | Common | `max_hp` | 25 |
+| `reserva_arcana` | Reserva Arcana | Stats | Common | `max_mp` | 20 |
+| `essencia_fluida` | Essência Fluída | Stats | Rare | `max_hp` | 40 |
+| `furia_berserker` | Fúria Berserker | Stats | Rare | `strength` | 8 |
+| `maos_midas` | Mãos de Midas | Recursos | Rare | `gold_drop_bonus` | 20 |
+| `bebida_deuses` | Bebida dos Deuses | Recursos | Rare | `potion_heal_bonus` | 15 |
+| `reflexos_rapidos` | Reflexos Rápidos | Combate | Rare | `dodge_chance` | 8 |
+| `escudo_fé` | Escudo da Fé | Combate | Rare | `damage_reduction` | 5 |
+| `essencia_viva` | Essência Viva | Recursos | Rare | `essence_bonus` | 20 |
+| `lamina_afiada` | Lâmina Afiada | Combate | Rare | `crit_chance` | 10 |
+| `bencao_divina` | Bênção Divina | Stats | Epic | `max_hp` | 70 |
+| `toque_dragao` | Toque do Dragão | Stats | Epic | `strength` | 15 |
+| `fome_batalha` | Fome de Batalha | Recursos | Epic | `essence_bonus` | 35 |
+| `punho_atordoante` | Punho Atordoante | Combate | Epic | `stun_chance` | 12 |
+| `sede_sangue` | Sede de Sangue | Combate | Epic | `crit_chance` | 18 |
+| `pele_adamantio` | Pele de Adamântio | Combate | Epic | `damage_reduction` | 15 |
+| `alma_eterna` | Alma Eterna | Stats | Epic | `max_hp` | 100 |
+| `lamina_lendaria` | Lâmina Lendária | Combate | Legendary | `crit_chance` | 30 |
+| `imortalidade` | Imortalidade Momentânea | Combate | Legendary | `death_ignore` | 1 |
+| `essencia_pura` | Essência Pura | Recursos | Legendary | `essence_bonus` | 60 |
+| `fortuna_absoluta` | Fortuna Absoluta | Recursos | Legendary | `gold_drop_bonus` | 50 |
+| `coracao_tita` | Coração de Titã | Stats | Legendary | `max_hp` | 200 |
+
+---
+
+### 2. `src/content/passives.py`
+
+Este arquivo concentra: classe de dados, loader do JSON, e gerador de escolhas aleatórias. **Não há lógica de passivas em nenhum outro arquivo além deste.**
 
 ```python
-def generate_essence_multiplier() -> float:
-    """Gera multiplicador de Essência para o andar usando distribuição gaussiana truncada.
-    
+"""Passivas permanentes de nível — loader, modelo e gerador de escolhas."""
+
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass
+from typing import Any
+
+from src.data.loader import _load_json  # reusar o utilitário existente
+from src.shared.constants import (
+    PASSIVE_COMMON_WEIGHT,
+    PASSIVE_EPIC_WEIGHT,
+    PASSIVE_LEGENDARY_WEIGHT,
+    PASSIVE_RARE_WEIGHT,
+)
+
+
+@dataclass(frozen=True)
+class PassiveCard:
+    """Carta de passiva permanente carregada do JSON."""
+
+    id: str
+    name: str
+    category: str
+    rarity: str
+    description: str
+    effect_type: str
+    effect_value: float
+
+
+_PASSIVE_REGISTRY: dict[str, PassiveCard] | None = None
+
+
+def _get_registry() -> dict[str, PassiveCard]:
+    """Carrega e cacheia o registro de passivas. Chave: id."""
+    global _PASSIVE_REGISTRY
+    if _PASSIVE_REGISTRY is None:
+        data = _load_json("passives.json")
+        _PASSIVE_REGISTRY = {
+            p["id"]: PassiveCard(**{k: p[k] for k in PassiveCard.__dataclass_fields__})
+            for p in data["passives"]
+        }
+    return _PASSIVE_REGISTRY
+
+
+def load_passives() -> list[PassiveCard]:
+    """Retorna lista de todas as passivas disponíveis."""
+    return list(_get_registry().values())
+
+
+def get_passive_by_id(passive_id: str) -> PassiveCard | None:
+    """Busca passiva pelo ID. Retorna None se não encontrada."""
+    return _get_registry().get(passive_id)
+
+
+def generate_passive_choices(count: int = 3) -> list[PassiveCard]:
+    """Gera N cartas únicas com distribuição ponderada por raridade.
+
+    Args:
+        count: Número de cartas a gerar (padrão: 3).
+
     Returns:
-        Multiplicador entre ESSENCE_MULT_MIN e ESSENCE_MULT_MAX, arredondado para 1 casa.
-        Valores intermediários são mais prováveis que extremos.
+        Lista de PassiveCard únicas para o jogador escolher.
     """
+    all_passives = load_passives()
+    weights_map = {
+        "Common": PASSIVE_COMMON_WEIGHT,
+        "Rare": PASSIVE_RARE_WEIGHT,
+        "Epic": PASSIVE_EPIC_WEIGHT,
+        "Legendary": PASSIVE_LEGENDARY_WEIGHT,
+    }
+    weights = [weights_map.get(p.rarity, 1) for p in all_passives]
+
+    chosen: list[PassiveCard] = []
+    pool = list(all_passives)
+    pool_weights = list(weights)
+
+    while len(chosen) < count and pool:
+        [pick] = random.choices(pool, weights=pool_weights, k=1)
+        idx = pool.index(pick)
+        chosen.append(pick)
+        pool.pop(idx)
+        pool_weights.pop(idx)
+
+    return chosen
 ```
 
-Usar `random.gauss(mean, std)` com clamp entre MIN e MAX. Arredondar para 1 casa decimal.
+---
 
-### 3. Loop de jogo (`src/engine/loop.py`)
+### 3. `src/shared/constants.py` — Adicionar ao final
 
-- `start_game()`: gerar `essence_multiplier = generate_essence_multiplier()` no início de cada andar (quando um novo mapa é criado)
-- Passar o multiplicador para `process_post_battle()` como parâmetro
-- Passar o multiplicador para `render_dungeon_status()` como parâmetro
+```python
+# Pesos de raridade para sorteio de passivas
+PASSIVE_COMMON_WEIGHT = 60
+PASSIVE_RARE_WEIGHT = 28
+PASSIVE_EPIC_WEIGHT = 10
+PASSIVE_LEGENDARY_WEIGHT = 2
+```
 
-Assinatura atualizada de `process_post_battle()`:
+---
+
+### 4. `src/entities/heroes.py` — Modificações em `Player`
+
+**Adicionar ao `__init__`:**
+```python
+self.passives: list = []  # list[PassiveCard] — tipagem via TYPE_CHECKING
+```
+
+**Adicionar métodos:**
+```python
+def add_passive(self, passive: object) -> str:
+    """Adiciona passiva e aplica efeitos de Stats imediatamente.
+
+    Efeitos de Stats (max_hp, max_mp, strength, defense, agility) são
+    aplicados sobre os atributos base. HP e MP atuais NÃO são alterados —
+    o jogador não cura ao escolher uma passiva.
+
+    Returns:
+        Mensagem de confirmação para exibição pela UI.
+    """
+    self.passives.append(passive)
+    self._apply_passive_stats(passive)
+    return f"Passiva adquirida: {getattr(passive, 'name', '?')}!"
+
+def _apply_passive_stats(self, passive: object) -> None:
+    """Aplica efeitos imediatos de passivas do tipo Stats.
+
+    NUNCA chama self.rest(). HP/MP atuais ficam intocados.
+    """
+    effect_type = getattr(passive, "effect_type", None)
+    value = int(getattr(passive, "effect_value", 0))
+
+    if effect_type == "max_hp":
+        self.base_hp += value
+    elif effect_type == "max_mp":
+        self.base_mp += value
+    elif effect_type == "strength":
+        self.base_st += value
+        self.avg_damage = (self.base_st + self.base_mg) // 3
+    elif effect_type == "defense":
+        self.base_df += value
+    elif effect_type == "agility":
+        self.base_ag = min(self.base_ag + value, 95)
+
+def get_passive_bonus(self, effect_type: str) -> float:
+    """Soma o bônus total de todas as passivas para um effect_type.
+
+    Usado por engine/ e combat helpers — evita que mechanics/ importe PassiveCard.
+
+    Args:
+        effect_type: Tipo de efeito (ex: 'crit_chance', 'gold_drop_bonus').
+
+    Returns:
+        Soma de effect_value de todas as passivas com o tipo solicitado.
+    """
+    return sum(
+        float(getattr(p, "effect_value", 0))
+        for p in self.passives
+        if getattr(p, "effect_type", None) == effect_type
+    )
+```
+
+---
+
+### 5. `src/mechanics/combat.py` — Integrar bônus sem importar PassiveCard
+
+`combat.py` **não importa nada de `content/`**. Usa `get_passive_bonus()` do próprio `Player`.
+
+Modificar `resolve_physical_attack()`:
+
+```python
+# Antes (crit_chance fixo):
+crit_chance = 25 if rogue_sneak_attack else 10
+
+# Depois (+ bônus de passivas via método do Player):
+base_crit = 25 if rogue_sneak_attack else 10
+passive_crit_bonus = int(attacker.get_passive_bonus("crit_chance")) \
+    if hasattr(attacker, "get_passive_bonus") else 0
+crit_chance = base_crit + passive_crit_bonus
+```
+
+Modificar chance de acerto (dodge):
+
+```python
+# Adicionar bônus de esquiva do defensor:
+passive_dodge_bonus = int(defender.get_passive_bonus("dodge_chance")) \
+    if hasattr(defender, "get_passive_bonus") else 0
+hit_chance = 85 + (attacker.get_ag() - defender.get_ag()) - passive_dodge_bonus
+```
+
+`damage_reduction` e `stun_chance` ficam para TASK-005 (cooldowns e mecânicas avançadas de combate). **Não implementar agora.**
+
+---
+
+### 6. `src/ui/passive_flow.py` — Seguir padrão de `inventory_flow.py`
+
+```python
+"""Fluxo de interação de seleção de passivas (orquestração UI → player)."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from src.ui import screens
+from src.ui.prompts import safe_get_key
+
+if TYPE_CHECKING:
+    from src.content.passives import PassiveCard
+    from src.entities.heroes import Player
+
+
+def run_passive_selection_flow(player: "Player", choices: list["PassiveCard"]) -> None:
+    """Exibe 3 cartas de passivas e aplica a escolha do jogador.
+
+    Segue o padrão de inventory_flow.py:
+    - A UI renderiza, o fluxo orquestra, a entidade aplica.
+    - Não retorna nada; muta o estado do player via player.add_passive().
+    """
+    while True:
+        screens.render_passive_selection(choices)
+        choice = safe_get_key(valid_keys=["1", "2", "3"])
+        if choice and choice.isdigit():
+            index = int(choice) - 1
+            if 0 <= index < len(choices):
+                msg = player.add_passive(choices[index])
+                screens.render_passive_acquired(msg)
+                return
+```
+
+---
+
+### 7. `src/ui/screens.py` — Novas funções de renderização
+
+```python
+def render_passive_selection(choices: list) -> None:
+    """Renderiza as 3 cartas de passivas para escolha."""
+    RARITY_COLORS = {
+        "Common": "white",
+        "Rare": "blue",
+        "Epic": "magenta",
+        "Legendary": "yellow",
+    }
+    renderer.console.clear()
+    renderer.console.print(
+        Panel(
+            Text("✨ Escolha uma Passiva Permanente ✨", justify="center", style="bold cyan"),
+            border_style="cyan",
+        )
+    )
+    for i, card in enumerate(choices, 1):
+        color = RARITY_COLORS.get(getattr(card, "rarity", "Common"), "white")
+        category = getattr(card, "category", "")
+        rarity = getattr(card, "rarity", "")
+        name = getattr(card, "name", "?")
+        description = getattr(card, "description", "")
+        renderer.console.print(
+            Panel(
+                Text.from_markup(
+                    f"[bold {color}]{name}[/bold {color}]\n"
+                    f"[dim]{description}[/dim]"
+                ),
+                title=f"[bold]{i}. [{rarity}] [{category}][/bold]",
+                border_style=color,
+            )
+        )
+
+
+def render_passive_acquired(message: str) -> None:
+    """Renderiza confirmação de passiva adquirida."""
+    from time import sleep
+    renderer.console.print(
+        Panel(Text(message, justify="center", style="bold green"), border_style="green")
+    )
+    sleep(1.5)
+```
+
+---
+
+### 8. `src/engine/loop.py` — Sequência correta pós-batalha
+
+**A seleção de passiva acontece APÓS o render de pós-batalha, não dentro dele.**
+
+```python
+# Importar no topo do arquivo:
+from src.content.passives import generate_passive_choices
+from src.ui.passive_flow import run_passive_selection_flow
+
+# Em run_fight(), substituir o bloco final por:
+
+# 1. Processar lógica (engine)
+xp_gained, player_won, dropped_item, level_up_msgs, levels_gained = process_post_battle(
+    player, monster, essence_multiplier
+)
+
+# 2. Renderizar resultado (UI)
+screens.render_post_battle(
+    player_name=player.get_nick_name(),
+    monster_name=monster.get_nick_name(),
+    xp_gained=xp_gained,
+    player_won=player_won,
+    dropped_item_name=getattr(dropped_item, "name", None) if dropped_item else None,
+    level_up_messages=level_up_msgs,
+)
+
+# 3. Uma carta por nível ganho (após o render, não dentro dele)
+if player_won and levels_gained > 0:
+    for _ in range(levels_gained):
+        choices = generate_passive_choices(count=3)
+        run_passive_selection_flow(player, choices)
+```
+
+**`process_post_battle()` precisa retornar `levels_gained: int`:**
+
 ```python
 def process_post_battle(
     player: "Player",
     monster: "Monster",
     essence_multiplier: float = 1.0,
-) -> tuple[int, bool, object | None, list[str]]:
+) -> tuple[int, bool, object | None, list[str], int]:
+    """
+    Retorna: (xp_gained, player_won, dropped_item, level_up_messages, levels_gained)
+    """
+    level_before = player.get_level()
+    # ... lógica existente ...
+    level_up_messages = player.level_up(show=True)
+    levels_gained = player.get_level() - level_before
+    # ...
+    return xp_gained, player_won, dropped_item, level_up_messages, levels_gained
 ```
 
-O cálculo de XP passa a ser:
+---
+
+### 9. `src/storage/save_manager.py`
+
+**Save:**
 ```python
-xp_gained = int(xp_base_reward * essence_multiplier)
+# Adicionar ao save_data:
+save_data["passives"] = [
+    getattr(p, "id", "") for p in player.passives
+]
 ```
 
-### 4. HUD do mapa (`src/ui/screens.py`)
+**Load (após definir nível do jogador):**
+```python
+from src.content.passives import get_passive_by_id
 
-`render_dungeon_status()` deve exibir o multiplicador com cor:
-- `< 0.8x` → vermelho (escassez)
-- `0.8x – 1.5x` → amarelo/branco (normal)
-- `> 1.5x` → verde (fartura)
+passive_ids = save_data.get("passives", [])
+for pid in passive_ids:
+    passive = get_passive_by_id(pid)
+    if passive:
+        player.passives.append(passive)
+        player._apply_passive_stats(passive)  # Reaplicar stats — SEM rest()
+```
 
-Exemplo de output:
-```
-Masmorra Nível 3 | Multiplicador: [2.1x] | HP: 80/104 | MP: 30/30
-```
+---
+
+## Decisões Confirmadas
+
+1. **Passivas são globais** — todas as classes podem receber qualquer passiva
+2. **Passivas em JSON** — permite geração externa, não hardcoded em Python
+3. **Identificador por `id`** — não por nome, para robustez no save/load
+4. **Sem limite de acúmulo** — mesma passiva pode ser escolhida múltiplas vezes
+5. **Stats aplicam imediatamente, sem `rest()`** — HP/MP atuais ficam intocados
+6. **`mechanics/combat.py` não importa `PassiveCard`** — usa `player.get_passive_bonus()`
+7. **Seleção de passiva é etapa após `render_post_battle()`** — nunca dentro dele
+8. **`damage_reduction` e `stun_chance` não são integrados agora** — ficam para TASK-005
+9. **O auto-test (bot) já lida com `["1","2","3"]`** — sempre escolhe carta 1, sem crash
 
 ---
 
 ## Critérios de Aceite
 
-- [x] Um novo multiplicador é gerado a cada vez que o jogador desce para um novo andar (não ao carregar o save)
-- [x] O multiplicador é exibido no HUD do mapa com a cor correta para o valor
-- [x] O XP recebido ao derrotar monstros reflete o multiplicador
-- [x] Valores extremos (0.5x e 3.0x) são raros mas possíveis (distribuição gaussiana)
-- [x] O multiplicador não é salvo no `savegame.json` (volta a 1.0x ao carregar)
-- [x] `ruff check src/` passa sem erros novos (apenas warnings pré-existentes)
-- [ ] O auto-test (modo BOT) conclui um run sem crash (testar manualmente)
+- [x] `passives.json` criado com mínimo 28 passivas (todas as 4 raridades cobertas)
+- [x] `generate_passive_choices()` está em `src/content/passives.py`, não em `math_operations.py`
+- [x] Ao subir de nível, 3 cartas são exibidas **após** a tela de pós-batalha
+- [x] Um nível = uma seleção de carta (dois níveis de uma vez = duas seleções sequenciais)
+- [x] Passivas de Stats alteram `base_hp`/`base_mp`/etc. sem chamar `rest()`
+- [x] `combat.py` não contém nenhum import de `content/passives`
+- [x] Passivas salvas como lista de IDs no `savegame.json`
+- [x] Passivas carregadas e reaplicadas corretamente ao carregar save
+- [x] `render_passive_selection()` exibe cor diferente por raridade
+- [x] `ruff check src/` passa sem erros novos
+- [ ] Auto-test conclui run sem crash (sempre escolhe carta 1)
 
 ---
 
 ## O Que NÃO Fazer Nesta Sessão
 
-- ❌ Não criar o sistema de cartas de passivas (é TASK-002)
-- ❌ Não modificar o sistema de slots de personagem/permadeath (é TASK-003)
-- ❌ Não adicionar cooldowns ao combate (é TASK-005)
-- ❌ Não criar eventos aleatórios de andar (é TASK-004)
-- ❌ Não tocar em `save_manager.py`
-- ❌ Não alterar a lógica de spawn de monstros
-- ❌ Não introduzir nenhuma dependência nova (sem novos pacotes pip)
-
----
-
-## Decisões Abertas (responder ANTES de implementar)
-
-1. **O multiplicador persiste se o jogador salvar e recarregar no mesmo andar?**
-   → Sugestão: NÃO. Multiplicador é gerado ao entrar no andar, não ao carregar o save. Se recarregar, assume 1.0x. Simples.
-
-2. **O multiplicador afeta apenas XP ou também gold drop?**
-   → Sugestão: apenas XP/Essência por enquanto. Gold é separado (será modificado pelo sistema de passivas futuro).
-
-3. **O multiplicador deve aparecer na tela de pós-batalha?**
-   → Sugestão: SIM. Exibir "XP ganho: 84 (×2.1)" na `render_post_battle()`.
-
-**Confirme ou ajuste as decisões acima antes de o Windsurf começar.**
+- ❌ Não integrar `damage_reduction` e `stun_chance` em `combat.py` (TASK-005)
+- ❌ Não criar passivas exclusivas de classe
+- ❌ Não implementar reroll de cartas ou reset de passivas
+- ❌ Não modificar `src/entities/base.py`
+- ❌ Não alterar lógica de spawn de monstros
+- ❌ Não introduzir dependências pip novas
+- ❌ Não implementar Arena, permadeath ou slots de personagem (TASK-003)
+- ❌ Não chamar `self.rest()` dentro de `_apply_passive_stats()`
 
 ---
 
 ## Entrega Esperada
 
 Ao finalizar, o Windsurf deve:
-1. Listar todos os arquivos modificados
-2. Mostrar o diff das assinaturas de função que mudaram
-3. Confirmar que `ruff check src/` passou
+1. Listar todos os arquivos criados e modificados
+2. Mostrar as assinaturas de função que mudaram (especialmente `process_post_battle`)
+3. Confirmar que `ruff check src/` passou sem erros novos
 4. **Aguardar aprovação antes de qualquer passo adicional**
 
 ---
 
-## Backlog de Sessões Futuras
+## Backlog
 
 | ID | Objetivo | Depende de |
 |---|---|---|
-| TASK-002 | Sistema de cartas de passivas ao subir de nível | TASK-001 |
 | TASK-003 | 10 slots de personagem + permadeath + Troféu de Fracasso | TASK-001 |
-| TASK-005 | Cooldowns de habilidades no combate | TASK-002 |
-| TASK-006 | Opção "Sair da Masmorra" entre andares | TASK-003 |
+| TASK-004 | Eventos aleatórios de andar (Mercador, Altar, Fonte) | TASK-001 |
+| TASK-005 | Cooldowns + `damage_reduction` + `stun_chance` em combate | TASK-002 |
+| TASK-006 | Opção "Sair da Masmorra" (extração) entre andares | TASK-003 |

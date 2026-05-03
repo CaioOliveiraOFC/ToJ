@@ -68,8 +68,12 @@ def resolve_physical_attack(
         and skill_name == "Ataque Furtivo"
         else CRIT_CHANCE_DEFAULT
     )
+    if hasattr(attacker, "get_passive_bonus"):
+        crit_chance += int(attacker.get_passive_bonus("crit_chance"))
 
     hit_chance = BASE_HIT_CHANCE + (attacker.get_ag() - defender.get_ag())
+    if hasattr(defender, "get_passive_bonus"):
+        hit_chance -= int(defender.get_passive_bonus("dodge_chance"))
     if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > hit_chance:
         miss = CombatResult(
             attacker_id=attacker.get_nick_name(),
@@ -137,7 +141,10 @@ def apply_skill(
     caster.reduce_mp(int(skill.mana_cost))
 
     if skill.effect_type == "damage":
-        strike = resolve_physical_attack(caster, target, int(skill.value), str(skill.name), rng=r, publish=None)
+        from src.shared.constants import SKILL_LEVEL_SCALING
+        scaling = 1.0 + (caster.level * SKILL_LEVEL_SCALING)
+        scaled_damage = int(skill.effect_value * scaling)
+        strike = resolve_physical_attack(caster, target, scaled_damage, str(skill.name), rng=r, publish=None)
         out = SkillApplyResult(kind="damage", mp_spent=int(skill.mana_cost), strike=strike)
         _emit(
             publish,
@@ -148,7 +155,7 @@ def apply_skill(
         return out
 
     if skill.effect_type == "heal":
-        heal_amount = int(skill.value)
+        heal_amount = int(skill.effect_value)
         caster.heal(heal_amount)
         out = SkillApplyResult(kind="heal", mp_spent=int(skill.mana_cost), heal_amount=heal_amount)
         _emit(
@@ -161,18 +168,18 @@ def apply_skill(
 
     if skill.effect_type == "status":
         if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= int(skill.chance):
-            target.active_effects[str(skill.value)] = {"duration": int(skill.duration)}
+            target.active_effects[str(skill.effect_value)] = {"duration": int(skill.duration)}
             out = SkillApplyResult(
                 kind="status",
                 mp_spent=int(skill.mana_cost),
-                status_effect=str(skill.value),
+                status_effect=str(skill.effect_value),
                 status_success=True,
             )
         else:
             out = SkillApplyResult(
                 kind="status",
                 mp_spent=int(skill.mana_cost),
-                status_effect=str(skill.value),
+                status_effect=str(skill.effect_value),
                 status_success=False,
             )
         _emit(
@@ -185,7 +192,7 @@ def apply_skill(
 
     if skill.effect_type == "buff":
         caster.active_buffs[str(skill.name)] = {
-            "value": int(skill.value),
+            "value": int(skill.effect_value),
             "duration": int(skill.duration),
         }
         out = SkillApplyResult(
@@ -225,12 +232,13 @@ def process_turn_start_effects(
 
     for effect, data in list(getattr(entity, "active_effects", {}).items()):
         if effect == "poison":
-            entity.take_damage(POISON_DAMAGE_PER_TICK)
+            poison_damage = POISON_DAMAGE_PER_TICK + (entity.get_ag() // 5)
+            entity.take_damage(poison_damage)
             _emit(
                 publish,
                 T.COMBAT_TURN_EFFECT,
                 type_="turn_effect",
-                payload={"entity": entity, "kind": "poison_tick", "damage": POISON_DAMAGE_PER_TICK},
+                payload={"entity": entity, "kind": "poison_tick", "damage": poison_damage},
             )
         if effect == "frozen":
             _emit(

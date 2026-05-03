@@ -10,7 +10,6 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from src.content.items import ALL_ITEMS, Armor, Potion, Weapon
-from src.content.skills import mage_skills, rogue_skills, warrior_skills
 from src.engine.game_logic import create_player_from_data
 from src.engine.loop import start_game
 from src.entities.heroes import Mage, Rogue, Warrior
@@ -31,12 +30,6 @@ PLAYER_FACTORY = {
     "Warrior": Warrior,
     "Mage": Mage,
     "Rogue": Rogue,
-}
-
-SKILLS_REGISTRY = {
-    "Warrior": warrior_skills,
-    "Mage": mage_skills,
-    "Rogue": rogue_skills,
 }
 
 
@@ -71,7 +64,6 @@ def run_main_loop() -> None:
             player, dungeon_level, map_state = load_game(
                 item_registry=ALL_ITEMS,
                 player_factory=PLAYER_FACTORY,
-                skills_registry=SKILLS_REGISTRY
             )
             if player:
                 start_game(player, dungeon_level, map_state)
