@@ -4,7 +4,7 @@ import copy
 import random
 from typing import Any
 
-from src.content.items import Armor, Item, Potion, Weapon
+from src.content.items import Item, get_all_items
 from src.data.loader import load_items_data
 
 
@@ -16,39 +16,27 @@ def _get_items_data() -> dict[str, Any]:
 def _build_loot_table() -> list[Item]:
     """Constrói a tabela de loot a partir dos dados JSON."""
     data = _get_items_data()
-    items_data = data["items"]
+    items_list = data.get("items", [])
 
     loot_table: list[Item] = []
 
-    for weapon in items_data["weapons"]:
-        rarity = weapon["rarity"]
-        item = Weapon(
-            name=weapon["name"],
-            description=weapon["description"],
-            base_damage=weapon["base_damage"],
+    for item_data in items_list:
+        if not item_data.get("droppable", True):
+            continue
+        
+        rarity = item_data.get("rarity", "Common")
+        
+        item = Item(
+            item_id=item_data.get("id", ""),
+            name=item_data.get("name", ""),
+            description=item_data.get("description", ""),
             rarity=rarity,
-        )
-        loot_table.append(item)
-
-    for armor in items_data["armors"]:
-        rarity = armor["rarity"]
-        item = Armor(
-            name=armor["name"],
-            description=armor["description"],
-            base_defense=armor["base_defense"],
-            slot=armor["slot"],
-            rarity=rarity,
-        )
-        loot_table.append(item)
-
-    for potion in items_data["potions"]:
-        rarity = potion["rarity"]
-        item = Potion(
-            name=potion["name"],
-            description=potion["description"],
-            base_effect_value=potion["base_effect_value"],
-            potion_type=potion["potion_type"],
-            rarity=rarity,
+            slot=item_data.get("slot", "Body"),
+            damage_bonus=item_data.get("damage_bonus", 0),
+            defense_bonus=item_data.get("defense_bonus", 0),
+            effect_type=item_data.get("effect_type"),
+            effect_value=item_data.get("effect_value", 0),
+            classes=item_data.get("classes"),
         )
         loot_table.append(item)
 
@@ -62,7 +50,7 @@ _LOOT_TABLE: list[Item] | None = None
 def get_loot() -> Item | None:
     """
     Gerador procedural que lê definições do JSON.
-
+    
     Mantém o mesmo comportamento: chance configurável de dropar um item (cópia).
     O código Python atua como injetor, instanciando objetos a partir dos dados JSON.
     """
@@ -78,3 +66,9 @@ def get_loot() -> Item | None:
         return copy.copy(random.choice(_LOOT_TABLE))
     return None
 
+
+def reload_loot_table() -> None:
+    """Recarrega a tabela de loot (útil para desenvolvimento)."""
+    global _LOOT_TABLE
+    _LOOT_TABLE = None
+    _build_loot_table()

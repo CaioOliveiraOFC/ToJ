@@ -460,15 +460,15 @@ def render_inventory_item_details(item: object, is_equipped: bool) -> None:
 
     renderer.console.print(Panel(details_table, title="[bold yellow]Detalhes do Item[/bold yellow]", border_style="yellow"))
 
-    # Ações - duck typing para identificar tipo de item
+    # Ações - verificar se é usável ou equipável
     action_table = Table(show_header=False, expand=True, border_style="dim white")
-    is_weapon_or_armor = hasattr(item, 'slot')
-    is_potion = hasattr(item, 'potion_type') or hasattr(item, 'effect_value')
+    is_usable = getattr(item, "is_usable", False)
+    is_equippable = hasattr(item, "slot")
 
-    if is_potion:
-        action_table.add_row("[bold blue]u[/bold blue]", "Usar Poção")
+    if is_usable:
+        action_table.add_row("[bold blue]u[/bold blue]", "Usar Item")
 
-    if is_weapon_or_armor:
+    if is_equippable:
         if is_equipped:
             action_table.add_row("[bold blue]e[/bold blue]", "Desequipar Item")
         else:

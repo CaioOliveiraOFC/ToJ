@@ -94,6 +94,9 @@ class Player(Entity):
             "Body": None,
             "Legs": None,
             "Shoes": None,
+            "Hands": None,
+            "Amulet": None,
+            "Ring": None,
         }
         self.skills: dict[int, SkillCard] = {}
         self.initial_skills_learned: int = 0
@@ -163,13 +166,18 @@ class Player(Entity):
         slot = getattr(item_to_equip, "slot", None)
         if not slot or slot not in self.equipment:
             return f"{getattr(item_to_equip, 'name', 'Item')} não pode ser equipado."
+        
+        item_classes = getattr(item_to_equip, "classes", None)
+        if item_classes is not None and self.get_classname() not in item_classes:
+            return f"Sua classe ({self.get_classname()}) não pode equipar {getattr(item_to_equip, 'name', 'Item')}."
+        
         if self.equipment[slot]:
             self.unequip(slot)
         self.inventory.remove(item_to_equip)
         self.equipment[slot] = item_to_equip
         if slot == "Weapon":
             self.avg_damage += int(getattr(item_to_equip, "damage_bonus", 0))
-        else:
+        elif slot in ("Helmet", "Body", "Legs", "Shoes", "Hands", "Amulet", "Ring"):
             self.base_df += int(getattr(item_to_equip, "defense_bonus", 0))
         self.rest()
         return f"{getattr(item_to_equip, 'name', 'Item')} equipado."
@@ -195,42 +203,60 @@ class Player(Entity):
         self.rest()
         return f"{getattr(item_to_unequip, 'name', 'Item')} desequipado."
 
-    def use_potion(self, potion: object) -> str:
-        """Usa uma poção e aplica seus efeitos.
+    def use_potion(self, item: object) -> str:
+        """Usa um item e aplica seus efeitos.
 
         Args:
-            potion: Poção a ser usada.
+            item: Item a ser usado.
 
         Returns:
             Mensagem descrevendo o efeito aplicado.
         """
-        potion_type = getattr(potion, "potion_type", None)
-        effect_value = int(getattr(potion, "effect_value", 0))
-        potion_name = getattr(potion, "name", "Poção")
+        effect_type = getattr(item, "effect_type", None)
+        effect_value = int(getattr(item, "effect_value", 0))
+        item_name = getattr(item, "name", "Item")
 
-        if potion_type == "Health":
+        if effect_type == "max_hp":
             self._hp += effect_value
             if self._hp > self.base_hp:
                 self._hp = self.base_hp
-            msg = f"Você usou {potion_name} e recuperou {effect_value} de HP."
-        elif potion_type == "Mana":
+            msg = f"Você usou {item_name} e recuperou {effect_value} de HP."
+        elif effect_type == "max_mp":
             self._mp += effect_value
             if self._mp > self.base_mp:
                 self._mp = self.base_mp
-            msg = f"Você usou {potion_name} e recuperou {effect_value} de MP."
-        elif potion_type == "Strength":
+            msg = f"Você usou {item_name} e recuperou {effect_value} de MP."
+        elif effect_type == "strength":
             self.active_buffs["Força Aumentada"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {potion_name}. Força aumentada em {effect_value} por 3 turnos!"
-        elif potion_type == "Defense":
+            msg = f"Você usou {item_name}. Força aumentada em {effect_value} por 3 turnos!"
+        elif effect_type == "defense":
             self.active_buffs["Defesa Aumentada"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {potion_name}. Defesa aumentada em {effect_value} por 3 turnos!"
-        elif potion_type == "Agility":
+            msg = f"Você usou {item_name}. Defesa aumentada em {effect_value} por 3 turnos!"
+        elif effect_type == "agility":
             self.active_buffs["Agilidade Aumentada"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {potion_name}. Agilidade aumentada em {effect_value} por 3 turnos!"
+            msg = f"Você usou {item_name}. Agilidade aumentada em {effect_value} por 3 turnos!"
+        elif effect_type == "speed":
+            self.active_buffs["Velocidade Aumentada"] = {"value": effect_value, "duration": 3}
+            msg = f"Você usou {item_name}. Velocidade aumentada em {effect_value} por 3 turnos!"
+        elif effect_type == "evasion":
+            self.active_buffs["Evasão Aumentada"] = {"value": effect_value, "duration": 3}
+            msg = f"Você usou {item_name}. Evasão aumentada em {effect_value} por 3 turnos!"
+        elif effect_type == "crit_chance":
+            self.active_buffs["Chance de Crítico"] = {"value": effect_value, "duration": 3}
+            msg = f"Você usou {item_name}. Chance de crítico +{effect_value}% por 3 turnos!"
+        elif effect_type == "crit_damage":
+            self.active_buffs["Dano Crítico"] = {"value": effect_value, "duration": 3}
+            msg = f"Você usou {item_name}. Dano crítico +{effect_value} por 3 turnos!"
+        elif effect_type == "life_steal":
+            self.active_buffs["Roubo de Vida"] = {"value": effect_value, "duration": 3}
+            msg = f"Você usou {item_name}. Roubo de vida +{effect_value}% por 3 turnos!"
+        elif effect_type == "mana_regen":
+            self.active_buffs["Regeneração de Mana"] = {"value": effect_value, "duration": 3}
+            msg = f"Você usou {item_name}. Regeneração de mana +{effect_value} por 3 turnos!"
         else:
-            msg = f"Você usou {potion_name}, mas não teve efeito aparente."
+            msg = f"Você usou {item_name}, mas não teve efeito aparente."
 
-        self.inventory.remove(potion)
+        self.inventory.remove(item)
         return msg
 
     def rest(self) -> None:

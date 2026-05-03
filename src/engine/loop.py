@@ -43,7 +43,7 @@ from src.shared.types import GameEvent
 from src.storage.save_manager import save_game
 from src.ui import screens
 from src.ui.combat_event_handlers import register_combat_ui_handlers
-from src.ui.inventory_flow import run_inventory_flow
+from src.ui.inventory_flow import run_inventory_flow_v2
 from src.ui.passive_flow import run_passive_selection_flow
 from src.ui.prompts import safe_get_key
 from src.ui.shop_flow import run_shop_flow
@@ -107,7 +107,7 @@ def _run_human_battle_turn(
                     break
 
         elif choice == "3":
-            potions = [item for item in player.inventory if isinstance(item, Potion)]
+            potions = [item for item in player.inventory if item.is_potion]
             if not potions:
                 screens.render_battle_no_potions_message()
                 sleep(0.5)
@@ -501,7 +501,7 @@ def _handle_player_input(
         screens.render_game_saved("Jogo salvo automaticamente ao sair.")
         return "quit"
     elif move == 'i':
-        run_inventory_flow(player)
+        run_inventory_flow_v2(player)
     elif move == 'p':
         save_game(player, dungeon_level, game_map.get_map_state())
         screens.render_game_saved()

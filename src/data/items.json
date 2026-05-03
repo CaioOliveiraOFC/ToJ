@@ -1,455 +1,133 @@
 {
-  "description": "Definições de itens para o sistema de loot e loja",
-  "version": "1.0",
-  "rarity_multipliers": {
-    "Common": 1.0,
-    "Rare": 1.15,
-    "Epic": 1.32,
-    "Legendary": 1.52
+  "description": "Catálogo de itens para loja e loot - Versão Expandida",
+  "version": "3.0",
+  "rarity_weights": {
+    "Common": 60,
+    "Rare": 28,
+    "Epic": 10,
+    "Legendary": 2
   },
-  "drop_chance_percent": 30,
-  "items": {
-    "weapons": [
-      {
-        "id": "espada_curta",
-        "name": "Espada Curta",
-        "description": "Uma espada básica e confiável.",
-        "base_damage": 5,
-        "rarity": "Common"
-      },
-      {
-        "id": "cajado_simples",
-        "name": "Cajado Simples",
-        "description": "Um cajado de madeira para iniciantes.",
-        "base_damage": 3,
-        "rarity": "Common"
-      },
-      {
-        "id": "adaga_agil",
-        "name": "Adaga Ágil",
-        "description": "Uma adaga leve, perfeita para ataques rápidos.",
-        "base_damage": 4,
-        "rarity": "Common"
-      },
-      {
-        "id": "clava_de_madeira",
-        "name": "Clava de Madeira",
-        "description": "Um pedaço de madeira pesado e brutal.",
-        "base_damage": 4,
-        "rarity": "Common"
-      },
-      {
-        "id": "machado_enferrujado",
-        "name": "Machado Enferrujado",
-        "description": "A lâmina perdeu o fio, mas ainda machuca.",
-        "base_damage": 5,
-        "rarity": "Common"
-      },
-      {
-        "id": "lanca_de_madeira",
-        "name": "Lança de Madeira",
-        "description": "Oferece um bom alcance para manter os inimigos longe.",
-        "base_damage": 4,
-        "rarity": "Common"
-      },
-      {
-        "id": "espada_longa_rara",
-        "name": "Espada Longa Rara",
-        "description": "Uma espada bem balanceada, com um brilho sutil.",
-        "base_damage": 8,
-        "rarity": "Rare"
-      },
-      {
-        "id": "cajado_de_carvalho",
-        "name": "Cajado de Carvalho Velho",
-        "description": "A madeira canaliza melhor a energia arcana.",
-        "base_damage": 6,
-        "rarity": "Rare"
-      },
-      {
-        "id": "arco_de_caca",
-        "name": "Arco de Caça",
-        "description": "Usado por caçadores locais, tem uma boa tensão.",
-        "base_damage": 7,
-        "rarity": "Rare"
-      },
-      {
-        "id": "lamina_dentada",
-        "name": "Lâmina Dentada",
-        "description": "Uma espada cruel que rasga a carne dos inimigos.",
-        "base_damage": 9,
-        "rarity": "Rare"
-      },
-      {
-        "id": "machado_de_batalha_epico",
-        "name": "Machado de Batalha Épico",
-        "description": "Um machado pesado que causa grande estrago.",
-        "base_damage": 12,
-        "rarity": "Epic"
-      },
-      {
-        "id": "espada_bastarda_de_aco",
-        "name": "Espada Bastarda de Aço",
-        "description": "Forjada por mestres anões, quase inquebrável.",
-        "base_damage": 14,
-        "rarity": "Epic"
-      },
-      {
-        "id": "cajado_das_mares",
-        "name": "Cajado das Marés",
-        "description": "Emana uma aura fria e úmida constantemente.",
-        "base_damage": 11,
-        "rarity": "Epic"
-      },
-      {
-        "id": "punhal_venenoso",
-        "name": "Punhal da Viúva",
-        "description": "A lâmina tem uma coloração esverdeada e letal.",
-        "base_damage": 10,
-        "rarity": "Epic"
-      },
-      {
-        "id": "besta_pesada",
-        "name": "Besta Pesada Perfurante",
-        "description": "Dispara virotes capazes de atravessar armaduras grossas.",
-        "base_damage": 13,
-        "rarity": "Epic"
-      },
-      {
-        "id": "arco_lendario",
-        "name": "Arco Lendário",
-        "description": "Um arco antigo, dizem que nunca erra o alvo.",
-        "base_damage": 18,
-        "rarity": "Legendary"
-      },
-      {
-        "id": "lamina_do_infinito",
-        "name": "Lâmina do Infinito",
-        "description": "Uma espada forjada a partir de uma estrela cadente.",
-        "base_damage": 22,
-        "rarity": "Legendary"
-      },
-      {
-        "id": "cajado_do_vazio",
-        "name": "Cajado do Vazio",
-        "description": "Parece absorver a luz ao seu redor. Irradia poder absoluto.",
-        "base_damage": 20,
-        "rarity": "Legendary"
-      },
-      {
-        "id": "furia_de_tita",
-        "name": "Fúria de Titã",
-        "description": "Um machado colossal que faz a terra tremer a cada golpe.",
-        "base_damage": 25,
-        "rarity": "Legendary"
-      },
-      {
-        "id": "foice_ceifadora",
-        "name": "Foice do Ceifador",
-        "description": "Quem empunha esta arma decide quem vive e quem morre.",
-        "base_damage": 24,
-        "rarity": "Legendary"
-      }
-    ],
-    "armors": [
-      {
-        "id": "elmo_de_couro",
-        "name": "Elmo de Couro",
-        "description": "Proteção simples para a cabeça.",
-        "base_defense": 2,
-        "slot": "Helmet",
-        "rarity": "Common"
-      },
-      {
-        "id": "capuz_de_pano",
-        "name": "Capuz de Pano",
-        "description": "Esconde o rosto, mas protege pouco.",
-        "base_defense": 1,
-        "slot": "Helmet",
-        "rarity": "Common"
-      },
-      {
-        "id": "peitoral_de_ferro",
-        "name": "Peitoral de Ferro",
-        "description": "Oferece boa proteção para o torso.",
-        "base_defense": 5,
-        "slot": "Body",
-        "rarity": "Common"
-      },
-      {
-        "id": "tunica_de_aprendiz",
-        "name": "Túnica de Aprendiz",
-        "description": "Vestimenta básica para conjuradores.",
-        "base_defense": 2,
-        "slot": "Body",
-        "rarity": "Common"
-      },
-      {
-        "id": "calcas_de_tecido",
-        "name": "Calças de Tecido",
-        "description": "Confortáveis, porém frágeis.",
-        "base_defense": 1,
-        "slot": "Legs",
-        "rarity": "Common"
-      },
-      {
-        "id": "sapatos_de_campones",
-        "name": "Sapatos de Camponês",
-        "description": "Apenas mantêm os pés limpos.",
-        "base_defense": 1,
-        "slot": "Shoes",
-        "rarity": "Common"
-      },
-      {
-        "id": "elmo_de_aco_raro",
-        "name": "Elmo de Aço Raro",
-        "description": "Um elmo robusto que protege contra concussões.",
-        "base_defense": 4,
-        "slot": "Helmet",
-        "rarity": "Rare"
-      },
-      {
-        "id": "cota_de_malha",
-        "name": "Cota de Malha",
-        "description": "Anéis de metal entrelaçados. Ótima contra cortes.",
-        "base_defense": 8,
-        "slot": "Body",
-        "rarity": "Rare"
-      },
-      {
-        "id": "grevas_de_bronze",
-        "name": "Grevas de Bronze",
-        "description": "Protege as canelas e coxas com eficiência.",
-        "base_defense": 5,
-        "slot": "Legs",
-        "rarity": "Rare"
-      },
-      {
-        "id": "botas_de_couro_raras",
-        "name": "Botas de Couro Raras",
-        "description": "Botas leves que oferecem alguma proteção.",
-        "base_defense": 3,
-        "slot": "Shoes",
-        "rarity": "Rare"
-      },
-      {
-        "id": "coroa_de_cristal",
-        "name": "Coroa de Cristal",
-        "description": "Uma coroa mágica que emite uma barreira leve.",
-        "base_defense": 6,
-        "slot": "Helmet",
-        "rarity": "Epic"
-      },
-      {
-        "id": "couraca_de_mithril",
-        "name": "Couraça de Mithril",
-        "description": "Metal prateado, incrivelmente leve e duro como diamante.",
-        "base_defense": 12,
-        "slot": "Body",
-        "rarity": "Epic"
-      },
-      {
-        "id": "manto_das_sombras",
-        "name": "Manto das Sombras",
-        "description": "Parece absorver a luz, dificultando que o inimigo acerte.",
-        "base_defense": 10,
-        "slot": "Body",
-        "rarity": "Epic"
-      },
-      {
-        "id": "perneiras_de_placa_epicas",
-        "name": "Perneiras de Placa Épicas",
-        "description": "Proteção pesada para as pernas.",
-        "base_defense": 8,
-        "slot": "Legs",
-        "rarity": "Epic"
-      },
-      {
-        "id": "botas_do_vento",
-        "name": "Botas do Vento",
-        "description": "Deixa os passos absurdamente leves e silenciosos.",
-        "base_defense": 5,
-        "slot": "Shoes",
-        "rarity": "Epic"
-      },
-      {
-        "id": "elmo_do_dragao",
-        "name": "Elmo do Dragão",
-        "description": "Forjado com as escamas de um dragão ancião.",
-        "base_defense": 10,
-        "slot": "Helmet",
-        "rarity": "Legendary"
-      },
-      {
-        "id": "armadura_do_rei_demonio",
-        "name": "Armadura do Rei Demônio",
-        "description": "Emana uma aura aterrorizante. Quase impenetrável.",
-        "base_defense": 22,
-        "slot": "Body",
-        "rarity": "Legendary"
-      },
-      {
-        "id": "vestes_celestiais",
-        "name": "Vestes Celestiais",
-        "description": "Brilha com a luz das estrelas. Tecida por deuses.",
-        "base_defense": 18,
-        "slot": "Body",
-        "rarity": "Legendary"
-      },
-      {
-        "id": "perneiras_de_titanio",
-        "name": "Perneiras de Titânio Divino",
-        "description": "Suporta o peso do mundo sem amassar.",
-        "base_defense": 14,
-        "slot": "Legs",
-        "rarity": "Legendary"
-      },
-      {
-        "id": "passos_fantasmas",
-        "name": "Passos Fantasmas",
-        "description": "Permite caminhar sobre a água e não deixa pegadas.",
-        "base_defense": 9,
-        "slot": "Shoes",
-        "rarity": "Legendary"
-      }
-    ],
-    "potions": [
-      {
-        "id": "pocao_de_cura_pequena",
-        "name": "Poção de Cura Pequena",
-        "description": "Restaura uma pequena quantidade de vida.",
-        "base_effect_value": 50,
-        "potion_type": "Health",
-        "rarity": "Common"
-      },
-      {
-        "id": "pocao_de_mana_pequena",
-        "name": "Poção de Mana Pequena",
-        "description": "Restaura uma pequena quantidade de mana.",
-        "base_effect_value": 30,
-        "potion_type": "Mana",
-        "rarity": "Common"
-      },
-      {
-        "id": "pocao_de_cura_media",
-        "name": "Poção de Cura Média",
-        "description": "Restaura uma quantidade moderada de vida.",
-        "base_effect_value": 100,
-        "potion_type": "Health",
-        "rarity": "Rare"
-      },
-      {
-        "id": "pocao_de_mana_media",
-        "name": "Poção de Mana Média",
-        "description": "Restaura uma quantidade razoável de mana.",
-        "base_effect_value": 60,
-        "potion_type": "Mana",
-        "rarity": "Rare"
-      },
-      {
-        "id": "pocao_de_forca",
-        "name": "Poção de Força",
-        "description": "Aumenta temporariamente o dano em 15%. (Efeito: +15)",
-        "base_effect_value": 15,
-        "potion_type": "Strength",
-        "rarity": "Rare"
-      },
-      {
-        "id": "pocao_de_defesa",
-        "name": "Poção de Defesa",
-        "description": "Aumenta temporariamente a defesa em 10. (Efeito: +10)",
-        "base_effect_value": 10,
-        "potion_type": "Defense",
-        "rarity": "Rare"
-      },
-      {
-        "id": "pocao_de_cura_epica",
-        "name": "Poção de Cura Épica",
-        "description": "Restaura uma grande quantidade de vida.",
-        "base_effect_value": 200,
-        "potion_type": "Health",
-        "rarity": "Epic"
-      },
-      {
-        "id": "pocao_de_mana_maior",
-        "name": "Poção de Mana Maior",
-        "description": "Restaura uma grande quantidade de mana.",
-        "base_effect_value": 150,
-        "potion_type": "Mana",
-        "rarity": "Epic"
-      },
-      {
-        "id": "elixir_da_potencia",
-        "name": "Elixir da Potência",
-        "description": "Aumenta significativamente o atributo de força por um tempo.",
-        "base_effect_value": 30,
-        "potion_type": "Strength",
-        "rarity": "Epic"
-      },
-      {
-        "id": "elixir_da_resiliencia",
-        "name": "Elixir da Resiliência",
-        "description": "Aumenta significativamente o atributo de defesa por um tempo.",
-        "base_effect_value": 20,
-        "potion_type": "Defense",
-        "rarity": "Epic"
-      },
-      {
-        "id": "pocao_de_agilidade",
-        "name": "Poção de Agilidade",
-        "description": "Aumenta temporariamente a agilidade em 20%. (Efeito: +20)",
-        "base_effect_value": 20,
-        "potion_type": "Agility",
-        "rarity": "Epic"
-      },
-      {
-        "id": "pocao_de_cura_maior",
-        "name": "Poção de Cura Maior",
-        "description": "Restaura uma quantidade massiva de vida. Muito potente.",
-        "base_effect_value": 400,
-        "potion_type": "Health",
-        "rarity": "Legendary"
-      },
-      {
-        "id": "lagrima_de_fenix",
-        "name": "Lágrima de Fênix",
-        "description": "Cura milagrosa que beira a imortalidade temporária.",
-        "base_effect_value": 1000,
-        "potion_type": "Health",
-        "rarity": "Legendary"
-      },
-      {
-        "id": "essencia_estelar",
-        "name": "Essência Estelar",
-        "description": "Restaura toda a mana cósmica do conjurador.",
-        "base_effect_value": 500,
-        "potion_type": "Mana",
-        "rarity": "Legendary"
-      },
-      {
-        "id": "pocao_do_gigante",
-        "name": "Sangue de Gigante",
-        "description": "Concede a força bruta de um colosso das montanhas.",
-        "base_effect_value": 60,
-        "potion_type": "Strength",
-        "rarity": "Legendary"
-      },
-      {
-        "id": "pele_de_pedra",
-        "name": "Pele de Gárgula",
-        "description": "Transforma a pele do usuário em rocha impenetrável.",
-        "base_effect_value": 50,
-        "potion_type": "Defense",
-        "rarity": "Legendary"
-      },
-      {
-        "id": "vento_engarrafado",
-        "name": "Vento Engarrafado",
-        "description": "Garante velocidade e esquiva sobre-humanas.",
-        "base_effect_value": 50,
-        "potion_type": "Agility",
-        "rarity": "Legendary"
-      }
-    ]
-  }
+  "items": [
+    {"id": "espada_ferro", "name": "Espada de Ferro", "description": "Uma espada simples e confiável.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 5, "defense_bonus": 0, "effect_type": null, "effect_value": 0, "classes": ["Warrior", "Rogue"], "sold_in_shop": true, "droppable": true, "price": 50, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "adaga_curta", "name": "Adaga Curta", "description": "Uma adaga leve e rápida.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 4, "defense_bonus": 0, "effect_type": "bleed", "effect_value": 2, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 40, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "cajado_aprendiz", "name": "Cajado de Aprendiz", "description": "Um cajado para iniciantes na magia.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 3, "defense_bonus": 0, "effect_type": "mana_regen", "effect_value": 5, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 45, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "clava_madeira", "name": "Clava de Madeira", "description": "Um porrete robusto.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 4, "defense_bonus": 0, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "machado_enferrujado", "name": "Machado Enferrujado", "description": "Ferrugem, mas ainda corta.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 5, "defense_bonus": 0, "effect_type": null, "effect_value": 0, "classes": ["Warrior"], "sold_in_shop": true, "droppable": true, "price": 55, "shop_min_floor": 2, "shop_max_floor": 15},
+    {"id": "arco_curto", "name": "Arco Curto", "description": "Um arco simples para tiroteio.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 4, "defense_bonus": 0, "effect_type": "stun", "effect_value": 3, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 45, "shop_min_floor": 2, "shop_max_floor": 15},
+    {"id": "lança_madeira", "name": "Lança de Madeira", "description": "Uma lança básica.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 5, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": ["Warrior"], "sold_in_shop": true, "droppable": true, "price": 50, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "martelo_mao", "name": "Martelo de Mão", "description": "Pequeno mas eficaz.", "slot": "Hands", "rarity": "Common", "damage_bonus": 3, "defense_bonus": 0, "effect_type": "stun", "effect_value": 2, "classes": ["Warrior"], "sold_in_shop": true, "droppable": true, "price": 35, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "luvas_couro", "name": "Luvas de Couro", "description": "Luvas protectoras leves.", "slot": "Hands", "rarity": "Common", "damage_bonus": 2, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "punhos_lona", "name": "Punhos de Lona", "description": "Proteção básica para as mãos.", "slot": "Hands", "rarity": "Common", "damage_bonus": 2, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 20, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "elmo_couro", "name": "Elmo de Couro", "description": "Proteção simples para a cabeça.", "slot": "Helmet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "chapeu_tecido", "name": "Chapéu de Tecido", "description": "Um lenço enrolado na cabeça.", "slot": "Helmet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 20, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "capuz_pano", "name": "Capuz de Pano", "description": "Capuz simples de pano.", "slot": "Helmet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "evasion", "effect_value": 2, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "gibao_couro", "name": "Gibão de Couro", "description": "Colete de couro protector.", "slot": "Body", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 3, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 45, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "túnica_pano", "name": "Túnica de Pano", "description": "Vestido simples de pano.", "slot": "Body", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 35, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "manto_puido", "name": "Manto Puído", "description": "Um manto velho mas útil.", "slot": "Body", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": "magic_resist", "effect_value": 3, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 40, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "camisa_corrente", "name": "Camisa de Corrente", "description": "Camisa com alguns anéis de metal.", "slot": "Body", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 3, "effect_type": null, "effect_value": 0, "classes": ["Warrior"], "sold_in_shop": true, "droppable": true, "price": 50, "shop_min_floor": 2, "shop_max_floor": 15},
+    {"id": "perneiras_couro", "name": "Perneiras de Couro", "description": "Proteção para as pernas.", "slot": "Legs", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "calça_pano", "name": "Calça de Pano", "description": "Calça simples de tecido.", "slot": "Legs", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 20, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "saiote_couro", "name": "Saia de Couro", "description": "Saia de couro para movimento.", "slot": "Legs", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": "speed", "effect_value": 3, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 35, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "botas_couro", "name": "Botas de Couro", "description": "Botas básicas de couro.", "slot": "Shoes", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": "speed", "effect_value": 2, "classes": null, "sold_in_shop": true, "droppable": true, "price": 35, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "sandalias_tecido", "name": "Sandálias de Tecido", "description": "Calçado leve e arejado.", "slot": "Shoes", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "speed", "effect_value": 3, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "sapatos_pano", "name": "Sapatos de Pano", "description": "Sapatos macios e silenciosos.", "slot": "Shoes", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "evasion", "effect_value": 4, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "amuleto_madeira", "name": "Amuleto de Madeira", "description": "Um amuleto simples de madeira.", "slot": "Amulet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "max_hp", "effect_value": 10, "classes": null, "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "amuleto_pedra", "name": "Amuleto de Pedra", "description": "Pedra lisa usável como amuleto.", "slot": "Amulet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "max_mp", "effect_value": 10, "classes": null, "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "anel_couro", "name": "Anel de Couro", "description": "Um anel simples de couro trançado.", "slot": "Ring", "rarity": "Common", "damage_bonus": 2, "defense_bonus": 0, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "anel_osso", "name": "Anel de Osso", "description": "Um anel feito de osso.", "slot": "Ring", "rarity": "Common", "damage_bonus": 2, "defense_bonus": 0, "effect_type": "crit_chance", "effect_value": 3, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 35, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "espada_longa", "name": "Espada Longa", "description": "Uma espada de lâmina longa.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 8, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": ["Warrior"], "sold_in_shop": true, "droppable": true, "price": 120, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "adaga_assassino", "name": "Adaga do Assassino", "description": "Adaga afiada para ataques furtivos.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 7, "defense_bonus": 0, "effect_type": "poison", "effect_value": 5, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 110, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "cajado_arcano", "name": "Cajado Arcano", "description": "Cajado com runas gravadas.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 6, "defense_bonus": 1, "effect_type": "magic_damage", "effect_value": 10, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 130, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "machado_batalha", "name": "Machado de Batalha", "description": "Machado pesado de guerra.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 10, "defense_bonus": 0, "effect_type": "bleed", "effect_value": 5, "classes": ["Warrior"], "sold_in_shop": true, "droppable": true, "price": 140, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "arco_longbow", "name": "Arco Longbow", "description": "Arco longo para maior alcance.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 8, "defense_bonus": 0, "effect_type": "stun", "effect_value": 5, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 120, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "tridente_guerreiro", "name": "Tridente do Guerreiro", "description": "Arma de três pontas.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 9, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": ["Warrior"], "sold_in_shop": true, "droppable": true, "price": 130, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "gladio_ferro", "name": "Gládio de Ferro", "description": "Espada curta militar.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 8, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": ["Warrior", "Rogue"], "sold_in_shop": true, "droppable": true, "price": 115, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "garras_ferro", "name": "Garras de Ferro", "description": "Garras afiadas para combate.", "slot": "Hands", "rarity": "Rare", "damage_bonus": 5, "defense_bonus": 1, "effect_type": "bleed", "effect_value": 4, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 90, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "manoplas_ferro", "name": "Manoplas de Ferro", "description": "Luvas com proteção de ferro.", "slot": "Hands", "rarity": "Rare", "damage_bonus": 4, "defense_bonus": 3, "effect_type": "stun", "effect_value": 3, "classes": ["Warrior"], "sold_in_shop": true, "droppable": true, "price": 85, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "bastão_mágico", "name": "Bastão Mágico", "description": "Bastão com encantamentos básicos.", "slot": "Hands", "rarity": "Rare", "damage_bonus": 4, "defense_bonus": 2, "effect_type": "mana_regen", "effect_value": 10, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 100, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "elmo_ferro", "name": "Elmo de Ferro", "description": "Elmo de proteção média.", "slot": "Helmet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 5, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 80, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "chapeu_encantado", "name": "Chapéu Encantado", "description": "Chapéu com encantamento menor.", "slot": "Helmet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 3, "effect_type": "magic_resist", "effect_value": 8, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 90, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "mascara_sombra", "name": "Máscara de Sombra", "description": "Máscara que ajuda na invisibilidade.", "slot": "Helmet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 3, "effect_type": "evasion", "effect_value": 8, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 85, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "peitoral_cota", "name": "Peitoral de Cota", "description": "Armadura de malha.", "slot": "Body", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 6, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 130, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "túnica_arcana", "name": "Túnica Arcana", "description": "Túnica com símbolos mágicos.", "slot": "Body", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 4, "effect_type": "magic_resist", "effect_value": 12, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 140, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "manto_sombra", "name": "Manto de Sombra", "description": "Manto que ajuda na invisibilidade.", "slot": "Body", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 4, "effect_type": "evasion", "effect_value": 10, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 120, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "armadura_placa", "name": "Armadura de Placa", "description": "Armadura pesada de placas.", "slot": "Body", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 8, "effect_type": "damage_reduction", "effect_value": 5, "classes": ["Warrior"], "sold_in_shop": true, "droppable": true, "price": 180, "shop_min_floor": 7, "shop_max_floor": 15},
+    {"id": "perneiras_ferro", "name": "Perneiras de Ferro", "description": "Proteção pesada para pernas.", "slot": "Legs", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 5, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 70, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "calça_cota", "name": "Calça de Cota", "description": "Calça de malha de ferro.", "slot": "Legs", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 4, "effect_type": "speed", "effect_value": 5, "classes": null, "sold_in_shop": true, "droppable": true, "price": 65, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "botas_ferro", "name": "Botas de Ferro", "description": "Botas com proteção de ferro.", "slot": "Shoes", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 4, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 70, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "botas_encantadas", "name": "Botas Encantadas", "description": "Botas com encantamento de velocidade.", "slot": "Shoes", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 3, "effect_type": "speed", "effect_value": 10, "classes": ["Mage"], "sold_in_shop": true, "droppable": true, "price": 85, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "botas_fantasma", "name": "Botas Fantasma", "description": "Botas que permitem movimentos silenciosos.", "slot": "Shoes", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 3, "effect_type": "evasion", "effect_value": 12, "classes": ["Rogue"], "sold_in_shop": true, "droppable": true, "price": 90, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "amuleto_vida", "name": "Amuleto da Vida", "description": "Amuleto que aumenta Vitalidade.", "slot": "Amulet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 2, "effect_type": "max_hp", "effect_value": 25, "classes": null, "sold_in_shop": true, "droppable": true, "price": 80, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "amuleto_mana", "name": "Amuleto da Mana", "description": "Amuleto que aumenta Mana.", "slot": "Amulet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 2, "effect_type": "max_mp", "effect_value": 25, "classes": null, "sold_in_shop": true, "droppable": true, "price": 80, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "amuleto_agilidade", "name": "Amuleto da Agilidade", "description": "Amuleto que aumenta Agilidade.", "slot": "Amulet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 2, "effect_type": "agility", "effect_value": 10, "classes": null, "sold_in_shop": true, "droppable": true, "price": 80, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "anel_aço", "name": "Anel de Aço", "description": "Anel simples de aço.", "slot": "Ring", "rarity": "Rare", "damage_bonus": 4, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 60, "shop_min_floor": 5, "shop_max_floor": 15},
+    {"id": "anel_rubim", "name": "Anel do Rubi", "description": "Anel com gema vermelha.", "slot": "Ring", "rarity": "Rare", "damage_bonus": 5, "defense_bonus": 1, "effect_type": "crit_chance", "effect_value": 8, "classes": null, "sold_in_shop": true, "droppable": true, "price": 90, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "espada_lendaria", "name": "Espada Lendária", "description": "Uma espada de história lendária.", "slot": "Weapon", "rarity": "Epic", "damage_bonus": 15, "defense_bonus": 2, "effect_type": "bleed", "effect_value": 10, "classes": ["Warrior"], "sold_in_shop": false, "droppable": true, "price": 500, "shop_min_floor": 10, "shop_max_floor": null},
+    {"id": "cajado_eterno", "name": "Cajado Eterno", "description": "Cajado de poder arcano imenso.", "slot": "Weapon", "rarity": "Epic", "damage_bonus": 12, "defense_bonus": 3, "effect_type": "magic_damage", "effect_value": 25, "classes": ["Mage"], "sold_in_shop": false, "droppable": true, "price": 550, "shop_min_floor": 10, "shop_max_floor": null},
+    {"id": "adaga_mortal", "name": "Adaga Mortal", "description": "Adaga que não falha.", "slot": "Weapon", "rarity": "Epic", "damage_bonus": 14, "defense_bonus": 1, "effect_type": "poison", "effect_value": 15, "classes": ["Rogue"], "sold_in_shop": false, "droppable": true, "price": 520, "shop_min_floor": 10, "shop_max_floor": null},
+    {"id": "arco_élfico", "name": "Arco Élfico", "description": "Arco feito por Elfos.", "slot": "Weapon", "rarity": "Epic", "damage_bonus": 14, "defense_bonus": 1, "effect_type": "stun", "effect_value": 12, "classes": ["Rogue"], "sold_in_shop": false, "droppable": true, "price": 480, "shop_min_floor": 10, "shop_max_floor": null},
+    {"id": "machado_terrível", "name": "Machado Terrível", "description": "Machado que causa terror.", "slot": "Weapon", "rarity": "Epic", "damage_bonus": 18, "defense_bonus": 2, "effect_type": "fear", "effect_value": 10, "classes": ["Warrior"], "sold_in_shop": false, "droppable": true, "price": 600, "shop_min_floor": 12, "shop_max_floor": null},
+    {"id": "luvas_titanio", "name": "Luvas de Titânio", "description": "Luvas de metal legendário.", "slot": "Hands", "rarity": "Epic", "damage_bonus": 8, "defense_bonus": 5, "effect_type": "crit_chance", "effect_value": 15, "classes": null, "sold_in_shop": false, "droppable": true, "price": 350, "shop_min_floor": 10, "shop_max_floor": null},
+    {"id": "elmo_dragão", "name": "Elmo de Dragão", "description": "Elmo feito de escamas de dragão.", "slot": "Helmet", "rarity": "Epic", "damage_bonus": 0, "defense_bonus": 10, "effect_type": "fire_resist", "effect_value": 20, "classes": null, "sold_in_shop": false, "droppable": true, "price": 400, "shop_min_floor": 12, "shop_max_floor": null},
+    {"id": "armadura_divina", "name": "Armadura Divina", "description": "Armadura abençoada pelos deuses.", "slot": "Body", "rarity": "Epic", "damage_bonus": 0, "defense_bonus": 15, "effect_type": "damage_reduction", "effect_value": 15, "classes": null, "sold_in_shop": false, "droppable": true, "price": 700, "shop_min_floor": 12, "shop_max_floor": null},
+    {"id": "amuleto_imortal", "name": "Amuleto da Imortalidade", "description": "Amuleto que torna imortal temporariamente.", "slot": "Amulet", "rarity": "Epic", "damage_bonus": 0, "defense_bonus": 5, "effect_type": "death_ignore", "effect_value": 1, "classes": null, "sold_in_shop": false, "droppable": true, "price": 600, "shop_min_floor": 15, "shop_max_floor": null},
+    {"id": "anel_fênix", "name": "Anel da Fênix", "description": "Anel que renasce das cinzas.", "slot": "Ring", "rarity": "Epic", "damage_bonus": 8, "defense_bonus": 3, "effect_type": "life_steal", "effect_value": 10, "classes": null, "sold_in_shop": false, "droppable": true, "price": 450, "shop_min_floor": 12, "shop_max_floor": null},
+    {"id": "espada_universo", "name": "Espada do Universo", "description": "A espada que pode cortar o próprio universo.", "slot": "Weapon", "rarity": "Legendary", "damage_bonus": 30, "defense_bonus": 5, "effect_type": "true_damage", "effect_value": 20, "classes": null, "sold_in_shop": false, "droppable": true, "price": 2000, "shop_min_floor": 20, "shop_max_floor": null},
+    {"id": "cajado_galaxia", "name": "Cajado da Galáxia", "description": "Contém o poder de uma galáxia.", "slot": "Weapon", "rarity": "Legendary", "damage_bonus": 25, "defense_bonus": 5, "effect_type": "armageddon", "effect_value": 50, "classes": null, "sold_in_shop": false, "droppable": true, "price": 2500, "shop_min_floor": 20, "shop_max_floor": null},
+    {"id": "pá_batalha", "name": "Pá de Batalha", "description": "Uma pá robusta para escavar e lutar.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 6, "defense_bonus": 0, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 45, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "bastão_cru", "name": "Bastão Cru", "description": "Bastão simples de madeira.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 3, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "faca_caça", "name": "Faca de Caça", "description": "Faca multifuncional de caçador.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 4, "defense_bonus": 0, "effect_type": "bleed", "effect_value": 1, "classes": null, "sold_in_shop": true, "droppable": true, "price": 35, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "escudo_madeira", "name": "Escudo de Madeira", "description": "Escudo leve de madeira compensada.", "slot": "Hands", "rarity": "Common", "damage_bonus": 1, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "luvas_rasas", "name": "Luvas Rasas", "description": "Luvas leves sem dedos.", "slot": "Hands", "rarity": "Common", "damage_bonus": 1, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 15, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "bandana_tecido", "name": "Bandana de Tecido", "description": "Bandana para proteger a cabeça.", "slot": "Helmet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 15, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "oculos_couro", "name": "Óculos de Couro", "description": "Proteção ocular simples.", "slot": "Helmet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "evasion", "effect_value": 1, "classes": null, "sold_in_shop": true, "droppable": true, "price": 20, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "colete_pano", "name": "Colete de Pano", "description": "Colete simples de tecido.", "slot": "Body", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "capa_pano", "name": "Capa de Pano", "description": "Capa leve para os ombros.", "slot": "Body", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 20, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "jaqueta_couro", "name": "Jaqueta de Couro", "description": "Jaqueta de couro melindungi.", "slot": "Body", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 3, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 55, "shop_min_floor": 2, "shop_max_floor": 15},
+    {"id": "saia_tecido", "name": "Saia de Tecido", "description": "Saia simples de tecido.", "slot": "Legs", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 15, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "bermuda_couro", "name": "Bermuda de Couro", "description": "Short de couro resistente.", "slot": "Legs", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "chinelos_pano", "name": "Chinelos de Pano", "description": "Calado simples para internos.", "slot": "Shoes", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 10, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "tamancos_madeira", "name": "Tamancos de Madeira", "description": "Calçado de madeira robusto.", "slot": "Shoes", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 20, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "amuleto_cordão", "name": "Amuleto de Cordão", "description": "Amuleto simples em cordão.", "slot": "Amulet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "agility", "effect_value": 3, "classes": null, "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "amuleto_ferro", "name": "Amuleto de Ferro", "description": "Amuleto de ferro forjado.", "slot": "Amulet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "strength", "effect_value": 3, "classes": null, "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "anel_palha", "name": "Anel de Palha", "description": "Anel trançado de palha.", "slot": "Ring", "rarity": "Common", "damage_bonus": 1, "defense_bonus": 0, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 10, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "anel_vegetal", "name": "Anel Vegetal", "description": "Anel feito de vegetal trançado.", "slot": "Ring", "rarity": "Common", "damage_bonus": 1, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 15, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "espada_treino", "name": "Espada de Treino", "description": "Espada de madeira para treinar.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 3, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 20, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "porrete", "name": "Porrete", "description": "Bastão pesado para combate.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 5, "defense_bonus": 0, "effect_type": "stun", "effect_value": 2, "classes": null, "sold_in_shop": true, "droppable": true, "price": 35, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "adaga_madeira", "name": "Adaga de Madeira", "description": "Adaga de madeira afiada.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 3, "defense_bonus": 0, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 15, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "gravetos", "name": "Gravetos Mágicos", "description": "Gravetos que canalizam magia.", "slot": "Weapon", "rarity": "Common", "damage_bonus": 2, "defense_bonus": 1, "effect_type": "mana_regen", "effect_value": 3, "classes": null, "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "escudo_ferro", "name": "Escudo de Ferro", "description": "Escudo de ferro resistente.", "slot": "Hands", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 3, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 45, "shop_min_floor": 2, "shop_max_floor": 15},
+    {"id": "luvas_lã", "name": "Luvas de Lã", "description": "Luvas quentes de lã.", "slot": "Hands", "rarity": "Common", "damage_bonus": 1, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 15, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "elmo_madeira", "name": "Elmo de Madeira", "description": "Elmo leve de madeira.", "slot": "Helmet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "capacete_couro", "name": "Capacete de Couro", "description": "Capacete acolchoado.", "slot": "Helmet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 35, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "túnica_tecido", "name": "Túnica de Tecido", "description": "Túnica básica de tecido.", "slot": "Body", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "armadura_couro", "name": "Armadura de Couro", "description": "Armadura completa de couro.", "slot": "Body", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 4, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 60, "shop_min_floor": 2, "shop_max_floor": 15},
+    {"id": "calças_tecido", "name": "Calças de Tecido", "description": "Calças confortáveis.", "slot": "Legs", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 15, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "armadura_camisa", "name": "Armadura de Camisa", "description": "Armadura leve de camização.", "slot": "Legs", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 35, "shop_min_floor": 2, "shop_max_floor": 15},
+    {"id": "botas_pano", "name": "Botas de Pano", "description": "Botas leves de pano.", "slot": "Shoes", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 15, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "sapatos_couro", "name": "Sapatos de Couro", "description": "Sapatos durar de couro.", "slot": "Shoes", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 2, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 30, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "amuleto_argila", "name": "Amuleto de Argila", "description": "Amuleto de argila moldada.", "slot": "Amulet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "defense", "effect_value": 3, "classes": null, "sold_in_shop": true, "droppable": true, "price": 20, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "amuleto_concha", "name": "Amuleto de Concha", "description": "Amuleto com concha marina.", "slot": "Amulet", "rarity": "Common", "damage_bonus": 0, "defense_bonus": 1, "effect_type": "max_mp", "effect_value": 5, "classes": null, "sold_in_shop": true, "droppable": true, "price": 25, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "anel_bronze", "name": "Anel de Bronze", "description": "Anel de bronze simples.", "slot": "Ring", "rarity": "Common", "damage_bonus": 2, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 20, "shop_min_floor": 1, "shop_max_floor": 15},
+    {"id": "anel_ouro", "name": "Anel de Ouro", "description": "Anel de ouro baixo.", "slot": "Ring", "rarity": "Common", "damage_bonus": 3, "defense_bonus": 1, "effect_type": "crit_chance", "effect_value": 2, "classes": null, "sold_in_shop": true, "droppable": true, "price": 40, "shop_min_floor": 2, "shop_max_floor": 15},
+    {"id": "espada_aco", "name": "Espada de Aço", "description": "Espada de aço temperado.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 9, "defense_bonus": 1, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 140, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "machado_guerra", "name": "Machado de Guerra", "description": "Machado robusto de guerra.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 11, "defense_bonus": 0, "effect_type": "bleed", "effect_value": 6, "classes": null, "sold_in_shop": true, "droppable": true, "price": 150, "shop_min_floor": 7, "shop_max_floor": 15},
+    {"id": "arco_composto", "name": "Arco Composto", "description": "Arco de madeira composta.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 9, "defense_bonus": 0, "effect_type": "stun", "effect_value": 4, "classes": null, "sold_in_shop": true, "droppable": true, "price": 130, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "cajado_cristal", "name": "Cajado de Cristal", "description": "Cajado com cristal místico.", "slot": "Weapon", "rarity": "Rare", "damage_bonus": 7, "defense_bonus": 2, "effect_type": "magic_damage", "effect_value": 12, "classes": null, "sold_in_shop": true, "droppable": true, "price": 160, "shop_min_floor": 7, "shop_max_floor": 15},
+    {"id": "luvas_aco", "name": "Luvas de Aço", "description": "Luvas de malha de aço.", "slot": "Hands", "rarity": "Rare", "damage_bonus": 5, "defense_bonus": 3, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 95, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "escudo_torre", "name": "Escudo Torre", "description": "Grande escudo de torre.", "slot": "Hands", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 5, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 120, "shop_min_floor": 7, "shop_max_floor": 15},
+    {"id": "elmo_aco", "name": "Elmo de Aço", "description": "Elmo de aço completo.", "slot": "Helmet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 6, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 100, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "capacete_ferro", "name": "Capacete de Ferro", "description": "Capacete de ferro защитный.", "slot": "Helmet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 5, "effect_type": "damage_reduction", "effect_value": 3, "classes": null, "sold_in_shop": true, "droppable": true, "price": 90, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "peitoral_ferro", "name": "Peitoral de Ferro", "description": "Armadura de peito de ferro.", "slot": "Body", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 7, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 150, "shop_min_floor": 7, "shop_max_floor": 15},
+    {"id": "armadura_cota_mala", "name": "Armadura de Cota de Malha", "description": "Armadura de malha completa.", "slot": "Body", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 8, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 170, "shop_min_floor": 8, "shop_max_floor": 15},
+    {"id": "calça_ferro", "name": "Calça de Ferro", "description": "Proteção de pernas em ferro.", "slot": "Legs", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 5, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 80, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "perneiras_aco", "name": "Perneiras de Aço", "description": "Perneiras de aço polido.", "slot": "Legs", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 6, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 85, "shop_min_floor": 7, "shop_max_floor": 15},
+    {"id": "botas_aco", "name": "Botas de Aço", "description": "Botas de aço resistente.", "slot": "Shoes", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 5, "effect_type": null, "effect_value": 0, "classes": null, "sold_in_shop": true, "droppable": true, "price": 75, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "botas_corrida", "name": "Botas de Corrida", "description": "Botas para corrida rápida.", "slot": "Shoes", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 3, "effect_type": "speed", "effect_value": 8, "classes": null, "sold_in_shop": true, "droppable": true, "price": 95, "shop_min_floor": 7, "shop_max_floor": 15},
+    {"id": "amuleto_prata", "name": "Amuleto de Prata", "description": "Amuleto de prata pura.", "slot": "Amulet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 2, "effect_type": "max_hp", "effect_value": 20, "classes": null, "sold_in_shop": true, "droppable": true, "price": 75, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "amuleto_ouro", "name": "Amuleto de Ouro", "description": "Amuleto de ouro robusto.", "slot": "Amulet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 2, "effect_type": "max_mp", "effect_value": 20, "classes": null, "sold_in_shop": true, "droppable": true, "price": 75, "shop_min_floor": 6, "shop_max_floor": 15},
+    {"id": "amuleto_força", "name": "Amuleto da Força", "description": "Amuleto que aumenta força.", "slot": "Amulet", "rarity": "Rare", "damage_bonus": 0, "defense_bonus": 2, "effect_type": "strength", "effect_value": 8, "classes": null, "sold_in_shop": true, "droppable": true, "price": 85, "shop_min_floor": 7, "shop_max_floor": 15},
+    {"id": "anel_diamante", "name": "Anel de Diamante", "description": "Anel com diamante falso.", "slot": "Ring", "rarity": "Rare", "damage_bonus": 6, "defense_bonus": 2, "effect_type": "crit_damage", "effect_value": 10, "classes": null, "sold_in_shop": true, "droppable": true, "price": 110, "shop_min_floor": 8, "shop_max_floor": 15},
+    {"id": "anel_esmeralda", "name": "Anel da Esmeralda", "description": "Anel com gema verde.", "slot": "Ring", "rarity": "Rare", "damage_bonus": 5, "defense_bonus": 2, "effect_type": "life_steal", "effect_value": 5, "classes": null, "sold_in_shop": true, "droppable": true, "price": 100, "shop_min_floor": 7, "shop_max_floor": 15}
+  ]
 }

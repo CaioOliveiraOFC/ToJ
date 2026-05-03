@@ -5,69 +5,98 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from src.ui import screens
-from src.ui.prompts import safe_get_key
+from src.ui.navigation_menu import navigate_inventory
+from src.ui.prompts import get_key
 
 if TYPE_CHECKING:
     from src.entities.heroes import Player
 
 
-def _is_potion(item: object) -> bool:
-    """Verifica se o item é uma poção via duck typing."""
-    return hasattr(item, "potion_type") or hasattr(item, "effect_value")
-
-
-def _is_equipment(item: object) -> bool:
-    """Verifica se o item é equipável (arma ou armadura) via duck typing."""
-    return hasattr(item, "slot")
-
-
 def run_inventory_flow(player: "Player") -> None:
-    """
-    Orquestra o fluxo completo do inventário.
-    Separa a lógica de interação (engine) da renderização (ui/screens).
-    """
+    """Orquestra o fluxo do inventário."""
+
     while True:
         screens.render_inventory_main(player)
 
-        valid_choices = ["x"] + [str(i + 1) for i in range(len(player.inventory))]
-        choice = safe_get_key(valid_keys=valid_choices)
+        valid_choices = [str(i) for i in range(len(player.inventory))] + ["0", "esc"]
+        choice = get_key()
 
-        if choice == "x":
+        if choice == "0" or choice.lower() == "esc":
             break
 
-        if choice and choice.isdigit():
+        try:
             item_index = int(choice) - 1
             if 0 <= item_index < len(player.inventory):
                 selected_item = player.inventory[item_index]
                 _run_item_action_flow(player, selected_item)
+        except ValueError:
+            pass
+
+
+def run_inventory_flow_v2(player: "Player") -> None:
+    """Fluxo do inventário usando menu navegável."""
+
+    while True:
+        if not player.inventory:
+            screens._render_empty_inventory_message()
+            get_key()
+            break
+
+        equipped_indices = []
+        for slot, equipped_item in player.equipment.items():
+            if equipped_item:
+                try:
+                    idx = player.inventory.index(equipped_item)
+                    equipped_indices.append(idx)
+                except ValueError:
+                    pass
+
+        selected_idx = navigate_inventory(player.inventory, equipped_indices)
+
+        if selected_idx is None:
+            break
+
+        selected_item = player.inventory[selected_idx]
+        _run_item_action_flow(player, selected_item)
 
 
 def _run_item_action_flow(player: "Player", item: object) -> None:
     """Fluxo de ações para um item selecionado."""
+    from src.content.items import Item
+    
+    is_equipped = _is_item_equipped(player, item)
+    
+    is_usable = isinstance(item, Item) and getattr(item, "is_usable", False)
+    is_equippable = hasattr(item, "slot")
+
     while True:
-        is_equipped = _is_item_equipped(player, item)
         screens.render_inventory_item_details(item, is_equipped)
 
-        action_options = _build_action_options(item, is_equipped)
-        action_choice = safe_get_key(valid_keys=action_options, allow_escape=False)
+        valid_keys = []
+        if is_usable:
+            valid_keys.append("u")
+        if is_equippable:
+            valid_keys.append("e")
+        valid_keys.extend(["c", "esc"])
 
-        if action_choice == "u":
-            if _is_potion(item):
+        action_choice = get_key()
+
+        if action_choice == "u" and is_usable:
+            if isinstance(item, Item):
                 msg = player.use_potion(item)
                 screens.render_inventory_item_used(msg or getattr(item, "name", "item"))
                 break
-        elif action_choice == "e":
-            if _is_equipment(item):
-                if is_equipped:
-                    slot = _find_equipped_slot(player, item)
-                    if slot:
-                        msg = player.unequip(slot)
-                        screens.render_inventory_item_unequipped(msg or getattr(item, "name", "item"))
-                else:
-                    msg = player.equip(item)
-                    screens.render_inventory_item_equipped(msg or getattr(item, "name", "item"))
-                break
-        elif action_choice == "c":
+        elif action_choice == "e" and is_equippable:
+            if is_equipped:
+                slot = _find_equipped_slot(player, item)
+                if slot:
+                    msg = player.unequip(slot)
+                    screens.render_inventory_item_unequipped(msg or getattr(item, "name", "item"))
+            else:
+                msg = player.equip(item)
+                screens.render_inventory_item_equipped(msg or getattr(item, "name", "item"))
+            break
+        elif action_choice == "c" or action_choice.lower() == "esc":
             break
 
 
@@ -85,18 +114,3 @@ def _find_equipped_slot(player: "Player", item: object) -> str | None:
         if equipped_item == item:
             return slot
     return None
-
-
-def _build_action_options(item: object, is_equipped: bool) -> list[str]:
-    """Constrói a lista de opções de ação disponíveis para o item."""
-    options = []
-
-    if _is_potion(item):
-        options.append("u")
-
-    if _is_equipment(item):
-        options.append("e")
-
-    options.append("c")
-
-    return options

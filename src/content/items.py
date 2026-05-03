@@ -1,156 +1,189 @@
 from src.shared.constants import RARITY_MULTIPLIERS
+from src.data.loader import load_json
 
 
 class Item:
     """Classe base para todos os itens do jogo.
 
-    Args:
-        name: Nome do item.
-        description: Descrição do item.
-        rarity: Raridade do item (default: "Common").
-
     Attributes:
+        id: Identificador único do item.
         name: Nome do item.
         description: Descrição do item.
         rarity: Raridade do item.
+        slot: Slot de equipamento.
+        classes: Lista de classes que podem usar o item (None = todas).
     """
 
-    def __init__(self, name: str, description: str, rarity: str = "Common") -> None:
+    def __init__(
+        self,
+        item_id: str,
+        name: str,
+        description: str,
+        rarity: str = "Common",
+        slot: str = "Body",
+        damage_bonus: int = 0,
+        defense_bonus: int = 0,
+        effect_type: str | None = None,
+        effect_value: int = 0,
+        classes: list[str] | None = None,
+        sold_in_shop: bool = True,
+        droppable: bool = True,
+        price: int = 50,
+        shop_min_floor: int = 1,
+        shop_max_floor: int | None = None,
+    ) -> None:
+        self.id: str = item_id
         self.name: str = name
         self.description: str = description
         self.rarity: str = rarity
+        self.slot: str = slot
+        self.damage_bonus: int = damage_bonus
+        self.defense_bonus: int = defense_bonus
+        self.effect_type: str | None = effect_type
+        self.effect_value: int = effect_value
+        self.classes: list[str] | None = classes
+        self.sold_in_shop: bool = sold_in_shop
+        self.droppable: bool = droppable
+        self.price: int = price
+        self.shop_min_floor: int = shop_min_floor
+        self.shop_max_floor: int | None = shop_max_floor
+
+        if effect_type and effect_value:
+            multiplier = RARITY_MULTIPLIERS.get(rarity, 1.0)
+            if effect_type in ("max_hp", "max_mp", "agility", "strength", "defense"):
+                self.effect_value = int(effect_value * multiplier)
+
+    @property
+    def is_potion(self) -> bool:
+        """Verifica se o item é uma poção (legacy)."""
+        return self.effect_type in ("max_hp", "max_mp", "agility", "strength", "defense")
+    
+    @property
+    def is_usable(self) -> bool:
+        """Verifica se o item pode ser usado (não é equipamento)."""
+        if not self.effect_type or self.effect_value <= 0:
+            return False
+        return self.effect_type in (
+            "max_hp", "max_mp", "agility", "strength", "defense",
+            "speed", "evasion", "crit_chance", "crit_damage",
+            "life_steal", "mana_regen"
+        )
+
+
+def _create_item_from_json(item_data: dict) -> Item:
+    """Cria um objeto Item a partir de dados do JSON."""
+    return Item(
+        item_id=item_data.get("id", ""),
+        name=item_data.get("name", ""),
+        description=item_data.get("description", ""),
+        rarity=item_data.get("rarity", "Common"),
+        slot=item_data.get("slot", "Body"),
+        damage_bonus=item_data.get("damage_bonus", 0),
+        defense_bonus=item_data.get("defense_bonus", 0),
+        effect_type=item_data.get("effect_type"),
+        effect_value=item_data.get("effect_value", 0),
+        classes=item_data.get("classes"),
+        sold_in_shop=item_data.get("sold_in_shop", True),
+        droppable=item_data.get("droppable", True),
+        price=item_data.get("price", 50),
+        shop_min_floor=item_data.get("shop_min_floor", 1),
+        shop_max_floor=item_data.get("shop_max_floor", None),
+    )
+
+
+# --- GERADOR DINÂMICO DE ITENS ---
+
+_ALL_ITEMS_CACHE: dict[str, Item] | None = None
+
+
+def _load_all_items() -> dict[str, Item]:
+    """Carrega todos os itens do JSON e gera ALL_ITEMS."""
+    global _ALL_ITEMS_CACHE
+    if _ALL_ITEMS_CACHE is not None:
+        return _ALL_ITEMS_CACHE
+
+    data = load_json("items.json")
+    items_list = data.get("items", [])
+
+    _ALL_ITEMS_CACHE = {}
+    for item_data in items_list:
+        item = _create_item_from_json(item_data)
+        _ALL_ITEMS_CACHE[item.name] = item
+
+    return _ALL_ITEMS_CACHE
+
+
+def get_all_items() -> dict[str, Item]:
+    """Retorna o dicionário de todos os itens (gerado dinamicamente do JSON)."""
+    return _load_all_items()
+
+
+# Alias para compatibilidade
+ALL_ITEMS = property(lambda self: _load_all_items())
+
+
+def reload_items() -> None:
+    """Recarrega os itens (útil para desenvolvimento)."""
+    global _ALL_ITEMS_CACHE
+    _ALL_ITEMS_CACHE = None
+    _load_all_items()
+
+
+# --- COMPATIBILIDADE COM CÓDIGO EXISTENTE ---
+# Para acesso direto via Item class (não recomendado, use get_all_items())
+
+def __getattr__(name: str) -> Item:
+    items = _load_all_items()
+    if name in items:
+        return items[name]
+    raise AttributeError(f"Item '{name}' not found")
+
+
+# Garante que ALL_ITEMS esteja carregado ao importar
+_load_all_items()
+
+
+# --- COMPATIBILIDADE COM CÓDIGO EXISTENTE ---
+# Para manter compatibilidade com código que espera classes separadas
 
 class Weapon(Item):
-    """Classe para itens que são armas.
+    """Classe de compatibilidade para armas."""
+    pass
 
-    Args:
-        name: Nome da arma.
-        description: Descrição da arma.
-        base_damage: Dano base da arma.
-        rarity: Raridade da arma (default: "Common").
-
-    Attributes:
-        base_damage: Dano base da arma.
-        damage_bonus: Bônus de dano calculado baseado na raridade.
-        slot: Slot de equipamento (sempre "Weapon").
-    """
-
-    def __init__(self, name: str, description: str, base_damage: int, rarity: str = "Common") -> None:
-        super().__init__(name, description, rarity)
-        self.base_damage: int = base_damage
-        self.damage_bonus: int = int(base_damage * RARITY_MULTIPLIERS[rarity])
-        self.slot: str = "Weapon"
 
 class Armor(Item):
-    """Classe para itens que são armaduras.
+    """Classe de compatibilidade para armaduras."""
+    pass
 
-    Esta é uma representação genérica para itens que podem ser lootados.
-    A implementação detalhada da armadura está em armor.py.
-
-    Args:
-        name: Nome da armadura.
-        description: Descrição da armadura.
-        base_defense: Defesa base da armadura.
-        slot: Slot de equipamento (ex: "Helmet", "Body", "Legs", "Shoes").
-        rarity: Raridade da armadura (default: "Common").
-
-    Attributes:
-        base_defense: Defesa base da armadura.
-        defense_bonus: Bônus de defesa calculado baseado na raridade.
-        slot: Slot de equipamento.
-    """
-
-    def __init__(self, name: str, description: str, base_defense: int, slot: str, rarity: str = "Common") -> None:
-        super().__init__(name, description, rarity)
-        self.base_defense: int = base_defense
-        self.defense_bonus: int = int(base_defense * RARITY_MULTIPLIERS[rarity])
-        self.slot: str = slot
 
 class Potion(Item):
-    """Classe para itens consumíveis, como poções.
-
-    Args:
-        name: Nome da poção.
-        description: Descrição da poção.
-        base_effect_value: Valor base do efeito da poção.
-        potion_type: Tipo da poção (ex: "Health", "Mana", "Strength", "Defense", "Agility").
-        rarity: Raridade da poção (default: "Common").
-
-    Attributes:
-        potion_type: Tipo do efeito da poção.
-        base_effect_value: Valor base do efeito.
-        effect_value: Valor do efeito calculado baseado na raridade.
-    """
-
-    def __init__(self, name: str, description: str, base_effect_value: int, potion_type: str = "Health", rarity: str = "Common") -> None:
-        super().__init__(name, description, rarity)
-        self.potion_type: str = potion_type
-        self.base_effect_value: int = base_effect_value
-        self.effect_value: int = int(base_effect_value * RARITY_MULTIPLIERS[rarity])
-
-# --- Definição dos Itens do Jogo ---
-
-# Armas
-espada_curta = Weapon("Espada Curta", "Uma espada básica e confiável.", 5, "Common")
-cajado_simples = Weapon("Cajado Simples", "Um cajado de madeira para iniciantes.", 3, "Common")
-adaga_agil = Weapon("Adaga Ágil", "Uma adaga leve, perfeita para ataques rápidos.", 4, "Common")
-espada_longa_rara = Weapon("Espada Longa Rara", "Uma espada bem balanceada, com um brilho sutil.", 8, "Rare")
-machado_de_batalha_epico = Weapon("Machado de Batalha Épico", "Um machado pesado que causa grande estrago.", 12, "Epic")
-arco_lendario = Weapon("Arco Lendário", "Um arco antigo, dizem que nunca erra o alvo.", 15, "Legendary")
-
-# Armaduras (representações genéricas para loot)
-# As armaduras detalhadas com slots e defesa são definidas em armor.py
-elmo_de_couro = Armor("Elmo de Couro", "Proteção simples para a cabeça.", 2, "Helmet", "Common")
-peitoral_de_ferro = Armor("Peitoral de Ferro", "Oferece boa proteção para o torso.", 5, "Body", "Common")
-botas_de_couro_raras = Armor("Botas de Couro Raras", "Botas leves que oferecem alguma proteção.", 3, "Shoes", "Rare")
-perneiras_de_placa_epicas = Armor("Perneiras de Placa Épicas", "Proteção pesada para as pernas.", 7, "Legs", "Epic")
-
-# Poções
-pocao_de_cura_pequena = Potion("Poção de Cura Pequena", "Restaura uma pequena quantidade de vida.", 50, "Health", "Common")
-pocao_de_cura_media = Potion("Poção de Cura Média", "Restaura uma quantidade moderada de vida.", 100, "Health", "Rare")
-pocao_de_mana_pequena = Potion("Poção de Mana Pequena", "Restaura uma pequena quantidade de mana.", 30, "Mana", "Common")
-pocao_de_forca = Potion("Poção de Força", "Aumenta temporariamente o dano em 15%. (Efeito: +15)", 15, "Strength", "Rare")
-pocao_de_defesa = Potion("Poção de Defesa", "Aumenta temporariamente a defesa em 10. (Efeito: +10)", 10, "Defense", "Rare")
-pocao_de_agilidade = Potion("Poção de Agilidade", "Aumenta temporariamente a agilidade em 20%. (Efeito: +20)", 20, "Agility", "Epic")
-pocao_de_cura_epica = Potion("Poção de Cura Épica", "Restaura uma grande quantidade de vida.", 200, "Health", "Epic")
-
-# 5 Novas Poções com efeitos escaláveis
-pocao_de_cura_maior = Potion("Poção de Cura Maior", "Restaura uma grande quantidade de vida. Muito potente.", 400, "Health", "Legendary")
-pocao_de_mana_maior = Potion("Poção de Mana Maior", "Restaura uma grande quantidade de mana.", 150, "Mana", "Epic")
-elixir_da_potencia = Potion("Elixir da Potência", "Aumenta significativamente o atributo de força por um tempo.", 30, "Strength", "Epic")
-elixir_da_resiliencia = Potion("Elixir da Resiliência", "Aumenta significativamente o atributo de defesa por um tempo.", 20, "Defense", "Epic")
-pocao_da_velocidade = Potion("Poção da Velocidade", "Aumenta drasticamente o atributo de agilidade por um tempo.", 40, "Agility", "Legendary")
+    """Classe de compatibilidade para poções."""
+    pass
 
 
-# --- REGISTRO CENTRAL DE ITENS ---
-# Este dicionário mapeia o nome de cada item ao seu objeto.
-# É essencial para a função de carregar o jogo.
-ALL_ITEMS = {
-    # Weapons
-    espada_curta.name: espada_curta,
-    cajado_simples.name: cajado_simples,
-    adaga_agil.name: adaga_agil,
-    espada_longa_rara.name: espada_longa_rara,
-    machado_de_batalha_epico.name: machado_de_batalha_epico,
-    arco_lendario.name: arco_lendario,
+# Exporta ALL_ITEMS para compatibilidade (propriedade dinâmica)
+class _ALL_ITEMS_Dict:
+    """Proxy para manter compatibilidade com ALL_ITEMS."""
+    def __getitem__(self, key):
+        return _load_all_items()[key]
+    
+    def __contains__(self, key):
+        return key in _load_all_items()
+    
+    def keys(self):
+        return _load_all_items().keys()
+    
+    def values(self):
+        return _load_all_items().values()
+    
+    def items(self):
+        return _load_all_items().items()
+    
+    def __len__(self):
+        return len(_load_all_items())
+    
+    def get(self, key, default=None):
+        return _load_all_items().get(key, default)
 
-    # Armors (generic for items.py)
-    elmo_de_couro.name: elmo_de_couro,
-    peitoral_de_ferro.name: peitoral_de_ferro,
-    botas_de_couro_raras.name: botas_de_couro_raras,
-    perneiras_de_placa_epicas.name: perneiras_de_placa_epicas,
 
-    # Potions
-    pocao_de_cura_pequena.name: pocao_de_cura_pequena,
-    pocao_de_cura_media.name: pocao_de_cura_media,
-    pocao_de_mana_pequena.name: pocao_de_mana_pequena,
-    pocao_de_forca.name: pocao_de_forca,
-    pocao_de_defesa.name: pocao_de_defesa,
-    pocao_de_agilidade.name: pocao_de_agilidade,
-    pocao_de_cura_epica.name: pocao_de_cura_epica,
-    pocao_de_cura_maior.name: pocao_de_cura_maior,
-    pocao_de_mana_maior.name: pocao_de_mana_maior,
-    elixir_da_potencia.name: elixir_da_potencia,
-    elixir_da_resiliencia.name: elixir_da_resiliencia,
-    pocao_da_velocidade.name: pocao_da_velocidade,
-}
+ALL_ITEMS = _ALL_ITEMS_Dict()
