@@ -250,7 +250,7 @@ def render_shop_purchase_success(item_name: str, price: int) -> None:
     """Renderiza mensagem de compra bem-sucedida."""
     renderer.console.print(
         Panel(
-            Text(
+            Text.from_markup(
                 f"Você comprou [bold green]{item_name}[/bold green] por [bold yellow]{price}[/bold yellow] ouro.",
                 justify="center",
                 style="green",
@@ -406,97 +406,6 @@ def _render_empty_inventory_message() -> None:
     )
 
 
-def _render_inventory_controls() -> None:
-    """Renderiza os controles de navegação do inventário."""
-    renderer.console.print(
-        "\n[dim white](número do item)[/dim white] selecionar | "
-        "[dim white](x)[/dim white] sair do inventário"
-    )
-
-
-def render_inventory_main(player: "Player") -> None:
-    """Renderiza a tela principal do inventário."""
-    renderer.console.clear()
-
-    # Cabeçalho
-    renderer.console.print(_create_inventory_header_panel(player))
-    renderer.show_status(player)
-
-    # Equipamentos
-    renderer.console.print(_create_equipment_table(player))
-    renderer.console.print("\n")
-
-    # Inventário
-    inv_table = _create_inventory_table(player)
-    if inv_table is None:
-        _render_empty_inventory_message()
-    else:
-        renderer.console.print(inv_table)
-
-    _render_inventory_controls()
-
-
-def render_inventory_item_details(item: object, is_equipped: bool) -> None:
-    """Renderiza os detalhes de um item do inventário."""
-    renderer.console.clear()
-
-    details_table = Table(show_header=False, expand=True, border_style="dim yellow")
-    details_table.add_column("Atributo", style="bold cyan")
-    details_table.add_column("Valor", style="white")
-
-    details_table.add_row("Nome", item.name)
-    if hasattr(item, 'description'):
-        details_table.add_row("Descrição", item.description)
-    details_table.add_row("Tipo", item.__class__.__name__)
-
-    # Duck typing: verifica atributos específicos em vez de importar classes de content/
-    if hasattr(item, 'damage_bonus'):
-        details_table.add_row("Dano", str(item.damage_bonus))
-    elif hasattr(item, 'defense_bonus'):
-        details_table.add_row("Defesa", str(item.defense_bonus))
-    elif hasattr(item, 'potion_type') or hasattr(item, 'effect_value'):
-        details_table.add_row("Tipo de Efeito", getattr(item, 'potion_type', 'Desconhecido'))
-        details_table.add_row("Poder de Efeito", f"+{getattr(item, 'effect_value', 0)}")
-
-    renderer.console.print(Panel(details_table, title="[bold yellow]Detalhes do Item[/bold yellow]", border_style="yellow"))
-
-    # Ações - verificar se é usável ou equipável
-    action_table = Table(show_header=False, expand=True, border_style="dim white")
-    is_usable = getattr(item, "is_usable", False)
-    is_equippable = hasattr(item, "slot")
-
-    if is_usable:
-        action_table.add_row("[bold blue]u[/bold blue]", "Usar Item")
-
-    if is_equippable:
-        if is_equipped:
-            action_table.add_row("[bold blue]e[/bold blue]", "Desequipar Item")
-        else:
-            action_table.add_row("[bold blue]e[/bold blue]", "Equipar Item")
-
-    action_table.add_row("[bold blue]c[/bold blue]", "Cancelar")
-
-    renderer.console.print(Panel(action_table, title="[bold cyan]Opções[/bold cyan]", border_style="cyan"))
-
-
-def render_inventory_item_used(item_name: str) -> None:
-    """Renderiza mensagem de item usado."""
-    renderer.console.print(Panel(f"Você usou [bold green]{item_name}[/bold green].", border_style="green"))
-    sleep(0.8)
-
-
-def render_inventory_item_equipped(item_name: str) -> None:
-    """Renderiza mensagem de item equipado."""
-    renderer.console.print(Panel(f"Você equipou [bold green]{item_name}[/bold green].", border_style="green"))
-    sleep(0.8)
-
-
-def render_inventory_item_unequipped(item_name: str) -> None:
-    """Renderiza mensagem de item desequipado."""
-    renderer.console.print(Panel(f"Você desequipou [bold yellow]{item_name}[/bold yellow].", border_style="yellow"))
-    sleep(0.8)
-
-
 def render_dungeon_status(
     dungeon_level: int, hp: int, max_hp: int, mp: int, max_mp: int,
     essence_multiplier: float = 1.0,
@@ -551,9 +460,25 @@ def render_continue_prompt() -> None:
 
 
 def render_map(map_lines: list[str]) -> None:
-    """Renderiza as linhas do mapa no console."""
+    """Renderiza as linhas do mapa no console com cores."""
+    from rich.text import Text
+    
     for line in map_lines:
-        renderer.console.print(line)
+        colored_line = Text()
+        for char in line:
+            if char == '@':
+                colored_line.append(char, style="bold green")
+            elif char == '&':
+                colored_line.append(char, style="bold red")
+            elif char == 'B':
+                colored_line.append(char, style="bold magenta")
+            elif char == 'X':
+                colored_line.append(char, style="dim")
+            elif char == 'D':
+                colored_line.append(char, style="bold yellow")
+            else:
+                colored_line.append(char, style="white")
+        renderer.console.print(colored_line)
 
 
 def render_passive_selection(choices: list) -> None:

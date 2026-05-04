@@ -180,7 +180,7 @@ class Player(Entity):
         elif slot in ("Helmet", "Body", "Legs", "Shoes", "Hands", "Amulet", "Ring"):
             self.base_df += int(getattr(item_to_equip, "defense_bonus", 0))
         self.rest()
-        return f"{getattr(item_to_equip, 'name', 'Item')} equipado."
+        return getattr(item_to_equip, "name", "Item")
 
     def unequip(self, slot: str) -> str | None:
         """Desequipa um item do slot especificado.
@@ -201,7 +201,7 @@ class Player(Entity):
         self.equipment[slot] = None
         self.inventory.append(item_to_unequip)
         self.rest()
-        return f"{getattr(item_to_unequip, 'name', 'Item')} desequipado."
+        return getattr(item_to_unequip, "name", "Item")
 
     def use_potion(self, item: object) -> str:
         """Usa um item e aplica seus efeitos.
@@ -299,9 +299,15 @@ class Player(Entity):
         value = int(passive.effect_value)
 
         if effect_type == "max_hp":
+            old_base_hp = self.base_hp
             self.base_hp += value
+            hp_ratio = self._hp / old_base_hp if old_base_hp > 0 else 1
+            self._hp = min(int(self.base_hp * hp_ratio), self.base_hp)
         elif effect_type == "max_mp":
+            old_base_mp = self.base_mp
             self.base_mp += value
+            mp_ratio = self._mp / old_base_mp if old_base_mp > 0 else 1
+            self._mp = min(int(self.base_mp * mp_ratio), self.base_mp)
         elif effect_type == "strength":
             self.base_st += value
             self.avg_damage = (self.base_st + self.base_mg) // DAMAGE_FORMULA_DIVISOR

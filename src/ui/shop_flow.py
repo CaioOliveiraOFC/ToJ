@@ -24,7 +24,7 @@ def run_shop_flow(player: "Player", shop: object, dungeon_level: int) -> None:
             _run_buy_flow(player, shop, dungeon_level)
         elif choice == "2":
             _run_sell_flow(player, shop, dungeon_level)
-        elif choice == "3" or choice.lower() == "esc":
+        elif choice == "3" or choice.lower() == "q":
             screens.render_shop_farewell()
             break
 
@@ -41,7 +41,7 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
         if not items_for_sale:
             break
             
-        selected_idx = navigate_shop_buy(items_for_sale, player.coins)
+        selected_idx = navigate_shop_buy(items_for_sale, player.coins, player)
 
         if selected_idx is None:
             break

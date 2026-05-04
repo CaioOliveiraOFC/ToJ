@@ -56,7 +56,7 @@ def splash_screen():
         sleep(0.5) # Pausa para leitura do painel completo
 
     console.print("\n") # Espaço antes do prompt
-    console.print(Panel(Text("Pressione [bold green]qualquer tecla[/bold green] para começar sua aventura...", justify="center", style="bold yellow"), border_style="yellow", width=80))
+    console.print(Panel(Text.from_markup("Pressione [bold green]qualquer tecla[/bold green] para começar sua aventura...", justify="center", style="bold yellow"), border_style="yellow", width=80))
     safe_get_key(allow_escape=False)
 
 def game_over_screen(player_name="Aventureiro"):
@@ -85,7 +85,7 @@ def game_over_screen(player_name="Aventureiro"):
     ))
     sleep(0.8)
     console.print(Panel(
-        Text("Pressione [bold green]qualquer tecla[/bold green] para retornar ao menu principal...", justify="center", style="bold yellow"),
+        Text.from_markup("Pressione [bold green]qualquer tecla[/bold green] para retornar ao menu principal...", justify="center", style="bold yellow"),
         border_style="yellow"
     ))
     safe_get_key(allow_escape=False)
@@ -117,7 +117,7 @@ def display_final_stats(level: int, actions: int, battles: int, crashes: int):
     ))
     sleep(0.8)
     console.print(Panel(
-        Text("Pressione [bold green]qualquer tecla[/bold green] para continuar...", justify="center", style="bold yellow"),
+        Text.from_markup("Pressione [bold green]qualquer tecla[/bold green] para continuar...", justify="center", style="bold yellow"),
         border_style="yellow"
     ))
     safe_get_key(allow_escape=False)

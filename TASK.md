@@ -5,6 +5,84 @@
 
 ## Sessão Atual
 
+**ID:** TASK-003
+**Data:** 03/05/2026
+**Status:** 🟡 Em progresso
+**Depende de:** TASK-002 concluída
+
+---
+
+## Objetivo
+
+Corrigir bugs críticos na UI e navegação do jogo.
+
+---
+
+## Bugs a corrigir
+
+### 1. Bug da loja - markup não renderizado
+- **Arquivo:** `src/ui/screens.py` linha 254
+- **Problema:** `Text(...)` não processa markup Rich
+- **Solução:** Mudar para `Text.from_markup(...)`
+
+### 2. Bug em toj_menu.py - markup não renderizado
+- **Arquivos:** `src/ui/toj_menu.py` linhas 59 e 120
+- **Problema:** Mesmo que acima
+- **Solução:** Mudar para `Text.from_markup(...)`
+
+### 3. STATUS não mostra bônus de stats corretamente
+- **Arquivo:** `src/ui/navigation_menu.py`
+- **Problema:** Não subtrai o valor do item atualmente equipado no mesmo slot
+- **Solução:** `bonus = novo_item.damage_bonus - item_equipado.damage_bonus`
+
+### 4. Q como tecla para sair (substitui ESC)
+- **Arquivos:** Todos os menus em `src/ui/`
+- **Problema:** ESC usado como sair, mas Q é a regra do jogo
+- **Solução:** Substituir `key.lower() == "esc"` por `key.lower() == "q"`
+
+### 5. Loja com terceiro quadro de melhoria de stats
+- **Arquivo:** `src/ui/navigation_menu.py` - `navigate_shop_buy`
+- **Problema:** Só tem 2 painéis (lista + detalhes), sem mostrar melhoria de stats
+- **Solução:** Adicionar 3º painel estilo inventário (player status com bônus do item)
+
+### 6. Mapa sem cores
+- **Arquivo:** `src/ui/screens.py` - `render_map()`
+- **Problema:** Renderiza apenas texto puro sem cores
+- **Solução:** Colorir cada caractere baseado no tipo (@, &, B, X, D)
+
+---
+
+## Arquivos que serão tocados
+
+| Arquivo | Ação | O que muda |
+|---|---|---|
+| `src/ui/screens.py` | Modificar | render_map() com cores, render_shop_purchase_success() |
+| `src/ui/toj_menu.py` | Modificar | Linhas 59, 88, 120 - Text() → Text.from_markup() |
+| `src/ui/navigation_menu.py` | Modificar | build_player_status(), navegar menus (Q), loja (3 painéis) |
+| `src/ui/shop_flow.py` | Modificar | Substituir ESC por Q |
+
+---
+
+## Critérios de Aceite
+
+- [ ] screens.py - render_map() exibe cores corretas para cada elemento
+- [ ] screens.py - render_shop_purchase_success() exibe cores corretamente
+- [ ] toj_menu.py - todas as mensagens com markup são renderizadas corretamente
+- [ ] navigation_menu.py - STATUS mostra (+X) quando item selecionado
+- [ ] navigation_menu.py - navegação usa Q para sair, não ESC
+- [ ] navigation_menu.py - navigate_shop_buy() tem 3 painéis como inventário
+- [ ] shop_flow.py - usa Q para sair da loja
+- [ ] ruff check src/ passa sem erros novos
+
+---
+
+# TASK.md — TOJ
+> Substitua o conteúdo deste arquivo a cada nova sessão. Um arquivo, uma sessão, um objetivo.
+
+---
+
+## Sessão Anterior (TASK-002)
+
 **ID:** TASK-002
 **Data:** 02/05/2026
 **Status:** ✅ Concluída
@@ -16,13 +94,13 @@
 
 ---
 
-## Objetivo
+## Objetivo (TASK-002)
 
 Implementar o **Sistema de Cartas de Passivas de Nível** — o coração da diferenciação de builds no TOJ. Ao subir de nível, o jogador escolhe **1 entre 3 passivas permanentes** exibidas em formato de cartas. Passivas se acumulam sem limite e persistem na run inteira (e na Arena, no futuro).
 
 ---
 
-## Contexto do Game Design
+## Contexto do Game Design (TASK-002)
 
 Do `GAME_DESIGN.md`:
 
@@ -41,7 +119,7 @@ Do `GAME_DESIGN.md`:
 
 ```
 shared/          → sem dependências
-entities/        → shared/ apenas
+entities/        → shared/
 mechanics/       → entities/, shared/
 content/         → entities/, mechanics/, shared/   ← PassiveCard mora aqui
 storage/         → content/, entities/, shared/
@@ -53,7 +131,7 @@ ui/              → content/, shared/  (NUNCA engine/ ou mechanics/ diretamente
 
 ---
 
-## Arquivos que serão tocados
+## Arquivos que serão tocados (TASK-002)
 
 | Arquivo | Ação | O que muda |
 |---|---|---|
@@ -76,7 +154,7 @@ ui/              → content/, shared/  (NUNCA engine/ ou mechanics/ diretamente
 
 ---
 
-## Especificação Técnica
+## Especificação Técnica (TASK-002)
 
 ### 1. `src/data/passives.json`
 
@@ -501,7 +579,7 @@ for pid in passive_ids:
 
 ---
 
-## Decisões Confirmadas
+## Decisões Confirmadas (TASK-002)
 
 1. **Passivas são globais** — todas as classes podem receber qualquer passiva
 2. **Passivas em JSON** — permite geração externa, não hardcoded em Python
@@ -515,12 +593,12 @@ for pid in passive_ids:
 
 ---
 
-## Critérios de Aceite
+## Critérios de Aceite (TASK-002)
 
 - [x] `passives.json` criado com mínimo 28 passivas (todas as 4 raridades cobertas)
 - [x] `generate_passive_choices()` está em `src/content/passives.py`, não em `math_operations.py`
 - [x] Ao subir de nível, 3 cartas são exibidas **após** a tela de pós-batalha
-- [x] Um nível = uma seleção de carta (dois níveis de uma vez = duas seleções sequenciais)
+- [x] Um nível = uma seleção de carta (dois níveis de uma vez = duasSeleções sequenciais)
 - [x] Passivas de Stats alteram `base_hp`/`base_mp`/etc. sem chamar `rest()`
 - [x] `combat.py` não contém nenhum import de `content/passives`
 - [x] Passivas salvas como lista de IDs no `savegame.json`
@@ -558,7 +636,7 @@ Ao finalizar, o Windsurf deve:
 
 | ID | Objetivo | Depende de |
 |---|---|---|
-| TASK-003 | 10 slots de personagem + permadeath + Troféu de Fracasso | TASK-001 |
-| TASK-004 | Eventos aleatórios de andar (Mercador, Altar, Fonte) | TASK-001 |
-| TASK-005 | Cooldowns + `damage_reduction` + `stun_chance` em combate | TASK-002 |
-| TASK-006 | Opção "Sair da Masmorra" (extração) entre andares | TASK-003 |
+| TASK-004 | 10 slots de personagem + permadeath + Troféu de Fracasso | TASK-002 |
+| TASK-005 | Eventos aleatórios de andar (Mercador, Altar, Fonte) | TASK-002 |
+| TASK-006 | Cooldowns + `damage_reduction` + `stun_chance` em combate | TASK-002 |
+| TASK-007 | Opção "Sair da Masmorra" (extração) entre andares | TASK-004 |
