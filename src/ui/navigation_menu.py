@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
 
+from rich.panel import Panel
+from rich.table import Table
+from src.content.items import Item, get_all_items
 from src.ui import renderer
 from src.ui.prompts import get_key
 
@@ -14,6 +18,73 @@ if TYPE_CHECKING:
 def escape_markup(text: str) -> str:
     """Escapa caracteres que quebram markup Rich."""
     return text.replace("[", "\\[").replace("]", "\\]")
+
+
+def build_player_status(player, selected_item=None) -> str:
+    """Constrói o conteúdo do painel de status do jogador."""
+    content = f"[bold]Classe:[/bold] {player.get_classname()}\n"
+    content += f"[bold]Nível:[/bold] {player.level}\n\n"
+
+    content += f"[red]HP:[/red] {player.get_hp()}/{player.base_hp}\n"
+    content += f"[blue]MP:[/blue] {player.get_mp()}/{player.base_mp}\n\n"
+
+    current_atk = player.avg_damage + player.get_passive_bonus('strength')
+    current_def = player.base_df + player.get_passive_bonus('defense')
+
+    atk_bonus = 0
+    def_bonus = 0
+    if selected_item:
+        selected_slot = getattr(selected_item, "slot", None)
+        equipped_item = player.equipment.get(selected_slot) if selected_slot else None
+
+        if selected_slot == "Weapon":
+            new_damage = getattr(selected_item, "damage_bonus", 0)
+            equipped_damage = getattr(equipped_item, "damage_bonus", 0) if equipped_item else 0
+            atk_bonus = new_damage - equipped_damage
+        elif selected_slot in ("Helmet", "Body", "Legs", "Shoes", "Hands", "Amulet", "Ring"):
+            new_def = getattr(selected_item, "defense_bonus", 0)
+            equipped_def = getattr(equipped_item, "defense_bonus", 0) if equipped_item else 0
+            def_bonus = new_def - equipped_def
+
+    atk_color = "green" if atk_bonus > 0 else "white" if atk_bonus == 0 else "red"
+    def_color = "green" if def_bonus > 0 else "white" if def_bonus == 0 else "red"
+
+    if atk_bonus != 0:
+        content += f"[bold]ATK:[/bold] {current_atk} [{atk_color}]({atk_bonus:+d})[/{atk_color}]\n"
+    else:
+        content += f"[bold]ATK:[/bold] {current_atk}\n"
+
+    if def_bonus != 0:
+        content += f"[bold]DEF:[/bold] {current_def} [{def_color}]({def_bonus:+d})[/{def_color}]\n"
+    else:
+        content += f"[bold]DEF:[/bold] {current_def}\n"
+
+    content += f"[bold]AGI:[/bold] {player.base_ag}\n\n"
+    content += f"[bold]Ouro:[/bold] {player.coins}\n\n"
+    content += "[bold]Equipamentos:[/bold]\n"
+    slot_names = {
+        "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
+        "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
+        "Amulet": "Amuleto", "Ring": "Anel",
+    }
+
+    selected_slot = getattr(selected_item, "slot", None) if selected_item else None
+
+    for slot, equipped_item in player.equipment.items():
+        slot_label = slot_names.get(slot, slot)
+
+        if equipped_item:
+            if slot == selected_slot:
+                content += f"  [{slot_label}] {escape_markup(equipped_item.name)} [yellow]← será trocado[yellow]\n"
+            else:
+                content += f"  [{slot_label}] {escape_markup(equipped_item.name)}\n"
+        else:
+            if selected_slot == slot:
+                content += f"  [{slot_label}] [green]← upgrade![green]\n"
+            else:
+                content += f"  [{slot_label}] [dim]Vazio[dim]\n"
+
+    return content
 
 
 def _find_equipped_slot_by_item(player, item) -> str | None:
@@ -71,9 +142,8 @@ def navigate_menu(
         if total_pages > 1:
             panel_content += f"\n[dim]Página {current_page + 1}/{total_pages}[/dim]\n"
         
-        panel_content += "\n[dim]W/S navegar | ENTER selecionar | ESC sair[/dim]"
+        panel_content += "\n[dim]W/S navegar | ENTER selecionar | Q sair[/dim]"
         
-        from rich.panel import Panel
         renderer.console.print(Panel(panel_content, border_style="cyan"))
         
         key = get_key()
@@ -116,10 +186,6 @@ def navigate_shop_buy(
     """
     if not items:
         return None
-    
-    from rich.table import Table
-    from rich.panel import Panel
-    from rich.console import Console
     
     current_index = 0
     max_visible = 10
@@ -268,12 +334,9 @@ def navigate_shop_sell(
         end_idx = min(start_idx + max_visible, total_items)
         visible_items = inventory[start_idx:end_idx]
         
-        from rich.panel import Panel
-        
         panel_content = "[bold yellow]VENDER ITENS[/bold yellow]\n"
         panel_content += "[dim]" + "=" * 50 + "[/dim]\n\n"
         
-        from src.content.items import get_all_items
         all_items = get_all_items()
         
         for i, item in enumerate(visible_items):
@@ -338,8 +401,6 @@ def navigate_inventory(
         None: ação realizada (equipar/usar) - precisa recarregar.
         False: ESC pressionado - sair.
     """
-    from rich.panel import Panel
-    from rich.table import Table
     
     # Ordering: Equipables first (by slot), then Usables (by effect), then Others
     SLOT_ORDER = {"Weapon": 1, "Helmet": 2, "Body": 3, "Legs": 4, "Shoes": 5, "Hands": 6, "Amulet": 7, "Ring": 8}
@@ -454,80 +515,7 @@ def navigate_inventory(
             content += "\n[dim][U] para usar[dim]\n"
         
         return content
-    
-    def build_player_status(player, selected_item=None) -> str:
-        """Constrói o conteúdo do painel de status do jogador."""
-        content = f"[bold]Classe:[/bold] {player.get_classname()}\n"
-        content += f"[bold]Nível:[/bold] {player.level}\n\n"
-        
-        content += f"[red]HP:[/red] {player.get_hp()}/{player.base_hp}\n"
-        content += f"[blue]MP:[/blue] {player.get_mp()}/{player.base_mp}\n\n"
-        
-        # Calculate base stats
-        current_atk = player.avg_damage + player.get_passive_bonus('strength')
-        current_def = player.base_df + player.get_passive_bonus('defense')
-        
-        # Calculate bonus from selected item (compared to currently equipped)
-        atk_bonus = 0
-        def_bonus = 0
-        if selected_item:
-            selected_slot = getattr(selected_item, "slot", None)
-            equipped_item = player.equipment.get(selected_slot) if selected_slot else None
-            
-            if selected_slot == "Weapon":
-                new_damage = getattr(selected_item, "damage_bonus", 0)
-                equipped_damage = getattr(equipped_item, "damage_bonus", 0) if equipped_item else 0
-                atk_bonus = new_damage - equipped_damage
-            elif selected_slot in ("Helmet", "Body", "Legs", "Shoes", "Hands", "Amulet", "Ring"):
-                new_def = getattr(selected_item, "defense_bonus", 0)
-                equipped_def = getattr(equipped_item, "defense_bonus", 0) if equipped_item else 0
-                def_bonus = new_def - equipped_def
-        
-        # Display stats with bonuses
-        atk_color = "green" if atk_bonus > 0 else "white" if atk_bonus == 0 else "red"
-        def_color = "green" if def_bonus > 0 else "white" if def_bonus == 0 else "red"
-        
-        if atk_bonus != 0:
-            content += f"[bold]ATK:[/bold] {current_atk} [{atk_color}]({atk_bonus:+d})[/{atk_color}]\n"
-        else:
-            content += f"[bold]ATK:[/bold] {current_atk}\n"
-        
-        if def_bonus != 0:
-            content += f"[bold]DEF:[/bold] {current_def} [{def_color}]({def_bonus:+d})[/{def_color}]\n"
-        else:
-            content += f"[bold]DEF:[/bold] {current_def}\n"
-        
-        content += f"[bold]AGI:[/bold] {player.base_ag}\n\n"
-        
-        content += f"[bold]Ouro:[/bold] {player.coins}\n\n"
-        
-        content += "[bold]Equipamentos:[/bold]\n"
-        slot_names = {
-            "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
-            "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
-            "Amulet": "Amuleto", "Ring": "Anel",
-        }
-        
-        selected_slot = getattr(selected_item, "slot", None) if selected_item else None
-        
-        for slot, equipped_item in player.equipment.items():
-            slot_label = slot_names.get(slot, slot)
-            
-            if equipped_item:
-                # Check if this slot will be replaced
-                if slot == selected_slot:
-                    content += f"  [{slot_label}] {escape_markup(equipped_item.name)} [yellow]← será trocado[yellow]\n"
-                else:
-                    content += f"  [{slot_label}] {escape_markup(equipped_item.name)}\n"
-            else:
-                # Check if selected item could fill this slot
-                if selected_slot == slot:
-                    content += f"  [{slot_label}] [green]← upgrade![green]\n"
-                else:
-                    content += f"  [{slot_label}] [dim]Vazio[dim]\n"
-        
-        return content
-    
+
     def build_active_effects_content(player) -> str:
         """Constrói o conteúdo do painel de efeitos ativos."""
         active_buffs = getattr(player, "active_buffs", {})
@@ -569,7 +557,6 @@ def navigate_inventory(
         
         # Clear console with better compatibility
         try:
-            import sys
             # Use ANSI escape sequence to clear screen and move cursor to top
             sys.stdout.write('\033[2J\033[H')
             sys.stdout.flush()
@@ -645,9 +632,9 @@ def navigate_inventory(
         
         # Rodapé com opções
         if pending_action == "use_confirm":
-            footer_content = "[yellow]⚠️ Item épico — confirme o uso[/yellow]\n[U] Confirmar  [ESC] Cancelar"
+            footer_content = "[yellow]⚠️ Item épico — confirme o uso[/yellow]\n[U] Confirmar  [Q] Cancelar"
         elif total_items == 0:
-            footer_content = "[dim]W/S para navegar | ESC sair[dim]"
+            footer_content = "[dim]W/S para navegar | Q sair[dim]"
         else:
             selected_item = sorted_inventory[current_index]
             is_equippable = hasattr(selected_item, "slot")
@@ -682,7 +669,6 @@ def navigate_inventory(
             elif key in ("u", "U"):
                 # Confirm use
                 selected_item = sorted_inventory[current_index]
-                from src.content.items import Item
                 if isinstance(selected_item, Item):
                     msg = player.use_potion(selected_item)
                     feedback_message = f"{selected_item.name} usado."
@@ -735,7 +721,6 @@ def navigate_inventory(
                     pending_action = "use_confirm"
                     feedback_message = "⚠️ Item épico — confirme o uso"
                 else:
-                    from src.content.items import Item
                     if isinstance(selected_item, Item):
                         msg = player.use_potion(selected_item)
                         feedback_message = f"{selected_item.name} usado."

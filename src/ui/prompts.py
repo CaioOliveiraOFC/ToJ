@@ -3,6 +3,13 @@
 from __future__ import annotations
 
 import platform
+import sys
+
+if platform.system() == "Windows":
+    import msvcrt
+else:
+    import termios
+    import tty
 
 
 def get_key() -> str:
@@ -17,8 +24,6 @@ def get_key() -> str:
         - "BACKSPACE" para Backspace
     """
     if platform.system() == "Windows":
-        import msvcrt
-
         while True:
             key = msvcrt.getch()
             if key in [b"\xe0", b"\x00"]:
@@ -42,10 +47,6 @@ def get_key() -> str:
                 return "ESC"
             return key.decode("utf-8", errors="replace")
     
-    import sys
-    import termios
-    import tty
-
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:

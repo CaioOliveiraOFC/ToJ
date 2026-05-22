@@ -1,0 +1,25 @@
+{
+    "player_class": "Warrior",
+    "player_name": "Thorin",
+    "level": 28,
+    "xp": 4200,
+    "coins": 5200,
+    "inventory": ["Martelo de Guerra", "Escudo de Ferro", "Poção de Cura Grande", "Poção de Mana Grande"],
+    "equipment": {
+        "Weapon": "Martelo de Guerra",
+        "Helmet": "Elmo de Ferro",
+        "Body": "Peitoral de Ferro",
+        "Legs": "Perneiras de Ferro",
+        "Shoes": "Botas de Ferro",
+        "Hands": "Escudo de Ferro",
+        "Amulet": null,
+        "Ring": null
+    },
+    "passives": ["coracao_ferro", "pele_grossa", "furia_berserker", "escudo_fé"],
+    "skills": {},
+    "initial_skills_learned": 4,
+    "active_buffs": {},
+    "active_effects": {},
+    "dungeon_level": 12,
+    "map_state": null
+}

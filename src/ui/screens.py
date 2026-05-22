@@ -461,7 +461,6 @@ def render_continue_prompt() -> None:
 
 def render_map(map_lines: list[str]) -> None:
     """Renderiza as linhas do mapa no console com cores."""
-    from rich.text import Text
     
     for line in map_lines:
         colored_line = Text()

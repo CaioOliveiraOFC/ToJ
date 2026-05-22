@@ -1,0 +1,25 @@
+{
+    "player_class": "Warrior",
+    "player_name": "Titan",
+    "level": 50,
+    "xp": 25000,
+    "coins": 25000,
+    "inventory": ["Espada Divina", "Armadura Lendária", "Poção de Cura Grande", "Poção de Mana Grande"],
+    "equipment": {
+        "Weapon": "Espada Divina",
+        "Helmet": "Elmo Divino",
+        "Body": "Armadura Lendária",
+        "Legs": "Perneiras Lendárias",
+        "Shoes": "Botas Divinas",
+        "Hands": "Escudo do Titans",
+        "Amulet": "Amuleto do Titans",
+        "Ring": "Anel Lendário"
+    },
+    "passives": ["coracao_ferro", "musculos_aco", "pele_grossa", "furia_berserker", "coracao_tita", "imortalidade", "essencia_pura"],
+    "skills": {},
+    "initial_skills_learned": 4,
+    "active_buffs": {},
+    "active_effects": {},
+    "dungeon_level": 30,
+    "map_state": null
+}

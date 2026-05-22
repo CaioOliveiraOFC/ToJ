@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 
 from src.ui import screens
 from src.ui.navigation_menu import navigate_shop_buy, navigate_shop_sell
+from src.ui.prompts import get_key
+from src.content.items import get_all_items
 
 if TYPE_CHECKING:
     from src.entities.heroes import Player
@@ -17,7 +19,6 @@ def run_shop_flow(player: "Player", shop: object, dungeon_level: int) -> None:
     while True:
         screens.render_shop_main(shop, player.coins)
 
-        from src.ui.prompts import get_key
         choice = get_key()
 
         if choice == "1":
@@ -73,7 +74,6 @@ def _run_sell_flow(player: "Player", shop: object, dungeon_level: int) -> None:
         item_to_sell = player.inventory[selected_idx]
 
         if shop.sell_item(player, item_to_sell, dungeon_level):
-            from src.content.items import get_all_items
             all_items = get_all_items()
             base_item = all_items.get(item_to_sell.name)
             sell_price = int(base_item.price * 0.5) if base_item else 10

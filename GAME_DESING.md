@@ -1,6 +1,8 @@
 # GAME DESIGN — Tales of the Journey (vFinal)
 > A bússola criativa. O resto é código, suor e tokens.
 
+> **Nota:** Este documento descreve o **estado atual e game feel** do jogo. Para a referência histórica e arquitetura completa, consulte **GAME_GUIDE.md**.
+
 ---
 
 ## A Alma do Jogo
@@ -168,9 +170,9 @@ para a run e, se o personagem for extraído com sucesso, vão com ele para a Are
 ## Métricas de Sucesso
 
 Uma feature está pronta quando:
-1. O bot BFS completa um run sem crash.
-2. Um novo jogador entende o que fazer sem instruções externas.
-3. A arquitetura não é violada (nenhum print() fora de ui/, sem imports cruzados).
+1. Um novo jogador entende o que fazer sem instruções externas.
+2. A arquitetura não é violada (nenhum print() fora de ui/, sem imports cruzados).
+3. Sessões longas rodam sem crashes.
 
 ---
 
@@ -240,3 +242,29 @@ Uma feature está pronta quando:
     frustração da perda, mas um sorriso escapa. O botão "Nova Run" pulsa. Ele aperta.
     O ciclo recomeça. Em algum lugar, uma futura audiência da Twitch digita "RNG
     injusto!". O jogo permanece em silêncio.
+
+---
+
+## 📋 Roadmap e Pendências
+
+### Em Desenvolvimento
+| Item | Status |
+|------|--------|
+| Painel de efeitos ativos (condicional) | ✅ Implementado |
+| Scroll inteligente ao remover item | 🔲 Pendente |
+| Mensagem de feedback pós-ação sem sair dos painéis | 🔲 Pendente |
+| Equipamento inicial por classe | 🔲 Pendente |
+| 4 habilidades iniciais (corrigir bug) | 🔲 Pendente |
+| Sistema de cooldown de habilidades | 🔲 Pendente |
+
+### Futuro (Tarefas do TASK.md)
+- **TASK-003:** 10 slots de personagens + permadeath + Troféu de Fracasso
+- **TASK-004:** Eventos aleatórios na masmorra (Mercador, Altar, Fonte, Armadilha)
+- **TASK-005:** Cooldowns + redução de dano + stun em combate
+- **TASK-006:** Saída da masmorra (extração) entre andares
+- **TASK-007:** Arena PvP (tiers, matchmaking, ranking por Elo)
+
+### Itens Concluídos
+- Sistema de Passivas ✅
+- Skills reimaginadas (data-driven JSON) ✅
+- Loja, itens e inventário ✅

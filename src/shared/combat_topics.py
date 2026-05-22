@@ -11,3 +11,13 @@ COMBAT_FLEE_RESULT = "combat.flee_result"
 SYSTEM_LOG_MESSAGE = "system.log_message"
 SYSTEM_SAVE_SUCCESS = "system.save_success"
 SYSTEM_SAVE_ERROR = "system.save_error"
+
+# Eventos de UI (engine → ui via EventBus)
+UI_OPEN_INVENTORY = "ui.open_inventory"
+UI_OPEN_SHOP = "ui.open_shop"
+UI_OPEN_PASSIVES = "ui.open_passives"
+UI_OPEN_SKILLS = "ui.open_skills"
+UI_GAME_OVER = "ui.game_over"
+UI_SAVE_SUCCESS = "ui.save_success"
+UI_MAIN_MENU = "ui.main_menu"
+UI_CHARACTER_CREATION = "ui.character_creation"

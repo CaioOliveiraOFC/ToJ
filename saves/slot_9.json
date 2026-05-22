@@ -1,0 +1,25 @@
+{
+    "player_class": "Rogue",
+    "player_name": "Shadow",
+    "level": 48,
+    "xp": 17800,
+    "coins": 15000,
+    "inventory": ["Adaga Estilhaçada", "Manto do Vazio", "Anel da Sorte"],
+    "equipment": {
+        "Weapon": "Adaga Estilhaçada",
+        "Helmet": "Máscara Sombria",
+        "Body": "Manto do Vazio",
+        "Legs": "Calças do Vazio",
+        "Shoes": "Botas Fantasma",
+        "Hands": "Luvas do Vazio",
+        "Amulet": "Amuleto do Vazio",
+        "Ring": "Anel da Sorte"
+    },
+    "passives": ["passos_leves", "olho_aguia", "lamina_afiada", "reflexos_rapidos", "lamina_lendaria", "imortalidade"],
+    "skills": {},
+    "initial_skills_learned": 4,
+    "active_buffs": {},
+    "active_effects": {},
+    "dungeon_level": 25,
+    "map_state": null
+}

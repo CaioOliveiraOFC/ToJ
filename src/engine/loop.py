@@ -30,6 +30,7 @@ from src.mechanics.math_operations import (
     generate_essence_multiplier,
 )
 from src.shared import combat_topics as topics
+from src.shared.types import GameEvent
 from src.shared.constants import (
     BASE_MAP_HEIGHT,
     BASE_MAP_WIDTH,
@@ -40,19 +41,39 @@ from src.shared.constants import (
     WALL_PERCENT_PER_LEVEL,
 )
 from src.shared.types import GameEvent
-from src.storage.save_manager import save_game
+from src.content.skills_loader import generate_skill_choices
+from src.storage.save_manager import save_game, delete_save, add_trophy
 from src.ui import screens
 from src.ui.combat_event_handlers import register_combat_ui_handlers
-from src.ui.inventory_flow import run_inventory_flow_v2
-from src.ui.passive_flow import run_passive_selection_flow
 from src.ui.prompts import safe_get_key
-from src.ui.shop_flow import run_shop_flow
-from src.ui.toj_menu import game_over_screen
+from src.ui.ui_event_handlers import register_ui_handlers
 from src.ui.utils import clear_screen
 
 if TYPE_CHECKING:
     from src.entities.heroes import Player
     from src.entities.monsters import Monster
+
+
+_game_event_bus: EventBus | None = None
+_ui_cleanup: callable | None = None
+
+
+def _get_game_publish() -> callable:
+    """Retorna publish callback para eventos de UI, criando o bus se necessário."""
+    global _game_event_bus, _ui_cleanup
+    if _game_event_bus is None:
+        _game_event_bus = EventBus()
+        register_combat_ui_handlers(_game_event_bus)
+        _ui_cleanup = register_ui_handlers(_game_event_bus)
+
+    def publish(topic: str, payload_or_event: dict | GameEvent) -> None:
+        if isinstance(payload_or_event, GameEvent):
+            _game_event_bus.publish(topic, payload_or_event)
+        else:
+            event = GameEvent(type=topic, payload=payload_or_event)
+            _game_event_bus.publish(topic, event)
+
+    return publish
 
 
 def _run_human_battle_turn(
@@ -250,8 +271,16 @@ def run_fight(
     """Loop principal de batalha: mecânica publica eventos; UI reage via inscrições no bus."""
     rng = rng or random.Random()
     bus = EventBus()
-    cleanup_ui = register_combat_ui_handlers(bus)
-    publish = bus.publish
+    cleanup_combat = register_combat_ui_handlers(bus)
+    cleanup_ui = register_ui_handlers(bus)
+
+    def publish(topic: str, payload_or_event: dict | GameEvent) -> None:
+        if isinstance(payload_or_event, GameEvent):
+            bus.publish(topic, payload_or_event)
+        else:
+            event = GameEvent(type=topic, payload=payload_or_event)
+            bus.publish(topic, event)
+
     level_before = player.get_level()
 
     try:
@@ -277,24 +306,17 @@ def run_fight(
             for lvl in range(level_before + 1, player.get_level() + 1):
                 # Escolha de passiva
                 choices = generate_passive_choices(count=3)
-                run_passive_selection_flow(player, choices)
+                publish(topics.UI_OPEN_PASSIVES, {"player": player, "choices": choices})
 
                 # Escolha de skill (apenas níveis ímpares >= 5)
                 if lvl >= 5 and lvl % 2 == 1:
-                    from src.content.skills_loader import generate_skill_choices
-                    from src.ui.skill_flow import (
-                        run_skill_selection_flow,
-                        run_skill_selection_with_replacement,
-                    )
-
                     player_skill_ids = [s.id for s in player.skills.values()]
                     skill_choices = generate_skill_choices(
                         player.get_classname(), lvl, player_skill_ids, count=3
                     )
-                    chosen_skill = run_skill_selection_flow(player, skill_choices)
-                    if chosen_skill:
-                        run_skill_selection_with_replacement(player, chosen_skill)
+                    publish(topics.UI_OPEN_SKILLS, {"player": player, "choices": skill_choices})
     finally:
+        cleanup_combat()
         cleanup_ui()
 
 
@@ -455,6 +477,7 @@ def _handle_player_movement(
     dungeon_level: int,
     move: str,
     essence_multiplier: float = 1.0,
+    slot: int = 1,
 ) -> str | None:
     """
     Processa o movimento do jogador.
@@ -467,7 +490,15 @@ def _handle_player_movement(
     if isinstance(collided_object, Monster):
         fight(player, collided_object, essence_multiplier=essence_multiplier)
         if not player.get_isalive():
-            game_over_screen(player.get_nick_name())
+            _get_game_publish()(topics.UI_GAME_OVER, {"player_name": player.get_nick_name()})
+            add_trophy(
+                player.get_nick_name(),
+                player.get_classname(),
+                player.get_level(),
+                dungeon_level,
+                "Derrotado na masmorra"
+            )
+            delete_save(slot)
             return "player_died"
         # After defeating a monster, update the map grid to reflect the empty space
         game_map.grid[game_map.player_pos['y']][game_map.player_pos['x']] = '.'
@@ -488,6 +519,7 @@ def _handle_player_input(
     game_map: MapOfGame,
     dungeon_level: int,
     essence_multiplier: float = 1.0,
+    slot: int = 1,
 ) -> str | None:
     """
     Processa o input do jogador.
@@ -497,16 +529,14 @@ def _handle_player_input(
     move = safe_get_key(valid_keys=['w', 'a', 's', 'd', 'i', 'q', 'p'])
 
     if move is None or move == 'q':
-        save_game(player, dungeon_level, game_map.get_map_state())
-        screens.render_game_saved("Jogo salvo automaticamente ao sair.")
         return "quit"
     elif move == 'i':
-        run_inventory_flow_v2(player)
+        _get_game_publish()(topics.UI_OPEN_INVENTORY, {"player": player})
     elif move == 'p':
-        save_game(player, dungeon_level, game_map.get_map_state())
+        save_game(player, dungeon_level, game_map.get_map_state(), slot=slot)
         screens.render_game_saved()
     elif move in ['w', 'a', 's', 'd']:
-        return _handle_player_movement(player, game_map, dungeon_level, move, essence_multiplier)
+        return _handle_player_movement(player, game_map, dungeon_level, move, essence_multiplier, slot)
 
     return None
 
@@ -515,6 +545,7 @@ def start_game(
     player: "Player",
     start_level: int = 1,
     initial_map_state: dict | None = None,
+    slot: int = 1,
 ) -> None:
     """Loop principal do jogo: exploração de masmorras e combate."""
     dungeon_level = start_level
@@ -531,13 +562,13 @@ def start_game(
         while True:
             _render_dungeon_screen(player, dungeon_level, game_map, essence_multiplier)
 
-            result = _handle_player_input(player, game_map, dungeon_level, essence_multiplier)
+            result = _handle_player_input(player, game_map, dungeon_level, essence_multiplier, slot)
 
             if result == "quit":
                 return
             elif result == "level_complete":
                 player.rest()
-                run_shop_flow(player, shop, dungeon_level)
+                _get_game_publish()(topics.UI_OPEN_SHOP, {"player": player, "shop": shop, "dungeon_level": dungeon_level})
                 dungeon_level += 1
                 initial_map_state = None
                 break

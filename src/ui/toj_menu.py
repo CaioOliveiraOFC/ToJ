@@ -8,9 +8,10 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from src.ui.prompts import safe_get_key
+from src.ui.prompts import safe_get_key, get_key
 from src.ui.screens import menu
 from src.ui.utils import clear_screen
+from src.storage.save_manager import list_slots, get_trophies
 
 console = Console()
 
@@ -194,21 +195,202 @@ def character_creation_flow() -> tuple[str, str] | None:
 
 def _prompt_for_name() -> str | None:
     """Solicita o nome do jogador via camada de UI."""
-    console.print(Panel(
-        Text("Digite o nome do seu herói:", justify="center", style="bold cyan"),
-        border_style="cyan"
-    ))
-    console.print("[dim](Pressione ESC para cancelar)[/dim]\n")
-    
-    name = console.input("[bold green]Nome:[/bold green] ").strip()
-    if not name:
+    while True:
         console.print(Panel(
-            Text("Nome não pode estar em branco.", style="red"),
-            border_style="red"
+            Text("Digite o nome do seu herói:", justify="center", style="bold cyan"),
+            border_style="cyan"
         ))
-        safe_get_key(allow_escape=False)
-        return _prompt_for_name()
-    return name
+        console.print("[dim](Pressione ESC para cancelar)[/dim]\n")
+        
+        name = console.input("[bold green]Nome:[/bold green] ").strip()
+        if not name:
+            console.print(Panel(
+                Text("Nome não pode estar em branco.", style="red"),
+                border_style="red"
+            ))
+            safe_get_key(allow_escape=False)
+            continue
+        return name
+
+
+def show_slots_menu(title: str, allow_new: bool = True) -> int | None:
+    """Mostra menu de slots e retorna slot selecionado (1-10) ou None para cancelar."""
+    slots = list_slots()
+    current_index = 0
+
+    while True:
+        clear_screen()
+
+        console.print(Panel(
+            Text(title, justify="center", style="bold cyan"),
+            border_style="cyan",
+            subtitle="Escolha um slot"
+        ))
+
+        table = Table(show_header=True, expand=True)
+        table.add_column("SLOT", style="bold yellow", justify="center", width=8)
+        table.add_column("NOME", style="cyan")
+        table.add_column("CLASSE", style="magenta")
+        table.add_column("NÍVEL", style="green", justify="center")
+        table.add_column("ANDAR", style="red", justify="center")
+
+        for i, s in enumerate(slots):
+            prefix = ">" if i == current_index else " "
+            name = s.get("name", "-") if s["occupied"] else "[dim]-[/dim]"
+            cls = s.get("class", "-") if s["occupied"] else "[dim]-[/dim]"
+            lvl = str(s.get("level", 0)) if s["occupied"] else "[dim]-[/dim]"
+            floor = str(s.get("floor", 0)) if s["occupied"] else "[dim]-[/dim]"
+            table.add_row(
+                f"{prefix} {s['slot']} {prefix}",
+                name,
+                cls,
+                lvl,
+                floor
+            )
+
+        console.print(table)
+        console.print()
+        console.print(Text("W/S = navegar  |  ENTER = carregar  |  Q = voltar", style="bold cyan"))
+
+        key = get_key()
+
+        if key.lower() == "q":
+            return None
+        elif key.lower() == "w":
+            current_index = (current_index - 1) % 10
+        elif key.lower() == "s":
+            current_index = (current_index + 1) % 10
+        elif key.upper() == "ENTER":
+            if not slots[current_index]["occupied"]:
+                console.print(Panel(
+                    Text("Slot vazio. Selecione um slot ocupado.", style="bold yellow"),
+                    border_style="yellow"
+                ))
+                sleep(0.8)
+                continue
+            return slots[current_index]["slot"]
+
+
+def select_new_slot() -> int | None:
+    """Seleciona slot para novo jogo (apenas slots vazios)."""
+    current_index = 0
+
+    while True:
+        clear_screen()
+        slots = list_slots()
+        available = [i for i, s in enumerate(slots) if not s["occupied"]]
+
+        console.print(Panel(
+            Text("ESCOLHA UM SLOT PARA NOVO JOGO", justify="center", style="bold cyan"),
+            border_style="cyan",
+            subtitle="Selecione um slot VAZIO"
+        ))
+
+        table = Table(show_header=True, expand=True)
+        table.add_column("SLOT", style="bold yellow", justify="center", width=8)
+        table.add_column("NOME", style="cyan")
+        table.add_column("CLASSE", style="magenta")
+        table.add_column("NÍVEL", style="green", justify="center")
+        table.add_column("ANDAR", style="red", justify="center")
+
+        for i, s in enumerate(slots):
+            prefix = ">" if i == current_index else " "
+            if s["occupied"]:
+                name = f"[red]{s.get('name', '-')}[/red]"
+                cls = f"[red]{s.get('class', '-')}[/red]"
+                lvl = f"[red]{s.get('level', 0)}[/red]"
+                floor = f"[red]{s.get('floor', 0)}[/red]"
+            else:
+                name = "[green]DISPONÍVEL[/green]"
+                cls = "-"
+                lvl = "-"
+                floor = "-"
+            table.add_row(
+                f"{prefix} {s['slot']} {prefix}",
+                name,
+                cls,
+                lvl,
+                floor
+            )
+
+        console.print(table)
+        console.print()
+
+        if not available:
+            console.print(Panel(
+                Text("Todos os slots estão ocupados!", style="bold red"),
+                border_style="red"
+            ))
+            console.print()
+            console.print(Text("Pressione Q para voltar", style="dim"))
+            key = get_key()
+            if key.lower() == "q":
+                return None
+            continue
+
+        console.print(Text("W/S = navegar  |  ENTER = criar  |  Q = voltar", style="bold cyan"))
+
+        key = get_key()
+
+        if key.lower() == "q":
+            return None
+        elif key.lower() == "w":
+            current_index = (current_index - 1) % 10
+        elif key.lower() == "s":
+            current_index = (current_index + 1) % 10
+        elif key.upper() == "ENTER":
+            if not slots[current_index]["occupied"]:
+                return slots[current_index]["slot"]
+            console.print(Panel(
+                Text("Slot ocupado. Escolha um slot vazio.", style="bold yellow"),
+                border_style="yellow"
+            ))
+            sleep(0.8)
+
+
+def show_trophies() -> None:
+    """Mostra o livro de troféus (personagens que morreram)."""
+    while True:
+        clear_screen()
+        trophies = get_trophies()
+
+        console.print(Panel(
+            Text("LIVRO DE TROFÉUS", justify="center", style="bold red"),
+            border_style="red",
+            subtitle="Heróis que findaram na masmorra"
+        ))
+
+        if not trophies:
+            console.print(Panel(
+                Text("Nenhum herói caiu em batalha ainda.", style="dim white"),
+                border_style="dim"
+            ))
+        else:
+            table = Table(show_header=True, expand=True)
+            table.add_column("Nome", style="cyan")
+            table.add_column("Classe", style="magenta")
+            table.add_column("Nível", style="green")
+            table.add_column("Andar", style="red")
+            table.add_column("Data", style="dim")
+            table.add_column("Causa", style="yellow")
+
+            for t in trophies:
+                table.add_row(
+                    t.get("name", "?"),
+                    t.get("class", "?"),
+                    str(t.get("level", 0)),
+                    str(t.get("floor", 0)),
+                    t.get("date", "-"),
+                    t.get("cause", "-")
+                )
+
+            console.print(table)
+            console.print(f"\n[bold]Total de baixas: {len(trophies)}[/bold]")
+
+        console.print("\n[dim]Q para voltar ao menu[/dim]")
+        key = safe_get_key(valid_keys=["q"])
+        if key == "q":
+            return
 
 
 def main_menu():
@@ -216,9 +398,13 @@ def main_menu():
         clear_screen()
         console.print(Panel(Text("MENU PRINCIPAL", justify="center", style="bold magenta"), border_style="magenta", subtitle="Escolha seu destino, aventureiro."))
 
+        slots = list_slots()
+        occupied_count = sum(1 for s in slots if s["occupied"])
+
         menu_options = {
-            "1": "Iniciar Nova Jornada",
-            "2": "Carregar Aventura",
+            "1": f"Nova Jornada ({10 - occupied_count} slots disponíveis)",
+            "2": f"Carregar Aventura ({occupied_count} slots ocupados)",
+            "3": "Livro de Troféus",
             "4": "Opções do Jogo",
             "5": "Sair do Jogo",
             "6": "MODO DE AUTO-TESTE (BOT)",
@@ -235,18 +421,25 @@ def main_menu():
         console.print(table)
         console.print("\n")
 
-        choice = safe_get_key(valid_keys=["1", "2", "4", "5", "6", "7"])
+        choice = safe_get_key(valid_keys=["1", "2", "3", "4", "5", "6", "7"])
 
         if choice == '1':
-            console.print(Panel(Text("Adentrando as sombras da nova jornada...", justify="center", style="green"), border_style="green"))
-            sleep(0.4)
-            return 'new_game'
+            slot = select_new_slot()
+            if slot:
+                console.print(Panel(Text(f"Iniciando nova jornada no slot {slot}...", justify="center", style="green"), border_style="green"))
+                sleep(0.4)
+                return ('new_game', slot)
+            # Se cancelou, continua no menu
         elif choice == '2':
-            console.print(Panel(Text("Revisitando memórias antigas...", justify="center", style="yellow"), border_style="yellow"))
-            sleep(0.4)
-            return 'load_game'
+            slot = show_slots_menu("CARREGAR AVENTURA")
+            if slot:
+                console.print(Panel(Text(f"Carregando aventura do slot {slot}...", justify="center", style="yellow"), border_style="yellow"))
+                sleep(0.4)
+                return ('load_game', slot)
+        elif choice == '3':
+            show_trophies()
         elif choice == '4':
-            options_menu() # Call the new options menu
+            options_menu()
         elif choice == '5':
             console.print(Panel(Text("Até que a escuridão nos encontre novamente, aventureiro!", justify="center", style="red"), border_style="red"))
             sleep(0.4)

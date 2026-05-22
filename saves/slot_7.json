@@ -1,0 +1,25 @@
+{
+    "player_class": "Warrior",
+    "player_name": "Bjorn",
+    "level": 42,
+    "xp": 11500,
+    "coins": 12000,
+    "inventory": ["Machado Lendário", "Escudo Divino", "Poção de Cura Grande", "Poção de Mana Grande"],
+    "equipment": {
+        "Weapon": "Machado Lendário",
+        "Helmet": "Elmo de Aço",
+        "Body": "Armadura de Aço",
+        "Legs": "Perneiras de Aço",
+        "Shoes": "Botas de Aço",
+        "Hands": "Escudo Divino",
+        "Amulet": "Amuleto da Força",
+        "Ring": "Anel de Aço"
+    },
+    "passives": ["coracao_ferro", "musculos_aco", "pele_grossa", "furia_berserker", "coracao_tita"],
+    "skills": {},
+    "initial_skills_learned": 4,
+    "active_buffs": {},
+    "active_effects": {},
+    "dungeon_level": 20,
+    "map_state": null
+}

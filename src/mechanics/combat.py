@@ -18,6 +18,7 @@ from src.shared.constants import (
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
     POISON_DAMAGE_PER_TICK,
+    SKILL_LEVEL_SCALING,
 )
 from src.shared.types import CombatResult, GameEvent
 
@@ -141,7 +142,6 @@ def apply_skill(
     caster.reduce_mp(int(skill.mana_cost))
 
     if skill.effect_type == "damage":
-        from src.shared.constants import SKILL_LEVEL_SCALING
         scaling = 1.0 + (caster.level * SKILL_LEVEL_SCALING)
         scaled_damage = int(skill.effect_value * scaling)
         strike = resolve_physical_attack(caster, target, scaled_damage, str(skill.name), rng=r, publish=None)

@@ -35,6 +35,8 @@ from src.shared.constants import (
     XP_EXPONENT,
 )
 
+from src.content.skills_loader import get_initial_skills
+
 if TYPE_CHECKING:
     from src.content.passives import PassiveCard
     from src.content.skills_loader import SkillCard
@@ -381,7 +383,6 @@ class Player(Entity):
         messages: list[str] = []
         # Apenas aprende skills iniciais nos níveis 1-4, uma por nível
         if 1 <= self.level <= 4 and self.initial_skills_learned < self.level:
-            from src.content.skills_loader import get_initial_skills
             initial_skills = get_initial_skills(self.get_classname())
             while self.initial_skills_learned < self.level and self.initial_skills_learned < len(initial_skills):
                 skill = initial_skills[self.initial_skills_learned]

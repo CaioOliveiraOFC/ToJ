@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from typing import TYPE_CHECKING
 
 from src.content.items import get_all_items, Item
@@ -36,8 +37,6 @@ class Shop:
         - Andar 10-14: 18-22 itens (Common + Rare + Epic)
         - Andar 15+: 22-25 itens (Common + Rare + Epic, sem Legendary)
         """
-        import random
-        
         all_items = get_all_items()
         available_items = []
 

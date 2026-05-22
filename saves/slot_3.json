@@ -1,0 +1,25 @@
+{
+    "player_class": "Rogue",
+    "player_name": "Kira",
+    "level": 22,
+    "xp": 2100,
+    "coins": 3500,
+    "inventory": ["Adaga Sombria", "Poção de Cura Grande"],
+    "equipment": {
+        "Weapon": "Adaga Sombria",
+        "Helmet": null,
+        "Body": "Túnica de Couro",
+        "Legs": null,
+        "Shoes": null,
+        "Hands": null,
+        "Amulet": null,
+        "Ring": null
+    },
+    "passives": ["passos_leves", "olho_aguia", "lamina_afiada"],
+    "skills": {},
+    "initial_skills_learned": 4,
+    "active_buffs": {},
+    "active_effects": {},
+    "dungeon_level": 10,
+    "map_state": null
+}

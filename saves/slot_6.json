@@ -1,0 +1,25 @@
+{
+    "player_class": "Rogue",
+    "player_name": "Vex",
+    "level": 40,
+    "xp": 9800,
+    "coins": 8500,
+    "inventory": ["Adaga Venenosa", "Manto de Seda", "Veneno Paralítico"],
+    "equipment": {
+        "Weapon": "Adaga Venenosa",
+        "Helmet": null,
+        "Body": "Manto de Seda",
+        "Legs": "Calças de Couro",
+        "Shoes": "Botas Silenciosas",
+        "Hands": "Luvas de Couro",
+        "Amulet": "Amuleto da Sorte",
+        "Ring": "Anel de Velocidade"
+    },
+    "passives": ["passos_leves", "olho_aguia", "lamina_afiada", "reflexos_rapidos", "lamina_lendaria"],
+    "skills": {},
+    "initial_skills_learned": 4,
+    "active_buffs": {},
+    "active_effects": {},
+    "dungeon_level": 18,
+    "map_state": null
+}
