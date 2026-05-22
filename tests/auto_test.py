@@ -46,8 +46,7 @@ class AutoTester:
         """Cria a função mock para draw_map."""
         def mocked_draw(map_self):
             self.current_map = map_self
-            original_draw(map_self)
-            return None
+            return original_draw(map_self)
         return mocked_draw
 
     def _update_progress_bar(self, level: int, real_print):
