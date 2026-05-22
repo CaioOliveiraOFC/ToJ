@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from src.entities.base import Entity
 from src.shared.constants import (
     AGILITY_CAP,
+    CLASS_WEIGHTS,
     DAMAGE_FORMULA_DIVISOR,
     MAGE_BASE_AG,
     MAGE_BASE_DF,
@@ -516,10 +517,15 @@ class Warrior(Player):
         return self.get_stat("df")
 
     def get_avg_damage(self) -> int:
-        """Fórmula Warrior: favorece Força."""
-        st = self.get_st()
-        mg = self.get_mg()
-        return (int(st * 2) + int(mg)) // 4
+        """BASE_POWER = (W_class · [ST, MG, AG]) + weapon_power."""
+        weights = CLASS_WEIGHTS["Warrior"]
+        base_power = (
+            self.get_st() * weights["st"]
+            + self.get_mg() * weights["mg"]
+            + self.get_ag() * weights["ag"]
+        )
+        weapon_bonus = getattr(self.equipment.get("Weapon"), "damage_bonus", 0)
+        return int(base_power + weapon_bonus)
 
 
 class Mage(Player):
@@ -586,10 +592,15 @@ class Mage(Player):
         return self.get_stat("df")
 
     def get_avg_damage(self) -> int:
-        """Fórmula Mage: ataque físico fraco, favorece Magia."""
-        st = self.get_st()
-        mg = self.get_mg()
-        return (int(st) + int(mg * 2)) // 5
+        """BASE_POWER = (W_class · [ST, MG, AG]) + weapon_power."""
+        weights = CLASS_WEIGHTS["Mage"]
+        base_power = (
+            self.get_st() * weights["st"]
+            + self.get_mg() * weights["mg"]
+            + self.get_ag() * weights["ag"]
+        )
+        weapon_bonus = getattr(self.equipment.get("Weapon"), "damage_bonus", 0)
+        return int(base_power + weapon_bonus)
 
 
 class Rogue(Player):
@@ -656,9 +667,14 @@ class Rogue(Player):
         return self.get_stat("df")
 
     def get_avg_damage(self) -> int:
-        """Fórmula Rogue: usa AG como identidade."""
-        st = self.get_st()
-        ag = self.get_ag()
-        return (int(st * 1.2) + int(ag * 1.8)) // 3
+        """BASE_POWER = (W_class · [ST, MG, AG]) + weapon_power."""
+        weights = CLASS_WEIGHTS["Rogue"]
+        base_power = (
+            self.get_st() * weights["st"]
+            + self.get_mg() * weights["mg"]
+            + self.get_ag() * weights["ag"]
+        )
+        weapon_bonus = getattr(self.equipment.get("Weapon"), "damage_bonus", 0)
+        return int(base_power + weapon_bonus)
 
 

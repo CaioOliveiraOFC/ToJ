@@ -10,15 +10,17 @@ from typing import Any, Literal
 from src.shared import combat_topics as T
 from src.shared.constants import (
     BASE_HIT_CHANCE,
+    CRIT_CHANCE_CAP,
     CRIT_CHANCE_DEFAULT,
     CRIT_CHANCE_HIGH,
-    CRIT_DAMAGE_MULTIPLIER,
-    DEFENSE_REDUCTION_DIVISOR,
+    CRIT_DAMAGE_BASE,
+    DEFENSE_K,
     FLEE_RANGE_MAX,
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
     POISON_DAMAGE_PER_TICK,
     SKILL_LEVEL_SCALING,
+    XMULT_CAP,
 )
 from src.shared.types import CombatResult, GameEvent
 
@@ -48,6 +50,42 @@ def _rng(rng: random.Random | None) -> random.Random:
     return rng if rng is not None else random
 
 
+def _defense_modifier(defense_target: int) -> float:
+    """DEFENSE_MODIFIER = k / (k + defense_target) — curva hiperbólica."""
+    return DEFENSE_K / (DEFENSE_K + max(0, defense_target))
+
+
+def _apply_xmult_cap(xmult_raw: float) -> float:
+    """min(xmult_raw, XMULT_CAP) — teto de multiplicadores puros."""
+    return min(xmult_raw, XMULT_CAP)
+
+
+def _calculate_damage(
+    base_power: float,
+    flat_mods: list[int] | None = None,
+    mult_mods: list[float] | None = None,
+    xmult_mods: list[float] | None = None,
+    defense_target: int = 0,
+) -> int:
+    """
+    Pipeline completo de dano:
+    ((BASE_POWER + ΣFLAT) × ΠMULT × ΠXMULT_capped) × DEFENSE_MODIFIER
+    """
+    flat_total = sum(flat_mods) if flat_mods else 0
+    mult_total = 1.0 + sum(mult_mods) if mult_mods else 1.0
+
+    xmult_raw = 1.0
+    if xmult_mods:
+        for v in xmult_mods:
+            xmult_raw *= v
+    xmult_capped = _apply_xmult_cap(xmult_raw)
+
+    def_mod = _defense_modifier(defense_target)
+
+    raw = (base_power + flat_total) * mult_total * xmult_capped * def_mod
+    return max(1, int(raw))
+
+
 def resolve_physical_attack(
     attacker,
     defender,
@@ -58,7 +96,8 @@ def resolve_physical_attack(
     publish: PublishFn = None,
 ) -> CombatResult:
     """
-    Resolve um golpe físico: acerto, crítico, dano após armadura e aplica `take_damage`.
+    Resolve um golpe físico: acerto, crítico, pipeline de dano e aplica `take_damage`.
+    `base_damage` é o BASE_POWER (vindo de get_avg_damage() com pesos de classe).
     """
     r = _rng(rng)
 
@@ -71,6 +110,7 @@ def resolve_physical_attack(
     )
     if hasattr(attacker, "get_passive_bonus"):
         crit_chance += int(attacker.get_passive_bonus("crit_chance"))
+    crit_chance = min(crit_chance, CRIT_CHANCE_CAP)
 
     hit_chance = BASE_HIT_CHANCE + (attacker.get_ag() - defender.get_ag())
     if hasattr(defender, "get_passive_bonus"):
@@ -93,12 +133,20 @@ def resolve_physical_attack(
         )
         return miss
 
-    defense_reduction = defender.get_df() // DEFENSE_REDUCTION_DIVISOR
-    damage = max(1, int(base_damage) - int(defense_reduction))
+    defense_target = defender.get_df()
+    xmult_mods: list[float] = []
 
     is_critical = r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= crit_chance
     if is_critical:
-        damage *= CRIT_DAMAGE_MULTIPLIER
+        xmult_mods.append(CRIT_DAMAGE_BASE)
+
+    damage = _calculate_damage(
+        base_power=float(base_damage),
+        flat_mods=None,
+        mult_mods=None,
+        xmult_mods=xmult_mods if xmult_mods else None,
+        defense_target=defense_target,
+    )
 
     defender.take_damage(damage)
     dead = defender.get_hp() <= 0
@@ -142,9 +190,11 @@ def apply_skill(
     caster.reduce_mp(int(skill.mana_cost))
 
     if skill.effect_type == "damage":
+        base_power = caster.get_avg_damage()
         scaling = 1.0 + (caster.level * SKILL_LEVEL_SCALING)
-        scaled_damage = int(skill.effect_value * scaling)
-        strike = resolve_physical_attack(caster, target, scaled_damage, str(skill.name), rng=r, publish=None)
+        skill_flat = int(skill.effect_value * scaling)
+        total_base = base_power + skill_flat
+        strike = resolve_physical_attack(caster, target, total_base, str(skill.name), rng=r, publish=None)
         out = SkillApplyResult(kind="damage", mp_spent=int(skill.mana_cost), strike=strike)
         _emit(
             publish,

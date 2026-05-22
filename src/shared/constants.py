@@ -21,7 +21,7 @@ SLEEP_MENU_REFRESH = 0.5
 SLEEP_GAME_OVER = 0.8
 
 # --- Estatísticas de Monstros ---
-MONSTER_BASE_HP = 70
+MONSTER_BASE_HP = 100
 MONSTER_HP_SCALING_PER_LEVEL = 20
 MONSTER_BASE_STRENGTH = 25
 MONSTER_STRENGTH_SCALING_PER_LEVEL = 15
@@ -29,6 +29,13 @@ MONSTER_BASE_DEFENSE = 20
 MONSTER_DEFENSE_SCALING_PER_LEVEL = 8
 MONSTER_BASE_MAGIC = 40
 MONSTER_MAGIC_SCALING_PER_LEVEL = 12
+
+# Stats base para instanciamento de monstros
+MONSTER_BASE_ST = 55
+MONSTER_BASE_MP = 40
+MONSTER_BASE_AG = 3
+MONSTER_BASE_MG = 50
+MONSTER_BASE_DF = 30
 
 # --- Sistema de XP e Moedas ---
 XP_INITIAL_COST = 3000
@@ -77,9 +84,20 @@ POISON_DAMAGE_PER_TICK = 5
 # Ranges e cálculos de combate
 PERCENTAGE_RANGE_MIN = 1
 PERCENTAGE_RANGE_MAX = 101  # randrange(1, 101) = 1-100
-DEFENSE_REDUCTION_DIVISOR = 4  # Redução de dano em 1/4 da defesa
-CRIT_DAMAGE_MULTIPLIER = 2
 FLEE_RANGE_MAX = 2  # randrange(0, 2) = 0 ou 1 (50% chance)
+
+# --- COMBAT_DESIGN.md: Constantes de Calibração ---
+DEFENSE_K = 100  # Curva de mitigação: k/(k+defense)
+XMULT_CAP = 5.0  # Teto de multiplicadores puros
+CRIT_CHANCE_CAP = 75  # % máximo de chance crítica
+CRIT_DAMAGE_BASE = 1.5  # Multiplicador padrão de crítico
+
+# Matriz de pesos por classe (Fórmula Universal de Dano)
+CLASS_WEIGHTS = {
+    "Warrior": {"st": 1.6, "mg": 0.4, "ag": 0.0},
+    "Mage": {"st": 0.3, "mg": 1.9, "ag": 0.0},
+    "Rogue": {"st": 0.8, "mg": 0.4, "ag": 1.7},
+}
 
 # --- Configurações de Mapa ---
 DEFAULT_WALL_PERCENTAGE = 0.2
@@ -135,14 +153,6 @@ ESSENCE_MULT_MIN = 0.5
 ESSENCE_MULT_MAX = 3.0
 ESSENCE_MULT_NORMAL_MEAN = 1.2   # Centro da curva gaussiana
 ESSENCE_MULT_NORMAL_STD = 0.5    # Desvio padrão (controla variação)
-
-# --- Stats Base de Monstros ---
-MONSTER_BASE_HP = 100
-MONSTER_BASE_MP = 40
-MONSTER_BASE_ST = 55
-MONSTER_BASE_AG = 3
-MONSTER_BASE_MG = 50
-MONSTER_BASE_DF = 30
 
 # Pesos de raridade para sorteio de passivas
 PASSIVE_COMMON_WEIGHT = 60
