@@ -84,12 +84,37 @@ def wait_enter_to_continue() -> None:
 
 def safe_get_key(valid_keys=None, allow_escape: bool = True) -> str | None:
     """Lê uma tecla com segurança, retornando apenas teclas válidas ou None se Escape."""
+    valid_keys_normalized = [k.lower() for k in valid_keys] if valid_keys is not None else None
+
+    def _read_key_with_enter() -> str | None:
+        prompt = "Escolha: "
+        if valid_keys_normalized:
+            prompt = f"Escolha [{'/'.join(valid_keys_normalized)}]: "
+        try:
+            typed = input(prompt).strip().lower()
+        except EOFError:
+            return None
+
+        if not typed:
+            return ""
+
+        key = typed[0]
+        if allow_escape and key == "esc":
+            return None
+        if valid_keys_normalized is None or key in valid_keys_normalized:
+            return key
+        return ""
+
     while True:
-        key = get_key()
+        try:
+            key = get_key()
+        except (termios.error, OSError):
+            key = _read_key_with_enter()
+
         if not key:
             continue
         key = key.lower()
-        if allow_escape and key.lower() == "esc":
+        if allow_escape and key == "esc":
             return None
-        if valid_keys is None or key.lower() in [k.lower() for k in valid_keys]:
+        if valid_keys_normalized is None or key in valid_keys_normalized:
             return key

@@ -11,11 +11,16 @@ class TimeoutException(Exception): pass
 class AutoTester:
     """Simula o comportamento de um jogador para testar crashes no fluxo do jogo em background."""
     def __init__(self):
+        self.target_level = 5
+        self.max_repeated_action = 20
         self.metrics = {
             "actions": 0,
             "combats": 0,
             "crashes": 0,
-            "errors": []
+            "errors": [],
+            "unique_valid_keys_seen": set(),
+            "action_count_by_key": {},
+            "menus_visited": set(),
         }
         self.current_map = None
         self.patchers = []
@@ -47,16 +52,16 @@ class AutoTester:
 
     def _update_progress_bar(self, level: int, real_print):
         """Renderiza a barra de progresso da simulação."""
-        pct = min(100, int((level / 20) * 100))
+        pct = min(100, int((level / self.target_level) * 100))
         bar_len = 20
         filled = int((pct / 100) * bar_len)
         bar = '=' * filled + '-' * (bar_len - filled)
-        real_print(f"\rProgresso Simulação: [{bar}] {pct}% (Lvl {level}/20)", end="", flush=True)
+        real_print(f"\rProgresso Simulação: [{bar}] {pct}% (Lvl {level}/{self.target_level})", end="", flush=True)
 
     def _check_victory_condition(self, level: int):
         """Verifica se o jogador atingiu o nível de vitória."""
-        if level >= 20:
-            raise VictoryException("Nível 20 atingido!")
+        if level >= self.target_level:
+            raise VictoryException(f"Nível {self.target_level} atingido!")
 
     def _check_timeout_conditions(self, choice: str):
         """Verifica condições de timeout (ações excessivas ou travamento)."""
@@ -65,8 +70,11 @@ class AutoTester:
 
         if choice == self.last_key:
             self.consecutive_key_count += 1
-            if self.consecutive_key_count >= 100:
-                raise TimeoutException(f"Stopped because pressed '{choice}' 100 times consecutively (bot is completely stuck).")
+            if self.consecutive_key_count >= self.max_repeated_action:
+                raise TimeoutException(
+                    f"Teste encerrado: ação '{choice}' repetida {self.max_repeated_action} vezes consecutivas "
+                    "(bot preso em loop/menu)."
+                )
         else:
             self.consecutive_key_count = 1
 
@@ -75,17 +83,26 @@ class AutoTester:
         if valid_keys is None:
             return 'a'
 
-        if 'w' in valid_keys and self.current_map:
+        normalized_keys = [k.lower() for k in valid_keys]
+        self.metrics["unique_valid_keys_seen"].update(normalized_keys)
+        self.metrics["menus_visited"].add(tuple(normalized_keys))
+
+        numeric_keys = [k for k in normalized_keys if k.isdigit()]
+        if numeric_keys:
+            least_used = min(numeric_keys, key=lambda k: self.metrics["action_count_by_key"].get(k, 0))
+            return least_used
+
+        if 'w' in normalized_keys and self.current_map:
             return self.decide_map_move()
-        elif '1' in valid_keys and '4' in valid_keys:
+        elif '1' in normalized_keys and '4' in normalized_keys:
             self.metrics["combats"] += 1
             return '1'
-        elif '1' in valid_keys and '0' in valid_keys:
+        elif '1' in normalized_keys and '0' in normalized_keys:
             return '0'
-        elif 'x' in valid_keys:
+        elif 'x' in normalized_keys:
             return 'x'
         else:
-            return valid_keys[0]
+            return normalized_keys[0]
 
     def _create_mocked_safe_get_key(self, real_print):
         """Cria a função mock para safe_get_key."""
@@ -100,6 +117,7 @@ class AutoTester:
             self._check_timeout_conditions(choice)
 
             self.last_key = choice
+            self.metrics["action_count_by_key"][choice] = self.metrics["action_count_by_key"].get(choice, 0) + 1
             return choice
         return mocked_safe_get_key
 
@@ -123,7 +141,7 @@ class AutoTester:
         self.patchers.extend([
             patch("src.engine.loop.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.ui.prompts.safe_get_key", side_effect=mocked_safe_get_key),
-            patch("src.engine.loop.wait_enter_to_continue", side_effect=lambda: None),
+            patch("src.ui.prompts.wait_enter_to_continue", side_effect=lambda: None),
             patch("builtins.input", side_effect=mocked_input),
             patch("builtins.print", side_effect=mocked_print),
             patch("rich.console.Console.input", side_effect=mocked_console_input, autospec=True),
@@ -149,7 +167,7 @@ class AutoTester:
 
     def _execute_simulation(self, player, real_print, start_game_func):
         """Executa a simulação do jogo com tratamento de exceções."""
-        real_print("\nIniciando Simulação em Background (Target: Lvl 20)...")
+        real_print(f"\nIniciando Simulação em Background (Target: Lvl {self.target_level})...")
         real_print("O terminal ficará parado, calculando na velocidade máxima...\n")
 
         for p in self.patchers:
@@ -255,15 +273,23 @@ class AutoTester:
             f.write("  RELATÓRIO DE SIMULAÇÃO AUTO-TEST  \n")
             f.write("="*50 + "\n")
             f.write("Contexto do Agente de Teste:\n")
-            f.write("- Alvo Principal: Chegar vivo ao Level 20.\n")
+            f.write(f"- Alvo Principal: Chegar vivo ao Level {self.target_level}.\n")
             f.write("- Limite de Hard Cap: 50.000 ações permitidas.\n")
+            f.write(f"- Regra anti-loop: encerrar ao repetir a mesma ação {self.max_repeated_action}x consecutivas.\n")
             f.write("- Objetivo: Verificar integridade de código (Crashes) e progressão/balanceamento da XP.\n")
             f.write("-" * 50 + "\n")
             f.write(f"Data/Hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-            f.write(f"Nível Final Alcançado: {final_level}/20\n")
+            f.write(f"Nível Final Alcançado: {final_level}/{self.target_level}\n")
             f.write(f"Ações Simuladas: {self.metrics['actions']}\n")
             f.write(f"Lutas (aprox): {self.metrics['combats']}\n")
             f.write(f"Crashes: {self.metrics['crashes']}\n\n")
+            f.write("Cobertura de gameplay:\n")
+            f.write(f"- Teclas válidas vistas: {', '.join(sorted(self.metrics['unique_valid_keys_seen'])) or 'Nenhuma'}\n")
+            f.write(f"- Menus/estados distintos visitados: {len(self.metrics['menus_visited'])}\n")
+            if self.metrics["action_count_by_key"]:
+                sorted_actions = sorted(self.metrics["action_count_by_key"].items(), key=lambda item: item[0])
+                f.write("- Ações por tecla: " + ", ".join([f"{k}:{v}" for k, v in sorted_actions]) + "\n")
+            f.write("\n")
 
             if self.metrics["errors"]:
                 f.write("="*50 + "\n")
