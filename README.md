@@ -78,9 +78,9 @@ ToJ/
 
 - ✅ Sistema de Passivas (Concluído)
 - ✅ Skills Reimaginadas (Pronta)
-- 🔲 Loja, Itens e Inventário (Em construção)
-- 🔲 Teste Automatizado com Bot BFS (Pendente)
-- 🔲 10 slots de personagens + permadeath (TASK-004)
+- ✅ Loja, Itens e Inventário (Concluído)
+- ✅ Teste Automatizado com Bot BFS (AutoTester — tests/auto_test.py)
+- ✅ 10 slots de personagens + permadeath + Troféu de Fracasso (TASK-004)
 - 🔲 Eventos aleatórios na masmorra (TASK-005)
 - 🔲 Cooldowns + redução de dano + stun (TASK-006)
 - 🔲 Saída da masmorra (extração) (TASK-007)
