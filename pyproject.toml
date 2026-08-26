@@ -32,3 +32,7 @@ strict = false
 ignore_missing_imports = true
 warn_unused_ignores = true
 show_error_codes = true
+
+[tool.pytest.ini_options]
+# auto_test.py é um harness standalone que roda o jogo inteiro (não é pytest)
+addopts = "--ignore=tests/auto_test.py"
