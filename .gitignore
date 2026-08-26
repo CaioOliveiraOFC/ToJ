@@ -17,6 +17,7 @@ __pycache__*
 
 # Dados gerados
 savegame.json
+saves/
 reports/
 
 # IDEs
