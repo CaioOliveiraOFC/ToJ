@@ -41,8 +41,7 @@ class AutoTester:
         """Cria a função mock para draw_map."""
         def mocked_draw(map_self):
             self.current_map = map_self
-            original_draw(map_self)
-            return None
+            return original_draw(map_self)
         return mocked_draw
 
     def _update_progress_bar(self, level: int, real_print):
@@ -123,7 +122,16 @@ class AutoTester:
         self.patchers.extend([
             patch("src.engine.loop.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.ui.prompts.safe_get_key", side_effect=mocked_safe_get_key),
-            patch("src.engine.loop.wait_enter_to_continue", side_effect=lambda: None),
+            # Fluxos pós-harness (loja/menus navegáveis) leem get_key() cru —
+            # sem estes patches a simulação bloqueia no teclado real.
+            # 'q' fecha loja/inventário imediatamente e devolve o controle ao mapa.
+            patch("src.ui.shop_flow.get_key", side_effect=lambda: "q"),
+            patch("src.ui.navigation_menu.get_key", side_effect=lambda: "q"),
+            patch("src.ui.toj_menu.get_key", side_effect=lambda: "q"),
+            # Fluxos importam safe_get_key por nome — patchar o módulo de origem
+            # não afeta essas referências; cobrir cada namespace importador.
+            patch("src.ui.passive_flow.safe_get_key", side_effect=mocked_safe_get_key),
+            patch("src.ui.skill_flow.safe_get_key", side_effect=mocked_safe_get_key),
             patch("builtins.input", side_effect=mocked_input),
             patch("builtins.print", side_effect=mocked_print),
             patch("rich.console.Console.input", side_effect=mocked_console_input, autospec=True),

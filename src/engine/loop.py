@@ -382,19 +382,6 @@ def process_post_battle(
             player.add_item_to_inventory(dropped_item)
 
     level_up_messages: list[str] = []
-    if player_won:
-        xp_gained = int(xp_base_reward * essence_multiplier)
-        player.add_xp_points(xp_gained)
-        player.earn_coins(coins_base_reward)
-        coins_gained = coins_base_reward
-        dropped_item = get_loot()
-        if dropped_item:
-            player.add_item_to_inventory(dropped_item)
-    else:
-        xp_gained = 0
-        coins_gained = 0
-
-    level_up_messages: list[str] = []
     levels_gained = 0
     if player_won:
         # Processa um level up por vez para permitir escolhas apropriadas
