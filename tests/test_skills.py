@@ -1,6 +1,8 @@
 """Teste rápido do sistema de skills."""
 import sys
-sys.path.insert(0, "src")
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.content.skills_loader import load_skills, get_initial_skills, generate_skill_choices
 from src.entities.heroes import Warrior, Mage, Rogue

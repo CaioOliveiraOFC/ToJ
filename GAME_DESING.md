@@ -258,11 +258,11 @@ Uma feature está pronta quando:
 | Sistema de cooldown de habilidades | 🔲 Pendente |
 
 ### Futuro (Tarefas do TASK.md)
-- **TASK-003:** 10 slots de personagens + permadeath + Troféu de Fracasso
-- **TASK-004:** Eventos aleatórios na masmorra (Mercador, Altar, Fonte, Armadilha)
-- **TASK-005:** Cooldowns + redução de dano + stun em combate
-- **TASK-006:** Saída da masmorra (extração) entre andares
-- **TASK-007:** Arena PvP (tiers, matchmaking, ranking por Elo)
+- **TASK-004:** 10 slots de personagens + permadeath + Troféu de Fracasso
+- **TASK-005:** Eventos aleatórios na masmorra (Mercador, Altar, Fonte, Armadilha)
+- **TASK-006:** Cooldowns + redução de dano + stun em combate
+- **TASK-007:** Saída da masmorra (extração) entre andares
+- Arena PvP (tiers, matchmaking, ranking por Elo)
 
 ### Itens Concluídos
 - Sistema de Passivas ✅

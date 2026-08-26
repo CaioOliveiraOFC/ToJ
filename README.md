@@ -17,7 +17,7 @@ RPG de masmorra terminal-based hardcore com exploração procedural e combate t�
 - Masmorras procedurais infinitas com multiplicador de Essência variável (0.5x a 3.0x)
 - Combate tático por turnos com iniciativa dinâmica, crítico, esquiva e itens/habilidades
 - 100+ cartas passivas permanentes em 4 raridades (Comum → Lendário)
-- 4 habilidades ativas por classe com custo de MP e cooldowns
+- 4 habilidades ativas por classe com custo de MP
 - Sistema de loja, drops de itens (armas, armaduras, poções)
 - Save/Load via JSON
 - Arquitetura orientada a eventos (EventBus) para fácil manutenção
@@ -72,7 +72,7 @@ ToJ/
 - `ARCHITECTURE.md` — Mapa completo do código
 - `GAME_DESING.md` — Design do jogo
 - `docs/GUIDE_PASSIVES.md` — Guia de passivas
-- `TASK.md` — Rastreador de tarefas (TASK-003 em progresso: correções de bugs na UI)
+- `TASK.md` — Rastreador de tarefas (TASK-004 concluída: slots de personagem + permadeath + Troféu de Fracasso)
 
 ## 🗺️ Roadmap
 
