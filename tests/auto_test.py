@@ -128,6 +128,15 @@ class AutoTester:
 
         def mocked_sleep(*args, **kwargs): pass
 
+        def mocked_save_game(*args, **kwargs):
+            return {"success": True, "message": "Mocked save (AutoTester - nao toca no disco)"}
+
+        def mocked_delete_save(*args, **kwargs):
+            return False
+
+        def mocked_add_trophy(*args, **kwargs):
+            return True
+
         self.patchers.extend([
             patch("src.engine.loop.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.ui.prompts.safe_get_key", side_effect=mocked_safe_get_key),
@@ -142,6 +151,16 @@ class AutoTester:
             patch("src.ui.passive_flow.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.ui.skill_flow.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.ui.extraction_flow.safe_get_key", side_effect=mocked_safe_get_key),
+            # AutoTester nao pode tocar nos saves reais — mocka persistencia
+            patch("src.storage.save_manager.save_game", side_effect=mocked_save_game),
+            patch("src.storage.save_manager.delete_save", side_effect=mocked_delete_save),
+            patch("src.storage.save_manager.add_trophy", side_effect=mocked_add_trophy),
+            patch("src.engine.loop.save_game", side_effect=mocked_save_game),
+            patch("src.engine.loop.delete_save", side_effect=mocked_delete_save),
+            patch("src.engine.loop.add_trophy", side_effect=mocked_add_trophy),
+            patch("src.engine.bootstrap.save_game", side_effect=mocked_save_game, create=True),
+            patch("src.engine.bootstrap.delete_save", side_effect=mocked_delete_save, create=True),
+            patch("src.engine.bootstrap.add_trophy", side_effect=mocked_add_trophy, create=True),
             patch("builtins.input", side_effect=mocked_input),
             patch("builtins.print", side_effect=mocked_print),
             patch("rich.console.Console.input", side_effect=mocked_console_input, autospec=True),
