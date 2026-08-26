@@ -74,6 +74,15 @@ class AutoTester:
         if valid_keys is None:
             return 'a'
 
+        # Extração entre andares: sempre CONTINUAR para exercitar a run completa
+        if valid_keys == ["1", "2"]:
+            return "2"
+
+        # Menus navegáveis (passivas/skills): valid_keys contém ENTER
+        if "ENTER" in (valid_keys or []):
+            seq = ["s", "s", "ENTER"]
+            return seq[self.metrics["actions"] % len(seq)]
+
         if 'w' in valid_keys and self.current_map:
             return self.decide_map_move()
         elif '1' in valid_keys and '4' in valid_keys:
@@ -132,6 +141,7 @@ class AutoTester:
             # não afeta essas referências; cobrir cada namespace importador.
             patch("src.ui.passive_flow.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.ui.skill_flow.safe_get_key", side_effect=mocked_safe_get_key),
+            patch("src.ui.extraction_flow.safe_get_key", side_effect=mocked_safe_get_key),
             patch("builtins.input", side_effect=mocked_input),
             patch("builtins.print", side_effect=mocked_print),
             patch("rich.console.Console.input", side_effect=mocked_console_input, autospec=True),

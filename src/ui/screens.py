@@ -451,6 +451,44 @@ def render_level_complete(dungeon_level: int) -> None:
     ))
 
 
+def render_extraction_prompt(
+    player_name: str,
+    dungeon_level: int,
+    xp_points: int,
+    level: int,
+    hp: int,
+    max_hp: int,
+    coins: int,
+    essence_multiplier: float = 1.0,
+) -> None:
+    """Tela de decisão entre EXTRAIR (preservar) e CONTINUAR (arriscar)."""
+    renderer.console.print(Panel(
+        Text("— Decisão de Extração —", justify="center", style="bold yellow"),
+        border_style="yellow",
+    ))
+    body = Text(justify="center")
+    body.append(f"Andar concluído: {dungeon_level}\n", style="bold cyan")
+    body.append(f"Aventureiro: {player_name}  |  Nível: {level}  |  HP: {hp}/{max_hp}  |  Ouro: {coins}\n", style="white")
+    body.append(f"Essência acumulada (XP): {xp_points}\n", style="bold green")
+    body.append(f"Multiplicador do próximo andar: {essence_multiplier}x\n\n", style="dim cyan")
+    body.append("Se você CONTINUAR e morrer no próximo andar,\n", style="bold red")
+    body.append("toda a essência, nível e progresso desta run serão perdidos (permadeath).\n", style="red")
+    body.append("Se você EXTRAIR, a run encerra agora e seu personagem\n", style="bold green")
+    body.append("é preservado com tudo que conquistou até aqui.\n", style="green")
+    renderer.console.print(Panel(body, border_style="cyan", title="Extrair ou Continuar?"))
+    renderer.console.print(Text("[1] EXTRAIR  — encerrar e preservar  |  [2] CONTINUAR — descer", justify="center", style="bold white"))
+    renderer.console.print(Text("Escolha 1 ou 2 e pressione ENTER.", justify="center", style="dim"))
+
+
+def render_extraction_success(dungeon_level: int) -> None:
+    """Confirmação após extração bem-sucedida."""
+    renderer.console.print(Panel(
+        Text(f"Extração concluída no andar {dungeon_level}!\nSeu progresso foi preservado.", justify="center", style="bold green"),
+        border_style="green",
+    ))
+    sleep(0.8)
+
+
 def render_continue_prompt() -> None:
     """Renderiza prompt para continuar jornada."""
     renderer.console.print(Panel(

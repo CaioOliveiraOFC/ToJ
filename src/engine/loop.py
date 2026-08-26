@@ -14,9 +14,9 @@ from src.content.factories.monsters import (
     create_boss_for_level,
     generate_monsters_for_level,
 )
-from src.content.items import Potion
 from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
+from src.content.skills_loader import generate_skill_choices
 from src.engine.events import EventBus
 from src.engine.map import MapOfGame
 from src.entities.monsters import Monster
@@ -30,7 +30,6 @@ from src.mechanics.math_operations import (
     generate_essence_multiplier,
 )
 from src.shared import combat_topics as topics
-from src.shared.types import GameEvent
 from src.shared.constants import (
     BASE_MAP_HEIGHT,
     BASE_MAP_WIDTH,
@@ -41,8 +40,7 @@ from src.shared.constants import (
     WALL_PERCENT_PER_LEVEL,
 )
 from src.shared.types import GameEvent
-from src.content.skills_loader import generate_skill_choices
-from src.storage.save_manager import save_game, delete_save, add_trophy
+from src.storage.save_manager import add_trophy, delete_save, save_game
 from src.ui import screens
 from src.ui.combat_event_handlers import register_combat_ui_handlers
 from src.ui.prompts import safe_get_key
@@ -555,6 +553,22 @@ def start_game(
                 return
             elif result == "level_complete":
                 player.rest()
+                # --- Decisão de extração (TASK-007) ---
+                # Sem meta-progressão nova: "preservar" = salvar o personagem
+                # no slot atual via save_game (xp/level/passivas/coins/inventário)
+                # e encerrar a run. Continuar mantém o fluxo histórico.
+                decision: dict[str, str | None] = {"choice": None}
+                _get_game_publish()(topics.UI_EXTRACTION_PROMPT, {
+                    "player": player,
+                    "dungeon_level": dungeon_level,
+                    "essence_multiplier": essence_multiplier,
+                    "result": decision,
+                    "slot": slot,
+                })
+                if decision.get("choice") == "extract":
+                    save_game(player, dungeon_level, None, slot=slot)
+                    screens.render_extraction_success(dungeon_level)
+                    return
                 _get_game_publish()(topics.UI_OPEN_SHOP, {"player": player, "shop": shop, "dungeon_level": dungeon_level})
                 dungeon_level += 1
                 initial_map_state = None

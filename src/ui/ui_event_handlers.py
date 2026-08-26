@@ -5,9 +5,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Protocol
 
-from src.shared.types import GameEvent
 from src.shared import combat_topics as topics
+from src.shared.types import GameEvent
 from src.ui import screens
+from src.ui.extraction_flow import run_extraction_prompt
 from src.ui.inventory_flow import run_inventory_flow_v2
 from src.ui.passive_flow import run_passive_selection_flow
 from src.ui.shop_flow import run_shop_flow
@@ -17,7 +18,11 @@ from src.ui.skill_flow import (
 )
 from src.ui.toj_menu import (
     character_creation_flow as _character_creation,
+)
+from src.ui.toj_menu import (
     game_over_screen,
+)
+from src.ui.toj_menu import (
     main_menu as _main_menu,
 )
 
@@ -58,6 +63,16 @@ def _on_open_passives(ev: GameEvent) -> None:
         run_passive_selection_flow(player, choices)
 
 
+def _on_extraction_prompt(ev: GameEvent) -> None:
+    player = ev.payload.get("player")
+    dungeon_level = ev.payload.get("dungeon_level", 1)
+    essence_multiplier = ev.payload.get("essence_multiplier", 1.0)
+    result = ev.payload.get("result")
+    if player is not None and isinstance(result, dict):
+        choice = run_extraction_prompt(player, dungeon_level, essence_multiplier)
+        result["choice"] = choice
+
+
 def _on_game_over(ev: GameEvent) -> None:
     player_name = ev.payload.get("player_name", "Aventureiro")
     game_over_screen(player_name)
@@ -91,6 +106,7 @@ def register_ui_handlers(sink: EventSink) -> Callable[[], None]:
         sink.subscribe(topics.UI_OPEN_SHOP, _on_open_shop),
         sink.subscribe(topics.UI_OPEN_PASSIVES, _on_open_passives),
         sink.subscribe(topics.UI_OPEN_SKILLS, _on_open_skills),
+        sink.subscribe(topics.UI_EXTRACTION_PROMPT, _on_extraction_prompt),
         sink.subscribe(topics.UI_GAME_OVER, _on_game_over),
         sink.subscribe(topics.UI_SAVE_SUCCESS, _on_save_success),
         sink.subscribe(topics.UI_MAIN_MENU, _on_main_menu),
