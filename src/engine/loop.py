@@ -14,6 +14,7 @@ from src.content.factories.monsters import (
     create_boss_for_level,
     generate_monsters_for_level,
 )
+from src.content.factories.dungeons import roll_random_event
 from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.content.skills_loader import generate_skill_choices
@@ -553,6 +554,25 @@ def start_game(
                 return
             elif result == "level_complete":
                 player.rest()
+                # --- Evento aleatório (TASK-005) — 25% antes da extração ---
+                event_type = roll_random_event()
+                if event_type:
+                    _get_game_publish()(topics.UI_RANDOM_EVENT, {
+                        "player": player,
+                        "dungeon_level": dungeon_level,
+                        "event_type": event_type,
+                    })
+                    if not player.get_isalive():
+                        _get_game_publish()(topics.UI_GAME_OVER, {"player_name": player.get_nick_name()})
+                        add_trophy(
+                            player.get_nick_name(),
+                            player.get_classname(),
+                            player.get_level(),
+                            dungeon_level,
+                            "Altar sombrio",
+                        )
+                        delete_save(slot)
+                        return
                 # Loja sempre disponível ao concluir o andar — inclusive para quem vai extrair,
                 # para não perder a recompensa do andar (corrige bug reportado).
                 _get_game_publish()(topics.UI_OPEN_SHOP, {"player": player, "shop": shop, "dungeon_level": dungeon_level})

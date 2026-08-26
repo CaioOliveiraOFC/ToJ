@@ -159,3 +159,13 @@ PASSIVE_COMMON_WEIGHT = 60
 PASSIVE_RARE_WEIGHT = 28
 PASSIVE_EPIC_WEIGHT = 10
 PASSIVE_LEGENDARY_WEIGHT = 2
+
+# --- Eventos Aleatórios de Masmorra (TASK-005) ---
+# Probabilidade de um evento especial ao entrar num andar (antes da extração)
+RANDOM_EVENT_CHANCE = 0.25  # 25% — equilíbrio entre surpresa e previsibilidade
+RANDOM_EVENT_MERCHANT_MIN_ITEMS = 1
+RANDOM_EVENT_MERCHANT_MAX_ITEMS = 3
+RANDOM_EVENT_ALTAR_HP_COST_PERCENT = 30  # % da vida máxima sacrificada
+RANDOM_EVENT_ALTAR_BUFF_VALUE = 15
+RANDOM_EVENT_ALTAR_BUFF_DURATION = 5  # turnos de combate
+RANDOM_EVENT_FOUNTAIN_HEAL_PERCENT = 50  # % da vida máxima curada

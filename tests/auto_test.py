@@ -151,6 +151,7 @@ class AutoTester:
             patch("src.ui.passive_flow.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.ui.skill_flow.safe_get_key", side_effect=mocked_safe_get_key),
             patch("src.ui.extraction_flow.safe_get_key", side_effect=mocked_safe_get_key),
+            patch("src.ui.random_event_flow.safe_get_key", side_effect=mocked_safe_get_key),
             # AutoTester nao pode tocar nos saves reais — mocka persistencia
             patch("src.storage.save_manager.save_game", side_effect=mocked_save_game),
             patch("src.storage.save_manager.delete_save", side_effect=mocked_delete_save),

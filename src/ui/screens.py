@@ -685,3 +685,107 @@ def render_skill_not_replaced() -> None:
         Panel(Text("Skill não substituída.", justify="center", style="bold yellow"), border_style="yellow")
     )
     sleep(1.0)
+
+
+# --- Eventos Aleatórios (TASK-005) ---
+
+def render_merchant_event(offers: list[dict], coins: int) -> None:
+    """Tela do Mercador Errante: mostra ofertas raras com preço."""
+    renderer.console.print(Panel(
+        Text("— Mercador Errante —", justify="center", style="bold yellow"),
+        border_style="yellow",
+    ))
+    body = Text(justify="center")
+    body.append("Um mercador surge da neblina com itens raros.\n", style="italic cyan")
+    body.append(f"Seu ouro: {coins}\n\n", style="bold white")
+    for idx, entry in enumerate(offers, 1):
+        item = entry["item"]
+        price = entry["price"]
+        name = getattr(item, "name", "?")
+        rarity = getattr(item, "rarity", "Common")
+        desc = getattr(item, "description", "")
+        body.append(f"[{idx}] {name} [{rarity}] — {price} ouro\n", style="yellow")
+        if desc:
+            body.append(f"    {desc}\n", style="dim")
+    renderer.console.print(Panel(body, border_style="cyan", title="Ofertas"))
+    renderer.console.print(Text("[1-3] Comprar  |  [0] Sair", justify="center", style="dim"))
+
+
+def render_merchant_purchase_success(item_name: str, price: int) -> None:
+    renderer.console.print(Panel(
+        Text(f"Você comprou {item_name} por {price} ouro!", justify="center", style="bold green"),
+        border_style="green",
+    ))
+    sleep(0.8)
+
+
+def render_altar_event(cost_hp: int, player_hp: int, max_hp: int) -> None:
+    """Tela do Altar: escolha de risco/recompensa."""
+    renderer.console.print(Panel(
+        Text("— Altar Sombrio —", justify="center", style="bold red"),
+        border_style="red",
+    ))
+    body = Text(justify="center")
+    body.append("O altar pulsa com energia sombria.\n", style="italic white")
+    body.append(f"Sacrifício: {cost_hp} HP (você tem {player_hp}/{max_hp})\n", style="bold red")
+    body.append("Recompensa: Benção do Altar (+15 dano por 5 turnos)\n\n", style="bold green")
+    body.append("O que você faz?\n", style="white")
+    body.append("[1] Sacrificar HP e receber a benção\n", style="yellow")
+    body.append("[2] Recusar e partir\n", style="dim")
+    renderer.console.print(Panel(body, border_style="magenta"))
+
+
+def render_altar_success() -> None:
+    renderer.console.print(Panel(
+        Text("O altar consome seu sangue e concede a Benção do Altar!", justify="center", style="bold magenta"),
+        border_style="magenta",
+    ))
+    sleep(0.8)
+
+
+def render_altar_refused() -> None:
+    renderer.console.print(Panel(
+        Text("Você recusa o pacto e se afasta do altar.", justify="center", style="dim"),
+        border_style="dim",
+    ))
+    sleep(0.6)
+
+
+def render_altar_no_hp() -> None:
+    renderer.console.print(Panel(
+        Text("Você está fraco demais para o sacrifício.", justify="center", style="bold red"),
+        border_style="red",
+    ))
+    sleep(0.8)
+
+
+def render_fountain_event(heal_amount: int, player_hp: int, max_hp: int) -> None:
+    """Tela da Fonte: cura sem custo."""
+    renderer.console.print(Panel(
+        Text("— Fonte Cristalina —", justify="center", style="bold blue"),
+        border_style="blue",
+    ))
+    body = Text(justify="center")
+    body.append("Águas cristalinas brilham à sua frente.\n", style="italic cyan")
+    body.append(f"Beber cura {heal_amount} HP (você tem {player_hp}/{max_hp})\n\n", style="bold green")
+    body.append("[1] Beber da fonte  |  [2] Ignorar\n", style="white")
+    renderer.console.print(Panel(body, border_style="blue"))
+
+
+def render_fountain_healed(healed: int, potion_name: str | None = None) -> None:
+    text = f"Você bebeu e recuperou {healed} HP!"
+    if potion_name:
+        text += f"\nEncontrou: {potion_name}!"
+    renderer.console.print(Panel(
+        Text(text, justify="center", style="bold green"),
+        border_style="green",
+    ))
+    sleep(0.8)
+
+
+def render_fountain_ignored() -> None:
+    renderer.console.print(Panel(
+        Text("Você ignora a fonte e segue em frente.", justify="center", style="dim"),
+        border_style="dim",
+    ))
+    sleep(0.5)

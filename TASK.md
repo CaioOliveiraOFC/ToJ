@@ -5,7 +5,7 @@
 
 ## Sessão Atual
 
-**ID:** TASK-007
+**ID:** TASK-005
 **Data:** 26/08/2026
 **Status:** ✅ Concluída
 **Depende de:** TASK-004 concluída
@@ -14,57 +14,57 @@
 
 ## Objetivo
 
-Implementar **opção "Sair da Masmorra" (extração) entre andares** — decisão EXTRAIR vs CONTINUAR no ponto de transição de andar, seguindo o padrão EventBus existente.
+Implementar **eventos aleatórios de masmorra**: Mercador Errante, Altar e Fonte — sistema simples sorteado ao entrar num andar, antes da decisão de extração.
 
 ---
 
 ## Contexto do Game Design
 
-Do GAME_DESING.md:
-> "Entre um andar e outro, o jogador pode optar por sair da masmorra e salvar o personagem para a Arena."
-> "A Essência acumulada é perdida em caso de morte no próximo andar."
+Do GAME_DESING.md (TASK-005):
+> Mercador Errante, Altar de Sacrifício, Fonte de Cura — eventos que quebram a rotina da masmorra com risco/recompensa.
+
+Antes só existiam strings soltas "mercador" na loja normal (screens.py:226,337), sem lógica.
 
 ---
 
 ## Especificação Técnica
 
-### Decisão de Design: o que "preservar essência" significa
+### Probabilidade
 
-**Sem meta-progressão nova.** O jogo hoje não tem moeda persistente entre runs além do próprio save por slot. "Preservar" = `save_game(player, dungeon_level, None, slot=slot)` no andar concluído e encerrar a run, mantendo `xp_points`, `level`, `passives`, `coins`, `inventory` e `equipment` no `saves/slot_{1-10}.json`. Morrer no próximo andar continua deletando o save (`delete_save` + `add_trophy`), como já validado no protótipo vertical slice.
+`RANDOM_EVENT_CHANCE = 0.25` (25%) em `src/shared/constants.py` — configurável via constante nomeada, não número mágico. Documentada como equilíbrio entre surpresa e previsibilidade. Sorteio via `roll_random_event()` em `src/content/factories/dungeons.py`.
 
-### Fluxo implementado
+### Tipos implementados
 
-```
-level_complete em start_game (loop.py:556) — após player.rest() e ANTES de UI_OPEN_SHOP:
-  1. publish(UI_EXTRACTION_PROMPT, {player, dungeon_level, essence_multiplier, result: {choice}})
-     -> ui_event_handlers._on_extraction_prompt -> extraction_flow.run_extraction_prompt()
-        mostra: andar concluído, HP atual, essência/XP acumulada, aviso de perda
-        opções: [1] EXTRAIR | [2] CONTINUAR
-  2. Se choice == "extract": save_game(...) + render_extraction_success() + return
-  3. Se "continue": publica UI_OPEN_SHOP e incrementa dungeon_level normalmente
-```
+| Tipo | Lógica real |
+|---|---|
+| **Mercador Errante** | 1-3 itens aleatórios (pool da loja com peso favorecendo Rare/Epic, desconto 10%), compra opcional via ouro |
+| **Altar** | Escolha binária: sacrificar 30% da vida máxima por buff `Benção do Altar` (+15 por 5 turnos) ou recusar; morte por sacrifício gera troféu e deleta save |
+| **Fonte** | Cura 50% da vida máxima + tenta recuperar 1 poção (`Poção de Cura Pequena`), sem custo |
 
-Arquitetura: segue o padrão `UI_OPEN_SHOP` — engine publica via `_get_game_publish()`, UI decide de forma bloqueante em `ui/` e devolve a escolha por dicionário mutável no payload (publish é síncrono).
+### Arquitetura
+
+Segue o padrão `UI_OPEN_SHOP`/`UI_EXTRACTION_PROMPT`: `loop.py` publica `UI_RANDOM_EVENT` via `_get_game_publish()` no branch `level_complete` (após `rest()`, antes da loja e extração); `ui_event_handlers._on_random_event` delega para `random_event_flow.run_random_event()` que é bloqueante em `ui/` e não acopla o engine.
 
 ### Arquivos tocados
 
 | Arquivo | Ação |
 |---|---|
-| `src/shared/combat_topics.py` | Novo tópico `UI_EXTRACTION_PROMPT` |
-| `src/ui/screens.py` | `render_extraction_prompt()` + `render_extraction_success()` |
-| `src/ui/extraction_flow.py` | Novo: `run_extraction_prompt()` |
-| `src/ui/ui_event_handlers.py` | Handler `_on_extraction_prompt` + registro |
-| `src/engine/loop.py` | Branch `level_complete`: publica extração, salva e retorna ou continua |
-| `tests/auto_test.py` | Mock de `extraction_flow.safe_get_key` + bot escolhe "2" (continuar) |
+| `src/shared/constants.py` | Constantes `RANDOM_EVENT_*` |
+| `src/content/factories/dungeons.py` | Lógica de sorteio e helpers dos 3 eventos |
+| `src/shared/combat_topics.py` | Novo tópico `UI_RANDOM_EVENT` |
+| `src/ui/screens.py` | `render_*` para mercador/altar/fonte |
+| `src/ui/random_event_flow.py` | Novo: 3 fluxos + dispatcher |
+| `src/ui/ui_event_handlers.py` | Handler `_on_random_event` + registro |
+| `src/engine/loop.py` | Sorteio e publish antes da extração; trata morte no altar |
+| `tests/auto_test.py` | Mock de `random_event_flow.safe_get_key` + bot escolhe continuar/recusar |
 
 ---
 
 ## Critérios de Aceite
 
-- [x] Prompt aparece exatamente entre andares, após `player.rest()` e antes de `UI_OPEN_SHOP`
-- [x] Segue padrão publish/handler, sem chamada direta de UI no engine
-- [x] Mostra andar, HP, essência/XP e reforça perda em caso de morte
-- [x] EXTRAIR encerra a run preservando save; CONTINUAR incrementa andar e abre loja
+- [x] 3 tipos têm lógica real, não só texto decorativo
+- [x] Probabilidade configurável via `RANDOM_EVENT_CHANCE` (25%)
+- [x] Segue publish/handler via EventBus, sem acoplamento direto ao loop
 - [x] pytest e AutoTester (vitória Lvl 20, 0 crashes) continuam passando
 
 ---
@@ -73,6 +73,6 @@ Arquitetura: segue o padrão `UI_OPEN_SHOP` — engine publica via `_get_game_pu
 
 | ID | Objetivo | Depende de |
 |---|---|---|
-| TASK-005 | Eventos aleatórios de andar (Mercador, Altar, Fonte) | TASK-004 |
+| TASK-005 | Eventos aleatórios de andar (Mercador, Altar, Fonte) | TASK-004 — ✅ Concluída |
 | TASK-006 | Cooldowns + `damage_reduction` + `stun_chance` em combate | TASK-004 |
 | TASK-007 | Opção "Sair da Masmorra" (extração) entre andares | TASK-004 — ✅ Concluída |
