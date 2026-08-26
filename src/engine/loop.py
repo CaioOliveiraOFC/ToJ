@@ -553,10 +553,14 @@ def start_game(
                 return
             elif result == "level_complete":
                 player.rest()
+                # Loja sempre disponível ao concluir o andar — inclusive para quem vai extrair,
+                # para não perder a recompensa do andar (corrige bug reportado).
+                _get_game_publish()(topics.UI_OPEN_SHOP, {"player": player, "shop": shop, "dungeon_level": dungeon_level})
                 # --- Decisão de extração (TASK-007) ---
                 # Sem meta-progressão nova: "preservar" = salvar o personagem
-                # no slot atual via save_game (xp/level/passivas/coins/inventário)
-                # e encerrar a run. Continuar mantém o fluxo histórico.
+                # no slot atual via save_game (xp/level/passivas/coins/inventário
+                # já com o resultado da loja) e encerrar a run. Continuar mantém
+                # o fluxo histórico.
                 decision: dict[str, str | None] = {"choice": None}
                 _get_game_publish()(topics.UI_EXTRACTION_PROMPT, {
                     "player": player,
@@ -569,7 +573,6 @@ def start_game(
                     save_game(player, dungeon_level, None, slot=slot)
                     screens.render_extraction_success(dungeon_level)
                     return
-                _get_game_publish()(topics.UI_OPEN_SHOP, {"player": player, "shop": shop, "dungeon_level": dungeon_level})
                 dungeon_level += 1
                 initial_map_state = None
                 break
