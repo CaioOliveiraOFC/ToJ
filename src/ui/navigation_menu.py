@@ -427,28 +427,8 @@ def navigate_inventory(
         
         return (category, slot_order, rarity_order, item.name)
     
-    # Sort inventory
-    sorted_inventory = sorted(inventory, key=get_item_sort_key)
-    
-    # Remove duplicates by id (keep first occurrence)
-    seen_ids = set()
-    unique_inventory = []
-    for item in sorted_inventory:
-        if id(item) not in seen_ids:
-            seen_ids.add(id(item))
-            unique_inventory.append(item)
-    sorted_inventory = unique_inventory
-    
-    # Build equipped items set (for O(1) lookup)
-    equipped_items = set()
-    for equipped_item in player.equipment.values():
-        if equipped_item:
-            equipped_items.add(id(equipped_item))
-    
     current_index = 0
     max_visible = 10
-    total_items = len(sorted_inventory)
-    total_pages = (total_items + max_visible - 1) // max_visible if total_items > 0 else 1
     current_page = 0
     
     feedback_message = ""
@@ -549,10 +529,44 @@ def navigate_inventory(
             content += f"[cyan]⏱{duration}[/cyan]\n"
         
         return content
-    
+
+    feedback_message = ""
+    pending_action = None  # For Epic+ confirmation
+
     # Main loop
     iteration = 0
     while True:
+        # Rebuild view from live player state — crucial for single-item case where
+        # inventory becomes empty after equip/use, and to keep feedback visible
+        def _rebuild_inventory_view():
+            _sorted = sorted(player.inventory, key=get_item_sort_key)
+            _seen = set()
+            _uniq = []
+            for _it in _sorted:
+                if id(_it) not in _seen:
+                    _seen.add(id(_it))
+                    _uniq.append(_it)
+            return _uniq
+
+        sorted_inventory = _rebuild_inventory_view()
+        total_items = len(sorted_inventory)
+        total_pages = (total_items + max_visible - 1) // max_visible if total_items > 0 else 1
+        # Clamp current_index/current_page when inventory shrinks (single-item equip → empty)
+        if total_items == 0:
+            current_index = 0
+            current_page = 0
+        elif current_index >= total_items:
+            current_index = total_items - 1
+            current_page = current_index // max_visible
+        elif current_page >= total_pages:
+            current_page = total_pages - 1
+
+        # Rebuild equipped set for O(1) lookup
+        equipped_items = set()
+        for _eq in player.equipment.values():
+            if _eq:
+                equipped_items.add(id(_eq))
+
         iteration += 1
         
         # Clear console with better compatibility
@@ -672,8 +686,9 @@ def navigate_inventory(
                 if isinstance(selected_item, Item):
                     msg = player.use_potion(selected_item)
                     feedback_message = f"{selected_item.name} usado."
-                # Reload inventory
-                return None  # Exit to refresh
+                pending_action = None
+                # Stay inside loop to keep feedback visible and handle single-item → empty
+                continue
             continue
         
         # Handle navigation
@@ -708,14 +723,14 @@ def navigate_inventory(
                         feedback_message = msg
                     else:
                         feedback_message = f"{selected_item.name} equipado."
-                # Reload and rebuild
-                return None  # Exit to refresh
+                # Stay inside loop so feedback remains visible — rebuild on next iteration handles single-item → empty case
+                continue
         
         elif key in ("u", "U") and total_items > 0:
             selected_item = sorted_inventory[current_index]
             is_usable = getattr(selected_item, "is_usable", False)
             rarity = getattr(selected_item, "rarity", "Common")
-            
+
             if is_usable:
                 if rarity in ("Epic", "Legendary"):
                     pending_action = "use_confirm"
@@ -724,7 +739,8 @@ def navigate_inventory(
                     if isinstance(selected_item, Item):
                         msg = player.use_potion(selected_item)
                         feedback_message = f"{selected_item.name} usado."
-                    return None  # Exit to refresh
+                    # Stay inside loop to keep feedback visible and handle single-item case (inventory may become empty)
+                    continue
         
         elif key.lower() == "q":
             return False  # ESC means exit the inventory
