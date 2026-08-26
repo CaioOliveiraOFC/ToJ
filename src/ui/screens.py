@@ -424,7 +424,7 @@ def render_dungeon_status(
         f"Multiplicador: [{mult_color}]{essence_multiplier}x[/] | "
         f"HP: {hp}/{max_hp} | MP: {mp}/{max_mp}"
     )
-    renderer.console.print(Text(status_text, style="bold cyan"))
+    renderer.console.print(Text.from_markup(status_text, style="bold cyan"))
     renderer.console.print(Text("Use 'w', 'a', 's', 'd' para mover.", style="dim"))
 
 
