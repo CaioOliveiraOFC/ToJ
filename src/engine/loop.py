@@ -117,6 +117,14 @@ def _run_human_battle_turn(
 
                 if skill_choice and skill_choice.isdigit() and int(skill_choice) in player.skills:
                     chosen_skill = player.skills[int(skill_choice)]
+                    # Cooldown check
+                    remaining = 0
+                    if hasattr(player, "skill_cooldowns"):
+                        remaining = player.skill_cooldowns.get(getattr(chosen_skill, "id", ""), 0)
+                    if remaining > 0:
+                        screens.render_skill_on_cooldown_message(chosen_skill.name, remaining)
+                        sleep(0.5)
+                        continue
                     if player.get_mp() < chosen_skill.mana_cost:
                         screens.render_battle_insufficient_mana_message()
                         sleep(0.5)

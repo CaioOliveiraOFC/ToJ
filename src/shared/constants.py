@@ -169,3 +169,10 @@ RANDOM_EVENT_ALTAR_HP_COST_PERCENT = 30  # % da vida máxima sacrificada
 RANDOM_EVENT_ALTAR_BUFF_VALUE = 15
 RANDOM_EVENT_ALTAR_BUFF_DURATION = 5  # turnos de combate
 RANDOM_EVENT_FOUNTAIN_HEAL_PERCENT = 50  # % da vida máxima curada
+
+# --- Novos sistemas de combate (TASK-006) ---
+DEFAULT_SKILL_COOLDOWN = 0  # sem cooldown por padrão
+STUN_DURATION = 1  # turnos perdidos quando atordoado
+STUN_CHANCE_DEFAULT = 15  # % base para aplicar stun em ações com stun
+DAMAGE_REDUCTION_DURATION = 3  # turnos que dura a redução de dano
+DAMAGE_REDUCTION_DEFAULT_PERCENT = 30  # % de dano reduzido

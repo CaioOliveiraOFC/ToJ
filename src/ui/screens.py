@@ -76,11 +76,24 @@ def render_skill_select_panel(player: "Player") -> None:
     skill_table.add_column("Chave", style="bold blue", justify="right")
     skill_table.add_column("Habilidade", style="cyan")
     skill_table.add_column("Custo", style="magenta", justify="left")
+    skill_table.add_column("Recarga", style="dim white", justify="left")
     for key, skill in player.skills.items():
-        skill_table.add_row(str(key) + ".", skill.name, f"{skill.mana_cost} MP")
-    skill_table.add_row("0.", "Voltar", "")
+        cooldown_remaining = 0
+        if hasattr(player, "skill_cooldowns"):
+            cooldown_remaining = player.skill_cooldowns.get(getattr(skill, "id", ""), 0)
+        if cooldown_remaining > 0:
+            skill_table.add_row(str(key) + ".", f"[dim]{skill.name} (recarga: {cooldown_remaining})[/dim]", f"{skill.mana_cost} MP", f"[red]{cooldown_remaining} turnos[/red]")
+        else:
+            skill_table.add_row(str(key) + ".", skill.name, f"{skill.mana_cost} MP", "")
+    skill_table.add_row("0.", "Voltar", "", "")
     renderer.console.print(
         Panel(skill_table, title="[bold yellow]Escolha uma habilidade[/bold yellow]", border_style="yellow")
+    )
+
+
+def render_skill_on_cooldown_message(skill_name: str, remaining: int) -> None:
+    renderer.console.print(
+        Panel(Text(f"{skill_name} está em recarga por {remaining} turno(s)!", justify="center", style="yellow"), border_style="yellow")
     )
 
 

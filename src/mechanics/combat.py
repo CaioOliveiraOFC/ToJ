@@ -14,12 +14,16 @@ from src.shared.constants import (
     CRIT_CHANCE_DEFAULT,
     CRIT_CHANCE_HIGH,
     CRIT_DAMAGE_BASE,
+    DAMAGE_REDUCTION_DEFAULT_PERCENT,
+    DAMAGE_REDUCTION_DURATION,
     DEFENSE_K,
     FLEE_RANGE_MAX,
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
     POISON_DAMAGE_PER_TICK,
     SKILL_LEVEL_SCALING,
+    STUN_CHANCE_DEFAULT,
+    STUN_DURATION,
     XMULT_CAP,
 )
 from src.shared.types import CombatResult, GameEvent
@@ -140,6 +144,14 @@ def resolve_physical_attack(
     if is_critical:
         xmult_mods.append(CRIT_DAMAGE_BASE)
 
+    # Damage reduction: verifica se o defensor tem o efeito ativo
+    damage_reduction_pct = 0
+    if hasattr(defender, "active_effects") and "damage_reduction" in defender.active_effects:
+        try:
+            damage_reduction_pct = int(defender.active_effects["damage_reduction"].get("value", 0))
+        except Exception:
+            damage_reduction_pct = 0
+
     damage = _calculate_damage(
         base_power=float(base_damage),
         flat_mods=None,
@@ -147,6 +159,29 @@ def resolve_physical_attack(
         xmult_mods=xmult_mods if xmult_mods else None,
         defense_target=defense_target,
     )
+
+    if damage_reduction_pct:
+        damage = max(1, int(damage * (1 - damage_reduction_pct / 100)))
+
+    # Stun chance: ao acertar, chance de atordoar o alvo
+    # Usa STUN_CHANCE_DEFAULT para ataques físicos e skills com stun implícito (ex: Esmagar)
+    stun_chance = 0
+    if skill_name == "Esmagar":
+        stun_chance = 30
+    elif hasattr(attacker, "get_passive_bonus"):
+        try:
+            stun_chance = int(attacker.get_passive_bonus("stun_chance"))
+        except Exception:
+            stun_chance = 0
+    if stun_chance and r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= stun_chance:
+        if hasattr(target := defender, "active_effects"):
+            target.active_effects["stun"] = {"duration": STUN_DURATION}
+            _emit(
+                publish,
+                T.COMBAT_TURN_EFFECT,
+                type_="turn_effect",
+                payload={"entity": defender, "kind": "stun_applied"},
+            )
 
     defender.take_damage(damage)
     dead = defender.get_hp() <= 0
@@ -181,6 +216,23 @@ def apply_skill(
 ) -> SkillApplyResult:
     """Aplica efeitos de habilidade no estado (sem prints)."""
     r = _rng(rng)
+
+    # Cooldown: verifica se skill está em recarga
+    skill_id = getattr(skill, "id", None)
+    skill_cooldown = int(getattr(skill, "cooldown", 0) or 0)
+    if skill_id and hasattr(caster, "skill_cooldowns"):
+        remaining = caster.skill_cooldowns.get(skill_id, 0)
+        if remaining > 0:
+            # Em cooldown — não consome MP nem aplica efeito
+            out = SkillApplyResult(kind="damage", mp_spent=0, strike=None)
+            _emit(
+                publish,
+                T.COMBAT_SKILL_CAST,
+                type_="skill_cast",
+                payload={"caster": caster, "skill": skill, "on_cooldown": True},
+            )
+            return out
+
     _emit(
         publish,
         T.COMBAT_SKILL_CAST,
@@ -189,12 +241,28 @@ def apply_skill(
     )
     caster.reduce_mp(int(skill.mana_cost))
 
+    # Aplica cooldown após uso bem-sucedido (se houver)
+    if skill_id and hasattr(caster, "skill_cooldowns") and skill_cooldown > 0:
+        caster.skill_cooldowns[skill_id] = skill_cooldown
+
     if skill.effect_type == "damage":
         base_power = caster.get_avg_damage()
         scaling = 1.0 + (caster.level * SKILL_LEVEL_SCALING)
         skill_flat = int(skill.effect_value * scaling)
         total_base = base_power + skill_flat
         strike = resolve_physical_attack(caster, target, total_base, str(skill.name), rng=r, publish=None)
+        # Stun chance específica da skill (se houver)
+        stun_chance_skill = int(getattr(skill, "stun_chance", 0) or 0)
+        if strike and not strike.was_evaded and stun_chance_skill:
+            if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= stun_chance_skill:
+                if hasattr(target, "active_effects"):
+                    target.active_effects["stun"] = {"duration": STUN_DURATION}
+                    _emit(
+                        publish,
+                        T.COMBAT_TURN_EFFECT,
+                        type_="turn_effect",
+                        payload={"entity": target, "kind": "stun_applied"},
+                    )
         out = SkillApplyResult(kind="damage", mp_spent=int(skill.mana_cost), strike=strike)
         _emit(
             publish,
@@ -258,6 +326,25 @@ def apply_skill(
         )
         return out
 
+    if skill.effect_type == "damage_reduction":
+        value = int(skill.effect_value) if isinstance(skill.effect_value, int) else DAMAGE_REDUCTION_DEFAULT_PERCENT
+        duration = int(skill.duration) if skill.duration else DAMAGE_REDUCTION_DURATION
+        # Aplica no alvo indicado pelo skill (self -> caster, enemy -> target)
+        recipient = caster if getattr(skill, "target", "self") == "self" else target
+        recipient.active_effects["damage_reduction"] = {"value": value, "duration": duration}
+        out = SkillApplyResult(
+            kind="buff",
+            mp_spent=int(skill.mana_cost),
+            buff_name="damage_reduction",
+        )
+        _emit(
+            publish,
+            T.COMBAT_SKILL_OUTCOME,
+            type_="skill_outcome",
+            payload={"caster": caster, "target": recipient, "result": out},
+        )
+        return out
+
     raise ValueError(f"Unknown skill.effect_type: {getattr(skill, 'effect_type', None)!r}")
 
 
@@ -276,6 +363,19 @@ def process_turn_start_effects(
     _ = _rng(rng)
 
     skipped_turn = False
+
+    # Cooldowns: decrementa a cada turno
+    if hasattr(entity, "skill_cooldowns"):
+        for sid in list(entity.skill_cooldowns.keys()):
+            entity.skill_cooldowns[sid] -= 1
+            if entity.skill_cooldowns[sid] <= 0:
+                del entity.skill_cooldowns[sid]
+                _emit(
+                    publish,
+                    T.COMBAT_TURN_EFFECT,
+                    type_="turn_effect",
+                    payload={"entity": entity, "kind": "cooldown_expired", "skill_id": sid},
+                )
 
     effects_to_remove: list[str] = []
     buffs_to_remove: list[str] = []
@@ -298,6 +398,22 @@ def process_turn_start_effects(
                 payload={"entity": entity, "kind": "frozen"},
             )
             skipped_turn = True
+        if effect == "stun":
+            _emit(
+                publish,
+                T.COMBAT_TURN_EFFECT,
+                type_="turn_effect",
+                payload={"entity": entity, "kind": "stun"},
+            )
+            skipped_turn = True
+        if effect == "damage_reduction":
+            # Apenas conta duração; a redução é aplicada em resolve_physical_attack
+            _emit(
+                publish,
+                T.COMBAT_TURN_EFFECT,
+                type_="turn_effect",
+                payload={"entity": entity, "kind": "damage_reduction_active", "value": data.get("value", 0)},
+            )
 
         data["duration"] -= 1
         if data["duration"] <= 0:

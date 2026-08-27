@@ -83,6 +83,19 @@ class AutoTester:
             seq = ["s", "s", "ENTER"]
             return seq[self.metrics["actions"] % len(seq)]
 
+        # Skills em combate: respeita cooldown
+        if valid_keys and "0" in valid_keys and self.player_ref and hasattr(self.player_ref, "skill_cooldowns"):
+            # Detecta menu de skills (chaves são slots numéricos)
+            try:
+                skill_keys = [k for k in valid_keys if k != "0" and k.isdigit() and int(k) in self.player_ref.skills]
+                if skill_keys:
+                    available = [k for k in skill_keys if self.player_ref.skill_cooldowns.get(self.player_ref.skills[int(k)].id, 0) == 0]
+                    if available:
+                        return available[0]
+                    return "0"  # todas em cooldown, volta
+            except Exception:
+                pass
+
         if 'w' in valid_keys and self.current_map:
             return self.decide_map_move()
         elif '1' in valid_keys and '4' in valid_keys:

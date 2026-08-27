@@ -31,6 +31,8 @@ class SkillCard:
     chance: int
     rarity: str
     is_initial: bool
+    cooldown: int = 0
+    stun_chance: int = 0
 
 
 _SKILL_REGISTRY: dict[str, SkillCard] | None = None
@@ -42,7 +44,7 @@ def _get_registry() -> dict[str, SkillCard]:
     if _SKILL_REGISTRY is None:
         data = load_json("skills.json")
         _SKILL_REGISTRY = {
-            s["id"]: SkillCard(**{k: s[k] for k in SkillCard.__dataclass_fields__})
+            s["id"]: SkillCard(**{k: s.get(k, 0) for k in SkillCard.__dataclass_fields__})
             for s in data["skills"]
         }
     return _SKILL_REGISTRY

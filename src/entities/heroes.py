@@ -106,6 +106,7 @@ class Player(Entity):
         self.active_effects: dict[str, object] = {}
         self.active_buffs: dict[str, dict[str, object]] = {}
         self.passives: list[PassiveCard] = []
+        self.skill_cooldowns: dict[str, int] = {}
 
     def add_item_to_inventory(self, item: object) -> str | None:
         """Adiciona item ao inventário.
