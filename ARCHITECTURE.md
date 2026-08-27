@@ -25,7 +25,10 @@ ToJ/
 │
 ├── tests/                          # TESTES AUTOMATIZADOS
 │   ├── __init__.py
-│   └── auto_test.py                # AutoTester BFS para QA
+│   ├── auto_test.py                # AutoTester BFS para QA (mock de saves)
+│   ├── test_combat.py              # Testes de dano, XMULT cap, defesa, crítico
+│   ├── test_math_operations.py     # Testes de XP, moedas, multiplicador
+│   └── test_new_systems.py         # Testes de cooldown, damage_reduction, stun
 │
 ├── docs/                           # Documentação adicional
 │   └── GUIDE_PASSIVES.md           # Guia para criar novas passivas
@@ -86,16 +89,18 @@ ToJ/
     └── ui/                         # APRESENTAÇÃO — único local com rich / print / input
         ├── __init__.py
         ├── renderer.py             # Console Rich (único local com import rich)
-        ├── screens.py              # Telas de estado (Game Over, Inventário, Combate)
+        ├── screens.py              # Telas de estado (Game Over, Inventário, Combate, Eventos, Extração)
         ├── prompts.py              # Leitura de teclado (suporta W/S, setas, ENTER, ESC/Q)
         ├── toj_menu.py             # Menu principal, splash screen, game over
         ├── utils.py                # clear_screen() multiplataforma
         ├── combat_event_handlers.py # Handlers de eventos de combate (EventBus)
         ├── ui_event_handlers.py    # Handlers de eventos de UI (EventBus)
-        ├── inventory_flow.py       # Fluxo de interação do inventário
+        ├── inventory_flow.py       # Fluxo de interação do inventário (single-item corrigido)
         ├── shop_flow.py            # Fluxo de interação da loja
         ├── skill_flow.py           # Fluxo de escolha de skills
         ├── passive_flow.py         # Fluxo de escolha de passivas
+        ├── extraction_flow.py      # Fluxo de decisão de extração entre andares
+        ├── random_event_flow.py    # Fluxos de Mercador/Altar/Fonte (TASK-005)
         ├── navigation_menu.py      # Menus navegáveis com split view (3-4 painéis)
         └── combat_event_handlers.py # Handlers de eventos de combate
 ```
@@ -126,13 +131,15 @@ ui/ ←── engine/ ←── mechanics/ ←── entities/
 - `combat.physical_strike` — Ataque físico executado
 - `combat.skill_outcome` — Resultado de skill (dano, heal, status)
 - `combat.skill_cast` — Skill foi usada
-- `combat.turn_effect` — Efeito por turno (poison, frozen, etc.)
+- `combat.turn_effect` — Efeito por turno (poison, frozen, stun, damage_reduction, etc.)
 - `combat.flee_result` — Resultado de fuga
 
 **Eventos de UI:**
 - `ui.open_inventory` — Abrir inventário
-- `ui.open_shop` — Abrir loja
+- `ui.open_shop` — Abrir loja (sempre antes da extração)
 - `ui.open_passives` — Abrir seleção de passivas
+- `ui.random_event` — Evento aleatório de masmorra (Mercador/Altar/Fonte, 25%)
+- `ui.extraction_prompt` — Decisão Extrair vs Continuar entre andares
 - `ui.game_over` — Tela de game over
 - `ui.save_success` — Salvamento bem-sucedido
 

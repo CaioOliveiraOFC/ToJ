@@ -88,14 +88,16 @@ para a run e, se o personagem for extraído com sucesso, vão com ele para a Are
 - Ao atingir certos níveis (ex: 10, 20), o personagem aprende novas habilidades
   automaticamente conforme a tabela da classe.
 - O personagem sempre carrega **exatamente 4 habilidades equipadas** por vez.
-- Em combate, as habilidades consomem recursos (MP, cooldowns).
+- Em combate, as habilidades consomem recursos (MP + cooldowns por skill via `skills.json`: Common 1-2, Rare 3, Epic 3, Legendary 4-5 turnos).
 
 ---
 
 ## Combate Tático (MiniXadrez)
 
 ### Recursos Gerenciados a Cada Turno
-- **Cooldowns:** Habilidades têm tempo de recarga em turnos. Sem spam.
+- **Cooldowns:** Habilidades têm tempo de recarga em turnos (definido por skill em `skills.json`, exibido na UI). Sem spam.
+- **Redução de dano:** Status temporário `damage_reduction` reduz dano recebido por N turnos.
+- **Atordoamento (stun):** Chance de fazer o alvo perder o próximo turno (ex: Esmagar 30%).
 - **Iniciativa dinâmica:** A ordem dos turnos muda conforme ações (velocidade,
   atordoamento, surpresa). O herói NEM SEMPRE começa atacando.
 
@@ -116,11 +118,9 @@ para a run e, se o personagem for extraído com sucesso, vão com ele para a Are
 - Ao entrar em um andar, o multiplicador de Essência daquele andar é exibido.
 - O jogador caminha pelo andar e encontra salas aleatoriamente:
   - **Combate:** encontro com 1 ou mais monstros.
-  - **Evento Aleatório:** Mercador Errante, Altar de Sacrifício, Fonte de Cura,
-    Armadilha (a implementar).
+  - **Evento Aleatório (25% ao entrar no andar, antes da extração):** Mercador Errante (1-3 itens raros com desconto), Altar (sacrifica 30% HP por buff) ou Fonte (cura 50% HP + poção), via EventBus.
   - **Boss:** a cada N andares, uma luta mais difícil com recompensa especial.
-- Entre um andar e outro, o jogador pode optar por **sair da masmorra** e salvar
-  o personagem para a Arena.
+- Entre um andar e outro, o jogador vê a **loja** do andar e em seguida decide **Extrair** (preserva save pós-loja) ou **Continuar** (avança).
 
 ---
 
@@ -251,20 +251,25 @@ Uma feature está pronta quando:
 | Item | Status |
 |------|--------|
 | Painel de efeitos ativos (condicional) | ✅ Implementado |
-| Scroll inteligente ao remover item | 🔲 Pendente |
-| Mensagem de feedback pós-ação sem sair dos painéis | 🔲 Pendente |
+| Scroll inteligente ao remover item | ✅ Corrigido (inventário single-item) |
+| Mensagem de feedback pós-ação sem sair dos painéis | ✅ Corrigido (feedback permanece visível) |
 | Equipamento inicial por classe | 🔲 Pendente |
 | 4 habilidades iniciais (corrigir bug) | 🔲 Pendente |
-| Sistema de cooldown de habilidades | 🔲 Pendente |
+| Sistema de cooldown de habilidades | ✅ Implementado (cooldown por skill via JSON) |
 
 ### Futuro (Tarefas do TASK.md)
-- **TASK-004:** 10 slots de personagens + permadeath + Troféu de Fracasso
-- **TASK-005:** Eventos aleatórios na masmorra (Mercador, Altar, Fonte, Armadilha)
-- **TASK-006:** Cooldowns + redução de dano + stun em combate
-- **TASK-007:** Saída da masmorra (extração) entre andares
-- Arena PvP (tiers, matchmaking, ranking por Elo)
+- **TASK-004:** 10 slots de personagens + permadeath + Troféu de Fracasso — ✅ Concluída
+- **TASK-005:** Eventos aleatórios na masmorra (Mercador, Altar, Fonte) — ✅ Concluída (25%)
+- **TASK-006:** Cooldowns + redução de dano + stun em combate — ✅ Concluída
+- **TASK-007:** Saída da masmorra (extração) entre andares — ✅ Concluída
+- Arena PvP (tiers, matchmaking, ranking por Elo) — 🔲 Único pendente
 
 ### Itens Concluídos
 - Sistema de Passivas ✅
 - Skills reimaginadas (data-driven JSON) ✅
 - Loja, itens e inventário ✅
+- AutoTester isolado dos saves + single-item equip corrigido ✅
+- Extração entre andares (preserva save pós-loja) ✅
+- Eventos aleatórios (Mercador/Altar/Fonte) ✅
+- Combate: cooldown, damage_reduction, stun ✅
+- Tag Rich do multiplicador corrigida (`Text.from_markup`) ✅

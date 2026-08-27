@@ -424,17 +424,17 @@ Reseta ao fim do combate
 
 12. Estado Atual e Pendências
 12.1 Implementado
-✅ Sistema de passivas com escolha a cada level up
+✅ Sistema de passivas com escolha a cada level up (29 passivas)
 
-✅ Sistema de skills com JSON (41 skills)
+✅ Sistema de skills com JSON (41 skills com cooldown)
 
-✅ Balanceamento de combate (4 etapas)
+✅ Balanceamento de combate (4 etapas) + cooldown, damage_reduction, stun
 
 ✅ Itens data-driven (121 itens)
 
-✅ Loja com progressão por andar e reroll 100%
+✅ Loja com progressão por andar e reroll 100% + Mercador Errante (evento)
 
-✅ Inventário com 3 painéis (lista + detalhes + status)
+✅ Inventário com 3 painéis (lista + detalhes + status) — single-item equip corrigido
 
 ✅ Menu navegável com W/S/ENTER/ESC
 
@@ -446,23 +446,21 @@ Reseta ao fim do combate
 
 ✅ Correção de HP/MP com proporção em passivas
 
+✅ 10 slots + permadeath + Troféu de Fracasso (TASK-004)
+
+✅ Eventos aleatórios Mercador/Altar/Fonte com 25% (TASK-005)
+
+✅ Extração entre andares preservando save pós-loja (TASK-007)
+
+✅ AutoTester isolado dos saves + tag Rich do multiplicador corrigida
+
 12.2 Pendências Técnicas (do roadmap)
-🟡 Scroll inteligente ao remover item
-
-🟡 Mensagem de feedback pós-ação sem sair dos painéis
-
 🟡 Equipamento inicial por classe (Weapon Common + Body Common)
 
 🟡 4 habilidades iniciais (corrigir bug - atualmente adiciona apenas 1)
 
-🟡 Sistema de cooldown de habilidades
-
 12.3 Futuro
-🟢 TASK-003: 10 slots de heróis + permadeath + Troféu de Fracasso
-
-🟢 Arena (PvP)
-
-🟢 Status effects complexos (taunt, mana_burn, sleep, etc.)
+🟢 Arena (PvP) — único pendente
 
 🟢 Mais itens e variedade de builds
 

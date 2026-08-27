@@ -1,6 +1,6 @@
 # ⚔️ Tales of the Journey (ToJ)
 
-RPG de masmorra terminal-based hardcore com exploração procedural e combate tático por turnos. O jogo conta com sistema de extração — o jogador pode sair da masmorra a qualquer momento para salvar seu progresso. No futuro, a extração será expandida com mais opções e recompensas.
+RPG de masmorra terminal-based hardcore com exploração procedural e combate tático por turnos. O jogo conta com sistema de extração — o jogador pode sair da masmorra entre andares para salvar seu progresso, além de eventos aleatórios e combate com cooldowns.
 
 ---
 
@@ -12,14 +12,14 @@ RPG de masmorra terminal-based hardcore com exploração procedural e combate t�
 
 ## ✨ Funcionalidades Atuais
 
-- RPG de masmorra terminal-based hardcore com exploração procedural e combate tático por turnos com extração; no futuro vai ter extração
+- RPG de masmorra terminal-based hardcore com exploração procedural e combate tático por turnos com extração entre andares
 - 3 classes: Guerreiro, Mago, Ladino (stats e habilidades únicas)
 - Masmorras procedurais infinitas com multiplicador de Essência variável (0.5x a 3.0x)
-- Combate tático por turnos com iniciativa dinâmica, crítico, esquiva e itens/habilidades
-- 100+ cartas passivas permanentes em 4 raridades (Comum → Lendário)
-- 4 habilidades ativas por classe com custo de MP
-- Sistema de loja, drops de itens (armas, armaduras, poções)
-- Save/Load via JSON
+- Combate tático por turnos com iniciativa dinâmica, crítico, esquiva, cooldowns, atordoamento e redução de dano
+- 29 cartas passivas permanentes em 4 raridades (Comum → Lendário)
+- 41 skills com custo de MP e cooldowns por raridade
+- Sistema de loja, drops de itens (armas, armaduras, poções) e eventos aleatórios (Mercador, Altar, Fonte)
+- Save/Load via JSON com 10 slots + permadeath e Troféu de Fracasso
 - Arquitetura orientada a eventos (EventBus) para fácil manutenção
 
 ## 🚀 Instalação e Execução
@@ -72,19 +72,19 @@ ToJ/
 - `ARCHITECTURE.md` — Mapa completo do código
 - `GAME_DESING.md` — Design do jogo
 - `docs/GUIDE_PASSIVES.md` — Guia de passivas
-- `TASK.md` — Rastreador de tarefas (TASK-004 concluída: slots de personagem + permadeath + Troféu de Fracasso)
+- `TASK.md` — Rastreador de tarefas (TASK-007 concluída: extração entre andares — todas as tasks 004-007 concluídas)
 
 ## 🗺️ Roadmap
 
-- ✅ Sistema de Passivas (Concluído)
-- ✅ Skills Reimaginadas (Pronta)
-- ✅ Loja, Itens e Inventário (Concluído)
-- ✅ Teste Automatizado com Bot BFS (AutoTester — tests/auto_test.py)
+- ✅ Sistema de Passivas (Concluído — 29 passivas)
+- ✅ Skills Reimaginadas (Concluída — 41 skills com cooldown)
+- ✅ Loja, Itens e Inventário (Concluído — single-item equip corrigido)
+- ✅ Teste Automatizado com Bot BFS (AutoTester — tests/auto_test.py, mock de saves)
 - ✅ 10 slots de personagens + permadeath + Troféu de Fracasso (TASK-004)
-- 🔲 Eventos aleatórios na masmorra (TASK-005)
-- 🔲 Cooldowns + redução de dano + stun (TASK-006)
-- 🔲 Saída da masmorra (extração) (TASK-007)
-- 🔲 Arena PvP
+- ✅ Eventos aleatórios na masmorra (TASK-005 — 25% Mercador/Altar/Fonte)
+- ✅ Cooldowns + redução de dano + stun (TASK-006 — cooldown por skill, status temporários)
+- ✅ Saída da masmorra (extração) entre andares (TASK-007 — preserva save pós-loja)
+- 🔲 Arena PvP (único pendente — tiers, matchmaking, ranking por Elo)
 
 ## 📊 Métricas de Sucesso
 
