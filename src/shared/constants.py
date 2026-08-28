@@ -176,3 +176,11 @@ STUN_DURATION = 1  # turnos perdidos quando atordoado
 STUN_CHANCE_DEFAULT = 15  # % base para aplicar stun em ações com stun
 DAMAGE_REDUCTION_DURATION = 3  # turnos que dura a redução de dano
 DAMAGE_REDUCTION_DEFAULT_PERCENT = 30  # % de dano reduzido
+
+# --- Correção de balanceamento (auditoria PROMPT 3) ---
+# Mini-boss coin agora tem base/escala dedicadas (antes reusava monster*3)
+MINI_BOSS_BASE_COIN_REWARD = 80
+MINI_BOSS_COIN_SCALING_PER_LEVEL = 15
+# Essência com progressão suave por andar
+ESSENCE_MULT_LEVEL_BONUS = 0.02  # +0.02 de média por andar
+ESSENCE_MULT_MAX_BONUS = 0.4  # teto do bônus acumulado

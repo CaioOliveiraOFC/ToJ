@@ -28,6 +28,7 @@ from src.mechanics.math_operations import (
     calculate_mini_boss_xp_reward,
     calculate_monster_coin_reward,
     calculate_monster_xp_reward,
+    estimate_next_essence_multiplier,
     generate_essence_multiplier,
 )
 from src.shared import combat_topics as topics
@@ -551,7 +552,7 @@ def start_game(
 
         # Gerar novo multiplicador apenas ao criar novo andar (não ao carregar)
         if not (initial_map_state and dungeon_level == start_level):
-            essence_multiplier = generate_essence_multiplier()
+            essence_multiplier = generate_essence_multiplier(dungeon_level)
 
         while True:
             _render_dungeon_screen(player, dungeon_level, game_map, essence_multiplier)
@@ -589,11 +590,13 @@ def start_game(
                 # no slot atual via save_game (xp/level/passivas/coins/inventário
                 # já com o resultado da loja) e encerrar a run. Continuar mantém
                 # o fluxo histórico.
+                next_estimate = estimate_next_essence_multiplier(dungeon_level)
                 decision: dict[str, str | None] = {"choice": None}
                 _get_game_publish()(topics.UI_EXTRACTION_PROMPT, {
                     "player": player,
                     "dungeon_level": dungeon_level,
-                    "essence_multiplier": essence_multiplier,
+                    "essence_multiplier": next_estimate,
+                    "is_estimate": True,
                     "result": decision,
                     "slot": slot,
                 })

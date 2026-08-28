@@ -128,20 +128,21 @@ class TestMiniBossStatsAndRewards:
     def test_valores_pinned(self, func, base, scaling, dungeon, expected):
         assert func(dungeon) == expected
 
-    def test_mini_boss_coin_usa_composicao_com_monstro(self):
-        # SUSPEITO (assimetria de duplicação): o XP do mini-boss tem constantes
-        # próprias (MINI_BOSS_BASE_XP_REWARD/SCALING), mas a MOEDA reusa a fórmula
-        # de monstro comum deslocada de +2 níveis e multiplica por 3. Duas vias
-        # diferentes para recompensas irmãs — se um dia mudar o scaling de moeda
-        # de monstro, o mini-boss muda junto, provavelmente sem intenção.
-        assert mo.calculate_mini_boss_coin_reward(1) == mo.calculate_monster_coin_reward(3) * 3
-        assert mo.calculate_mini_boss_coin_reward(10) == mo.calculate_monster_coin_reward(12) * 3
+    def test_mini_boss_coin_usa_formula_dedicada(self):
+        # Corrigido: mini-boss agora tem base/escala próprias (80 +15), consistente
+        # com XP (120 +25), mantendo proporção sem reversão. Não deve ser
+        # simplesmente monster*3.
+        assert mo.calculate_mini_boss_coin_reward(1) == 80 + 2 * 15  # 110
+        assert mo.calculate_mini_boss_coin_reward(10) == 80 + 11 * 15  # 245
+        # Ainda mais recompensador que monstro no mesmo nível efetivo
+        assert mo.calculate_mini_boss_coin_reward(1) > mo.calculate_monster_coin_reward(3)
+        assert mo.calculate_mini_boss_coin_reward(10) > mo.calculate_monster_coin_reward(12)
 
     @pytest.mark.parametrize(
         "dungeon,expected",
         [
-            (1, 150),  # coin(3)=50 * 3
-            (10, 420),  # coin(12)=140 * 3
+            (1, 110),  # 80 + 2*15
+            (10, 245),  # 80 + 11*15
         ],
     )
     def test_mini_boss_coin_valores_pinned(self, dungeon, expected):
@@ -149,10 +150,8 @@ class TestMiniBossStatsAndRewards:
 
 
 # --------------------------------------------------- generate_essence_multiplier
-#
-# NOTA DE AUDITORIA (design): a docstring diz "para o andar", mas a função NÃO
-# recebe dungeon_level — é RNG pura por chamada. O teste cobre 3 seeds distintas;
-# amarrar o multiplicador ao andar exigiria mudança na assinatura (fora de escopo).
+# Corrigido: agora recebe dungeon_level e a média sobe 0.02 por andar (teto +0.4),
+# dando progressão suave. A UI de extração mostra estimativa do próximo andar.
 
 
 class TestGenerateEssenceMultiplier:
@@ -164,19 +163,34 @@ class TestGenerateEssenceMultiplier:
             (42, 1.1),
         ],
     )
-    def test_seeds_fixas_valores_pinned(self, seed, expected):
+    def test_seeds_fixas_valores_pinned_nivel_1(self, seed, expected):
         random.seed(seed)
-        assert mo.generate_essence_multiplier() == expected
+        assert mo.generate_essence_multiplier(1) == expected
 
     @pytest.mark.parametrize("seed", [0, 7, 42, 123])
     def test_sempre_dentro_dos_limites_do_design(self, seed):
         random.seed(seed)
-        value = mo.generate_essence_multiplier()
+        value = mo.generate_essence_multiplier(1)
         assert 0.5 <= value <= 3.0
         assert round(value, 1) == value
 
-    def test_replicacao_gauss_confere_valor_exato(self):
+    def test_replicacao_gauss_confere_valor_exato_nivel_1(self):
         random.seed(0)
         expected_raw = max(0.5, min(3.0, random.gauss(1.2, 0.5)))
         random.seed(0)
-        assert mo.generate_essence_multiplier() == round(expected_raw, 1)
+        assert mo.generate_essence_multiplier(1) == round(expected_raw, 1)
+
+    def test_progressao_com_andar_aumenta_media(self):
+        # Média em andar 20 deve ser maior que no andar 1 (0.02*19=0.38 de bônus)
+        random.seed(0)
+        v1 = mo.generate_essence_multiplier(1)
+        random.seed(0)
+        v20 = mo.generate_essence_multiplier(20)
+        # Com mesma seed, o valor roll é o mesmo gauss, mas a média é maior, então v20 >= v1
+        assert v20 >= v1
+
+    def test_estimativa_proximo_andar(self):
+        # Estimativa para o próximo andar é a média esperada, sem sortear
+        assert mo.estimate_next_essence_multiplier(1) == 1.2  # 1.2 + 0.02
+        assert mo.estimate_next_essence_multiplier(10) == 1.4  # 1.2 + 0.20
+        assert mo.estimate_next_essence_multiplier(30) == 1.6  # teto +0.4
