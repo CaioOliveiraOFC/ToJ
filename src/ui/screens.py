@@ -354,6 +354,54 @@ def render_shop_farewell() -> None:
     sleep(0.8)
 
 
+def render_shop_equip_prompt(item_name: str, slot: str, bonus_text: str) -> None:
+    """Prompt interativo para equipar direto da loja quando slot vazio."""
+    slot_names = {
+        "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
+        "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
+        "Amulet": "Amuleto", "Ring": "Anel",
+    }
+    slot_label = slot_names.get(slot, slot)
+    body = Text(justify="center")
+    body.append(f"Slot {slot_label} está vazio!\n", style="bold green")
+    body.append(f"Equipar {item_name} agora te dá ", style="white")
+    body.append(f"{bonus_text}", style="bold green")
+    body.append(" sem perder nada.\n\n", style="white")
+    body.append("Deseja equipar agora?\n", style="yellow")
+    body.append("[S] Sim  |  [N] Não (fica na mochila)", style="dim")
+    renderer.console.print(Panel(body, border_style="green", title="Equipar agora?"))
+
+
+def render_shop_equip_success(item_name: str, slot: str) -> None:
+    slot_names = {
+        "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
+        "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
+        "Amulet": "Amuleto", "Ring": "Anel",
+    }
+    slot_label = slot_names.get(slot, slot)
+    renderer.console.print(Panel(
+        Text(f"{item_name} equipado em {slot_label}! Bônus aplicado.", justify="center", style="bold green"),
+        border_style="green",
+    ))
+    sleep(0.8)
+
+
+def render_shop_equip_failed(msg: str) -> None:
+    renderer.console.print(Panel(
+        Text(f"Não foi possível equipar: {msg}", justify="center", style="red"),
+        border_style="red",
+    ))
+    sleep(0.8)
+
+
+def render_shop_kept_in_inventory(item_name: str) -> None:
+    renderer.console.print(Panel(
+        Text(f"{item_name} guardado na mochila. Equipe quando quiser via inventário (I).", justify="center", style="dim"),
+        border_style="dim",
+    ))
+    sleep(0.6)
+
+
 # =============================================================================
 # INVENTÁRIO - Funções puras de renderização
 # =============================================================================

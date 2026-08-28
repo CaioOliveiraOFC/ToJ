@@ -52,10 +52,40 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
         price = chosen_item_data["price"]
 
         if player.coins >= price:
+            # Verifica se slot está vazio antes da compra para oferecer equipar
+            slot = getattr(item_to_buy, "slot", None)
+            was_empty = False
+            if slot and hasattr(player, "equipment"):
+                was_empty = player.equipment.get(slot) is None
             if shop.buy_item(player, item_to_buy, dungeon_level):
                 screens.render_shop_purchase_success(item_to_buy.name, price)
                 # Remove o item da lista (não rerrola, mantém os outros)
                 items_for_sale.pop(selected_idx)
+                # Oferece equipar diretamente se slot estava vazio — puro benefício
+                if was_empty and slot:
+                    # Mostra detalhe do benefício antes de perguntar
+                    bonus_dmg = getattr(item_to_buy, "damage_bonus", 0)
+                    bonus_def = getattr(item_to_buy, "defense_bonus", 0)
+                    bonus_str = []
+                    if bonus_dmg:
+                        bonus_str.append(f"+{bonus_dmg} Dano")
+                    if bonus_def:
+                        bonus_str.append(f"+{bonus_def} Defesa")
+                    effect = getattr(item_to_buy, "effect_type", None)
+                    eff_val = getattr(item_to_buy, "effect_value", 0)
+                    if effect and eff_val:
+                        bonus_str.append(f"{effect} +{eff_val}")
+                    bonus_text = ", ".join(bonus_str) if bonus_str else "benefícios"
+                    screens.render_shop_equip_prompt(item_to_buy.name, slot, bonus_text)
+                    equip_choice = get_key()
+                    if equip_choice and equip_choice.lower() in ("s", "y", "1", "e"):
+                        msg = player.equip(item_to_buy)
+                        if "não pode" not in str(msg).lower():
+                            screens.render_shop_equip_success(item_to_buy.name, slot)
+                        else:
+                            screens.render_shop_equip_failed(msg)
+                    else:
+                        screens.render_shop_kept_in_inventory(item_to_buy.name)
         else:
             screens.render_shop_insufficient_gold()
 

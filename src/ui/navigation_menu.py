@@ -194,7 +194,7 @@ def navigate_shop_buy(
     current_page = 0
     
     def build_item_details(item) -> str:
-        """Constrói o conteúdo do painel de detalhes."""
+        """Constrói o conteúdo do painel de detalhes — com destaque para slot vazio."""
         content = f"[bold]Nome:[/bold] {escape_markup(item.name)}\n\n"
         content += f"[bold]Descrição:[/bold]\n{escape_markup(item.description)}\n\n"
         
@@ -204,15 +204,35 @@ def navigate_shop_buy(
         damage = getattr(item, "damage_bonus", 0)
         defense = getattr(item, "defense_bonus", 0)
         
-        if damage > 0:
-            content += f"[bold]Dano:[/bold] +{damage}\n"
-        if defense > 0:
-            content += f"[bold]Defesa:[/bold] +{defense}\n"
+        # Destaque especial quando slot está vazio — puro benefício
+        equipped_in_slot = player.equipment.get(slot_name) if hasattr(player, "equipment") and slot_name != "Unknown" else None
+        is_slot_empty = equipped_in_slot is None and slot_name != "Unknown"
+        
+        if is_slot_empty and (damage > 0 or defense > 0):
+            content += "[bold green]★ Slot vazio — puro benefício ao equipar![/bold green]\n"
+            if damage > 0:
+                content += f"[bold]Dano:[/bold] [green]+{damage} (sem perda)[/green]\n"
+            if defense > 0:
+                content += f"[bold]Defesa:[/bold] [green]+{defense} (sem perda)[/green]\n"
+        else:
+            if damage > 0:
+                content += f"[bold]Dano:[/bold] +{damage}\n"
+            if defense > 0:
+                content += f"[bold]Defesa:[/bold] +{defense}\n"
+            if equipped_in_slot and (damage > 0 or defense > 0):
+                # Mostra comparativo mesmo na loja quando slot ocupado
+                equip_dmg = getattr(equipped_in_slot, "damage_bonus", 0)
+                equip_def = getattr(equipped_in_slot, "defense_bonus", 0)
+                if damage != equip_dmg or defense != equip_def:
+                    content += f"[dim]Equipado: {escape_markup(equipped_in_slot.name)} (Dano +{equip_dmg}, Defesa +{equip_def})[/dim]\n"
         
         effect_type = getattr(item, "effect_type", None)
         effect_value = getattr(item, "effect_value", 0)
         if effect_type and effect_value:
-            content += f"[bold]Efeito:[/bold] {effect_type} +{effect_value}\n"
+            if is_slot_empty:
+                content += f"[bold]Efeito:[/bold] [green]{effect_type} +{effect_value} (puro benefício)[/green]\n"
+            else:
+                content += f"[bold]Efeito:[/bold] {effect_type} +{effect_value}\n"
         
         rarity = getattr(item, "rarity", "Common")
         content += f"[bold]Raridade:[/bold] {rarity}\n"
@@ -223,6 +243,9 @@ def navigate_shop_buy(
         else:
             classes_str = "Todas"
         content += f"[bold]Classes:[/bold] {classes_str}\n"
+        price = next((d["price"] for d in items if d["item"] == item), 0)
+        if price:
+            content += f"[bold]Preço:[/bold] {price} ouro\n"
         
         return content
     
