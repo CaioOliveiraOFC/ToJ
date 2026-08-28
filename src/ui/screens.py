@@ -197,7 +197,7 @@ def render_post_battle(
 # =============================================================================
 
 
-def render_shop_main(shop: object, player_coins: int) -> None:
+def render_shop_main(shop: object, player_coins: int, has_equipable: bool = False) -> None:
     """Renderiza a tela principal da loja."""
 
     renderer.console.clear()
@@ -209,7 +209,10 @@ def render_shop_main(shop: object, player_coins: int) -> None:
         )
     )
 
-    shop_options = {"1": "Comprar Itens", "2": "Vender Itens", "3": "Sair da Loja"}
+    if has_equipable:
+        shop_options = {"1": "Comprar Itens", "2": "Vender Itens", "3": "Equipar da Mochila", "4": "Sair da Loja"}
+    else:
+        shop_options = {"1": "Comprar Itens", "2": "Vender Itens", "3": "Sair da Loja"}
 
     options_table = Table(show_header=False, expand=True, highlight=True, row_styles=["none", "dim"])
     options_table.add_column("Opção", style="bold blue", justify="right")
@@ -370,6 +373,121 @@ def render_shop_equip_prompt(item_name: str, slot: str, bonus_text: str) -> None
     body.append("Deseja equipar agora?\n", style="yellow")
     body.append("[S] Sim  |  [N] Não (fica na mochila)", style="dim")
     renderer.console.print(Panel(body, border_style="green", title="Equipar agora?"))
+
+
+def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
+    """Mostra comparação simples antigo vs novo ao trocar na loja."""
+    slot_names = {
+        "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
+        "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
+        "Amulet": "Amuleto", "Ring": "Anel",
+    }
+    slot_label = slot_names.get(slot, slot)
+    renderer.console.print(Panel(
+        Text(f"Trocar equipamento — {slot_label}", justify="center", style="bold yellow"),
+        border_style="yellow",
+    ))
+    table = Table(show_header=True, expand=True, border_style="dim white")
+    table.add_column("Atributo", style="bold white")
+    table.add_column("Equipado", style="cyan", justify="center")
+    table.add_column("Novo", style="green", justify="center")
+    table.add_column("Diferença", style="yellow", justify="center")
+
+    def _fmt(v):
+        return str(v) if v else "—"
+
+    attrs = []
+    ndmg = getattr(new_item, "damage_bonus", 0)
+    odmg = getattr(old_item, "damage_bonus", 0)
+    if ndmg or odmg:
+        attrs.append(("Dano", odmg, ndmg))
+    ndef = getattr(new_item, "defense_bonus", 0)
+    odef = getattr(old_item, "defense_bonus", 0)
+    if ndef or odef:
+        attrs.append(("Defesa", odef, ndef))
+    neff = getattr(new_item, "effect_type", None)
+    oeff = getattr(old_item, "effect_type", None)
+    neffv = getattr(new_item, "effect_value", 0)
+    oeffv = getattr(old_item, "effect_value", 0)
+    if neff or oeff:
+        # efeito como linha única se tipos iguais, senão duas linhas
+        if neff == oeff and neff:
+            diff = neffv - oeffv
+            diff_str = f"{diff:+d}" if diff else "="
+            table.add_row(f"Efeito ({neff})", str(oeffv), str(neffv), diff_str)
+        else:
+            if oeff:
+                table.add_row(f"Efeito ({oeff})", str(oeffv), "—", "—")
+            if neff:
+                table.add_row(f"Efeito ({neff})", "—", str(neffv), "—")
+    for label, old_v, new_v in attrs:
+        diff = new_v - old_v
+        if diff > 0:
+            diff_str = f"[green]+{diff}[/green]"
+        elif diff < 0:
+            diff_str = f"[red]{diff}[/red]"
+        else:
+            diff_str = "[yellow]=[/yellow]"
+        # usar Text para valores, mas tabela aceita markup via Text.from_markup? Mantém simples
+        table.add_row(label, _fmt(old_v), _fmt(new_v), diff_str)
+
+    if not attrs and not (neff or oeff):
+        table.add_row("Bônus", "—", "—", "[yellow]=[/yellow]")
+
+    renderer.console.print(table)
+    # Resumo
+    total_new = getattr(new_item, "damage_bonus", 0) + getattr(new_item, "defense_bonus", 0)
+    total_old = getattr(old_item, "damage_bonus", 0) + getattr(old_item, "defense_bonus", 0)
+    if total_new > total_old:
+        resumo = "[bold green]▲ Upgrade geral[/bold green]"
+    elif total_new < total_old:
+        resumo = "[bold red]▼ Downgrade geral[/bold red]"
+    else:
+        resumo = "[bold yellow]● Equivalente[/bold yellow] — escolha por efeito/raridade"
+    renderer.console.print(Panel(
+        Text.from_markup(f"Equipado: {old_item.name}\nNovo: {new_item.name}\n{resumo}\n\n[S] Equipar agora  |  [N] Manter na mochila", justify="center"),
+        border_style="cyan",
+        title="Equipar?",
+    ))
+
+
+def render_shop_old_sell_prompt(old_item_name: str, sell_price: int, slot: str) -> None:
+    """Pergunta se deseja vender/descartar o item antigo após troca."""
+    slot_names = {
+        "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
+        "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
+        "Amulet": "Amuleto", "Ring": "Anel",
+    }
+    label = slot_names.get(slot, slot)
+    body = Text(justify="center")
+    body.append(f"{old_item_name} foi para a mochila (slot {label}).\n", style="white")
+    body.append(f"Vender agora por {sell_price} ouro?\n\n", style="bold yellow")
+    body.append("[S] Vender  |  [D] Descartar  |  [N] Manter na mochila", style="dim")
+    renderer.console.print(Panel(body, border_style="yellow", title="O que fazer com o antigo?"))
+
+
+def render_shop_old_discarded(item_name: str) -> None:
+    renderer.console.print(Panel(
+        Text(f"{item_name} descartado.", justify="center", style="dim"),
+        border_style="dim",
+    ))
+    sleep(0.6)
+
+
+def render_shop_old_kept(item_name: str) -> None:
+    renderer.console.print(Panel(
+        Text(f"{item_name} mantido na mochila.", justify="center", style="dim"),
+        border_style="dim",
+    ))
+    sleep(0.6)
+
+
+def render_shop_equip_inventory_empty() -> None:
+    renderer.console.print(Panel(
+        Text("Nenhum item equipável na mochila.", justify="center", style="dim white"),
+        border_style="dim white",
+    ))
+    sleep(0.8)
 
 
 def render_shop_equip_success(item_name: str, slot: str) -> None:
