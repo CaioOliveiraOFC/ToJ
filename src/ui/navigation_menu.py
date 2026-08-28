@@ -434,65 +434,129 @@ def navigate_inventory(
     feedback_message = ""
     pending_action = None  # For Epic+ confirmation
     
-    def build_item_details(item, equipped_in_slot=None) -> str:
-        """Constrói o conteúdo do painel de detalhes do item."""
-        content = f"[bold]Nome:[/bold] {escape_markup(item.name)}\n\n"
-        content += f"[bold]Descrição:[/bold]\n{escape_markup(item.description)}\n\n"
+    def build_item_details(item, equipped_in_slot=None, quantity: int = 1) -> str:
+        """Constrói o conteúdo do painel de detalhes do item — comparativo rico."""
+        # Cores por raridade para o nome
+        rarity = getattr(item, "rarity", "Common")
+        rarity_color = {"Common": "white", "Rare": "cyan", "Epic": "magenta", "Legendary": "yellow"}.get(rarity, "white")
+        content = f"[bold {rarity_color}]{escape_markup(item.name)}[/bold {rarity_color}]  [dim][{rarity}][/dim]\n"
+        content += f"[dim]{escape_markup(item.description)}[/dim]\n\n"
         
         slot_name = getattr(item, "slot", "Unknown")
-        content += f"[bold]Tipo:[/bold] {slot_name}\n"
+        content += f"[bold]Tipo:[/bold] {slot_name}"
+        if quantity > 1:
+            content += f"  [yellow]x{quantity} no inventário[/yellow]"
+        content += "\n"
+        content += f"[dim]{'-'*30}[/dim]\n"
         
         damage = getattr(item, "damage_bonus", 0)
         defense = getattr(item, "defense_bonus", 0)
+        price = getattr(item, "price", 0)
+        sell_price = int(price * 0.5) if price else 0
         
         is_equippable = slot_name != "Unknown"
         is_usable = getattr(item, "is_usable", False)
         
-        # Comparison with equipped
+        # Preço sempre visível no inventário
+        if price:
+            content += f"[bold]Valor:[/bold] {price} ouro  [dim](venda: {sell_price}o)[/dim]\n"
+        
+        # Comparativo rico quando há item equipado no mesmo slot
         if equipped_in_slot:
-            content += "[bold cyan]Ao equipar:[/bold cyan]\n"
+            content += "\n[bold cyan]► Comparativo com equipado:[/bold cyan]\n"
+            content += f"  [dim]Equipado: {escape_markup(equipped_in_slot.name)}[/dim]\n"
             equip_damage = getattr(equipped_in_slot, "damage_bonus", 0)
             equip_defense = getattr(equipped_in_slot, "defense_bonus", 0)
+            equip_effect = getattr(equipped_in_slot, "effect_type", None)
+            equip_eff_val = getattr(equipped_in_slot, "effect_value", 0)
             
-            if damage > 0:
+            has_any_diff = False
+            # Dano
+            if damage != 0 or equip_damage != 0:
                 diff = damage - equip_damage
-                arrow = "↑" if diff > 0 else "↓" if diff < 0 else "="
-                color = "green" if diff > 0 else "red" if diff < 0 else "white"
-                content += f"[bold]Dano:[/bold] +{damage} [{color}]{arrow} {abs(diff)}[/{color}] (atual:+{equip_damage})\n"
-            if defense > 0:
+                if diff > 0:
+                    content += f"  Dano: [green]↑ +{diff}[/green]  ({equip_damage} -> {damage})\n"
+                    has_any_diff = True
+                elif diff < 0:
+                    content += f"  Dano: [red]↓ {diff}[/red]  ({equip_damage} -> {damage})\n"
+                    has_any_diff = True
+                else:
+                    content += f"  Dano: [yellow]= Igual (0)[/yellow]  ({damage})\n"
+            # Defesa
+            if defense != 0 or equip_defense != 0:
                 diff = defense - equip_defense
-                arrow = "↑" if diff > 0 else "↓" if diff < 0 else "="
-                color = "green" if diff > 0 else "red" if diff < 0 else "white"
-                content += f"[bold]Defesa:[/bold] +{defense} [{color}]{arrow} {abs(diff)}[/{color}] (atual:+{equip_defense})\n"
+                if diff > 0:
+                    content += f"  Defesa: [green]↑ +{diff}[/green]  ({equip_defense} -> {defense})\n"
+                    has_any_diff = True
+                elif diff < 0:
+                    content += f"  Defesa: [red]↓ {diff}[/red]  ({equip_defense} -> {defense})\n"
+                    has_any_diff = True
+                else:
+                    content += f"  Defesa: [yellow]= Igual (0)[/yellow]  ({defense})\n"
+            # Efeito
+            effect_type = getattr(item, "effect_type", None)
+            effect_value = getattr(item, "effect_value", 0)
+            if effect_type or equip_effect:
+                if effect_type == equip_effect and effect_value == equip_eff_val:
+                    content += f"  Efeito: [yellow]= Igual[/yellow] ({effect_type} +{effect_value})\n"
+                elif effect_type and equip_effect:
+                    content += f"  Efeito: [cyan]{effect_type} +{effect_value}[/cyan]  [dim]vs {equip_effect} +{equip_eff_val}[/dim]\n"
+                    has_any_diff = True
+                elif effect_type:
+                    content += f"  Efeito: [green]+ {effect_type} +{effect_value}[/green]  [dim](equipado sem efeito)[/dim]\n"
+                    has_any_diff = True
+                elif equip_effect:
+                    content += f"  Efeito: [red]- {equip_effect} +{equip_eff_val}[/red]  [dim](novo sem efeito)[/dim]\n"
+                    has_any_diff = True
+            if not has_any_diff and damage == equip_damage and defense == equip_defense:
+                content += "  [dim]— Nenhuma mudança de status —[/dim]\n"
+                content += "  [yellow]Itens idênticos: trocar não altera atributos[/yellow]\n"
+            # Resumo visual
+            if has_any_diff:
+                # Calcula diferença total para feedback rápido
+                total_new = damage + defense
+                total_old = equip_damage + equip_defense
+                if total_new > total_old:
+                    content += "\n[bold green]▲ Upgrade geral[/bold green]\n"
+                elif total_new < total_old:
+                    content += "\n[bold red]▼ Downgrade geral[/bold red]\n"
+                else:
+                    content += "\n[bold yellow]● Equivalente[/bold yellow] — escolha por efeito/raridade\n"
+            else:
+                content += "\n[bold yellow]● Equivalente[/bold yellow]\n"
         else:
+            # Sem item equipado no slot — mostra status base + upgrade
             if damage > 0:
-                content += f"[bold]Dano:[/bold] +{damage}\n"
+                content += f"[bold]Dano:[/bold] [green]+{damage}[/green]  [dim](slot vazio -> upgrade!)[/dim]\n"
             if defense > 0:
-                content += f"[bold]Defesa:[/bold] +{defense}\n"
+                content += f"[bold]Defesa:[/bold] [green]+{defense}[/green]  [dim](slot vazio -> upgrade!)[/dim]\n"
+            effect_type = getattr(item, "effect_type", None)
+            effect_value = getattr(item, "effect_value", 0)
+            if effect_type and effect_value:
+                content += f"[bold]Efeito:[/bold] [green]{effect_type} +{effect_value}[/green]\n"
+            if not damage and not defense and not (effect_type and effect_value):
+                content += "[dim]Sem bônus de combate — item utilitário[/dim]\n"
         
-        effect_type = getattr(item, "effect_type", None)
-        effect_value = getattr(item, "effect_value", 0)
-        if effect_type and effect_value:
-            content += f"[bold]Efeito:[/bold] {effect_type} +{effect_value}\n"
-        
-        rarity = getattr(item, "rarity", "Common")
+        # Raridade e classes
         if rarity in ("Epic", "Legendary"):
-            content += f"[bold]Raridade:[/bold] [{'magenta' if rarity == 'Epic' else 'yellow'}]{rarity}[/]\n"
+            content += f"\n[bold]Raridade:[/bold] [{'magenta' if rarity == 'Epic' else 'yellow'}]{rarity}[/]  [bold]★[/bold]\n"
         else:
-            content += f"[bold]Raridade:[/bold] {rarity}\n"
+            content += f"\n[bold]Raridade:[/bold] {rarity}\n"
         
         classes = getattr(item, "classes", None)
         if classes:
             classes_str = ", ".join(classes)
+            content += f"[bold]Classes:[/bold] {classes_str}\n"
         else:
-            classes_str = "Todas"
-        content += f"[bold]Classes:[/bold] {classes_str}\n"
+            content += f"[bold]Classes:[/bold] Todas\n"
         
-        # Show action hints - only for actually usable items (potions)
-        if is_equippable:
-            content += "\n[dim][E] para equipar[dim]\n"
+        # Dica de ação
+        if is_equippable and is_usable:
+            content += "\n[dim][E] equipar  |  [U] usar (ambíguo)[/dim]\n"
+        elif is_equippable:
+            content += "\n[dim][E] para equipar  |  [Q] sair[/dim]\n"
         elif is_usable:
-            content += "\n[dim][U] para usar[dim]\n"
+            content += "\n[dim][U] para usar  |  [Q] sair[/dim]\n"
         
         return content
 
@@ -540,18 +604,22 @@ def navigate_inventory(
         # inventory becomes empty after equip/use, and to keep feedback visible
         def _rebuild_inventory_view():
             _sorted = sorted(player.inventory, key=get_item_sort_key)
-            _seen = set()
+            # Agrupa duplicatas por ID para mostrar quantidade
+            _counts = {}
             _uniq = []
+            _seen_ids = set()
             for _it in _sorted:
-                if id(_it) not in _seen:
-                    _seen.add(id(_it))
+                _id = getattr(_it, "id", _it.name)
+                _counts[_id] = _counts.get(_id, 0) + 1
+                if id(_it) not in _seen_ids:
+                    _seen_ids.add(id(_it))
                     _uniq.append(_it)
-            return _uniq
+            return _uniq, _counts
 
-        sorted_inventory = _rebuild_inventory_view()
+        sorted_inventory, item_counts = _rebuild_inventory_view()
         total_items = len(sorted_inventory)
         total_pages = (total_items + max_visible - 1) // max_visible if total_items > 0 else 1
-        # Clamp current_index/current_page when inventory shrinks (single-item equip → empty)
+        # Clamp current_index/current_page when inventory shrinks (single-item equip -> empty)
         if total_items == 0:
             current_index = 0
             current_page = 0
@@ -595,12 +663,27 @@ def navigate_inventory(
         else:
             for i, item in enumerate(visible_items):
                 real_index = start_idx + i
-                
                 prefix = ">" if real_index == current_index else " "
                 is_equipped = id(item) in equipped_items
-                equipped_mark = "[bold green] (E)[/bold green]" if is_equipped else ""
-                
-                left_content += f"{prefix} [{real_index + 1:2}] {escape_markup(item.name)}{equipped_mark}\n"
+                # Quantidade para duplicatas
+                item_id = getattr(item, "id", item.name)
+                qty = item_counts.get(item_id, 1)
+                qty_str = f" [dim]x{qty}[/dim]" if qty > 1 else ""
+                # Cor por raridade
+                rarity = getattr(item, "rarity", "Common")
+                rarity_color = {"Common": "white", "Rare": "cyan", "Epic": "magenta", "Legendary": "yellow"}.get(rarity, "white")
+                # Preço
+                price = getattr(item, "price", 0)
+                price_str = f" [dim]{price}o[/dim]" if price else ""
+                # Marca de equipado vs solto com visual mais claro
+                if is_equipped:
+                    equipped_mark = " [green](E)[/green]"
+                else:
+                    equipped_mark = " [dim](na bolsa)[/dim]"
+                # Slot e tipo com cor por raridade
+                slot = getattr(item, "slot", "")
+                slot_label = {"Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura", "Legs": "Calça", "Shoes": "Bota", "Hands": "Luva", "Amulet": "Amuleto", "Ring": "Anel"}.get(slot, slot)
+                left_content += f"{prefix} [{real_index + 1:2}] [{rarity_color}]{escape_markup(item.name)}[/{rarity_color}]{qty_str}[dim] ({slot_label})[/dim]{price_str}{equipped_mark}\n"
             
             if total_pages > 1:
                 left_content += f"\n[dim]Página {current_page + 1}/{total_pages}[/dim]\n"
@@ -613,7 +696,8 @@ def navigate_inventory(
         else:
             selected_item = sorted_inventory[current_index]
             equipped_in_slot = player.equipment.get(getattr(selected_item, "slot", None))
-            middle_content = build_item_details(selected_item, equipped_in_slot)
+            qty = item_counts.get(getattr(selected_item, "id", selected_item.name), 1)
+            middle_content = build_item_details(selected_item, equipped_in_slot, quantity=qty)
         
         middle_panel = Panel(middle_content, border_style="yellow", title="[yellow]DETALHES[/yellow]", width=40)
         
@@ -687,7 +771,7 @@ def navigate_inventory(
                     msg = player.use_potion(selected_item)
                     feedback_message = f"{selected_item.name} usado."
                 pending_action = None
-                # Stay inside loop to keep feedback visible and handle single-item → empty
+                # Stay inside loop to keep feedback visible and handle single-item -> empty
                 continue
             continue
         
@@ -723,7 +807,7 @@ def navigate_inventory(
                         feedback_message = msg
                     else:
                         feedback_message = f"{selected_item.name} equipado."
-                # Stay inside loop so feedback remains visible — rebuild on next iteration handles single-item → empty case
+                # Stay inside loop so feedback remains visible — rebuild on next iteration handles single-item -> empty case
                 continue
         
         elif key in ("u", "U") and total_items > 0:
