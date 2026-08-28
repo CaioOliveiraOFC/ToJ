@@ -75,12 +75,12 @@ def build_player_status(player, selected_item=None) -> str:
 
         if equipped_item:
             if slot == selected_slot:
-                content += f"  [{slot_label}] {escape_markup(equipped_item.name)} [yellow]← será trocado[yellow]\n"
+                content += f"  [{slot_label}] {escape_markup(equipped_item.name)} [yellow]<- será trocado[yellow]\n"
             else:
                 content += f"  [{slot_label}] {escape_markup(equipped_item.name)}\n"
         else:
             if selected_slot == slot:
-                content += f"  [{slot_label}] [green]← upgrade![green]\n"
+                content += f"  [{slot_label}] [green]<- upgrade![green]\n"
             else:
                 content += f"  [{slot_label}] [dim]Vazio[dim]\n"
 
@@ -194,7 +194,7 @@ def navigate_shop_buy(
     current_page = 0
     
     def build_item_details(item) -> str:
-        """Constrói o conteúdo do painel de detalhes — com destaque para slot vazio."""
+        """Constrói o conteúdo do painel de detalhes - com destaque para slot vazio."""
         content = f"[bold]Nome:[/bold] {escape_markup(item.name)}\n\n"
         content += f"[bold]Descrição:[/bold]\n{escape_markup(item.description)}\n\n"
         
@@ -204,12 +204,12 @@ def navigate_shop_buy(
         damage = getattr(item, "damage_bonus", 0)
         defense = getattr(item, "defense_bonus", 0)
         
-        # Destaque especial quando slot está vazio — puro benefício
+        # Destaque especial quando slot está vazio - puro benefício
         equipped_in_slot = player.equipment.get(slot_name) if hasattr(player, "equipment") and slot_name != "Unknown" else None
         is_slot_empty = equipped_in_slot is None and slot_name != "Unknown"
         
         if is_slot_empty and (damage > 0 or defense > 0):
-            content += "[bold green]★ Slot vazio — puro benefício ao equipar![/bold green]\n"
+            content += "[bold green]* Slot vazio - puro beneficio ao equipar![/bold green]\n"
             if damage > 0:
                 content += f"[bold]Dano:[/bold] [green]+{damage} (sem perda)[/green]\n"
             if defense > 0:
@@ -230,7 +230,7 @@ def navigate_shop_buy(
         effect_value = getattr(item, "effect_value", 0)
         if effect_type and effect_value:
             if is_slot_empty:
-                content += f"[bold]Efeito:[/bold] [green]{effect_type} +{effect_value} (puro benefício)[/green]\n"
+                content += f"[bold]Efeito:[/bold] [green]{effect_type} +{effect_value} (puro beneficio)[/green]\n"
             else:
                 content += f"[bold]Efeito:[/bold] {effect_type} +{effect_value}\n"
         
@@ -458,7 +458,7 @@ def navigate_inventory(
     pending_action = None  # For Epic+ confirmation
     
     def build_item_details(item, equipped_in_slot=None, quantity: int = 1) -> str:
-        """Constrói o conteúdo do painel de detalhes do item — comparativo rico."""
+        """Constrói o conteúdo do painel de detalhes do item - comparativo rico."""
         # Cores por raridade para o nome
         rarity = getattr(item, "rarity", "Common")
         rarity_color = {"Common": "white", "Rare": "cyan", "Epic": "magenta", "Legendary": "yellow"}.get(rarity, "white")
@@ -486,7 +486,7 @@ def navigate_inventory(
         
         # Comparativo rico quando há item equipado no mesmo slot
         if equipped_in_slot:
-            content += "\n[bold cyan]► Comparativo com equipado:[/bold cyan]\n"
+            content += "\n[bold cyan]> Comparativo com equipado:[/bold cyan]\n"
             content += f"  [dim]Equipado: {escape_markup(equipped_in_slot.name)}[/dim]\n"
             equip_damage = getattr(equipped_in_slot, "damage_bonus", 0)
             equip_defense = getattr(equipped_in_slot, "defense_bonus", 0)
@@ -532,7 +532,7 @@ def navigate_inventory(
                     content += f"  Efeito: [red]- {equip_effect} +{equip_eff_val}[/red]  [dim](novo sem efeito)[/dim]\n"
                     has_any_diff = True
             if not has_any_diff and damage == equip_damage and defense == equip_defense:
-                content += "  [dim]— Nenhuma mudança de status —[/dim]\n"
+                content += "  [dim]- Nenhuma mudança de status -[/dim]\n"
                 content += "  [yellow]Itens idênticos: trocar não altera atributos[/yellow]\n"
             # Resumo visual
             if has_any_diff:
@@ -540,15 +540,15 @@ def navigate_inventory(
                 total_new = damage + defense
                 total_old = equip_damage + equip_defense
                 if total_new > total_old:
-                    content += "\n[bold green]▲ Upgrade geral[/bold green]\n"
+                    content += "\n[bold green]^ Upgrade geral[/bold green]\n"
                 elif total_new < total_old:
-                    content += "\n[bold red]▼ Downgrade geral[/bold red]\n"
+                    content += "\n[bold red]v Downgrade geral[/bold red]\n"
                 else:
-                    content += "\n[bold yellow]● Equivalente[/bold yellow] — escolha por efeito/raridade\n"
+                    content += "\n[bold yellow]* Equivalente[/bold yellow] - escolha por efeito/raridade\n"
             else:
-                content += "\n[bold yellow]● Equivalente[/bold yellow]\n"
+                content += "\n[bold yellow]* Equivalente[/bold yellow]\n"
         else:
-            # Sem item equipado no slot — mostra status base + upgrade
+            # Sem item equipado no slot - mostra status base + upgrade
             if damage > 0:
                 content += f"[bold]Dano:[/bold] [green]+{damage}[/green]  [dim](slot vazio -> upgrade!)[/dim]\n"
             if defense > 0:
@@ -558,11 +558,11 @@ def navigate_inventory(
             if effect_type and effect_value:
                 content += f"[bold]Efeito:[/bold] [green]{effect_type} +{effect_value}[/green]\n"
             if not damage and not defense and not (effect_type and effect_value):
-                content += "[dim]Sem bônus de combate — item utilitário[/dim]\n"
+                content += "[dim]Sem bônus de combate - item utilitário[/dim]\n"
         
         # Raridade e classes
         if rarity in ("Epic", "Legendary"):
-            content += f"\n[bold]Raridade:[/bold] [{'magenta' if rarity == 'Epic' else 'yellow'}]{rarity}[/]  [bold]★[/bold]\n"
+            content += f"\n[bold]Raridade:[/bold] [{'magenta' if rarity == 'Epic' else 'yellow'}]{rarity}[/]  [bold]*[/bold]\n"
         else:
             content += f"\n[bold]Raridade:[/bold] {rarity}\n"
         
@@ -613,7 +613,7 @@ def navigate_inventory(
             
             stat_label = stat_map.get(buff_name, "")
             content += f"[green]+{value}[/green] {stat_label} ({buff_name[:12]}) "
-            content += f"[cyan]⏱{duration}[/cyan]\n"
+            content += f"[cyan]t{duration}[/cyan]\n"
         
         return content
 
@@ -623,7 +623,7 @@ def navigate_inventory(
     # Main loop
     iteration = 0
     while True:
-        # Rebuild view from live player state — crucial for single-item case where
+        # Rebuild view from live player state - crucial for single-item case where
         # inventory becomes empty after equip/use, and to keep feedback visible
         def _rebuild_inventory_view():
             _sorted = sorted(player.inventory, key=get_item_sort_key)
@@ -753,7 +753,7 @@ def navigate_inventory(
         
         # Rodapé com opções
         if pending_action == "use_confirm":
-            footer_content = "[yellow]⚠️ Item épico — confirme o uso[/yellow]\n[U] Confirmar  [Q] Cancelar"
+            footer_content = "[yellow]! Item épico - confirme o uso[/yellow]\n[U] Confirmar  [Q] Cancelar"
         elif total_items == 0:
             footer_content = "[dim]W/S para navegar | Q sair[dim]"
         else:
@@ -830,7 +830,7 @@ def navigate_inventory(
                         feedback_message = msg
                     else:
                         feedback_message = f"{selected_item.name} equipado."
-                # Stay inside loop so feedback remains visible — rebuild on next iteration handles single-item -> empty case
+                # Stay inside loop so feedback remains visible - rebuild on next iteration handles single-item -> empty case
                 continue
         
         elif key in ("u", "U") and total_items > 0:
@@ -841,7 +841,7 @@ def navigate_inventory(
             if is_usable:
                 if rarity in ("Epic", "Legendary"):
                     pending_action = "use_confirm"
-                    feedback_message = "⚠️ Item épico — confirme o uso"
+                    feedback_message = "! Item épico - confirme o uso"
                 else:
                     if isinstance(selected_item, Item):
                         msg = player.use_potion(selected_item)

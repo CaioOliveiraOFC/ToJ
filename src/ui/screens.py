@@ -384,7 +384,7 @@ def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
     }
     slot_label = slot_names.get(slot, slot)
     renderer.console.print(Panel(
-        Text(f"Trocar equipamento — {slot_label}", justify="center", style="bold yellow"),
+        Text(f"Trocar equipamento - {slot_label}", justify="center", style="bold yellow"),
         border_style="yellow",
     ))
     table = Table(show_header=True, expand=True, border_style="dim white")
@@ -394,7 +394,7 @@ def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
     table.add_column("Diferença", style="yellow", justify="center")
 
     def _fmt(v):
-        return str(v) if v else "—"
+        return str(v) if v else "-"
 
     attrs = []
     ndmg = getattr(new_item, "damage_bonus", 0)
@@ -417,9 +417,9 @@ def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
             table.add_row(f"Efeito ({neff})", str(oeffv), str(neffv), diff_str)
         else:
             if oeff:
-                table.add_row(f"Efeito ({oeff})", str(oeffv), "—", "—")
+                table.add_row(f"Efeito ({oeff})", str(oeffv), "-", "-")
             if neff:
-                table.add_row(f"Efeito ({neff})", "—", str(neffv), "—")
+                table.add_row(f"Efeito ({neff})", "-", str(neffv), "-")
     for label, old_v, new_v in attrs:
         diff = new_v - old_v
         if diff > 0:
@@ -432,18 +432,18 @@ def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
         table.add_row(label, _fmt(old_v), _fmt(new_v), diff_str)
 
     if not attrs and not (neff or oeff):
-        table.add_row("Bônus", "—", "—", "[yellow]=[/yellow]")
+        table.add_row("Bônus", "-", "-", "[yellow]=[/yellow]")
 
     renderer.console.print(table)
-    # Resumo
+    # Resumo (ASCII para compatibilidade Windows cp1252)
     total_new = getattr(new_item, "damage_bonus", 0) + getattr(new_item, "defense_bonus", 0)
     total_old = getattr(old_item, "damage_bonus", 0) + getattr(old_item, "defense_bonus", 0)
     if total_new > total_old:
-        resumo = "[bold green]▲ Upgrade geral[/bold green]"
+        resumo = "[bold green]>> Upgrade geral[/bold green]"
     elif total_new < total_old:
-        resumo = "[bold red]▼ Downgrade geral[/bold red]"
+        resumo = "[bold red]<< Downgrade geral[/bold red]"
     else:
-        resumo = "[bold yellow]● Equivalente[/bold yellow] — escolha por efeito/raridade"
+        resumo = "[bold yellow]== Equivalente[/bold yellow] -- escolha por efeito/raridade"
     renderer.console.print(Panel(
         Text.from_markup(f"Equipado: {old_item.name}\nNovo: {new_item.name}\n{resumo}\n\n[S] Equipar agora  |  [N] Manter na mochila", justify="center"),
         border_style="cyan",
@@ -642,21 +642,21 @@ def render_extraction_prompt(
 ) -> None:
     """Tela de decisão entre EXTRAIR (preservar) e CONTINUAR (arriscar)."""
     renderer.console.print(Panel(
-        Text("— Decisão de Extração —", justify="center", style="bold yellow"),
+        Text("- Decisão de Extração -", justify="center", style="bold yellow"),
         border_style="yellow",
     ))
     body = Text(justify="center")
     body.append(f"Andar concluído: {dungeon_level}\n", style="bold cyan")
     body.append(f"Aventureiro: {player_name}  |  Nível: {level}  |  HP: {hp}/{max_hp}  |  Ouro: {coins}\n", style="white")
     body.append(f"Essência acumulada (XP): {xp_points}\n", style="bold green")
-    body.append(f"Estimativa para o próximo andar: ~{essence_multiplier}x (faixa 0.5x – 3.0x)\n", style="dim cyan")
-    body.append("Valor exato só é sorteado ao entrar — pode variar.\n\n", style="dim")
+    body.append(f"Estimativa para o próximo andar: ~{essence_multiplier}x (faixa 0.5x - 3.0x)\n", style="dim cyan")
+    body.append("Valor exato só é sorteado ao entrar - pode variar.\n\n", style="dim")
     body.append("Se você CONTINUAR e morrer no próximo andar,\n", style="bold red")
     body.append("toda a essência, nível e progresso desta run serão perdidos (permadeath).\n", style="red")
     body.append("Se você EXTRAIR, a run encerra agora e seu personagem\n", style="bold green")
     body.append("é preservado com tudo que conquistou até aqui.\n", style="green")
     renderer.console.print(Panel(body, border_style="cyan", title="Extrair ou Continuar?"))
-    renderer.console.print(Text("[1] EXTRAIR  — encerrar e preservar  |  [2] CONTINUAR — descer", justify="center", style="bold white"))
+    renderer.console.print(Text("[1] EXTRAIR  - encerrar e preservar  |  [2] CONTINUAR - descer", justify="center", style="bold white"))
     renderer.console.print(Text("Escolha 1 ou 2 e pressione ENTER.", justify="center", style="dim"))
 
 
@@ -872,7 +872,7 @@ def render_skill_not_replaced() -> None:
 def render_merchant_event(offers: list[dict], coins: int) -> None:
     """Tela do Mercador Errante: mostra ofertas raras com preço."""
     renderer.console.print(Panel(
-        Text("— Mercador Errante —", justify="center", style="bold yellow"),
+        Text("- Mercador Errante -", justify="center", style="bold yellow"),
         border_style="yellow",
     ))
     body = Text(justify="center")
@@ -884,7 +884,7 @@ def render_merchant_event(offers: list[dict], coins: int) -> None:
         name = getattr(item, "name", "?")
         rarity = getattr(item, "rarity", "Common")
         desc = getattr(item, "description", "")
-        body.append(f"[{idx}] {name} [{rarity}] — {price} ouro\n", style="yellow")
+        body.append(f"[{idx}] {name} [{rarity}] - {price} ouro\n", style="yellow")
         if desc:
             body.append(f"    {desc}\n", style="dim")
     renderer.console.print(Panel(body, border_style="cyan", title="Ofertas"))
@@ -902,7 +902,7 @@ def render_merchant_purchase_success(item_name: str, price: int) -> None:
 def render_altar_event(cost_hp: int, player_hp: int, max_hp: int) -> None:
     """Tela do Altar: escolha de risco/recompensa."""
     renderer.console.print(Panel(
-        Text("— Altar Sombrio —", justify="center", style="bold red"),
+        Text("- Altar Sombrio -", justify="center", style="bold red"),
         border_style="red",
     ))
     body = Text(justify="center")
@@ -942,7 +942,7 @@ def render_altar_no_hp() -> None:
 def render_fountain_event(heal_amount: int, player_hp: int, max_hp: int) -> None:
     """Tela da Fonte: cura sem custo."""
     renderer.console.print(Panel(
-        Text("— Fonte Cristalina —", justify="center", style="bold blue"),
+        Text("- Fonte Cristalina -", justify="center", style="bold blue"),
         border_style="blue",
     ))
     body = Text(justify="center")
@@ -972,11 +972,11 @@ def render_fountain_ignored() -> None:
 
 
 def render_character_status(player) -> None:
-    """Tela dedicada de Status do Personagem — consolidada."""
+    """Tela dedicada de Status do Personagem - consolidada."""
     from src.ui.navigation_menu import escape_markup
 
     # Cabeçalho
-    title = f"{player.get_nick_name()} — {player.get_classname()}  |  Nível {player.get_level()}"
+    title = f"{player.get_nick_name()} - {player.get_classname()}  |  Nível {player.get_level()}"
     renderer.console.print(Panel(Text(title, justify="center", style="bold cyan"), border_style="cyan"))
 
     # XP
@@ -1081,7 +1081,7 @@ def render_character_status(player) -> None:
             dur = data.get("duration", "?") if isinstance(data, dict) else "?"
             val = data.get("value", "") if isinstance(data, dict) else ""
             val_str = f" (+{val})" if val != "" else ""
-            effect_lines.append(f"{escape_markup(str(name))}{val_str} — {dur} turno(s) restantes")
+            effect_lines.append(f"{escape_markup(str(name))}{val_str} - {dur} turno(s) restantes")
         except Exception:
             effect_lines.append(f"{escape_markup(str(name))}")
     if effect_lines:
