@@ -443,7 +443,7 @@ def render_dungeon_status(
 
 def render_dungeon_controls() -> None:
     """Renderiza os controles disponíveis no mapa."""
-    renderer.console.print("\n[dim](i)nventário | (p)ara Salvar | (q) para Sair[/dim]")
+    renderer.console.print("\n[dim](i)nventário | (c) status | (p)ara Salvar | (q) para Sair[/dim]")
 
 
 def render_game_saved(message: str = "Jogo salvo!") -> None:
@@ -803,3 +803,125 @@ def render_fountain_ignored() -> None:
         border_style="dim",
     ))
     sleep(0.5)
+
+
+def render_character_status(player) -> None:
+    """Tela dedicada de Status do Personagem — consolidada."""
+    from src.ui.navigation_menu import escape_markup
+
+    # Cabeçalho
+    title = f"{player.get_nick_name()} — {player.get_classname()}  |  Nível {player.get_level()}"
+    renderer.console.print(Panel(Text(title, justify="center", style="bold cyan"), border_style="cyan"))
+
+    # XP
+    try:
+        xp_atual = player.xp_points
+        xp_needed = player.need_to_next()
+        xp_total = player.need_to_up()
+    except Exception:
+        xp_atual = getattr(player, "xp_points", 0)
+        xp_needed = 0
+        xp_total = 0
+    xp_text = f"XP: {xp_atual} / {xp_total}  (falta {xp_needed} pro próximo nível)" if xp_total else f"XP: {xp_atual}"
+    renderer.console.print(Panel(Text(xp_text, justify="center", style="green"), border_style="green"))
+
+    # HP/MP
+    try:
+        hp = player.get_hp()
+        max_hp = getattr(player, "base_hp", hp)
+        mp = player.get_mp()
+        max_mp = getattr(player, "base_mp", mp)
+    except Exception:
+        hp = max_hp = mp = max_mp = 0
+    hp_mp_text = f"HP: {hp}/{max_hp}   |   MP: {mp}/{max_mp}"
+    renderer.console.print(Panel(Text(hp_mp_text, justify="center", style="bold white"), border_style="white"))
+
+    # Atributos base
+    try:
+        atk = player.get_avg_damage() if hasattr(player, "get_avg_damage") else getattr(player, "avg_damage", 0)
+        base_df = getattr(player, "base_df", getattr(player, "base_ag", 0))
+        base_ag = getattr(player, "base_ag", 0)
+        base_st = getattr(player, "base_st", 0)
+        base_mg = getattr(player, "base_mg", 0)
+        attrs_text = f"ATK: {atk}  |  DEF: {base_df}  |  AGI: {base_ag}  |  ST: {base_st}  |  MG: {base_mg}"
+    except Exception:
+        attrs_text = "Atributos indisponíveis"
+    renderer.console.print(Panel(Text(attrs_text, justify="center", style="yellow"), border_style="yellow", title="Atributos"))
+
+    # Equipamento
+    if hasattr(player, "equipment") and isinstance(player.equipment, dict):
+        equip_lines = []
+        slot_names = {
+            "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
+            "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
+            "Amulet": "Amuleto", "Ring": "Anel",
+        }
+        has_any = False
+        for slot, item in player.equipment.items():
+            label = slot_names.get(slot, slot)
+            if item:
+                has_any = True
+                equip_lines.append(f"[{label}] {escape_markup(getattr(item, 'name', str(item)))}")
+            else:
+                equip_lines.append(f"[{label}] [dim]Vazio[/dim]")
+        if not has_any and not equip_lines:
+            equip_text = "Nenhum equipamento"
+        else:
+            equip_text = "\n".join(equip_lines) if equip_lines else "Nenhum equipamento"
+    else:
+        equip_text = "Nenhum equipamento"
+    renderer.console.print(Panel(Text.from_markup(equip_text), border_style="magenta", title="Equipamento"))
+
+    # Passivas
+    passives = getattr(player, "passives", [])
+    if passives:
+        passive_lines = []
+        for p in passives:
+            name = escape_markup(getattr(p, "name", str(p)))
+            desc = escape_markup(getattr(p, "description", ""))
+            rarity = getattr(p, "rarity", "")
+            passive_lines.append(f"- {name} [{rarity}] {desc}")
+        passive_text = "\n".join(passive_lines)
+    else:
+        passive_text = "[dim]Nenhuma passiva ativa[/dim]"
+    renderer.console.print(Panel(Text.from_markup(passive_text), border_style="blue", title="Passivas"))
+
+    # Cooldowns
+    cooldowns = getattr(player, "skill_cooldowns", {})
+    if cooldowns:
+        cd_lines = []
+        for sid, rem in cooldowns.items():
+            # Tenta resolver nome da skill pelo id
+            skill_name = sid
+            try:
+                from src.content.skills_loader import get_skill_by_id
+                sc = get_skill_by_id(sid)
+                if sc:
+                    skill_name = sc.name
+            except Exception:
+                pass
+            cd_lines.append(f"{escape_markup(skill_name)}: {rem} turno(s)")
+        cd_text = "\n".join(cd_lines)
+    else:
+        cd_text = "[dim]Nenhum cooldown ativo[/dim]"
+    renderer.console.print(Panel(Text.from_markup(cd_text), border_style="yellow", title="Cooldowns"))
+
+    # Efeitos temporários
+    active_effects = getattr(player, "active_effects", {})
+    active_buffs = getattr(player, "active_buffs", {})
+    effect_lines = []
+    for name, data in {**active_effects, **active_buffs}.items():
+        try:
+            dur = data.get("duration", "?") if isinstance(data, dict) else "?"
+            val = data.get("value", "") if isinstance(data, dict) else ""
+            val_str = f" (+{val})" if val != "" else ""
+            effect_lines.append(f"{escape_markup(str(name))}{val_str} — {dur} turno(s) restantes")
+        except Exception:
+            effect_lines.append(f"{escape_markup(str(name))}")
+    if effect_lines:
+        effect_text = "\n".join(effect_lines)
+    else:
+        effect_text = "[dim]Nenhum efeito temporário[/dim]"
+    renderer.console.print(Panel(Text.from_markup(effect_text), border_style="red", title="Efeitos Temporários"))
+
+    renderer.console.print(Panel(Text("[Q] Voltar", justify="center", style="dim"), border_style="dim"))

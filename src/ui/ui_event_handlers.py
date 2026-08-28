@@ -8,6 +8,7 @@ from typing import Any, Protocol
 from src.shared import combat_topics as topics
 from src.shared.types import GameEvent
 from src.ui import screens
+from src.ui.character_status_flow import run_character_status_flow
 from src.ui.extraction_flow import run_extraction_prompt
 from src.ui.inventory_flow import run_inventory_flow_v2
 from src.ui.random_event_flow import run_random_event
@@ -82,6 +83,12 @@ def _on_random_event(ev: GameEvent) -> None:
         run_random_event(player, dungeon_level, event_type)
 
 
+def _on_open_character_status(ev: GameEvent) -> None:
+    player = ev.payload.get("player")
+    if player:
+        run_character_status_flow(player)
+
+
 def _on_game_over(ev: GameEvent) -> None:
     player_name = ev.payload.get("player_name", "Aventureiro")
     game_over_screen(player_name)
@@ -117,6 +124,7 @@ def register_ui_handlers(sink: EventSink) -> Callable[[], None]:
         sink.subscribe(topics.UI_OPEN_SKILLS, _on_open_skills),
         sink.subscribe(topics.UI_EXTRACTION_PROMPT, _on_extraction_prompt),
         sink.subscribe(topics.UI_RANDOM_EVENT, _on_random_event),
+        sink.subscribe(topics.UI_OPEN_CHARACTER_STATUS, _on_open_character_status),
         sink.subscribe(topics.UI_GAME_OVER, _on_game_over),
         sink.subscribe(topics.UI_SAVE_SUCCESS, _on_save_success),
         sink.subscribe(topics.UI_MAIN_MENU, _on_main_menu),

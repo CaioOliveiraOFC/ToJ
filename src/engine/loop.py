@@ -521,12 +521,14 @@ def _handle_player_input(
     Retorna 'quit' para sair, 'level_complete' para próximo nível,
     None para continuar.
     """
-    move = safe_get_key(valid_keys=['w', 'a', 's', 'd', 'i', 'q', 'p'])
+    move = safe_get_key(valid_keys=['w', 'a', 's', 'd', 'i', 'c', 'q', 'p'])
 
     if move is None or move == 'q':
         return "quit"
     elif move == 'i':
         _get_game_publish()(topics.UI_OPEN_INVENTORY, {"player": player})
+    elif move == 'c':
+        _get_game_publish()(topics.UI_OPEN_CHARACTER_STATUS, {"player": player})
     elif move == 'p':
         save_game(player, dungeon_level, game_map.get_map_state(), slot=slot)
         screens.render_game_saved()
