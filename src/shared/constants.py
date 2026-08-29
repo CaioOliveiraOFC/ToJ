@@ -105,7 +105,7 @@ MAP_BORDER_OFFSET = 1  # Offset para evitar bordas
 MIN_EMPTY_TILES_START = 1
 
 # --- Stats Base de Heróis ---
-# Warrior: HP, MP, ST, AG, MG, DF
+# Balanceado: Mage buff minimo (96->99, 23->25) para corrigir 5 andares de gap
 WARRIOR_BASE_HP = 104
 WARRIOR_BASE_MP = 30
 WARRIOR_BASE_ST = 104
@@ -113,15 +113,13 @@ WARRIOR_BASE_AG = 5
 WARRIOR_BASE_MG = 30
 WARRIOR_BASE_DF = 30
 
-# Mage: HP, MP, ST, AG, MG, DF
-MAGE_BASE_HP = 96
+MAGE_BASE_HP = 99
 MAGE_BASE_MP = 100
 MAGE_BASE_ST = 32
 MAGE_BASE_AG = 5
 MAGE_BASE_MG = 100
-MAGE_BASE_DF = 23
+MAGE_BASE_DF = 25
 
-# Rogue: HP, MP, ST, AG, MG, DF
 ROGUE_BASE_HP = 99
 ROGUE_BASE_MP = 50
 ROGUE_BASE_ST = 75
@@ -130,10 +128,11 @@ ROGUE_BASE_MG = 66
 ROGUE_BASE_DF = 20
 
 # --- Progressão de Level Up ---
-# Percentuais de crescimento por classe
+# Balanceado: Mage ganha HP growth 8 (antes 0)
 WARRIOR_HP_GROWTH_PERCENT = 20
 WARRIOR_ST_GROWTH_PERCENT = 10
 
+MAGE_HP_GROWTH_PERCENT = 8
 MAGE_MP_GROWTH_PERCENT = 18
 MAGE_MG_GROWTH_PERCENT = 18
 

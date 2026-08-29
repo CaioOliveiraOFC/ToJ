@@ -1,0 +1,21 @@
+Balanceamento - 5 runs por classe (seeds 101,202,303,404,505) Quick 8000 cap
+Warrior seed=101 level=5/20 actions=270 combats=29 cause=death_combat crashes=0
+Warrior seed=202 level=20/20 actions=1839 combats=337 cause=victory crashes=0
+Warrior seed=303 level=20/20 actions=2030 combats=381 cause=victory crashes=0
+Warrior seed=404 level=20/20 actions=1632 combats=296 cause=victory crashes=0
+Warrior seed=505 level=5/20 actions=186 combats=26 cause=death_combat crashes=0
+Mage seed=101 level=5/20 actions=264 combats=23 cause=death_combat crashes=0
+Mage seed=202 level=10/20 actions=600 combats=64 cause=death_combat crashes=0
+Mage seed=303 level=9/20 actions=682 combats=69 cause=death_combat crashes=0
+Mage seed=404 level=20/20 actions=1509 combats=173 cause=victory crashes=0
+Mage seed=505 level=5/20 actions=175 combats=15 cause=death_combat crashes=0
+Rogue seed=101 level=5/20 actions=283 combats=42 cause=death_combat crashes=0
+Rogue seed=202 level=20/20 actions=1832 combats=330 cause=victory crashes=0
+Rogue seed=303 level=20/20 actions=2011 combats=362 cause=victory crashes=0
+Rogue seed=404 level=20/20 actions=1611 combats=275 cause=victory crashes=0
+Rogue seed=505 level=5/20 actions=188 combats=28 cause=death_combat crashes=0
+
+RESUMO
+Warrior: avg 14.0 levels [5, 20, 20, 20, 5] survived 3/5 {'death_combat': 2, 'victory': 3}
+Mage: avg 9.8 levels [5, 10, 9, 20, 5] survived 1/5 {'death_combat': 4, 'victory': 1}
+Rogue: avg 14.0 levels [5, 20, 20, 20, 5] survived 3/5 {'death_combat': 2, 'victory': 3}

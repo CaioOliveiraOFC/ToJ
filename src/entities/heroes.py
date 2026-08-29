@@ -13,6 +13,7 @@ from src.shared.constants import (
     MAGE_BASE_MG,
     MAGE_BASE_MP,
     MAGE_BASE_ST,
+    MAGE_HP_GROWTH_PERCENT,
     MAGE_MG_GROWTH_PERCENT,
     MAGE_MP_GROWTH_PERCENT,
     ROGUE_AGILITY_GROWTH_PERCENT,
@@ -417,6 +418,7 @@ class Player(Entity):
             self.base_hp += int(percentage(WARRIOR_HP_GROWTH_PERCENT, self.base_hp, False))
             self.base_st += int(percentage(WARRIOR_ST_GROWTH_PERCENT, self.base_st, False))
         elif class_name == "Mage":
+            self.base_hp += int(percentage(MAGE_HP_GROWTH_PERCENT, self.base_hp, False))
             self.base_mp += int(percentage(MAGE_MP_GROWTH_PERCENT, self.base_mp, False))
             self.base_mg += int(percentage(MAGE_MG_GROWTH_PERCENT, self.base_mg, False))
         elif class_name == "Rogue":
