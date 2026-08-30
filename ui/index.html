@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Tales of the Journey — Forge Run</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main id="app">
+  <header class="topbar"><div><small>FORGE RUN</small><strong>TOJ</strong></div><div id="floor">ANDAR 1</div><div id="essence">ESSÊNCIA 1.0x</div></header>
+  <section class="arena">
+    <div class="enemy-card"><div class="name" id="enemyName">Rato Espectral</div><div class="bar"><i id="enemyHp"></i></div><span id="enemyHpText">100 / 100</span></div>
+    <div class="stage"><div class="glow"></div><div id="enemySprite" class="sprite enemy"></div><div id="damage"></div><div class="vs">VS</div><div id="heroSprite" class="sprite hero"></div></div>
+    <div class="hero-card"><div class="name" id="heroName">Guerreiro</div><div class="bar"><i id="heroHp"></i></div><span id="heroHpText">104 / 104</span><div class="resource"><span id="mpText">MP 30 / 30</span></div></div>
+  </section>
+  <section id="log" class="log">Escolha sua ação.</section>
+  <section class="actions" id="actions">
+    <button data-action="attack">ATAQUE</button><button data-action="skill">SKILL</button><button data-action="potion">POÇÃO</button><button data-action="flee">FUGIR</button>
+  </section>
+  <section id="skillPanel" class="modal hidden"><div class="panel"><h2>HABILIDADES</h2><div id="skills"></div><button data-close>VOLTAR</button></div></section>
+  <section id="resultPanel" class="modal hidden"><div class="panel"><div id="resultTitle"></div><div id="resultBody"></div><div id="resultActions"></div></div></section>
+  <section id="extractPanel" class="modal hidden"><div class="panel reveal"><small>O ANDAR GUARDA</small><h1 id="revealMultiplier">1.0x</h1><p>Multiplicador de Essência</p><button id="continueBtn">CONTINUAR</button><button id="extractBtn">EXTRAIR</button></div></section>
+</main>
+<script src="./game.js"></script>
+</body>
+</html>
