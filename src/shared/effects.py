@@ -10,6 +10,11 @@ A correção não é aumentar a lista de nomes, é parar de identificar efeito p
 nome. Aqui um efeito declara **qual atributo ele modifica**, e o motor consulta
 o atributo. Conteúdo novo passa a funcionar sem tocar no motor, que é a razão de
 os dados estarem em JSON.
+
+Vive em `shared/` porque `entities/` precisa somar buffs para responder
+`get_stat`, e `entities/` só pode importar de `shared/`. O módulo não importa
+nada do projeto: ele lê o estado das entidades por duck typing, o que o mantém
+sem dependência de camada nenhuma.
 """
 
 from __future__ import annotations

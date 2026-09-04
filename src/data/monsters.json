@@ -1,154 +1,387 @@
 {
-  "description": "Configuração de geração de monstros. Os atributos e o comportamento vêm dos arquétipos em src/content/factories/archetypes.py; aqui fica só a densidade do andar.",
-  "version": "2.0",
-  "categories": {
-    "common": {
-      "weight": 60,
-      "min_level": 1,
+  "description": "Monstros: arquétipos (papel, orçamento, comportamento e nomes) e densidade do andar. O código aplica as fórmulas; os valores vivem aqui.",
+  "version": "3.0",
+  "generation": {
+    "base_count": 3,
+    "scaling_per_3_levels": 3,
+    "min_monsters": 2,
+    "boss_spawn_chance": 0.1,
+    "advanced_role_min_floor": 4,
+    "advanced_roles": [
+      "controller",
+      "support"
+    ],
+    "elite_spawn_chance": 0.12,
+    "level_variation": {
+      "offsets": [
+        0,
+        1,
+        2
+      ],
+      "weights": [
+        70,
+        25,
+        5
+      ],
+      "max_above_floor": 3,
+      "early_player_level": 3,
+      "early_max_above_player": 2,
+      "first_floor_max_level": 3
+    }
+  },
+  "archetypes": {
+    "trash": {
+      "label": "Trash",
+      "budget": {
+        "hp": 0.5,
+        "attack": 0.7,
+        "defense": 0.85,
+        "agility": 0.95
+      },
+      "skill_use_chance": 0,
+      "threat": "Acúmulo. Nunca mata sozinho, drena recurso em grupo.",
+      "counterplay": "Matar rápido e gastar pouco.",
       "names": [
         "Goblin",
-        "Orc",
-        "Esqueleto",
-        "Zumbi",
         "Rato Gigante",
-        "Morcego Vampiro",
         "Slime Verde",
-        "Bandido",
-        "Cultista",
-        "Aranha das Cavernas",
         "Kobold",
-        "Lobo Faminto",
-        "Carniçal Menor",
-        "Besouro Gigante",
-        "Ladrão de Túmulos",
-        "Espectro Fraco",
-        "Gosma Ácida",
-        "Centopeia Gigante",
+        "Esqueleto",
+        "Morcego Vampiro",
         "Verme da Terra",
-        "Corvo Sanguinário",
-        "Javali Selvagem",
-        "Sapo Mutante",
-        "Múmia Desgastada",
-        "Espadachim Esqueleto",
-        "Goblin Arqueiro",
-        "Rato da Peste",
-        "Cão Sarnento",
-        "Elemental da Poeira",
-        "Pária Corrompido",
-        "Saqueador"
-      ]
+        "Corvo Sanguinário"
+      ],
+      "skills": []
     },
-    "uncommon": {
-      "weight": 25,
-      "min_level": 5,
+    "bruiser": {
+      "label": "Bruiser",
+      "budget": {
+        "hp": 1.0,
+        "attack": 1.0,
+        "defense": 1.0,
+        "agility": 1.0
+      },
+      "skill_use_chance": 25,
+      "threat": "Pressão constante. O combate padrão.",
+      "counterplay": "Trocar dano com vantagem.",
       "names": [
-        "Aranha Gigante",
-        "Lobo Mal",
-        "Serpente Venenosa",
-        "Orc Guerreiro",
+        "Orc",
+        "Bandido",
+        "Lobo Faminto",
         "Hobgoblin",
-        "Harpia",
-        "Homem-Lagarto",
-        "Warg",
-        "Aparição",
-        "Aranha Viúva-Negra",
-        "Troll das Cavernas",
-        "Esqueleto Encouraçado",
         "Cultista Fanático",
-        "Sombra",
-        "Mímico",
-        "Carniçal Voraz",
-        "Basilisco Jovem",
-        "Elemental do Fogo Menor",
-        "Elemental da Água Menor",
-        "Escorpião Gigante",
-        "Gosma Tóxica",
-        "Urso Coruja",
         "Javali Atroz",
-        "Caçador Furtivo",
-        "Centauro Batedor",
-        "Banshee Menor",
-        "Espectro Uivante",
-        "Verme da Areia",
-        "Gárgula Desperta",
-        "Lobo Invernal",
-        "Sanguessuga Gigante",
-        "Ente Corrompido"
+        "Homem-Lagarto"
+      ],
+      "skills": [
+        {
+          "id": "mob_golpe_pesado",
+          "name": "Golpe Pesado",
+          "effect_type": "damage",
+          "effect_value": 40,
+          "mana_cost": 15,
+          "cooldown": 3,
+          "duration": 2,
+          "chance": 100,
+          "target": "enemy"
+        }
       ]
     },
-    "rare": {
-      "weight": 12,
-      "min_level": 10,
+    "tank": {
+      "label": "Tank",
+      "budget": {
+        "hp": 1.35,
+        "attack": 0.7,
+        "defense": 1.45,
+        "agility": 0.6
+      },
+      "skill_use_chance": 35,
+      "threat": "Duração. Alonga o combate e força atrito.",
+      "counterplay": "Dano contínuo em vez de explosão; trazer recurso de sobra.",
+      "names": [
+        "Golem de Pedra",
+        "Troll das Cavernas",
+        "Gárgula",
+        "Esqueleto Encouraçado",
+        "Golem de Ferro",
+        "Ente Corrompido"
+      ],
+      "skills": [
+        {
+          "id": "mob_carapaca",
+          "name": "Carapaça",
+          "effect_type": "damage_reduction",
+          "effect_value": 35,
+          "mana_cost": 20,
+          "cooldown": 4,
+          "duration": 3,
+          "chance": 100,
+          "target": "self"
+        }
+      ]
+    },
+    "glass_cannon": {
+      "label": "Glass cannon",
+      "budget": {
+        "hp": 0.55,
+        "attack": 1.9,
+        "defense": 0.5,
+        "agility": 1.1
+      },
+      "skill_use_chance": 45,
+      "threat": "Pico de dano. Pune quem erra a ordem de foco.",
+      "counterplay": "Matar primeiro ou atordoar.",
+      "names": [
+        "Necromante",
+        "Cultista",
+        "Aparição",
+        "Lich Aprendiz",
+        "Elemental do Fogo Menor",
+        "Anomalia Arcana"
+      ],
+      "skills": [
+        {
+          "id": "mob_rajada",
+          "name": "Rajada Arcana",
+          "effect_type": "damage",
+          "effect_value": 70,
+          "mana_cost": 25,
+          "cooldown": 2,
+          "duration": 2,
+          "chance": 100,
+          "target": "enemy"
+        }
+      ]
+    },
+    "skirmisher": {
+      "label": "Skirmisher",
+      "budget": {
+        "hp": 0.75,
+        "attack": 0.95,
+        "defense": 0.7,
+        "agility": 2.6
+      },
+      "skill_use_chance": 30,
+      "threat": "Acerta quem esquiva e age primeiro.",
+      "counterplay": "Controle, ou defesa que não dependa de esquiva.",
+      "names": [
+        "Caçador Furtivo",
+        "Assassino das Sombras",
+        "Harpia",
+        "Warg",
+        "Sombra",
+        "Centauro Batedor"
+      ],
+      "skills": [
+        {
+          "id": "mob_corte_rapido",
+          "name": "Corte Rápido",
+          "effect_type": "damage",
+          "effect_value": 30,
+          "mana_cost": 12,
+          "cooldown": 2,
+          "duration": 2,
+          "chance": 100,
+          "target": "enemy"
+        }
+      ]
+    },
+    "controller": {
+      "label": "Controlador",
+      "budget": {
+        "hp": 0.9,
+        "attack": 0.8,
+        "defense": 0.9,
+        "agility": 1.3
+      },
+      "skill_use_chance": 55,
+      "threat": "Nega turnos e recurso.",
+      "counterplay": "Matar rápido, ou não depender de MP.",
+      "names": [
+        "Banshee",
+        "Súcubo",
+        "Mestre das Ilusões",
+        "Espectro Uivante",
+        "Devorador de Mentes Menor",
+        "Naga"
+      ],
+      "skills": [
+        {
+          "id": "mob_torpor",
+          "name": "Torpor",
+          "effect_type": "status",
+          "effect_value": "stun",
+          "mana_cost": 25,
+          "cooldown": 3,
+          "duration": 1,
+          "chance": 55,
+          "target": "enemy"
+        },
+        {
+          "id": "mob_queima_mana",
+          "name": "Queima de Mana",
+          "effect_type": "status",
+          "effect_value": "mana_burn",
+          "mana_cost": 20,
+          "cooldown": 3,
+          "duration": 2,
+          "chance": 75,
+          "target": "enemy"
+        }
+      ]
+    },
+    "support": {
+      "label": "Suporte",
+      "budget": {
+        "hp": 0.8,
+        "attack": 0.6,
+        "defense": 1.0,
+        "agility": 1.0
+      },
+      "skill_use_chance": 60,
+      "threat": "Multiplica os outros. Sozinho é inofensivo.",
+      "counterplay": "Prioridade de alvo: matar antes do resto.",
+      "names": [
+        "Cultista Sombrio",
+        "Xamã Goblin",
+        "Aclito Corrompido",
+        "Espectro Curandeiro"
+      ],
+      "skills": [
+        {
+          "id": "mob_regenerar",
+          "name": "Regenerar",
+          "effect_type": "heal",
+          "effect_value": 30,
+          "mana_cost": 25,
+          "cooldown": 3,
+          "duration": 2,
+          "chance": 100,
+          "target": "self"
+        },
+        {
+          "id": "mob_bencao",
+          "name": "Bênção Sombria",
+          "effect_type": "buff",
+          "effect_value": 25,
+          "mana_cost": 20,
+          "cooldown": 4,
+          "duration": 3,
+          "chance": 100,
+          "target": "self",
+          "effect_stat": "df"
+        }
+      ]
+    },
+    "elite": {
+      "label": "Elite",
+      "budget": {
+        "hp": 1.4,
+        "attack": 1.25,
+        "defense": 1.15,
+        "agility": 1.1
+      },
+      "skill_use_chance": 45,
+      "threat": "Marco do andar. Testa se a build funciona.",
+      "counterplay": "Chegar com recurso. Preparar antes de engajar.",
       "names": [
         "Minotauro",
-        "Gárgula",
         "Cavaleiro Corrompido",
-        "Troll da Montanha",
-        "Ogre",
         "Manticora",
-        "Vampiro",
-        "Golem de Pedra",
+        "Ogre",
         "Wyvern",
-        "Banshee",
         "Dullahan",
-        "Quimera",
-        "Elemental do Fogo Majestoso",
-        "Treant Corrompido",
-        "Assassino das Sombras",
-        "Lich Aprendiz",
-        "Dragão Menor",
-        "Verme da Morte",
-        "Gigante da Colina",
-        "Naga",
-        "Demônio Menor",
-        "Súcubo",
-        "Íncubo",
-        "Golem de Ferro",
-        "Titã de Gelo Jovem",
-        "Hidra Jovem",
-        "Esfinge",
-        "Necromante",
-        "Cavaleiro da Morte",
-        "Anomalia Arcana",
-        "Devorador de Mentes Menor"
+        "Quimera"
+      ],
+      "skills": [
+        {
+          "id": "mob_investida_brutal",
+          "name": "Investida Brutal",
+          "effect_type": "damage",
+          "effect_value": 55,
+          "mana_cost": 25,
+          "cooldown": 3,
+          "duration": 2,
+          "chance": 100,
+          "target": "enemy"
+        },
+        {
+          "id": "mob_rugido",
+          "name": "Rugido",
+          "effect_type": "status",
+          "effect_value": "weakened",
+          "mana_cost": 20,
+          "cooldown": 4,
+          "duration": 3,
+          "chance": 70,
+          "target": "enemy"
+        }
       ]
     },
     "boss": {
-      "weight": 3,
-      "min_level": 20,
+      "label": "Boss",
+      "budget": {
+        "hp": 1.8,
+        "attack": 1.35,
+        "defense": 1.2,
+        "agility": 1.15
+      },
+      "skill_use_chance": 55,
+      "threat": "Portão a cada 5 andares. Exige execução por muitos turnos.",
+      "counterplay": "Plano, recurso e uso correto de controle.",
       "names": [
         "Dragão Jovem",
         "Lich Menor",
         "Rei Goblin",
         "Lorde Vampiro",
-        "Demônio Maior",
-        "Dragão Ancião",
         "Behemoth",
-        "Golem de Adamantium",
-        "Arquimago Corrompido",
-        "Tirano das Sombras",
-        "Leviatã",
-        "Fênix Negra",
-        "Titã Ancião",
-        "Rainha das Aranhas",
-        "Cavaleiro do Apocalipse",
         "Rei Esqueleto",
-        "Hidra Ancestral",
-        "Devorador de Mundos",
-        "Avatar da Destruição",
-        "Mestre das Ilusões",
-        "Colosso de Pedra Escura",
-        "Senhor da Peste",
-        "Imperador Orc",
-        "Dragão Zumbi"
+        "Titã Ancião"
       ],
-      "level_bonus": 5
+      "skills": [
+        {
+          "id": "boss_devastar",
+          "name": "Devastar",
+          "effect_type": "damage",
+          "effect_value": 80,
+          "mana_cost": 30,
+          "cooldown": 3,
+          "duration": 2,
+          "chance": 100,
+          "target": "enemy"
+        },
+        {
+          "id": "boss_esmagar",
+          "name": "Esmagar",
+          "effect_type": "status",
+          "effect_value": "stun",
+          "mana_cost": 30,
+          "cooldown": 4,
+          "duration": 1,
+          "chance": 50,
+          "target": "enemy"
+        },
+        {
+          "id": "boss_couraca",
+          "name": "Couraça Ancestral",
+          "effect_type": "damage_reduction",
+          "effect_value": 30,
+          "mana_cost": 25,
+          "cooldown": 5,
+          "duration": 3,
+          "chance": 100,
+          "target": "self"
+        }
+      ]
     }
   },
-  "generation": {
-    "base_count": 3,
-    "scaling_per_3_levels": 3,
-    "min_monsters": 2,
-    "boss_spawn_chance": 0.1
+  "routine_role_weights": {
+    "trash": 42,
+    "bruiser": 24,
+    "skirmisher": 12,
+    "glass_cannon": 10,
+    "tank": 7,
+    "controller": 3,
+    "support": 2
   }
 }

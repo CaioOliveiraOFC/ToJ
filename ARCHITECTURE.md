@@ -8,7 +8,11 @@
 3. `entities/` não importa de `content/`: Inversão de dependência — entidades não conhecem dados.
 4. Nada de `print()` fora de `ui/`: Toda saída passa pelo renderer Rich.
 5. Dados em JSON, código limpo, sem hardcoded: Tudo data-driven.
+   - A fronteira: **fórmula é código, valor é dado**. Um multiplicador de arquétipo, o nome de um monstro ou o custo de uma skill mudam sem que a regra mude — vão para o JSON. Números que governam balanceamento e não cabem no JSON ficam em `shared/constants.py`, com nome.
 6. `safe_get_key()` é o único ponto de entrada de teclado: Consistência multiplataforma.
+
+> As seis regras acima são verificadas por `tests/test_architecture.py`. Regra que
+> só existe em Markdown é regra que ninguém checa.
 
 ---
 
@@ -19,16 +23,18 @@ ToJ/
 ├── main.py                         # Entry point: bootstrap e orquestração do menu
 ├── README.md
 ├── ARCHITECTURE.md                 # Este arquivo
-├── SPRINTS.md                      # Roadmap de desenvolvimento
-├── savegame.json                   # Estado persistido da última sessão
-├── pyproject.toml                  # Configuração do projeto (ruff, mypy)
+├── BALANCE_REPORT.md               # Modelo de balanceamento e números medidos
+├── requirements.txt                # Dependências de execução
+├── pyproject.toml                  # Configuração do projeto (ruff, mypy, pytest)
 │
 ├── tests/                          # TESTES AUTOMATIZADOS
 │   ├── __init__.py
 │   ├── auto_test.py                # AutoTester BFS para QA (mock de saves)
+│   ├── test_architecture.py        # As seis regras desta página, verificadas
 │   ├── test_combat.py              # Testes de dano, XMULT cap, defesa, crítico
 │   ├── test_math_operations.py     # Testes de XP, moedas, multiplicador
-│   └── test_new_systems.py         # Testes de cooldown, damage_reduction, stun
+│   ├── test_new_systems.py         # Testes de cooldown, damage_reduction, stun
+│   └── balance/                    # Invariantes de balanceamento (simulação)
 │
 ├── docs/                           # Documentação adicional
 │   └── GUIDE_PASSIVES.md           # Guia para criar novas passivas
@@ -39,16 +45,19 @@ ToJ/
     ├── shared/                     # TIPOS COMPARTILHADOS — sem dependências
     │   ├── __init__.py
     │   ├── types.py                # TypedDicts e Dataclasses (CombatResult, EntityStats, DTOs)
-    │   ├── constants.py           # Constantes globais do jogo
-    │   └── combat_topics.py       # Tópicos de eventos do EventBus (combat.*, ui.*, system.*)
+    │   ├── constants.py            # Constantes globais do jogo
+    │   ├── formulas.py             # Curvas de crescimento e de XP (fonte única)
+    │   ├── effects.py              # Tabela de buffs, status e modificadores de combate
+    │   ├── registries.py           # Injeção de dependência entre camadas
+    │   └── combat_topics.py        # Tópicos de eventos do EventBus (combat.*, ui.*, system.*)
     │
     ├── data/                       # DADOS ESTÁTICOS (JSON e loaders)
     │   ├── __init__.py
     │   ├── loader.py               # Utilitários para carregar JSON
-    │   ├── items.json              # ~121 itens (armas, armaduras, consumíveis)
-    │   ├── passives.json           # 27 passivas em 4 raridades
-    │   ├── skills.json             # 41 skills (12 iniciais + 24 novas + 5 de classe)
-    │   └── monsters.json           # Definições de monstros
+    │   ├── items.json              # 159 itens (armas, armaduras, 14 consumíveis)
+    │   ├── passives.json           # 29 passivas em 4 raridades
+    │   ├── skills.json             # 41 skills das três classes
+    │   └── monsters.json           # Arquétipos, orçamento por papel e densidade do andar
     │
     ├── engine/                     # ORQUESTRADOR CENTRAL
     │   ├── __init__.py
@@ -67,12 +76,23 @@ ToJ/
     │
     ├── storage/                    # PERSISTÊNCIA
     │   ├── __init__.py
-    │   └── save_manager.py         # save_game / load_game → savegame.json
+    │   └── save_manager.py         # save_game / load_game → saves/slot_N.json (10 slots)
     │
     ├── mechanics/                  # REGRAS DE NEGÓCIO
     │   ├── __init__.py
-    │   ├── combat.py               # Fórmulas de dano, esquiva, crítico
-    │   └── math_operations.py      # Escalonamento de stats, XP, multiplicador
+    │   ├── combat.py               # Fórmulas de dano, acerto, crítico, status
+    │   ├── battle.py               # Laço de batalha puro (jogo e simulação usam este)
+    │   ├── monster_ai.py           # Decisão de turno do monstro
+    │   └── math_operations.py      # Recompensas e multiplicador de essência
+
+    ├── sim/                        # SIMULAÇÃO HEADLESS (balanceamento)
+    │   ├── __init__.py
+    │   ├── harness.py              # simulate() e simulate_run()
+    │   ├── policies.py             # Políticas do bot (greedy, smart, random)
+    │   ├── encounters.py           # Catálogo de encontros nomeados
+    │   ├── loadouts.py             # Equipamento típico por nível
+    │   ├── metrics.py              # Agregação e intervalo de confiança
+    │   └── runner.py               # CLI de desenvolvimento
     │
     ├── content/                    # DADOS E FÁBRICAS
     │   ├── __init__.py
@@ -82,6 +102,7 @@ ToJ/
     │   ├── shop.py                 # Lógica da loja (preços, compra, venda)
     │   └── factories/
     │       ├── __init__.py
+    │       ├── archetypes.py       # Papéis de monstro carregados do JSON
     │       ├── monsters.py         # generate_monsters_for_level / create_boss
     │       ├── loot.py             # Drop de itens com raridade
     │       └── dungeons.py         # Geração de masmorras
@@ -111,8 +132,8 @@ ToJ/
 
 ```
 ui/ ←── engine/ ←── mechanics/ ←── entities/
-                  ↑               ↑
-              content/         shared/
+         ↑        ↑               ↑
+        sim/   content/         shared/
                   ↑
                storage/
                   ↑
@@ -120,6 +141,13 @@ ui/ ←── engine/ ←── mechanics/ ←── entities/
 ```
 
 **Regra:** Todas as camadas podem importar de `shared/`. Nenhuma outra importação cruzada é permitida.
+
+**Consequência prática:** quando `entities/` precisa de uma fórmula (`shared/formulas.py`),
+de uma tabela de efeitos (`shared/effects.py`) ou de um catálogo de `content/`
+(`shared/registries.py`), a saída é sempre `shared/` — nunca um import para cima.
+
+**Imports sob `TYPE_CHECKING`** não contam como dependência de camada: não existem
+em tempo de execução e servem só para anotar tipos.
 
 ---
 
@@ -179,6 +207,7 @@ As seguintes funções de UI podem ser importadas diretamente por `engine/` por 
 4. `register_combat_ui_handlers()` — Setup de handlers de combate
 5. `register_ui_handlers()` — Setup de handlers de UI
 6. `toj_menu.main_menu`, `toj_menu.character_creation_flow` — Fluxos de menu principal (executam antes do loop do jogo)
+7. `sim/runner.py` usa `print()` — é uma CLI de desenvolvimento, não saída de jogo. Importar `ui/` de dentro de `sim/` quebraria a regra maior de a simulação ser headless.
 
 ---
 
@@ -191,6 +220,7 @@ As seguintes funções de UI podem ser importadas diretamente por `engine/` por 
 | `entities/` | Estado puro (Player, Monster) | shared/ |
 | `mechanics/` | Regras de negócio (combate, matemática) | entities/, shared/ |
 | `content/` | Dados (itens, skills, passivas) + fábricas | entities/, mechanics/, shared/, data/ |
+| `sim/` | Simulação headless para balanceamento | content/, mechanics/, entities/, shared/, data/ |
 | `storage/` | Persistência (save/load) | content/, entities/, shared/ |
 | `engine/` | Orquestração central | content/, mechanics/, entities/, storage/, ui/ (via EventBus) |
 | `ui/` | Apresentação e input | shared/, content/ |
@@ -210,6 +240,9 @@ As seguintes funções de UI podem ser importadas diretamente por `engine/` por 
 ## Notas Importantes
 
 - `data/` é uma camada de suporte que fornece loaders para JSON (não tem dependências de lógica)
+- `mechanics/battle.py` é o laço de batalha compartilhado: `engine/loop.py` passa um callback que lê o teclado, `sim/harness.py` passa uma política. Um simulador que reimplementa o combate mede um jogo que não existe
+- `shared/formulas.py` é a fonte única das curvas de crescimento; herói e monstro usam a mesma razão de propósito
+- Balanceamento é medido, não estimado: `python -m pytest tests/balance -q`
 - `engine/ui_events.py` é um utilitário para emitir eventos sem violar regras de importação
 - `content/shop.py` contém a lógica de preços e transações
 - `content/skills_loader.py` carrega skills do JSON

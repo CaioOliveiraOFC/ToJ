@@ -16,28 +16,22 @@ import random
 from typing import Any
 
 from src.content.factories.archetypes import (
-    ARCHETYPES,
-    ROUTINE_ROLE_WEIGHTS,
+    all_archetypes,
     get_archetype,
+    routine_role_weights,
     spawn_by_role,
 )
 from src.data.loader import load_monsters_data
 from src.entities.monsters import Monster
-
-# A partir deste andar o gerador começa a incluir papéis de controle e suporte,
-# que exigem que o jogador reordene alvos. Antes disso o andar é de aprendizado.
-ADVANCED_ROLE_MIN_FLOOR = 4
-# Papéis reservados para andares mais profundos.
-ADVANCED_ROLES = ("controller", "support")
-# Chance de um elite aparecer em um andar comum, a partir de ADVANCED_ROLE_MIN_FLOOR.
-ELITE_SPAWN_CHANCE = 0.12
+from src.shared.constants import DEFAULT_MONSTER_ROLE as DEFAULT_ROLE
+from src.shared.constants import MINI_BOSS_LEVEL_BONUS
 
 
 def calculate_scaled_monster_level(dungeon_level: int, player_level: int) -> int:
     """Nível do monstro, com variação controlada em torno do andar.
 
-    Regras de segurança contra RNG injusto: nunca mais que `dungeon_level + 3`,
-    e nos três primeiros níveis do jogador nunca mais que `player_level + 2`.
+    Os deslocamentos, os pesos e os limites de segurança contra RNG injusto vêm
+    de `generation.level_variation` no JSON.
 
     Args:
         dungeon_level: Nível atual da masmorra.
@@ -46,17 +40,19 @@ def calculate_scaled_monster_level(dungeon_level: int, player_level: int) -> int
     Returns:
         Nível do monstro calculado com segurança.
     """
+    variation = _get_monsters_data()["generation"]["level_variation"]
+
     monster_level = random.choices(
-        [dungeon_level, dungeon_level + 1, dungeon_level + 2],
-        weights=[70, 25, 5],
+        [dungeon_level + offset for offset in variation["offsets"]],
+        weights=variation["weights"],
         k=1,
     )[0]
 
-    monster_level = min(monster_level, dungeon_level + 3)
-    if player_level <= 3:
-        monster_level = min(monster_level, player_level + 2)
+    monster_level = min(monster_level, dungeon_level + int(variation["max_above_floor"]))
+    if player_level <= int(variation["early_player_level"]):
+        monster_level = min(monster_level, player_level + int(variation["early_max_above_player"]))
     if dungeon_level == 1:
-        monster_level = min(monster_level, 3)
+        monster_level = min(monster_level, int(variation["first_floor_max_level"]))
 
     return max(1, monster_level)
 
@@ -67,10 +63,16 @@ def _get_monsters_data() -> dict[str, Any]:
 
 
 def _pick_role(dungeon_level: int) -> str:
-    """Sorteia um papel para o andar, respeitando a profundidade mínima."""
-    weights = dict(ROUTINE_ROLE_WEIGHTS)
-    if dungeon_level < ADVANCED_ROLE_MIN_FLOOR:
-        for role in ADVANCED_ROLES:
+    """Sorteia um papel para o andar, respeitando a profundidade mínima.
+
+    Papéis de controle e suporte exigem que o jogador reordene alvos, então só
+    entram a partir do andar configurado em `generation.advanced_role_min_floor`.
+    Antes disso o andar é de aprendizado.
+    """
+    generation = _get_monsters_data()["generation"]
+    weights = dict(routine_role_weights())
+    if dungeon_level < int(generation["advanced_role_min_floor"]):
+        for role in generation["advanced_roles"]:
             weights.pop(role, None)
     roles = list(weights)
     return random.choices(roles, weights=[weights[r] for r in roles], k=1)[0]
@@ -83,15 +85,15 @@ def _name_for(role: str, level: int) -> str:
     return f"{random.choice(pool)} Nv.{level}"
 
 
-def create_monster(nick_name: str, level: int, role: str = "bruiser") -> Monster:
+def create_monster(nick_name: str, level: int, role: str = DEFAULT_ROLE) -> Monster:
     """Cria um monstro do papel indicado, com o orçamento do nível.
 
     Mantém a assinatura histórica (`nick_name`, `level`) porque o carregamento de
     save reconstrói monstros por nome e nível.
     """
     lvl = max(1, int(level))
-    if role not in ARCHETYPES:
-        role = "bruiser"
+    if role not in all_archetypes():
+        role = DEFAULT_ROLE
     return spawn_by_role(role, lvl, name=nick_name)
 
 
@@ -124,7 +126,10 @@ def generate_monsters_for_level(dungeon_level: int, player_level: int = 1) -> li
         monsters.append(create_monster(_name_for(role, level), level, role))
 
     # Elite: o marco do andar. Testa se a build funciona, sem ser um chefe.
-    if dungeon_level >= ADVANCED_ROLE_MIN_FLOOR and random.random() < ELITE_SPAWN_CHANCE:
+    if (
+        dungeon_level >= int(generation["advanced_role_min_floor"])
+        and random.random() < float(generation["elite_spawn_chance"])
+    ):
         level = calculate_scaled_monster_level(dungeon_level, player_level)
         monsters.append(create_monster(_name_for("elite", level), level, "elite"))
 
@@ -140,7 +145,5 @@ def create_boss_for_level(dungeon_level: int) -> Monster:
     Returns:
         Instância de Monster configurada como chefe.
     """
-    from src.shared.constants import MINI_BOSS_LEVEL_BONUS
-
     boss_level = dungeon_level + MINI_BOSS_LEVEL_BONUS
     return create_monster(_name_for("boss", boss_level), boss_level, "boss")

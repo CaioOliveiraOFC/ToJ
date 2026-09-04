@@ -19,15 +19,13 @@ from src.shared.constants import (
     ESSENCE_MULT_MIN,
     ESSENCE_MULT_NORMAL_MEAN,
     ESSENCE_MULT_NORMAL_STD,
-    GROWTH_RATE,
     MINI_BOSS_BASE_COIN_REWARD,
     MINI_BOSS_BASE_XP_REWARD,
     MINI_BOSS_LEVEL_BONUS,
     MONSTER_BASE_COIN_REWARD,
     MONSTER_BASE_XP_REWARD,
-    XP_BASE_COST,
-    XP_LEVEL_RATIO,
 )
+from src.shared.formulas import geometric, xp_for_level
 
 
 def percentage(percent: int | float, whole: int | float, remainder: bool = True) -> int | float:
@@ -55,7 +53,7 @@ def calculate_xp_for_next_level(current_level: int) -> int:
     inflar os números do monstro.
 
     Antes existiam duas curvas de XP no código: esta, que ninguém chamava, e
-    `Player.need_to_up`. Agora só existe esta, e `need_to_up` delega a ela.
+    `Player.need_to_up`. Hoje as duas delegam para `shared/formulas.py`.
 
     Args:
         current_level: Nível atual do jogador.
@@ -63,17 +61,17 @@ def calculate_xp_for_next_level(current_level: int) -> int:
     Returns:
         Quantidade de XP necessária para o próximo nível.
     """
-    return int(XP_BASE_COST * (XP_LEVEL_RATIO ** (max(1, current_level) - 1)))
+    return xp_for_level(current_level)
 
 
 def calculate_monster_xp_reward(monster_level: int) -> int:
     """XP concedida por derrotar um monstro do nível dado."""
-    return int(MONSTER_BASE_XP_REWARD * (GROWTH_RATE ** (max(1, monster_level) - 1)))
+    return geometric(MONSTER_BASE_XP_REWARD, monster_level)
 
 
 def calculate_monster_coin_reward(monster_level: int) -> int:
     """Moedas concedidas por derrotar um monstro do nível dado."""
-    return int(MONSTER_BASE_COIN_REWARD * (GROWTH_RATE ** (max(1, monster_level) - 1)))
+    return geometric(MONSTER_BASE_COIN_REWARD, monster_level)
 
 
 def _calculate_mini_boss_effective_level(dungeon_level: int) -> int:
@@ -84,13 +82,13 @@ def _calculate_mini_boss_effective_level(dungeon_level: int) -> int:
 def calculate_mini_boss_xp_reward(dungeon_level: int) -> int:
     """XP concedida por derrotar um mini-chefe."""
     level = _calculate_mini_boss_effective_level(dungeon_level)
-    return int(MINI_BOSS_BASE_XP_REWARD * (GROWTH_RATE ** (max(1, level) - 1)))
+    return geometric(MINI_BOSS_BASE_XP_REWARD, level)
 
 
 def calculate_mini_boss_coin_reward(dungeon_level: int) -> int:
     """Moedas concedidas por derrotar um mini-chefe."""
     level = _calculate_mini_boss_effective_level(dungeon_level)
-    return int(MINI_BOSS_BASE_COIN_REWARD * (GROWTH_RATE ** (max(1, level) - 1)))
+    return geometric(MINI_BOSS_BASE_COIN_REWARD, level)
 
 
 def generate_essence_multiplier(dungeon_level: int = 1) -> float:

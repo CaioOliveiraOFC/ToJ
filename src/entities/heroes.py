@@ -2,13 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src.content.skills_loader import get_initial_skills
 from src.entities.base import Entity
-from src.mechanics.effects import buff_value, sum_buffs
 from src.shared.constants import (
     CLASS_WEIGHTS,
     DAMAGE_FORMULA_DIVISOR,
-    GROWTH_RATE,
+    INITIAL_SKILL_LEVELS,
     LEVEL_UP_RESTORE_PERCENT,
     MAGE_BASE_AG,
     MAGE_BASE_DF,
@@ -16,6 +14,7 @@ from src.shared.constants import (
     MAGE_BASE_MG,
     MAGE_BASE_MP,
     MAGE_BASE_ST,
+    POTION_BUFF_DURATION,
     ROGUE_BASE_AG,
     ROGUE_BASE_DF,
     ROGUE_BASE_HP,
@@ -29,6 +28,9 @@ from src.shared.constants import (
     WARRIOR_BASE_MP,
     WARRIOR_BASE_ST,
 )
+from src.shared.effects import buff_value, sum_buffs
+from src.shared.formulas import geometric, xp_for_level
+from src.shared.registries import get_initial_skills_for
 
 if TYPE_CHECKING:
     from src.content.passives import PassiveCard
@@ -70,9 +72,6 @@ POTION_BUFFS: dict[str, tuple[str, str]] = {
 
 # Consumíveis que aplicam um status em vez de um buff de atributo.
 POTION_STATUSES = ("poison", "bleed", "stun", "fear", "true_damage", "death_ignore")
-
-POTION_BUFF_DURATION = 3
-
 
 class Player(Entity):
     """Classe base para personagens jogáveis (heróis).
@@ -171,8 +170,7 @@ class Player(Entity):
 
     def _scaled(self, key: str) -> int:
         """Valor do atributo no nível atual: base do nível 1 vezes a razão comum."""
-        base = self._growth.get(key, 0)
-        grown = int(round(base * (GROWTH_RATE ** (self.level - 1)))) + self._bonus.get(key, 0)
+        grown = geometric(self._growth.get(key, 0), self.level) + self._bonus.get(key, 0)
         return int(grown * (1 + self.equipment_percent(key) / 100))
 
     def _add_bonus(self, key: str, value: int) -> None:
@@ -548,7 +546,7 @@ class Player(Entity):
         return messages
 
     def learn_new_skills(self, show: bool = True) -> list[str]:
-        """Aprende skills iniciais uma por nível (níveis 1-4).
+        """Aprende as skills iniciais da classe, uma por nível.
 
         Args:
             show: Se True, inclui mensagens de novas habilidades.
@@ -557,9 +555,8 @@ class Player(Entity):
             Lista de mensagens sobre habilidades aprendidas.
         """
         messages: list[str] = []
-        # Apenas aprende skills iniciais nos níveis 1-4, uma por nível
-        if 1 <= self.level <= 4 and self.initial_skills_learned < self.level:
-            initial_skills = get_initial_skills(self.get_classname())
+        if 1 <= self.level <= INITIAL_SKILL_LEVELS and self.initial_skills_learned < self.level:
+            initial_skills = get_initial_skills_for(self.get_classname())
             while self.initial_skills_learned < self.level and self.initial_skills_learned < len(initial_skills):
                 skill = initial_skills[self.initial_skills_learned]
                 new_key = self.initial_skills_learned + 1
@@ -604,12 +601,12 @@ class Player(Entity):
     def need_to_up(self) -> int:
         """XP total necessária para subir de nível.
 
-        Delega para `math_operations`: existiam duas curvas de XP no código, e
-        a que ninguém chamava era a que parecia oficial. Agora há uma só.
+        A curva vive em `shared/formulas.py` porque `mechanics/` também precisa
+        dela: existiam duas curvas de XP no código, e a que ninguém chamava era
+        a que parecia oficial. Agora há uma só, e ela fica na camada que as
+        duas podem importar.
         """
-        from src.mechanics.math_operations import calculate_xp_for_next_level
-
-        return calculate_xp_for_next_level(self.level)
+        return xp_for_level(self.level)
 
     def set_level(self, target_level: int) -> str:
         """Define o nível do jogador ajustando atributos.

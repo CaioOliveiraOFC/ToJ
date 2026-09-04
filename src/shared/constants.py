@@ -77,6 +77,8 @@ CRIT_CHANCE_HIGH = 25  # Para Rogue com Ataque Furtivo
 CRIT_CHANCE_DEFAULT = 10
 BASE_HIT_CHANCE = 85
 POISON_DAMAGE_PER_TICK = 5
+# Divisor da agilidade no dano de veneno: quem é mais ágil sangra mais rápido.
+POISON_AGILITY_DIVISOR = 5
 
 # Ranges e cálculos de combate
 PERCENTAGE_RANGE_MIN = 1
@@ -199,6 +201,10 @@ RANDOM_EVENT_FOUNTAIN_HEAL_PERCENT = 50  # % da vida máxima curada
 DEFAULT_SKILL_COOLDOWN = 0  # sem cooldown por padrão
 STUN_DURATION = 1  # turnos perdidos quando atordoado
 STUN_CHANCE_DEFAULT = 15  # % base para aplicar stun em ações com stun
+# Chance de atordoar da skill Esmagar, nomeada porque o motor a aplica direto.
+ESMAGAR_STUN_CHANCE = 30
+# Nome da skill que carrega esse atordoamento embutido no motor.
+ESMAGAR_SKILL_NAME = "Esmagar"
 DAMAGE_REDUCTION_DURATION = 3  # turnos que dura a redução de dano
 DAMAGE_REDUCTION_DEFAULT_PERCENT = 30  # % de dano reduzido
 
@@ -233,6 +239,24 @@ MONSTER_BUDGET_ATTACK = 44
 MONSTER_BUDGET_DEFENSE = 20
 MONSTER_BUDGET_AGILITY = 8
 MONSTER_BUDGET_MP = 60
+# `Monster.avg_damage` é derivado de (st + mg) // DAMAGE_FORMULA_DIVISOR. Para
+# que o ataque do orçamento apareça exatamente nesse valor, st e mg recebem
+# metade do divisor cada: 1.5 = DAMAGE_FORMULA_DIVISOR / 2.
+MONSTER_ATTACK_TO_STAT_RATIO = 1.5
+# Abaixo desta fração da vida, um monstro com cura prioriza se curar.
+MONSTER_HEAL_HP_RATIO = 0.5
+# Papel usado quando nada mais é indicado (carregamento de save antigo, por exemplo).
+DEFAULT_MONSTER_ROLE = "bruiser"
+
+# --- Composição de encontros por profundidade ---
+# Andares rasos mantêm inimigos isolados, para ensinar; grupos aparecem a partir
+# de ENCOUNTER_GROUP_MIN_FLOOR e ficam maiores conforme a profundidade. Elites e
+# chefes nunca entram em grupo: eles já são o encontro.
+ENCOUNTER_GROUP_MIN_FLOOR = 4
+ENCOUNTER_LARGE_GROUP_MIN_FLOOR = 10
+ENCOUNTER_MAX_SIZE_SHALLOW = 1
+ENCOUNTER_MAX_SIZE_MID = 2
+ENCOUNTER_MAX_SIZE_DEEP = 3
 
 # --- Acerto relativo ---
 # A chance de acerto usa a diferença *relativa* de agilidade, não a absoluta.
@@ -247,6 +271,11 @@ HIT_CHANCE_CEIL = 95    # nenhum atacante fica infalível
 MANA_BURN_PER_TICK = 12       # MP drenado por turno por "mana_burn"
 BLEED_DAMAGE_PERCENT = 4      # % do HP máximo por turno por "bleed"
 INVISIBLE_HIT_PENALTY = 45    # pontos percentuais de acerto perdidos contra alvo invisível
+
+# Duração, em turnos, dos buffs vindos de consumíveis.
+POTION_BUFF_DURATION = 3
+# Níveis em que o herói aprende as skills iniciais da classe, uma por nível.
+INITIAL_SKILL_LEVELS = 4
 
 # --- Descanso entre andares ---
 # Concluir um andar devolve parte dos recursos. Não tudo: a cura completa a cada

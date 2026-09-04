@@ -12,6 +12,7 @@ from src.shared.constants import (
     PASSIVE_LEGENDARY_WEIGHT,
     PASSIVE_RARE_WEIGHT,
 )
+from src.shared.registries import set_initial_skill_provider
 
 
 @dataclass(frozen=True)
@@ -131,3 +132,9 @@ def generate_skill_choices(
         pool_weights.pop(idx)
 
     return chosen
+
+
+# Registra este módulo como a fonte de skills iniciais. `entities/` consulta o
+# registro em `shared/` e nunca importa de `content/`, como manda a regra 3 da
+# arquitetura: entidades não conhecem dados.
+set_initial_skill_provider(get_initial_skills)

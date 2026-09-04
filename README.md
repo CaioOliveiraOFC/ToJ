@@ -76,8 +76,8 @@ python -m src.sim.runner matrix --iterations 500   # matriz classe x encontro
 ```
 
 Estado atual (400 runs por classe, jogador competente): Guerreiro chega em média
-ao andar 13,9 e termina a masmorra em 12% das runs; Mago 11,6 e 16%; Ladino 13,2
-e 1,5%. Um bot que só aperta "atacar" nunca termina, e para no andar 2.
+ao andar 14,3 e termina a masmorra em 14% das runs; Mago 12,7 e 22%; Ladino 13,7
+e 3%. Um bot que só aperta "atacar" nunca termina, e para no andar 2.
 Detalhes em `BALANCE_REPORT.md`.
 
 ## 🛠️ Tecnologias

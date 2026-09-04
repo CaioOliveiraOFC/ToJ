@@ -27,6 +27,7 @@ from src.shared.constants import (  # noqa: E402
     XP_BASE_COST,
     XP_LEVEL_RATIO,
 )
+from src.shared.formulas import geometric, xp_for_level  # noqa: E402
 
 # ------------------------------------------------------------------ percentage
 
@@ -55,8 +56,7 @@ class TestPercentage:
 class TestEscalonamentoCompartilhado:
     def test_recompensas_usam_a_razao_comum(self):
         assert mo.calculate_monster_xp_reward(1) == MONSTER_BASE_XP_REWARD
-        esperado_nv10 = int(MONSTER_BASE_XP_REWARD * GROWTH_RATE**9)
-        assert mo.calculate_monster_xp_reward(10) == esperado_nv10
+        assert mo.calculate_monster_xp_reward(10) == geometric(MONSTER_BASE_XP_REWARD, 10)
 
     def test_custo_de_xp_cresce_mais_rapido_que_a_recompensa(self):
         # É essa diferença que faz o número de combates por nível subir ao longo
@@ -84,9 +84,7 @@ class TestXpForNextLevel:
 
     @pytest.mark.parametrize("level", [2, 5, 10, 19])
     def test_formula_geometrica(self, level):
-        assert mo.calculate_xp_for_next_level(level) == int(
-            XP_BASE_COST * XP_LEVEL_RATIO ** (level - 1)
-        )
+        assert mo.calculate_xp_for_next_level(level) == xp_for_level(level)
 
     def test_curva_e_monotonica(self):
         custos = [mo.calculate_xp_for_next_level(n) for n in range(1, 21)]
@@ -103,12 +101,8 @@ class TestMonsterRewards:
 
     @pytest.mark.parametrize("level", [5, 10, 20])
     def test_progressao_geometrica(self, level):
-        assert mo.calculate_monster_xp_reward(level) == int(
-            MONSTER_BASE_XP_REWARD * GROWTH_RATE ** (level - 1)
-        )
-        assert mo.calculate_monster_coin_reward(level) == int(
-            MONSTER_BASE_COIN_REWARD * GROWTH_RATE ** (level - 1)
-        )
+        assert mo.calculate_monster_xp_reward(level) == geometric(MONSTER_BASE_XP_REWARD, level)
+        assert mo.calculate_monster_coin_reward(level) == geometric(MONSTER_BASE_COIN_REWARD, level)
 
 
 # --------------------------------------------------- generate_essence_multiplier

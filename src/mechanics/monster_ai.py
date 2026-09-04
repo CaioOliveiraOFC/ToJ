@@ -15,6 +15,12 @@ from __future__ import annotations
 import random
 
 from src.mechanics import combat as combat_mech
+from src.shared.constants import (
+    DEFAULT_MONSTER_ROLE,
+    MONSTER_HEAL_HP_RATIO,
+    PERCENTAGE_RANGE_MAX,
+    PERCENTAGE_RANGE_MIN,
+)
 
 
 def _usable_skills(monster) -> list:
@@ -33,7 +39,7 @@ def _pick_skill(monster, hero, usable: list, rng: random.Random):
     if not usable:
         return None
 
-    role = getattr(monster, "role", "bruiser")
+    role = getattr(monster, "role", DEFAULT_MONSTER_ROLE)
     hp_ratio = monster.get_hp() / max(1, int(getattr(monster, "base_hp", 1)))
 
     heals = [s for s in usable if s.effect_type == "heal"]
@@ -43,7 +49,7 @@ def _pick_skill(monster, hero, usable: list, rng: random.Random):
 
     # Curar-se quando ferido vem antes de qualquer outra intenção: um suporte que
     # morre com a cura na mão é um suporte que não cumpriu a função dele.
-    if heals and hp_ratio < 0.5:
+    if heals and hp_ratio < MONSTER_HEAL_HP_RATIO:
         return heals[0]
 
     if role == "controller" and statuses:
@@ -70,7 +76,7 @@ def decide_monster_action(monster, hero, *, rng: random.Random | None = None, pu
     usable = _usable_skills(monster)
     if usable:
         skill_chance = int(getattr(monster, "skill_use_chance", 0))
-        if skill_chance and r.randrange(1, 101) <= skill_chance:
+        if skill_chance and r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= skill_chance:
             chosen = _pick_skill(monster, hero, usable, r)
             if chosen is not None:
                 target = monster if chosen.target == "self" else hero

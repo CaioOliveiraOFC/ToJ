@@ -8,9 +8,9 @@ Valores medidos no estado atual (400 runs por classe, política competente,
 equipamento típico) — `reports/validation_20260904.json`:
 
     classe      andar médio   chega ao 20   andar médio do bot que só ataca
-    Guerreiro       13.9          12,2%                  2.3
-    Mago            11.6          16,0%                  2.0
-    Ladino          13.2           1,5%                  3.4
+    Guerreiro       14.3          14,0%                  2.3
+    Mago            12.7          22,0%                  2.0
+    Ladino          13.7           3,2%                  3.4
 
 Duração de combate no nível 12, em turnos, da classe mais lenta:
     trash 5.3 · bruiser 11.1 · tank 22.9 · elite 18.3 · chefe 28.8

@@ -7,8 +7,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from src.mechanics import effects as fx
 from src.shared import combat_topics as T
+from src.shared import effects as fx
 from src.shared.constants import (
     BASE_HIT_CHANCE,
     BLEED_DAMAGE_PERCENT,
@@ -19,6 +19,8 @@ from src.shared.constants import (
     DAMAGE_REDUCTION_DEFAULT_PERCENT,
     DAMAGE_REDUCTION_DURATION,
     DEFENSE_K,
+    ESMAGAR_SKILL_NAME,
+    ESMAGAR_STUN_CHANCE,
     FLEE_RANGE_MAX,
     HIT_AGILITY_SWING,
     HIT_CHANCE_CEIL,
@@ -27,6 +29,7 @@ from src.shared.constants import (
     MANA_BURN_PER_TICK,
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
+    POISON_AGILITY_DIVISOR,
     POISON_DAMAGE_PER_TICK,
     STUN_DURATION,
     XMULT_CAP,
@@ -202,7 +205,11 @@ def resolve_physical_attack(
     damage = max(1, int(damage * fx.incoming_damage_multiplier(defender)))
 
     # Stun: por skill nomeada, ou pela passiva de atordoamento do atacante.
-    stun_chance = 30 if skill_name == "Esmagar" else int(fx.combat_modifier(attacker, "stun_chance"))
+    stun_chance = (
+        ESMAGAR_STUN_CHANCE
+        if skill_name == ESMAGAR_SKILL_NAME
+        else int(fx.combat_modifier(attacker, "stun_chance"))
+    )
     if stun_chance and r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= stun_chance:
         if hasattr(defender, "active_effects"):
             defender.active_effects["stun"] = {"duration": STUN_DURATION}
@@ -458,7 +465,7 @@ def process_turn_start_effects(
 
     for effect, data in list(getattr(entity, "active_effects", {}).items()):
         if effect == "poison":
-            poison_damage = POISON_DAMAGE_PER_TICK + (entity.get_ag() // 5)
+            poison_damage = POISON_DAMAGE_PER_TICK + (entity.get_ag() // POISON_AGILITY_DIVISOR)
             entity.take_damage(poison_damage)
             _emit(
                 publish,

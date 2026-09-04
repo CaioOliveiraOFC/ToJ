@@ -17,13 +17,13 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from src.content.factories.archetypes import ARCHETYPES, spawn_by_role  # noqa: E402
+from src.content.factories.archetypes import all_archetypes, spawn_by_role  # noqa: E402
 from src.content.items import get_all_items  # noqa: E402
 from src.content.passives import load_passives  # noqa: E402
 from src.content.skills_loader import load_skills  # noqa: E402
 from src.entities.heroes import POTION_BUFFS, POTION_STATUSES  # noqa: E402
 from src.mechanics import combat as cmb  # noqa: E402
-from src.mechanics import effects as fx  # noqa: E402
+from src.shared import effects as fx  # noqa: E402
 from src.sim.harness import ALL_CLASSES, make_hero, simulate, simulate_run  # noqa: E402
 from tests.balance import thresholds as T  # noqa: E402
 
@@ -80,7 +80,7 @@ class TestChanceDeAcerto:
     @pytest.mark.parametrize("classe", ALL_CLASSES)
     def test_monstro_sempre_consegue_acertar_o_heroi(self, classe, level):
         heroi = make_hero(classe, level, "expected")
-        for papel in ARCHETYPES:
+        for papel in all_archetypes():
             chance = cmb.hit_chance(spawn_by_role(papel, level), heroi)
             assert chance >= T.HIT_FLOOR, (
                 f"{classe} no nível {level} é praticamente imune a {papel}: {chance}% de acerto."
@@ -90,7 +90,7 @@ class TestChanceDeAcerto:
     @pytest.mark.parametrize("classe", ALL_CLASSES)
     def test_heroi_nunca_acerta_sempre(self, classe, level):
         heroi = make_hero(classe, level, "expected")
-        for papel in ARCHETYPES:
+        for papel in all_archetypes():
             assert cmb.hit_chance(heroi, spawn_by_role(papel, level)) <= T.HIT_CEIL
 
     def test_vantagem_de_agilidade_nao_depende_do_nivel(self):
@@ -373,7 +373,7 @@ class TestArquetipos:
     """Cada papel precisa distribuir o orçamento de um jeito diferente."""
 
     def test_todo_arquetipo_tem_uma_forca_e_uma_fraqueza(self):
-        for papel, arquetipo in ARCHETYPES.items():
+        for papel, arquetipo in all_archetypes().items():
             eixos = (arquetipo.hp, arquetipo.attack, arquetipo.defense, arquetipo.agility)
             if papel in ("bruiser", "elite", "boss"):
                 continue  # referência e marcos: custam mais orçamento, não o redistribuem
@@ -388,7 +388,7 @@ class TestArquetipos:
             )
 
     def test_todo_arquetipo_declara_ameaca_e_counterplay(self):
-        for papel, arquetipo in ARCHETYPES.items():
+        for papel, arquetipo in all_archetypes().items():
             assert arquetipo.threat and arquetipo.counterplay, (
                 f"{papel} não documenta o que ameaça nem como se responde a ele."
             )

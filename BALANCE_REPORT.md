@@ -36,9 +36,9 @@ nível 1; a identidade está em como elas gastam o resto.
 | Mago | 119 | 466 | Vence rápido ou não vence | Controlador, que rouba turno e mana |
 | Ladino | 100 | 463 + esquiva | Escolhe quando lutar | Skirmisher, que anula a esquiva |
 
-**Nove arquétipos de monstro**, cada um com ameaça e counterplay declarados em
-`content/factories/archetypes.py`. Todo arquétipo precisa de pelo menos uma
-classe que sofre contra ele.
+**Nove arquétipos de monstro**, com orçamento, comportamento, ameaça e
+counterplay declarados em `src/data/monsters.json`. Todo arquétipo precisa de
+pelo menos uma classe que sofre contra ele.
 
 **Escala relativa.** Dano de skill é percentual do poder base; cura, percentual
 do HP máximo; bônus de equipamento, percentual do atributo; chance de acerto usa
@@ -53,13 +53,13 @@ a diferença relativa de agilidade, com piso de 20% e teto de 95%.
 
 | Classe | Andar médio | Chega ao andar 20 | Bot que só ataca |
 |---|---:|---:|---:|
-| Guerreiro | 13,9 | 12,2% | andar médio 2,3 |
-| Mago | 11,6 | 16,0% | andar médio 2,0 |
-| Ladino | 13,2 | 1,5% | andar médio 3,4 |
+| Guerreiro | 14,3 | 14,0% | andar médio 2,3 |
+| Mago | 12,7 | 22,0% | andar médio 2,0 |
+| Ladino | 13,7 | 3,2% | andar médio 3,4 |
 
 - O bot que só ataca **não termina a masmorra** em nenhuma classe.
-- Distância entre a melhor e a pior classe: **2,3 andares**.
-- Jogar bem vale de **9,8 a 11,6 andares** de profundidade.
+- Distância entre a melhor e a pior classe: **1,7 andares**.
+- Jogar bem vale de **10,3 a 12,1 andares** de profundidade.
 - Duração de combate: trash 3-5 turnos, bruiser 6-11, elite 10-18, chefe 14-29.
 - Custo de um encontro: trash 3%, bruiser 13-18%, elite 25-35%, chefe 39% da vida.
 

@@ -34,6 +34,11 @@ from src.shared import combat_topics as topics
 from src.shared.constants import (
     BASE_MAP_HEIGHT,
     BASE_MAP_WIDTH,
+    ENCOUNTER_GROUP_MIN_FLOOR,
+    ENCOUNTER_LARGE_GROUP_MIN_FLOOR,
+    ENCOUNTER_MAX_SIZE_DEEP,
+    ENCOUNTER_MAX_SIZE_MID,
+    ENCOUNTER_MAX_SIZE_SHALLOW,
     FLOOR_CLEAR_RESTORE_PERCENT,
     MAP_HEIGHT_INCREMENT_PER_5_LEVELS,
     MAP_WIDTH_INCREMENT_PER_5_LEVELS,
@@ -431,12 +436,12 @@ def _build_encounters(monsters: list, dungeon_level: int) -> list[list]:
     solos = [m for m in monsters if getattr(m, "is_boss", False)]
     rest = [m for m in monsters if not getattr(m, "is_boss", False)]
 
-    if dungeon_level < 4:
-        max_size = 1
-    elif dungeon_level < 10:
-        max_size = 2
+    if dungeon_level < ENCOUNTER_GROUP_MIN_FLOOR:
+        max_size = ENCOUNTER_MAX_SIZE_SHALLOW
+    elif dungeon_level < ENCOUNTER_LARGE_GROUP_MIN_FLOOR:
+        max_size = ENCOUNTER_MAX_SIZE_MID
     else:
-        max_size = 3
+        max_size = ENCOUNTER_MAX_SIZE_DEEP
 
     groups: list[list] = [[m] for m in solos]
     index = 0
