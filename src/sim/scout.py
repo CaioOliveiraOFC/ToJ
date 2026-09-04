@@ -23,6 +23,7 @@ from dataclasses import dataclass, field
 from src.content.passives import load_passives
 from src.content.skills_loader import load_skills
 from src.sim.harness import ALL_CLASSES, simulate_run
+from src.sim.pick_policies import DELIBERATE_POLICIES, POLICIES
 from src.sim.toggles import ABLATION_SYSTEMS, Toggles
 
 # Um item é destaque quando se afasta da mediana por este fator. Não é um
@@ -34,6 +35,12 @@ LOW_PICK_RATE = 0.15
 # Um sistema cuja remoção muda a profundidade média menos que isto não está
 # sustentando nada.
 NEGLIGIBLE_ABLATION_FLOORS = 0.5
+# Escolher de propósito precisa render pelo menos isto sobre escolher ao acaso.
+# Abaixo disso, o menu de cartas é decorativo.
+MIN_CHOICE_VALUE_FLOORS = 0.5
+# Acima desta taxa de escolha em todas as políticas, a carta não é uma opção: é
+# a resposta certa, e o menu que a oferece não está perguntando nada.
+UNIVERSAL_PICK_RATE = 0.7
 
 
 @dataclass
@@ -51,6 +58,39 @@ class Finding:
 
 
 @dataclass
+class PolicyComparison:
+    """Como cada política de escolha se saiu, e o que cada uma levou."""
+
+    mean_floor_by_policy: dict[str, float] = field(default_factory=dict)
+    passive_pick_rate: dict[str, dict[str, float]] = field(default_factory=dict)
+    skill_pick_rate: dict[str, dict[str, float]] = field(default_factory=dict)
+
+    def choice_value(self) -> float:
+        """Quanto escolher de propósito rende sobre escolher ao acaso.
+
+        É a pergunta que o menu de cartas existe para responder. Se der zero, o
+        jogador está apertando um botão que não muda nada.
+        """
+        deliberadas = [
+            self.mean_floor_by_policy[nome]
+            for nome in DELIBERATE_POLICIES
+            if nome in self.mean_floor_by_policy
+        ]
+        aleatoria = self.mean_floor_by_policy.get("random")
+        if not deliberadas or aleatoria is None:
+            return 0.0
+        return max(deliberadas) - aleatoria
+
+    def to_dict(self) -> dict:
+        return {
+            "mean_floor_by_policy": self.mean_floor_by_policy,
+            "choice_value_floors": self.choice_value(),
+            "passive_pick_rate": self.passive_pick_rate,
+            "skill_pick_rate": self.skill_pick_rate,
+        }
+
+
+@dataclass
 class ScoutReport:
     """Resultado do scout: telemetria agregada, destaques e ablação."""
 
@@ -60,6 +100,7 @@ class ScoutReport:
     findings: list[Finding] = field(default_factory=list)
     ablation: list[dict] = field(default_factory=list)
     baseline_mean_floor: float = 0.0
+    policies: PolicyComparison | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -74,6 +115,7 @@ class ScoutReport:
                 for f in self.findings
             ],
             "ablation": self.ablation,
+            "pick_policies": self.policies.to_dict() if self.policies else None,
         }
 
 
@@ -99,6 +141,144 @@ def collect(iterations: int, classes: list[str], policy: str, loadout: str,
         profundidades.append(resultado["mean_floor"])
         _merge(agregada, resultado["telemetry"] or {})
     return agregada, statistics.fmean(profundidades)
+
+
+def compare_pick_policies(iterations: int, classes: list[str], policy: str, loadout: str,
+                          seed: int, max_floor: int) -> PolicyComparison:
+    """Roda a simulação com cada política de escolha e compara o que cada uma leva.
+
+    Com uma política só, "esta passiva é ignorada" mistura duas causas: a carta é
+    fraca, ou a carta serve a uma build que aquele bot não joga. Rodar várias
+    separa as duas, e a política aleatória dá a referência.
+    """
+    comparacao = PolicyComparison()
+
+    for nome in POLICIES:
+        telemetria: dict = {}
+        profundidades: list[float] = []
+        for hero_class in classes:
+            resultado = simulate_run(hero_class, max_floor, iterations, policy, seed,
+                                     loadout, pick_policy=nome)
+            profundidades.append(resultado["mean_floor"])
+            _merge(telemetria, resultado["telemetry"] or {})
+
+        comparacao.mean_floor_by_policy[nome] = statistics.fmean(profundidades)
+        comparacao.passive_pick_rate[nome] = _pick_rates(telemetria.get("passives", {}))
+        comparacao.skill_pick_rate[nome] = _pick_rates(telemetria.get("skills", {}))
+
+    return comparacao
+
+
+def _pick_rates(bloco: dict) -> dict[str, float]:
+    """Taxa de escolha de cada carta, entre as vezes em que foi oferecida."""
+    offered, picked = bloco.get("offered", {}), bloco.get("picked", {})
+    return {
+        cid: picked.get(cid, 0) / vezes
+        for cid, vezes in offered.items()
+        if vezes >= 10
+    }
+
+
+def analyse_pick_policies(comparacao: PolicyComparison) -> list[Finding]:
+    """O que a comparação entre políticas revela sobre as cartas e sobre o menu."""
+    achados: list[Finding] = []
+
+    valor = comparacao.choice_value()
+    espalhamento = (
+        max(comparacao.mean_floor_by_policy.values())
+        - min(comparacao.mean_floor_by_policy.values())
+    ) if comparacao.mean_floor_by_policy else 0.0
+
+    if valor < MIN_CHOICE_VALUE_FLOORS:
+        achados.append(Finding(
+            "escolha", "valor de escolher", "SUSPEITA",
+            f"a melhor política deliberada rende {valor:+.1f} andar sobre sortear ao acaso "
+            "— o menu de cartas não está fazendo pergunta nenhuma",
+            valor,
+        ))
+    else:
+        achados.append(Finding(
+            "escolha", "valor de escolher", "ok",
+            f"escolher de propósito rende {valor:+.1f} andar sobre sortear",
+            valor,
+        ))
+
+    # A profundidade média de uma run é bimodal, então este número balança entre
+    # execuções. Dizer isso é mais honesto que apresentar uma casa decimal que a
+    # amostra não sustenta.
+    if abs(valor) < espalhamento * 0.4:
+        achados.append(Finding(
+            "escolha", "confiança da medição", "referência",
+            f"o valor da escolha ({valor:+.1f}) é pequeno perto do espalhamento entre "
+            f"políticas ({espalhamento:.1f}) — aumente --policy-iterations antes de decidir",
+            espalhamento,
+        ))
+
+    ordenadas = sorted(comparacao.mean_floor_by_policy.items(), key=lambda kv: -kv[1])
+    achados.append(Finding(
+        "escolha", "ranking de intenção", "referência",
+        " > ".join(f"{nome} {andar:.1f}" for nome, andar in ordenadas),
+        0.0,
+    ))
+
+    achados += _analyse_cards(comparacao.passive_pick_rate, "passivas")
+    achados += _analyse_cards(comparacao.skill_pick_rate, "skills")
+    return achados
+
+
+def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str) -> list[Finding]:
+    """Classifica cada carta pelo padrão de escolha entre as políticas.
+
+    Três padrões, três diagnósticos diferentes:
+    ignorada por todas as intenções é carta fraca; levada por todas é a resposta
+    certa disfarçada de escolha; levada por uma só é identidade de build, que é
+    exatamente o que se quer e não deve ser mexido.
+    """
+    from src.content.passives import load_passives
+    from src.content.skills_loader import load_skills
+
+    catalogo = (
+        {p.id: p.name for p in load_passives()} if sistema == "passivas"
+        else {s.id: s.name for s in load_skills()}
+    )
+    deliberadas = [n for n in DELIBERATE_POLICIES if n in taxas_por_politica]
+    if not deliberadas:
+        return []
+
+    todas_cartas = {cid for nome in deliberadas for cid in taxas_por_politica[nome]}
+    fracas, universais, identidade = [], [], []
+
+    for cid in sorted(todas_cartas):
+        taxas = [taxas_por_politica[n].get(cid, 0.0) for n in deliberadas]
+        nome = catalogo.get(cid, cid)
+        if max(taxas) <= LOW_PICK_RATE:
+            fracas.append(nome)
+        elif min(taxas) >= UNIVERSAL_PICK_RATE:
+            universais.append(nome)
+        elif sum(1 for t in taxas if t >= 0.4) == 1:
+            identidade.append(nome)
+
+    achados: list[Finding] = []
+    if fracas:
+        achados.append(Finding(
+            sistema, "recusadas por toda intenção", "morta",
+            f"{len(fracas)} cartas: " + ", ".join(fracas[:8]),
+            len(fracas),
+        ))
+    if universais:
+        achados.append(Finding(
+            sistema, "levadas por toda intenção", "SUSPEITA",
+            f"{len(universais)} cartas: " + ", ".join(universais[:8])
+            + " — não são opção, são a resposta certa",
+            len(universais),
+        ))
+    if identidade:
+        achados.append(Finding(
+            sistema, "cartas de identidade", "ok",
+            f"{len(identidade)} escolhidas por uma intenção só: " + ", ".join(identidade[:8]),
+            len(identidade),
+        ))
+    return achados
 
 
 def analyse_skills(telemetry: dict) -> list[Finding]:
@@ -344,7 +524,8 @@ def ablate(iterations: int, classes: list[str], policy: str, loadout: str,
 def run_scout(iterations: int = 60, classes: list[str] | None = None, policy: str = "smart",
               loadout: str = "expected", seed: int = 1337, max_floor: int = 20,
               with_ablation: bool = False, ablation_iterations: int = 40,
-              per_skill: bool = False, per_passive: bool = False) -> ScoutReport:
+              per_skill: bool = False, per_passive: bool = False,
+              with_pick_policies: bool = True, policy_iterations: int = 40) -> ScoutReport:
     """Executa o scout completo e devolve o relatório."""
     turmas = classes or list(ALL_CLASSES)
     telemetria, baseline = collect(iterations, turmas, policy, loadout, seed, max_floor)
@@ -362,6 +543,12 @@ def run_scout(iterations: int = 60, classes: list[str] | None = None, policy: st
         findings=achados,
         baseline_mean_floor=baseline,
     )
+
+    if with_pick_policies:
+        relatorio.policies = compare_pick_policies(
+            policy_iterations, turmas, policy, loadout, seed, max_floor,
+        )
+        relatorio.findings += analyse_pick_policies(relatorio.policies)
 
     if with_ablation:
         relatorio.ablation = ablate(
@@ -395,7 +582,8 @@ def format_report(report: ScoutReport) -> str:
         "=" * 78,
     ]
 
-    for sistema in ("skills", "passivas", "equipamento", "economia", "essência", "eventos"):
+    for sistema in ("escolha", "skills", "passivas", "equipamento", "economia",
+                    "essência", "eventos"):
         do_sistema = [f for f in report.findings if f.system == sistema]
         if not do_sistema:
             continue

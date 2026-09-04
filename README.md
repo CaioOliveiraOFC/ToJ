@@ -79,7 +79,9 @@ python -m src.sim.runner scout --ablate            # + o quanto cada sistema sus
 
 O `scout` responde o que a profundidade média não responde: qual skill é forte
 demais, qual passiva ninguém leva, quanto o equipamento contribui, quanto a
-Essência decide a run e se os eventos aleatórios mudam alguma coisa.
+Essência decide a run e se os eventos aleatórios mudam alguma coisa. Ele roda a
+run com quatro intenções de build diferentes, o que separa a carta fraca da
+carta de nicho e mede se escolher rende alguma coisa sobre sortear.
 
 A simulação roda os mesmos sistemas do jogo — passivas, escolha de skill, drops,
 loja, eventos e Essência — e não só o combate.

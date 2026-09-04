@@ -26,6 +26,7 @@ from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
 from src.sim import progression
 from src.sim.encounters import build_encounter
 from src.sim.loadouts import apply_loadout
+from src.sim.pick_policies import DEFAULT_PICK_POLICY, get_pick_policy
 from src.sim.policies import get_policy
 from src.sim.telemetry import RunTelemetry
 from src.sim.toggles import Toggles
@@ -179,6 +180,7 @@ def simulate_run(
     encounters_per_floor=None,
     toggles: Toggles | None = None,
     collect_telemetry: bool = True,
+    pick_policy: str = DEFAULT_PICK_POLICY,
 ) -> dict:
     """Simula runs completas de masmorra, com todos os sistemas que o jogo roda.
 
@@ -195,6 +197,7 @@ def simulate_run(
     herói que o jogo entrega.
     """
     decide = get_policy(policy)
+    picker = get_pick_policy(pick_policy)
     cfg = toggles or Toggles()
     telemetry = RunTelemetry() if collect_telemetry else None
     shop = Shop()
@@ -228,7 +231,7 @@ def simulate_run(
                 if telemetry is not None:
                     telemetry.record_battle(outcome)
                 if outcome.hero_won:
-                    _award(hero, monsters, essence, rng, cfg, telemetry)
+                    _award(hero, monsters, essence, rng, cfg, telemetry, picker)
 
             if died:
                 break
@@ -267,6 +270,7 @@ def simulate_run(
         "skills_at_end_mean": statistics.fmean(skills_at_end),
         "passives_at_end_mean": statistics.fmean(passives_at_end),
         "toggles": cfg.label(),
+        "pick_policy": pick_policy,
         "telemetry": telemetry.to_dict() if telemetry is not None else None,
     }
 
@@ -351,7 +355,7 @@ def _default_floor_plan(floor: int) -> list[str]:
 
 
 def _award(hero, monsters: list, essence: float, rng: random.Random,
-           toggles: Toggles | None = None, telemetry=None) -> None:
+           toggles: Toggles | None = None, telemetry=None, picker=None) -> None:
     """Aplica XP, ouro, loot e as escolhas de nível, como o jogo faz.
 
     Espelha `engine.loop.process_post_battle`: a Essência multiplica o XP, as
@@ -396,7 +400,7 @@ def _award(hero, monsters: list, essence: float, rng: random.Random,
         hero.level_up(show=False)
     levels_gained = hero.get_level() - level_before
     if levels_gained > 0:
-        progression.on_level_up(hero, levels_gained, rng, toggles, telemetry)
+        progression.on_level_up(hero, levels_gained, rng, toggles, telemetry, picker)
 
 
 def _percentile(values: list[int], q: float) -> float:

@@ -21,6 +21,7 @@ from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.content.skills_loader import generate_skill_choices
 from src.mechanics.math_operations import generate_essence_multiplier
+from src.sim.pick_policies import DEFAULT_PICK_POLICY, PickPolicy, get_pick_policy
 from src.sim.toggles import Toggles
 
 # O jogo oferece escolha de skill nos níveis ímpares a partir deste.
@@ -29,70 +30,24 @@ SKILL_CHOICE_MIN_LEVEL = 5
 TARGET_HEALING_POTIONS = 3
 # Fração do ouro que o bot aceita gastar em equipamento; o resto fica para poção.
 GEAR_BUDGET_RATIO = 0.6
-# Ordem de preferência de passivas para um jogador competente: primeiro o que
-# mantém a run viva, depois o que a encurta, por último o que a enriquece.
-PASSIVE_PRIORITY = (
-    "max_hp", "defense", "damage_reduction", "death_ignore",
-    "strength", "crit_chance", "agility",
-    "potion_heal_bonus", "max_mp", "dodge_chance", "stun_chance",
-    "essence_bonus", "gold_drop_bonus",
-)
+def pick_passive(hero, choices: list, rng: random.Random, picker: PickPolicy | None = None):
+    """Escolhe uma passiva entre as oferecidas, pela política indicada.
 
-
-def pick_passive(hero, choices: list, rng: random.Random):
-    """Escolhe uma passiva entre as três oferecidas.
-
-    A heurística é a de um jogador competente: prioriza o que resolve o problema
-    mais próximo — sobrevivência quando a classe é frágil, dano quando ela já
-    aguenta. Um bot que sorteia ao acaso mede a média das builds, não a build que
-    alguém montaria.
+    A ordem de preferência vive em `sim/pick_policies.py`, e não aqui, porque o
+    scout precisa comparar políticas diferentes: ranking de carta tirado de um
+    único jeito de jogar é o ranking daquele jeito de jogar, não do conteúdo.
     """
-    if not choices:
-        return None
-
-    # Sobrevivência primeiro. Numa masmorra de permadeath decidida por atrito, o
-    # que encerra a run é acabar a vida, não demorar a matar — e uma heurística
-    # que dependesse dos atributos da classe acabaria dando builds diferentes por
-    # acidente de arredondamento, em vez de por decisão.
-    for efeito in PASSIVE_PRIORITY:
-        for carta in choices:
-            if carta.effect_type == efeito:
-                return carta
-    return max(choices, key=lambda c: float(c.effect_value) if str(c.effect_value).replace(".", "").isdigit() else 0)
+    return (picker or get_pick_policy(DEFAULT_PICK_POLICY)).pick_passive(hero, choices, rng)
 
 
-def pick_skill(hero, choices: list, rng: random.Random):
-    """Escolhe uma skill nova entre as oferecidas, e qual substituir.
-
-    Prefere dano, depois controle, depois cura — a ordem que a política de
-    combate sabe usar. Substitui a skill de menor valor entre as que o herói já
-    tem, para o slot novo não desperdiçar a escolha.
-    """
-    if not choices:
-        return None, None
-
-    ordem = {"damage": 0, "status": 1, "heal": 2, "damage_reduction": 3, "buff": 4}
-    nova = min(choices, key=lambda s: (ordem.get(s.effect_type, 9), -_valor(s)))
-
-    if len(hero.skills) < 4:
-        return nova, max(hero.skills, default=0) + 1
-
-    pior = min(hero.skills, key=lambda k: _valor(hero.skills[k]))
-    if _valor(nova) <= _valor(hero.skills[pior]):
-        return None, None
-    return nova, pior
-
-
-def _valor(skill) -> float:
-    """Valor bruto de uma skill, para comparar candidatas."""
-    try:
-        return float(skill.effect_value)
-    except (TypeError, ValueError):
-        return 25.0  # skills de status não têm valor numérico; valem como controle
+def pick_skill(hero, choices: list, rng: random.Random, picker: PickPolicy | None = None):
+    """Escolhe uma skill nova entre as oferecidas, e qual substituir."""
+    return (picker or get_pick_policy(DEFAULT_PICK_POLICY)).pick_skill(hero, choices, rng)
 
 
 def on_level_up(hero, levels_gained: int, rng: random.Random,
-                toggles: Toggles | None = None, telemetry=None) -> None:
+                toggles: Toggles | None = None, telemetry=None,
+                picker: PickPolicy | None = None) -> None:
     """Aplica as escolhas que o jogo oferece a cada nível ganho.
 
     Espelha `engine/loop.py`: uma passiva por nível, e uma skill nos níveis
@@ -103,7 +58,7 @@ def on_level_up(hero, levels_gained: int, rng: random.Random,
     if cfg.passives:
         for _ in range(levels_gained):
             ofertas = [c for c in generate_passive_choices(count=3) if c.id not in cfg.banned_passives]
-            escolhida = pick_passive(hero, ofertas, rng)
+            escolhida = pick_passive(hero, ofertas, rng, picker)
             if telemetry is not None:
                 telemetry.record_offer("passive", ofertas, escolhida)
             if escolhida is not None:
@@ -118,7 +73,7 @@ def on_level_up(hero, levels_gained: int, rng: random.Random,
             conhecidas = [s.id for s in hero.skills.values()]
             ofertas = generate_skill_choices(hero.get_classname(), lvl, conhecidas, count=3)
             ofertas = [o for o in ofertas if o.id not in cfg.banned_skills]
-            nova, slot = pick_skill(hero, ofertas, rng)
+            nova, slot = pick_skill(hero, ofertas, rng, picker)
             if telemetry is not None:
                 telemetry.record_offer("skill", ofertas, nova)
             if nova is not None and slot is not None:

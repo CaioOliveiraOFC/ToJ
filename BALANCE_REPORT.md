@@ -106,10 +106,20 @@ Os dois discordam com frequência, e a discordância é informação: uma skill 
 ter dano alto por ser sempre usada mas ablação baixa, porque outra a substitui;
 uma passiva rara pode ter atribuição baixa e ablação alta.
 
+**Comparação entre intenções de build** — o scout roda a run com quatro
+políticas de escolha de carta (`survival`, `offense`, `economy` e `random`) e
+compara. Com uma política só, "esta passiva é ignorada" mistura duas causas:
+a carta é fraca, ou serve a uma build que aquele bot não joga. Com várias, o
+padrão separa: recusada por toda intenção é carta fraca; levada por toda
+intenção é a resposta certa disfarçada de escolha; levada por uma só é
+identidade de build, que é o que se quer. A política `random` é o grupo de
+controle e mede o **valor da escolha**.
+
 ```bash
-python -m src.sim.runner scout --iterations 60                    # atribuição, ~10s
-python -m src.sim.runner scout --iterations 50 --ablate           # + ablação, ~40s
+python -m src.sim.runner scout --iterations 60                    # atribuição, ~25s
+python -m src.sim.runner scout --iterations 50 --ablate           # + ablação, ~90s
 python -m src.sim.runner scout --ablate --per-skill --per-passive # carta a carta, minutos
+python -m src.sim.runner run --pick-policy economy                # calibrar com outra intenção
 ```
 
 ### O que o primeiro scout encontrou
@@ -140,9 +150,23 @@ Quatro problemas que a métrica de profundidade sozinha não mostrava:
    mesma: falta preço alto o bastante ou item bom o bastante para o ouro ter
    destino.
 
-Também: uma única passiva, Sangue de Guerreiro, é escolhida em 91% das ofertas —
-não é escolha, é a resposta certa. E 15 skills nunca são escolhidas quando
-oferecidas.
+### O achado mais importante: escolher não vale nada
+
+Com 80 runs por política, o valor da escolha é **+0,0 andar**: a melhor intenção
+deliberada não vai mais fundo que sortear a carta ao acaso.
+
+    economy 8,1  >  random 8,0  >  survival 7,3  >  offense 7,1
+
+O menu de cartas não está fazendo pergunta nenhuma. Vale notar que `survival`,
+a política usada em toda a calibração, é a segunda pior — e a diferença entre
+elas cabe no ruído da amostra, o que reforça o mesmo diagnóstico.
+
+A comparação também reclassifica cartas que uma política só condenava por
+engano. Das 29 passivas, apenas **duas** são recusadas por toda intenção
+(Lâmina Lendária, Reflexos Rápidos); **23** são levadas por exatamente uma
+intenção, o que é identidade saudável e não deve ser mexido. Nas skills, **10**
+são recusadas por todas — essas são fracas de verdade — e **Assassinato** é
+levada por todas, ou seja, não é opção: é a resposta certa.
 
 ## Como reproduzir
 

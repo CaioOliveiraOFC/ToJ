@@ -95,6 +95,7 @@ ToJ/
     │   ├── progression.py          # Passiva, skill, loot e loja durante a run
     │   ├── telemetry.py            # Contribuição por sistema, coletada na run
     │   ├── toggles.py              # Interruptores de sistema para ablação
+    │   ├── pick_policies.py        # Intenções de build (survival/offense/economy/random)
     │   ├── scout.py                # Destaques por sistema (atribuição + ablação)
     │   └── runner.py               # CLI de desenvolvimento
     │

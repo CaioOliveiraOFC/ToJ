@@ -18,6 +18,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from src.sim import scout  # noqa: E402
 from src.sim.harness import simulate_run  # noqa: E402
+from src.sim.pick_policies import (  # noqa: E402
+    DELIBERATE_POLICIES,
+    PASSIVE_PRIORITIES,
+    POLICIES,
+    SKILL_PRIORITIES,
+    get_pick_policy,
+)
 from src.sim.toggles import ABLATION_SYSTEMS, Toggles  # noqa: E402
 
 pytestmark = pytest.mark.balance
@@ -149,3 +156,79 @@ class TestRelatorio:
             findings=scout.analyse_skills(telemetria), baseline_mean_floor=5.0,
         )
         assert json.dumps(relatorio.to_dict())
+
+
+class TestPoliticasDeEscolha:
+    """Várias intenções de build, para separar carta fraca de carta de nicho.
+
+    Com uma política só, "esta passiva é ignorada" mistura duas causas: a carta
+    é ruim, ou serve a uma build que aquele bot não joga. É a diferença entre
+    corrigir o conteúdo e corrigir o medidor.
+    """
+
+    def test_toda_politica_deliberada_cobre_todo_efeito_de_passiva(self):
+        from src.content.passives import load_passives
+
+        efeitos = {p.effect_type for p in load_passives()}
+        for nome, ordem in PASSIVE_PRIORITIES.items():
+            faltando = efeitos - set(ordem)
+            assert not faltando, (
+                f"a política {nome} não sabe ordenar {faltando}: essas passivas "
+                "cairiam no desempate por valor e o ranking viraria ruído."
+            )
+
+    def test_toda_politica_cobre_todo_tipo_de_skill(self):
+        from src.content.skills_loader import load_skills
+
+        tipos = {s.effect_type for s in load_skills()}
+        for nome, ordem in SKILL_PRIORITIES.items():
+            assert tipos <= set(ordem), f"a política {nome} não ordena {tipos - set(ordem)}"
+
+    def test_politicas_diferentes_escolhem_cartas_diferentes(self):
+        # Se todas escolhessem igual, comparar não separaria nada.
+        import random as _random
+
+        from src.content.passives import load_passives
+
+        cartas = load_passives()[:3]
+        heroi = None
+        escolhas = {
+            nome: get_pick_policy(nome).pick_passive(heroi, cartas, _random.Random(1)).id
+            for nome in DELIBERATE_POLICIES
+        }
+        assert len(set(escolhas.values())) > 1, (
+            f"todas as intenções levaram a mesma carta: {escolhas}"
+        )
+
+    def test_politica_aleatoria_nao_e_deliberada(self):
+        assert POLICIES["random"].deliberate is False
+        assert "random" not in DELIBERATE_POLICIES
+
+    def test_politica_desconhecida_falha_alto(self):
+        with pytest.raises(ValueError, match="Política de escolha desconhecida"):
+            get_pick_policy("nao_existe")
+
+    def test_a_run_aceita_cada_politica(self):
+        for nome in POLICIES:
+            resultado = simulate_run("Warrior", 8, 4, "smart", 1337, "expected",
+                                     pick_policy=nome)
+            assert resultado["pick_policy"] == nome
+
+    def test_comparacao_produz_taxa_por_politica(self):
+        comparacao = scout.compare_pick_policies(
+            iterations=5, classes=["Warrior"], policy="smart",
+            loadout="expected", seed=1337, max_floor=12,
+        )
+        assert set(comparacao.mean_floor_by_policy) == set(POLICIES)
+        assert comparacao.passive_pick_rate, "nenhuma taxa de escolha de passiva registrada"
+        assert isinstance(comparacao.choice_value(), float)
+
+    def test_comparacao_gera_achados_classificando_cartas(self):
+        comparacao = scout.compare_pick_policies(
+            iterations=5, classes=["Warrior"], policy="smart",
+            loadout="expected", seed=1337, max_floor=12,
+        )
+        achados = scout.analyse_pick_policies(comparacao)
+        assuntos = {f.subject for f in achados}
+        assert "valor de escolher" in assuntos
+        assert "ranking de intenção" in assuntos

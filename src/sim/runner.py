@@ -19,6 +19,7 @@ from pathlib import Path
 from src.sim.encounters import ENCOUNTERS, MATRIX_ENCOUNTERS
 from src.sim.harness import ALL_CLASSES, simulate, simulate_run
 from src.sim.metrics import skill_gap
+from src.sim.pick_policies import DEFAULT_PICK_POLICY, POLICIES
 from src.sim.scout import format_report, run_scout
 
 DEFAULT_LEVELS = (1, 5, 10, 15, 20)
@@ -144,7 +145,7 @@ def cmd_run(args) -> None:
         for policy in args.policies.split(","):
             data = simulate_run(
                 hero_class, args.max_floor, args.iterations, policy.strip(),
-                args.seed, args.loadout,
+                args.seed, args.loadout, pick_policy=getattr(args, "pick_policy", DEFAULT_PICK_POLICY),
             )
             rows.append(data)
             print(
@@ -203,6 +204,8 @@ def cmd_scout(args) -> None:
         ablation_iterations=args.ablation_iterations,
         per_skill=args.per_skill,
         per_passive=args.per_passive,
+        with_pick_policies=not args.no_pick_policies,
+        policy_iterations=args.policy_iterations,
     )
     print(format_report(report))
     payload = report.to_dict()
@@ -258,6 +261,9 @@ def build_parser() -> argparse.ArgumentParser:
     common(p_run, iterations=500)
     p_run.add_argument("--policies", default="smart,greedy")
     p_run.add_argument("--max-floor", type=int, default=20)
+    p_run.add_argument("--pick-policy", default=DEFAULT_PICK_POLICY,
+                       choices=sorted(POLICIES),
+                       help="como o bot escolhe passiva e skill ao subir de nível")
     p_run.set_defaults(func=cmd_run)
 
     p_scout = sub.add_parser("scout", help="destaques por sistema (skills, passivas, itens, eventos)")
@@ -274,6 +280,9 @@ def build_parser() -> argparse.ArgumentParser:
                          help="ablação carta a carta das skills (lento)")
     p_scout.add_argument("--per-passive", action="store_true",
                          help="ablação carta a carta das passivas (lento)")
+    p_scout.add_argument("--no-pick-policies", action="store_true",
+                         help="pula a comparação entre políticas de escolha de carta")
+    p_scout.add_argument("--policy-iterations", type=int, default=40)
     p_scout.add_argument("--out")
     p_scout.set_defaults(func=cmd_scout)
 
