@@ -21,6 +21,7 @@ from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.content.skills_loader import generate_skill_choices
 from src.mechanics.math_operations import generate_essence_multiplier
+from src.sim.toggles import Toggles
 
 # O jogo oferece escolha de skill nos níveis ímpares a partir deste.
 SKILL_CHOICE_MIN_LEVEL = 5
@@ -90,38 +91,57 @@ def _valor(skill) -> float:
         return 25.0  # skills de status não têm valor numérico; valem como controle
 
 
-def on_level_up(hero, levels_gained: int, rng: random.Random) -> None:
+def on_level_up(hero, levels_gained: int, rng: random.Random,
+                toggles: Toggles | None = None, telemetry=None) -> None:
     """Aplica as escolhas que o jogo oferece a cada nível ganho.
 
     Espelha `engine/loop.py`: uma passiva por nível, e uma skill nos níveis
     ímpares a partir de `SKILL_CHOICE_MIN_LEVEL`.
     """
-    for _ in range(levels_gained):
-        escolhida = pick_passive(hero, generate_passive_choices(count=3), rng)
-        if escolhida is not None:
-            hero.add_passive(escolhida)
+    cfg = toggles or Toggles()
+
+    if cfg.passives:
+        for _ in range(levels_gained):
+            ofertas = [c for c in generate_passive_choices(count=3) if c.id not in cfg.banned_passives]
+            escolhida = pick_passive(hero, ofertas, rng)
+            if telemetry is not None:
+                telemetry.record_offer("passive", ofertas, escolhida)
+            if escolhida is not None:
+                hero.add_passive(escolhida)
+
+    if not cfg.skill_choice:
+        return
 
     nivel = hero.get_level()
     for lvl in range(nivel - levels_gained + 1, nivel + 1):
         if lvl >= SKILL_CHOICE_MIN_LEVEL and lvl % 2 == 1:
             conhecidas = [s.id for s in hero.skills.values()]
             ofertas = generate_skill_choices(hero.get_classname(), lvl, conhecidas, count=3)
+            ofertas = [o for o in ofertas if o.id not in cfg.banned_skills]
             nova, slot = pick_skill(hero, ofertas, rng)
+            if telemetry is not None:
+                telemetry.record_offer("skill", ofertas, nova)
             if nova is not None and slot is not None:
                 hero.skills[slot] = nova
 
 
-def collect_loot(hero, rng: random.Random) -> None:
+def collect_loot(hero, rng: random.Random, toggles: Toggles | None = None, telemetry=None) -> None:
     """Recolhe o drop do combate e equipa se for melhor que o item atual.
 
     O jogo dropa item a cada vitória. Ignorar isso na simulação corta a principal
     fonte de equipamento da run.
     """
+    if toggles is not None and not toggles.loot:
+        return
     item = get_loot()
     if item is None:
         return
     hero.add_item_to_inventory(item)
-    equip_if_better(hero, item)
+    if telemetry is not None:
+        telemetry.items_from_loot += 1
+    if equip_if_better(hero, item) and telemetry is not None:
+        telemetry.items_equipped_from_loot += 1
+        telemetry.equipped_by_slot[str(item.slot)] += 1
 
 
 def equip_if_better(hero, item) -> bool:
@@ -148,7 +168,8 @@ def _peso_do_item(item) -> float:
     )
 
 
-def visit_shop(hero, shop: Shop, dungeon_level: int, rng: random.Random) -> None:
+def visit_shop(hero, shop: Shop, dungeon_level: int, rng: random.Random,
+               toggles: Toggles | None = None, telemetry=None) -> None:
     """Gasta o ouro do andar como um jogador gastaria.
 
     Primeiro repõe cura, porque sem consumível o próximo andar vira aposta.
@@ -156,6 +177,8 @@ def visit_shop(hero, shop: Shop, dungeon_level: int, rng: random.Random) -> None
     tudo para uma compra futura é uma decisão que nenhum jogador de permadeath
     toma.
     """
+    if toggles is not None and not toggles.shop:
+        return
     ofertas = shop.get_available_items(dungeon_level, hero.get_classname())
     if not ofertas:
         return
@@ -174,6 +197,9 @@ def visit_shop(hero, shop: Shop, dungeon_level: int, rng: random.Random) -> None
             if not shop.buy_item(hero, oferta["item"], dungeon_level):
                 break
             em_maos += 1
+            if telemetry is not None:
+                telemetry.items_bought += 1
+                telemetry.gold_on_consumables += int(oferta["price"])
 
     orcamento = int(hero.coins * GEAR_BUDGET_RATIO)
     equipamentos = [
@@ -191,7 +217,12 @@ def visit_shop(hero, shop: Shop, dungeon_level: int, rng: random.Random) -> None
             continue
         if shop.buy_item(hero, item, dungeon_level):
             orcamento -= oferta["price"]
-            equip_if_better(hero, item)
+            if telemetry is not None:
+                telemetry.items_bought += 1
+                telemetry.gold_on_gear += int(oferta["price"])
+            if equip_if_better(hero, item) and telemetry is not None:
+                telemetry.items_equipped_from_shop += 1
+                telemetry.equipped_by_slot[str(item.slot)] += 1
 
 
 def floor_essence_multiplier(dungeon_level: int) -> float:

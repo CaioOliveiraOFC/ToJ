@@ -19,6 +19,7 @@ from pathlib import Path
 from src.sim.encounters import ENCOUNTERS, MATRIX_ENCOUNTERS
 from src.sim.harness import ALL_CLASSES, simulate, simulate_run
 from src.sim.metrics import skill_gap
+from src.sim.scout import format_report, run_scout
 
 DEFAULT_LEVELS = (1, 5, 10, 15, 20)
 
@@ -183,6 +184,34 @@ def cmd_compare(args) -> None:
           f"de {args.tolerance:.0%}")
 
 
+def cmd_scout(args) -> None:
+    """Scout de sistemas: quem carrega o jogo e quem não faz nada.
+
+    Sem `--ablate`, roda só a atribuição — o que cada sistema entregou durante
+    runs normais, em segundos. Com `--ablate`, desliga um sistema por vez e mede
+    o quanto a run perde, o que custa minutos e prova causalidade.
+    """
+    started = time.time()
+    report = run_scout(
+        iterations=args.iterations,
+        classes=_classes(args.classes),
+        policy=args.policy,
+        loadout=args.loadout,
+        seed=args.seed,
+        max_floor=args.max_floor,
+        with_ablation=args.ablate or args.per_skill or args.per_passive,
+        ablation_iterations=args.ablation_iterations,
+        per_skill=args.per_skill,
+        per_passive=args.per_passive,
+    )
+    print(format_report(report))
+    payload = report.to_dict()
+    payload["elapsed_seconds"] = round(time.time() - started, 2)
+    if args.out:
+        _write(args.out, payload)
+    print(f"{payload['elapsed_seconds']}s")
+
+
 def _write(path: str, payload: dict) -> None:
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -230,6 +259,23 @@ def build_parser() -> argparse.ArgumentParser:
     p_run.add_argument("--policies", default="smart,greedy")
     p_run.add_argument("--max-floor", type=int, default=20)
     p_run.set_defaults(func=cmd_run)
+
+    p_scout = sub.add_parser("scout", help="destaques por sistema (skills, passivas, itens, eventos)")
+    p_scout.add_argument("--classes", default="all")
+    p_scout.add_argument("--iterations", type=int, default=60)
+    p_scout.add_argument("--policy", default="smart", choices=["smart", "greedy", "random"])
+    p_scout.add_argument("--loadout", default="expected", choices=["naked", "expected", "best"])
+    p_scout.add_argument("--seed", type=int, default=1337)
+    p_scout.add_argument("--max-floor", type=int, default=20)
+    p_scout.add_argument("--ablate", action="store_true",
+                         help="desliga cada sistema e mede o delta de profundidade")
+    p_scout.add_argument("--ablation-iterations", type=int, default=40)
+    p_scout.add_argument("--per-skill", action="store_true",
+                         help="ablação carta a carta das skills (lento)")
+    p_scout.add_argument("--per-passive", action="store_true",
+                         help="ablação carta a carta das passivas (lento)")
+    p_scout.add_argument("--out")
+    p_scout.set_defaults(func=cmd_scout)
 
     p_cmp = sub.add_parser("compare", help="compara contra uma baseline")
     p_cmp.add_argument("--against", required=True)

@@ -48,6 +48,13 @@ class BattleOutcome:
     hp_max: int = 0
     action_counts: dict[str, int] = field(default_factory=dict)
     skill_uses: dict[str, int] = field(default_factory=dict)
+    # Dano e mana por skill. Contar usos diz o que o bot escolhe; somar dano e
+    # mana diz o que a escolha rendeu — é a diferença entre saber que uma skill
+    # é popular e saber que ela é forte demais.
+    skill_damage: dict[str, int] = field(default_factory=dict)
+    skill_mp: dict[str, int] = field(default_factory=dict)
+    basic_damage: int = 0
+    items_by_effect: dict[str, int] = field(default_factory=dict)
 
 
 # A decisão recebe o herói, o encontro e o índice do turno do herói (0 no
@@ -174,8 +181,10 @@ def _run_hero_turn(
     target = action.target or pick_default_target(monsters)
 
     if action.kind == "item" and action.item is not None:
+        efeito = str(getattr(action.item, "effect_type", "?"))
         hero.use_potion(action.item)
         out.items_used += 1
+        out.items_by_effect[efeito] = out.items_by_effect.get(efeito, 0) + 1
         return
 
     if target is None:
@@ -186,13 +195,18 @@ def _run_hero_turn(
     if action.kind == "skill" and action.skill is not None:
         mp_before = hero.get_mp()
         combat_mech.apply_skill(hero, target, action.skill, rng=rng, publish=publish)
-        out.mp_spent += max(0, mp_before - hero.get_mp())
+        gasto = max(0, mp_before - hero.get_mp())
+        out.mp_spent += gasto
         skill_id = getattr(action.skill, "id", "?")
         out.skill_uses[skill_id] = out.skill_uses.get(skill_id, 0) + 1
+        out.skill_mp[skill_id] = out.skill_mp.get(skill_id, 0) + gasto
+        dano = max(0, hp_before - target.get_hp())
+        out.skill_damage[skill_id] = out.skill_damage.get(skill_id, 0) + dano
     else:
         combat_mech.resolve_physical_attack(
             hero, target, hero.get_avg_damage(), "", rng=rng, publish=publish
         )
+        out.basic_damage += max(0, hp_before - target.get_hp())
 
     out.damage_dealt += max(0, hp_before - target.get_hp())
     if target.get_hp() <= 0:

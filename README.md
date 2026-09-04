@@ -73,7 +73,13 @@ python -m pytest tests/balance -q                  # invariantes rápidas (6s)
 python -m pytest tests/balance -q -m balance_full  # runs de 20 andares (8s)
 python -m src.sim.runner run --iterations 400      # curva de dificuldade
 python -m src.sim.runner matrix --iterations 500   # matriz classe x encontro
+python -m src.sim.runner scout --iterations 60     # destaques por sistema
+python -m src.sim.runner scout --ablate            # + o quanto cada sistema sustenta
 ```
+
+O `scout` responde o que a profundidade média não responde: qual skill é forte
+demais, qual passiva ninguém leva, quanto o equipamento contribui, quanto a
+Essência decide a run e se os eventos aleatórios mudam alguma coisa.
 
 A simulação roda os mesmos sistemas do jogo — passivas, escolha de skill, drops,
 loja, eventos e Essência — e não só o combate.

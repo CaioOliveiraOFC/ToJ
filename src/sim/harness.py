@@ -27,6 +27,8 @@ from src.sim import progression
 from src.sim.encounters import build_encounter
 from src.sim.loadouts import apply_loadout
 from src.sim.policies import get_policy
+from src.sim.telemetry import RunTelemetry
+from src.sim.toggles import Toggles
 
 HERO_CLASSES = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 ALL_CLASSES = ("Warrior", "Mage", "Rogue")
@@ -175,6 +177,8 @@ def simulate_run(
     seed: int = 1337,
     loadout: str = "expected",
     encounters_per_floor=None,
+    toggles: Toggles | None = None,
+    collect_telemetry: bool = True,
 ) -> dict:
     """Simula runs completas de masmorra, com todos os sistemas que o jogo roda.
 
@@ -191,6 +195,8 @@ def simulate_run(
     herói que o jogo entrega.
     """
     decide = get_policy(policy)
+    cfg = toggles or Toggles()
+    telemetry = RunTelemetry() if collect_telemetry else None
     shop = Shop()
     deepest: list[int] = []
     survival = {floor: 0 for floor in range(1, max_floor + 1)}
@@ -204,7 +210,9 @@ def simulate_run(
         reached = 0
 
         for floor in range(1, max_floor + 1):
-            essence = progression.floor_essence_multiplier(floor)
+            essence = progression.floor_essence_multiplier(floor) if cfg.essence else 1.0
+            if telemetry is not None:
+                telemetry.essence_rolls.append(essence)
             fights = encounters_per_floor(floor) if encounters_per_floor else _default_floor_plan(floor)
             died = False
 
@@ -217,8 +225,10 @@ def simulate_run(
                 if not hero.get_isalive() or hero.get_hp() <= 0:
                     died = True
                     break
+                if telemetry is not None:
+                    telemetry.record_battle(outcome)
                 if outcome.hero_won:
-                    _award(hero, monsters, essence, rng)
+                    _award(hero, monsters, essence, rng, cfg, telemetry)
 
             if died:
                 break
@@ -228,15 +238,21 @@ def simulate_run(
             level_at_floor[floor].append(hero.get_level())
 
             # Fim do andar, na ordem do jogo: evento aleatório, loja, descanso.
-            _apply_random_event(hero, rng)
+            if cfg.events:
+                _apply_random_event(hero, shop, floor, rng, cfg, telemetry)
             if not hero.get_isalive() or hero.get_hp() <= 0:
                 break
-            progression.visit_shop(hero, shop, floor, rng)
+            progression.visit_shop(hero, shop, floor, rng, cfg, telemetry)
             hero.recover(FLOOR_CLEAR_RESTORE_PERCENT)
 
         deepest.append(reached)
         skills_at_end.append(len(hero.skills))
         passives_at_end.append(len(hero.passives))
+        if telemetry is not None:
+            telemetry.runs += 1
+            telemetry.gold_unspent += hero.coins
+            telemetry.final_power_equipped.append(hero.get_avg_damage())
+            telemetry.final_power_naked.append(_power_without_equipment(hero))
 
     return {
         "levels_by_floor": {f: statistics.fmean(v) for f, v in sorted(level_at_floor.items()) if v},
@@ -250,24 +266,61 @@ def simulate_run(
         "survival_by_floor": {floor: count / iterations for floor, count in survival.items()},
         "skills_at_end_mean": statistics.fmean(skills_at_end),
         "passives_at_end_mean": statistics.fmean(passives_at_end),
+        "toggles": cfg.label(),
+        "telemetry": telemetry.to_dict() if telemetry is not None else None,
     }
 
 
-def _apply_random_event(hero, rng: random.Random) -> None:
+def _power_without_equipment(hero) -> float:
+    """Poder de ataque que o herói teria sem nada equipado.
+
+    Comparado com o poder real, dá a fatia do dano que veio de equipamento —
+    a resposta para "equipamento importa?" sem precisar de uma run separada.
+    """
+    equipado = dict(hero.equipment)
+    for slot in hero.equipment:
+        hero.equipment[slot] = None
+    try:
+        return float(hero.get_avg_damage())
+    finally:
+        hero.equipment.update(equipado)
+
+
+def _apply_random_event(hero, shop, floor: int, rng: random.Random,
+                        toggles=None, telemetry=None) -> None:
     """Evento aleatório de andar, com a mesma chance do jogo.
 
-    O Altar cobra vida por um buff e pode matar; a Fonte cura. O bot aceita a
-    Fonte sempre e o Altar só com vida sobrando, que é a decisão que um jogador
-    competente toma.
+    O Altar cobra vida por um buff e pode matar; a Fonte cura; o Mercador é uma
+    loja extra. O bot aceita a Fonte sempre e o Altar só com vida sobrando, que é
+    a decisão que um jogador competente toma.
     """
     event = roll_random_event(rng)
+    if event is None:
+        return
+    if telemetry is not None:
+        telemetry.event_counts[event] += 1
+
     if event == "fountain":
-        apply_fountain_heal(hero)
-    elif event == "altar" and hero.get_hp() > altar_hp_cost(hero) * 2:
-        hero.take_damage(altar_hp_cost(hero))
-        apply_altar_blessing(hero)
-        if hero.get_hp() <= 0:
-            hero.set_isalive(False)
+        curado = apply_fountain_heal(hero)
+        if telemetry is not None:
+            telemetry.fountain_healed += int(curado)
+    elif event == "altar":
+        custo = altar_hp_cost(hero)
+        if hero.get_hp() > custo * 2:
+            hero.take_damage(custo)
+            apply_altar_blessing(hero)
+            if telemetry is not None:
+                telemetry.altar_hp_paid += int(custo)
+            if hero.get_hp() <= 0:
+                hero.set_isalive(False)
+                if telemetry is not None:
+                    telemetry.altar_deaths += 1
+        elif telemetry is not None:
+            telemetry.event_declined["altar"] += 1
+    elif event == "merchant":
+        # Uma segunda passagem pela loja. Antes, o Mercador aparecia em um terço
+        # dos eventos e a simulação não fazia nada com ele.
+        progression.visit_shop(hero, shop, floor, rng, toggles, telemetry)
 
 
 def _default_floor_plan(floor: int) -> list[str]:
@@ -297,7 +350,8 @@ def _default_floor_plan(floor: int) -> list[str]:
     return fights
 
 
-def _award(hero, monsters: list, essence: float, rng: random.Random) -> None:
+def _award(hero, monsters: list, essence: float, rng: random.Random,
+           toggles: Toggles | None = None, telemetry=None) -> None:
     """Aplica XP, ouro, loot e as escolhas de nível, como o jogo faz.
 
     Espelha `engine.loop.process_post_battle`: a Essência multiplica o XP, as
@@ -323,9 +377,15 @@ def _award(hero, monsters: list, essence: float, rng: random.Random) -> None:
             xp += calculate_monster_xp_reward(monster.level)
             coins += calculate_monster_coin_reward(monster.level)
 
-    hero.add_xp_points(int(xp * essence * essence_passive))
-    hero.earn_coins(int(coins * gold_passive))
-    progression.collect_loot(hero, rng)
+    xp_final = int(xp * essence * essence_passive)
+    coins_final = int(coins * gold_passive)
+    hero.add_xp_points(xp_final)
+    hero.earn_coins(coins_final)
+    if telemetry is not None:
+        telemetry.xp_base += xp
+        telemetry.xp_after_essence += xp_final
+        telemetry.gold_earned += coins_final
+    progression.collect_loot(hero, rng, toggles, telemetry)
 
     # Contar pela mudança de nível, não pelo retorno de `level_up`: com
     # `show=False` ele devolve lista vazia mesmo quando o nível sobe, e um laço
@@ -336,7 +396,7 @@ def _award(hero, monsters: list, essence: float, rng: random.Random) -> None:
         hero.level_up(show=False)
     levels_gained = hero.get_level() - level_before
     if levels_gained > 0:
-        progression.on_level_up(hero, levels_gained, rng)
+        progression.on_level_up(hero, levels_gained, rng, toggles, telemetry)
 
 
 def _percentile(values: list[int], q: float) -> float:

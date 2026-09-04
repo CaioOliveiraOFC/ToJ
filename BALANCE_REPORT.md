@@ -89,6 +89,61 @@ empilhadas tende a chegar ao 20. A run é decidida cedo. Fechar essa lacuna —
 fazer os andares finais voltarem a ser uma pergunta — é o próximo trabalho de
 balanceamento, e depende de as passivas deixarem de ser puro acúmulo.
 
+## Scout de sistemas
+
+Profundidade média responde "está balanceado?". Não responde "qual skill é forte
+demais, qual passiva ninguém leva, quanto a Essência decide a run". Para isso o
+scout usa dois métodos, porque nenhum dos dois sozinho basta:
+
+**Atribuição** — telemetria coletada durante runs normais: dano por skill e por
+mana, ofertas e escolhas de cada carta, origem do equipamento, destino do ouro,
+efeito da Essência, o que cada evento fez. Custa segundos, aponta o suspeito.
+
+**Ablação** — desliga um sistema e compara a profundidade média. Custa dezenas
+de segundos, condena.
+
+Os dois discordam com frequência, e a discordância é informação: uma skill pode
+ter dano alto por ser sempre usada mas ablação baixa, porque outra a substitui;
+uma passiva rara pode ter atribuição baixa e ablação alta.
+
+```bash
+python -m src.sim.runner scout --iterations 60                    # atribuição, ~10s
+python -m src.sim.runner scout --iterations 50 --ablate           # + ablação, ~40s
+python -m src.sim.runner scout --ablate --per-skill --per-passive # carta a carta, minutos
+```
+
+### O que o primeiro scout encontrou
+
+Ablação, em andares de profundidade média perdidos ao desligar o sistema:
+
+| Sistema desligado | Delta |
+|---|---:|
+| Essência | −3,9 |
+| Passivas | −2,0 |
+| Loja | −2,0 |
+| Loot | −0,9 |
+| Eventos aleatórios | +0,2 |
+| Escolha de skill | +0,3 |
+
+Quatro problemas que a métrica de profundidade sozinha não mostrava:
+
+1. **A Essência decide a run mais que qualquer escolha do jogador.** Um
+   multiplicador sorteado, sobre o qual ninguém tem controle, pesa o dobro das
+   passivas. Isso é sorte no lugar de decisão.
+2. **Escolher skill nova piora a run** (+0,3 andar ao desligar). O bot escolhe
+   skills Raras e Épicas de dano que depois nunca usa, porque custam mais mana e
+   perdem para o ataque básico no cálculo dele. Cinco skills aparecem como
+   "escolhidas mas nunca usadas".
+3. **Eventos aleatórios não mudam nada** (+0,2). A Fonte cura muito num jogo onde
+   o descanso de andar já cura, e o Altar nunca matou ninguém em 97 aparições.
+4. **83% do ouro nunca é gasto.** A economia não tem no que competir consigo
+   mesma: falta preço alto o bastante ou item bom o bastante para o ouro ter
+   destino.
+
+Também: uma única passiva, Sangue de Guerreiro, é escolhida em 91% das ofertas —
+não é escolha, é a resposta certa. E 15 skills nunca são escolhidas quando
+oferecidas.
+
 ## Como reproduzir
 
 ```bash

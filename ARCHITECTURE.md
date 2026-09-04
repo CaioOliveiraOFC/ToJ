@@ -92,6 +92,10 @@ ToJ/
     │   ├── encounters.py           # Catálogo de encontros nomeados
     │   ├── loadouts.py             # Equipamento típico por nível
     │   ├── metrics.py              # Agregação e intervalo de confiança
+    │   ├── progression.py          # Passiva, skill, loot e loja durante a run
+    │   ├── telemetry.py            # Contribuição por sistema, coletada na run
+    │   ├── toggles.py              # Interruptores de sistema para ablação
+    │   ├── scout.py                # Destaques por sistema (atribuição + ablação)
     │   └── runner.py               # CLI de desenvolvimento
     │
     ├── content/                    # DADOS E FÁBRICAS
