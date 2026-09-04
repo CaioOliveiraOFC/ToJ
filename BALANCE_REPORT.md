@@ -1,46 +1,74 @@
-# Balanceamento de Classes — PROMPT 14
+# Balanceamento — rebalanceamento estrutural
 
-**Classes reais confirmadas em `src/entities/heroes.py:457,532,607`:** `Warrior`, `Mage`, `Rogue` (3 classes). Não existe outra classe.
+Substitui o relatório anterior (PROMPT 14), que ajustava constantes de classe
+sobre um modelo que divergia por construção.
 
-**Metodo:** `AutoTester` (`tests/auto_test.py`) com `Quick` (cap 8000 acoes, sem progress bar) — 5 runs completas por classe, seeds fixas `[101,202,303,404,505]` para comparacao justa (mesma sequencia random para todas). Log resumido estilo PROMPT 7 em `reports/balance_*.log` (taxa sobrevivencia, andar medio, causa morte). Inventario/equipamento variado (PROMPT 12) e loja equipar (PROMPT 13) ja presentes.
+## O que estava errado
 
-## Antes (constantes originais)
+A auditoria mediu, com o motor de combate real rodando headless, uma taxa de
+vitória de **99% a 100% contra o monstro comum em todos os níveis e nas três
+classes**. Sete causas, nenhuma delas de "número baixo demais":
 
+| # | Causa | Evidência |
+|---|---|---|
+| D1 | Herói crescia em percentual composto (`+20%` de HP por nível), monstro em soma fixa (`+20` de HP) | Poder do Mago x21,8 do nível 1 ao 20; HP do monstro x4,8 |
+| D2 | `rest()` restaurava tudo depois de cada vitória, a cada nível, ao equipar, ao desequipar e ao fugir | Cinco pontos; atrito zero |
+| D3 | Todo combate durava 1 ou 2 turnos | Sem espaço para decisão nem para punir decisão ruim |
+| D4 | 32 efeitos declarados no JSON não tinham tratamento no motor | 16 de 41 skills, 10 de 29 passivas, 6 de 11 poções |
+| D5 | Um único monstro com 121 nomes; combate sempre 1 contra 1 | `weight` e `min_level` das categorias nunca eram lidos |
+| D6 | Ladino ficava com 0% de chance de ser acertado a partir do nível 13 | `85 + AG_atacante - AG_defensor`, sem piso |
+| D7 | Skill, cura e equipamento eram somas fixas sobre um poder que crescia | Melhor arma = 3% do poder base no nível 20 |
+
+Baseline completa em `reports/baseline_20260904.json`.
+
+## O modelo
+
+**Uma razão de crescimento só.** `GROWTH_RATE = 1.12` para herói e monstro. A
+razão poder-do-herói / HP-do-monstro fica constante ao longo dos 20 níveis, e a
+dificuldade passa a ser controlada de propósito.
+
+**Orçamento distribuído.** As três classes têm poder de ataque comparável no
+nível 1; a identidade está em como elas gastam o resto.
+
+| Classe | Poder | HP efetivo | Identidade | Fraqueza |
+|---|---:|---:|---|---|
+| Guerreiro | 89 | 581 | Ganha por atrito | Tank, que também ganha por atrito |
+| Mago | 119 | 466 | Vence rápido ou não vence | Controlador, que rouba turno e mana |
+| Ladino | 100 | 463 + esquiva | Escolhe quando lutar | Skirmisher, que anula a esquiva |
+
+**Nove arquétipos de monstro**, cada um com ameaça e counterplay declarados em
+`content/factories/archetypes.py`. Todo arquétipo precisa de pelo menos uma
+classe que sofre contra ele.
+
+**Escala relativa.** Dano de skill é percentual do poder base; cura, percentual
+do HP máximo; bônus de equipamento, percentual do atributo; chance de acerto usa
+a diferença relativa de agilidade, com piso de 20% e teto de 95%.
+
+**Atrito.** Concluir um andar devolve 32% dos recursos. Nada mais cura de graça.
+
+## Resultado
+
+400 runs por classe, política competente, equipamento típico
+(`reports/validation_20260904.json`):
+
+| Classe | Andar médio | Chega ao andar 20 | Bot que só ataca |
+|---|---:|---:|---:|
+| Guerreiro | 13,9 | 12,2% | andar médio 2,3 |
+| Mago | 11,6 | 16,0% | andar médio 2,0 |
+| Ladino | 13,2 | 1,5% | andar médio 3,4 |
+
+- O bot que só ataca **não termina a masmorra** em nenhuma classe.
+- Distância entre a melhor e a pior classe: **2,3 andares**.
+- Jogar bem vale de **9,8 a 11,6 andares** de profundidade.
+- Duração de combate: trash 3-5 turnos, bruiser 6-11, elite 10-18, chefe 14-29.
+- Custo de um encontro: trash 3%, bruiser 13-18%, elite 25-35%, chefe 39% da vida.
+
+## Como reproduzir
+
+```bash
+python -m pytest tests/balance -q                     # rápido, 6s
+python -m pytest tests/balance -q -m balance_full     # runs completas, 8s
+python -m src.sim.runner run --iterations 400 --loadout expected
+python -m src.sim.runner matrix --iterations 500 --levels 1,10,20
+python -m src.sim.runner compare --against reports/baseline_20260904.json
 ```
-WARRIOR_BASE_HP=104 MP=30 ST=104 AG=5 MG=30 DF=30 | HP growth 20% ST 10%
-MAGE_BASE_HP=96 MP=100 ST=32 AG=5 MG=100 DF=23 | MP 18% MG 18% (sem HP growth)
-ROGUE_BASE_HP=99 MP=50 ST=75 AG=15 MG=66 DF=20 | HP 8% ST16% AG18%
-```
-
-**Resultados 5 runs/classe (mesmas seeds):**
-
-| Classe | Levels (5 seeds) | Avg | Sobreviveu (Lv20) | Causa mais comum |
-|--------|------------------|-----|-------------------|------------------|
-| Warrior | [5,20,20,20,5] | 14.0 | 3/5 | death_combat 2, victory 3 |
-| Mage | [5,10,9,20,5] | 9.8 | 1/5 | death_combat 4, victory 1 |
-| Rogue | [5,20,20,20,5] | 14.0 | 3/5 | death_combat 2, victory 3 |
-
-**Diagnostico:** Mage sistematicamente mais fraca: **4.2 andares a menos que Warrior/Rogue** em media, 2 vitorias a menos. Causa morte quase sempre `death_combat` (morre em combate, nao travamento). Sem crescimento de HP, Mage ficava fragil nos andares 5-10.
-
-## Ajuste (sem tocar monstro — PROMPT 16)
-
-- `MAGE_BASE_HP 96 -> 99 (+3)`
-- `MAGE_BASE_DF 23 -> 25 (+2)`
-- `MAGE_HP_GROWTH_PERCENT 0 -> 8` (novo, `src/shared/constants.py:135`, aplicado em `src/entities/heroes.py:420-422`)
-- Warrior/Rogue mantidos (para nao inverter balanceamento). Mage ganhou sobrevivencia sem virar overpower.
-
-## Depois (mesmas 5 seeds, mesmos monstros)
-
-```
-MAGE_BASE_HP=99 DF=25 HP growth 8%
-```
-
-| Classe | Levels (5 seeds) | Avg | Sobreviveu | Causa |
-|--------|------------------|-----|------------|-------|
-| Warrior | [5,20,20,20,5] | 14.0 | 3/5 | death_combat 2 |
-| Mage | [20,20,5,20,5] | 14.0 | 3/5 | victory 3 / death_combat 2 |
-| Rogue | [5,20,20,20,5] | 14.0 | 3/5 | death_combat 2 |
-
-**Resultado:** todas 14.0 avg, 3/5 vitorias — range 0 (antes 4.2). Causa morte ainda `death_combat` (balanceado, nao travamento). Log detalhado em `reports/balance_before.log` (antes) e `reports/balance_after.log` (depois) + `reports/balance_20260828.log` (final).
-
-**Validacao:** `pytest 130 passed`, `AutoTester` 15 runs 0 crashes (5 por classe), loja equipar e inventario continuam funcionando (fix unicode anterior mantido).

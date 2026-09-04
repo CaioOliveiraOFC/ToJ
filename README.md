@@ -13,19 +13,20 @@ RPG de masmorra terminal-based hardcore com exploração procedural e combate t�
 ## ✨ Funcionalidades Atuais
 
 - RPG de masmorra terminal-based hardcore com exploração procedural e combate tático por turnos com extração entre andares
-- 3 classes: Guerreiro, Mago, Ladino (stats e habilidades únicas)
-- Masmorras procedurais infinitas com multiplicador de Essência variável (0.5x a 3.0x)
-- Combate tático por turnos com iniciativa dinâmica, crítico, esquiva, cooldowns, atordoamento e redução de dano
+- 3 classes com identidade própria: Guerreiro (atrito), Mago (explosão), Ladino (esquiva) — poder comparável, fraquezas diferentes
+- 9 arquétipos de monstro (trash, bruiser, tank, glass cannon, skirmisher, controlador, suporte, elite, chefe), cada um com um counterplay
+- Encontros compostos com escolha de alvo a partir do andar 4
+- Recursos importam: vencer custa vida e mana, e concluir o andar devolve só parte
 - 29 cartas passivas permanentes em 4 raridades (Comum → Lendário)
-- 41 skills com custo de MP e cooldowns por raridade
-- Sistema de loja, drops de itens (armas, armaduras, poções) e eventos aleatórios (Mercador, Altar, Fonte)
+- 41 skills com custo de MP, cooldown e efeitos que funcionam de fato
+- 14 consumíveis, loja, drops e eventos aleatórios (Mercador, Altar, Fonte)
 - Save/Load via JSON com 10 slots + permadeath e Troféu de Fracasso
-- Arquitetura orientada a eventos (EventBus) para fácil manutenção
+- Arquitetura orientada a eventos (EventBus) e simulação headless para balanceamento
 
 ## 🚀 Instalação e Execução
 
 ```bash
-pip install rich pyfiglet
+pip install -r requirements.txt
 python main.py
 ```
 
@@ -61,6 +62,24 @@ ToJ/
 └── tests/                   # Testes
 ```
 
+## ⚖️ Balanceamento
+
+O balanceamento é medido, não estimado. `src/sim/` roda o motor de combate real
+sem UI e simula milhares de combates por segundo; `tests/balance/` transforma os
+alvos em invariantes que quebram quando alguém os desfaz.
+
+```bash
+python -m pytest tests/balance -q                  # invariantes rápidas (6s)
+python -m pytest tests/balance -q -m balance_full  # runs de 20 andares (8s)
+python -m src.sim.runner run --iterations 400      # curva de dificuldade
+python -m src.sim.runner matrix --iterations 500   # matriz classe x encontro
+```
+
+Estado atual (400 runs por classe, jogador competente): Guerreiro chega em média
+ao andar 13,9 e termina a masmorra em 12% das runs; Mago 11,6 e 16%; Ladino 13,2
+e 1,5%. Um bot que só aperta "atacar" nunca termina, e para no andar 2.
+Detalhes em `BALANCE_REPORT.md`.
+
 ## 🛠️ Tecnologias
 
 - Python 3.12+, Rich, pyfiglet
@@ -72,7 +91,8 @@ ToJ/
 - `ARCHITECTURE.md` — Mapa completo do código
 - `GAME_DESING.md` — Design do jogo
 - `docs/GUIDE_PASSIVES.md` — Guia de passivas
-- `TASK.md` — Rastreador de tarefas (TASK-007 concluída: extração entre andares — todas as tasks 004-007 concluídas)
+- `BALANCE_REPORT.md` — Modelo de balanceamento e números medidos
+- `TASK.md` — Rastreador de tarefas
 
 ## 🗺️ Roadmap
 
@@ -84,6 +104,7 @@ ToJ/
 - ✅ Eventos aleatórios na masmorra (TASK-005 — 25% Mercador/Altar/Fonte)
 - ✅ Cooldowns + redução de dano + stun (TASK-006 — cooldown por skill, status temporários)
 - ✅ Saída da masmorra (extração) entre andares (TASK-007 — preserva save pós-loja)
+- ✅ Rebalanceamento estrutural (orçamento único, arquétipos, atrito, encontros compostos)
 - 🔲 Arena PvP (único pendente — tiers, matchmaking, ranking por Elo)
 
 ## 📊 Métricas de Sucesso
