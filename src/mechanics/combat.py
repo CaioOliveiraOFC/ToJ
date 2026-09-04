@@ -7,6 +7,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Literal
 
+from src.mechanics import effects as fx
 from src.shared import combat_topics as T
 from src.shared.constants import (
     BASE_HIT_CHANCE,
@@ -18,10 +19,15 @@ from src.shared.constants import (
     DAMAGE_REDUCTION_DURATION,
     DEFENSE_K,
     FLEE_RANGE_MAX,
+    HIT_AGILITY_SWING,
+    HIT_CHANCE_CEIL,
+    HIT_CHANCE_FLOOR,
+    INVISIBLE_HIT_PENALTY,
+    MANA_BURN_PER_TICK,
+    BLEED_DAMAGE_PERCENT,
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
     POISON_DAMAGE_PER_TICK,
-    SKILL_LEVEL_SCALING,
     STUN_CHANCE_DEFAULT,
     STUN_DURATION,
     XMULT_CAP,
@@ -90,16 +96,48 @@ def _calculate_damage(
     return max(1, int(raw))
 
 
+def hit_chance(attacker, defender) -> int:
+    """Chance de acerto, a partir da diferença *relativa* de agilidade.
+
+    A fórmula antiga era `85 + AG_atacante - AG_defensor`, sem piso. Como a
+    agilidade do Ladino crescia 18% ao nível e a do monstro era a constante 3,
+    a chance de o monstro acertar caía a zero por volta do nível 13: a classe
+    ficava imune a dano, e nenhum balanceamento de monstro alcançava isso.
+
+    Usando a diferença relativa, a vantagem de quem investe em agilidade é
+    grande, permanente e limitada — e continua valendo a mesma coisa no nível 1
+    e no nível 20, porque os dois lados escalam juntos.
+    """
+    att_ag = max(0, attacker.get_ag())
+    def_ag = max(0, defender.get_ag())
+    total = att_ag + def_ag
+    swing = 0.0 if total <= 0 else HIT_AGILITY_SWING * (att_ag - def_ag) / total
+
+    chance = BASE_HIT_CHANCE + swing
+    chance -= fx.combat_modifier(defender, "dodge_chance")
+    chance -= fx.combat_modifier(defender, "evasion")
+    if "invisible" in getattr(defender, "active_effects", {}):
+        chance -= INVISIBLE_HIT_PENALTY
+
+    return int(max(HIT_CHANCE_FLOOR, min(HIT_CHANCE_CEIL, chance)))
+
+
 def skill_damage_base(caster, skill) -> int:
     """BASE_POWER total de uma skill de dano, antes de defesa e crítico.
+
+    `effect_value` é um **percentual sobre o poder base**, não uma soma fixa.
+    Como soma fixa, a skill anti-escalava: o poder base cresce a cada nível e o
+    valor da skill não, então no nível 20 o Apocalipse entregava apenas +30%
+    sobre um ataque básico que é gratuito e sem recarga. Como percentual, a
+    skill mantém o mesmo peso relativo do nível 1 ao 20.
 
     Vive aqui, e não na política do simulador, porque o bot precisa estimar o
     dano com a mesma fórmula que o motor aplica. Duas cópias da fórmula divergem
     na primeira mudança de balanceamento.
     """
     base_power = caster.get_avg_damage()
-    scaling = 1.0 + (caster.level * SKILL_LEVEL_SCALING)
-    return int(base_power + int(skill.effect_value) * scaling)
+    bonus_percent = int(skill.effect_value)
+    return max(1, int(base_power * (1 + bonus_percent / 100)))
 
 
 def resolve_physical_attack(
@@ -117,21 +155,7 @@ def resolve_physical_attack(
     """
     r = _rng(rng)
 
-    crit_chance = (
-        CRIT_CHANCE_HIGH
-        if hasattr(attacker, "get_classname")
-        and attacker.get_classname() == "Rogue"
-        and skill_name == "Ataque Furtivo"
-        else CRIT_CHANCE_DEFAULT
-    )
-    if hasattr(attacker, "get_passive_bonus"):
-        crit_chance += int(attacker.get_passive_bonus("crit_chance"))
-    crit_chance = min(crit_chance, CRIT_CHANCE_CAP)
-
-    hit_chance = BASE_HIT_CHANCE + (attacker.get_ag() - defender.get_ag())
-    if hasattr(defender, "get_passive_bonus"):
-        hit_chance -= int(defender.get_passive_bonus("dodge_chance"))
-    if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > hit_chance:
+    if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > hit_chance(attacker, defender):
         miss = CombatResult(
             attacker_id=attacker.get_nick_name(),
             defender_id=defender.get_nick_name(),
@@ -149,45 +173,40 @@ def resolve_physical_attack(
         )
         return miss
 
-    defense_target = defender.get_df()
-    xmult_mods: list[float] = []
+    crit_chance = (
+        CRIT_CHANCE_HIGH
+        if hasattr(attacker, "get_classname")
+        and attacker.get_classname() == "Rogue"
+        and skill_name == "Ataque Furtivo"
+        else CRIT_CHANCE_DEFAULT
+    )
+    crit_chance += int(fx.combat_modifier(attacker, "crit_chance"))
+    crit_chance = min(crit_chance, CRIT_CHANCE_CAP)
 
+    xmult_mods: list[float] = []
     is_critical = r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= crit_chance
     if is_critical:
-        xmult_mods.append(CRIT_DAMAGE_BASE)
-
-    # Damage reduction: verifica se o defensor tem o efeito ativo
-    damage_reduction_pct = 0
-    if hasattr(defender, "active_effects") and "damage_reduction" in defender.active_effects:
-        try:
-            damage_reduction_pct = int(defender.active_effects["damage_reduction"].get("value", 0))
-        except Exception:
-            damage_reduction_pct = 0
+        crit_damage = CRIT_DAMAGE_BASE + fx.combat_modifier(attacker, "crit_damage") / 100
+        xmult_mods.append(crit_damage)
 
     damage = _calculate_damage(
         base_power=float(base_damage),
         flat_mods=None,
         mult_mods=None,
         xmult_mods=xmult_mods if xmult_mods else None,
-        defense_target=defense_target,
+        defense_target=defender.get_df(),
     )
 
-    if damage_reduction_pct:
-        damage = max(1, int(damage * (1 - damage_reduction_pct / 100)))
+    # Status do atacante que reduzem o dano causado (weakened, fear) e status do
+    # defensor que reduzem o dano recebido (damage_reduction ativo ou passivo).
+    damage = int(damage * fx.outgoing_damage_multiplier(attacker))
+    damage = max(1, int(damage * fx.incoming_damage_multiplier(defender)))
 
-    # Stun chance: ao acertar, chance de atordoar o alvo
-    # Usa STUN_CHANCE_DEFAULT para ataques físicos e skills com stun implícito (ex: Esmagar)
-    stun_chance = 0
-    if skill_name == "Esmagar":
-        stun_chance = 30
-    elif hasattr(attacker, "get_passive_bonus"):
-        try:
-            stun_chance = int(attacker.get_passive_bonus("stun_chance"))
-        except Exception:
-            stun_chance = 0
+    # Stun: por skill nomeada, ou pela passiva de atordoamento do atacante.
+    stun_chance = 30 if skill_name == "Esmagar" else int(fx.combat_modifier(attacker, "stun_chance"))
     if stun_chance and r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= stun_chance:
-        if hasattr(target := defender, "active_effects"):
-            target.active_effects["stun"] = {"duration": STUN_DURATION}
+        if hasattr(defender, "active_effects"):
+            defender.active_effects["stun"] = {"duration": STUN_DURATION}
             _emit(
                 publish,
                 T.COMBAT_TURN_EFFECT,
@@ -196,7 +215,22 @@ def resolve_physical_attack(
             )
 
     defender.take_damage(damage)
+    fx.wake_on_damage(defender)
+
+    # Roubo de vida: devolve ao atacante um percentual do dano causado.
+    life_steal = fx.combat_modifier(attacker, "life_steal")
+    if life_steal > 0:
+        attacker.heal(max(1, int(damage * life_steal / 100)))
+
     dead = defender.get_hp() <= 0
+    if dead and _survive_lethal_blow(defender):
+        dead = False
+        _emit(
+            publish,
+            T.COMBAT_TURN_EFFECT,
+            type_="turn_effect",
+            payload={"entity": defender, "kind": "death_ignored"},
+        )
     if dead:
         defender.set_isalive(False)
 
@@ -216,6 +250,23 @@ def resolve_physical_attack(
         payload={"attacker": attacker, "defender": defender, "strike": strike},
     )
     return strike
+
+
+def _survive_lethal_blow(entity) -> bool:
+    """Passiva `death_ignore`: sobrevive com 1 de HP a um golpe letal, uma vez por combate.
+
+    Uma vez por combate, e não uma vez por run, porque uma passiva que ressuscita
+    para sempre transforma qualquer encontro perdido em encontro vencido e apaga
+    a decisão de fugir.
+    """
+    getter = getattr(entity, "get_passive_bonus", None)
+    if not callable(getter) or getter("death_ignore") <= 0:
+        return False
+    if getattr(entity, "_death_ignore_used", False):
+        return False
+    entity._death_ignore_used = True
+    entity._hp = 1
+    return True
 
 
 def apply_skill(
@@ -282,7 +333,11 @@ def apply_skill(
         return out
 
     if skill.effect_type == "heal":
-        heal_amount = int(skill.effect_value)
+        # Percentual do HP máximo, não valor fixo: uma cura de 50 pontos era
+        # irrelevante para um herói com milhares de HP no fim do jogo.
+        max_hp = int(getattr(caster, "base_hp", caster.get_hp()))
+        heal_amount = max(1, int(max_hp * int(skill.effect_value) / 100))
+        heal_amount += int(heal_amount * fx.combat_modifier(caster, "potion_heal_bonus") / 100)
         caster.heal(heal_amount)
         out = SkillApplyResult(kind="heal", mp_spent=int(skill.mana_cost), heal_amount=heal_amount)
         _emit(
@@ -318,8 +373,13 @@ def apply_skill(
         return out
 
     if skill.effect_type == "buff":
-        caster.active_buffs[str(skill.name)] = {
-            "value": int(skill.effect_value),
+        # O buff declara qual atributo modifica. Sem isso, o motor precisava
+        # reconhecer o buff pelo nome, e todo nome fora da lista era um no-op.
+        recipient = caster if getattr(skill, "target", "self") == "self" else target
+        stat = str(getattr(skill, "effect_stat", "") or "")
+        recipient.active_buffs[str(skill.name)] = {
+            "stat": stat,
+            "value": fx.buff_value(recipient, stat, int(skill.effect_value)),
             "duration": int(skill.duration),
         }
         out = SkillApplyResult(
@@ -367,13 +427,13 @@ def process_turn_start_effects(
     Processa efeitos no início do turno do `entity`.
 
     Publica `COMBAT_TURN_EFFECT` quando `publish` é fornecido.
-    Retorna `True` se o turno deve ser pulado (ex.: congelado).
+    Retorna `True` se o turno deve ser pulado (congelado, atordoado ou dormindo).
     """
     _ = _rng(rng)
 
     skipped_turn = False
 
-    # Cooldowns: decrementa a cada turno
+    # Cooldowns: decrementa a cada turno.
     if hasattr(entity, "skill_cooldowns"):
         for sid in list(entity.skill_cooldowns.keys()):
             entity.skill_cooldowns[sid] -= 1
@@ -385,6 +445,14 @@ def process_turn_start_effects(
                     type_="turn_effect",
                     payload={"entity": entity, "kind": "cooldown_expired", "skill_id": sid},
                 )
+
+    # Regeneração de mana vinda de buff ou passiva.
+    mana_regen = fx.combat_modifier(entity, "mana_regen")
+    if mana_regen > 0:
+        entity.reduce_mp(-int(mana_regen))
+        max_mp = int(getattr(entity, "base_mp", entity.get_mp()))
+        if entity.get_mp() > max_mp:
+            entity._mp = max_mp
 
     effects_to_remove: list[str] = []
     buffs_to_remove: list[str] = []
@@ -399,29 +467,46 @@ def process_turn_start_effects(
                 type_="turn_effect",
                 payload={"entity": entity, "kind": "poison_tick", "damage": poison_damage},
             )
-        if effect == "frozen":
+        elif effect == "bleed":
+            max_hp = int(getattr(entity, "base_hp", entity.get_hp()))
+            bleed_damage = max(1, int(max_hp * BLEED_DAMAGE_PERCENT / 100))
+            entity.take_damage(bleed_damage)
             _emit(
                 publish,
                 T.COMBAT_TURN_EFFECT,
                 type_="turn_effect",
-                payload={"entity": entity, "kind": "frozen"},
+                payload={"entity": entity, "kind": "bleed_tick", "damage": bleed_damage},
             )
-            skipped_turn = True
-        if effect == "stun":
+        elif effect == "mana_burn":
+            entity.reduce_mp(MANA_BURN_PER_TICK)
+            if entity.get_mp() < 0:
+                entity._mp = 0
             _emit(
                 publish,
                 T.COMBAT_TURN_EFFECT,
                 type_="turn_effect",
-                payload={"entity": entity, "kind": "stun"},
+                payload={"entity": entity, "kind": "mana_burn_tick", "amount": MANA_BURN_PER_TICK},
+            )
+
+        if effect in fx.TURN_SKIPPING_STATUSES:
+            _emit(
+                publish,
+                T.COMBAT_TURN_EFFECT,
+                type_="turn_effect",
+                payload={"entity": entity, "kind": effect},
             )
             skipped_turn = True
+
         if effect == "damage_reduction":
-            # Apenas conta duração; a redução é aplicada em resolve_physical_attack
             _emit(
                 publish,
                 T.COMBAT_TURN_EFFECT,
                 type_="turn_effect",
-                payload={"entity": entity, "kind": "damage_reduction_active", "value": data.get("value", 0)},
+                payload={
+                    "entity": entity,
+                    "kind": "damage_reduction_active",
+                    "value": data.get("value", 0),
+                },
             )
 
         data["duration"] -= 1

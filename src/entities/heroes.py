@@ -3,38 +3,30 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from src.entities.base import Entity
+from src.mechanics.effects import buff_value, sum_buffs
 from src.shared.constants import (
-    AGILITY_CAP,
     CLASS_WEIGHTS,
     DAMAGE_FORMULA_DIVISOR,
+    GROWTH_RATE,
+    LEVEL_UP_RESTORE_PERCENT,
     MAGE_BASE_AG,
     MAGE_BASE_DF,
     MAGE_BASE_HP,
     MAGE_BASE_MG,
     MAGE_BASE_MP,
     MAGE_BASE_ST,
-    MAGE_HP_GROWTH_PERCENT,
-    MAGE_MG_GROWTH_PERCENT,
-    MAGE_MP_GROWTH_PERCENT,
-    ROGUE_AGILITY_GROWTH_PERCENT,
     ROGUE_BASE_AG,
     ROGUE_BASE_DF,
     ROGUE_BASE_HP,
     ROGUE_BASE_MG,
     ROGUE_BASE_MP,
     ROGUE_BASE_ST,
-    ROGUE_HP_GROWTH_PERCENT,
-    ROGUE_ST_GROWTH_PERCENT,
     WARRIOR_BASE_AG,
     WARRIOR_BASE_DF,
     WARRIOR_BASE_HP,
     WARRIOR_BASE_MG,
     WARRIOR_BASE_MP,
     WARRIOR_BASE_ST,
-    WARRIOR_HP_GROWTH_PERCENT,
-    WARRIOR_ST_GROWTH_PERCENT,
-    XP_BASE_COST,
-    XP_EXPONENT,
 )
 
 from src.content.skills_loader import get_initial_skills
@@ -59,6 +51,30 @@ def percentage(percent: int, whole: int, remainder: bool = True) -> int | float:
     return (percent * whole) // 100
 
 
+# Efeitos de consumível que viram buff temporário, com o atributo que cada um
+# modifica. O nome do buff é só rótulo de UI: quem decide o efeito é o atributo.
+POTION_BUFFS: dict[str, tuple[str, str]] = {
+    "strength": ("st", "Força Aumentada"),
+    "defense": ("df", "Defesa Aumentada"),
+    "agility": ("ag", "Agilidade Aumentada"),
+    "speed": ("ag", "Velocidade Aumentada"),
+    "magic_damage": ("mg", "Poder Mágico"),
+    "evasion": ("evasion", "Evasão Aumentada"),
+    "crit_chance": ("crit_chance", "Chance de Crítico"),
+    "crit_damage": ("crit_damage", "Dano Crítico"),
+    "life_steal": ("life_steal", "Roubo de Vida"),
+    "mana_regen": ("mana_regen", "Regeneração de Mana"),
+    "damage_reduction": ("damage_reduction", "Redução de Dano"),
+    "magic_resist": ("damage_reduction", "Resistência Mágica"),
+    "fire_resist": ("damage_reduction", "Resistência ao Fogo"),
+}
+
+# Consumíveis que aplicam um status em vez de um buff de atributo.
+POTION_STATUSES = ("poison", "bleed", "stun", "fear", "true_damage", "death_ignore")
+
+POTION_BUFF_DURATION = 3
+
+
 class Player(Entity):
     """Classe base para personagens jogáveis (heróis).
 
@@ -80,7 +96,22 @@ class Player(Entity):
         active_buffs: Buffs ativos no jogador.
     """
 
+    # Atributos base do nível 1, definidos por cada subclasse.
+    CLASS_BASE: dict[str, int] = {}
+
     def __init__(self, nick_name: str) -> None:
+        # `_growth` guarda os valores do nível 1 e nunca muda; o valor atual de
+        # cada atributo é derivado do nível. `_bonus` acumula os acréscimos
+        # planos de passivas e equipamento.
+        #
+        # Antes, o level up fazia `base_hp += 20% de base_hp`, um crescimento
+        # composto que divergia para sempre do crescimento aditivo do monstro.
+        # Derivar do nível também evita o erro de arredondamento que congelaria
+        # um atributo pequeno: `int(8 * 1.12)` é 8, então a agilidade do Mago
+        # nunca sairia do lugar se o valor fosse acumulado em inteiro.
+        self._growth: dict[str, int] = dict(self.CLASS_BASE)
+        self._bonus: dict[str, int] = {"hp": 0, "mp": 0, "st": 0, "ag": 0, "mg": 0, "df": 0}
+
         self.nick_name = nick_name
         self.level = 1
         self.xp_points = 0
@@ -108,6 +139,93 @@ class Player(Entity):
         self.active_buffs: dict[str, dict[str, object]] = {}
         self.passives: list[PassiveCard] = []
         self.skill_cooldowns: dict[str, int] = {}
+
+    # Qual campo do item alimenta cada atributo. O bônus do item é lido como
+    # PERCENTUAL do atributo, não como soma fixa: a melhor arma do jogo dava +30
+    # de dano sobre um poder base de ~860 no nível 20, ou seja 3%, e o conjunto
+    # completo de defesa somava 52 pontos. Equipamento não decidia nada.
+    EQUIP_STAT_SOURCES = {
+        "hp": ("max_hp",),
+        "mp": ("max_mp",),
+        "st": ("strength",),
+        "ag": ("agility", "speed"),
+        "mg": ("magic_damage",),
+        "df": ("defense",),
+    }
+
+    def equipment_percent(self, key: str) -> float:
+        """Soma, em percentual, o que o equipamento acrescenta a um atributo."""
+        total = 0.0
+        sources = self.EQUIP_STAT_SOURCES.get(key, ())
+        for item in self.equipment.values():
+            if item is None:
+                continue
+            if key == "df":
+                total += float(getattr(item, "defense_bonus", 0))
+            if getattr(item, "effect_type", None) in sources:
+                total += float(getattr(item, "effect_value", 0))
+        return total
+
+    def weapon_percent(self) -> float:
+        """Percentual de dano acrescentado pela arma equipada."""
+        return float(getattr(self.equipment.get("Weapon"), "damage_bonus", 0))
+
+    def _scaled(self, key: str) -> int:
+        """Valor do atributo no nível atual: base do nível 1 vezes a razão comum."""
+        base = self._growth.get(key, 0)
+        grown = int(round(base * (GROWTH_RATE ** (self.level - 1)))) + self._bonus.get(key, 0)
+        return int(grown * (1 + self.equipment_percent(key) / 100))
+
+    def _add_bonus(self, key: str, value: int) -> None:
+        self._bonus[key] = self._bonus.get(key, 0) + int(value)
+
+    @property
+    def base_hp(self) -> int:
+        return max(1, self._scaled("hp"))
+
+    @base_hp.setter
+    def base_hp(self, value: int) -> None:
+        self._add_bonus("hp", int(value) - self.base_hp)
+
+    @property
+    def base_mp(self) -> int:
+        return max(0, self._scaled("mp"))
+
+    @base_mp.setter
+    def base_mp(self, value: int) -> None:
+        self._add_bonus("mp", int(value) - self.base_mp)
+
+    @property
+    def base_st(self) -> int:
+        return max(0, self._scaled("st"))
+
+    @base_st.setter
+    def base_st(self, value: int) -> None:
+        self._add_bonus("st", int(value) - self.base_st)
+
+    @property
+    def base_ag(self) -> int:
+        return max(0, self._scaled("ag"))
+
+    @base_ag.setter
+    def base_ag(self, value: int) -> None:
+        self._add_bonus("ag", int(value) - self.base_ag)
+
+    @property
+    def base_mg(self) -> int:
+        return max(0, self._scaled("mg"))
+
+    @base_mg.setter
+    def base_mg(self, value: int) -> None:
+        self._add_bonus("mg", int(value) - self.base_mg)
+
+    @property
+    def base_df(self) -> int:
+        return max(0, self._scaled("df"))
+
+    @base_df.setter
+    def base_df(self, value: int) -> None:
+        self._add_bonus("df", int(value) - self.base_df)
 
     def add_item_to_inventory(self, item: object) -> str | None:
         """Adiciona item ao inventário.
@@ -178,13 +296,17 @@ class Player(Entity):
         
         if self.equipment[slot]:
             self.unequip(slot)
-        self.inventory.remove(item_to_equip)
+        # `remove` sem guarda levantava ValueError quando o item não estava no
+        # inventário — o que acontecia em todo carregamento de save com
+        # equipamento, porque load_game já havia retirado o item. A exceção era
+        # engolida por `except Exception` e o jogador via "save corrompido".
+        if item_to_equip in self.inventory:
+            self.inventory.remove(item_to_equip)
         self.equipment[slot] = item_to_equip
-        if slot == "Weapon":
-            self.avg_damage += int(getattr(item_to_equip, "damage_bonus", 0))
-        elif slot in ("Helmet", "Body", "Legs", "Shoes", "Hands", "Amulet", "Ring"):
-            self.base_df += int(getattr(item_to_equip, "defense_bonus", 0))
-        self.rest()
+        # Sem soma de atributo aqui: o bônus é lido dinamicamente das
+        # propriedades, o que evita contabilidade duplicada. E sem `rest()`:
+        # equipar um item era uma cura completa gratuita e ilimitada.
+        self._hp = min(self._hp, self.base_hp)
         return getattr(item_to_equip, "name", "Item")
 
     def unequip(self, slot: str) -> str | None:
@@ -199,17 +321,18 @@ class Player(Entity):
         item_to_unequip = self.equipment.get(slot)
         if not item_to_unequip:
             return None
-        if slot == "Weapon":
-            self.avg_damage -= int(getattr(item_to_unequip, "damage_bonus", 0))
-        else:
-            self.base_df -= int(getattr(item_to_unequip, "defense_bonus", 0))
         self.equipment[slot] = None
         self.inventory.append(item_to_unequip)
-        self.rest()
         return getattr(item_to_unequip, "name", "Item")
 
     def use_potion(self, item: object) -> str:
-        """Usa um item e aplica seus efeitos.
+        """Usa um consumível e aplica seu efeito.
+
+        A versão anterior era uma cadeia de `if` por nome de efeito que escrevia
+        buffs com nomes literais no dicionário de estado. Seis dos onze tipos
+        gravavam um buff que `get_stat` nunca lia — a poção era consumida e não
+        fazia nada. Agora o efeito declara o atributo que modifica, e o motor
+        consulta o atributo.
 
         Args:
             item: Item a ser usado.
@@ -222,58 +345,82 @@ class Player(Entity):
         item_name = getattr(item, "name", "Item")
 
         if effect_type == "max_hp":
-            self._hp += effect_value
-            if self._hp > self.base_hp:
-                self._hp = self.base_hp
-            msg = f"Você usou {item_name} e recuperou {effect_value} de HP."
+            # Percentual do máximo: uma poção de valor fixo cura 25% no nível 1
+            # e 3% no nível 20, então deixa de ser uma decisão exatamente onde
+            # ela deveria pesar mais.
+            healed = max(1, int(self.base_hp * effect_value / 100))
+            healed += int(healed * self.get_passive_bonus("potion_heal_bonus") / 100)
+            self.heal(healed)
+            msg = f"Você usou {item_name} e recuperou {healed} de HP."
         elif effect_type == "max_mp":
-            self._mp += effect_value
-            if self._mp > self.base_mp:
-                self._mp = self.base_mp
-            msg = f"Você usou {item_name} e recuperou {effect_value} de MP."
-        elif effect_type == "strength":
-            self.active_buffs["Força Aumentada"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {item_name}. Força aumentada em {effect_value} por 3 turnos!"
-        elif effect_type == "defense":
-            self.active_buffs["Defesa Aumentada"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {item_name}. Defesa aumentada em {effect_value} por 3 turnos!"
-        elif effect_type == "agility":
-            self.active_buffs["Agilidade Aumentada"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {item_name}. Agilidade aumentada em {effect_value} por 3 turnos!"
-        elif effect_type == "speed":
-            self.active_buffs["Velocidade Aumentada"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {item_name}. Velocidade aumentada em {effect_value} por 3 turnos!"
-        elif effect_type == "evasion":
-            self.active_buffs["Evasão Aumentada"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {item_name}. Evasão aumentada em {effect_value} por 3 turnos!"
-        elif effect_type == "crit_chance":
-            self.active_buffs["Chance de Crítico"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {item_name}. Chance de crítico +{effect_value}% por 3 turnos!"
-        elif effect_type == "crit_damage":
-            self.active_buffs["Dano Crítico"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {item_name}. Dano crítico +{effect_value} por 3 turnos!"
-        elif effect_type == "life_steal":
-            self.active_buffs["Roubo de Vida"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {item_name}. Roubo de vida +{effect_value}% por 3 turnos!"
-        elif effect_type == "mana_regen":
-            self.active_buffs["Regeneração de Mana"] = {"value": effect_value, "duration": 3}
-            msg = f"Você usou {item_name}. Regeneração de mana +{effect_value} por 3 turnos!"
+            restored = max(1, int(self.base_mp * effect_value / 100))
+            self._mp = min(self.base_mp, self._mp + restored)
+            msg = f"Você usou {item_name} e recuperou {restored} de MP."
+        elif effect_type in POTION_BUFFS:
+            stat, label = POTION_BUFFS[effect_type]
+            self.active_buffs[label] = {
+                "stat": stat,
+                "value": buff_value(self, stat, effect_value),
+                "duration": POTION_BUFF_DURATION,
+            }
+            msg = (
+                f"Você usou {item_name}. {label} +{effect_value} "
+                f"por {POTION_BUFF_DURATION} turnos!"
+            )
+        elif effect_type in POTION_STATUSES:
+            self.active_effects[effect_type] = {
+                "value": effect_value,
+                "duration": POTION_BUFF_DURATION,
+            }
+            msg = f"Você usou {item_name}. Efeito {effect_type} ativo por {POTION_BUFF_DURATION} turnos!"
         else:
             msg = f"Você usou {item_name}, mas não teve efeito aparente."
 
-        self.inventory.remove(item)
+        if item in self.inventory:
+            self.inventory.remove(item)
         return msg
 
     def rest(self) -> None:
-        """Restaura HP, MP, limpa efeitos e marca como vivo."""
+        """Restaura HP e MP ao máximo e limpa efeitos.
+
+        Só deve ser usado na construção do personagem. Durante a run, chamar
+        isto anula o atrito: era invocado depois de cada vitória, a cada nível,
+        ao equipar, ao fugir e ao concluir o andar, e o efeito somado era que
+        nenhum combate custava nada ao seguinte.
+        """
         self._hp = self.base_hp
         self._mp = self.base_mp
         self.active_effects.clear()
         self.active_buffs.clear()
         self.set_isalive(True)
 
+    def recover(self, percent: int) -> int:
+        """Restaura um percentual do máximo de HP e MP, e limpa efeitos de combate.
+
+        É o descanso com custo: devolve o suficiente para o próximo andar ser
+        jogável, e pouco o bastante para a decisão de extrair continuar existindo.
+
+        Args:
+            percent: Percentual do máximo a restaurar.
+
+        Returns:
+            HP efetivamente recuperado.
+        """
+        before = self._hp
+        self.heal(int(self.base_hp * percent / 100))
+        self._mp = min(self.base_mp, self._mp + int(self.base_mp * percent / 100))
+        self.active_effects.clear()
+        self.active_buffs.clear()
+        self.skill_cooldowns.clear()
+        self._death_ignore_used = False
+        return self._hp - before
+
     def get_stat(self, stat: str) -> int:
-        """Retorna o valor de um atributo considerando buffs ativos.
+        """Valor de um atributo somando todos os buffs ativos que o modificam.
+
+        A versão anterior comparava o nome do buff com cinco literais. Qualquer
+        buff com outro nome — o que incluía 12 das 14 skills de buff do jogo —
+        era escrito e nunca lido.
 
         Args:
             stat: Nome do atributo ('st', 'ag', 'mg', 'df').
@@ -281,18 +428,7 @@ class Player(Entity):
         Returns:
             Valor do atributo com buffs aplicados.
         """
-        base_value = int(getattr(self, f"base_{stat}"))
-        if stat == "st" and "Grito de Guerra" in self.active_buffs:
-            base_value += int(self.active_buffs["Grito de Guerra"]["value"])
-        if stat == "ag" and "Cortina de Fumaça" in self.active_buffs:
-            base_value += int(self.active_buffs["Cortina de Fumaça"]["value"])
-        if stat == "st" and "Força Aumentada" in self.active_buffs:
-            base_value += int(self.active_buffs["Força Aumentada"]["value"])
-        if stat == "df" and "Defesa Aumentada" in self.active_buffs:
-            base_value += int(self.active_buffs["Defesa Aumentada"]["value"])
-        if stat == "ag" and "Agilidade Aumentada" in self.active_buffs:
-            base_value += int(self.active_buffs["Agilidade Aumentada"]["value"])
-        return base_value
+        return int(getattr(self, f"base_{stat}")) + sum_buffs(self, stat)
 
     def add_passive(self, passive: PassiveCard) -> str:
         self.passives.append(passive)
@@ -319,7 +455,9 @@ class Player(Entity):
         elif effect_type == "defense":
             self.base_df += value
         elif effect_type == "agility":
-            self.base_ag = min(self.base_ag + value, AGILITY_CAP)
+            # Sem teto: com a chance de acerto relativa, agilidade alta é
+            # vantagem limitada pela fórmula, não imunidade.
+            self.base_ag += value
 
     def add_passive_load(self, passive: PassiveCard) -> None:
         self.passives.append(passive)
@@ -337,9 +475,45 @@ class Player(Entity):
         """Retorna o tipo da entidade."""
         return "Human"
 
+    def get_mp(self) -> int:
+        """Retorna os pontos de mana atuais."""
+        return int(self._mp)
+
+    def get_st(self) -> int:
+        """Retorna a força com buffs aplicados."""
+        return self.get_stat("st")
+
+    def get_ag(self) -> int:
+        """Retorna a agilidade com buffs aplicados."""
+        return self.get_stat("ag")
+
+    def get_mg(self) -> int:
+        """Retorna a magia com buffs aplicados."""
+        return self.get_stat("mg")
+
+    def get_df(self) -> int:
+        """Retorna a defesa com buffs aplicados."""
+        return self.get_stat("df")
+
+    @staticmethod
+    def get_classname() -> str:
+        """Nome da classe. Cada subclasse concreta redefine."""
+        return "Player"
+
     def get_avg_damage(self) -> int:
-        """Retorna o dano médio do jogador."""
-        return self.avg_damage
+        """BASE_POWER = (W_classe · [ST, MG, AG]) + poder da arma.
+
+        Os pesos ficam em CLASS_WEIGHTS e são a identidade ofensiva da classe.
+        A arma soma sobre esse total; o valor é lido do equipamento e não do
+        campo `avg_damage`, para não contar o bônus duas vezes.
+        """
+        weights = CLASS_WEIGHTS[self.get_classname()]
+        base_power = (
+            self.get_st() * weights["st"]
+            + self.get_mg() * weights["mg"]
+            + self.get_ag() * weights["ag"]
+        )
+        return max(1, int(base_power * (1 + self.weapon_percent() / 100)))
 
     def add_xp_points(self, amount: int) -> None:
         """Adiciona pontos de experiência.
@@ -412,29 +586,31 @@ class Player(Entity):
         return f"Skill {old_name} substituída por {new_skill.name}!"
 
     def _update_stats_on_level_up(self) -> None:
-        """Atualiza atributos base ao subir de nível (método interno)."""
-        class_name = self.get_classname()
-        if class_name == "Warrior":
-            self.base_hp += int(percentage(WARRIOR_HP_GROWTH_PERCENT, self.base_hp, False))
-            self.base_st += int(percentage(WARRIOR_ST_GROWTH_PERCENT, self.base_st, False))
-        elif class_name == "Mage":
-            self.base_hp += int(percentage(MAGE_HP_GROWTH_PERCENT, self.base_hp, False))
-            self.base_mp += int(percentage(MAGE_MP_GROWTH_PERCENT, self.base_mp, False))
-            self.base_mg += int(percentage(MAGE_MG_GROWTH_PERCENT, self.base_mg, False))
-        elif class_name == "Rogue":
-            self.base_hp += int(percentage(ROGUE_HP_GROWTH_PERCENT, self.base_hp, False))
-            self.base_st += int(percentage(ROGUE_ST_GROWTH_PERCENT, self.base_st, False))
-            self.base_ag = min(int(self.base_ag * (1 + ROGUE_AGILITY_GROWTH_PERCENT / 100)), AGILITY_CAP)
+        """Atualiza o estado derivado do nível e devolve parte dos recursos.
+
+        Os atributos em si não são recalculados aqui: eles são derivados de
+        `self.level` pelas propriedades `base_*`, com a mesma razão de
+        crescimento que os monstros usam. Subir de nível restaura apenas
+        `LEVEL_UP_RESTORE_PERCENT` do máximo — a cura completa a cada nível era
+        uma das cinco fontes de cura gratuita que anulavam o atrito da run.
+        """
         self.avg_damage = (self.base_st + self.base_mg) // DAMAGE_FORMULA_DIVISOR
-        self.rest()
+        self.heal(int(self.base_hp * LEVEL_UP_RESTORE_PERCENT / 100))
+        self._mp = min(self.base_mp, self._mp + int(self.base_mp * LEVEL_UP_RESTORE_PERCENT / 100))
 
     def need_to_next(self) -> int:
         """Retorna a quantidade de XP necessária para o próximo nível."""
         return max(0, self.need_to_up() - self.xp_points)
 
     def need_to_up(self) -> int:
-        """Retorna a quantidade total de XP necessária para subir de nível."""
-        return int(XP_BASE_COST * (self.level**XP_EXPONENT))
+        """XP total necessária para subir de nível.
+
+        Delega para `math_operations`: existiam duas curvas de XP no código, e
+        a que ninguém chamava era a que parecia oficial. Agora há uma só.
+        """
+        from src.mechanics.math_operations import calculate_xp_for_next_level
+
+        return calculate_xp_for_next_level(self.level)
 
     def set_level(self, target_level: int) -> str:
         """Define o nível do jogador ajustando atributos.
@@ -457,227 +633,91 @@ class Player(Entity):
 
 
 class Warrior(Player):
-    """Classe Guerreiro - focada em força física e HP alto.
+    """Guerreiro — o maior HP efetivo do jogo, o menor pico de dano.
 
-    Attributes:
-        base_hp: HP base do guerreiro.
-        base_mp: MP base do guerreiro.
-        base_st: Força base do guerreiro.
-        base_ag: Agilidade base do guerreiro.
-        base_mg: Magia base do guerreiro.
-        base_df: Defesa base do guerreiro.
+    Identidade: ganha por atrito. Sobrevive a combates longos que matam as
+    outras classes, e por isso é quem melhor absorve um encontro que deu errado.
+    Fraqueza: contra o tank, que também ganha por atrito e tem mais HP.
     """
 
-    base_hp: int = WARRIOR_BASE_HP
-    base_mp: int = WARRIOR_BASE_MP
-    base_st: int = WARRIOR_BASE_ST
-    base_ag: int = WARRIOR_BASE_AG
-    base_mg: int = WARRIOR_BASE_MG
-    base_df: int = WARRIOR_BASE_DF
+    CLASS_BASE = {
+        "hp": WARRIOR_BASE_HP,
+        "mp": WARRIOR_BASE_MP,
+        "st": WARRIOR_BASE_ST,
+        "ag": WARRIOR_BASE_AG,
+        "mg": WARRIOR_BASE_MG,
+        "df": WARRIOR_BASE_DF,
+    }
 
     def __init__(self, nick_name: str) -> None:
-        """Inicializa um guerreiro.
-
-        Args:
-            nick_name: Nome do jogador.
-        """
         super().__init__(nick_name)
-        self._hp, self.base_hp = self.base_hp, self.base_hp
-        self._mp, self.base_mp = self.base_mp, self.base_mp
-        self._st, self.base_st = self.base_st, self.base_st
-        self._ag, self.base_ag = self.base_ag, self.base_ag
-        self._mg, self.base_mg = self.base_mg, self.base_mg
-        self._df, self.base_df = self.base_df, self.base_df
-        self.avg_damage = (self._st + self._mg) // DAMAGE_FORMULA_DIVISOR
+        self._hp = self.base_hp
+        self._mp = self.base_mp
+        self.avg_damage = (self.base_st + self.base_mg) // DAMAGE_FORMULA_DIVISOR
+        self.learn_new_skills(show=False)
 
     @staticmethod
     def get_classname() -> str:
         """Retorna o nome da classe."""
         return "Warrior"
 
-    def get_hp(self) -> int:
-        """Retorna os pontos de vida atuais."""
-        return self._hp
-
-    def get_mp(self) -> int:
-        """Retorna os pontos de mana atuais."""
-        return self._mp
-
-    def get_st(self) -> int:
-        """Retorna a força com buffs aplicados."""
-        return self.get_stat("st")
-
-    def get_ag(self) -> int:
-        """Retorna a agilidade com buffs aplicados."""
-        return self.get_stat("ag")
-
-    def get_mg(self) -> int:
-        """Retorna a magia com buffs aplicados."""
-        return self.get_stat("mg")
-
-    def get_df(self) -> int:
-        """Retorna a defesa com buffs aplicados."""
-        return self.get_stat("df")
-
-    def get_avg_damage(self) -> int:
-        """BASE_POWER = (W_class · [ST, MG, AG]) + weapon_power."""
-        weights = CLASS_WEIGHTS["Warrior"]
-        base_power = (
-            self.get_st() * weights["st"]
-            + self.get_mg() * weights["mg"]
-            + self.get_ag() * weights["ag"]
-        )
-        weapon_bonus = getattr(self.equipment.get("Weapon"), "damage_bonus", 0)
-        return int(base_power + weapon_bonus)
-
 
 class Mage(Player):
-    """Classe Mago - focada em magia e MP alto.
+    """Mago — maior pico de dano, menor HP efetivo, refém de MP.
 
-    Attributes:
-        base_hp: HP base do mago.
-        base_mp: MP base do mago.
-        base_st: Força base do mago.
-        base_ag: Agilidade base do mago.
-        base_mg: Magia base do mago.
-        base_df: Defesa base do mago.
+    Identidade: vence rápido ou não vence. Tem o burst para derrubar um alvo
+    antes que ele aja, e o menor orçamento de sobrevivência para quando isso
+    falha. Fraqueza: contra o controlador, que rouba turnos e queima mana.
     """
 
-    base_hp: int = MAGE_BASE_HP
-    base_mp: int = MAGE_BASE_MP
-    base_st: int = MAGE_BASE_ST
-    base_ag: int = MAGE_BASE_AG
-    base_mg: int = MAGE_BASE_MG
-    base_df: int = MAGE_BASE_DF
+    CLASS_BASE = {
+        "hp": MAGE_BASE_HP,
+        "mp": MAGE_BASE_MP,
+        "st": MAGE_BASE_ST,
+        "ag": MAGE_BASE_AG,
+        "mg": MAGE_BASE_MG,
+        "df": MAGE_BASE_DF,
+    }
 
     def __init__(self, nick_name: str) -> None:
-        """Inicializa um mago.
-
-        Args:
-            nick_name: Nome do jogador.
-        """
         super().__init__(nick_name)
-        self._hp, self.base_hp = self.base_hp, self.base_hp
-        self._mp, self.base_mp = self.base_mp, self.base_mp
-        self._st, self.base_st = self.base_st, self.base_st
-        self._ag, self.base_ag = self.base_ag, self.base_ag
-        self._mg, self.base_mg = self.base_mg, self.base_mg
-        self._df, self.base_df = self.base_df, self.base_df
-        self.avg_damage = (self._st + self._mg) // DAMAGE_FORMULA_DIVISOR
+        self._hp = self.base_hp
+        self._mp = self.base_mp
+        self.avg_damage = (self.base_st + self.base_mg) // DAMAGE_FORMULA_DIVISOR
+        self.learn_new_skills(show=False)
 
     @staticmethod
     def get_classname() -> str:
         """Retorna o nome da classe."""
         return "Mage"
 
-    def get_hp(self) -> int:
-        """Retorna os pontos de vida atuais."""
-        return self._hp
-
-    def get_mp(self) -> int:
-        """Retorna os pontos de mana atuais."""
-        return self._mp
-
-    def get_st(self) -> int:
-        """Retorna a força com buffs aplicados."""
-        return self.get_stat("st")
-
-    def get_ag(self) -> int:
-        """Retorna a agilidade com buffs aplicados."""
-        return self.get_stat("ag")
-
-    def get_mg(self) -> int:
-        """Retorna a magia com buffs aplicados."""
-        return self.get_stat("mg")
-
-    def get_df(self) -> int:
-        """Retorna a defesa com buffs aplicados."""
-        return self.get_stat("df")
-
-    def get_avg_damage(self) -> int:
-        """BASE_POWER = (W_class · [ST, MG, AG]) + weapon_power."""
-        weights = CLASS_WEIGHTS["Mage"]
-        base_power = (
-            self.get_st() * weights["st"]
-            + self.get_mg() * weights["mg"]
-            + self.get_ag() * weights["ag"]
-        )
-        weapon_bonus = getattr(self.equipment.get("Weapon"), "damage_bonus", 0)
-        return int(base_power + weapon_bonus)
-
 
 class Rogue(Player):
-    """Classe Ladino - focada em agilidade e ataques rápidos.
+    """Ladino — escolhe quando lutar; evita dano em vez de absorvê-lo.
 
-    Attributes:
-        base_hp: HP base do ladino.
-        base_mp: MP base do ladino.
-        base_st: Força base do ladino.
-        base_ag: Agilidade base do ladino.
-        base_mg: Magia base do ladino.
-        base_df: Defesa base do ladino.
+    Identidade: a agilidade dá a ele a vantagem de acerto e de iniciativa mais
+    alta do jogo, permanente mas limitada — a chance de acerto é relativa, então
+    ele nunca fica imune como ficava antes. Fraqueza: contra o skirmisher, que
+    tem agilidade suficiente para anular essa vantagem.
     """
 
-    base_hp: int = ROGUE_BASE_HP
-    base_mp: int = ROGUE_BASE_MP
-    base_st: int = ROGUE_BASE_ST
-    base_ag: int = ROGUE_BASE_AG
-    base_mg: int = ROGUE_BASE_MG
-    base_df: int = ROGUE_BASE_DF
+    CLASS_BASE = {
+        "hp": ROGUE_BASE_HP,
+        "mp": ROGUE_BASE_MP,
+        "st": ROGUE_BASE_ST,
+        "ag": ROGUE_BASE_AG,
+        "mg": ROGUE_BASE_MG,
+        "df": ROGUE_BASE_DF,
+    }
 
     def __init__(self, nick_name: str) -> None:
-        """Inicializa um ladino.
-
-        Args:
-            nick_name: Nome do jogador.
-        """
         super().__init__(nick_name)
-        self._hp, self.base_hp = self.base_hp, self.base_hp
-        self._mp, self.base_mp = self.base_mp, self.base_mp
-        self._st, self.base_st = self.base_st, self.base_st
-        self._ag, self.base_ag = self.base_ag, self.base_ag
-        self._mg, self.base_mg = self.base_mg, self.base_mg
-        self._df, self.base_df = self.base_df, self.base_df
-        self.avg_damage = (self._st + self._mg) // DAMAGE_FORMULA_DIVISOR
+        self._hp = self.base_hp
+        self._mp = self.base_mp
+        self.avg_damage = (self.base_st + self.base_mg) // DAMAGE_FORMULA_DIVISOR
+        self.learn_new_skills(show=False)
 
     @staticmethod
     def get_classname() -> str:
         """Retorna o nome da classe."""
         return "Rogue"
-
-    def get_hp(self) -> int:
-        """Retorna os pontos de vida atuais."""
-        return self._hp
-
-    def get_mp(self) -> int:
-        """Retorna os pontos de mana atuais."""
-        return self._mp
-
-    def get_st(self) -> int:
-        """Retorna a força com buffs aplicados."""
-        return self.get_stat("st")
-
-    def get_ag(self) -> int:
-        """Retorna a agilidade com buffs aplicados."""
-        return self.get_stat("ag")
-
-    def get_mg(self) -> int:
-        """Retorna a magia com buffs aplicados."""
-        return self.get_stat("mg")
-
-    def get_df(self) -> int:
-        """Retorna a defesa com buffs aplicados."""
-        return self.get_stat("df")
-
-    def get_avg_damage(self) -> int:
-        """BASE_POWER = (W_class · [ST, MG, AG]) + weapon_power."""
-        weights = CLASS_WEIGHTS["Rogue"]
-        base_power = (
-            self.get_st() * weights["st"]
-            + self.get_mg() * weights["mg"]
-            + self.get_ag() * weights["ag"]
-        )
-        weapon_bonus = getattr(self.equipment.get("Weapon"), "damage_bonus", 0)
-        return int(base_power + weapon_bonus)
-
-

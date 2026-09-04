@@ -126,20 +126,45 @@ def test_legendary_nao_e_estritamente_melhor_que_epic():
 
 
 def test_equip_unequip_restora_status():
+    # O bônus do item é percentual do atributo, não soma fixa: uma armadura de
+    # "defesa 3" dá +3% de defesa, e por isso continua valendo o mesmo no nível
+    # 20, onde +3 pontos sobre 301 de defesa não valeriam nada.
     player = Warrior("Teste")
     base_def = player.base_df
-    # Usa armadura com defesa — equip lógica atual só lida com damage/defense, não effect_type
-    # Amuletos com max_hp não alteram base_hp via equip (só via use_potion), então testa defesa
-    armadura = get_all_items()["Gibão de Couro"]  # def 3
+    armadura = get_all_items()["Gibão de Couro"]  # defesa 3 -> +3%
     player.inventory.append(armadura)
     player.equip(armadura)
-    assert player.base_df == base_def + 3
-    # Desequipa
+    assert player.base_df == int(base_def * 1.03)
     player.unequip("Body")
     assert player.base_df == base_def
-    # Documentação: estrutura atual de Item suporta damage_bonus/defense_bonus + effect,
-    # mas equip() só aplica os dois primeiros; efeitos como max_hp de amuletos só via uso,
-    # não via equipamento — trade-offs com efeito precisam ser via dano/defesa para teste
+
+
+def test_bonus_de_equipamento_mantem_peso_entre_niveis():
+    # Como soma fixa, a melhor arma do jogo valia 3% do poder base no nível 20.
+    # Como percentual, ela vale o mesmo em qualquer nível.
+    arma = get_all_items()["Espada de Ferro"]
+
+    def ganho_no_nivel(nivel):
+        player = Warrior("Teste")
+        player.set_level(nivel)
+        sem_arma = player.get_avg_damage()
+        player.inventory.append(arma)
+        player.equip(arma)
+        return player.get_avg_damage() / sem_arma
+
+    assert ganho_no_nivel(1) == pytest.approx(ganho_no_nivel(20), rel=0.02)
+
+
+def test_equipar_item_nao_cura_o_heroi():
+    # Equipar chamava rest(), que restaurava HP e MP ao máximo: era uma cura
+    # completa gratuita e ilimitada, acionável pelo inventário a qualquer hora.
+    player = Warrior("Teste")
+    player.take_damage(player.base_hp // 2)
+    ferido = player.get_hp()
+    arma = get_all_items()["Espada de Ferro"]
+    player.inventory.append(arma)
+    player.equip(arma)
+    assert player.get_hp() <= ferido
 
 
 def test_catalogo_tem_minimo_12_novos_itens_com_tradeoff():

@@ -34,6 +34,7 @@ from src.mechanics.math_operations import (
 from src.shared import combat_topics as topics
 from src.shared.constants import (
     BASE_MAP_HEIGHT,
+    FLOOR_CLEAR_RESTORE_PERCENT,
     BASE_MAP_WIDTH,
     MAP_HEIGHT_INCREMENT_PER_5_LEVELS,
     MAP_WIDTH_INCREMENT_PER_5_LEVELS,
@@ -173,7 +174,8 @@ def _run_human_battle_turn(
                             source="engine.loop",
                         ),
                     )
-                player.rest()
+                # Sem `rest()`: fugir devolvia HP e MP cheios, o que fazia da
+                # fuga uma cura gratuita em vez de uma retirada com custo.
                 return "flee"
             if publish:
                 publish(
@@ -373,18 +375,23 @@ def process_post_battle(
     dropped_item = None
     coins_gained = 0
 
+    # Passivas de essência e de ouro eram lidas por ninguém: `essence_bonus`
+    # (4 cartas) e `gold_drop_bonus` (2 cartas) não apareciam em nenhum cálculo.
+    essence_passive = 1 + player.get_passive_bonus("essence_bonus") / 100
+    gold_passive = 1 + player.get_passive_bonus("gold_drop_bonus") / 100
+
     if not player_won:
-        pity_xp = int((xp_base_reward // 10) * essence_multiplier)
-        pity_coins = coins_base_reward // 10
+        pity_xp = int((xp_base_reward // 10) * essence_multiplier * essence_passive)
+        pity_coins = int((coins_base_reward // 10) * gold_passive)
         player.add_xp_points(pity_xp)
         player.earn_coins(pity_coins)
         xp_gained = pity_xp
         coins_gained = pity_coins
     else:
-        xp_gained = int(xp_base_reward * essence_multiplier)
+        xp_gained = int(xp_base_reward * essence_multiplier * essence_passive)
         player.add_xp_points(xp_gained)
-        player.earn_coins(coins_base_reward)
-        coins_gained = coins_base_reward
+        coins_gained = int(coins_base_reward * gold_passive)
+        player.earn_coins(coins_gained)
         dropped_item = get_loot()
         if dropped_item:
             player.add_item_to_inventory(dropped_item)
@@ -399,7 +406,10 @@ def process_post_battle(
                 break
             level_up_messages.extend(msgs)
             levels_gained += 1
-        player.rest()
+
+    # Sem `rest()`: curar por completo depois de cada vitória tornava todo
+    # combate independente do anterior e zerava o atrito do andar. Poções,
+    # skills de cura e a Fonte existem justamente para pagar esse custo.
 
     return xp_gained, player_won, dropped_item, level_up_messages, coins_gained, levels_gained
 
@@ -564,7 +574,9 @@ def start_game(
             if result == "quit":
                 return
             elif result == "level_complete":
-                player.rest()
+                # Descanso parcial, não cura completa: o andar é a unidade de
+                # risco, e chegar ferido ao próximo é o que dá peso à extração.
+                player.recover(FLOOR_CLEAR_RESTORE_PERCENT)
                 # --- Evento aleatório (TASK-005) — 25% antes da extração ---
                 event_type = roll_random_event()
                 if event_type:

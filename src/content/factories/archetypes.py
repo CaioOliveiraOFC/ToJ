@@ -176,7 +176,7 @@ ARCHETYPES: dict[str, Archetype] = {
     "elite": Archetype(
         role="elite",
         label="Elite",
-        hp=1.8, attack=1.4, defense=1.25, agility=1.1,
+        hp=1.7, attack=1.3, defense=1.2, agility=1.1,
         skill_use_chance=45,
         skills=(
             _skill("mob_investida_brutal", "Investida Brutal", "damage", 55,
@@ -192,7 +192,7 @@ ARCHETYPES: dict[str, Archetype] = {
     "boss": Archetype(
         role="boss",
         label="Boss",
-        hp=3.0, attack=1.5, defense=1.4, agility=1.15,
+        hp=2.4, attack=1.35, defense=1.3, agility=1.15,
         skill_use_chance=55,
         skills=(
             _skill("boss_devastar", "Devastar", "damage", 80, mana_cost=30, cooldown=3),

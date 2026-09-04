@@ -38,16 +38,13 @@ MONSTER_BASE_MG = 50
 MONSTER_BASE_DF = 30
 
 # --- Sistema de XP e Moedas ---
-XP_INITIAL_COST = 3000
-XP_GROWTH_PER_LEVEL = 750
-MONSTER_BASE_XP_REWARD = 50
-MONSTER_XP_SCALING_PER_LEVEL = 20
+MONSTER_BASE_XP_REWARD = 45
 MONSTER_BASE_COIN_REWARD = 30
-MONSTER_COIN_SCALING_PER_LEVEL = 10
-MINI_BOSS_COIN_MULTIPLIER = 3
 
 # --- Mini-Bosses ---
-MINI_BOSS_LEVEL_BONUS = 2
+# O chefe já custa 2,4x o orçamento do andar. Somar níveis a isso empilhava dois
+# multiplicadores e transformava o andar 5 num muro, não num portão.
+MINI_BOSS_LEVEL_BONUS = 1
 MINI_BOSS_BASE_HP = 150
 MINI_BOSS_HP_SCALING_PER_LEVEL = 40
 MINI_BOSS_BASE_STRENGTH = 80
@@ -104,31 +101,52 @@ DEFAULT_WALL_PERCENTAGE = 0.2
 MAP_BORDER_OFFSET = 1  # Offset para evitar bordas
 MIN_EMPTY_TILES_START = 1
 
-# --- Stats Base de Heróis ---
-# Balanceado: Mage buff minimo (96->99, 23->25) para corrigir 5 andares de gap
-WARRIOR_BASE_HP = 104
-WARRIOR_BASE_MP = 30
-WARRIOR_BASE_ST = 104
-WARRIOR_BASE_AG = 5
+# --- Stats Base de Heróis (nível 1) ---
+# Os três perfis distribuem o mesmo orçamento de poder de ataque no nível 1
+# (100 pontos, aplicando CLASS_WEIGHTS) de formas diferentes, e a diferença
+# entre as classes está em HP, defesa e agilidade — não em quem bate mais.
+# Antes, o Mago tinha 21,8x de crescimento de poder contra 5,6x do Guerreiro,
+# porque o peso de classe alto dele multiplicava justamente o atributo que
+# crescia mais rápido.
+#
+# O orçamento trocado entre os eixos é o que dá identidade: quem ganha em dano
+# paga em sobrevivência, e o inverso. Poder de ataque no nível 1, aplicando
+# CLASS_WEIGHTS, contra HP efetivo (HP vezes a mitigação da defesa):
+#
+#   Guerreiro:  48*1.6 + 30*0.4 =  89    EHP 440*1.32 = 581
+#   Mago:       30*0.3 + 58*1.9 = 119    EHP 370*1.26 = 466
+#   Ladino:     48*0.8 + 32*0.4 + 29*1.7 = 100   EHP 370*1.25 = 463 + esquiva
+#
+# A distância de HP efetivo entre a classe mais dura e a mais frágil é de 25%.
+# Com 45%, que era a versão anterior destes números, o Guerreiro dominava a run:
+# numa masmorra decidida por atrito, HP efetivo vale mais que pico de dano, e
+# uma vantagem grande demais nesse eixo não é identidade, é dominância.
+WARRIOR_BASE_HP = 440
+WARRIOR_BASE_MP = 60
+WARRIOR_BASE_ST = 48
+WARRIOR_BASE_AG = 10
 WARRIOR_BASE_MG = 30
-WARRIOR_BASE_DF = 30
+WARRIOR_BASE_DF = 32
 
-MAGE_BASE_HP = 99
-MAGE_BASE_MP = 100
-MAGE_BASE_ST = 32
-MAGE_BASE_AG = 5
-MAGE_BASE_MG = 100
-MAGE_BASE_DF = 25
+MAGE_BASE_HP = 370
+MAGE_BASE_MP = 140
+MAGE_BASE_ST = 30
+MAGE_BASE_AG = 8
+MAGE_BASE_MG = 58
+MAGE_BASE_DF = 26
 
-ROGUE_BASE_HP = 99
-ROGUE_BASE_MP = 50
-ROGUE_BASE_ST = 75
-ROGUE_BASE_AG = 15
-ROGUE_BASE_MG = 66
-ROGUE_BASE_DF = 20
+ROGUE_BASE_HP = 370
+ROGUE_BASE_MP = 90
+ROGUE_BASE_ST = 48
+ROGUE_BASE_AG = 29
+ROGUE_BASE_MG = 32
+ROGUE_BASE_DF = 25
 
 # --- Progressão de Level Up ---
-# Balanceado: Mage ganha HP growth 8 (antes 0)
+# Todos os atributos de todas as classes crescem pela mesma razão GROWTH_RATE,
+# a mesma que os monstros usam. As constantes por classe abaixo não são mais
+# lidas pelo motor; ficam registradas porque documentam o modelo antigo, em que
+# cada classe crescia a uma taxa própria e o herói divergia do monstro.
 WARRIOR_HP_GROWTH_PERCENT = 20
 WARRIOR_ST_GROWTH_PERCENT = 10
 
@@ -139,13 +157,21 @@ MAGE_MG_GROWTH_PERCENT = 18
 ROGUE_ST_GROWTH_PERCENT = 16
 ROGUE_AGILITY_GROWTH_PERCENT = 18
 ROGUE_HP_GROWTH_PERCENT = 8
+# Teto histórico de agilidade. Com a chance de acerto relativa ele deixou de ser
+# necessário: a vantagem de agilidade é limitada pela própria fórmula, e travar
+# o atributo no nível 12 congelava a identidade do Ladino.
 AGILITY_CAP = 95
 
 # Fórmulas
 DAMAGE_FORMULA_DIVISOR = 3  # (ST + MG) // 3
 SKILL_LEVEL_SCALING = 0.08  # +8% dano de skill por nível
-XP_BASE_COST = 100
-XP_EXPONENT = 1.5  # level ** 1.5
+# Custo de XP do nível 1 e razão de crescimento do custo. A razão é maior que
+# GROWTH_RATE de propósito: o número de combates por nível sobe ao longo da run
+# (cerca de 3 no nível 1, cerca de 14 no nível 19), então o herói fica
+# progressivamente atrás do andar. É essa defasagem que cria dificuldade
+# crescente, em vez de inflar os números do monstro.
+XP_BASE_COST = 140
+XP_LEVEL_RATIO = 1.195
 
 # --- Multiplicador de Essência por Andar ---
 ESSENCE_MULT_MIN = 0.5
@@ -216,3 +242,21 @@ MONSTER_BUDGET_MP = 60
 HIT_AGILITY_SWING = 30  # pontos percentuais máximos que a agilidade move
 HIT_CHANCE_FLOOR = 20   # nenhum defensor fica imune
 HIT_CHANCE_CEIL = 95    # nenhum atacante fica infalível
+
+# --- Efeitos de status ---
+MANA_BURN_PER_TICK = 12       # MP drenado por turno por "mana_burn"
+BLEED_DAMAGE_PERCENT = 4      # % do HP máximo por turno por "bleed"
+INVISIBLE_HIT_PENALTY = 45    # pontos percentuais de acerto perdidos contra alvo invisível
+
+# --- Descanso entre andares ---
+# Concluir um andar devolve parte dos recursos. Não tudo: a cura completa a cada
+# andar era uma das cinco fontes de cura gratuita que tornavam cada combate
+# independente do anterior. Não zero: uma run de 20 andares em uma única barra
+# de vida não é difícil, é impossível. O andar é a unidade de risco, e o que
+# sobra de vida no fim dele é o que dá peso à decisão de extrair.
+FLOOR_CLEAR_RESTORE_PERCENT = 32
+
+# --- Level up ---
+# Subir de nível restaura parte dos recursos, não tudo. Cura completa a cada
+# nível era uma das cinco fontes de cura gratuita que zeravam o atrito da run.
+LEVEL_UP_RESTORE_PERCENT = 30

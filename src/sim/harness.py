@@ -18,6 +18,7 @@ from src.mechanics.battle import run_battle
 from src.sim.encounters import build_encounter
 from src.sim.loadouts import apply_loadout
 from src.sim.policies import get_policy
+from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
 
 HERO_CLASSES = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 ALL_CLASSES = ("Warrior", "Mage", "Rogue")
@@ -179,6 +180,7 @@ def simulate_run(
     decide = get_policy(policy)
     deepest: list[int] = []
     survival = {floor: 0 for floor in range(1, max_floor + 1)}
+    level_at_floor: dict[int, list[int]] = {floor: [] for floor in range(1, max_floor + 1)}
 
     for i in range(iterations):
         rng = random.Random(seed + i)
@@ -189,7 +191,10 @@ def simulate_run(
             fights = encounters_per_floor(floor) if encounters_per_floor else _default_floor_plan(floor)
             died = False
             for name in fights:
-                monsters = build_encounter(name, max(1, hero.get_level()))
+                # O nível do encontro vem do ANDAR, não do herói — é assim que o
+                # jogo real gera monstros. Amarrar ao nível do herói esconderia
+                # justamente a defasagem que cria a dificuldade crescente.
+                monsters = build_encounter(name, floor)
                 outcome = run_battle(hero, monsters, lambda h, m: decide(h, m), rng=rng, publish=None)
                 if not hero.get_isalive() or hero.get_hp() <= 0:
                     died = True
@@ -200,10 +205,16 @@ def simulate_run(
                 break
             reached = floor
             survival[floor] += 1
+            level_at_floor[floor].append(hero.get_level())
+            # Fim do andar: descanso parcial e reposição de consumíveis na loja,
+            # como o jogo real oferece entre andares.
+            hero.recover(FLOOR_CLEAR_RESTORE_PERCENT)
+            _restock(hero, floor)
 
         deepest.append(reached)
 
     return {
+        "levels_by_floor": {f: statistics.fmean(v) for f, v in sorted(level_at_floor.items()) if v},
         "hero_class": hero_class,
         "policy": policy,
         "loadout": loadout,
@@ -216,24 +227,66 @@ def simulate_run(
 
 
 def _default_floor_plan(floor: int) -> list[str]:
-    """Composição de um andar: alguns encontros comuns, marco a cada 5 andares."""
-    from src.sim.encounters import ROUTINE_ENCOUNTERS
+    """Composição de um andar, por faixa de profundidade.
 
-    count = 3 + floor // 4
-    plan = [ROUTINE_ENCOUNTERS[(floor + i) % len(ROUTINE_ENCOUNTERS)] for i in range(count)]
+    A faixa importa mais que a contagem: os primeiros andares ensinam com
+    encontros isolados, e a partir do andar 6 as composições passam a exigir
+    escolha de alvo, que é a decisão tática mais básica que o jogo tem.
+    """
+    if floor <= 2:
+        return ["trash_solo", "trash_solo", "bruiser_solo"]
+    if floor <= 5:
+        plan = ["trash_solo", "trash_pair", "bruiser_solo", "skirmisher_solo"]
+    elif floor <= 10:
+        plan = ["trash_pair", "bruiser_solo", "glass_solo", "skirmisher_solo",
+                "tank_solo", "controller_solo"]
+    else:
+        plan = ["trash_trio", "bruiser_solo", "tank_plus_glass", "controller_plus_bruiser",
+                "skirmisher_pair", "support_plus_bruiser", "glass_solo"]
+
+    count = min(len(plan), 3 + floor // 4)
+    fights = [plan[(floor + i) % len(plan)] for i in range(count)]
     if floor % 5 == 0:
-        plan.append("boss_solo")
+        fights.append("boss_solo")
     elif floor % 3 == 0:
-        plan.append("elite_solo")
-    return plan
+        fights.append("elite_solo")
+    return fights
+
+
+# Quantos consumíveis o jogador repõe na loja ao concluir um andar. Sem isto a
+# simulação mede uma run em que ninguém compra nada, que não é a run que existe.
+RESTOCK_POTIONS = 2
+
+
+def _restock(hero, floor: int) -> None:
+    """Repõe poções de cura entre andares, gastando o ouro acumulado."""
+    from src.content.items import get_all_items
+
+    potions = [
+        item
+        for item in get_all_items().values()
+        if getattr(item, "consumable", False)
+        and getattr(item, "effect_type", None) == "max_hp"
+        and getattr(item, "shop_min_floor", 1) <= floor
+    ]
+    if not potions:
+        return
+    best = max(potions, key=lambda i: i.effect_value)
+    carried = sum(1 for i in hero.inventory if getattr(i, "effect_type", None) == "max_hp")
+    for _ in range(max(0, RESTOCK_POTIONS - carried)):
+        if hero.spend_coins(int(best.price)):
+            hero.add_item_to_inventory(best)
 
 
 def _award(hero, monsters: list) -> None:
     """Concede XP e sobe de nível como o jogo faz depois de uma vitória."""
     from src.mechanics.math_operations import calculate_monster_xp_reward
 
+    from src.mechanics.math_operations import calculate_monster_coin_reward
+
     for monster in monsters:
         hero.add_xp_points(calculate_monster_xp_reward(monster.level))
+        hero.earn_coins(calculate_monster_coin_reward(monster.level))
     while hero.level_up(show=False):
         pass
 

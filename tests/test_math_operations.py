@@ -1,13 +1,14 @@
-"""Testes unitários de src/mechanics/math_operations.py — valores esperados calculados manualmente.
+"""Testes de src/mechanics/math_operations.py.
 
-Constantes (src/shared/constants.py):
-  MONSTER:  HP 100/+20 | ST 25/+15 | DF 20/+8 | MG 40/+12
-            XP 50/+20  | moedas 30/+10
-  MINI_BOSS (nível efetivo = dungeon_level + 2):
-            HP 150/+40 | ST 80/+30 | DF 45/+10 | MG 75/+18
-            XP 120/+25 | moedas = calculate_monster_coin_reward(d+2) * 3
-  XP nível: 3000 + (nível-1)*750
-  Essência: gauss(1.2, 0.5) truncada em [0.5, 3.0], arredondada a 1 casa.
+As fórmulas de atributo de monstro saíram deste módulo: hoje o monstro é montado
+por arquétipo em content/factories/archetypes.py, com a mesma razão geométrica
+do herói. O que resta aqui é recompensa e progressão.
+
+  Monstro:   XP e moedas = base * GROWTH_RATE^(nível-1)
+  Mini-chefe: mesma forma, nível efetivo = andar + MINI_BOSS_LEVEL_BONUS
+  Custo de nível: XP_BASE_COST * XP_LEVEL_RATIO^(nível-1), com
+                  XP_LEVEL_RATIO > GROWTH_RATE de propósito
+  Essência: gauss truncada em [0.5, 3.0], arredondada a 1 casa.
 """
 
 import random
@@ -19,6 +20,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pytest  # noqa: E402
 
 from src.mechanics import math_operations as mo  # noqa: E402
+from src.shared.constants import (  # noqa: E402
+    GROWTH_RATE,
+    MONSTER_BASE_COIN_REWARD,
+    MONSTER_BASE_XP_REWARD,
+    XP_BASE_COST,
+    XP_LEVEL_RATIO,
+)
 
 # ------------------------------------------------------------------ percentage
 
@@ -36,117 +44,71 @@ class TestPercentage:
         assert mo.percentage(33, 10, remainder=False) == 3  # 3.3 -> 3
 
 
-# ------------------------------------------------- stats lineares de monstro
+# ------------------------------ escalonamento geométrico compartilhado
+#
+# A regra central do rebalanceamento: herói e monstro crescem pela MESMA razão.
+# Antes, o herói crescia em percentual composto e o monstro em soma fixa, e duas
+# curvas de formas diferentes divergem para sempre — era daí que vinha a taxa de
+# vitória de 100% contra monstro comum em todos os níveis.
 
 
-class TestMonsterStats:
-    @pytest.mark.parametrize(
-        "func,base,scaling",
-        [
-            (mo.calculate_monster_hp, 100, 20),
-            (mo.calculate_monster_strength, 25, 15),
-            (mo.calculate_monster_defense, 20, 8),
-            (mo.calculate_monster_magic, 40, 12),
-        ],
-    )
-    def test_nivel_1_retorna_o_base(self, func, base, scaling):
-        assert func(1) == base
+class TestEscalonamentoCompartilhado:
+    def test_recompensas_usam_a_razao_comum(self):
+        assert mo.calculate_monster_xp_reward(1) == MONSTER_BASE_XP_REWARD
+        esperado_nv10 = int(MONSTER_BASE_XP_REWARD * GROWTH_RATE**9)
+        assert mo.calculate_monster_xp_reward(10) == esperado_nv10
 
-    @pytest.mark.parametrize(
-        "func,base,scaling",
-        [
-            (mo.calculate_monster_hp, 100, 20),
-            (mo.calculate_monster_strength, 25, 15),
-            (mo.calculate_monster_defense, 20, 8),
-            (mo.calculate_monster_magic, 40, 12),
-        ],
-    )
-    def test_progressao_linear_nivel_5(self, func, base, scaling):
-        assert func(5) == base + 4 * scaling
+    def test_custo_de_xp_cresce_mais_rapido_que_a_recompensa(self):
+        # É essa diferença que faz o número de combates por nível subir ao longo
+        # da run, colocando o herói progressivamente atrás do andar.
+        assert XP_LEVEL_RATIO > GROWTH_RATE
+
+    def test_combates_por_nivel_sobem_com_o_nivel(self):
+        def combates(nivel):
+            return mo.calculate_xp_for_next_level(nivel) / mo.calculate_monster_xp_reward(nivel)
+
+        assert combates(1) < combates(10) < combates(19)
+
+    def test_mini_boss_recompensa_mais_que_monstro_do_mesmo_andar(self):
+        for andar in (1, 5, 10, 15):
+            assert mo.calculate_mini_boss_xp_reward(andar) > mo.calculate_monster_xp_reward(andar)
+            assert mo.calculate_mini_boss_coin_reward(andar) > mo.calculate_monster_coin_reward(andar)
 
 
 # --------------------------------------------------------------------- XP
 
 
 class TestXpForNextLevel:
-    @pytest.mark.parametrize(
-        "level,expected",
-        [
-            (1, 3000),
-            (2, 3750),
-            (10, 9750),  # 3000 + 9*750
-        ],
-    )
-    def test_formula_manual(self, level, expected):
-        assert mo.calculate_xp_for_next_level(level) == expected
+    def test_nivel_1_e_o_custo_base(self):
+        assert mo.calculate_xp_for_next_level(1) == XP_BASE_COST
+
+    @pytest.mark.parametrize("level", [2, 5, 10, 19])
+    def test_formula_geometrica(self, level):
+        assert mo.calculate_xp_for_next_level(level) == int(
+            XP_BASE_COST * XP_LEVEL_RATIO ** (level - 1)
+        )
+
+    def test_curva_e_monotonica(self):
+        custos = [mo.calculate_xp_for_next_level(n) for n in range(1, 21)]
+        assert custos == sorted(custos)
 
 
 # ----------------------------------------------- recompensas de monstro comum
 
 
 class TestMonsterRewards:
-    @pytest.mark.parametrize(
-        "level,expected",
-        [(1, 50), (5, 130), (10, 230)],  # 50 + (n-1)*20
-    )
-    def test_xp_reward_manual(self, level, expected):
-        assert mo.calculate_monster_xp_reward(level) == expected
+    def test_nivel_1_retorna_a_base(self):
+        assert mo.calculate_monster_xp_reward(1) == MONSTER_BASE_XP_REWARD
+        assert mo.calculate_monster_coin_reward(1) == MONSTER_BASE_COIN_REWARD
 
-    @pytest.mark.parametrize(
-        "level,expected",
-        [(1, 30), (7, 90)],  # 30 + (n-1)*10
-    )
-    def test_coin_reward_manual(self, level, expected):
-        assert mo.calculate_monster_coin_reward(level) == expected
-
-
-# --------------------------- recompensas/stats de mini-boss (captura de duplicação)
-#
-# NOTA DE AUDITORIA: as cinco funções calculate_mini_boss_* têm estrutura idêntica
-# entre si (base + (nível_efetivo - 1) * scaling, com nível_efetivo = d + 2) —
-# candidatos claros a uma única função parametrizada. Os testes abaixo pinam os
-# valores exatos justamente para que qualquer divergência futura entre elas quebre.
-
-
-class TestMiniBossStatsAndRewards:
-    @pytest.mark.parametrize(
-        "func,base,scaling,dungeon,expected",
-        [
-            # d=1 -> efetivo 3 ; d=4 -> efetivo 6
-            (mo.calculate_mini_boss_hp, 150, 40, 1, 150 + 2 * 40),
-            (mo.calculate_mini_boss_hp, 150, 40, 4, 150 + 5 * 40),
-            (mo.calculate_mini_boss_strength, 80, 30, 1, 80 + 2 * 30),
-            (mo.calculate_mini_boss_strength, 80, 30, 4, 80 + 5 * 30),
-            (mo.calculate_mini_boss_defense, 45, 10, 1, 45 + 2 * 10),
-            (mo.calculate_mini_boss_defense, 45, 10, 4, 45 + 5 * 10),
-            (mo.calculate_mini_boss_magic, 75, 18, 1, 75 + 2 * 18),
-            (mo.calculate_mini_boss_magic, 75, 18, 4, 75 + 5 * 18),
-            (mo.calculate_mini_boss_xp_reward, 120, 25, 1, 120 + 2 * 25),
-            (mo.calculate_mini_boss_xp_reward, 120, 25, 4, 120 + 5 * 25),
-        ],
-    )
-    def test_valores_pinned(self, func, base, scaling, dungeon, expected):
-        assert func(dungeon) == expected
-
-    def test_mini_boss_coin_usa_formula_dedicada(self):
-        # Corrigido: mini-boss agora tem base/escala próprias (80 +15), consistente
-        # com XP (120 +25), mantendo proporção sem reversão. Não deve ser
-        # simplesmente monster*3.
-        assert mo.calculate_mini_boss_coin_reward(1) == 80 + 2 * 15  # 110
-        assert mo.calculate_mini_boss_coin_reward(10) == 80 + 11 * 15  # 245
-        # Ainda mais recompensador que monstro no mesmo nível efetivo
-        assert mo.calculate_mini_boss_coin_reward(1) > mo.calculate_monster_coin_reward(3)
-        assert mo.calculate_mini_boss_coin_reward(10) > mo.calculate_monster_coin_reward(12)
-
-    @pytest.mark.parametrize(
-        "dungeon,expected",
-        [
-            (1, 110),  # 80 + 2*15
-            (10, 245),  # 80 + 11*15
-        ],
-    )
-    def test_mini_boss_coin_valores_pinned(self, dungeon, expected):
-        assert mo.calculate_mini_boss_coin_reward(dungeon) == expected
+    @pytest.mark.parametrize("level", [5, 10, 20])
+    def test_progressao_geometrica(self, level):
+        assert mo.calculate_monster_xp_reward(level) == int(
+            MONSTER_BASE_XP_REWARD * GROWTH_RATE ** (level - 1)
+        )
+        assert mo.calculate_monster_coin_reward(level) == int(
+            MONSTER_BASE_COIN_REWARD * GROWTH_RATE ** (level - 1)
+        )
 
 
 # --------------------------------------------------- generate_essence_multiplier

@@ -245,14 +245,26 @@ class TestResolvePhysicalAttack:
             assert (res.damage, res.was_critical) == (exp, crit)
 
     def test_agility_altera_chance_de_acerto(self):
-        # AG 90 vs AG 10 -> hit_chance = 85 + 80 = 165 (sempre acerta);
-        # AG 10 vs AG 95 -> 85 - 85 = 0 (só acerta com roll... nunca: roll>=1 > 0)
+        # A chance de acerto usa a diferença RELATIVA de agilidade, limitada
+        # entre HIT_CHANCE_FLOOR e HIT_CHANCE_CEIL. Ninguém fica imune nem
+        # infalível, por maior que seja a diferença de agilidade.
         a_hi, d_low = StubEntity(ag=90), StubEntity(df=20, ag=10)
         a_low, d_hi = StubEntity(ag=10), StubEntity(df=20, ag=95)
-        r1 = cmb.resolve_physical_attack(a_hi, d_low, 50, rng=random.Random(19))  # seed de miss
-        r2 = cmb.resolve_physical_attack(a_low, d_hi, 50, rng=random.Random(3))  # seed de hit
-        assert r1.was_evaded is False
-        assert r2.was_evaded is True
+        assert cmb.hit_chance(a_hi, d_low) > cmb.hit_chance(a_low, d_hi)
+        assert cmb.hit_chance(a_low, d_hi) >= cmb.HIT_CHANCE_FLOOR
+        assert cmb.hit_chance(a_hi, d_low) <= cmb.HIT_CHANCE_CEIL
+
+    def test_acerto_e_escala_livre(self):
+        # Dois combatentes cujas agilidades crescem juntas mantêm a mesma
+        # chance de acerto. É o que impede a classe ágil de virar imune.
+        baixo = cmb.hit_chance(StubEntity(ag=8), StubEntity(ag=31))
+        alto = cmb.hit_chance(StubEntity(ag=80), StubEntity(ag=310))
+        assert baixo == alto
+
+    def test_nenhum_defensor_fica_imune(self):
+        # O bug original: AG do monstro fixa em 3 contra AG do Ladino sem teto
+        # zerava a chance de acerto a partir do nível 13.
+        assert cmb.hit_chance(StubEntity(ag=3), StubEntity(ag=1000)) >= cmb.HIT_CHANCE_FLOOR
 
     @pytest.mark.parametrize("seed", range(12))
     def test_rogue_ataque_furtivo_usa_crit_chance_high_e_cap_75(self, seed):
@@ -301,19 +313,24 @@ class TestApplySkill:
             duration=duration,
         )
 
-    def test_skill_de_dano_usa_scaling_por_level(self):
+    def test_skill_de_dano_e_percentual_do_poder_base(self):
         caster, target = self._caster_target()
-        # scaling = 1 + 10*0.08 = 1.8 ; flat = int(30*1.8)=54 ; base = 40+54 = 94
-        hit, crit = predict_attack_rolls(7, BASE_HIT_CHANCE, CRIT_CHANCE_DEFAULT)
-        res = cmb.apply_skill(caster, target, self._skill("damage"), rng=random.Random(7))
+        # effect_value 30 = +30% sobre o poder base 40 -> 52.
+        skill = self._skill("damage")
+        assert cmb.skill_damage_base(caster, skill) == 52
+        res = cmb.apply_skill(caster, target, skill, rng=random.Random(7))
         assert res.kind == "damage"
         assert res.mp_spent == 20
         assert caster.get_mp() == 80
-        assert res.strike.was_evaded is (not hit)
-        if hit:
-            assert res.strike.damage == expected_damage(
-                94, xmult=[CRIT_DAMAGE_BASE] if crit else None, defense=0
-            )
+
+    def test_skill_de_dano_mantem_peso_relativo_entre_niveis(self):
+        # Como percentual, a skill vale o mesmo no nível 1 e no nível 20. Como
+        # soma fixa, ela anti-escalava e virava ruído no fim do jogo.
+        baixo, _ = self._caster_target()
+        alto, _ = self._caster_target()
+        alto.level = 20
+        skill = self._skill("damage")
+        assert cmb.skill_damage_base(baixo, skill) == cmb.skill_damage_base(alto, skill)
 
     def test_skill_de_cura(self):
         caster, target = self._caster_target()
@@ -339,7 +356,7 @@ class TestApplySkill:
             caster, target, self._skill("buff", value=8, duration=2), rng=random.Random(0)
         )
         assert res.kind == "buff"
-        assert caster.active_buffs["Bola de Fogo"] == {"value": 8, "duration": 2}
+        assert caster.active_buffs["Bola de Fogo"] == {"stat": "", "value": 8, "duration": 2}
         assert caster.get_mp() == 80
 
     def test_effect_type_desconhecido_levanta_valueerror(self):

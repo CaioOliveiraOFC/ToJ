@@ -1,4 +1,9 @@
-"""Funções matemáticas para cálculo de estatísticas e recompensas.
+"""Funções matemáticas para recompensas e progressão.
+
+As fórmulas de atributo de monstro saíram daqui: elas eram aritméticas
+(`base + (nível-1) * passo`) enquanto o herói crescia em percentual composto, e
+duas curvas de formas diferentes divergem para sempre. Hoje o monstro é montado
+em `content/factories/archetypes.py`, com a mesma razão geométrica do herói.
 
 Todas as constantes são importadas de src.shared.constants.
 """
@@ -14,33 +19,14 @@ from src.shared.constants import (
     ESSENCE_MULT_MIN,
     ESSENCE_MULT_NORMAL_MEAN,
     ESSENCE_MULT_NORMAL_STD,
+    GROWTH_RATE,
     MINI_BOSS_BASE_COIN_REWARD,
-    MINI_BOSS_BASE_DEFENSE,
-    MINI_BOSS_BASE_HP,
-    MINI_BOSS_BASE_MAGIC,
-    MINI_BOSS_BASE_STRENGTH,
     MINI_BOSS_BASE_XP_REWARD,
-    MINI_BOSS_COIN_SCALING_PER_LEVEL,
-    MINI_BOSS_DEFENSE_SCALING_PER_LEVEL,
-    MINI_BOSS_HP_SCALING_PER_LEVEL,
     MINI_BOSS_LEVEL_BONUS,
-    MINI_BOSS_MAGIC_SCALING_PER_LEVEL,
-    MINI_BOSS_STRENGTH_SCALING_PER_LEVEL,
-    MINI_BOSS_XP_SCALING_PER_LEVEL,
     MONSTER_BASE_COIN_REWARD,
-    MONSTER_BASE_DEFENSE,
-    MONSTER_BASE_HP,
-    MONSTER_BASE_MAGIC,
-    MONSTER_BASE_STRENGTH,
     MONSTER_BASE_XP_REWARD,
-    MONSTER_COIN_SCALING_PER_LEVEL,
-    MONSTER_DEFENSE_SCALING_PER_LEVEL,
-    MONSTER_HP_SCALING_PER_LEVEL,
-    MONSTER_MAGIC_SCALING_PER_LEVEL,
-    MONSTER_STRENGTH_SCALING_PER_LEVEL,
-    MONSTER_XP_SCALING_PER_LEVEL,
-    XP_GROWTH_PER_LEVEL,
-    XP_INITIAL_COST,
+    XP_BASE_COST,
+    XP_LEVEL_RATIO,
 )
 
 
@@ -60,58 +46,16 @@ def percentage(percent: int | float, whole: int | float, remainder: bool = True)
     return (percent * whole) // 100
 
 
-def calculate_monster_hp(monster_level: int) -> int:
-    """Calcula o HP total de um monstro baseado no seu nível.
-
-    Args:
-        monster_level: Nível do monstro (mínimo 1).
-
-    Returns:
-        HP total calculado.
-    """
-    return MONSTER_BASE_HP + (monster_level - 1) * MONSTER_HP_SCALING_PER_LEVEL
-
-
-def calculate_monster_strength(monster_level: int) -> int:
-    """Calcula a força (strength) de um monstro baseado no seu nível.
-
-    Args:
-        monster_level: Nível do monstro (mínimo 1).
-
-    Returns:
-        Valor de força calculado.
-    """
-    return MONSTER_BASE_STRENGTH + (monster_level - 1) * MONSTER_STRENGTH_SCALING_PER_LEVEL
-
-
-def calculate_monster_defense(monster_level: int) -> int:
-    """Calcula a defesa de um monstro baseado no seu nível.
-
-    Args:
-        monster_level: Nível do monstro (mínimo 1).
-
-    Returns:
-        Valor de defesa calculado.
-    """
-    return MONSTER_BASE_DEFENSE + (monster_level - 1) * MONSTER_DEFENSE_SCALING_PER_LEVEL
-
-
-def calculate_monster_magic(monster_level: int) -> int:
-    """Calcula o atributo mágico de um monstro baseado no seu nível.
-
-    Args:
-        monster_level: Nível do monstro (mínimo 1).
-
-    Returns:
-        Valor mágico calculado.
-    """
-    return MONSTER_BASE_MAGIC + (monster_level - 1) * MONSTER_MAGIC_SCALING_PER_LEVEL
-
-
 def calculate_xp_for_next_level(current_level: int) -> int:
-    """Calcula a quantidade de XP necessária para alcançar o próximo nível.
+    """XP necessária para sair de `current_level` para o próximo.
 
-    Fórmula: XP_INITIAL_COST + (current_level - 1) * XP_GROWTH_PER_LEVEL
+    Geométrica, com razão maior que a de crescimento dos atributos. Isso faz o
+    número de combates por nível subir ao longo da run: o herói fica cada vez
+    mais para trás do andar, e é daí que vem a dificuldade crescente — não de
+    inflar os números do monstro.
+
+    Antes existiam duas curvas de XP no código: esta, que ninguém chamava, e
+    `Player.need_to_up`. Agora só existe esta, e `need_to_up` delega a ela.
 
     Args:
         current_level: Nível atual do jogador.
@@ -119,124 +63,34 @@ def calculate_xp_for_next_level(current_level: int) -> int:
     Returns:
         Quantidade de XP necessária para o próximo nível.
     """
-    return XP_INITIAL_COST + (current_level - 1) * XP_GROWTH_PER_LEVEL
+    return int(XP_BASE_COST * (XP_LEVEL_RATIO ** (max(1, current_level) - 1)))
 
 
 def calculate_monster_xp_reward(monster_level: int) -> int:
-    """Calcula a recompensa de XP por derrotar um monstro.
-
-    Args:
-        monster_level: Nível do monstro derrotado.
-
-    Returns:
-        Quantidade de XP a ser concedida.
-    """
-    return MONSTER_BASE_XP_REWARD + (monster_level - 1) * MONSTER_XP_SCALING_PER_LEVEL
-
-
-def _calculate_mini_boss_effective_level(dungeon_level: int) -> int:
-    """Calcula o nível efetivo de um mini-boss.
-
-    Args:
-        dungeon_level: Nível atual da masmorra.
-
-    Returns:
-        Nível efetivo do mini-boss (dungeon_level + bônus).
-    """
-    return dungeon_level + MINI_BOSS_LEVEL_BONUS
-
-
-def calculate_mini_boss_hp(dungeon_level: int) -> int:
-    """Calcula o HP de um mini-boss para o nível da masmorra.
-
-    Args:
-        dungeon_level: Nível atual da masmorra.
-
-    Returns:
-        HP total do mini-boss calculado.
-    """
-    effective_level = _calculate_mini_boss_effective_level(dungeon_level)
-    return MINI_BOSS_BASE_HP + (effective_level - 1) * MINI_BOSS_HP_SCALING_PER_LEVEL
-
-
-def calculate_mini_boss_strength(dungeon_level: int) -> int:
-    """Calcula a força de um mini-boss para o nível da masmorra.
-
-    Args:
-        dungeon_level: Nível atual da masmorra.
-
-    Returns:
-        Valor de força do mini-boss calculado.
-    """
-    effective_level = _calculate_mini_boss_effective_level(dungeon_level)
-    return MINI_BOSS_BASE_STRENGTH + (effective_level - 1) * MINI_BOSS_STRENGTH_SCALING_PER_LEVEL
-
-
-def calculate_mini_boss_defense(dungeon_level: int) -> int:
-    """Calcula a defesa de um mini-boss para o nível da masmorra.
-
-    Args:
-        dungeon_level: Nível atual da masmorra.
-
-    Returns:
-        Valor de defesa do mini-boss calculado.
-    """
-    effective_level = _calculate_mini_boss_effective_level(dungeon_level)
-    return MINI_BOSS_BASE_DEFENSE + (effective_level - 1) * MINI_BOSS_DEFENSE_SCALING_PER_LEVEL
-
-
-def calculate_mini_boss_magic(dungeon_level: int) -> int:
-    """Calcula o atributo mágico de um mini-boss para o nível da masmorra.
-
-    Args:
-        dungeon_level: Nível atual da masmorra.
-
-    Returns:
-        Valor mágico do mini-boss calculado.
-    """
-    effective_level = _calculate_mini_boss_effective_level(dungeon_level)
-    return MINI_BOSS_BASE_MAGIC + (effective_level - 1) * MINI_BOSS_MAGIC_SCALING_PER_LEVEL
-
-
-def calculate_mini_boss_xp_reward(dungeon_level: int) -> int:
-    """Calcula a recompensa de XP por derrotar um mini-boss.
-
-    Args:
-        dungeon_level: Nível atual da masmorra.
-
-    Returns:
-        Quantidade de XP a ser concedida pela vitória.
-    """
-    effective_level = _calculate_mini_boss_effective_level(dungeon_level)
-    return MINI_BOSS_BASE_XP_REWARD + (effective_level - 1) * MINI_BOSS_XP_SCALING_PER_LEVEL
+    """XP concedida por derrotar um monstro do nível dado."""
+    return int(MONSTER_BASE_XP_REWARD * (GROWTH_RATE ** (max(1, monster_level) - 1)))
 
 
 def calculate_monster_coin_reward(monster_level: int) -> int:
-    """Calcula a recompensa de moedas por derrotar um monstro.
+    """Moedas concedidas por derrotar um monstro do nível dado."""
+    return int(MONSTER_BASE_COIN_REWARD * (GROWTH_RATE ** (max(1, monster_level) - 1)))
 
-    Args:
-        monster_level: Nível do monstro derrotado.
 
-    Returns:
-        Quantidade de moedas a ser concedida.
-    """
-    return MONSTER_BASE_COIN_REWARD + (monster_level - 1) * MONSTER_COIN_SCALING_PER_LEVEL
+def _calculate_mini_boss_effective_level(dungeon_level: int) -> int:
+    """Nível efetivo de um mini-chefe: o andar mais o bônus de chefe."""
+    return dungeon_level + MINI_BOSS_LEVEL_BONUS
+
+
+def calculate_mini_boss_xp_reward(dungeon_level: int) -> int:
+    """XP concedida por derrotar um mini-chefe."""
+    level = _calculate_mini_boss_effective_level(dungeon_level)
+    return int(MINI_BOSS_BASE_XP_REWARD * (GROWTH_RATE ** (max(1, level) - 1)))
 
 
 def calculate_mini_boss_coin_reward(dungeon_level: int) -> int:
-    """Calcula a recompensa de moedas por derrotar um mini-boss.
-
-    Usa base e escala dedicadas (consistente com XP), mantendo o mini-boss
-    proporcionalmente mais recompensador que o monstro comum sem reversão.
-
-    Args:
-        dungeon_level: Nível atual da masmorra.
-
-    Returns:
-        Quantidade de moedas a ser concedida pela vitória.
-    """
-    effective_level = _calculate_mini_boss_effective_level(dungeon_level)
-    return MINI_BOSS_BASE_COIN_REWARD + (effective_level - 1) * MINI_BOSS_COIN_SCALING_PER_LEVEL
+    """Moedas concedidas por derrotar um mini-chefe."""
+    level = _calculate_mini_boss_effective_level(dungeon_level)
+    return int(MINI_BOSS_BASE_COIN_REWARD * (GROWTH_RATE ** (max(1, level) - 1)))
 
 
 def generate_essence_multiplier(dungeon_level: int = 1) -> float:

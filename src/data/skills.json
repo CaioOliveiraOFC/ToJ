@@ -1,6 +1,6 @@
 {
-  "description": "CatÃ¡logo de skills para escolhas de nÃ­vel",
-  "version": "1.0",
+  "description": "Skills. effect_value de dano e percentual sobre o poder base; de cura, percentual do HP maximo; de buff, percentual do atributo indicado em effect_stat (ou literal, para modificadores que ja sao %).",
+  "version": "2.0",
   "rarity_weights": {
     "Common": 60,
     "Rare": 28,
@@ -23,7 +23,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 1,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "investida",
@@ -40,7 +41,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 1,
-      "stun_chance": 15
+      "stun_chance": 15,
+      "effect_stat": ""
     },
     {
       "id": "escudo_protetor",
@@ -49,7 +51,7 @@
       "level_required": 1,
       "mana_cost": 25,
       "effect_type": "buff",
-      "effect_value": 8,
+      "effect_value": 40,
       "description": "Levanta um escudo que aumenta sua defesa por 3 turnos.",
       "target": "self",
       "duration": 3,
@@ -57,7 +59,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "df"
     },
     {
       "id": "grito_guerra",
@@ -66,7 +69,7 @@
       "level_required": 1,
       "mana_cost": 20,
       "effect_type": "buff",
-      "effect_value": 10,
+      "effect_value": 35,
       "description": "Aumenta seu dano de ataque por 3 turnos.",
       "target": "self",
       "duration": 3,
@@ -74,7 +77,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "st"
     },
     {
       "id": "golpe_devastador",
@@ -91,7 +95,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "bola_fogo",
@@ -108,7 +113,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 1,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "missil_magico",
@@ -125,7 +131,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 1,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "drenar_vida",
@@ -134,7 +141,7 @@
       "level_required": 1,
       "mana_cost": 30,
       "effect_type": "heal",
-      "effect_value": 25,
+      "effect_value": 15,
       "description": "Drena a vida do inimigo e recupera sua prÃ³pria vida.",
       "target": "self",
       "duration": 0,
@@ -142,7 +149,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "escudo_magico",
@@ -151,7 +159,7 @@
       "level_required": 1,
       "mana_cost": 25,
       "effect_type": "buff",
-      "effect_value": 5,
+      "effect_value": 35,
       "description": "Cria um escudo mÃ¡gico que reduz dano recebido por 3 turnos.",
       "target": "self",
       "duration": 3,
@@ -159,7 +167,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "df"
     },
     {
       "id": "raio_congelante",
@@ -176,7 +185,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "cura_menor",
@@ -185,7 +195,7 @@
       "level_required": 20,
       "mana_cost": 35,
       "effect_type": "heal",
-      "effect_value": 50,
+      "effect_value": 30,
       "description": "Recupera uma porÃ§Ã£o da sua vida.",
       "target": "self",
       "duration": 0,
@@ -193,7 +203,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "ataque_furtivo",
@@ -210,7 +221,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 1,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "golpe_baixo",
@@ -227,7 +239,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 2,
-      "stun_chance": 15
+      "stun_chance": 15,
+      "effect_stat": ""
     },
     {
       "id": "evasao",
@@ -244,7 +257,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "evasion"
     },
     {
       "id": "sombra_rapida",
@@ -253,7 +267,7 @@
       "level_required": 1,
       "mana_cost": 18,
       "effect_type": "buff",
-      "effect_value": 12,
+      "effect_value": 30,
       "description": "Desaparece nas sombras, aumentando sua chance de esquiva.",
       "target": "self",
       "duration": 2,
@@ -261,7 +275,8 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "ag"
     },
     {
       "id": "lancar_adaga",
@@ -278,7 +293,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "cortina_fumaca",
@@ -287,7 +303,7 @@
       "level_required": 20,
       "mana_cost": 25,
       "effect_type": "buff",
-      "effect_value": 20,
+      "effect_value": 45,
       "description": "Aumenta sua esquiva por 3 turnos.",
       "target": "self",
       "duration": 3,
@@ -295,7 +311,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "ag"
     },
     {
       "id": "cutelada",
@@ -312,7 +329,8 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "provocacao",
@@ -321,15 +339,16 @@
       "level_required": 5,
       "mana_cost": 15,
       "effect_type": "status",
-      "effect_value": "taunt",
-      "description": "Provoca inimigo (taunt) por 2 turnos.",
+      "effect_value": "weakened",
+      "description": "Provoca o inimigo e reduz o dano que ele causa por 3 turnos.",
       "target": "enemy",
-      "duration": 2,
-      "chance": 100,
+      "duration": 3,
+      "chance": 85,
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "fortalecimento",
@@ -338,7 +357,7 @@
       "level_required": 7,
       "mana_cost": 25,
       "effect_type": "buff",
-      "effect_value": 15,
+      "effect_value": 45,
       "description": "+15 Força por 4 turnos.",
       "target": "self",
       "duration": 4,
@@ -346,7 +365,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "st"
     },
     {
       "id": "golpe_duplo",
@@ -363,7 +383,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "resistencia_heroica",
@@ -372,7 +393,7 @@
       "level_required": 11,
       "mana_cost": 30,
       "effect_type": "buff",
-      "effect_value": 10,
+      "effect_value": 25,
       "description": "+10% redução dano por 3 turnos.",
       "target": "self",
       "duration": 3,
@@ -380,7 +401,8 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "damage_reduction"
     },
     {
       "id": "furia",
@@ -389,7 +411,7 @@
       "level_required": 13,
       "mana_cost": 40,
       "effect_type": "buff",
-      "effect_value": 20,
+      "effect_value": 70,
       "description": "+20 Força + crítico por 2 turnos.",
       "target": "self",
       "duration": 2,
@@ -397,7 +419,8 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "st"
     },
     {
       "id": "esmagar",
@@ -414,7 +437,8 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 4,
-      "stun_chance": 30
+      "stun_chance": 30,
+      "effect_stat": ""
     },
     {
       "id": "imortal",
@@ -423,7 +447,7 @@
       "level_required": 20,
       "mana_cost": 60,
       "effect_type": "buff",
-      "effect_value": 1,
+      "effect_value": 65,
       "description": "Ignora morte 1 vez (1 turno).",
       "target": "self",
       "duration": 1,
@@ -431,7 +455,8 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 5,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "damage_reduction"
     },
     {
       "id": "relampago",
@@ -448,7 +473,8 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "barreira_arcana",
@@ -457,7 +483,7 @@
       "level_required": 5,
       "mana_cost": 25,
       "effect_type": "buff",
-      "effect_value": 8,
+      "effect_value": 40,
       "description": "+8 redução dano por 3 turnos.",
       "target": "self",
       "duration": 3,
@@ -465,7 +491,8 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "df"
     },
     {
       "id": "explosao_arcana",
@@ -482,7 +509,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "dreno_mana",
@@ -499,7 +527,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "sono_profundo",
@@ -516,7 +545,8 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "tempestade",
@@ -533,7 +563,8 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "ressurgir",
@@ -542,7 +573,7 @@
       "level_required": 15,
       "mana_cost": 60,
       "effect_type": "heal",
-      "effect_value": 100,
+      "effect_value": 55,
       "description": "Cura completa + revives.",
       "target": "self",
       "duration": 0,
@@ -550,7 +581,8 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 5,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "apocalipse",
@@ -567,7 +599,8 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 5,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "golpe_sombras",
@@ -584,7 +617,8 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "envenenar",
@@ -601,7 +635,8 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "passo_felino",
@@ -610,7 +645,7 @@
       "level_required": 7,
       "mana_cost": 25,
       "effect_type": "buff",
-      "effect_value": 20,
+      "effect_value": 50,
       "description": "+20 esquiva por 3 turnos.",
       "target": "self",
       "duration": 3,
@@ -618,7 +653,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "ag"
     },
     {
       "id": "assassinato",
@@ -635,7 +671,8 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "evasao_perfeita",
@@ -652,7 +689,8 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": "evasion"
     },
     {
       "id": "danca_laminas",
@@ -669,7 +707,8 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "fantasma",
@@ -677,16 +716,17 @@
       "skill_class": "Rogue",
       "level_required": 15,
       "mana_cost": 50,
-      "effect_type": "buff",
+      "effect_type": "status",
       "effect_value": "invisible",
-      "description": "Invisibilidade por 2 turnos.",
+      "description": "Fica invisivel por 2 turnos: inimigos quase nunca acertam.",
       "target": "self",
       "duration": 2,
       "chance": 100,
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 4,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     },
     {
       "id": "morte_subita",
@@ -703,7 +743,8 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 5,
-      "stun_chance": 0
+      "stun_chance": 0,
+      "effect_stat": ""
     }
   ]
 }

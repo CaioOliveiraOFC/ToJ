@@ -1,6 +1,6 @@
 {
-  "description": "Catálogo de itens para loja e loot - Versão Expandida",
-  "version": "3.0",
+  "description": "Catálogo de itens. `consumable: true` marca o que é gasto ao usar; em consumíveis de cura, effect_value é percentual do máximo.",
+  "version": "2.0",
   "rarity_weights": {
     "Common": 60,
     "Rare": 28,
@@ -26,7 +26,8 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "adaga_curta",
@@ -45,7 +46,8 @@
       "droppable": true,
       "price": 40,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "cajado_aprendiz",
@@ -64,7 +66,8 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "clava_madeira",
@@ -81,7 +84,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "machado_enferrujado",
@@ -100,7 +104,8 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 2,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "arco_curto",
@@ -119,7 +124,8 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 2,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "lança_madeira",
@@ -138,7 +144,8 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "martelo_mao",
@@ -157,7 +164,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "luvas_couro",
@@ -174,7 +182,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "punhos_lona",
@@ -193,7 +202,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "elmo_couro",
@@ -210,7 +220,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "chapeu_tecido",
@@ -229,7 +240,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "capuz_pano",
@@ -248,7 +260,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "gibao_couro",
@@ -265,7 +278,8 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "túnica_pano",
@@ -284,7 +298,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "manto_puido",
@@ -303,7 +318,8 @@
       "droppable": true,
       "price": 40,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "camisa_corrente",
@@ -322,7 +338,8 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 2,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "perneiras_couro",
@@ -339,7 +356,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "calça_pano",
@@ -356,7 +374,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "saiote_couro",
@@ -375,7 +394,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "botas_couro",
@@ -392,7 +412,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "sandalias_tecido",
@@ -411,7 +432,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "sapatos_pano",
@@ -430,7 +452,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_madeira",
@@ -447,7 +470,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_pedra",
@@ -464,7 +488,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_couro",
@@ -481,7 +506,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_osso",
@@ -500,7 +526,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "espada_longa",
@@ -519,7 +546,8 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "adaga_assassino",
@@ -538,7 +566,8 @@
       "droppable": true,
       "price": 110,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "cajado_arcano",
@@ -557,7 +586,8 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "machado_batalha",
@@ -576,7 +606,8 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "arco_longbow",
@@ -595,7 +626,8 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "tridente_guerreiro",
@@ -614,7 +646,8 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "gladio_ferro",
@@ -634,7 +667,8 @@
       "droppable": true,
       "price": 115,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "garras_ferro",
@@ -653,7 +687,8 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "manoplas_ferro",
@@ -672,7 +707,8 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "bastão_mágico",
@@ -691,7 +727,8 @@
       "droppable": true,
       "price": 100,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "elmo_ferro",
@@ -708,7 +745,8 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "chapeu_encantado",
@@ -727,7 +765,8 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "mascara_sombra",
@@ -746,7 +785,8 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "peitoral_cota",
@@ -763,7 +803,8 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "túnica_arcana",
@@ -782,7 +823,8 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "manto_sombra",
@@ -801,7 +843,8 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "armadura_placa",
@@ -820,7 +863,8 @@
       "droppable": true,
       "price": 180,
       "shop_min_floor": 7,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "perneiras_ferro",
@@ -837,7 +881,8 @@
       "droppable": true,
       "price": 70,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "calça_cota",
@@ -854,7 +899,8 @@
       "droppable": true,
       "price": 65,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "botas_ferro",
@@ -871,7 +917,8 @@
       "droppable": true,
       "price": 70,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "botas_encantadas",
@@ -890,7 +937,8 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "botas_fantasma",
@@ -909,7 +957,8 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_vida",
@@ -926,7 +975,8 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_mana",
@@ -943,7 +993,8 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_agilidade",
@@ -960,7 +1011,8 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_aço",
@@ -977,7 +1029,8 @@
       "droppable": true,
       "price": 60,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_rubim",
@@ -994,7 +1047,8 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "espada_lendaria",
@@ -1013,7 +1067,8 @@
       "droppable": true,
       "price": 500,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "cajado_eterno",
@@ -1032,7 +1087,8 @@
       "droppable": true,
       "price": 550,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "adaga_mortal",
@@ -1051,7 +1107,8 @@
       "droppable": true,
       "price": 520,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "arco_élfico",
@@ -1070,7 +1127,8 @@
       "droppable": true,
       "price": 480,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "machado_terrível",
@@ -1089,7 +1147,8 @@
       "droppable": true,
       "price": 600,
       "shop_min_floor": 12,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "luvas_titanio",
@@ -1106,7 +1165,8 @@
       "droppable": true,
       "price": 350,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "elmo_dragão",
@@ -1123,7 +1183,8 @@
       "droppable": true,
       "price": 400,
       "shop_min_floor": 12,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "armadura_divina",
@@ -1140,7 +1201,8 @@
       "droppable": true,
       "price": 700,
       "shop_min_floor": 12,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "amuleto_imortal",
@@ -1157,7 +1219,8 @@
       "droppable": true,
       "price": 600,
       "shop_min_floor": 15,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "anel_fênix",
@@ -1174,7 +1237,8 @@
       "droppable": true,
       "price": 450,
       "shop_min_floor": 12,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "espada_universo",
@@ -1191,7 +1255,8 @@
       "droppable": true,
       "price": 2000,
       "shop_min_floor": 20,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "cajado_galaxia",
@@ -1208,7 +1273,8 @@
       "droppable": true,
       "price": 2500,
       "shop_min_floor": 20,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "pá_batalha",
@@ -1225,7 +1291,8 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "bastão_cru",
@@ -1242,7 +1309,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "faca_caça",
@@ -1259,7 +1327,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "escudo_madeira",
@@ -1276,7 +1345,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "luvas_rasas",
@@ -1293,7 +1363,8 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "bandana_tecido",
@@ -1310,7 +1381,8 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "oculos_couro",
@@ -1327,7 +1399,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "colete_pano",
@@ -1344,7 +1417,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "capa_pano",
@@ -1361,7 +1435,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "jaqueta_couro",
@@ -1378,7 +1453,8 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 2,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "saia_tecido",
@@ -1395,7 +1471,8 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "bermuda_couro",
@@ -1412,7 +1489,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "chinelos_pano",
@@ -1429,7 +1507,8 @@
       "droppable": true,
       "price": 10,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "tamancos_madeira",
@@ -1446,7 +1525,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_cordão",
@@ -1463,7 +1543,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_ferro",
@@ -1480,7 +1561,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_palha",
@@ -1497,7 +1579,8 @@
       "droppable": true,
       "price": 10,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_vegetal",
@@ -1514,7 +1597,8 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "espada_treino",
@@ -1531,7 +1615,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "porrete",
@@ -1548,7 +1633,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "adaga_madeira",
@@ -1565,7 +1651,8 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "gravetos",
@@ -1582,7 +1669,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "escudo_ferro",
@@ -1599,7 +1687,8 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 2,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "luvas_lã",
@@ -1616,7 +1705,8 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "elmo_madeira",
@@ -1633,7 +1723,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "capacete_couro",
@@ -1650,7 +1741,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "túnica_tecido",
@@ -1667,7 +1759,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "armadura_couro",
@@ -1684,7 +1777,8 @@
       "droppable": true,
       "price": 60,
       "shop_min_floor": 2,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "calças_tecido",
@@ -1701,7 +1795,8 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "armadura_camisa",
@@ -1718,7 +1813,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 2,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "botas_pano",
@@ -1735,7 +1831,8 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "sapatos_couro",
@@ -1752,7 +1849,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_argila",
@@ -1769,7 +1867,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_concha",
@@ -1786,7 +1885,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_bronze",
@@ -1803,7 +1903,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_ouro",
@@ -1820,7 +1921,8 @@
       "droppable": true,
       "price": 40,
       "shop_min_floor": 2,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "espada_aco",
@@ -1837,7 +1939,8 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "machado_guerra",
@@ -1854,7 +1957,8 @@
       "droppable": true,
       "price": 150,
       "shop_min_floor": 7,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "arco_composto",
@@ -1871,7 +1975,8 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "cajado_cristal",
@@ -1888,7 +1993,8 @@
       "droppable": true,
       "price": 160,
       "shop_min_floor": 7,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "luvas_aco",
@@ -1905,7 +2011,8 @@
       "droppable": true,
       "price": 95,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "escudo_torre",
@@ -1922,7 +2029,8 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 7,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "elmo_aco",
@@ -1939,7 +2047,8 @@
       "droppable": true,
       "price": 100,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "capacete_ferro",
@@ -1956,7 +2065,8 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "peitoral_ferro",
@@ -1973,7 +2083,8 @@
       "droppable": true,
       "price": 150,
       "shop_min_floor": 7,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "armadura_cota_mala",
@@ -1990,7 +2101,8 @@
       "droppable": true,
       "price": 170,
       "shop_min_floor": 8,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "calça_ferro",
@@ -2007,7 +2119,8 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "perneiras_aco",
@@ -2024,7 +2137,8 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 7,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "botas_aco",
@@ -2041,7 +2155,8 @@
       "droppable": true,
       "price": 75,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "botas_corrida",
@@ -2058,7 +2173,8 @@
       "droppable": true,
       "price": 95,
       "shop_min_floor": 7,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_prata",
@@ -2075,7 +2191,8 @@
       "droppable": true,
       "price": 75,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_ouro",
@@ -2092,7 +2209,8 @@
       "droppable": true,
       "price": 75,
       "shop_min_floor": 6,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "amuleto_força",
@@ -2109,7 +2227,8 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 7,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_diamante",
@@ -2126,7 +2245,8 @@
       "droppable": true,
       "price": 110,
       "shop_min_floor": 8,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "anel_esmeralda",
@@ -2143,7 +2263,8 @@
       "droppable": true,
       "price": 100,
       "shop_min_floor": 7,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "lamina_veloz",
@@ -2160,7 +2281,8 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "clava_pesada",
@@ -2179,7 +2301,8 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "adaga_sangrenta",
@@ -2198,7 +2321,8 @@
       "droppable": true,
       "price": 60,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "cota_leve",
@@ -2215,7 +2339,8 @@
       "droppable": true,
       "price": 40,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "placa_pesada",
@@ -2234,7 +2359,8 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "manto_curandeiro",
@@ -2253,7 +2379,8 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "espada_vinganca",
@@ -2272,7 +2399,8 @@
       "droppable": true,
       "price": 150,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "cajado_equilibrio",
@@ -2291,7 +2419,8 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "arco_precisao",
@@ -2310,7 +2439,8 @@
       "droppable": true,
       "price": 135,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "armadura_espinhos",
@@ -2329,7 +2459,8 @@
       "droppable": true,
       "price": 160,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "tunica_fluxo",
@@ -2349,7 +2480,8 @@
       "droppable": true,
       "price": 145,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "colete_resistencia",
@@ -2366,7 +2498,8 @@
       "droppable": true,
       "price": 155,
       "shop_min_floor": 5,
-      "shop_max_floor": 15
+      "shop_max_floor": 15,
+      "consumable": false
     },
     {
       "id": "lamina_tempestade",
@@ -2386,7 +2519,8 @@
       "droppable": true,
       "price": 600,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "cajado_vazio",
@@ -2405,7 +2539,8 @@
       "droppable": true,
       "price": 650,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "arco_silencio",
@@ -2424,7 +2559,8 @@
       "droppable": true,
       "price": 580,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "armadura_fenrir",
@@ -2443,7 +2579,8 @@
       "droppable": true,
       "price": 750,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "manto_etereo",
@@ -2462,7 +2599,8 @@
       "droppable": true,
       "price": 700,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "colete_sombra",
@@ -2481,7 +2619,8 @@
       "droppable": true,
       "price": 720,
       "shop_min_floor": 10,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "espada_eclipse",
@@ -2500,7 +2639,8 @@
       "droppable": true,
       "price": 2200,
       "shop_min_floor": 15,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "cajado_oblivion",
@@ -2519,7 +2659,8 @@
       "droppable": true,
       "price": 2600,
       "shop_min_floor": 15,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "adaga_vazio",
@@ -2538,7 +2679,8 @@
       "droppable": true,
       "price": 2400,
       "shop_min_floor": 15,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "armadura_tita",
@@ -2557,7 +2699,8 @@
       "droppable": true,
       "price": 2800,
       "shop_min_floor": 15,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "tunica_arquimago",
@@ -2576,7 +2719,8 @@
       "droppable": true,
       "price": 2600,
       "shop_min_floor": 15,
-      "shop_max_floor": null
+      "shop_max_floor": null,
+      "consumable": false
     },
     {
       "id": "manto_assassino",
@@ -2595,6 +2739,259 @@
       "droppable": true,
       "price": 2700,
       "shop_min_floor": 15,
+      "shop_max_floor": null,
+      "consumable": false
+    },
+    {
+      "id": "pocao_cura_pequena",
+      "name": "Poção de Cura Pequena",
+      "description": "Recupera 25% da vida máxima.",
+      "rarity": "Common",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "max_hp",
+      "effect_value": 25,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 40,
+      "shop_min_floor": 1,
+      "shop_max_floor": null
+    },
+    {
+      "id": "pocao_cura_media",
+      "name": "Poção de Cura Média",
+      "description": "Recupera 40% da vida máxima.",
+      "rarity": "Rare",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "max_hp",
+      "effect_value": 40,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 90,
+      "shop_min_floor": 4,
+      "shop_max_floor": null
+    },
+    {
+      "id": "pocao_cura_grande",
+      "name": "Poção de Cura Grande",
+      "description": "Recupera 60% da vida máxima.",
+      "rarity": "Epic",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "max_hp",
+      "effect_value": 60,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 180,
+      "shop_min_floor": 9,
+      "shop_max_floor": null
+    },
+    {
+      "id": "pocao_mana_pequena",
+      "name": "Poção de Mana Pequena",
+      "description": "Recupera 30% da mana máxima.",
+      "rarity": "Common",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "max_mp",
+      "effect_value": 30,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 35,
+      "shop_min_floor": 1,
+      "shop_max_floor": null
+    },
+    {
+      "id": "pocao_mana_media",
+      "name": "Poção de Mana Média",
+      "description": "Recupera 50% da mana máxima.",
+      "rarity": "Rare",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "max_mp",
+      "effect_value": 50,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 80,
+      "shop_min_floor": 4,
+      "shop_max_floor": null
+    },
+    {
+      "id": "pocao_mana_grande",
+      "name": "Poção de Mana Grande",
+      "description": "Recupera 75% da mana máxima.",
+      "rarity": "Epic",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "max_mp",
+      "effect_value": 75,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 160,
+      "shop_min_floor": 9,
+      "shop_max_floor": null
+    },
+    {
+      "id": "elixir_forca",
+      "name": "Elixir de Força",
+      "description": "Aumenta a força em 40% por 3 turnos.",
+      "rarity": "Rare",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "strength",
+      "effect_value": 40,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 70,
+      "shop_min_floor": 2,
+      "shop_max_floor": null
+    },
+    {
+      "id": "elixir_pedra",
+      "name": "Elixir de Pedra",
+      "description": "Aumenta a defesa em 50% por 3 turnos.",
+      "rarity": "Rare",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "defense",
+      "effect_value": 50,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 70,
+      "shop_min_floor": 2,
+      "shop_max_floor": null
+    },
+    {
+      "id": "elixir_vento",
+      "name": "Elixir do Vento",
+      "description": "Aumenta a agilidade em 45% por 3 turnos.",
+      "rarity": "Rare",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "agility",
+      "effect_value": 45,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 70,
+      "shop_min_floor": 2,
+      "shop_max_floor": null
+    },
+    {
+      "id": "elixir_precisao",
+      "name": "Elixir de Precisão",
+      "description": "Chance de crítico +20 por 3 turnos.",
+      "rarity": "Rare",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "crit_chance",
+      "effect_value": 20,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 110,
+      "shop_min_floor": 6,
+      "shop_max_floor": null
+    },
+    {
+      "id": "elixir_vampirico",
+      "name": "Elixir Vampírico",
+      "description": "Roubo de vida 25% por 3 turnos.",
+      "rarity": "Epic",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "life_steal",
+      "effect_value": 25,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 150,
+      "shop_min_floor": 8,
+      "shop_max_floor": null
+    },
+    {
+      "id": "elixir_couraca",
+      "name": "Elixir de Couraça",
+      "description": "Reduz o dano recebido em 30% por 3 turnos.",
+      "rarity": "Epic",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "damage_reduction",
+      "effect_value": 30,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 150,
+      "shop_min_floor": 8,
+      "shop_max_floor": null
+    },
+    {
+      "id": "elixir_foco",
+      "name": "Elixir de Foco",
+      "description": "Regenera 20 de mana por turno, por 3 turnos.",
+      "rarity": "Rare",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "mana_regen",
+      "effect_value": 20,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 120,
+      "shop_min_floor": 6,
+      "shop_max_floor": null
+    },
+    {
+      "id": "pedra_fantasma",
+      "name": "Pedra Fantasma",
+      "description": "Evasão +25 por 3 turnos.",
+      "rarity": "Epic",
+      "slot": null,
+      "consumable": true,
+      "damage_bonus": 0,
+      "defense_bonus": 0,
+      "effect_type": "evasion",
+      "effect_value": 25,
+      "classes": null,
+      "sold_in_shop": true,
+      "droppable": true,
+      "price": 140,
+      "shop_min_floor": 8,
       "shop_max_floor": null
     }
   ]
