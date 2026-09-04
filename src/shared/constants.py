@@ -183,3 +183,36 @@ MINI_BOSS_COIN_SCALING_PER_LEVEL = 15
 # Essência com progressão suave por andar
 ESSENCE_MULT_LEVEL_BONUS = 0.02  # +0.02 de média por andar
 ESSENCE_MULT_MAX_BONUS = 0.4  # teto do bônus acumulado
+
+# --- Laço de batalha ---
+# Teto de turnos por batalha. Existe só como rede de segurança contra um empate
+# infinito (dois lados que não conseguem se matar); nenhum combate balanceado
+# deve chegar perto disso.
+MAX_BATTLE_TURNS = 200
+
+# =====================================================================
+# MODELO DE ORÇAMENTO (rebalanceamento)
+# =====================================================================
+# Uma única razão de crescimento para herói e monstro. Antes, o herói crescia em
+# percentual composto e o monstro em soma fixa: uma curva geométrica contra uma
+# aritmética, que divergem para sempre por construção. Com a mesma razão dos dois
+# lados, a razão poder-do-herói / HP-do-monstro fica constante ao longo dos 20
+# níveis, e a dificuldade passa a ser controlada de propósito, não por acidente.
+GROWTH_RATE = 1.12
+
+# --- Orçamento do monstro (perfil "bruiser" no nível 1) ---
+# Os arquétipos em content/factories/archetypes.py multiplicam estes valores.
+MONSTER_BUDGET_HP = 420
+MONSTER_BUDGET_ATTACK = 39
+MONSTER_BUDGET_DEFENSE = 20
+MONSTER_BUDGET_AGILITY = 8
+MONSTER_BUDGET_MP = 60
+
+# --- Acerto relativo ---
+# A chance de acerto usa a diferença *relativa* de agilidade, não a absoluta.
+# Com a diferença absoluta, uma agilidade que cresce sem teto zera a chance de o
+# monstro acertar e a classe fica imune. Com a relativa, a vantagem de quem
+# investe em agilidade é grande mas permanente e limitada.
+HIT_AGILITY_SWING = 30  # pontos percentuais máximos que a agilidade move
+HIT_CHANCE_FLOOR = 20   # nenhum defensor fica imune
+HIT_CHANCE_CEIL = 95    # nenhum atacante fica infalível

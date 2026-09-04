@@ -1,0 +1,1403 @@
+{
+  "kind": "baseline",
+  "iterations": 500,
+  "seed": 1337,
+  "loadout": "naked",
+  "elapsed_seconds": 3.09,
+  "results": [
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 1,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 1.272,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 154.808,
+      "damage_taken_mean": 1.968,
+      "hp_left_pct_on_win": 0.9810769230769231,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 1,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 1.272,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 154.808,
+      "damage_taken_mean": 1.968,
+      "hp_left_pct_on_win": 0.9810769230769231,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 1,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.32,
+      "flee_rate": 0.042,
+      "death_rate": 0.638,
+      "turns_mean": 4.144,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 215.808,
+      "damage_taken_mean": 105.984,
+      "hp_left_pct_on_win": 0.46616586538461535,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 0.9656992084432717,
+        "flee": 0.03430079155672823
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 1,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.346,
+      "flee_rate": 0.0,
+      "death_rate": 0.654,
+      "turns_mean": 4.222,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 224.264,
+      "damage_taken_mean": 106.928,
+      "hp_left_pct_on_win": 0.43763895064473096,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 1,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 1.272,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 172.636,
+      "damage_taken_mean": 1.974,
+      "hp_left_pct_on_win": 0.980060606060606,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 1,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 1.272,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 172.636,
+      "damage_taken_mean": 1.974,
+      "hp_left_pct_on_win": 0.980060606060606,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 1,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.76,
+      "flee_rate": 0.0,
+      "death_rate": 0.24,
+      "turns_mean": 3.236,
+      "turns_p90": 4.0,
+      "damage_dealt_mean": 220.56,
+      "damage_taken_mean": 70.752,
+      "hp_left_pct_on_win": 0.45964912280701753,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 1,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.76,
+      "flee_rate": 0.0,
+      "death_rate": 0.24,
+      "turns_mean": 3.236,
+      "turns_p90": 4.0,
+      "damage_dealt_mean": 220.56,
+      "damage_taken_mean": 70.752,
+      "hp_left_pct_on_win": 0.45964912280701753,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 1,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 2.916,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 184.0,
+      "damage_taken_mean": 12.304,
+      "hp_left_pct_on_win": 0.8757171717171717,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 1,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 2.916,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 184.0,
+      "damage_taken_mean": 12.304,
+      "hp_left_pct_on_win": 0.8757171717171717,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 1,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.232,
+      "flee_rate": 0.0,
+      "death_rate": 0.768,
+      "turns_mean": 4.828,
+      "turns_p90": 7.0,
+      "damage_dealt_mean": 171.946,
+      "damage_taken_mean": 119.834,
+      "hp_left_pct_on_win": 0.38714733542319746,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 1,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.232,
+      "flee_rate": 0.0,
+      "death_rate": 0.768,
+      "turns_mean": 4.828,
+      "turns_p90": 7.0,
+      "damage_dealt_mean": 171.946,
+      "damage_taken_mean": 119.834,
+      "hp_left_pct_on_win": 0.38714733542319746,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 5,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 1.508,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 251.778,
+      "damage_taken_mean": 10.33,
+      "hp_left_pct_on_win": 0.9512735849056604,
+      "mp_spent_mean": 20.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.7974481658692185,
+        "attack": 0.2025518341307815
+      },
+      "skill_usage": {
+        "investida": 500
+      }
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 5,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.998,
+      "flee_rate": 0.0,
+      "death_rate": 0.002,
+      "turns_mean": 3.354,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 330.094,
+      "damage_taken_mean": 44.034,
+      "hp_left_pct_on_win": 0.7939180247287027,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 5,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.27,
+      "flee_rate": 0.0,
+      "death_rate": 0.73,
+      "turns_mean": 4.502,
+      "turns_p90": 6.0,
+      "damage_dealt_mean": 310.864,
+      "damage_taken_mean": 200.948,
+      "hp_left_pct_on_win": 0.5125087351502446,
+      "mp_spent_mean": 20.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.4191114836546521,
+        "attack": 0.5808885163453479
+      },
+      "skill_usage": {
+        "investida": 500
+      }
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 5,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.094,
+      "flee_rate": 0.0,
+      "death_rate": 0.906,
+      "turns_mean": 4.678,
+      "turns_p90": 6.0,
+      "damage_dealt_mean": 265.916,
+      "damage_taken_mean": 224.78,
+      "hp_left_pct_on_win": 0.48414291449217184,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 5,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.996,
+      "flee_rate": 0.0,
+      "death_rate": 0.004,
+      "turns_mean": 1.288,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 334.756,
+      "damage_taken_mean": 5.988,
+      "hp_left_pct_on_win": 0.9604022149202871,
+      "mp_spent_mean": 28.6,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "bola_fogo": 566,
+        "drenar_vida": 5
+      }
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 5,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 1.272,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 258.408,
+      "damage_taken_mean": 5.538,
+      "hp_left_pct_on_win": 0.9580454545454545,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 5,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.25,
+      "flee_rate": 0.0,
+      "death_rate": 0.75,
+      "turns_mean": 3.982,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 289.884,
+      "damage_taken_mean": 188.558,
+      "hp_left_pct_on_win": 0.706,
+      "mp_spent_mean": 56.88,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "bola_fogo": 660,
+        "drenar_vida": 398
+      }
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 5,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.32,
+      "flee_rate": 0.0,
+      "death_rate": 0.68,
+      "turns_mean": 4.072,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 369.024,
+      "damage_taken_mean": 192.66,
+      "hp_left_pct_on_win": 0.21889204545454546,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 5,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 1.0,
+      "turns_p90": 1.0,
+      "damage_dealt_mean": 214.616,
+      "damage_taken_mean": 0.0,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 10.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "ataque_furtivo": 500
+      }
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 5,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 3.0,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 244.738,
+      "damage_taken_mean": 29.164,
+      "hp_left_pct_on_win": 0.779060606060606,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 5,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.068,
+      "flee_rate": 0.526,
+      "death_rate": 0.406,
+      "turns_mean": 4.172,
+      "turns_p90": 7.0,
+      "damage_dealt_mean": 95.974,
+      "damage_taken_mean": 159.576,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 20.86,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.5993953136810279,
+        "flee": 0.40060468631897206
+      },
+      "skill_usage": {
+        "golpe_baixo": 500,
+        "ataque_furtivo": 293
+      }
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 5,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.22,
+      "flee_rate": 0.0,
+      "death_rate": 0.78,
+      "turns_mean": 5.7,
+      "turns_p90": 9.0,
+      "damage_dealt_mean": 269.388,
+      "damage_taken_mean": 212.036,
+      "hp_left_pct_on_win": 0.22699724517906336,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 10,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 3.34,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 470.18,
+      "damage_taken_mean": 74.88,
+      "hp_left_pct_on_win": 0.8568260038240918,
+      "mp_spent_mean": 20.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.4608294930875576,
+        "attack": 0.5391705069124424
+      },
+      "skill_usage": {
+        "investida": 500
+      }
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 10,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 3.356,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 410.316,
+      "damage_taken_mean": 79.794,
+      "hp_left_pct_on_win": 0.8474302103250478,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 10,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.384,
+      "flee_rate": 0.238,
+      "death_rate": 0.378,
+      "turns_mean": 7.144,
+      "turns_p90": 9.0,
+      "damage_dealt_mean": 541.42,
+      "damage_taken_mean": 494.508,
+      "hp_left_pct_on_win": 0.41085086042065005,
+      "mp_spent_mean": 20.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.24987506246876562,
+        "attack": 0.6226886556721639,
+        "flee": 0.12743628185907047
+      },
+      "skill_usage": {
+        "investida": 500
+      }
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 10,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.632,
+      "flee_rate": 0.0,
+      "death_rate": 0.368,
+      "turns_mean": 7.404,
+      "turns_p90": 9.0,
+      "damage_dealt_mean": 565.796,
+      "damage_taken_mean": 512.082,
+      "hp_left_pct_on_win": 0.18510540455502578,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 10,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.99,
+      "flee_rate": 0.0,
+      "death_rate": 0.01,
+      "turns_mean": 1.274,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 529.442,
+      "damage_taken_mean": 10.452,
+      "hp_left_pct_on_win": 0.9569549663299662,
+      "mp_spent_mean": 28.33,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "bola_fogo": 563,
+        "drenar_vida": 3
+      }
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 10,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.996,
+      "flee_rate": 0.0,
+      "death_rate": 0.004,
+      "turns_mean": 1.268,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 454.404,
+      "damage_taken_mean": 9.966,
+      "hp_left_pct_on_win": 0.9521314424364122,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 10,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.25,
+      "flee_rate": 0.0,
+      "death_rate": 0.75,
+      "turns_mean": 3.982,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 468.99,
+      "damage_taken_mean": 291.662,
+      "hp_left_pct_on_win": 0.6565416666666666,
+      "mp_spent_mean": 56.88,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "bola_fogo": 660,
+        "drenar_vida": 398
+      }
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 10,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.76,
+      "flee_rate": 0.0,
+      "death_rate": 0.24,
+      "turns_mean": 3.236,
+      "turns_p90": 4.0,
+      "damage_dealt_mean": 604.612,
+      "damage_taken_mean": 194.074,
+      "hp_left_pct_on_win": 0.23591008771929822,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 10,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 2.508,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 504.396,
+      "damage_taken_mean": 20.73,
+      "hp_left_pct_on_win": 0.89203125,
+      "mp_spent_mean": 17.54,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "ataque_furtivo": 877
+      }
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 10,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 3.0,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 374.74,
+      "damage_taken_mean": 27.528,
+      "hp_left_pct_on_win": 0.856625,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 10,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.27,
+      "flee_rate": 0.5,
+      "death_rate": 0.23,
+      "turns_mean": 5.942,
+      "turns_p90": 9.0,
+      "damage_dealt_mean": 334.854,
+      "damage_taken_mean": 176.104,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 29.86,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.6894065446478093,
+        "flee": 0.2856350526899612,
+        "attack": 0.024958402662229616
+      },
+      "skill_usage": {
+        "golpe_baixo": 500,
+        "ataque_furtivo": 743
+      }
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 10,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.632,
+      "flee_rate": 0.0,
+      "death_rate": 0.368,
+      "turns_mean": 7.196,
+      "turns_p90": 9.0,
+      "damage_dealt_mean": 552.644,
+      "damage_taken_mean": 205.958,
+      "hp_left_pct_on_win": 0.42681962025316456,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 15,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 3.34,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 596.228,
+      "damage_taken_mean": 108.43,
+      "hp_left_pct_on_win": 0.9164637904468412,
+      "mp_spent_mean": 20.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.4608294930875576,
+        "attack": 0.5391705069124424
+      },
+      "skill_usage": {
+        "investida": 500
+      }
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 15,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 3.356,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 534.628,
+      "damage_taken_mean": 115.554,
+      "hp_left_pct_on_win": 0.910975346687211,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 15,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.948,
+      "flee_rate": 0.018,
+      "death_rate": 0.034,
+      "turns_mean": 7.98,
+      "turns_p90": 9.0,
+      "damage_dealt_mean": 880.588,
+      "damage_taken_mean": 697.144,
+      "hp_left_pct_on_win": 0.4888761028001534,
+      "mp_spent_mean": 20.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.22311468094600626,
+        "attack": 0.7675145024542614,
+        "flee": 0.009370816599732263
+      },
+      "skill_usage": {
+        "investida": 500
+      }
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 15,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.976,
+      "flee_rate": 0.0,
+      "death_rate": 0.024,
+      "turns_mean": 8.04,
+      "turns_p90": 10.0,
+      "damage_dealt_mean": 839.594,
+      "damage_taken_mean": 722.868,
+      "hp_left_pct_on_win": 0.4551043219076006,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 15,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.99,
+      "flee_rate": 0.0,
+      "death_rate": 0.01,
+      "turns_mean": 1.274,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 926.276,
+      "damage_taken_mean": 15.096,
+      "hp_left_pct_on_win": 0.9572137142029615,
+      "mp_spent_mean": 28.33,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "bola_fogo": 563,
+        "drenar_vida": 3
+      }
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 15,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.996,
+      "flee_rate": 0.0,
+      "death_rate": 0.004,
+      "turns_mean": 1.268,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 852.448,
+      "damage_taken_mean": 14.394,
+      "hp_left_pct_on_win": 0.9524189949763211,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 15,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.316,
+      "flee_rate": 0.0,
+      "death_rate": 0.684,
+      "turns_mean": 3.728,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 813.96,
+      "damage_taken_mean": 359.726,
+      "hp_left_pct_on_win": 0.7560228664761127,
+      "mp_spent_mean": 54.17,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "bola_fogo": 649,
+        "drenar_vida": 362
+      }
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 15,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.778,
+      "flee_rate": 0.0,
+      "death_rate": 0.222,
+      "turns_mean": 3.042,
+      "turns_p90": 4.0,
+      "damage_dealt_mean": 1093.02,
+      "damage_taken_mean": 240.386,
+      "hp_left_pct_on_win": 0.3679225290470004,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 15,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 2.508,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 707.122,
+      "damage_taken_mean": 0.0,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 17.54,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "ataque_furtivo": 877
+      }
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 15,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 2.82,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 562.19,
+      "damage_taken_mean": 0.0,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 15,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 6.848,
+      "turns_p90": 7.0,
+      "damage_dealt_mean": 895.764,
+      "damage_taken_mean": 0.0,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 44.24,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "golpe_baixo": 500,
+        "ataque_furtivo": 1462
+      }
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 15,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 6.956,
+      "turns_p90": 7.0,
+      "damage_dealt_mean": 889.9,
+      "damage_taken_mean": 0.0,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 20,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 3.34,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 788.516,
+      "damage_taken_mean": 141.17,
+      "hp_left_pct_on_win": 0.9562399256044638,
+      "mp_spent_mean": 20.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.4608294930875576,
+        "attack": 0.5391705069124424
+      },
+      "skill_usage": {
+        "investida": 500
+      }
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_monster",
+      "level": 20,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 3.356,
+      "turns_p90": 5.0,
+      "damage_dealt_mean": 726.82,
+      "damage_taken_mean": 150.426,
+      "hp_left_pct_on_win": 0.9533707377557347,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 20,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 7.54,
+      "turns_p90": 9.0,
+      "damage_dealt_mean": 1142.91,
+      "damage_taken_mean": 813.6,
+      "hp_left_pct_on_win": 0.7477991320520768,
+      "mp_spent_mean": 20.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 0.234192037470726,
+        "attack": 0.765807962529274
+      },
+      "skill_usage": {
+        "investida": 500
+      }
+    },
+    {
+      "hero_class": "Warrior",
+      "encounter": "legacy_boss",
+      "level": 20,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 8.076,
+      "turns_p90": 11.0,
+      "damage_dealt_mean": 1157.592,
+      "damage_taken_mean": 911.038,
+      "hp_left_pct_on_win": 0.7175951642901426,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 20,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.99,
+      "flee_rate": 0.0,
+      "death_rate": 0.01,
+      "turns_mean": 1.282,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 1729.038,
+      "damage_taken_mean": 20.352,
+      "hp_left_pct_on_win": 0.9618334938628338,
+      "mp_spent_mean": 28.45,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "bola_fogo": 563,
+        "drenar_vida": 5
+      }
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_monster",
+      "level": 20,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 1.272,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 1665.232,
+      "damage_taken_mean": 18.822,
+      "hp_left_pct_on_win": 0.9539804400977995,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 20,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.908,
+      "flee_rate": 0.0,
+      "death_rate": 0.092,
+      "turns_mean": 1.372,
+      "turns_p90": 4.0,
+      "damage_dealt_mean": 1214.184,
+      "damage_taken_mean": 63.352,
+      "hp_left_pct_on_win": 0.9862348265351184,
+      "mp_spent_mean": 29.03,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "bola_fogo": 517,
+        "drenar_vida": 53
+      }
+    },
+    {
+      "hero_class": "Mage",
+      "encounter": "legacy_boss",
+      "level": 20,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 0.988,
+      "flee_rate": 0.0,
+      "death_rate": 0.012,
+      "turns_mean": 1.256,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 1261.48,
+      "damage_taken_mean": 37.392,
+      "hp_left_pct_on_win": 0.9250616196311731,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 20,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 1.0,
+      "turns_p90": 1.0,
+      "damage_dealt_mean": 563.746,
+      "damage_taken_mean": 0.0,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 10.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "ataque_furtivo": 500
+      }
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_monster",
+      "level": 20,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 2.82,
+      "turns_p90": 3.0,
+      "damage_dealt_mean": 852.426,
+      "damage_taken_mean": 0.0,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 20,
+      "policy": "smart",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 6.848,
+      "turns_p90": 7.0,
+      "damage_dealt_mean": 1271.66,
+      "damage_taken_mean": 0.0,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 44.24,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "skill": 1.0
+      },
+      "skill_usage": {
+        "golpe_baixo": 500,
+        "ataque_furtivo": 1462
+      }
+    },
+    {
+      "hero_class": "Rogue",
+      "encounter": "legacy_boss",
+      "level": 20,
+      "policy": "greedy",
+      "loadout": "naked",
+      "iterations": 500,
+      "win_rate": 1.0,
+      "flee_rate": 0.0,
+      "death_rate": 0.0,
+      "turns_mean": 6.448,
+      "turns_p90": 7.0,
+      "damage_dealt_mean": 1275.638,
+      "damage_taken_mean": 0.0,
+      "hp_left_pct_on_win": 1.0,
+      "mp_spent_mean": 0.0,
+      "items_used_mean": 0.0,
+      "action_mix": {
+        "attack": 1.0
+      },
+      "skill_usage": {}
+    }
+  ]
+}

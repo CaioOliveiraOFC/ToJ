@@ -77,6 +77,14 @@ class Monster(Entity):
         self.active_effects: dict[str, object] = {}
         self.active_buffs: dict[str, object] = {}
 
+        # Papel no encontro (ver content/factories/archetypes.py). O default
+        # mantém o monstro histórico: bruiser sem skills, só ataque básico.
+        self.role: str = "bruiser"
+        self.skills: list = []
+        self.skill_cooldowns: dict[str, int] = {}
+        self.skill_use_chance: int = 0
+        self.resistances: dict[str, int] = {}
+
     def get_avg_damage(self) -> int:
         """Retorna o dano médio do monstro."""
         return self.avg_damage

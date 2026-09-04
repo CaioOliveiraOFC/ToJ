@@ -90,6 +90,18 @@ def _calculate_damage(
     return max(1, int(raw))
 
 
+def skill_damage_base(caster, skill) -> int:
+    """BASE_POWER total de uma skill de dano, antes de defesa e crítico.
+
+    Vive aqui, e não na política do simulador, porque o bot precisa estimar o
+    dano com a mesma fórmula que o motor aplica. Duas cópias da fórmula divergem
+    na primeira mudança de balanceamento.
+    """
+    base_power = caster.get_avg_damage()
+    scaling = 1.0 + (caster.level * SKILL_LEVEL_SCALING)
+    return int(base_power + int(skill.effect_value) * scaling)
+
+
 def resolve_physical_attack(
     attacker,
     defender,
@@ -246,10 +258,7 @@ def apply_skill(
         caster.skill_cooldowns[skill_id] = skill_cooldown
 
     if skill.effect_type == "damage":
-        base_power = caster.get_avg_damage()
-        scaling = 1.0 + (caster.level * SKILL_LEVEL_SCALING)
-        skill_flat = int(skill.effect_value * scaling)
-        total_base = base_power + skill_flat
+        total_base = skill_damage_base(caster, skill)
         strike = resolve_physical_attack(caster, target, total_base, str(skill.name), rng=r, publish=None)
         # Stun chance específica da skill (se houver)
         stun_chance_skill = int(getattr(skill, "stun_chance", 0) or 0)
