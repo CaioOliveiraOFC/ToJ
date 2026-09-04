@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from src.content.skills_loader import get_initial_skills
 from src.entities.base import Entity
 from src.mechanics.effects import buff_value, sum_buffs
 from src.shared.constants import (
@@ -28,8 +29,6 @@ from src.shared.constants import (
     WARRIOR_BASE_MP,
     WARRIOR_BASE_ST,
 )
-
-from src.content.skills_loader import get_initial_skills
 
 if TYPE_CHECKING:
     from src.content.passives import PassiveCard
@@ -289,11 +288,11 @@ class Player(Entity):
         slot = getattr(item_to_equip, "slot", None)
         if not slot or slot not in self.equipment:
             return f"{getattr(item_to_equip, 'name', 'Item')} não pode ser equipado."
-        
+
         item_classes = getattr(item_to_equip, "classes", None)
         if item_classes is not None and self.get_classname() not in item_classes:
             return f"Sua classe ({self.get_classname()}) não pode equipar {getattr(item_to_equip, 'name', 'Item')}."
-        
+
         if self.equipment[slot]:
             self.unequip(slot)
         # `remove` sem guarda levantava ValueError quando o item não estava no

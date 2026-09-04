@@ -3,9 +3,8 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-from src.content.items import get_all_items, Item
+from src.content.items import Item, get_all_items
 from src.shared.constants import (
-    RARITY_MULTIPLIERS,
     SELL_PRICE_FACTOR,
 )
 
@@ -22,9 +21,9 @@ class Shop:
     def get_price(self, item: Item, dungeon_level: int) -> int:
         """Calcula o preço de um item baseado no preço base do JSON e nível da dungeon."""
         base_price = getattr(item, "price", 50)
-        
+
         price = base_price * (1 + (dungeon_level * 0.05))
-        
+
         return int(price)
 
     def get_available_items(self, dungeon_level: int, player_class: str) -> list[dict]:
@@ -43,28 +42,28 @@ class Shop:
         for item in all_items.values():
             if not getattr(item, "sold_in_shop", False):
                 continue
-            
+
             shop_min = getattr(item, "shop_min_floor", 1)
             shop_max = getattr(item, "shop_max_floor", None)
-            
+
             if dungeon_level < shop_min:
                 continue
             if shop_max is not None and dungeon_level > shop_max:
                 continue
-            
+
             rarity = getattr(item, "rarity", "Common")
             if rarity == "Legendary":
                 continue
             if rarity == "Epic" and dungeon_level < 10:
                 continue
-            
+
             item_classes = getattr(item, "classes", None)
             if item_classes is not None and player_class not in item_classes:
                 continue
-            
+
             price = self.get_price(item, dungeon_level)
             available_items.append({"item": item, "price": price})
-        
+
         # Define quantos itens mostrar conforme o andar
         if dungeon_level <= 3:
             max_items = random.randint(8, 10)
@@ -76,7 +75,7 @@ class Shop:
             max_items = random.randint(18, 22)
         else:
             max_items = random.randint(22, 25)
-        
+
         # Embaralha 100% e pega os primeiros N
         random.shuffle(available_items)
         return available_items[:max_items]

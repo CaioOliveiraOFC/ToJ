@@ -14,9 +14,9 @@ from src.engine.events import EventBus
 from src.engine.game_logic import create_player_from_data
 from src.engine.loop import start_game
 from src.entities.heroes import Mage, Rogue, Warrior
-from src.storage.save_manager import load_game, list_slots, delete_save, get_trophies
+from src.storage.save_manager import load_game
 from src.ui import screens
-from src.ui.ui_event_handlers import register_ui_handlers, call_main_menu, call_character_creation
+from src.ui.ui_event_handlers import call_character_creation, call_main_menu, register_ui_handlers
 
 # Import condicional - AutoTester foi movido para fora da camada UI
 try:
@@ -55,27 +55,27 @@ def _create_test_hero() -> Warrior:
     """Cria um herói de nível 50 para testes."""
     player = Warrior("Tester")
     player.set_level(50)
-    
+
     all_items = get_all_items()
-    
+
     health_potion = all_items.get("Poção de Cura Grande")
     if health_potion:
         player.add_item_to_inventory(health_potion)
-    
+
     mana_potion = all_items.get("Poção de Mana Grande")
     if mana_potion:
         player.add_item_to_inventory(mana_potion)
-    
+
     sword = all_items.get("Espada Longa")
     if sword:
         player.add_item_to_inventory(sword)
         player.equip(sword)
-    
+
     armor = all_items.get("Peitoral de Ferro")
     if armor:
         player.add_item_to_inventory(armor)
         player.equip(armor)
-    
+
     return player
 
 

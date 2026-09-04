@@ -1,5 +1,5 @@
-from src.shared.constants import RARITY_MULTIPLIERS
 from src.data.loader import load_json
+from src.shared.constants import RARITY_MULTIPLIERS
 
 
 class Item:
@@ -64,7 +64,7 @@ class Item:
         poções do combate e era destruído ao ser "bebido". Agora o dado diz.
         """
         return bool(self.consumable)
-    
+
     @property
     def is_usable(self) -> bool:
         """Verifica se o item pode ser usado (não é equipamento)."""
@@ -174,22 +174,22 @@ class _ALL_ITEMS_Dict:
     """Proxy para manter compatibilidade com ALL_ITEMS."""
     def __getitem__(self, key):
         return _load_all_items()[key]
-    
+
     def __contains__(self, key):
         return key in _load_all_items()
-    
+
     def keys(self):
         return _load_all_items().keys()
-    
+
     def values(self):
         return _load_all_items().values()
-    
+
     def items(self):
         return _load_all_items().items()
-    
+
     def __len__(self):
         return len(_load_all_items())
-    
+
     def get(self, key, default=None):
         return _load_all_items().get(key, default)
 

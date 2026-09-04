@@ -15,10 +15,10 @@ from dataclasses import asdict, dataclass, field
 
 from src.entities.heroes import Mage, Rogue, Warrior
 from src.mechanics.battle import run_battle
+from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
 from src.sim.encounters import build_encounter
 from src.sim.loadouts import apply_loadout
 from src.sim.policies import get_policy
-from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
 
 HERO_CLASSES = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 ALL_CLASSES = ("Warrior", "Mage", "Rogue")
@@ -175,7 +175,6 @@ def simulate_run(
     O herói **não** é curado entre combates do mesmo andar — é justamente esse
     atrito que o rebalanceamento existe para criar.
     """
-    from src.sim.encounters import ROUTINE_ENCOUNTERS
 
     decide = get_policy(policy)
     deepest: list[int] = []
@@ -280,9 +279,10 @@ def _restock(hero, floor: int) -> None:
 
 def _award(hero, monsters: list) -> None:
     """Concede XP e sobe de nível como o jogo faz depois de uma vitória."""
-    from src.mechanics.math_operations import calculate_monster_xp_reward
-
-    from src.mechanics.math_operations import calculate_monster_coin_reward
+    from src.mechanics.math_operations import (
+        calculate_monster_coin_reward,
+        calculate_monster_xp_reward,
+    )
 
     for monster in monsters:
         hero.add_xp_points(calculate_monster_xp_reward(monster.level))

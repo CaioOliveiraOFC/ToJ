@@ -91,7 +91,7 @@ ARCHETYPES: dict[str, Archetype] = {
     "trash": Archetype(
         role="trash",
         label="Trash",
-        hp=0.60, attack=0.70, defense=0.85, agility=0.95,
+        hp=0.5, attack=0.70, defense=0.85, agility=0.95,
         threat="Acúmulo. Nunca mata sozinho, drena recurso em grupo.",
         counterplay="Matar rápido e gastar pouco.",
         names=("Goblin", "Rato Gigante", "Slime Verde", "Kobold", "Esqueleto",
@@ -111,7 +111,7 @@ ARCHETYPES: dict[str, Archetype] = {
     "tank": Archetype(
         role="tank",
         label="Tank",
-        hp=1.9, attack=0.75, defense=1.9, agility=0.6,
+        hp=1.35, attack=0.70, defense=1.45, agility=0.6,
         skill_use_chance=35,
         skills=(_skill("mob_carapaca", "Carapaça", "damage_reduction", 35,
                        mana_cost=20, cooldown=4, duration=3, target="self"),),
@@ -176,7 +176,7 @@ ARCHETYPES: dict[str, Archetype] = {
     "elite": Archetype(
         role="elite",
         label="Elite",
-        hp=1.7, attack=1.3, defense=1.2, agility=1.1,
+        hp=1.4, attack=1.25, defense=1.15, agility=1.1,
         skill_use_chance=45,
         skills=(
             _skill("mob_investida_brutal", "Investida Brutal", "damage", 55,
@@ -192,7 +192,7 @@ ARCHETYPES: dict[str, Archetype] = {
     "boss": Archetype(
         role="boss",
         label="Boss",
-        hp=2.4, attack=1.35, defense=1.3, agility=1.15,
+        hp=1.8, attack=1.35, defense=1.2, agility=1.15,
         skill_use_chance=55,
         skills=(
             _skill("boss_devastar", "Devastar", "damage", 80, mana_cost=30, cooldown=3),

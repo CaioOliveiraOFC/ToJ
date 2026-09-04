@@ -4,7 +4,7 @@ import copy
 import random
 from typing import Any
 
-from src.content.items import Item, get_all_items
+from src.content.items import Item
 from src.data.loader import load_items_data
 
 
@@ -23,9 +23,9 @@ def _build_loot_table() -> list[Item]:
     for item_data in items_list:
         if not item_data.get("droppable", True):
             continue
-        
+
         rarity = item_data.get("rarity", "Common")
-        
+
         item = Item(
             item_id=item_data.get("id", ""),
             name=item_data.get("name", ""),

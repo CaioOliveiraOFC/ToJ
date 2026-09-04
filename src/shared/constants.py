@@ -229,7 +229,7 @@ GROWTH_RATE = 1.12
 # --- Orçamento do monstro (perfil "bruiser" no nível 1) ---
 # Os arquétipos em content/factories/archetypes.py multiplicam estes valores.
 MONSTER_BUDGET_HP = 420
-MONSTER_BUDGET_ATTACK = 39
+MONSTER_BUDGET_ATTACK = 44
 MONSTER_BUDGET_DEFENSE = 20
 MONSTER_BUDGET_AGILITY = 8
 MONSTER_BUDGET_MP = 60

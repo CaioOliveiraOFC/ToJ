@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from src.content.items import get_all_items
 from src.ui import screens
 from src.ui.navigation_menu import navigate_shop_buy, navigate_shop_sell
 from src.ui.prompts import get_key
-from src.content.items import get_all_items
 
 if TYPE_CHECKING:
     from src.entities.heroes import Player

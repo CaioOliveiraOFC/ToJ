@@ -7,12 +7,9 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import pytest
 
 from src.mechanics import combat as cmb
 from src.shared.constants import (
-    DAMAGE_REDUCTION_DEFAULT_PERCENT,
-    DAMAGE_REDUCTION_DURATION,
     STUN_DURATION,
 )
 

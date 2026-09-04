@@ -48,8 +48,12 @@ def render_turn_banner(attacker: "Entity") -> None:
     sleep(0.5)
 
 
-def render_battle_frame(player: "Player", monster: "Monster") -> None:
-    renderer.render_battle_frame(player, monster)
+def render_battle_frame(player: "Player", monster: "Monster", monsters: list | None = None) -> None:
+    renderer.render_battle_frame(player, monster, monsters)
+
+
+def render_target_select_panel(monsters: list) -> None:
+    renderer.render_target_select_panel(monsters)
 
 
 def render_battle_action_panel() -> None:
@@ -679,7 +683,7 @@ def render_continue_prompt() -> None:
 
 def render_map(map_lines: list[str]) -> None:
     """Renderiza as linhas do mapa no console com cores."""
-    
+
     for line in map_lines:
         colored_line = Text()
         for char in line:

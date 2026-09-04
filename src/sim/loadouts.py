@@ -11,6 +11,7 @@ from __future__ import annotations
 from src.content.items import get_all_items
 from src.content.passives import load_passives
 
+
 # Quantas passivas o jogador tem no nível N. Ele escolhe uma por nível, então o
 # "esperado" é praticamente o nível menos um.
 def expected_passive_count(level: int) -> int:

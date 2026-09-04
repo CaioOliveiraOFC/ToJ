@@ -46,7 +46,7 @@ def get_key() -> str:
             if key == b"\x1b":
                 return "ESC"
             return key.decode("utf-8", errors="replace")
-    
+
     fd = sys.stdin.fileno()
     old_settings = termios.tcgetattr(fd)
     try:

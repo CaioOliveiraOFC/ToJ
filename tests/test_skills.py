@@ -4,14 +4,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.content.skills_loader import load_skills, get_initial_skills, generate_skill_choices
-from src.entities.heroes import Warrior, Mage, Rogue
+from src.content.skills_loader import generate_skill_choices, get_initial_skills, load_skills
+from src.entities.heroes import Mage, Rogue, Warrior
+
 
 def test_load_skills():
     print("=== Teste 1: Carregar skills ===")
     skills = load_skills()
     print(f"Total de skills: {len(skills)}")
-    
+
     # Verifica skills por classe
     for cls in ["Warrior", "Mage", "Rogue"]:
         class_skills = [s for s in skills if s.skill_class == cls]
@@ -45,7 +46,7 @@ def test_player_flow():
     print(f"Skills iniciais: {len(player.skills)}")
     for k, v in player.skills.items():
         print(f"  Slot {k}: {v.name}")
-    
+
     # Simula level up
     print("\nSimulando level up para 2...")
     player.level = 2

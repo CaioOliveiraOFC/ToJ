@@ -6,8 +6,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pytest
+
 from src.content.items import get_all_items
-from src.entities.heroes import Warrior, Mage, Rogue
+from src.entities.heroes import Warrior
 
 
 def test_equip_muda_atk_e_def():

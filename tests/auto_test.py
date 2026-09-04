@@ -28,6 +28,7 @@ class AutoTester:
     def _setup_test_environment(self, player):
         """Configura o ambiente de teste e retorna dependências necessárias."""
         import io
+
         from src.engine.map import MapOfGame
 
         self.player_ref = player

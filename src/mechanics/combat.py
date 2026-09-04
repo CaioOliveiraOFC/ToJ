@@ -11,6 +11,7 @@ from src.mechanics import effects as fx
 from src.shared import combat_topics as T
 from src.shared.constants import (
     BASE_HIT_CHANCE,
+    BLEED_DAMAGE_PERCENT,
     CRIT_CHANCE_CAP,
     CRIT_CHANCE_DEFAULT,
     CRIT_CHANCE_HIGH,
@@ -24,11 +25,9 @@ from src.shared.constants import (
     HIT_CHANCE_FLOOR,
     INVISIBLE_HIT_PENALTY,
     MANA_BURN_PER_TICK,
-    BLEED_DAMAGE_PERCENT,
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
     POISON_DAMAGE_PER_TICK,
-    STUN_CHANCE_DEFAULT,
     STUN_DURATION,
     XMULT_CAP,
 )

@@ -81,9 +81,15 @@ class MapOfGame:
             self.exit_pos = {'y': exit_y, 'x': exit_x}
 
     def place_enemy(self, enemy_obj: object) -> None:
-        """Coloca um inimigo em um local aleatório."""
+        """Coloca um inimigo, ou um grupo deles, em um local aleatório.
+
+        Uma posição guarda um encontro inteiro, não um monstro: é isso que
+        permite composições — um tank protegendo um glass cannon, por exemplo —
+        em vez do combate um contra um que existia antes.
+        """
         y, x = self._get_random_empty_spot()
-        self.enemies_pos[(y, x)] = enemy_obj
+        group = list(enemy_obj) if isinstance(enemy_obj, list) else [enemy_obj]
+        self.enemies_pos[(y, x)] = group
 
     def draw_map(self) -> list[str]:
         """Gera representação pura do mapa como lista de strings para renderização pela UI.
@@ -100,8 +106,8 @@ class MapOfGame:
                 if y == self.player_pos['y'] and x == self.player_pos['x']:
                     char = '@'
                 elif (y, x) in self.enemies_pos:
-                    enemy = self.enemies_pos[(y, x)]
-                    if getattr(enemy, 'is_boss', False):
+                    group = self.enemies_pos[(y, x)]
+                    if any(getattr(mob, "is_boss", False) for mob in group):
                         char = 'B'
                     else:
                         char = '&'
@@ -160,8 +166,11 @@ class MapOfGame:
         """Retorna um dicionário com o estado atual do mapa para salvamento."""
         # Serializar enemies_pos para salvar. (y, x) -> {nick_name, level}
         enemies_serializable = {
-            f"{y},{x}": {"nick_name": enemy.nick_name, "level": enemy.level}
-            for (y, x), enemy in self.enemies_pos.items()
+            f"{y},{x}": [
+                {"nick_name": mob.nick_name, "level": mob.level, "role": getattr(mob, "role", "bruiser")}
+                for mob in group
+            ]
+            for (y, x), group in self.enemies_pos.items()
         }
 
         return {
@@ -182,7 +191,12 @@ class MapOfGame:
         self.exit_pos = map_state["exit_pos"]
 
         self.enemies_pos = {}
-        for pos_str, enemy_data in map_state["enemies_pos"].items():
+        for pos_str, entry in map_state["enemies_pos"].items():
             y, x = map(int, pos_str.split(','))
-            monster = create_monster(enemy_data["nick_name"], enemy_data["level"])
-            self.enemies_pos[(y, x)] = monster
+            # Saves anteriores guardavam um único monstro por posição; hoje
+            # guardam o encontro. Aceitar os dois formatos evita invalidar saves.
+            group_data = entry if isinstance(entry, list) else [entry]
+            self.enemies_pos[(y, x)] = [
+                create_monster(mob["nick_name"], mob["level"], mob.get("role", "bruiser"))
+                for mob in group_data
+            ]
