@@ -50,7 +50,12 @@ class BattleOutcome:
     skill_uses: dict[str, int] = field(default_factory=dict)
 
 
-HeroDecision = Callable[[Any, list], Action]
+# A decisão recebe o herói, o encontro e o índice do turno do herói (0 no
+# primeiro). O turno é necessário para decisões de abertura — preparar buff, por
+# exemplo. Inferir "início do combate" pela vida do inimigo é circular: enquanto
+# o herói só prepara, o inimigo continua com a vida cheia e o combate parece
+# estar sempre começando.
+HeroDecision = Callable[[Any, list, int], Action]
 
 
 def alive(entities: list) -> list:
@@ -103,6 +108,7 @@ def run_battle(
 
     order = build_turn_order(hero, monsters)
     index = 0
+    hero_turn = 0
 
     while out.turns < max_turns:
         if not alive(monsters):
@@ -134,7 +140,8 @@ def run_battle(
             continue
 
         if actor is hero:
-            _run_hero_turn(hero, monsters, hero_decision, r, publish, out)
+            _run_hero_turn(hero, monsters, hero_decision, r, publish, out, hero_turn)
+            hero_turn += 1
             if out.fled:
                 return out
         else:
@@ -149,9 +156,11 @@ def run_battle(
     return out
 
 
-def _run_hero_turn(hero, monsters, hero_decision, rng, publish, out: BattleOutcome) -> None:
+def _run_hero_turn(
+    hero, monsters, hero_decision, rng, publish, out: BattleOutcome, hero_turn: int = 0
+) -> None:
     """Aplica a decisão do herói e contabiliza as métricas do turno."""
-    action = hero_decision(hero, monsters)
+    action = hero_decision(hero, monsters, hero_turn)
     if action is None:
         action = Action(kind="attack")
 

@@ -46,22 +46,48 @@ a diferença relativa de agilidade, com piso de 20% e teto de 95%.
 
 **Atrito.** Concluir um andar devolve 32% dos recursos. Nada mais cura de graça.
 
+## O que a simulação roda
+
+A run simulada percorre os mesmos sistemas do jogo, e não só o combate:
+
+| Sistema | Onde |
+|---|---|
+| Escolha de passiva a cada nível | `sim/progression.py: on_level_up` |
+| Escolha de skill em nível ímpar a partir do 5 | `sim/progression.py: pick_skill` |
+| Drop de item por vitória, com troca se for melhor | `sim/progression.py: collect_loot` |
+| Loja entre andares: repõe cura e melhora equipamento | `sim/progression.py: visit_shop` |
+| Evento aleatório de andar (Fonte, Altar) | `sim/harness.py: _apply_random_event` |
+| Multiplicador de Essência por andar | `sim/progression.py: floor_essence_multiplier` |
+| Buff, elixir, poção de mana e controle em combate | `sim/policies.py: smart_policy` |
+
+Isso importa mais do que parece. Uma calibração anterior media um herói que
+atravessava vinte andares **com zero passivas** e o equipamento do andar 1,
+porque `while level_up(show=False)` nunca iterava — o método devolve lista vazia
+quando `show=False`, mesmo tendo subido de nível. Os números daquela calibração
+não valiam para o jogo que existe. `test_a_run_entrega_a_progressao_do_jogo`
+existe para que isso não volte em silêncio.
+
 ## Resultado
 
-400 runs por classe, política competente, equipamento típico
+250 runs por classe, política competente, equipamento típico
 (`reports/validation_20260904.json`):
 
-| Classe | Andar médio | Chega ao andar 20 | Bot que só ataca |
-|---|---:|---:|---:|
-| Guerreiro | 14,3 | 14,0% | andar médio 2,3 |
-| Mago | 12,7 | 22,0% | andar médio 2,0 |
-| Ladino | 13,7 | 3,2% | andar médio 3,4 |
+| Classe | Andar médio | Mediano | Chega ao andar 20 | Passivas ao fim | Bot que só ataca |
+|---|---:|---:|---:|---:|---:|
+| Guerreiro | 8,1 | 4 | 26,0% | 9,6 | andar médio 1,0 |
+| Mago | 5,8 | 2 | 17,6% | 6,9 | andar médio 0,3 |
+| Ladino | 8,1 | 4 | 23,6% | 9,8 | andar médio 1,0 |
 
 - O bot que só ataca **não termina a masmorra** em nenhuma classe.
-- Distância entre a melhor e a pior classe: **1,7 andares**.
-- Jogar bem vale de **10,3 a 12,1 andares** de profundidade.
-- Duração de combate: trash 3-5 turnos, bruiser 6-11, elite 10-18, chefe 14-29.
-- Custo de um encontro: trash 3%, bruiser 13-18%, elite 25-35%, chefe 39% da vida.
+- Distância entre a melhor e a pior classe: **2,3 andares**.
+- Jogar bem vale de **5,5 a 7,1 andares** de profundidade.
+- Duração de combate: trash 3,4 turnos, bruiser 8-12, elite 12-17, chefe 16-24.
+
+**A distribuição é bimodal**, e isso é um achado, não um detalhe: a maioria das
+runs termina nos primeiros andares, e quem passa do andar 5 com passivas
+empilhadas tende a chegar ao 20. A run é decidida cedo. Fechar essa lacuna —
+fazer os andares finais voltarem a ser uma pergunta — é o próximo trabalho de
+balanceamento, e depende de as passivas deixarem de ser puro acúmulo.
 
 ## Como reproduzir
 

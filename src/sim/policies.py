@@ -12,6 +12,7 @@ import random
 
 from src.mechanics import combat as combat_mech
 from src.mechanics.battle import Action, alive
+from src.shared.effects import TURN_SKIPPING_STATUSES
 
 # Um combate que o herói vai perder de qualquer jeito vale mais como fuga do que
 # como morte. Abaixo deste percentual de HP, e sem cura na mão, o bot esperto foge.
@@ -20,6 +21,21 @@ FLEE_HP_RATIO = 0.12
 HEAL_HP_RATIO = 0.35
 # Papéis que matam rápido e por isso morrem primeiro.
 PRIORITY_ROLES = ("glass_cannon", "support", "controller")
+# Abaixo desta fração de mana, o bot bebe poção de mana se tiver uma.
+MANA_POTION_RATIO = 0.25
+# Efeitos de consumível que valem um turno no começo de um combate longo.
+COMBAT_ELIXIR_EFFECTS = (
+    "strength", "defense", "agility", "crit_chance",
+    "damage_reduction", "life_steal", "evasion",
+)
+# A partir de quantos turnos estimados vale gastar um turno preparando buff.
+LONG_FIGHT_TURNS = 5
+# Quantos turnos contam como abertura do combate. Preparação (buff, elixir,
+# status que só enfraquece) só vale aqui. Sem esse limite o bot reaplica o buff
+# assim que ele expira e nunca ataca: como o inimigo continua com a vida cheia,
+# qualquer teste baseado na vida acha que o combate ainda está começando. O laço
+# inflava o combate do Ladino de 6 para 50 turnos.
+OPENING_TURNS = 2
 
 
 def _hp_ratio(entity) -> float:
@@ -43,15 +59,42 @@ def _usable_skills(hero, kinds: tuple[str, ...]) -> list:
     ]
 
 
-def _healing_potions(hero) -> list:
+def _consumables(hero, effect_types: tuple[str, ...]) -> list:
+    """Consumíveis do inventário cujo efeito está na lista pedida."""
     return [
         item
         for item in hero.inventory
-        if getattr(item, "effect_type", None) == "max_hp" and getattr(item, "effect_value", 0) > 0
+        if getattr(item, "consumable", False)
+        and getattr(item, "effect_type", None) in effect_types
+        and getattr(item, "effect_value", 0) > 0
     ]
 
 
-def greedy_policy(hero, monsters: list) -> Action:
+def _healing_potions(hero) -> list:
+    return _consumables(hero, ("max_hp",))
+
+
+def _mana_potions(hero) -> list:
+    return _consumables(hero, ("max_mp",))
+
+
+def _combat_elixirs(hero) -> list:
+    """Elixires que valem a pena antes de um combate longo."""
+    return _consumables(hero, COMBAT_ELIXIR_EFFECTS)
+
+
+def _active_buff_stats(hero) -> set[str]:
+    """Atributos que já estão sob efeito de buff, para não empilhar o mesmo."""
+    from src.shared.effects import buff_stat
+
+    return {
+        buff_stat(name, data)
+        for name, data in getattr(hero, "active_buffs", {}).items()
+        if isinstance(data, dict)
+    }
+
+
+def greedy_policy(hero, monsters: list, turn: int = 0) -> Action:
     """Sempre ataque básico, sempre no primeiro alvo vivo.
 
     É o piso de referência: o jogador que nunca aprende nada. Se este bot chega
@@ -61,7 +104,7 @@ def greedy_policy(hero, monsters: list) -> Action:
     return Action(kind="attack", target=living[0] if living else None)
 
 
-def random_policy(hero, monsters: list, rng: random.Random | None = None) -> Action:
+def random_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None = None) -> Action:
     """Ações aleatórias entre as legais. Serve para separar sorte de decisão."""
     r = rng or random
     living = alive(monsters)
@@ -81,11 +124,14 @@ def random_policy(hero, monsters: list, rng: random.Random | None = None) -> Act
     return Action(kind="attack", target=target)
 
 
-def smart_policy(hero, monsters: list, rng: random.Random | None = None) -> Action:
+def smart_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None = None) -> Action:
     """Heurística de jogador competente.
 
     A ordem das verificações é a própria tese do que "jogar bem" significa aqui:
-    não morrer, escolher o alvo certo, e só então otimizar dano.
+    não morrer, escolher o alvo certo, preparar o combate longo, e só então
+    otimizar dano. Uma política que só ataca e cura mede um jogo em que buff,
+    controle e elixir não existem — e o balanceamento sai calibrado para esse
+    jogo, não para o que está no código.
     """
     living = alive(monsters)
     if not living:
@@ -108,21 +154,53 @@ def smart_policy(hero, monsters: list, rng: random.Random | None = None) -> Acti
 
     # 3. Escolher alvo: papéis perigosos primeiro, depois o mais frágil.
     target = _choose_target(living)
+    basic = _estimate_basic_damage(hero, target)
+    turnos_estimados = _estimated_turns(living, basic)
+    combate_longo = turnos_estimados >= LONG_FIGHT_TURNS
 
-    # 4. Controle enquanto o combate ainda é longo. Atordoar um alvo cedo
-    #    economiza mais vida do que qualquer skill de dano gasta em MP.
-    if len(living) > 1 or target.get_hp() > _estimate_basic_damage(hero, target) * 3:
+    # 4. Preparar o combate longo. Um buff de defesa no primeiro turno de uma
+    #    luta de dez turnos rende mais que o dano daquele turno; num combate de
+    #    três, é turno perdido.
+    if combate_longo and turn < OPENING_TURNS:
+        ativos = _active_buff_stats(hero)
+        buffs = [
+            s for s in _usable_skills(hero, ("buff", "damage_reduction"))
+            if getattr(s, "effect_stat", "") not in ativos
+        ]
+        if buffs:
+            return Action(kind="skill", target=hero, skill=buffs[0])
+
+        elixires = [
+            i for i in _combat_elixirs(hero)
+            if _elixir_stat(i) not in ativos
+        ]
+        if elixires:
+            return Action(kind="item", item=elixires[0])
+
+    # 5. Repor mana quando ela é o gargalo e há poção em mãos.
+    if _mp_ratio(hero) < MANA_POTION_RATIO and hero.skills:
+        mana = _mana_potions(hero)
+        if mana:
+            return Action(kind="item", item=mana[0])
+
+    # 6. Controle. Atordoar um alvo economiza mais vida do que qualquer skill de
+    #    dano gasta em MP, e vale sempre que o efeito não estiver ativo. Já um
+    #    status que só enfraquece não encurta a luta: reaplicá-lo a cada expiração
+    #    é um turno perdido por rodada, e era o que inflava o combate do Ladino
+    #    de 11 para 50 turnos. Esse tipo entra só na abertura.
+    if len(living) > 1 or combate_longo:
+        ativos_no_alvo = getattr(target, "active_effects", {})
         control = [
             s
             for s in _usable_skills(hero, ("status",))
-            if not getattr(target, "active_effects", {}).get(str(s.effect_value))
+            if str(s.effect_value) not in ativos_no_alvo
+            and (str(s.effect_value) in TURN_SKIPPING_STATUSES or turn < OPENING_TURNS)
         ]
         if control:
             return Action(kind="skill", target=target, skill=control[0])
 
-    # 5. Otimizar dano: usar a skill só quando ela bate mais que o ataque básico,
+    # 7. Otimizar dano: usar a skill só quando ela bate mais que o ataque básico,
     #    que é gratuito. Skill que não supera o básico é MP jogado fora.
-    basic = _estimate_basic_damage(hero, target)
     best_skill, best_damage = None, basic
     for skill in _usable_skills(hero, ("damage",)):
         estimate = _estimate_skill_damage(hero, skill, target)
@@ -133,6 +211,24 @@ def smart_policy(hero, monsters: list, rng: random.Random | None = None) -> Acti
         return Action(kind="skill", target=target, skill=best_skill)
 
     return Action(kind="attack", target=target)
+
+
+def _mp_ratio(hero) -> float:
+    return hero.get_mp() / max(1, int(getattr(hero, "base_mp", 1)))
+
+
+def _elixir_stat(item) -> str:
+    """Atributo que um elixir modifica, para não empilhar o mesmo buff."""
+    from src.entities.heroes import POTION_BUFFS
+
+    entry = POTION_BUFFS.get(getattr(item, "effect_type", ""), None)
+    return entry[0] if entry else ""
+
+
+def _estimated_turns(living: list, damage_per_turn: int) -> int:
+    """Quantos turnos o encontro inteiro deve durar no ritmo atual."""
+    total_hp = sum(m.get_hp() for m in living)
+    return max(1, total_hp // max(1, damage_per_turn))
 
 
 def _choose_target(living: list):

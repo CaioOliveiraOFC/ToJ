@@ -101,7 +101,7 @@ def _choose_target(player: "Player", monsters: list) -> "Monster | None":
     return living[index] if 0 <= index < len(living) else living[0]
 
 
-def _human_decision(player: "Player", monsters: list) -> battle.Action:
+def _human_decision(player: "Player", monsters: list, turn: int = 0) -> battle.Action:
     """Lê a ação do jogador para o turno dele.
 
     Só orquestra teclas e devolve a decisão; quem aplica a regra é

@@ -115,9 +115,9 @@ MIN_EMPTY_TILES_START = 1
 # paga em sobrevivência, e o inverso. Poder de ataque no nível 1, aplicando
 # CLASS_WEIGHTS, contra HP efetivo (HP vezes a mitigação da defesa):
 #
-#   Guerreiro:  48*1.6 + 30*0.4 =  89    EHP 440*1.32 = 581
-#   Mago:       30*0.3 + 58*1.9 = 119    EHP 370*1.26 = 466
-#   Ladino:     48*0.8 + 32*0.4 + 29*1.7 = 100   EHP 370*1.25 = 463 + esquiva
+#   Guerreiro:  54*1.6 + 30*0.4 =  98    EHP 440*1.32 = 581
+#   Mago:       30*0.3 + 52*1.9 = 108    EHP 370*1.26 = 466
+#   Ladino:     48*0.8 + 32*0.4 + 26*1.7 =  95   EHP 370*1.25 = 463 + esquiva
 #
 # A distância de HP efetivo entre a classe mais dura e a mais frágil é de 25%.
 # Com 45%, que era a versão anterior destes números, o Guerreiro dominava a run:
@@ -125,7 +125,7 @@ MIN_EMPTY_TILES_START = 1
 # uma vantagem grande demais nesse eixo não é identidade, é dominância.
 WARRIOR_BASE_HP = 440
 WARRIOR_BASE_MP = 60
-WARRIOR_BASE_ST = 48
+WARRIOR_BASE_ST = 54
 WARRIOR_BASE_AG = 10
 WARRIOR_BASE_MG = 30
 WARRIOR_BASE_DF = 32
@@ -134,13 +134,13 @@ MAGE_BASE_HP = 370
 MAGE_BASE_MP = 140
 MAGE_BASE_ST = 30
 MAGE_BASE_AG = 8
-MAGE_BASE_MG = 58
+MAGE_BASE_MG = 52
 MAGE_BASE_DF = 26
 
 ROGUE_BASE_HP = 370
 ROGUE_BASE_MP = 90
 ROGUE_BASE_ST = 48
-ROGUE_BASE_AG = 29
+ROGUE_BASE_AG = 26
 ROGUE_BASE_MG = 32
 ROGUE_BASE_DF = 25
 
@@ -235,7 +235,7 @@ GROWTH_RATE = 1.12
 # --- Orçamento do monstro (perfil "bruiser" no nível 1) ---
 # Os arquétipos em content/factories/archetypes.py multiplicam estes valores.
 MONSTER_BUDGET_HP = 420
-MONSTER_BUDGET_ATTACK = 44
+MONSTER_BUDGET_ATTACK = 88
 MONSTER_BUDGET_DEFENSE = 20
 MONSTER_BUDGET_AGILITY = 8
 MONSTER_BUDGET_MP = 60
@@ -283,7 +283,7 @@ INITIAL_SKILL_LEVELS = 4
 # independente do anterior. Não zero: uma run de 20 andares em uma única barra
 # de vida não é difícil, é impossível. O andar é a unidade de risco, e o que
 # sobra de vida no fim dele é o que dá peso à decisão de extrair.
-FLOOR_CLEAR_RESTORE_PERCENT = 32
+FLOOR_CLEAR_RESTORE_PERCENT = 29
 
 # --- Level up ---
 # Subir de nível restaura parte dos recursos, não tudo. Cura completa a cada

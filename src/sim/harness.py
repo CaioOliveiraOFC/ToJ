@@ -13,9 +13,17 @@ import random
 import statistics
 from dataclasses import asdict, dataclass, field
 
+from src.content.factories.dungeons import (
+    altar_hp_cost,
+    apply_altar_blessing,
+    apply_fountain_heal,
+    roll_random_event,
+)
+from src.content.shop import Shop
 from src.entities.heroes import Mage, Rogue, Warrior
 from src.mechanics.battle import run_battle
 from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
+from src.sim import progression
 from src.sim.encounters import build_encounter
 from src.sim.loadouts import apply_loadout
 from src.sim.policies import get_policy
@@ -117,7 +125,7 @@ def simulate(
         outcome = run_battle(
             hero,
             monsters,
-            lambda h, m: decide(h, m),
+            lambda h, m, t: decide(h, m, t),
             rng=rng,
             publish=None,
         )
@@ -168,18 +176,27 @@ def simulate_run(
     loadout: str = "expected",
     encounters_per_floor=None,
 ) -> dict:
-    """Simula runs completas de masmorra, andar a andar, com atrito entre combates.
+    """Simula runs completas de masmorra, com todos os sistemas que o jogo roda.
 
     A run é a unidade que importa para a curva de dificuldade: um combate isolado
     pode ser fácil e a sequência de oito combates sem cura ainda matar o jogador.
     O herói **não** é curado entre combates do mesmo andar — é justamente esse
     atrito que o rebalanceamento existe para criar.
-    """
 
+    A run reproduz o `engine/loop.py`: escolha de passiva a cada nível, escolha
+    de skill nos níveis ímpares a partir do 5, drop de item a cada vitória,
+    multiplicador de Essência por andar, evento aleatório, loja entre andares e
+    descanso parcial. Simular só o combate mede um herói que atravessa vinte
+    andares com quatro skills comuns e o equipamento do andar 1 — que não é o
+    herói que o jogo entrega.
+    """
     decide = get_policy(policy)
+    shop = Shop()
     deepest: list[int] = []
     survival = {floor: 0 for floor in range(1, max_floor + 1)}
     level_at_floor: dict[int, list[int]] = {floor: [] for floor in range(1, max_floor + 1)}
+    skills_at_end: list[int] = []
+    passives_at_end: list[int] = []
 
     for i in range(iterations):
         rng = random.Random(seed + i)
@@ -187,30 +204,39 @@ def simulate_run(
         reached = 0
 
         for floor in range(1, max_floor + 1):
+            essence = progression.floor_essence_multiplier(floor)
             fights = encounters_per_floor(floor) if encounters_per_floor else _default_floor_plan(floor)
             died = False
+
             for name in fights:
                 # O nível do encontro vem do ANDAR, não do herói — é assim que o
                 # jogo real gera monstros. Amarrar ao nível do herói esconderia
                 # justamente a defasagem que cria a dificuldade crescente.
                 monsters = build_encounter(name, floor)
-                outcome = run_battle(hero, monsters, lambda h, m: decide(h, m), rng=rng, publish=None)
+                outcome = run_battle(hero, monsters, lambda h, m, t: decide(h, m, t), rng=rng, publish=None)
                 if not hero.get_isalive() or hero.get_hp() <= 0:
                     died = True
                     break
                 if outcome.hero_won:
-                    _award(hero, monsters)
+                    _award(hero, monsters, essence, rng)
+
             if died:
                 break
+
             reached = floor
             survival[floor] += 1
             level_at_floor[floor].append(hero.get_level())
-            # Fim do andar: descanso parcial e reposição de consumíveis na loja,
-            # como o jogo real oferece entre andares.
+
+            # Fim do andar, na ordem do jogo: evento aleatório, loja, descanso.
+            _apply_random_event(hero, rng)
+            if not hero.get_isalive() or hero.get_hp() <= 0:
+                break
+            progression.visit_shop(hero, shop, floor, rng)
             hero.recover(FLOOR_CLEAR_RESTORE_PERCENT)
-            _restock(hero, floor)
 
         deepest.append(reached)
+        skills_at_end.append(len(hero.skills))
+        passives_at_end.append(len(hero.passives))
 
     return {
         "levels_by_floor": {f: statistics.fmean(v) for f, v in sorted(level_at_floor.items()) if v},
@@ -222,7 +248,26 @@ def simulate_run(
         "mean_floor": statistics.fmean(deepest),
         "reached_20_rate": sum(1 for d in deepest if d >= max_floor) / iterations,
         "survival_by_floor": {floor: count / iterations for floor, count in survival.items()},
+        "skills_at_end_mean": statistics.fmean(skills_at_end),
+        "passives_at_end_mean": statistics.fmean(passives_at_end),
     }
+
+
+def _apply_random_event(hero, rng: random.Random) -> None:
+    """Evento aleatório de andar, com a mesma chance do jogo.
+
+    O Altar cobra vida por um buff e pode matar; a Fonte cura. O bot aceita a
+    Fonte sempre e o Altar só com vida sobrando, que é a decisão que um jogador
+    competente toma.
+    """
+    event = roll_random_event(rng)
+    if event == "fountain":
+        apply_fountain_heal(hero)
+    elif event == "altar" and hero.get_hp() > altar_hp_cost(hero) * 2:
+        hero.take_damage(altar_hp_cost(hero))
+        apply_altar_blessing(hero)
+        if hero.get_hp() <= 0:
+            hero.set_isalive(False)
 
 
 def _default_floor_plan(floor: int) -> list[str]:
@@ -252,43 +297,46 @@ def _default_floor_plan(floor: int) -> list[str]:
     return fights
 
 
-# Quantos consumíveis o jogador repõe na loja ao concluir um andar. Sem isto a
-# simulação mede uma run em que ninguém compra nada, que não é a run que existe.
-RESTOCK_POTIONS = 2
+def _award(hero, monsters: list, essence: float, rng: random.Random) -> None:
+    """Aplica XP, ouro, loot e as escolhas de nível, como o jogo faz.
 
-
-def _restock(hero, floor: int) -> None:
-    """Repõe poções de cura entre andares, gastando o ouro acumulado."""
-    from src.content.items import get_all_items
-
-    potions = [
-        item
-        for item in get_all_items().values()
-        if getattr(item, "consumable", False)
-        and getattr(item, "effect_type", None) == "max_hp"
-        and getattr(item, "shop_min_floor", 1) <= floor
-    ]
-    if not potions:
-        return
-    best = max(potions, key=lambda i: i.effect_value)
-    carried = sum(1 for i in hero.inventory if getattr(i, "effect_type", None) == "max_hp")
-    for _ in range(max(0, RESTOCK_POTIONS - carried)):
-        if hero.spend_coins(int(best.price)):
-            hero.add_item_to_inventory(best)
-
-
-def _award(hero, monsters: list) -> None:
-    """Concede XP e sobe de nível como o jogo faz depois de uma vitória."""
+    Espelha `engine.loop.process_post_battle`: a Essência multiplica o XP, as
+    passivas de essência e de ouro entram na conta, e cada nível ganho abre uma
+    escolha de passiva (e de skill, nos níveis ímpares a partir do 5).
+    """
     from src.mechanics.math_operations import (
+        calculate_mini_boss_coin_reward,
+        calculate_mini_boss_xp_reward,
         calculate_monster_coin_reward,
         calculate_monster_xp_reward,
     )
 
+    essence_passive = 1 + hero.get_passive_bonus("essence_bonus") / 100
+    gold_passive = 1 + hero.get_passive_bonus("gold_drop_bonus") / 100
+
+    xp = coins = 0
     for monster in monsters:
-        hero.add_xp_points(calculate_monster_xp_reward(monster.level))
-        hero.earn_coins(calculate_monster_coin_reward(monster.level))
-    while hero.level_up(show=False):
-        pass
+        if getattr(monster, "is_boss", False):
+            xp += calculate_mini_boss_xp_reward(monster.level)
+            coins += calculate_mini_boss_coin_reward(monster.level)
+        else:
+            xp += calculate_monster_xp_reward(monster.level)
+            coins += calculate_monster_coin_reward(monster.level)
+
+    hero.add_xp_points(int(xp * essence * essence_passive))
+    hero.earn_coins(int(coins * gold_passive))
+    progression.collect_loot(hero, rng)
+
+    # Contar pela mudança de nível, não pelo retorno de `level_up`: com
+    # `show=False` ele devolve lista vazia mesmo quando o nível sobe, e um laço
+    # `while level_up(show=False)` nunca itera. Foi assim que a simulação passou
+    # a rodar sem nenhuma passiva e sem nenhuma escolha de skill.
+    level_before = hero.get_level()
+    while hero.xp_points >= hero.need_to_up():
+        hero.level_up(show=False)
+    levels_gained = hero.get_level() - level_before
+    if levels_gained > 0:
+        progression.on_level_up(hero, levels_gained, rng)
 
 
 def _percentile(values: list[int], q: float) -> float:

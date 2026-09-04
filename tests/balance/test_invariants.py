@@ -350,6 +350,18 @@ class TestRunCompleta:
         )
 
     @pytest.mark.parametrize("classe", ALL_CLASSES)
+    def test_a_run_entrega_a_progressao_do_jogo(self, runs, classe):
+        # O jogo dá uma passiva por nível e uma escolha de skill nos níveis
+        # ímpares a partir do 5. Uma simulação que não entrega isso mede um
+        # herói que ninguém joga, e todo número calibrado em cima dela é falso.
+        dados = runs[(classe, "smart")]
+        assert dados["passives_at_end_mean"] >= T.MIN_PASSIVES_AT_END, (
+            f"{classe} termina a run com {dados['passives_at_end_mean']:.1f} passivas: "
+            "a progressão parou de rodar na simulação."
+        )
+        assert dados["skills_at_end_mean"] >= 3.0
+
+    @pytest.mark.parametrize("classe", ALL_CLASSES)
     def test_curva_de_dificuldade_e_monotonica(self, runs, classe):
         sobrevivencia = runs[(classe, "smart")]["survival_by_floor"]
         andares = sorted(sobrevivencia)
