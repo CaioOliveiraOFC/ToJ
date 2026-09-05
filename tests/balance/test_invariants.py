@@ -417,6 +417,47 @@ class TestArquetipos:
 # ------------------------------------------------------------------ desempenho
 
 
+class TestReprodutibilidade:
+    """Mesma seed, mesmo resultado — senão nenhum número aqui significa nada.
+
+    A simulação semeia o `rng` que injeta no combate, mas a camada de conteúdo
+    sorteia pelo gerador global do módulo `random`: oferta de carta, nível do
+    monstro, spawn de elite, drop, estoque da loja e Essência. Enquanto só o
+    `rng` local era semeado, o mesmo comando dava 7.0 e 7.8 de andar médio em
+    execuções seguidas — oscilação maior que quase todo delta medido, o que
+    tornava qualquer achado indistinguível de ruído.
+    """
+
+    def test_mesma_seed_produz_a_mesma_run(self):
+        kwargs = dict(hero_class="Warrior", max_floor=12, iterations=15,
+                      policy="smart", seed=99, loadout="expected")
+        primeira = simulate_run(**kwargs)
+        segunda = simulate_run(**kwargs)
+        assert primeira == segunda, (
+            "duas execuções com a mesma seed divergiram: algum sorteio escapa "
+            "do gerador semeado."
+        )
+
+    def test_seeds_diferentes_produzem_runs_diferentes(self):
+        # A trava não pode ter congelado o sorteio: sem variação, a média de
+        # N runs seria a mesma run repetida N vezes.
+        kwargs = dict(hero_class="Warrior", max_floor=12, iterations=15,
+                      policy="smart", loadout="expected")
+        assert (
+            simulate_run(seed=99, **kwargs)["mean_floor"]
+            != simulate_run(seed=4242, **kwargs)["mean_floor"]
+        )
+
+    def test_a_simulacao_devolve_o_gerador_global_como_encontrou(self):
+        # Deixar o `random` global preso numa sequência fixa faria um teste
+        # posterior esconder a instabilidade que ele existe para pegar.
+        import random
+
+        estado = random.getstate()
+        simulate_run("Warrior", 6, 3, "smart", 7, "expected")
+        assert random.getstate() == estado
+
+
 class TestDesempenho:
     """A suíte precisa ser rápida o bastante para ser usada durante o trabalho."""
 

@@ -97,4 +97,18 @@ MIN_PASSIVES_AT_END = 3.0
 # Iterações por cenário nos testes rápidos. Suficiente para pegar regressão
 # estrutural sem transformar a suíte em algo que ninguém roda.
 FAST_ITERATIONS = 120
-FAST_RUN_ITERATIONS = 60
+
+# A run completa precisa de muito mais amostra que um combate isolado. A
+# profundidade alcançada é bimodal — a maioria das runs morre cedo e as
+# sobreviventes chegam ao fim —, então a média carrega erro amostral grande.
+#
+# Medido em cinco seeds, o andar médio do Warrior varia assim:
+#
+#     60 runs  ->  10.4  6.9  8.9  10.5  7.7   (desvio 1.44)
+#    250 runs  ->   9.3  8.9  8.4   9.1  8.4   (desvio 0.35)
+#
+# Com 60 runs a distância entre a melhor e a pior classe deu de 2.4 a 4.9
+# andares conforme a seed, contra um limite de 4.0: o teste aprovava ou
+# reprovava o mesmo jogo, medindo o próprio ruído. Com 250 a mesma distância
+# fica entre 3.0 e 3.7, e o veredito passa a ser sobre o jogo.
+FAST_RUN_ITERATIONS = 250

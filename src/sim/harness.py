@@ -9,6 +9,7 @@ combates por cenário em menos de um segundo.
 
 from __future__ import annotations
 
+import functools
 import random
 import statistics
 from dataclasses import asdict, dataclass, field
@@ -93,6 +94,38 @@ def make_hero(hero_class: str, level: int, loadout: str = "naked"):
     return hero
 
 
+def _isolates_global_rng(func):
+    """Semeia e restaura o gerador global do módulo `random` em volta da função.
+
+    A camada de conteúdo não sorteia pelo `rng` que a simulação injeta: a oferta
+    de passiva e de skill, o nível do monstro, o spawn de elite, o drop de loot,
+    o estoque da loja e o multiplicador de Essência saem todos de
+    `random.<função>` em `content/` e `mechanics/math_operations.py`.
+
+    Enquanto só o `rng` local era semeado, duas execuções com a mesma `--seed`
+    davam resultados diferentes — no scout, 7.0 contra 7.8 de andar médio nas
+    mesmas 20 runs. Essa oscilação é maior que quase todo delta que o scout
+    reporta, então achado nenhum era distinguível de ruído e nenhuma regressão
+    de balanceamento era bissetável.
+
+    O estado anterior é restaurado ao sair: a simulação não pode deixar o
+    gerador do processo preso numa sequência fixa para quem rodar depois, ou um
+    teste posterior passaria a esconder justamente a instabilidade que ele
+    existe para pegar.
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        estado = random.getstate()
+        try:
+            return func(*args, **kwargs)
+        finally:
+            random.setstate(estado)
+
+    return wrapper
+
+
+@_isolates_global_rng
 def simulate(
     hero_class: str,
     encounter: str,
@@ -104,9 +137,10 @@ def simulate(
 ) -> SimResult:
     """Roda `iterations` combates do cenário e devolve as métricas agregadas.
 
-    Cada iteração usa `random.Random(seed + i)`, nunca o gerador global do módulo.
-    É isso que torna qualquer resultado reproduzível e qualquer regressão de
-    balanceamento bissetável.
+    Cada iteração usa `random.Random(seed + i)` para as decisões da simulação e
+    semeia o gerador global com o mesmo valor, porque é dele que a camada de
+    conteúdo sorteia. É isso que torna qualquer resultado reproduzível e
+    qualquer regressão de balanceamento bissetável.
     """
     decide = get_policy(policy)
 
@@ -122,6 +156,9 @@ def simulate(
 
     for i in range(iterations):
         rng = random.Random(seed + i)
+        # A camada de conteúdo sorteia pelo gerador global; sem semeá-lo, a
+        # mesma seed produz runs diferentes.
+        random.seed(seed + i)
         hero = make_hero(hero_class, level, loadout)
         monsters = build_encounter(encounter, level)
 
@@ -170,6 +207,7 @@ def simulate(
     )
 
 
+@_isolates_global_rng
 def simulate_run(
     hero_class: str,
     max_floor: int = 20,
@@ -209,6 +247,9 @@ def simulate_run(
 
     for i in range(iterations):
         rng = random.Random(seed + i)
+        # A camada de conteúdo sorteia pelo gerador global; sem semeá-lo, a
+        # mesma seed produz runs diferentes.
+        random.seed(seed + i)
         hero = make_hero(hero_class, 1, loadout)
         reached = 0
 
