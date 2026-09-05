@@ -43,7 +43,24 @@ PRINT_EXCEPTIONS = {"src/sim/runner.py"}
 
 
 def python_files() -> list[Path]:
-    return sorted(SRC.rglob("*.py"))
+    return arquivos_de(SRC, recursivo=True)
+
+
+def arquivos_de(pasta: Path, recursivo: bool = False) -> list[Path]:
+    """Os `.py` de uma pasta, garantindo que a busca achou alguma coisa.
+
+    Um teste que percorre o resultado de um `glob` passa quando o `glob` não
+    casa com nada — e é assim que uma pasta renomeada transforma a regra de
+    arquitetura em teste verde que não verifica nada. Já aconteceu nesta base:
+    uma auditoria por padrão de texto deu certo porque o padrão não encontrava
+    arquivo nenhum.
+    """
+    encontrados = sorted(pasta.rglob("*.py") if recursivo else pasta.glob("*.py"))
+    assert encontrados, (
+        f"{pasta.relative_to(ROOT)} não tem nenhum .py: a regra abaixo não seria "
+        "verificada, e o teste passaria sem olhar uma linha."
+    )
+    return encontrados
 
 
 def layer_of(path: Path) -> str | None:
@@ -120,7 +137,7 @@ class TestRegra3Camadas:
 
     def test_entities_nao_conhece_dados(self):
         # A regra 3 escrita por extenso, porque é a que mais se quebra sem querer.
-        for path in (SRC / "entities").glob("*.py"):
+        for path in arquivos_de(SRC / "entities"):
             tree = ast.parse(path.read_text(encoding="utf-8"))
             for module, lineno in runtime_imports(tree):
                 assert not module.startswith("src.content"), (
@@ -131,7 +148,7 @@ class TestRegra3Camadas:
     def test_simulacao_e_headless(self):
         # Se `sim/` importar `ui/` ou `engine/`, ela deixa de ser rápida e passa
         # a medir a UI em vez das regras.
-        for path in (SRC / "sim").glob("*.py"):
+        for path in arquivos_de(SRC / "sim"):
             tree = ast.parse(path.read_text(encoding="utf-8"))
             for module, lineno in runtime_imports(tree):
                 assert not module.startswith(("src.ui", "src.engine")), (

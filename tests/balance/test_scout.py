@@ -87,6 +87,44 @@ class TestTelemetria:
         )
 
 
+class TestDerrota:
+    """A luta que encerra a run é a que mais informa, e era a única descartada.
+
+    `simulate_run` saía do laço assim que o herói morria, antes de registrar a
+    batalha. Com isso a telemetria via 100% das vitórias e 0% das derrotas: a
+    duração média do combate caía, uma skill usada só na luta fatal aparecia
+    como "escolhida mas nunca usada", e não havia como perguntar o que o herói
+    estava fazendo quando morreu.
+    """
+
+    def test_a_batalha_fatal_e_registrada(self):
+        # Mago pelado, sem usar skill, contra um chefe no andar 1: toda run
+        # morre no primeiro combate. Se a batalha fatal fosse descartada, a
+        # telemetria não teria batalha nenhuma.
+        resultado = simulate_run(
+            "Mage", 20, 20, "greedy", 7, "naked",
+            encounters_per_floor=lambda andar: ["boss_solo"],
+        )
+        telemetria = resultado["telemetry"]
+        assert resultado["mean_floor"] == 0.0, "o cenário precisa matar toda run no andar 1"
+        assert telemetria["defeats"] == 20
+        assert telemetria["battles"] == 20, (
+            "a luta que encerrou a run não entrou na telemetria"
+        )
+        assert telemetria["turns"] > 0
+
+    def test_derrota_conta_a_run_que_o_heroi_nao_terminou(self):
+        runs = 40
+        resultado = simulate_run("Warrior", 20, runs, "smart", 1337, "expected")
+        sobreviventes = round(resultado["reached_20_rate"] * runs)
+        assert resultado["telemetry"]["defeats"] == runs - sobreviventes
+
+    def test_toda_run_derrotada_deixa_pelo_menos_uma_batalha(self):
+        resultado = simulate_run("Warrior", 20, RUNS, "smart", 1337, "expected")
+        telemetria = resultado["telemetry"]
+        assert telemetria["battles"] >= telemetria["defeats"] > 0
+
+
 class TestAblacao:
     """Desligar um sistema precisa realmente desligá-lo."""
 
@@ -156,6 +194,29 @@ class TestRelatorio:
             findings=scout.analyse_skills(telemetria), baseline_mean_floor=5.0,
         )
         assert json.dumps(relatorio.to_dict())
+
+
+class TestAmostraPequena:
+    """Carta ausente por sorteio não é carta ausente do jogo.
+
+    A oferta de passiva é ponderada por raridade: uma Lendária pesa 2 contra 60
+    de uma Comum. Numa amostra curta ela falta porque o sorteio não calhou, e
+    declarar isso "conteúdo morto" manda corrigir um problema que não existe.
+    """
+
+    def test_amostra_curta_nao_declara_carta_morta(self):
+        curta = {"passives": {"offered": {"coracao_ferro": 40},
+                              "picked": {"coracao_ferro": 40}}}
+        assuntos = {f.subject for f in scout.analyse_passives(curta)}
+        assert "nunca sorteadas" not in assuntos
+
+    def test_amostra_longa_ainda_acusa_carta_morta(self):
+        # A guarda não pode virar desculpa: com amostra grande a ausência volta
+        # a ser achado.
+        longa = {"passives": {"offered": {"coracao_ferro": 4000},
+                              "picked": {"coracao_ferro": 4000}}}
+        mortas = [f for f in scout.analyse_passives(longa) if f.subject == "nunca sorteadas"]
+        assert mortas and mortas[0].value > 0
 
 
 class TestPoliticasDeEscolha:
@@ -244,6 +305,34 @@ class TestPoliticasDeEscolha:
         assert set(comparacao.mean_floor_by_policy) == set(POLICIES)
         assert comparacao.passive_pick_rate, "nenhuma taxa de escolha de passiva registrada"
         assert isinstance(comparacao.choice_value(), float)
+
+    def test_carta_sem_amostra_nao_e_confundida_com_carta_recusada(self):
+        """Falta de oferta e recusa do jogador são causas diferentes.
+
+        A carta que uma política ofereceu pouco fica de fora da tabela daquela
+        política. Lida como taxa zero, ela era condenada como fraca — e o viés
+        não é aleatório: as intenções que morrem mais raso nunca chegam às
+        cartas de fim de jogo, então eram sempre elas as condenadas.
+        """
+        comparacao = scout.PolicyComparison()
+        comparacao.mean_floor_by_policy = {nome: 8.0 for nome in POLICIES}
+        # `apocalipse` só tem taxa numa intenção; `cutelada` tem em todas.
+        comparacao.skill_pick_rate = {
+            "survival": {"cutelada": 0.0},
+            "offense": {"cutelada": 0.0},
+            "economy": {"cutelada": 0.0, "apocalipse": 1.0},
+            "random": {},
+        }
+        por_assunto = {
+            f.subject: f.detail
+            for f in scout._analyse_cards(comparacao.skill_pick_rate, "skills")
+        }
+
+        assert "Apocalipse" in por_assunto.get("sem amostra suficiente", "")
+        assert "Apocalipse" not in por_assunto.get("recusadas por toda intenção", "")
+        assert "Apocalipse" not in por_assunto.get("cartas de identidade", "")
+        # A carta com amostra em todas continua sendo julgada.
+        assert "Cutelada" in por_assunto.get("recusadas por toda intenção", "")
 
     def test_comparacao_gera_achados_classificando_cartas(self):
         comparacao = scout.compare_pick_policies(

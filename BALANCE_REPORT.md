@@ -149,6 +149,20 @@ sinal de que a medição estava quebrada, e ele sumiu junto com o defeito: todos
 os seis sistemas agora perdem profundidade ao serem desligados. Ver
 `TestReprodutibilidade` em `tests/balance/test_invariants.py`.
 
+### Mais dois defeitos do medidor, encontrados na reauditoria
+
+**A batalha que encerrava a run não era registrada.** `simulate_run` saía do
+laço assim que o herói morria, antes de chamar `record_battle`: a telemetria via
+100% das vitórias e 0% das derrotas — 562 combates de 30.759. A correção
+acrescentou `defeats` à telemetria, então agora dá para perguntar o que o herói
+fazia quando morreu. A duração média do combate praticamente não mudou (9,93
+para 9,90 turnos): ao contrário do que eu esperava, a luta fatal é **mais
+curta** que a média, porque o herói superado morre rápido.
+
+**Carta sem amostra era lida como carta recusada.** O scout descarta a carta
+oferecida menos de dez vezes, e depois tratava a ausência como taxa zero. Agora
+ela entra num grupo próprio, "sem amostra suficiente", em vez de ser condenada.
+
 ### O que o scout encontra agora
 
 250 runs por classe, ablação com 150, comparação de intenções com 150
@@ -198,10 +212,19 @@ build mais fraca.
 A comparação entre intenções também reclassifica cartas que uma política só
 condenava por engano. Das 29 passivas, apenas **uma** é recusada por toda
 intenção (Reflexos Rápidos); **20** são levadas por exatamente uma intenção, o
-que é identidade saudável e não deve ser mexido. Nas skills, **11** são
+que é identidade saudável e não deve ser mexido. Nas skills, **10** são
 recusadas por todas — essas são fracas de verdade — e **Assassinato** e
 **Explosão Arcana** são levadas por todas, ou seja, não são opção: são a
 resposta certa.
+
+Outras **5** skills ficam explicitamente **sem julgamento** (Apocalipse,
+Esmagar, Imortal, Morte Súbita, Ressurgir): pelo menos uma intenção não as
+ofereceu dez vezes, e sem amostra não há taxa. O scout classificava essas
+cartas como se a taxa fosse zero, e o viés não era aleatório — `survival` e
+`offense` morrem mais raso e nunca chegam aos níveis em que as cartas de fim de
+jogo aparecem, então eram sempre elas as condenadas. `Ressurgir` estava na lista
+de fracas por esse motivo, e `Apocalipse` e `Morte Súbita` estavam na de
+identidade. Para julgá-las, `--policy-iterations` maior.
 
 ## Como reproduzir
 

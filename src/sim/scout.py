@@ -22,6 +22,12 @@ from dataclasses import dataclass, field
 
 from src.content.passives import load_passives
 from src.content.skills_loader import load_skills
+from src.shared.constants import (
+    PASSIVE_COMMON_WEIGHT,
+    PASSIVE_EPIC_WEIGHT,
+    PASSIVE_LEGENDARY_WEIGHT,
+    PASSIVE_RARE_WEIGHT,
+)
 from src.sim.harness import ALL_CLASSES, simulate_run
 from src.sim.pick_policies import DELIBERATE_POLICIES, POLICIES
 from src.sim.toggles import ABLATION_SYSTEMS, Toggles
@@ -30,8 +36,21 @@ from src.sim.toggles import ABLATION_SYSTEMS, Toggles
 # veredito: é o que merece um segundo olhar.
 OUTLIER_HIGH = 2.0
 OUTLIER_LOW = 0.4
+# Os mesmos pesos que `generate_passive_choices` usa para sortear a oferta.
+RARITY_WEIGHTS = {
+    "Common": PASSIVE_COMMON_WEIGHT,
+    "Rare": PASSIVE_RARE_WEIGHT,
+    "Epic": PASSIVE_EPIC_WEIGHT,
+    "Legendary": PASSIVE_LEGENDARY_WEIGHT,
+}
 # Abaixo desta taxa de escolha, uma carta oferecida é conteúdo que ninguém quer.
 LOW_PICK_RATE = 0.15
+# Ofertas mínimas para que a taxa de escolha signifique alguma coisa. Abaixo
+# disso a carta não é julgada: é declarada sem amostra.
+MIN_OFFERS_FOR_RATE = 10
+# Quantas aparições a amostra precisava prever antes de a ausência de uma carta
+# significar "conteúdo morto" em vez de "sorteio não calhou".
+MIN_EXPECTED_OFFERS = 3.0
 # Um sistema cuja remoção muda a profundidade média menos que isto não está
 # sustentando nada.
 NEGLIGIBLE_ABLATION_FLOORS = 0.5
@@ -175,7 +194,7 @@ def _pick_rates(bloco: dict) -> dict[str, float]:
     return {
         cid: picked.get(cid, 0) / vezes
         for cid, vezes in offered.items()
-        if vezes >= 10
+        if vezes >= MIN_OFFERS_FOR_RATE
     }
 
 
@@ -233,6 +252,15 @@ def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str
     ignorada por todas as intenções é carta fraca; levada por todas é a resposta
     certa disfarçada de escolha; levada por uma só é identidade de build, que é
     exatamente o que se quer e não deve ser mexido.
+
+    Só entra na classificação a carta que **toda** política deliberada ofereceu
+    o bastante para render uma taxa. Antes, a carta ausente da tabela de uma
+    política era lida como taxa zero — descartada por falta de amostra e
+    recusada pelo jogador viravam a mesma coisa. O viés não era aleatório:
+    `survival` e `offense` morrem mais raso e nunca chegam aos níveis em que as
+    cartas de fim de jogo são oferecidas, então eram justamente elas que
+    apareciam como fracas. `ressurgir` era condenada assim, e `apocalipse` e
+    `morte_subita` eram promovidas a "identidade" pelo mesmo engano.
     """
     from src.content.passives import load_passives
     from src.content.skills_loader import load_skills
@@ -246,11 +274,15 @@ def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str
         return []
 
     todas_cartas = {cid for nome in deliberadas for cid in taxas_por_politica[nome]}
-    fracas, universais, identidade = [], [], []
+    fracas, universais, identidade, sem_amostra = [], [], [], []
 
     for cid in sorted(todas_cartas):
-        taxas = [taxas_por_politica[n].get(cid, 0.0) for n in deliberadas]
         nome = catalogo.get(cid, cid)
+        ausentes = [n for n in deliberadas if cid not in taxas_por_politica[n]]
+        if ausentes:
+            sem_amostra.append(nome)
+            continue
+        taxas = [taxas_por_politica[n][cid] for n in deliberadas]
         if max(taxas) <= LOW_PICK_RATE:
             fracas.append(nome)
         elif min(taxas) >= UNIVERSAL_PICK_RATE:
@@ -277,6 +309,14 @@ def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str
             sistema, "cartas de identidade", "ok",
             f"{len(identidade)} escolhidas por uma intenção só: " + ", ".join(identidade[:8]),
             len(identidade),
+        ))
+    if sem_amostra:
+        achados.append(Finding(
+            sistema, "sem amostra suficiente", "referência",
+            f"{len(sem_amostra)} cartas oferecidas menos de {MIN_OFFERS_FOR_RATE}x a alguma "
+            f"intenção, não classificadas: " + ", ".join(sem_amostra[:8])
+            + " — aumente --policy-iterations para julgá-las",
+            len(sem_amostra),
         ))
     return achados
 
@@ -376,7 +416,18 @@ def analyse_passives(telemetry: dict) -> list[Finding]:
                 taxa,
             ))
 
-    nunca_ofertadas = [catalogo[pid].name for pid in catalogo if pid not in offered]
+    # Conteúdo morto e amostra pequena produzem o mesmo sintoma — a carta não
+    # aparece —, mas só o primeiro é problema. `generate_passive_choices` é
+    # ponderada por raridade: uma Lendária vale 2 contra 60 de uma Comum, então
+    # numa amostra curta ela falta por sorteio, não por estar fora da tabela.
+    # Só é declarada morta a carta que a amostra deveria ter mostrado.
+    total_ofertas = sum(offered.values())
+    nunca_ofertadas = [
+        catalogo[pid].name for pid in catalogo
+        if pid not in offered
+        and _ofertas_esperadas(catalogo[pid], catalogo.values(), total_ofertas)
+        >= MIN_EXPECTED_OFFERS
+    ]
     if nunca_ofertadas:
         achados.append(Finding(
             "passivas", "nunca sorteadas", "morta",
@@ -384,6 +435,14 @@ def analyse_passives(telemetry: dict) -> list[Finding]:
             len(nunca_ofertadas),
         ))
     return achados
+
+
+def _ofertas_esperadas(carta, catalogo, total_ofertas: int) -> float:
+    """Quantas vezes a carta deveria ter aparecido, dada a amostra e a raridade."""
+    pesos = sum(RARITY_WEIGHTS.get(c.rarity, 1) for c in catalogo)
+    if not pesos:
+        return 0.0
+    return total_ofertas * RARITY_WEIGHTS.get(carta.rarity, 1) / pesos
 
 
 def analyse_equipment(telemetry: dict) -> list[Finding]:
@@ -588,8 +647,11 @@ def format_report(report: ScoutReport) -> str:
         if not do_sistema:
             continue
         linhas.append(f"\n{sistema.upper()}")
-        suspeitas = [f for f in do_sistema if f.verdict in ("SUSPEITA", "morta")]
-        resto = [f for f in do_sistema if f not in suspeitas]
+        # Particiona numa passada. Com `f not in suspeitas`, o `in` comparava
+        # `Finding` por valor — dois achados de campos iguais colapsariam num só.
+        suspeitas, resto = [], []
+        for achado in do_sistema:
+            (suspeitas if achado.verdict in ("SUSPEITA", "morta") else resto).append(achado)
         linhas += [f.line() for f in suspeitas + resto]
 
     if report.ablation:

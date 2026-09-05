@@ -9,49 +9,50 @@
   "baseline_mean_floor": 7.739999999999999,
   "telemetry": {
     "runs": 750,
-    "battles": 30197,
-    "turns": 299904,
+    "battles": 30759,
+    "turns": 304475,
+    "defeats": 562,
     "skills": {
       "uses": {
-        "investida": 16269,
-        "escudo_protetor": 943,
-        "golpe_poderoso": 806,
+        "investida": 16278,
+        "escudo_protetor": 966,
+        "golpe_poderoso": 809,
         "furia": 1419,
-        "fortalecimento": 1068,
+        "fortalecimento": 1069,
         "imortal": 55,
         "esmagar": 51,
         "grito_guerra": 2,
-        "bola_fogo": 18761,
-        "drenar_vida": 53,
-        "escudo_magico": 26,
-        "missil_magico": 162,
-        "barreira_arcana": 1883,
+        "bola_fogo": 18851,
+        "drenar_vida": 58,
+        "escudo_magico": 38,
+        "missil_magico": 166,
+        "barreira_arcana": 1898,
         "ressurgir": 5,
-        "golpe_baixo": 576,
-        "ataque_furtivo": 12384,
-        "evasao": 113,
-        "sombra_rapida": 308,
-        "envenenar": 379,
+        "golpe_baixo": 606,
+        "ataque_furtivo": 12398,
+        "evasao": 143,
+        "sombra_rapida": 338,
+        "envenenar": 386,
         "assassinato": 4293,
-        "passo_felino": 2821
+        "passo_felino": 2825
       },
       "damage": {
-        "investida": 13980791,
+        "investida": 13981837,
         "escudo_protetor": 0,
-        "golpe_poderoso": 436739,
+        "golpe_poderoso": 437615,
         "furia": 0,
         "fortalecimento": 0,
         "imortal": 0,
         "esmagar": 86939,
         "grito_guerra": 0,
-        "bola_fogo": 14469927,
+        "bola_fogo": 14487045,
         "drenar_vida": 0,
         "escudo_magico": 0,
-        "missil_magico": 56399,
+        "missil_magico": 57873,
         "barreira_arcana": 0,
         "ressurgir": 0,
         "golpe_baixo": 0,
-        "ataque_furtivo": 10533227,
+        "ataque_furtivo": 10536048,
         "evasao": 0,
         "sombra_rapida": 0,
         "envenenar": 0,
@@ -59,27 +60,27 @@
         "passo_felino": 0
       },
       "mp": {
-        "investida": 325380,
-        "escudo_protetor": 23575,
-        "golpe_poderoso": 12090,
+        "investida": 325560,
+        "escudo_protetor": 24150,
+        "golpe_poderoso": 12135,
         "furia": 56760,
-        "fortalecimento": 26700,
+        "fortalecimento": 26725,
         "imortal": 3300,
         "esmagar": 2550,
         "grito_guerra": 40,
-        "bola_fogo": 469025,
-        "drenar_vida": 1590,
-        "escudo_magico": 650,
-        "missil_magico": 3240,
-        "barreira_arcana": 47075,
+        "bola_fogo": 471275,
+        "drenar_vida": 1740,
+        "escudo_magico": 950,
+        "missil_magico": 3320,
+        "barreira_arcana": 47450,
         "ressurgir": 300,
-        "golpe_baixo": 8640,
-        "ataque_furtivo": 272448,
-        "evasao": 2260,
-        "sombra_rapida": 5544,
-        "envenenar": 7580,
+        "golpe_baixo": 9090,
+        "ataque_furtivo": 272756,
+        "evasao": 2860,
+        "sombra_rapida": 6084,
+        "envenenar": 7720,
         "assassinato": 171720,
-        "passo_felino": 70525
+        "passo_felino": 70625
       },
       "offered": {
         "provocacao": 976,
@@ -126,7 +127,7 @@
         "assassinato": 87,
         "cortina_fumaca": 51
       },
-      "basic_damage": 26103574
+      "basic_damage": 26250916
     },
     "passives": {
       "offered": {
@@ -214,7 +215,7 @@
       "gold_unspent": 4461372
     },
     "consumables": {
-      "max_hp": 4047
+      "max_hp": 4163
     },
     "essence": {
       "rolls": 6367,
@@ -368,7 +369,7 @@
       "subject": "ataque básico",
       "verdict": "referência",
       "detail": "38% do dano total sai do ataque gratuito",
-      "value": 0.3755497417736878
+      "value": 0.37674443629955384
     },
     {
       "system": "passivas",
@@ -556,8 +557,8 @@
       "system": "skills",
       "subject": "recusadas por toda intenção",
       "verdict": "morta",
-      "detail": "11 cartas: Cura Menor, Cutelada, Dreno de Mana, Evasão Perfeita, Fantasma, Lançar Adaga, Provocação, Raio Congelante",
-      "value": 11
+      "detail": "10 cartas: Cura Menor, Cutelada, Dreno de Mana, Evasão Perfeita, Fantasma, Lançar Adaga, Provocação, Raio Congelante",
+      "value": 10
     },
     {
       "system": "skills",
@@ -570,8 +571,15 @@
       "system": "skills",
       "subject": "cartas de identidade",
       "verdict": "ok",
-      "detail": "9 escolhidas por uma intenção só: Apocalipse, Barreira Arcana, Cortina de Fumaça, Fortalecimento, Fúria, Golpe Duplo, Golpe nas Sombras, Morte Súbita",
-      "value": 9
+      "detail": "7 escolhidas por uma intenção só: Barreira Arcana, Cortina de Fumaça, Fortalecimento, Fúria, Golpe Duplo, Golpe nas Sombras, Relâmpago",
+      "value": 7
+    },
+    {
+      "system": "skills",
+      "subject": "sem amostra suficiente",
+      "verdict": "referência",
+      "detail": "5 cartas oferecidas menos de 10x a alguma intenção, não classificadas: Apocalipse, Esmagar, Imortal, Morte Súbita, Ressurgir — aumente --policy-iterations para julgá-las",
+      "value": 5
     }
   ],
   "ablation": [
@@ -855,5 +863,5 @@
       }
     }
   },
-  "elapsed_seconds": 286.98
+  "elapsed_seconds": 281.86
 }

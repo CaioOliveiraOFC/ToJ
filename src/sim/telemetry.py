@@ -69,6 +69,10 @@ class RunTelemetry:
     # --- Combate ---
     battles: int = 0
     turns: int = 0
+    # Runs que terminaram com o herói morto. Separar vitória de derrota é o que
+    # permite perguntar "o que ele estava fazendo quando morreu" — a pergunta
+    # mais útil num jogo de permadeath.
+    defeats: int = 0
 
     def record_battle(self, outcome) -> None:
         """Soma o que uma batalha entregou, por skill e por consumível."""
@@ -104,6 +108,7 @@ class RunTelemetry:
             "runs": self.runs,
             "battles": self.battles,
             "turns": self.turns,
+            "defeats": self.defeats,
             "skills": {
                 "uses": dict(self.skill_uses),
                 "damage": dict(self.skill_damage),

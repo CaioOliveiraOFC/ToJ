@@ -266,11 +266,16 @@ def simulate_run(
                 # justamente a defasagem que cria a dificuldade crescente.
                 monsters = build_encounter(name, floor)
                 outcome = run_battle(hero, monsters, lambda h, m, t: decide(h, m, t), rng=rng, publish=None)
+                # Registrar ANTES de checar a morte. Sair primeiro descartava a
+                # luta que encerra a run — 100% das derrotas — e com ela o que o
+                # herói fez no combate mais difícil que enfrentou: a duração
+                # média caía, e uma skill usada só na luta fatal aparecia como
+                # "escolhida mas nunca usada".
+                if telemetry is not None:
+                    telemetry.record_battle(outcome)
                 if not hero.get_isalive() or hero.get_hp() <= 0:
                     died = True
                     break
-                if telemetry is not None:
-                    telemetry.record_battle(outcome)
                 if outcome.hero_won:
                     _award(hero, monsters, essence, rng, cfg, telemetry, picker)
 
@@ -294,6 +299,10 @@ def simulate_run(
         passives_at_end.append(len(hero.passives))
         if telemetry is not None:
             telemetry.runs += 1
+            # Pelo estado do herói, não pela bandeira `died`: ela só cobre a
+            # morte em combate, e o Altar também mata — a derrota no evento
+            # ficaria de fora da contagem.
+            telemetry.defeats += int(not hero.get_isalive() or hero.get_hp() <= 0)
             telemetry.gold_unspent += hero.coins
             telemetry.final_power_equipped.append(hero.get_avg_damage())
             telemetry.final_power_naked.append(_power_without_equipment(hero))

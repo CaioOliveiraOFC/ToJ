@@ -22,6 +22,9 @@ RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
 
 DADOS = sorted((RAIZ / "src" / "data").glob("*.json"))
+# Sem isto, mover `src/data/` transformaria os testes abaixo em zero casos
+# parametrizados — nada a executar, nada a falhar, suíte verde.
+assert DADOS, "nenhum JSON encontrado em src/data/: os testes abaixo não rodariam."
 
 # Assinatura de UTF-8 lido como latin-1: um 'Ã' ou 'Â' seguido de um byte de
 # continuação. Em português correto, 'Ã' só ocorre em maiúsculas isoladas

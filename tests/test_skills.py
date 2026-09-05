@@ -1,64 +1,109 @@
-"""Teste rápido do sistema de skills."""
+"""Catálogo de skills: carga, skills iniciais e geração de escolhas.
+
+Este arquivo já existiu com quatro testes que só chamavam `print()`. Eles
+passavam desde que nada levantasse exceção — quatro testes verdes que não
+verificavam nada, e um `__main__` que imprimia "todos os testes passaram" sem
+ter checado uma linha. Cada `print` daqui virou a asserção do que ele mostrava.
+"""
+
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.content.skills_loader import generate_skill_choices, get_initial_skills, load_skills
-from src.entities.heroes import Mage, Rogue, Warrior
+from src.content.skills_loader import (  # noqa: E402
+    generate_skill_choices,
+    get_initial_skills,
+    get_skills_for_class,
+    load_skills,
+)
+from src.entities.heroes import Mage, Rogue, Warrior  # noqa: E402
+from src.shared.constants import INITIAL_SKILL_LEVELS  # noqa: E402
+
+CLASSES = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 
 
-def test_load_skills():
-    print("=== Teste 1: Carregar skills ===")
+def test_catalogo_carrega_sem_id_repetido():
     skills = load_skills()
-    print(f"Total de skills: {len(skills)}")
+    assert skills, "nenhuma skill carregada"
+    ids = [s.id for s in skills]
+    assert len(ids) == len(set(ids)), "id de skill repetido no JSON"
 
-    # Verifica skills por classe
-    for cls in ["Warrior", "Mage", "Rogue"]:
-        class_skills = [s for s in skills if s.skill_class == cls]
-        initial = [s for s in class_skills if s.is_initial]
-        print(f"{cls}: {len(class_skills)} total, {len(initial)} iniciais")
-    print()
 
-def test_initial_skills():
-    print("=== Teste 2: Skills iniciais ===")
-    for cls_name, cls in [("Warrior", Warrior), ("Mage", Mage), ("Rogue", Rogue)]:
-        player = cls("Teste")
-        initial = get_initial_skills(cls_name)
-        print(f"{cls_name}: {len(initial)} skills iniciais")
-        for s in initial:
-            print(f"  - {s.name} (id: {s.id}, level: {s.level_required})")
-    print()
+@pytest.mark.parametrize("classe", sorted(CLASSES))
+def test_toda_classe_tem_skills_iniciais(classe):
+    iniciais = get_initial_skills(classe)
+    assert iniciais, f"{classe} não tem skill inicial"
+    assert all(s.is_initial for s in iniciais)
+    assert all(s.skill_class == classe for s in iniciais)
+    assert len(iniciais) == INITIAL_SKILL_LEVELS, (
+        f"{classe} tem {len(iniciais)} iniciais e o herói aprende uma por nível "
+        f"até o {INITIAL_SKILL_LEVELS}: alguém ficaria com slot vazio ou skill sobrando."
+    )
 
-def test_skill_choices():
-    print("=== Teste 3: Geração de escolhas ===")
-    for cls in ["Warrior", "Mage", "Rogue"]:
-        choices = generate_skill_choices(cls, 5, [], count=3)
-        print(f"{cls} nível 5: {len(choices)} escolhas")
-        for c in choices:
-            print(f"  - {c.name} (raridade: {c.rarity}, nível: {c.level_required})")
-    print()
 
-def test_player_flow():
-    print("=== Teste 4: Fluxo do Player ===")
-    player = Warrior("Teste")
-    print(f"Criado: {player.get_nick_name()} (Classe: {player.get_classname()})")
-    print(f"Skills iniciais: {len(player.skills)}")
-    for k, v in player.skills.items():
-        print(f"  Slot {k}: {v.name}")
+@pytest.mark.parametrize("classe", sorted(CLASSES))
+def test_escolhas_sao_unicas_e_da_classe(classe):
+    escolhas = generate_skill_choices(classe, player_level=11, player_skill_ids=[], count=3)
+    assert len(escolhas) == 3
+    assert len({s.id for s in escolhas}) == 3, "a mesma carta foi oferecida duas vezes"
+    for skill in escolhas:
+        assert skill.skill_class == classe
+        assert not skill.is_initial, "skill inicial não deve aparecer no menu de escolha"
+        assert skill.level_required <= 11, "carta acima do nível do herói foi oferecida"
 
-    # Simula level up
-    print("\nSimulando level up para 2...")
-    player.level = 2
-    msgs = player.learn_new_skills(show=True)
-    for m in msgs:
-        print(f"  {m}")
-    print(f"Skills agora: {len(player.skills)}")
-    print()
 
-if __name__ == "__main__":
-    test_load_skills()
-    test_initial_skills()
-    test_skill_choices()
-    test_player_flow()
-    print("=== Todos os testes passaram! ===")
+@pytest.mark.parametrize("classe", sorted(CLASSES))
+def test_o_menu_so_enche_a_partir_do_nivel_9(classe):
+    """O catálogo não sustenta um menu de três cartas quando ele começa.
+
+    `SKILL_CHOICE_MIN_LEVEL` é 5, e no nível 5 existem só duas cartas
+    candidatas nas três classes: a primeira escolha do jogo mostra duas opções
+    num menu de três. No nível 7 são exatamente três — escolher entre todas as
+    cartas que existem não é escolher. Só a partir do 9 há mais candidatas que
+    vagas.
+
+    Isto é lacuna de conteúdo, não defeito de código: `generate_skill_choices`
+    devolve o que existe. O teste fixa o número para que subir o catálogo
+    apareça aqui em vez de passar despercebido.
+    """
+    candidatas = {
+        nivel: len([
+            s for s in get_skills_for_class(classe)
+            if not s.is_initial and s.level_required <= nivel
+        ])
+        for nivel in (5, 7, 9)
+    }
+    assert candidatas == {5: 2, 7: 3, 9: 4}, (
+        f"{classe}: o catálogo mudou ({candidatas}). Se aumentou, o menu do "
+        "nível 5 finalmente oferece escolha — atualize este número."
+    )
+    assert len(generate_skill_choices(classe, 5, [], count=3)) == candidatas[5]
+
+
+@pytest.mark.parametrize("classe", sorted(CLASSES))
+def test_escolha_nunca_repete_o_que_o_heroi_ja_tem(classe):
+    disponiveis = [
+        s for s in get_skills_for_class(classe) if not s.is_initial and s.level_required <= 20
+    ]
+    conhecidas = [s.id for s in disponiveis[:2]]
+    escolhas = generate_skill_choices(classe, 20, conhecidas, count=3)
+    assert not ({s.id for s in escolhas} & set(conhecidas))
+
+
+@pytest.mark.parametrize("classe,cls", sorted(CLASSES.items()))
+def test_subir_de_nivel_entrega_a_proxima_skill_inicial(classe, cls):
+    heroi = cls("Teste")
+    antes = dict(heroi.skills)
+    heroi.level = heroi.level + 1
+    mensagens = heroi.learn_new_skills(show=True)
+
+    assert len(heroi.skills) == len(antes) + 1, "subir de nível não entregou skill nova"
+    assert mensagens, "o herói aprendeu uma skill e não avisou ninguém"
+    nova = set(heroi.skills.values()) - set(antes.values())
+    assert len(nova) == 1
+    assert next(iter(nova)).is_initial
