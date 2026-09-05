@@ -140,13 +140,26 @@ def smart_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None 
     ratio = _hp_ratio(hero)
     heal_skills = _usable_skills(hero, ("heal",))
     potions = _healing_potions(hero)
+    letal = _golpe_letal(hero, living)
 
-    # 1. Sobreviver. Cura antes de qualquer coisa.
-    if ratio < HEAL_HP_RATIO:
+    # 1. Sobreviver — mas matar vem antes de curar quando o golpe é letal.
+    #
+    #    Sem essa checagem o bot cura sempre que cai abaixo do limiar, mesmo com
+    #    o inimigo a um golpe da morte. Contra um alvo de dano alto isso vira
+    #    espiral: cura, toma dano, cura de novo. O Mago gastava 231 dos 840
+    #    turnos de skill curando na luta contra o glass cannon do andar 3, e
+    #    levava 5,0 turnos onde o Ladino levava 2,7 — daí uma taxa de vitória de
+    #    44,8% contra 99,8%. Não era fraqueza da classe: era o bot medindo mal o
+    #    próprio jogo, e a calibração saiu em cima disso.
+    if ratio < HEAL_HP_RATIO and letal is None:
         if heal_skills:
             return Action(kind="skill", target=hero, skill=heal_skills[0])
         if potions:
             return Action(kind="item", item=potions[0])
+
+    if letal is not None:
+        alvo, skill = letal
+        return Action(kind="skill" if skill else "attack", target=alvo, skill=skill)
 
     # 2. Fugir de combate perdido em vez de morrer nele.
     if ratio < FLEE_HP_RATIO and not heal_skills and not potions:
@@ -211,6 +224,25 @@ def smart_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None 
         return Action(kind="skill", target=target, skill=best_skill)
 
     return Action(kind="attack", target=target)
+
+
+def _golpe_letal(hero, living: list):
+    """O alvo que morre neste turno, e com o quê. `None` se nenhum morre.
+
+    Devolve `(alvo, skill)`, com `skill=None` quando o ataque básico já basta —
+    ele é gratuito, então nunca vale gastar mana para matar quem o básico mata.
+    O último ponto de vida do inimigo vale o mesmo que o primeiro: um turno
+    gasto curando com o alvo a um golpe da morte é um turno de dano recebido a
+    troco de nada.
+    """
+    for alvo in living:
+        if _estimate_basic_damage(hero, alvo) >= alvo.get_hp():
+            return alvo, None
+    for alvo in living:
+        for skill in _usable_skills(hero, ("damage",)):
+            if _estimate_skill_damage(hero, skill, alvo) >= alvo.get_hp():
+                return alvo, skill
+    return None
 
 
 def _mp_ratio(hero) -> float:

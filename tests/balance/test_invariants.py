@@ -24,6 +24,7 @@ from src.content.skills_loader import load_skills  # noqa: E402
 from src.entities.heroes import POTION_BUFFS, POTION_STATUSES  # noqa: E402
 from src.mechanics import combat as cmb  # noqa: E402
 from src.shared import effects as fx  # noqa: E402
+from src.sim.encounters import build_encounter  # noqa: E402
 from src.sim.harness import ALL_CLASSES, make_hero, simulate, simulate_run  # noqa: E402
 from src.sim.metrics import curve_deltas  # noqa: E402
 from tests.balance import thresholds as T  # noqa: E402
@@ -438,6 +439,58 @@ class TestArquetipos:
 
 
 # ------------------------------------------------------------------ desempenho
+
+
+class TestGolpeLetal:
+    """Matar vem antes de curar quando o alvo morre neste turno.
+
+    O bot curava sempre que caía abaixo do limiar, mesmo com o inimigo a um
+    golpe da morte. Contra alvo de dano alto isso vira espiral: cura, toma
+    dano, cura de novo. O Mago gastava 231 dos 840 turnos de skill curando na
+    luta contra o glass cannon do andar 3, levava 5,0 turnos onde o Ladino
+    levava 2,7, e vencia 44,8% contra 99,8%. A classe não era fraca — o bot
+    jogava mal, e a calibração inteira saiu em cima disso.
+    """
+
+    def _cenario(self, classe="Mage", nivel=3):
+        heroi = make_hero(classe, nivel, "expected")
+        alvo = build_encounter("glass_solo", nivel)[0]
+        return heroi, alvo
+
+    def test_com_o_alvo_a_um_golpe_o_bot_ataca_em_vez_de_curar(self):
+        from src.sim.policies import smart_policy
+
+        heroi, alvo = self._cenario()
+        heroi.take_damage(int(heroi.base_hp * 0.80))  # abaixo do limiar de cura
+        alvo.take_damage(alvo.get_hp() - 1)
+
+        acao = smart_policy(heroi, [alvo], turn=3)
+        assert acao.kind in ("attack", "skill")
+        assert getattr(acao.skill, "effect_type", "damage") != "heal", (
+            "o bot curou com o inimigo a um ponto de vida da morte"
+        )
+
+    def test_sem_golpe_letal_o_bot_continua_curando(self):
+        # A regra não pode ter desligado a cura: com o alvo inteiro e o herói
+        # quase morto, curar é a decisão certa.
+        from src.sim.policies import smart_policy
+
+        heroi, alvo = self._cenario()
+        heroi.take_damage(int(heroi.base_hp * 0.80))
+
+        acao = smart_policy(heroi, [alvo], turn=3)
+        curou = acao.kind == "item" or getattr(acao.skill, "effect_type", "") == "heal"
+        assert curou, "o bot ignorou a cura com o alvo de vida cheia"
+
+    def test_o_basico_gratuito_tem_prioridade_sobre_a_skill_letal(self):
+        # Gastar mana para matar quem o ataque básico já mata é mana perdida.
+        from src.sim.policies import smart_policy
+
+        heroi, alvo = self._cenario()
+        alvo.take_damage(alvo.get_hp() - 1)
+
+        acao = smart_policy(heroi, [alvo], turn=3)
+        assert acao.kind == "attack", f"gastou {acao.kind} para matar um alvo com 1 de vida"
 
 
 class TestFidelidadeDoAndar:
