@@ -200,6 +200,28 @@ class TestPoliticasDeEscolha:
             f"todas as intenções levaram a mesma carta: {escolhas}"
         )
 
+    def test_desempate_dentro_do_efeito_e_por_valor(self):
+        """A ordem da oferta não pode decidir entre duas cartas do mesmo efeito.
+
+        `max_hp` tem seis cartas, de +15 a +200. Se a política levasse a
+        primeira da lista, a Lendária apareceria como ignorada em metade das
+        ofertas em que aparece ao lado da Comum — e o scout reportaria um
+        defeito de conteúdo que é, na verdade, defeito do medidor.
+        """
+        import random as _random
+
+        from src.content.passives import get_passive_by_id
+
+        fraca = get_passive_by_id("coracao_ferro")
+        forte = get_passive_by_id("coracao_tita")
+        assert fraca.effect_type == forte.effect_type
+
+        for ordem in ([fraca, forte], [forte, fraca]):
+            escolhida = get_pick_policy("survival").pick_passive(None, ordem, _random.Random(1))
+            assert escolhida.id == forte.id, (
+                f"a oferta {[c.id for c in ordem]} levou a carta mais fraca"
+            )
+
     def test_politica_aleatoria_nao_e_deliberada(self):
         assert POLICIES["random"].deliberate is False
         assert "random" not in DELIBERATE_POLICIES

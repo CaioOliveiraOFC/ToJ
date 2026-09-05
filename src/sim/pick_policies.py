@@ -86,9 +86,15 @@ class PickPolicy:
             return rng.choice(choices)
 
         for efeito in PASSIVE_PRIORITIES[self.name]:
-            for carta in choices:
-                if carta.effect_type == efeito:
-                    return carta
+            mesmas = [c for c in choices if c.effect_type == efeito]
+            if mesmas:
+                # Dentro de um mesmo efeito o valor é comparável (+15 HP e
+                # +200 HP medem a mesma coisa), então o desempate é por valor.
+                # Sem isso a ordem da oferta decidia, e uma Lendária aparecia
+                # como "carta ignorada" metade das vezes em que era oferecida
+                # ao lado da Comum do mesmo tipo — defeito do medidor lido
+                # como defeito do conteúdo.
+                return max(mesmas, key=lambda c: _numeric(c.effect_value))
         return max(choices, key=lambda c: _numeric(c.effect_value))
 
     def pick_skill(self, hero, choices: list, rng: random.Random):
