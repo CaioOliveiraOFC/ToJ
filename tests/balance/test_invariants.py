@@ -440,6 +440,61 @@ class TestArquetipos:
 # ------------------------------------------------------------------ desempenho
 
 
+class TestFidelidadeDoAndar:
+    """O andar simulado precisa ser o andar que o jogo gera.
+
+    A simulação tinha tabela própria para elite: um em todo andar múltiplo de 3,
+    começando no 3. O jogo nunca gera elite antes de
+    `generation.advanced_role_min_floor` e, a partir dali, só com
+    `generation.elite_spawn_chance`. Esse elite inventado era onde a run
+    terminava — 36 das 48 mortes do Guerreiro no andar 3, 66 das 117 do Mago,
+    44 das 53 do Ladino — e o scout reportava a "parede do andar 3" como achado
+    de design. Era o medidor.
+    """
+
+    def test_elite_nao_aparece_antes_do_andar_do_jogo(self):
+        from src.content.factories.monsters import generation_rules
+        from src.sim.harness import _default_floor_plan
+
+        minimo = int(generation_rules()["advanced_role_min_floor"])
+        for _ in range(300):
+            for andar in range(1, minimo):
+                assert "elite_solo" not in _default_floor_plan(andar), (
+                    f"a simulação gerou elite no andar {andar}; o jogo só gera "
+                    f"a partir do {minimo}."
+                )
+
+    def test_frequencia_de_elite_segue_a_chance_do_jogo(self):
+        import random
+
+        from src.content.factories.monsters import generation_rules
+        from src.sim.harness import _default_floor_plan
+
+        regras = generation_rules()
+        chance = float(regras["elite_spawn_chance"])
+        minimo = int(regras["advanced_role_min_floor"])
+        # Andar 6: acima do mínimo e fora do ciclo de chefe, então o elite é o
+        # único sorteio em jogo.
+        random.seed(1337)
+        amostras = 4000
+        com_elite = sum(
+            1 for _ in range(amostras) if "elite_solo" in _default_floor_plan(max(6, minimo))
+        )
+        taxa = com_elite / amostras
+        assert abs(taxa - chance) < 0.03, (
+            f"elite aparece em {taxa:.1%} dos andares, e o jogo gera com {chance:.0%}."
+        )
+
+    def test_chefe_a_cada_cinco_andares_como_no_jogo(self):
+        # `engine/loop.py`: `if dungeon_level % 5 == 0`. Aqui é determinístico,
+        # então uma passada basta.
+        from src.sim.harness import _default_floor_plan
+
+        for andar in range(1, 21):
+            tem_chefe = "boss_solo" in _default_floor_plan(andar)
+            assert tem_chefe == (andar % 5 == 0), f"andar {andar}: chefe {tem_chefe}"
+
+
 class TestReprodutibilidade:
     """Mesma seed, mesmo resultado — senão nenhum número aqui significa nada.
 

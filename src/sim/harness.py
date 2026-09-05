@@ -20,6 +20,7 @@ from src.content.factories.dungeons import (
     apply_fountain_heal,
     roll_random_event,
 )
+from src.content.factories.monsters import generation_rules
 from src.content.shop import Shop
 from src.entities.heroes import Mage, Rogue, Warrior
 from src.mechanics.battle import run_battle
@@ -390,6 +391,15 @@ def _default_floor_plan(floor: int) -> list[str]:
     A faixa importa mais que a contagem: os primeiros andares ensinam com
     encontros isolados, e a partir do andar 6 as composições passam a exigir
     escolha de alvo, que é a decisão tática mais básica que o jogo tem.
+
+    Elite e chefe seguem as regras do jogo, lidas do JSON, e não uma tabela
+    própria. A tabela anterior punha um elite em todo andar múltiplo de 3,
+    começando no 3. O jogo nunca gera elite antes de
+    `generation.advanced_role_min_floor` (andar 4) e, a partir dali, só com
+    `generation.elite_spawn_chance` (12%). O elite do andar 3 era invenção do
+    simulador, e era ele que encerrava a run: 36 das 48 mortes do Guerreiro no
+    andar 3, 66 das 117 do Mago e 44 das 53 do Ladino. A "parede do andar 3" que
+    o scout reportava media o medidor.
     """
     if floor <= 2:
         return ["trash_solo", "trash_solo", "bruiser_solo"]
@@ -404,9 +414,15 @@ def _default_floor_plan(floor: int) -> list[str]:
 
     count = min(len(plan), 3 + floor // 4)
     fights = [plan[(floor + i) % len(plan)] for i in range(count)]
+
+    regras = generation_rules()
+    # Mini-chefe a cada 5 andares, como `engine/loop.py` faz.
     if floor % 5 == 0:
         fights.append("boss_solo")
-    elif floor % 3 == 0:
+    elif (
+        floor >= int(regras["advanced_role_min_floor"])
+        and random.random() < float(regras["elite_spawn_chance"])
+    ):
         fights.append("elite_solo")
     return fights
 

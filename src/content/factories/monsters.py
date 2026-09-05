@@ -62,6 +62,17 @@ def _get_monsters_data() -> dict[str, Any]:
     return load_monsters_data()
 
 
+def generation_rules() -> dict[str, Any]:
+    """Regras de povoamento de andar, como estão no JSON.
+
+    Público porque a simulação de run precisa montar andares com as mesmas
+    regras do jogo. Enquanto ela tinha a própria tabela, o andar 3 simulado
+    trazia um elite garantido que o jogo nunca gera antes do andar 4 — e era
+    esse elite, não o design, que encerrava metade das runs do Mago ali.
+    """
+    return dict(_get_monsters_data()["generation"])
+
+
 def _pick_role(dungeon_level: int) -> str:
     """Sorteia um papel para o andar, respeitando a profundidade mínima.
 
