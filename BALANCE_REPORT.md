@@ -70,17 +70,19 @@ existe para que isso não volte em silêncio.
 ## Resultado
 
 250 runs por classe, política competente, equipamento típico
-(`reports/validation_20260904.json`):
+(`reports/validation_20260905.json`):
 
 | Classe | Andar médio | Mediano | Chega ao andar 20 | Passivas ao fim | Bot que só ataca |
 |---|---:|---:|---:|---:|---:|
-| Guerreiro | 8,1 | 4 | 26,0% | 9,6 | andar médio 1,0 |
-| Mago | 5,8 | 2 | 17,6% | 6,9 | andar médio 0,3 |
-| Ladino | 8,1 | 4 | 23,6% | 9,8 | andar médio 1,0 |
+| Guerreiro | 9,3 | 5 | 32,8% | 11,3 | andar médio 1,2 |
+| Mago | 5,8 | 3 | 16,4% | 6,9 | andar médio 0,3 |
+| Ladino | 8,2 | 4 | 26,0% | 9,9 | andar médio 1,2 |
 
 - O bot que só ataca **não termina a masmorra** em nenhuma classe.
-- Distância entre a melhor e a pior classe: **2,3 andares**.
-- Jogar bem vale de **5,5 a 7,1 andares** de profundidade.
+- Distância entre a melhor e a pior classe: **3,5 andares**, com o Mago
+  consistentemente atrás nas cinco seeds medidas (5,3 a 5,8 contra 8,4 a 9,3 do
+  Guerreiro). É o maior desequilíbrio aberto.
+- Jogar bem vale de **5,4 a 8,1 andares** de profundidade.
 - Duração de combate: trash 3,4 turnos, bruiser 8-12, elite 12-17, chefe 16-24.
 
 **A distribuição é bimodal**, e isso é um achado, não um detalhe: a maioria das
@@ -116,64 +118,105 @@ identidade de build, que é o que se quer. A política `random` é o grupo de
 controle e mede o **valor da escolha**.
 
 ```bash
-python -m src.sim.runner scout --iterations 60                    # atribuição, ~25s
-python -m src.sim.runner scout --iterations 50 --ablate           # + ablação, ~90s
+python -m src.sim.runner scout --iterations 60                    # atribuição rápida, ~40s
+python -m src.sim.runner scout --iterations 250 --policy-iterations 150   # confiável, ~3min
+python -m src.sim.runner scout --iterations 250 --ablate --ablation-iterations 150  # ~5min
 python -m src.sim.runner scout --ablate --per-skill --per-passive # carta a carta, minutos
 python -m src.sim.runner run --pick-policy economy                # calibrar com outra intenção
 ```
 
-### O que o primeiro scout encontrou
+### Correção: os números do primeiro scout mediam ruído
 
-Ablação, em andares de profundidade média perdidos ao desligar o sistema:
+O primeiro scout rodou sobre uma simulação que **não era reproduzível**. O
+harness semeava o `rng` que injeta no combate, mas a camada de conteúdo sorteia
+pelo gerador global do módulo `random` — oferta de carta, nível do monstro,
+spawn de elite, drop, estoque da loja, Essência — e esse nunca era semeado.
+Duas execuções do mesmo comando davam 7,0 e 7,8 de andar médio. Em cinco seeds
+a 60 runs o andar médio do Guerreiro variou de 6,9 a 10,5.
+
+Essa oscilação era maior que quase todo delta que o scout reportava. Três
+conclusões do relatório anterior não sobreviveram à correção, e ficam
+registradas porque o erro é do medidor, não do jogo:
+
+| Afirmação anterior | Medida real |
+|---|---|
+| "Escolher carta vale +0,0 andar — o menu não faz pergunta nenhuma" | **+1,1 andar** sobre sortear ao acaso |
+| "Eventos aleatórios não mudam nada (+0,2)" | **−0,6 andar** ao desligar: pequeno, mas real |
+| "Escolher skill nova piora a run (+0,3)" | **−0,0 andar**: neutro, não prejudicial |
+
+Delta positivo ao desligar um sistema — a run ficar *melhor* sem ele — era o
+sinal de que a medição estava quebrada, e ele sumiu junto com o defeito: todos
+os seis sistemas agora perdem profundidade ao serem desligados. Ver
+`TestReprodutibilidade` em `tests/balance/test_invariants.py`.
+
+### O que o scout encontra agora
+
+250 runs por classe, ablação com 150, comparação de intenções com 150
+(`reports/scout_20260905.json`):
 
 | Sistema desligado | Delta |
 |---|---:|
-| Essência | −3,9 |
-| Passivas | −2,0 |
-| Loja | −2,0 |
-| Loot | −0,9 |
-| Eventos aleatórios | +0,2 |
-| Escolha de skill | +0,3 |
+| Essência | −5,1 |
+| Passivas | −3,5 |
+| Loja | −2,8 |
+| Loot | −1,5 |
+| Eventos aleatórios | −0,6 |
+| Escolha de skill | −0,0 |
 
 Quatro problemas que a métrica de profundidade sozinha não mostrava:
 
 1. **A Essência decide a run mais que qualquer escolha do jogador.** Um
-   multiplicador sorteado, sobre o qual ninguém tem controle, pesa o dobro das
-   passivas. Isso é sorte no lugar de decisão.
-2. **Escolher skill nova piora a run** (+0,3 andar ao desligar). O bot escolhe
+   multiplicador sorteado, sobre o qual ninguém tem controle, pesa mais que as
+   passivas (−5,1 contra −3,5) e multiplica o XP em 1,51x na média. Isso é sorte
+   no lugar de decisão, e é o problema de design mais grave em aberto.
+2. **Escolher skill nova não muda nada** (−0,0 andar ao desligar). O bot leva
    skills Raras e Épicas de dano que depois nunca usa, porque custam mais mana e
-   perdem para o ataque básico no cálculo dele. Cinco skills aparecem como
-   "escolhidas mas nunca usadas".
-3. **Eventos aleatórios não mudam nada** (+0,2). A Fonte cura muito num jogo onde
-   o descanso de andar já cura, e o Altar nunca matou ninguém em 97 aparições.
-4. **83% do ouro nunca é gasto.** A economia não tem no que competir consigo
-   mesma: falta preço alto o bastante ou item bom o bastante para o ouro ter
-   destino.
+   perdem para o ataque básico — que sozinho responde por **38% do dano total**.
+   Três skills aparecem como "escolhidas mas nunca usadas", e **Explosão Arcana**
+   consegue ser as duas coisas: levada por toda intenção e nunca lançada.
+3. **As passivas grandes de HP são resposta óbvia, não escolha.** Coração de Titã
+   é levada em 100% das 54 ofertas, Alma Eterna em 99% de 283, Bênção Divina em
+   98% de 242. O eixo `max_hp` tem seis cartas de +15 a +200 e domina todos os
+   outros efeitos.
+4. **84% do ouro nunca é gasto** (829 mil de 5,29 milhões). A economia não tem no
+   que competir consigo mesma: falta preço alto o bastante ou item bom o
+   bastante para o ouro ter destino.
 
-### O achado mais importante: escolher não vale nada
+### Escolher vale 1,1 andar — mas a calibração usou a pior intenção
 
-Com 80 runs por política, o valor da escolha é **+0,0 andar**: a melhor intenção
-deliberada não vai mais fundo que sortear a carta ao acaso.
+Com 150 runs por política:
 
-    economy 8,1  >  random 8,0  >  survival 7,3  >  offense 7,1
+    economy 9,6  >  random 8,5  >  offense 7,9  >  survival 7,9
 
-O menu de cartas não está fazendo pergunta nenhuma. Vale notar que `survival`,
-a política usada em toda a calibração, é a segunda pior — e a diferença entre
-elas cabe no ruído da amostra, o que reforça o mesmo diagnóstico.
+Escolher de propósito rende **+1,1 andar** sobre sortear a carta ao acaso, então
+o menu de cartas faz pergunta. O que ele revela é outro problema: `survival` —
+a política usada em **toda a calibração** — empata em último, 1,7 andar atrás de
+`economy`. O jogo é mais fácil do que os números de calibração dizem para quem
+constrói pensando em progressão, e a banda de dificuldade foi ajustada contra a
+build mais fraca.
 
-A comparação também reclassifica cartas que uma política só condenava por
-engano. Das 29 passivas, apenas **duas** são recusadas por toda intenção
-(Lâmina Lendária, Reflexos Rápidos); **23** são levadas por exatamente uma
-intenção, o que é identidade saudável e não deve ser mexido. Nas skills, **10**
-são recusadas por todas — essas são fracas de verdade — e **Assassinato** é
-levada por todas, ou seja, não é opção: é a resposta certa.
+A comparação entre intenções também reclassifica cartas que uma política só
+condenava por engano. Das 29 passivas, apenas **uma** é recusada por toda
+intenção (Reflexos Rápidos); **20** são levadas por exatamente uma intenção, o
+que é identidade saudável e não deve ser mexido. Nas skills, **11** são
+recusadas por todas — essas são fracas de verdade — e **Assassinato** e
+**Explosão Arcana** são levadas por todas, ou seja, não são opção: são a
+resposta certa.
 
 ## Como reproduzir
 
+Todo comando é determinístico: a mesma `--seed` devolve o mesmo resultado.
+
 ```bash
-python -m pytest tests/balance -q                     # rápido, 6s
-python -m pytest tests/balance -q -m balance_full     # runs completas, 8s
-python -m src.sim.runner run --iterations 400 --loadout expected
+python -m pytest tests/balance -q                     # invariantes, ~60s
+python -m pytest tests/balance -q -m balance_full     # runs completas
+python -m src.sim.runner run --iterations 250 --loadout expected
 python -m src.sim.runner matrix --iterations 500 --levels 1,10,20
 python -m src.sim.runner compare --against reports/baseline_20260904.json
 ```
+
+**Amostra mínima.** A profundidade da run é bimodal, então a média tem erro
+amostral grande: a 60 runs o andar médio do Guerreiro variou 3,6 andares entre
+seeds; a 250, 0,9. Abaixo de 250 runs por classe, qualquer delta menor que um
+andar é ruído — o scout avisa quando o valor medido é pequeno perto do
+espalhamento entre políticas.

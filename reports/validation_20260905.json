@@ -1,0 +1,1157 @@
+{
+  "kind": "run",
+  "iterations": 250,
+  "seed": 1337,
+  "loadout": "expected",
+  "elapsed_seconds": 50.45,
+  "results": [
+    {
+      "levels_by_floor": {
+        "1": 1.664,
+        "2": 2.752,
+        "3": 4.836633663366337,
+        "4": 6.331288343558282,
+        "5": 8.031746031746032,
+        "6": 9.542857142857143,
+        "7": 10.34,
+        "8": 11.3,
+        "9": 12.666666666666666,
+        "10": 13.989247311827956,
+        "11": 15.191011235955056,
+        "12": 16.693181818181817,
+        "13": 17.75862068965517,
+        "14": 18.941176470588236,
+        "15": 20.132530120481928,
+        "16": 21.182926829268293,
+        "17": 22.097560975609756,
+        "18": 23.304878048780488,
+        "19": 24.182926829268293,
+        "20": 25.195121951219512
+      },
+      "hero_class": "Warrior",
+      "policy": "smart",
+      "loadout": "expected",
+      "iterations": 250,
+      "median_floor": 5.0,
+      "mean_floor": 9.308,
+      "reached_20_rate": 0.328,
+      "survival_by_floor": {
+        "1": 1.0,
+        "2": 1.0,
+        "3": 0.808,
+        "4": 0.652,
+        "5": 0.504,
+        "6": 0.42,
+        "7": 0.4,
+        "8": 0.4,
+        "9": 0.384,
+        "10": 0.372,
+        "11": 0.356,
+        "12": 0.352,
+        "13": 0.348,
+        "14": 0.34,
+        "15": 0.332,
+        "16": 0.328,
+        "17": 0.328,
+        "18": 0.328,
+        "19": 0.328,
+        "20": 0.328
+      },
+      "skills_at_end_mean": 3.82,
+      "passives_at_end_mean": 11.296,
+      "toggles": "completo",
+      "pick_policy": "survival",
+      "telemetry": {
+        "runs": 250,
+        "battles": 12318,
+        "turns": 133187,
+        "skills": {
+          "uses": {
+            "investida": 16269,
+            "escudo_protetor": 943,
+            "golpe_poderoso": 806,
+            "furia": 1419,
+            "fortalecimento": 1068,
+            "imortal": 55,
+            "esmagar": 51,
+            "grito_guerra": 2
+          },
+          "damage": {
+            "investida": 13980791,
+            "escudo_protetor": 0,
+            "golpe_poderoso": 436739,
+            "furia": 0,
+            "fortalecimento": 0,
+            "imortal": 0,
+            "esmagar": 86939,
+            "grito_guerra": 0
+          },
+          "mp": {
+            "investida": 325380,
+            "escudo_protetor": 23575,
+            "golpe_poderoso": 12090,
+            "furia": 56760,
+            "fortalecimento": 26700,
+            "imortal": 3300,
+            "esmagar": 2550,
+            "grito_guerra": 40
+          },
+          "offered": {
+            "provocacao": 976,
+            "cutelada": 977,
+            "fortalecimento": 210,
+            "golpe_duplo": 485,
+            "golpe_devastador": 253,
+            "furia": 70,
+            "resistencia_heroica": 160,
+            "imortal": 13,
+            "esmagar": 16
+          },
+          "picked": {
+            "fortalecimento": 147,
+            "furia": 70,
+            "golpe_devastador": 46,
+            "imortal": 11,
+            "esmagar": 2
+          },
+          "basic_damage": 14925979
+        },
+        "passives": {
+          "offered": {
+            "olho_aguia": 582,
+            "reflexos_rapidos": 277,
+            "sangue_guerreiro": 538,
+            "musculos_aco": 605,
+            "bebida_deuses": 319,
+            "sorte_iniciante": 631,
+            "fome_batalha": 115,
+            "toque_dragao": 107,
+            "furia_berserker": 256,
+            "coracao_ferro": 543,
+            "bencao_divina": 94,
+            "pele_grossa": 608,
+            "passos_leves": 597,
+            "reserva_arcana": 630,
+            "mente_serena": 569,
+            "escudo_fe": 318,
+            "sede_sangue": 91,
+            "lamina_afiada": 267,
+            "maos_midas": 297,
+            "essencia_viva": 278,
+            "alma_eterna": 119,
+            "punho_atordoante": 114,
+            "essencia_fluida": 291,
+            "pele_adamantio": 120,
+            "imortalidade": 19,
+            "coracao_tita": 27,
+            "essencia_pura": 28,
+            "lamina_lendaria": 19,
+            "fortuna_absoluta": 13
+          },
+          "picked": {
+            "sangue_guerreiro": 474,
+            "musculos_aco": 215,
+            "toque_dragao": 54,
+            "coracao_ferro": 377,
+            "bencao_divina": 94,
+            "passos_leves": 107,
+            "pele_grossa": 379,
+            "escudo_fe": 166,
+            "olho_aguia": 134,
+            "alma_eterna": 118,
+            "essencia_fluida": 268,
+            "pele_adamantio": 66,
+            "sede_sangue": 30,
+            "imortalidade": 7,
+            "reflexos_rapidos": 5,
+            "bebida_deuses": 32,
+            "lamina_afiada": 71,
+            "reserva_arcana": 52,
+            "furia_berserker": 107,
+            "coracao_tita": 27,
+            "lamina_lendaria": 9,
+            "essencia_viva": 4,
+            "mente_serena": 25,
+            "fome_batalha": 2,
+            "punho_atordoante": 1
+          }
+        },
+        "equipment": {
+          "items_from_loot": 3634,
+          "items_equipped_from_loot": 648,
+          "items_bought": 2922,
+          "items_equipped_from_shop": 2023,
+          "equipped_by_slot": {
+            "Amulet": 411,
+            "Weapon": 563,
+            "Ring": 413,
+            "Body": 384,
+            "Legs": 385,
+            "Hands": 170,
+            "Helmet": 200,
+            "Shoes": 145
+          },
+          "power_naked_sum": 161281.0,
+          "power_equipped_sum": 192024,
+          "power_samples": 250
+        },
+        "economy": {
+          "gold_earned": 2266830,
+          "gold_on_gear": 192269,
+          "gold_on_consumables": 137987,
+          "gold_unspent": 1936574
+        },
+        "consumables": {
+          "max_hp": 1477
+        },
+        "essence": {
+          "rolls": 2495,
+          "sum": 3395.700000000003,
+          "xp_base": 3399878,
+          "xp_after": 5119076
+        },
+        "events": {
+          "counts": {
+            "merchant": 218,
+            "fountain": 187,
+            "altar": 203
+          },
+          "declined": {
+            "altar": 69
+          },
+          "fountain_healed": 140440,
+          "altar_hp_paid": 103546,
+          "altar_deaths": 0
+        }
+      }
+    },
+    {
+      "levels_by_floor": {
+        "1": 1.7650602409638554,
+        "2": 3.0588235294117645,
+        "3": 5.8,
+        "4": 7.0,
+        "5": 8.8,
+        "6": 10.5,
+        "7": 11.0,
+        "8": 11.666666666666666,
+        "9": 13.0,
+        "10": 14.0,
+        "11": 15.5,
+        "12": 17.0
+      },
+      "hero_class": "Warrior",
+      "policy": "greedy",
+      "loadout": "expected",
+      "iterations": 250,
+      "median_floor": 1.0,
+      "mean_floor": 1.232,
+      "reached_20_rate": 0.0,
+      "survival_by_floor": {
+        "1": 0.664,
+        "2": 0.408,
+        "3": 0.04,
+        "4": 0.032,
+        "5": 0.02,
+        "6": 0.016,
+        "7": 0.012,
+        "8": 0.012,
+        "9": 0.008,
+        "10": 0.008,
+        "11": 0.008,
+        "12": 0.004,
+        "13": 0.0,
+        "14": 0.0,
+        "15": 0.0,
+        "16": 0.0,
+        "17": 0.0,
+        "18": 0.0,
+        "19": 0.0,
+        "20": 0.0
+      },
+      "skills_at_end_mean": 1.88,
+      "passives_at_end_mean": 1.488,
+      "toggles": "completo",
+      "pick_policy": "survival",
+      "telemetry": {
+        "runs": 250,
+        "battles": 1402,
+        "turns": 9497,
+        "skills": {
+          "uses": {},
+          "damage": {},
+          "mp": {},
+          "offered": {
+            "cutelada": 35,
+            "provocacao": 38,
+            "fortalecimento": 9,
+            "golpe_duplo": 9,
+            "golpe_devastador": 6,
+            "resistencia_heroica": 1
+          },
+          "picked": {
+            "fortalecimento": 9
+          },
+          "basic_damage": 617555
+        },
+        "passives": {
+          "offered": {
+            "olho_aguia": 78,
+            "reflexos_rapidos": 31,
+            "sangue_guerreiro": 74,
+            "punho_atordoante": 16,
+            "essencia_fluida": 40,
+            "pele_grossa": 81,
+            "reserva_arcana": 79,
+            "escudo_fe": 41,
+            "musculos_aco": 78,
+            "lamina_afiada": 35,
+            "bebida_deuses": 33,
+            "pele_adamantio": 20,
+            "mente_serena": 81,
+            "sorte_iniciante": 94,
+            "passos_leves": 73,
+            "furia_berserker": 33,
+            "essencia_viva": 37,
+            "lamina_lendaria": 5,
+            "toque_dragao": 11,
+            "coracao_ferro": 80,
+            "alma_eterna": 10,
+            "fome_batalha": 16,
+            "maos_midas": 33,
+            "fortuna_absoluta": 4,
+            "coracao_tita": 5,
+            "bencao_divina": 10,
+            "sede_sangue": 14,
+            "essencia_pura": 2,
+            "imortalidade": 2
+          },
+          "picked": {
+            "sangue_guerreiro": 67,
+            "essencia_fluida": 39,
+            "escudo_fe": 17,
+            "pele_grossa": 48,
+            "musculos_aco": 28,
+            "olho_aguia": 18,
+            "pele_adamantio": 12,
+            "lamina_lendaria": 4,
+            "passos_leves": 6,
+            "toque_dragao": 7,
+            "coracao_ferro": 60,
+            "alma_eterna": 10,
+            "mente_serena": 3,
+            "reserva_arcana": 8,
+            "furia_berserker": 13,
+            "coracao_tita": 5,
+            "bencao_divina": 10,
+            "lamina_afiada": 8,
+            "sede_sangue": 4,
+            "bebida_deuses": 4,
+            "punho_atordoante": 1
+          }
+        },
+        "equipment": {
+          "items_from_loot": 433,
+          "items_equipped_from_loot": 159,
+          "items_bought": 336,
+          "items_equipped_from_shop": 336,
+          "equipped_by_slot": {
+            "Amulet": 101,
+            "Weapon": 170,
+            "Ring": 71,
+            "Legs": 67,
+            "Body": 52,
+            "Helmet": 12,
+            "Hands": 13,
+            "Shoes": 9
+          },
+          "power_naked_sum": 30621.0,
+          "power_equipped_sum": 33271,
+          "power_samples": 250
+        },
+        "economy": {
+          "gold_earned": 57777,
+          "gold_on_gear": 16152,
+          "gold_on_consumables": 0,
+          "gold_unspent": 41625
+        },
+        "consumables": {},
+        "essence": {
+          "rolls": 558,
+          "sum": 718.7999999999998,
+          "xp_base": 86149,
+          "xp_after": 116477
+        },
+        "events": {
+          "counts": {
+            "fountain": 23,
+            "merchant": 33,
+            "altar": 20
+          },
+          "declined": {
+            "altar": 17
+          },
+          "fountain_healed": 7322,
+          "altar_hp_paid": 581,
+          "altar_deaths": 0
+        }
+      }
+    },
+    {
+      "levels_by_floor": {
+        "1": 1.6693548387096775,
+        "2": 2.765432098765432,
+        "3": 5.015873015873016,
+        "4": 6.488636363636363,
+        "5": 8.216666666666667,
+        "6": 9.84,
+        "7": 10.591836734693878,
+        "8": 11.591836734693878,
+        "9": 12.83673469387755,
+        "10": 14.145833333333334,
+        "11": 15.26086956521739,
+        "12": 16.82608695652174,
+        "13": 17.977777777777778,
+        "14": 19.045454545454547,
+        "15": 20.238095238095237,
+        "16": 21.24390243902439,
+        "17": 22.24390243902439,
+        "18": 23.317073170731707,
+        "19": 24.146341463414632,
+        "20": 25.146341463414632
+      },
+      "hero_class": "Mage",
+      "policy": "smart",
+      "loadout": "expected",
+      "iterations": 250,
+      "median_floor": 3.0,
+      "mean_floor": 5.752,
+      "reached_20_rate": 0.164,
+      "survival_by_floor": {
+        "1": 0.992,
+        "2": 0.972,
+        "3": 0.504,
+        "4": 0.352,
+        "5": 0.24,
+        "6": 0.2,
+        "7": 0.196,
+        "8": 0.196,
+        "9": 0.196,
+        "10": 0.192,
+        "11": 0.184,
+        "12": 0.184,
+        "13": 0.18,
+        "14": 0.176,
+        "15": 0.168,
+        "16": 0.164,
+        "17": 0.164,
+        "18": 0.164,
+        "19": 0.164,
+        "20": 0.164
+      },
+      "skills_at_end_mean": 3.46,
+      "passives_at_end_mean": 6.928,
+      "toggles": "completo",
+      "pick_policy": "survival",
+      "telemetry": {
+        "runs": 250,
+        "battles": 7286,
+        "turns": 62162,
+        "skills": {
+          "uses": {
+            "bola_fogo": 18761,
+            "drenar_vida": 53,
+            "escudo_magico": 26,
+            "missil_magico": 162,
+            "barreira_arcana": 1883,
+            "ressurgir": 5
+          },
+          "damage": {
+            "bola_fogo": 14469927,
+            "drenar_vida": 0,
+            "escudo_magico": 0,
+            "missil_magico": 56399,
+            "barreira_arcana": 0,
+            "ressurgir": 0
+          },
+          "mp": {
+            "bola_fogo": 469025,
+            "drenar_vida": 1590,
+            "escudo_magico": 650,
+            "missil_magico": 3240,
+            "barreira_arcana": 47075,
+            "ressurgir": 300
+          },
+          "offered": {
+            "relampago": 553,
+            "barreira_arcana": 126,
+            "explosao_arcana": 79,
+            "dreno_mana": 274,
+            "sono_profundo": 112,
+            "raio_congelante": 235,
+            "tempestade": 82,
+            "ressurgir": 9,
+            "cura_menor": 59,
+            "apocalipse": 5
+          },
+          "picked": {
+            "barreira_arcana": 112,
+            "explosao_arcana": 79,
+            "ressurgir": 9
+          },
+          "basic_damage": 1594681
+        },
+        "passives": {
+          "offered": {
+            "bebida_deuses": 167,
+            "musculos_aco": 374,
+            "reserva_arcana": 409,
+            "punho_atordoante": 70,
+            "olho_aguia": 348,
+            "sangue_guerreiro": 340,
+            "reflexos_rapidos": 184,
+            "alma_eterna": 72,
+            "sorte_iniciante": 376,
+            "essencia_fluida": 172,
+            "mente_serena": 338,
+            "escudo_fe": 204,
+            "passos_leves": 365,
+            "lamina_afiada": 179,
+            "coracao_ferro": 340,
+            "furia_berserker": 164,
+            "maos_midas": 165,
+            "sede_sangue": 53,
+            "essencia_viva": 163,
+            "pele_grossa": 364,
+            "pele_adamantio": 70,
+            "lamina_lendaria": 14,
+            "essencia_pura": 18,
+            "imortalidade": 17,
+            "toque_dragao": 64,
+            "bencao_divina": 69,
+            "fome_batalha": 70,
+            "fortuna_absoluta": 17,
+            "coracao_tita": 10
+          },
+          "picked": {
+            "musculos_aco": 134,
+            "sangue_guerreiro": 300,
+            "alma_eterna": 72,
+            "essencia_fluida": 162,
+            "escudo_fe": 101,
+            "lamina_afiada": 45,
+            "sede_sangue": 15,
+            "passos_leves": 46,
+            "olho_aguia": 65,
+            "pele_grossa": 230,
+            "reserva_arcana": 37,
+            "furia_berserker": 71,
+            "coracao_ferro": 251,
+            "pele_adamantio": 43,
+            "lamina_lendaria": 9,
+            "toque_dragao": 30,
+            "mente_serena": 15,
+            "bencao_divina": 65,
+            "reflexos_rapidos": 3,
+            "bebida_deuses": 20,
+            "coracao_tita": 10,
+            "imortalidade": 7,
+            "essencia_viva": 1
+          }
+        },
+        "equipment": {
+          "items_from_loot": 2147,
+          "items_equipped_from_loot": 435,
+          "items_bought": 2115,
+          "items_equipped_from_shop": 1570,
+          "equipped_by_slot": {
+            "Weapon": 343,
+            "Amulet": 276,
+            "Ring": 280,
+            "Body": 357,
+            "Shoes": 299,
+            "Legs": 230,
+            "Helmet": 125,
+            "Hands": 95
+          },
+          "power_naked_sum": 105221.0,
+          "power_equipped_sum": 122452,
+          "power_samples": 250
+        },
+        "economy": {
+          "gold_earned": 1186033,
+          "gold_on_gear": 126382,
+          "gold_on_consumables": 72028,
+          "gold_unspent": 987623
+        },
+        "consumables": {
+          "max_hp": 1181
+        },
+        "essence": {
+          "rolls": 1647,
+          "sum": 2212.6999999999953,
+          "xp_base": 1778269,
+          "xp_after": 2614738
+        },
+        "events": {
+          "counts": {
+            "merchant": 142,
+            "fountain": 125,
+            "altar": 108
+          },
+          "declined": {
+            "altar": 41
+          },
+          "fountain_healed": 87663,
+          "altar_hp_paid": 49341,
+          "altar_deaths": 0
+        }
+      }
+    },
+    {
+      "levels_by_floor": {
+        "1": 1.9242424242424243,
+        "2": 3.25
+      },
+      "hero_class": "Mage",
+      "policy": "greedy",
+      "loadout": "expected",
+      "iterations": 250,
+      "median_floor": 0.0,
+      "mean_floor": 0.344,
+      "reached_20_rate": 0.0,
+      "survival_by_floor": {
+        "1": 0.264,
+        "2": 0.08,
+        "3": 0.0,
+        "4": 0.0,
+        "5": 0.0,
+        "6": 0.0,
+        "7": 0.0,
+        "8": 0.0,
+        "9": 0.0,
+        "10": 0.0,
+        "11": 0.0,
+        "12": 0.0,
+        "13": 0.0,
+        "14": 0.0,
+        "15": 0.0,
+        "16": 0.0,
+        "17": 0.0,
+        "18": 0.0,
+        "19": 0.0,
+        "20": 0.0
+      },
+      "skills_at_end_mean": 0.86,
+      "passives_at_end_mean": 0.528,
+      "toggles": "completo",
+      "pick_policy": "survival",
+      "telemetry": {
+        "runs": 250,
+        "battles": 705,
+        "turns": 4125,
+        "skills": {
+          "uses": {},
+          "damage": {},
+          "mp": {},
+          "offered": {
+            "relampago": 2,
+            "barreira_arcana": 2
+          },
+          "picked": {
+            "barreira_arcana": 2
+          },
+          "basic_damage": 221566
+        },
+        "passives": {
+          "offered": {
+            "punho_atordoante": 3,
+            "olho_aguia": 31,
+            "sangue_guerreiro": 28,
+            "reserva_arcana": 29,
+            "escudo_fe": 17,
+            "musculos_aco": 30,
+            "pele_grossa": 29,
+            "pele_adamantio": 8,
+            "essencia_fluida": 11,
+            "sorte_iniciante": 34,
+            "reflexos_rapidos": 10,
+            "mente_serena": 23,
+            "furia_berserker": 14,
+            "lamina_afiada": 17,
+            "lamina_lendaria": 2,
+            "passos_leves": 22,
+            "toque_dragao": 6,
+            "fome_batalha": 8,
+            "essencia_viva": 10,
+            "coracao_ferro": 26,
+            "bebida_deuses": 6,
+            "maos_midas": 16,
+            "alma_eterna": 5,
+            "sede_sangue": 6,
+            "bencao_divina": 4,
+            "imortalidade": 1
+          },
+          "picked": {
+            "sangue_guerreiro": 24,
+            "escudo_fe": 6,
+            "essencia_fluida": 11,
+            "musculos_aco": 8,
+            "pele_adamantio": 5,
+            "pele_grossa": 20,
+            "lamina_lendaria": 2,
+            "passos_leves": 1,
+            "olho_aguia": 4,
+            "toque_dragao": 4,
+            "furia_berserker": 6,
+            "reserva_arcana": 4,
+            "lamina_afiada": 3,
+            "coracao_ferro": 22,
+            "alma_eterna": 5,
+            "sede_sangue": 2,
+            "bencao_divina": 4,
+            "imortalidade": 1
+          }
+        },
+        "equipment": {
+          "items_from_loot": 215,
+          "items_equipped_from_loot": 96,
+          "items_bought": 103,
+          "items_equipped_from_shop": 103,
+          "equipped_by_slot": {
+            "Amulet": 33,
+            "Weapon": 44,
+            "Body": 44,
+            "Shoes": 28,
+            "Ring": 24,
+            "Helmet": 6,
+            "Legs": 14,
+            "Hands": 6
+          },
+          "power_naked_sum": 28584.0,
+          "power_equipped_sum": 30216,
+          "power_samples": 250
+        },
+        "economy": {
+          "gold_earned": 21850,
+          "gold_on_gear": 3932,
+          "gold_on_consumables": 0,
+          "gold_unspent": 17918
+        },
+        "consumables": {},
+        "essence": {
+          "rolls": 336,
+          "sum": 431.8999999999999,
+          "xp_base": 32629,
+          "xp_after": 42922
+        },
+        "events": {
+          "counts": {
+            "merchant": 9,
+            "fountain": 3,
+            "altar": 7
+          },
+          "declined": {
+            "altar": 7
+          },
+          "fountain_healed": 643,
+          "altar_hp_paid": 0,
+          "altar_deaths": 0
+        }
+      }
+    },
+    {
+      "levels_by_floor": {
+        "1": 1.664,
+        "2": 2.755020080321285,
+        "3": 4.826530612244898,
+        "4": 6.28,
+        "5": 7.980952380952381,
+        "6": 9.629213483146067,
+        "7": 10.465116279069768,
+        "8": 11.44047619047619,
+        "9": 12.82716049382716,
+        "10": 14.181818181818182,
+        "11": 15.243243243243244,
+        "12": 16.87323943661972,
+        "13": 17.943661971830984,
+        "14": 19.074626865671643,
+        "15": 20.16923076923077,
+        "16": 21.338461538461537,
+        "17": 22.26153846153846,
+        "18": 23.369230769230768,
+        "19": 24.369230769230768,
+        "20": 25.384615384615383
+      },
+      "hero_class": "Rogue",
+      "policy": "smart",
+      "loadout": "expected",
+      "iterations": 250,
+      "median_floor": 4.0,
+      "mean_floor": 8.16,
+      "reached_20_rate": 0.26,
+      "survival_by_floor": {
+        "1": 1.0,
+        "2": 0.996,
+        "3": 0.784,
+        "4": 0.6,
+        "5": 0.42,
+        "6": 0.356,
+        "7": 0.344,
+        "8": 0.336,
+        "9": 0.324,
+        "10": 0.308,
+        "11": 0.296,
+        "12": 0.284,
+        "13": 0.284,
+        "14": 0.268,
+        "15": 0.26,
+        "16": 0.26,
+        "17": 0.26,
+        "18": 0.26,
+        "19": 0.26,
+        "20": 0.26
+      },
+      "skills_at_end_mean": 3.82,
+      "passives_at_end_mean": 9.94,
+      "toggles": "completo",
+      "pick_policy": "survival",
+      "telemetry": {
+        "runs": 250,
+        "battles": 10593,
+        "turns": 104555,
+        "skills": {
+          "uses": {
+            "golpe_baixo": 576,
+            "ataque_furtivo": 12384,
+            "evasao": 113,
+            "sombra_rapida": 308,
+            "envenenar": 379,
+            "assassinato": 4293,
+            "passo_felino": 2821
+          },
+          "damage": {
+            "golpe_baixo": 0,
+            "ataque_furtivo": 10533227,
+            "evasao": 0,
+            "sombra_rapida": 0,
+            "envenenar": 0,
+            "assassinato": 3840038,
+            "passo_felino": 0
+          },
+          "mp": {
+            "golpe_baixo": 8640,
+            "ataque_furtivo": 272448,
+            "evasao": 2260,
+            "sombra_rapida": 5544,
+            "envenenar": 7580,
+            "assassinato": 171720,
+            "passo_felino": 70525
+          },
+          "offered": {
+            "golpe_sombras": 865,
+            "envenenar": 655,
+            "passo_felino": 119,
+            "assassinato": 87,
+            "lancar_adaga": 359,
+            "danca_laminas": 130,
+            "fantasma": 21,
+            "evasao_perfeita": 138,
+            "cortina_fumaca": 51,
+            "morte_subita": 10
+          },
+          "picked": {
+            "envenenar": 167,
+            "passo_felino": 119,
+            "assassinato": 87,
+            "cortina_fumaca": 51
+          },
+          "basic_damage": 9582914
+        },
+        "passives": {
+          "offered": {
+            "olho_aguia": 514,
+            "reflexos_rapidos": 283,
+            "sangue_guerreiro": 514,
+            "musculos_aco": 520,
+            "bebida_deuses": 260,
+            "punho_atordoante": 95,
+            "reserva_arcana": 532,
+            "coracao_ferro": 488,
+            "essencia_viva": 290,
+            "maos_midas": 266,
+            "pele_grossa": 514,
+            "pele_adamantio": 128,
+            "furia_berserker": 252,
+            "mente_serena": 527,
+            "passos_leves": 521,
+            "escudo_fe": 255,
+            "coracao_tita": 17,
+            "alma_eterna": 92,
+            "sorte_iniciante": 490,
+            "essencia_fluida": 241,
+            "lamina_afiada": 214,
+            "sede_sangue": 103,
+            "fome_batalha": 101,
+            "essencia_pura": 16,
+            "bencao_divina": 79,
+            "toque_dragao": 93,
+            "fortuna_absoluta": 12,
+            "lamina_lendaria": 21,
+            "imortalidade": 17
+          },
+          "picked": {
+            "sangue_guerreiro": 451,
+            "coracao_ferro": 360,
+            "pele_adamantio": 55,
+            "escudo_fe": 127,
+            "coracao_tita": 17,
+            "alma_eterna": 91,
+            "furia_berserker": 111,
+            "musculos_aco": 182,
+            "essencia_fluida": 226,
+            "lamina_afiada": 53,
+            "pele_grossa": 313,
+            "sede_sangue": 31,
+            "passos_leves": 80,
+            "bebida_deuses": 33,
+            "bencao_divina": 79,
+            "olho_aguia": 130,
+            "reserva_arcana": 50,
+            "toque_dragao": 49,
+            "lamina_lendaria": 10,
+            "mente_serena": 21,
+            "reflexos_rapidos": 7,
+            "imortalidade": 5,
+            "fome_batalha": 3,
+            "punho_atordoante": 1
+          }
+        },
+        "equipment": {
+          "items_from_loot": 3132,
+          "items_equipped_from_loot": 623,
+          "items_bought": 2779,
+          "items_equipped_from_shop": 1990,
+          "equipped_by_slot": {
+            "Shoes": 390,
+            "Weapon": 570,
+            "Ring": 395,
+            "Amulet": 345,
+            "Body": 313,
+            "Legs": 259,
+            "Hands": 149,
+            "Helmet": 192
+          },
+          "power_naked_sum": 134486.0,
+          "power_equipped_sum": 158069,
+          "power_samples": 250
+        },
+        "economy": {
+          "gold_earned": 1838056,
+          "gold_on_gear": 180416,
+          "gold_on_consumables": 120465,
+          "gold_unspent": 1537175
+        },
+        "consumables": {
+          "max_hp": 1389
+        },
+        "essence": {
+          "rolls": 2225,
+          "sum": 3059.600000000002,
+          "xp_base": 2756528,
+          "xp_after": 4222657
+        },
+        "events": {
+          "counts": {
+            "altar": 171,
+            "merchant": 178,
+            "fountain": 156
+          },
+          "declined": {
+            "altar": 45
+          },
+          "fountain_healed": 90154,
+          "altar_hp_paid": 84750,
+          "altar_deaths": 0
+        }
+      }
+    },
+    {
+      "levels_by_floor": {
+        "1": 1.7402597402597402,
+        "2": 3.0348837209302326,
+        "3": 5.777777777777778,
+        "4": 6.846153846153846,
+        "5": 8.833333333333334,
+        "6": 10.4,
+        "7": 11.0,
+        "8": 12.0,
+        "9": 13.0,
+        "10": 14.5,
+        "11": 15.75,
+        "12": 17.0,
+        "13": 19.0
+      },
+      "hero_class": "Rogue",
+      "policy": "greedy",
+      "loadout": "expected",
+      "iterations": 250,
+      "median_floor": 1.0,
+      "mean_floor": 1.22,
+      "reached_20_rate": 0.0,
+      "survival_by_floor": {
+        "1": 0.616,
+        "2": 0.344,
+        "3": 0.072,
+        "4": 0.052,
+        "5": 0.024,
+        "6": 0.02,
+        "7": 0.02,
+        "8": 0.016,
+        "9": 0.016,
+        "10": 0.016,
+        "11": 0.016,
+        "12": 0.004,
+        "13": 0.004,
+        "14": 0.0,
+        "15": 0.0,
+        "16": 0.0,
+        "17": 0.0,
+        "18": 0.0,
+        "19": 0.0,
+        "20": 0.0
+      },
+      "skills_at_end_mean": 1.82,
+      "passives_at_end_mean": 1.62,
+      "toggles": "completo",
+      "pick_policy": "survival",
+      "telemetry": {
+        "runs": 250,
+        "battles": 1510,
+        "turns": 10105,
+        "skills": {
+          "uses": {},
+          "damage": {},
+          "mp": {},
+          "offered": {
+            "envenenar": 37,
+            "golpe_sombras": 57,
+            "passo_felino": 13,
+            "assassinato": 6,
+            "lancar_adaga": 12,
+            "evasao_perfeita": 4,
+            "danca_laminas": 4
+          },
+          "picked": {
+            "envenenar": 22,
+            "passo_felino": 13,
+            "assassinato": 6
+          },
+          "basic_damage": 742855
+        },
+        "passives": {
+          "offered": {
+            "olho_aguia": 82,
+            "reflexos_rapidos": 40,
+            "sangue_guerreiro": 83,
+            "punho_atordoante": 12,
+            "passos_leves": 87,
+            "alma_eterna": 18,
+            "musculos_aco": 78,
+            "pele_grossa": 92,
+            "pele_adamantio": 19,
+            "essencia_fluida": 35,
+            "mente_serena": 88,
+            "reserva_arcana": 92,
+            "sorte_iniciante": 94,
+            "bebida_deuses": 33,
+            "coracao_ferro": 79,
+            "essencia_viva": 40,
+            "lamina_afiada": 40,
+            "escudo_fe": 44,
+            "furia_berserker": 44,
+            "lamina_lendaria": 8,
+            "sede_sangue": 17,
+            "bencao_divina": 9,
+            "maos_midas": 36,
+            "imortalidade": 3,
+            "fortuna_absoluta": 2,
+            "coracao_tita": 3,
+            "fome_batalha": 20,
+            "toque_dragao": 14,
+            "essencia_pura": 3
+          },
+          "picked": {
+            "sangue_guerreiro": 75,
+            "alma_eterna": 18,
+            "essencia_fluida": 35,
+            "pele_grossa": 59,
+            "musculos_aco": 25,
+            "bebida_deuses": 4,
+            "coracao_ferro": 59,
+            "pele_adamantio": 12,
+            "furia_berserker": 14,
+            "lamina_lendaria": 4,
+            "passos_leves": 14,
+            "bencao_divina": 9,
+            "sede_sangue": 9,
+            "reserva_arcana": 9,
+            "olho_aguia": 17,
+            "mente_serena": 2,
+            "coracao_tita": 3,
+            "escudo_fe": 17,
+            "lamina_afiada": 12,
+            "reflexos_rapidos": 1,
+            "toque_dragao": 5,
+            "imortalidade": 2
+          }
+        },
+        "equipment": {
+          "items_from_loot": 461,
+          "items_equipped_from_loot": 186,
+          "items_bought": 383,
+          "items_equipped_from_shop": 383,
+          "equipped_by_slot": {
+            "Ring": 99,
+            "Weapon": 168,
+            "Shoes": 93,
+            "Amulet": 90,
+            "Legs": 46,
+            "Hands": 19,
+            "Helmet": 19,
+            "Body": 35
+          },
+          "power_naked_sum": 30600.0,
+          "power_equipped_sum": 32790,
+          "power_samples": 250
+        },
+        "economy": {
+          "gold_earned": 70073,
+          "gold_on_gear": 19567,
+          "gold_on_consumables": 0,
+          "gold_unspent": 50506
+        },
+        "consumables": {},
+        "essence": {
+          "rolls": 555,
+          "sum": 721.4000000000003,
+          "xp_base": 104619,
+          "xp_after": 147117
+        },
+        "events": {
+          "counts": {
+            "fountain": 29,
+            "merchant": 31,
+            "altar": 22
+          },
+          "declined": {
+            "altar": 18
+          },
+          "fountain_healed": 6895,
+          "altar_hp_paid": 950,
+          "altar_deaths": 0
+        }
+      }
+    }
+  ]
+}
