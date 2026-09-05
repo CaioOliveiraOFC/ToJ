@@ -27,6 +27,7 @@ from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
 from src.sim import progression
 from src.sim.encounters import build_encounter
 from src.sim.loadouts import apply_loadout
+from src.sim.metrics import wilson_interval
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, get_pick_policy
 from src.sim.policies import get_policy
 from src.sim.telemetry import RunTelemetry
@@ -48,6 +49,9 @@ class SimResult:
     iterations: int
 
     win_rate: float = 0.0
+    # Intervalo de Wilson da taxa de vitória. Sem ele, 61% e 64% em 500
+    # iterações parecem números diferentes e são o mesmo número.
+    win_rate_ci: tuple[float, float] = (0.0, 0.0)
     flee_rate: float = 0.0
     death_rate: float = 0.0
     turns_mean: float = 0.0
@@ -69,7 +73,9 @@ class SimResult:
         return (
             f"Class: {self.hero_class}   Level: {self.level}   Encounter: {self.encounter}\n"
             f"Simulations: {self.iterations:,}   Policy: {self.policy}   Loadout: {self.loadout}\n"
-            f"Win rate: {self.win_rate:.1%}   Death rate: {self.death_rate:.1%}   "
+            f"Win rate: {self.win_rate:.1%} "
+            f"(IC95 {self.win_rate_ci[0]:.1%}-{self.win_rate_ci[1]:.1%})   "
+            f"Death rate: {self.death_rate:.1%}   "
             f"Flee rate: {self.flee_rate:.1%}\n"
             f"Avg turns: {self.turns_mean:.1f} (p90 {self.turns_p90:.0f})   "
             f"Avg damage dealt: {self.damage_dealt_mean:.0f}   "
@@ -193,6 +199,7 @@ def simulate(
         loadout=loadout,
         iterations=iterations,
         win_rate=wins / iterations,
+        win_rate_ci=wilson_interval(wins, iterations),
         flee_rate=fled / iterations,
         death_rate=(iterations - wins - fled) / iterations,
         turns_mean=statistics.fmean(turns),

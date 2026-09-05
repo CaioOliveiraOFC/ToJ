@@ -11,12 +11,12 @@ mediu um herói sem passiva nenhuma e com o equipamento do andar 1 — os númer
 dela não valem para o jogo que existe.
 
 Valores medidos no estado atual (250 runs por classe, política competente,
-equipamento típico) — `reports/validation_20260904.json`:
+equipamento típico) — `reports/validation_20260905.json`:
 
     classe    andar médio  mediano  chega ao 20  passivas ao fim  bot que só ataca
-    Guerreiro      8.1        4        26,0%          9.6          andar médio 1.0
-    Mago           5.8        2        17,6%          6.9          andar médio 0.3
-    Ladino         8.1        4        23,6%          9.8          andar médio 1.0
+    Guerreiro      9.3        5        32,8%         11.3          andar médio 1.2
+    Mago           5.8        3        16,4%          6.9          andar médio 0.3
+    Ladino         8.2        4        26,0%          9.9          andar médio 1.2
 
 A distribuição é bimodal: a maioria das runs termina nos primeiros andares, e as
 que passam do andar 5 com passivas empilhadas tendem a chegar ao 20. Por isso a
@@ -51,6 +51,16 @@ MAX_GREEDY_REACH_20 = 0.02
 # O jogador competente deve conseguir, mas não com folga.
 MIN_SMART_REACH_20 = 0.05
 MAX_SMART_REACH_20 = 0.45
+
+# --- Forma da curva de sobrevivência ---
+# Nenhum andar sozinho pode decidir a run. Medido hoje: a maior queda está no
+# andar 3, e vale 0.19 no Guerreiro, 0.21 no Ladino e 0.47 no Mago. O limite tem
+# folga sobre o Mago porque ele já está perto: a parede do andar 3 é um achado
+# de design em aberto, não um valor aprovado.
+MAX_FLOOR_DROP = 0.55
+# A curva precisa cair de verdade entre o primeiro andar e o último. Medido:
+# 0.67 no Guerreiro, 0.83 no Mago, 0.74 no Ladino.
+MIN_TOTAL_ATTRITION = 0.50
 
 # --- Duração de combate por arquétipo ---
 # Um combate de 1 a 2 turnos não tem espaço para decisão nenhuma; era a duração

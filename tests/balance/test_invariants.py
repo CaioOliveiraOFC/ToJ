@@ -25,6 +25,7 @@ from src.entities.heroes import POTION_BUFFS, POTION_STATUSES  # noqa: E402
 from src.mechanics import combat as cmb  # noqa: E402
 from src.shared import effects as fx  # noqa: E402
 from src.sim.harness import ALL_CLASSES, make_hero, simulate, simulate_run  # noqa: E402
+from src.sim.metrics import curve_deltas  # noqa: E402
 from tests.balance import thresholds as T  # noqa: E402
 
 pytestmark = pytest.mark.balance
@@ -362,13 +363,35 @@ class TestRunCompleta:
         assert dados["skills_at_end_mean"] >= 3.0
 
     @pytest.mark.parametrize("classe", ALL_CLASSES)
-    def test_curva_de_dificuldade_e_monotonica(self, runs, classe):
+    def test_nenhum_andar_sozinho_decide_a_run(self, runs, classe):
+        """A curva precisa distribuir o atrito, não concentrá-lo num degrau.
+
+        Substitui um teste que verificava se a curva era monotônica. Ela é
+        monotônica **por construção**: `survival_by_floor` só incrementa o andar
+        que a run alcançou, e alcançar o andar N+1 exige ter alcançado o N. O
+        teste não podia falhar, então não media nada.
+
+        A pergunta que vale é outra: onde a run é decidida. Hoje a maior queda
+        está sempre no andar 3, e vale 0.19 no Guerreiro, 0.21 no Ladino e 0.47
+        no Mago — quase metade das runs do Mago termina num andar só. A parede
+        do andar 3 é achado de design em aberto; o limite aqui existe para pegar
+        piora, não para dizer que está bom.
+        """
+        deltas = curve_deltas(runs[(classe, "smart")]["survival_by_floor"])
+        andar, queda = max(deltas, key=lambda item: item[1])
+        assert queda <= T.MAX_FLOOR_DROP, (
+            f"{classe}: o andar {andar} sozinho encerra {queda:.0%} das runs."
+        )
+
+    @pytest.mark.parametrize("classe", ALL_CLASSES)
+    def test_a_curva_cai_de_verdade(self, runs, classe):
+        # Sem atrito acumulado, a masmorra é um corredor: o teste de andar médio
+        # ainda passaria com uma curva quase plana e uma cauda curta.
         sobrevivencia = runs[(classe, "smart")]["survival_by_floor"]
-        andares = sorted(sobrevivencia)
-        for anterior, atual in zip(andares, andares[1:]):
-            assert sobrevivencia[atual] <= sobrevivencia[anterior] + 0.001, (
-                f"{classe}: o andar {atual} é mais seguro que o {anterior}."
-            )
+        atrito = sobrevivencia[1] - sobrevivencia[20]
+        assert atrito >= T.MIN_TOTAL_ATTRITION, (
+            f"{classe}: só {atrito:.0%} das runs se perdem entre o andar 1 e o 20."
+        )
 
     @pytest.mark.parametrize("classe", ALL_CLASSES)
     def test_dificuldade_cresce_de_fato(self, runs, classe):
@@ -439,14 +462,16 @@ class TestReprodutibilidade:
         )
 
     def test_seeds_diferentes_produzem_runs_diferentes(self):
-        # A trava não pode ter congelado o sorteio: sem variação, a média de
-        # N runs seria a mesma run repetida N vezes.
+        """A trava não pode ter congelado o sorteio.
+
+        Compara o resultado inteiro, não o `mean_floor`. A média de 15 inteiros
+        cai num conjunto pequeno de valores: em doze seedes medidas, 2 dos 66
+        pares davam a mesma média — 3% de chance de este teste reprovar por
+        coincidência, sem nada de errado no código.
+        """
         kwargs = dict(hero_class="Warrior", max_floor=12, iterations=15,
                       policy="smart", loadout="expected")
-        assert (
-            simulate_run(seed=99, **kwargs)["mean_floor"]
-            != simulate_run(seed=4242, **kwargs)["mean_floor"]
-        )
+        assert simulate_run(seed=99, **kwargs) != simulate_run(seed=4242, **kwargs)
 
     def test_a_simulacao_devolve_o_gerador_global_como_encontrou(self):
         # Deixar o `random` global preso numa sequência fixa faria um teste
