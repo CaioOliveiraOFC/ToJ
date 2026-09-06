@@ -72,17 +72,19 @@ existe para que isso não volte em silêncio.
 250 runs por classe, política competente, equipamento típico
 (`reports/validation_20260905.json`):
 
-| Classe | Andar médio | Mediano | Chega ao andar 20 | Passivas ao fim | Bot que só ataca |
-|---|---:|---:|---:|---:|---:|
-| Guerreiro | 10,6 | 7 | 36,4% | 12,6 | andar médio 1,3 |
-| Mago | 8,2 | 4 | 25,2% | 9,6 | andar médio 0,4 |
-| Ladino | 9,7 | 5 | 28,8% | 11,5 | andar médio 1,2 |
+| Classe | Andar médio | Mediano | Chega ao andar 20 | Bot que só ataca |
+|---|---:|---:|---:|---:|
+| Guerreiro | 10,4 | 7 | 34,0% | andar médio 0,9 |
+| Mago | 7,4 | 4 | 19,2% | andar médio 0,2 |
+| Ladino | 9,7 | 5 | 28,8% | andar médio 0,9 |
 
 - O bot que só ataca **não termina a masmorra** em nenhuma classe.
-- Distância entre a melhor e a pior classe: **2,4 andares**. Era 3,5 enquanto o
-  bot desperdiçava turnos curando com o inimigo a um golpe da morte — ver
-  "Matar antes de curar", abaixo. Nenhum número de classe foi alterado.
-- Jogar bem vale de **7,8 a 9,3 andares** de profundidade.
+- Distância entre a melhor e a pior classe: **3,0 andares**. Nenhum número de
+  classe foi alterado em nenhuma das rodadas: os 3,5 anteriores caíram para 2,4
+  ao consertar o bot que curava com o inimigo a um golpe da morte, e voltaram a
+  3,0 ao tirar peso da sorte — o Mago era quem mais dependia de um sorteio alto
+  de Essência para sobreviver aos primeiros andares.
+- Jogar bem vale de **7,2 a 9,5 andares** de profundidade.
 - Duração de combate: trash 3,4 turnos, bruiser 8-12, elite 12-17, chefe 16-24.
 
 **A distribuição é bimodal**, e isso é um achado, não um detalhe: a maioria das
@@ -163,6 +165,46 @@ curta** que a média, porque o herói superado morre rápido.
 oferecida menos de dez vezes, e depois tratava a ausência como taxa zero. Agora
 ela entra num grupo próprio, "sem amostra suficiente", em vez de ser condenada.
 
+### A sorte deixou de decidir a run
+
+A Essência sorteada nos cinco primeiros andares explicava **38,7%** da variância
+da profundidade final. Nesse trecho o herói ainda não tem passiva, equipamento
+nem nível para compensar um sorteio ruim, então o número decide antes de existir
+decisão. Os 25% mais azarados paravam no andar 3,8; os 25% mais sortudos, no
+16,2. Uma distância de **12,4 andares** tirada na moeda, num jogo em que escolher
+carta de propósito valia 1,5.
+
+O desvio do sorteio caiu de 0,5 para 0,2. A média não mudou, então o ritmo do
+jogo é o mesmo — o andar médio vai de 9,5 para 9,2. O que sai é o peso da sorte:
+
+| | Antes | Depois |
+|---|---:|---:|
+| Variância da run explicada pelo sorteio | 38,7% | 12,8% |
+| Distância entre o quartil azarado e o sortudo | 12,4 andares | 7,4 andares |
+| Valor de escolher carta de propósito | +1,5 andar | +1,8 andar |
+
+Também foi medido um desvio que cresce com o andar, para deixar a sorte só onde
+ela não decide mais. Perdeu para o desvio fixo nos três eixos: 14,7% de
+variância explicada contra 12,6%, mesma distância entre quartis, e andar médio
+menor. A ideia era melhor que o resultado.
+
+Os limites do sorteio passaram de 0,5–3,0 para 0,6–2,2. Com desvio 0,2, os
+extremos antigos ficavam a mais de oito desvios da média: a tela de extração
+prometia ao jogador uma faixa que o sorteio nunca entregaria.
+
+**O efeito colateral é o ponto.** Com menos ruído, todo sistema de decisão
+passou a pesar mais na ablação:
+
+| Sistema | Antes | Depois |
+|---|---:|---:|
+| Passivas | −4,4 | −4,4 |
+| Loja | −3,8 | −3,8 |
+| Loot | −2,1 | −2,1 |
+| Escolha de skill | −0,2 | −0,2 |
+
+Nenhum desses sistemas mudou. Eles só pararam de ser medidos por cima de um
+sorteio que respondia por 38% do resultado.
+
 ### Dois defeitos que passavam por achado de design
 
 **O elite do andar 3 não existe no jogo.** `_default_floor_plan` mantinha tabela
@@ -192,20 +234,20 @@ sem alterar um único número de balanceamento.
 
 | Sistema desligado | Delta |
 |---|---:|
-| Essência | −5,7 |
+| Essência | −5,4 |
 | Passivas | −3,5 |
 | Loja | −3,3 |
 | Loot | −1,5 |
-| Eventos aleatórios | −0,3 |
+| Eventos aleatórios | −0,6 |
 | Escolha de skill | +0,1 |
 
 Quatro problemas que a métrica de profundidade sozinha não mostrava:
 
 1. **A Essência decide a run mais que qualquer escolha do jogador.** Um
    multiplicador sorteado, sobre o qual ninguém tem controle, pesa mais que as
-   passivas (−5,7 contra −3,5) e multiplica o XP em 1,50x na média. Isso é sorte
+   passivas (−5,4 contra −4,4) e multiplica o XP em 1,47x na média. Isso é sorte
    no lugar de decisão, e é o problema de design mais grave em aberto.
-2. **Escolher skill nova não muda nada** (+0,1 andar ao desligar). O bot leva
+2. **Escolher skill nova quase não muda nada** (−0,2 andar ao desligar). O bot leva
    skills Raras e Épicas de dano que depois nunca usa, porque custam mais mana e
    perdem para o ataque básico — que sozinho responde por **38% do dano total**.
    Três skills aparecem como "escolhidas mas nunca usadas", e **Explosão Arcana**
@@ -214,7 +256,7 @@ Quatro problemas que a métrica de profundidade sozinha não mostrava:
    é levada em 100% das 54 ofertas, Alma Eterna em 99% de 283, Bênção Divina em
    98% de 242. O eixo `max_hp` tem seis cartas de +15 a +200 e domina todos os
    outros efeitos.
-4. **83% do ouro nunca é gasto** (1,08 milhão de 6,24 milhões). A economia não tem no
+4. **82% do ouro nunca é gasto** (1,05 milhão de 5,76 milhões). A economia não tem no
    que competir consigo mesma: falta preço alto o bastante ou item bom o
    bastante para o ouro ter destino.
 
@@ -222,11 +264,11 @@ Quatro problemas que a métrica de profundidade sozinha não mostrava:
 
 Com 150 runs por política:
 
-    economy 12,3  >  random 10,7  >  offense 9,9  >  survival 9,5
+    economy 12,2  >  random 10,4  >  offense 10,0  >  survival 9,3
 
-Escolher de propósito rende **+1,5 andar** sobre sortear a carta ao acaso, então
+Escolher de propósito rende **+1,8 andar** sobre sortear a carta ao acaso, então
 o menu de cartas faz pergunta. O que ele revela é outro problema: `survival` —
-a política usada em **toda a calibração** — fica em último, 2,8 andares atrás de
+a política usada em **toda a calibração** — fica em último, 2,9 andares atrás de
 `economy`. O jogo é mais fácil do que os números de calibração dizem para quem
 constrói pensando em progressão, e a banda de dificuldade foi ajustada contra a
 build mais fraca.

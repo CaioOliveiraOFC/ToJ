@@ -37,6 +37,11 @@ from src.sim.toggles import Toggles
 HERO_CLASSES = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 ALL_CLASSES = ("Warrior", "Mage", "Rogue")
 
+# Andares iniciais: o trecho em que a run ainda não tem passiva, equipamento nem
+# nível para compensar um sorteio ruim. É onde a sorte pesa, e por isso é o
+# recorte usado para medir o quanto ela decide.
+EARLY_FLOORS = 5
+
 
 @dataclass
 class SimResult:
@@ -252,6 +257,10 @@ def simulate_run(
     level_at_floor: dict[int, list[int]] = {floor: [] for floor in range(1, max_floor + 1)}
     skills_at_end: list[int] = []
     passives_at_end: list[int] = []
+    # Essência sorteada nos primeiros andares, por run. É o dado que permite
+    # perguntar quanto da profundidade final foi decidido pela moeda antes de o
+    # jogador ter passiva, equipamento ou nível para decidir qualquer coisa.
+    early_essence: list[float] = []
 
     for i in range(iterations):
         rng = random.Random(seed + i)
@@ -260,9 +269,12 @@ def simulate_run(
         random.seed(seed + i)
         hero = make_hero(hero_class, 1, loadout)
         reached = 0
+        cedo: list[float] = []
 
         for floor in range(1, max_floor + 1):
             essence = progression.floor_essence_multiplier(floor) if cfg.essence else 1.0
+            if floor <= EARLY_FLOORS:
+                cedo.append(essence)
             if telemetry is not None:
                 telemetry.essence_rolls.append(essence)
             fights = encounters_per_floor(floor) if encounters_per_floor else _default_floor_plan(floor)
@@ -303,6 +315,7 @@ def simulate_run(
             hero.recover(FLOOR_CLEAR_RESTORE_PERCENT)
 
         deepest.append(reached)
+        early_essence.append(statistics.fmean(cedo) if cedo else 1.0)
         skills_at_end.append(len(hero.skills))
         passives_at_end.append(len(hero.passives))
         if telemetry is not None:
@@ -329,6 +342,8 @@ def simulate_run(
         "passives_at_end_mean": statistics.fmean(passives_at_end),
         "toggles": cfg.label(),
         "pick_policy": pick_policy,
+        "deepest_by_run": deepest,
+        "early_essence_by_run": early_essence,
         "telemetry": telemetry.to_dict() if telemetry is not None else None,
     }
 

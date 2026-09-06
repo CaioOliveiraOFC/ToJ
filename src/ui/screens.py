@@ -12,6 +12,12 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from src.shared.constants import (
+    ESSENCE_MULT_GOOD,
+    ESSENCE_MULT_MAX,
+    ESSENCE_MULT_MIN,
+    ESSENCE_MULT_POOR,
+)
 from src.ui import renderer
 
 if TYPE_CHECKING:
@@ -594,10 +600,13 @@ def render_dungeon_status(
     essence_multiplier: float = 1.0,
 ) -> None:
     """Renderiza o status da masmorra na parte superior da tela."""
-    # Determina a cor do multiplicador baseado no valor
-    if essence_multiplier < 0.8:
+    # Determina a cor do multiplicador baseado no valor. Os limiares vêm de
+    # `shared/constants.py`, derivados da média e do desvio do sorteio: com os
+    # valores digitados aqui, apertar o desvio deixava a tela pintando de verde
+    # um andar que passou a ser comum.
+    if essence_multiplier < ESSENCE_MULT_POOR:
         mult_color = "red"
-    elif essence_multiplier > 1.5:
+    elif essence_multiplier > ESSENCE_MULT_GOOD:
         mult_color = "green"
     else:
         mult_color = "yellow"
@@ -653,7 +662,11 @@ def render_extraction_prompt(
     body.append(f"Andar concluído: {dungeon_level}\n", style="bold cyan")
     body.append(f"Aventureiro: {player_name}  |  Nível: {level}  |  HP: {hp}/{max_hp}  |  Ouro: {coins}\n", style="white")
     body.append(f"Essência acumulada (XP): {xp_points}\n", style="bold green")
-    body.append(f"Estimativa para o próximo andar: ~{essence_multiplier}x (faixa 0.5x - 3.0x)\n", style="dim cyan")
+    body.append(
+        f"Estimativa para o próximo andar: ~{essence_multiplier}x "
+        f"(faixa {ESSENCE_MULT_MIN}x - {ESSENCE_MULT_MAX}x)\n",
+        style="dim cyan",
+    )
     body.append("Valor exato só é sorteado ao entrar - pode variar.\n\n", style="dim")
     body.append("Se você CONTINUAR e morrer no próximo andar,\n", style="bold red")
     body.append("toda a essência, nível e progresso desta run serão perdidos (permadeath).\n", style="red")

@@ -13,10 +13,10 @@ dela não valem para o jogo que existe.
 Valores medidos no estado atual (250 runs por classe, política competente,
 equipamento típico) — `reports/validation_20260905.json`:
 
-    classe    andar médio  mediano  chega ao 20  passivas ao fim  bot que só ataca
-    Guerreiro     10.6        7        36,4%         12.6          andar médio 1.3
-    Mago           8.2        4        25,2%          9.6          andar médio 0.4
-    Ladino         9.7        5        28,8%         11.5          andar médio 1.2
+    classe    andar médio  mediano  chega ao 20  bot que só ataca
+    Guerreiro     10.4        7        34,0%         andar médio 0.9
+    Mago           7.4        4        19,2%         andar médio 0.2
+    Ladino         9.7        5        28,8%         andar médio 0.9
 
 A distribuição é bimodal: a maioria das runs termina nos primeiros andares, e as
 que passam do andar 5 com passivas empilhadas tendem a chegar ao 20. Por isso a
@@ -52,13 +52,22 @@ MAX_GREEDY_REACH_20 = 0.02
 MIN_SMART_REACH_20 = 0.05
 MAX_SMART_REACH_20 = 0.45
 
+# --- Peso da sorte ---
+# Quanto da profundidade final a Essência sorteada nos primeiros andares
+# explica. Era 38,7%: os 25% mais azarados paravam no andar 3,8 e os 25% mais
+# sortudos no 16,2, uma distância de 12,4 andares decidida antes de o jogador
+# ter passiva, equipamento ou nível para reagir. Escolher carta de propósito, no
+# mesmo jogo, vale 1,8 andar. Com o desvio do sorteio em 0.2, a variância
+# explicada fica em 12,0% no Guerreiro, 9,9% no Mago e 16,6% no Ladino.
+MAX_LUCK_VARIANCE_EXPLAINED = 0.20
+
 # --- Forma da curva de sobrevivência ---
 # Nenhum andar sozinho pode decidir a run. A maior queda fica no andar 5, onde
 # está o mini-chefe — a parede projetada. A parede do andar 3 que aparecia antes
 # era um elite que a simulação inventava e o jogo nunca gera.
 MAX_FLOOR_DROP = 0.55
 # A curva precisa cair de verdade entre o primeiro andar e o último. Medido:
-# 0.64 no Guerreiro, 0.73 no Mago, 0.71 no Ladino.
+# 0.66 no Guerreiro, 0.79 no Mago, 0.71 no Ladino.
 MIN_TOTAL_ATTRITION = 0.50
 
 # --- Duração de combate por arquétipo ---

@@ -26,7 +26,7 @@ from src.mechanics import combat as cmb  # noqa: E402
 from src.shared import effects as fx  # noqa: E402
 from src.sim.encounters import build_encounter  # noqa: E402
 from src.sim.harness import ALL_CLASSES, make_hero, simulate, simulate_run  # noqa: E402
-from src.sim.metrics import curve_deltas  # noqa: E402
+from src.sim.metrics import curve_deltas, variance_explained  # noqa: E402
 from tests.balance import thresholds as T  # noqa: E402
 
 pytestmark = pytest.mark.balance
@@ -439,6 +439,49 @@ class TestArquetipos:
 
 
 # ------------------------------------------------------------------ desempenho
+
+
+class TestPesoDaSorte:
+    """A moeda não pode decidir a run mais que o jogador.
+
+    A Essência sorteada nos cinco primeiros andares explicava 38,7% da variância
+    da profundidade final. Nesse trecho o herói ainda não tem passiva,
+    equipamento nem nível para compensar um sorteio ruim, então o número decide
+    antes de existir decisão. Para comparação, escolher carta de propósito em
+    vez de sortear vale 1,5 andar, e a distância entre o quartil azarado e o
+    sortudo era de 12,4.
+
+    O desvio do sorteio caiu de 0.5 para 0.2. A média não mudou, então o ritmo
+    do jogo é o mesmo; o que sai é o peso da sorte.
+    """
+
+    @pytest.mark.balance_full
+    @pytest.mark.parametrize("classe", ALL_CLASSES)
+    def test_a_essencia_sorteada_nao_decide_a_run(self, classe):
+        dados = simulate_run(classe, 20, T.FAST_RUN_ITERATIONS, "smart",
+                             loadout="expected")
+        explicado = variance_explained(
+            dados["early_essence_by_run"],
+            [float(d) for d in dados["deepest_by_run"]],
+        )
+        assert explicado <= T.MAX_LUCK_VARIANCE_EXPLAINED, (
+            f"{classe}: a Essência dos primeiros andares explica {explicado:.0%} "
+            "da profundidade final — a run é da moeda, não do jogador."
+        )
+
+    @pytest.mark.balance_full
+    def test_reduzir_a_sorte_nao_mudou_o_ritmo_do_jogo(self):
+        # A média do sorteio não mudou, então o andar médio tem de continuar na
+        # banda. Se cair fora, quem mexeu no desvio mexeu na média junto.
+        medias = {
+            classe: simulate_run(classe, 20, T.FAST_RUN_ITERATIONS, "smart",
+                                 loadout="expected")["mean_floor"]
+            for classe in ALL_CLASSES
+        }
+        for classe, media in medias.items():
+            assert T.MIN_CLASS_MEAN_FLOOR <= media <= T.MAX_CLASS_MEAN_FLOOR, (
+                f"{classe} chega ao andar {media:.1f}, fora da banda."
+            )
 
 
 class TestGolpeLetal:

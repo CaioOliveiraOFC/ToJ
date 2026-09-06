@@ -176,10 +176,39 @@ XP_BASE_COST = 140
 XP_LEVEL_RATIO = 1.195
 
 # --- Multiplicador de Essência por Andar ---
-ESSENCE_MULT_MIN = 0.5
-ESSENCE_MULT_MAX = 3.0
+# O sorteio da Essência dos cinco primeiros andares explicava 38,7% da variância
+# da profundidade final da run: os 25% mais azarados paravam no andar 3,8 e os
+# 25% mais sortudos no 16,2, uma distância de 12,4 andares decidida por um
+# número que o jogador não controla. Para comparação, escolher carta de
+# propósito em vez de sortear vale 1,5 andar. A run era da moeda, não do
+# jogador.
+#
+# O desvio caiu de 0.5 para 0.2. A média não mudou, então o ritmo do jogo não
+# muda: o andar médio vai de 9,49 para 9,19. O que muda é o peso da sorte —
+# a variância explicada cai para 12,6% e a distância entre azarado e sortudo,
+# para 7,3 andares.
+#
+# Medido também um desvio que cresce com o andar (sorte só onde ela não decide
+# mais). Perdeu para o desvio fixo nos três eixos: 14,7% de variância explicada
+# contra 12,6%, mesma distância, e andar médio menor. A ideia era melhor que o
+# resultado.
+#
+# 0.12 leva a variância a 8,2%, mas o andar médio cai para 8,95 e a distância só
+# melhora de 7,3 para 6,9: retorno decrescente, e a Essência vira constante.
+# 0.2 é o joelho da curva.
 ESSENCE_MULT_NORMAL_MEAN = 1.2   # Centro da curva gaussiana
-ESSENCE_MULT_NORMAL_STD = 0.5    # Desvio padrão (controla variação)
+ESSENCE_MULT_NORMAL_STD = 0.2    # Desvio padrão (controla variação)
+# Limites do sorteio, a três desvios da média mais baixa e da mais alta. Antes
+# eram 0.5 e 3.0, faixa herdada de um desvio de 0.5: com 0.2 esses extremos
+# ficariam a mais de oito desvios, ou seja, nunca sairiam — e a tela de
+# extração prometeria ao jogador uma faixa que o sorteio não entrega.
+ESSENCE_MULT_MIN = 0.6
+ESSENCE_MULT_MAX = 2.2
+# Faixas de leitura na tela: um desvio abaixo da média é andar ruim, um desvio
+# acima é andar bom. Derivadas, e não digitadas, para que mexer no desvio não
+# deixe a cor da tela mentindo sobre o sorteio.
+ESSENCE_MULT_POOR = round(ESSENCE_MULT_NORMAL_MEAN - ESSENCE_MULT_NORMAL_STD, 2)
+ESSENCE_MULT_GOOD = round(ESSENCE_MULT_NORMAL_MEAN + ESSENCE_MULT_NORMAL_STD, 2)
 
 # Pesos de raridade para sorteio de passivas
 PASSIVE_COMMON_WEIGHT = 60

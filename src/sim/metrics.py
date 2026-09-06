@@ -8,6 +8,7 @@ uma diferença é real e quando é a semente.
 from __future__ import annotations
 
 import math
+import statistics
 
 
 def wilson_interval(successes: int, trials: int, z: float = 1.96) -> tuple[float, float]:
@@ -50,3 +51,22 @@ def curve_deltas(survival_by_floor: dict[int, float]) -> list[tuple[int, float]]
         (floors[i + 1], survival_by_floor[floors[i]] - survival_by_floor[floors[i + 1]])
         for i in range(len(floors) - 1)
     ]
+
+
+def variance_explained(xs: list[float], ys: list[float]) -> float:
+    """Fração da variância de `ys` explicada por `xs` (o R² de uma reta).
+
+    Serve para uma pergunta só, e ela é de design: quanto do resultado da run
+    veio de um número que o jogador não controla. Um sistema de sorte que
+    explica mais da profundidade final que todas as escolhas somadas não é
+    tempero, é o jogo.
+    """
+    if len(xs) != len(ys) or len(xs) < 2:
+        return 0.0
+    media_x = statistics.fmean(xs)
+    media_y = statistics.fmean(ys)
+    covariancia = sum((x - media_x) * (y - media_y) for x, y in zip(xs, ys))
+    dispersao = (
+        sum((x - media_x) ** 2 for x in xs) * sum((y - media_y) ** 2 for y in ys)
+    ) ** 0.5
+    return (covariancia / dispersao) ** 2 if dispersao else 0.0
