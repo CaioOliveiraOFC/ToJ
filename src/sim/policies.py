@@ -272,7 +272,7 @@ def _choose_target(living: list):
 
 def _estimate_basic_damage(hero, target) -> int:
     mitigation = 100 / (100 + max(0, target.get_df()))
-    return max(1, int(hero.get_avg_damage() * mitigation))
+    return max(1, int(combat_mech.basic_attack_power(hero) * mitigation))
 
 
 def _estimate_skill_damage(hero, skill, target) -> int:

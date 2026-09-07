@@ -11,6 +11,7 @@ from src.shared import combat_topics as T
 from src.shared import effects as fx
 from src.shared.constants import (
     BASE_HIT_CHANCE,
+    BASIC_ATTACK_POWER_MULT,
     BLEED_DAMAGE_PERCENT,
     CRIT_CHANCE_CAP,
     CRIT_CHANCE_DEFAULT,
@@ -27,6 +28,7 @@ from src.shared.constants import (
     HIT_CHANCE_FLOOR,
     INVISIBLE_HIT_PENALTY,
     MANA_BURN_PER_TICK,
+    MP_REGEN_PERCENT_PER_TURN,
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
     POISON_AGILITY_DIVISOR,
@@ -122,6 +124,21 @@ def hit_chance(attacker, defender) -> int:
         chance -= INVISIBLE_HIT_PENALTY
 
     return int(max(HIT_CHANCE_FLOOR, min(HIT_CHANCE_CEIL, chance)))
+
+
+def basic_attack_power(attacker) -> int:
+    """BASE_POWER de um ataque básico: uma FRAÇÃO do poder total da entidade.
+
+    Existe para que o ataque básico e a skill não paguem o mesmo número. A
+    skill de dano rende `poder * (1 + effect_value/100)`; enquanto o básico
+    rendia o `poder` inteiro, de graça e sem recarga, a skill mediana do jogo
+    valia 1,65 ataque gratuito — e a linha ótima do jogador era não gastar
+    recurso nenhum, ou repetir a mesma skill até o fim do combate.
+
+    Vive aqui, ao lado de `skill_damage_base`, porque a política do simulador
+    precisa estimar o dano com a mesma fórmula que o motor aplica.
+    """
+    return max(1, int(attacker.get_avg_damage() * BASIC_ATTACK_POWER_MULT))
 
 
 def skill_damage_base(caster, skill) -> int:
@@ -452,11 +469,12 @@ def process_turn_start_effects(
                     payload={"entity": entity, "kind": "cooldown_expired", "skill_id": sid},
                 )
 
-    # Regeneração de mana vinda de buff ou passiva.
+    # Regeneração de mana: a base do turno, mais o que vier de buff ou passiva.
+    max_mp = int(getattr(entity, "base_mp", entity.get_mp()))
     mana_regen = fx.combat_modifier(entity, "mana_regen")
+    mana_regen += max(1, max_mp * MP_REGEN_PERCENT_PER_TURN / 100)
     if mana_regen > 0:
         entity.reduce_mp(-int(mana_regen))
-        max_mp = int(getattr(entity, "base_mp", entity.get_mp()))
         if entity.get_mp() > max_mp:
             entity._mp = max_mp
 

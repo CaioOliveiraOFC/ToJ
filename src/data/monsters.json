@@ -84,6 +84,19 @@
           "duration": 2,
           "chance": 100,
           "target": "enemy"
+        },
+        {
+          "id": "mob_furia",
+          "name": "Fúria",
+          "effect_type": "buff",
+          "effect_value": 45,
+          "effect_stat": "st",
+          "mana_cost": 18,
+          "cooldown": 5,
+          "duration": 3,
+          "chance": 100,
+          "target": "self",
+          "description": "Aumenta a própria força e transforma os turnos seguintes em pressão."
         }
       ]
     },
@@ -117,6 +130,31 @@
           "duration": 3,
           "chance": 100,
           "target": "self"
+        },
+        {
+          "id": "mob_muralha",
+          "name": "Muralha",
+          "effect_type": "buff",
+          "effect_value": 55,
+          "effect_stat": "df",
+          "mana_cost": 18,
+          "cooldown": 5,
+          "duration": 3,
+          "chance": 100,
+          "target": "self",
+          "description": "Ergue a guarda: aumenta a própria defesa por vários turnos."
+        },
+        {
+          "id": "mob_impacto",
+          "name": "Impacto de Escudo",
+          "effect_type": "damage",
+          "effect_value": 45,
+          "mana_cost": 20,
+          "cooldown": 4,
+          "duration": 3,
+          "chance": 100,
+          "target": "enemy",
+          "description": "Golpe pesado com o escudo, lento e caro."
         }
       ]
     },
@@ -150,6 +188,18 @@
           "duration": 2,
           "chance": 100,
           "target": "enemy"
+        },
+        {
+          "id": "mob_detonacao",
+          "name": "Detonação Arcana",
+          "effect_type": "damage",
+          "effect_value": 130,
+          "mana_cost": 40,
+          "cooldown": 5,
+          "duration": 3,
+          "chance": 100,
+          "target": "enemy",
+          "description": "Descarga total. Cara, lenta, e decide o combate."
         }
       ]
     },
@@ -183,6 +233,31 @@
           "duration": 2,
           "chance": 100,
           "target": "enemy"
+        },
+        {
+          "id": "mob_evasao_mob",
+          "name": "Esquiva Felina",
+          "effect_type": "buff",
+          "effect_value": 25,
+          "effect_stat": "evasion",
+          "mana_cost": 15,
+          "cooldown": 5,
+          "duration": 3,
+          "chance": 100,
+          "target": "self",
+          "description": "Fica mais difícil de acertar por alguns turnos."
+        },
+        {
+          "id": "mob_ferida",
+          "name": "Ferida Aberta",
+          "effect_type": "status",
+          "effect_value": "bleed",
+          "mana_cost": 15,
+          "cooldown": 3,
+          "duration": 3,
+          "chance": 75,
+          "target": "enemy",
+          "description": "Corte que sangra: dano por turno enquanto durar."
         }
       ]
     },
@@ -227,6 +302,18 @@
           "duration": 2,
           "chance": 75,
           "target": "enemy"
+        },
+        {
+          "id": "mob_medo",
+          "name": "Presságio",
+          "effect_type": "status",
+          "effect_value": "fear",
+          "mana_cost": 18,
+          "cooldown": 4,
+          "duration": 3,
+          "chance": 70,
+          "target": "enemy",
+          "description": "Enche o alvo de pavor e reduz o dano que ele causa."
         }
       ]
     },
@@ -270,6 +357,18 @@
           "chance": 100,
           "target": "self",
           "effect_stat": "df"
+        },
+        {
+          "id": "mob_maldicao",
+          "name": "Maldição",
+          "effect_type": "status",
+          "effect_value": "weakened",
+          "mana_cost": 20,
+          "cooldown": 4,
+          "duration": 3,
+          "chance": 80,
+          "target": "enemy",
+          "description": "Enfraquece o alvo e derruba o dano dele."
         }
       ]
     },
@@ -315,6 +414,18 @@
           "duration": 3,
           "chance": 70,
           "target": "enemy"
+        },
+        {
+          "id": "mob_couraca_elite",
+          "name": "Pele de Ferro",
+          "effect_type": "damage_reduction",
+          "effect_value": 25,
+          "mana_cost": 22,
+          "cooldown": 5,
+          "duration": 3,
+          "chance": 100,
+          "target": "self",
+          "description": "Reduz o dano recebido por alguns turnos."
         }
       ]
     },
@@ -371,6 +482,19 @@
           "duration": 3,
           "chance": 100,
           "target": "self"
+        },
+        {
+          "id": "boss_ira",
+          "name": "Ira Final",
+          "effect_type": "buff",
+          "effect_value": 50,
+          "effect_stat": "st",
+          "mana_cost": 25,
+          "cooldown": 6,
+          "duration": 3,
+          "chance": 100,
+          "target": "self",
+          "description": "A fera enfurece e passa a bater muito mais forte."
         }
       ]
     }

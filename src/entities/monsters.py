@@ -85,6 +85,9 @@ class Monster(Entity):
         self.skill_cooldowns: dict[str, int] = {}
         self.skill_use_chance: int = 0
         self.resistances: dict[str, int] = {}
+        # Turnos já tomados NESTE combate. A IA usa para saber se está na
+        # abertura, quando um buff de duração rende todos os turnos à frente.
+        self.turns_taken: int = 0
 
     def get_stat(self, stat: str) -> int:
         """Valor de um atributo somando os buffs ativos que o modificam.

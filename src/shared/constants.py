@@ -87,6 +87,27 @@ FLEE_RANGE_MAX = 2  # randrange(0, 2) = 0 ou 1 (50% chance)
 
 # --- COMBAT_DESIGN.md: Constantes de Calibração ---
 DEFENSE_K = 100  # Curva de mitigação: k/(k+defense)
+# Fração do BASE_POWER que sai num ataque básico.
+#
+# Valia 1.0: o ataque básico é gratuito, não tem recarga e entregava o poder
+# inteiro, enquanto a skill custa mana, tem recarga e paga apenas
+# `1 + effect_value/100` em cima do MESMO número. A skill de dano mediana do
+# jogo (65%) valia 1,65 ataque de graça.
+#
+# ATENÇÃO ao que a medição mostrou, porque é o contrário do que parece: mexer
+# só neste número NÃO tira o jogo do ataque básico. Medido a 250 runs por
+# classe, com a regeneração de mana em zero, baixar de 1,0 para 0,9 move a
+# fatia do dano vinda do básico de 35,9% para 35,2% — ou seja, nada — e derruba
+# o Guerreiro de 9,2 para 8,1 andares. O herói não spamava básico porque o
+# básico era forte; spamava porque ficava sem mana no terceiro turno. Quem
+# conserta o spam é MP_REGEN_PERCENT_PER_TURN.
+#
+# O papel deste número é outro, e é indispensável: a regeneração sozinha
+# (1,0 / 2%) leva a distância entre classes de 3,9 para 4,7 andares, acima do
+# limite de 4,0, porque Guerreiro e Ladino aproveitam a mana nova e o Mago quase
+# não muda. Com 0.90 junto, a distância cai para 3,4 e o Guerreiro fica
+# exatamente onde estava (9,2). É o nerf que paga a regeneração.
+BASIC_ATTACK_POWER_MULT = 0.90
 XMULT_CAP = 5.0  # Teto de multiplicadores puros
 CRIT_CHANCE_CAP = 75  # % máximo de chance crítica
 CRIT_DAMAGE_BASE = 1.5  # Multiplicador padrão de crítico
@@ -274,6 +295,17 @@ MONSTER_BUDGET_MP = 60
 MONSTER_ATTACK_TO_STAT_RATIO = 1.5
 # Abaixo desta fração da vida, um monstro com cura prioriza se curar.
 MONSTER_HEAL_HP_RATIO = 0.5
+# Abaixo desta fração da vida, o monstro entra em desespero: gasta o que tiver
+# para não morrer de graça — defesa se for tank, o maior dano se não for.
+MONSTER_DESPERATE_HP_RATIO = 0.35
+# Acima desta fração de vida do herói o monstro não tenta executar. Abaixo dela,
+# qualquer arquétipo com dano guardado usa a maior skill que tiver, ignorando a
+# rolagem de `skill_use_chance`: um golpe que mata vale mais que a média.
+MONSTER_EXECUTE_HP_RATIO = 0.35
+# Quantos turnos do início do combate contam como abertura. Um buff de defesa
+# lançado no primeiro turno de uma luta de dez rende os três turnos inteiros;
+# lançado no oitavo, rende um. Tank, elite, chefe e suporte abrem buffando.
+MONSTER_OPENER_TURNS = 1
 # Papel usado quando nada mais é indicado (carregamento de save antigo, por exemplo).
 DEFAULT_MONSTER_ROLE = "bruiser"
 
@@ -312,6 +344,29 @@ INITIAL_SKILL_LEVELS = 4
 # independente do anterior. Não zero: uma run de 20 andares em uma única barra
 # de vida não é difícil, é impossível. O andar é a unidade de risco, e o que
 # sobra de vida no fim dele é o que dá peso à decisão de extrair.
+# Mana devolvida por turno de combate, em % do MP máximo.
+#
+# Valia 0: a única mana do combate era a do pool, e a única recarga era o
+# descanso de fim de andar (FLOOR_CLEAR_RESTORE_PERCENT). O Guerreiro entra no
+# nível 1 com 60 de MP e a Investida custa 20 — três usos e acabou. Medido: 2,2
+# skills por combate de doze turnos, e 36% do dano do herói saindo do ataque
+# básico. Isso não é o jogador escolhendo bater; é o jogador sem alternativa, e
+# um combate cuja melhor jogada é sempre a mesma não admite adaptação.
+#
+# Com regeneração por turno, a mana deixa de ser um estoque que se gasta uma vez
+# e vira ritmo: dá para bater agora e pagar a skill grande dali a três turnos.
+# A 2%, o básico cai de 36% para 17% do dano, o herói passa a soltar 3,1 skills
+# por combate, e o Mago passa a usar duas skills diferentes em vez de uma —
+# o "spam de uma skill só" era, na origem, falta de recurso para uma segunda.
+#
+# 2% e não mais: a 3% o Guerreiro sobe para 11,3 andares e a distância entre
+# classes vai a 5,6, acima do limite de 4,0. A regeneração é forte demais para
+# ser dada sozinha; ela vem acompanhada do nerf em BASIC_ATTACK_POWER_MULT.
+#
+# Vale para monstro também, e é o que sustenta o arquétipo num combate longo:
+# um tank sem mana no turno 8 volta a ser um saco de pancada.
+MP_REGEN_PERCENT_PER_TURN = 2
+
 FLOOR_CLEAR_RESTORE_PERCENT = 29
 
 # --- Level up ---

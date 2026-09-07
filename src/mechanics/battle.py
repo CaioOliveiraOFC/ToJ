@@ -120,6 +120,7 @@ def run_battle(
     # diante a promessa não valia. O reset pertence à entrada do combate.
     for entidade in (hero, *monsters):
         entidade._death_ignore_used = False
+        entidade.turns_taken = 0
 
     order = build_turn_order(hero, monsters)
     index = 0
@@ -223,7 +224,7 @@ def _run_hero_turn(
         out.skill_damage[skill_id] = out.skill_damage.get(skill_id, 0) + dano
     else:
         combat_mech.resolve_physical_attack(
-            hero, target, hero.get_avg_damage(), "", rng=rng, publish=publish
+            hero, target, combat_mech.basic_attack_power(hero), "", rng=rng, publish=publish
         )
         out.basic_damage += max(0, hp_before - target.get_hp())
 

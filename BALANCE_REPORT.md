@@ -298,6 +298,119 @@ jogo aparecem, então eram sempre elas as condenadas. `Ressurgir` estava na list
 de fracas por esse motivo, e `Apocalipse` e `Morte Súbita` estavam na de
 identidade. Para julgá-las, `--policy-iterations` maior.
 
+## O combate voltou a ter escolha
+
+O pedido era direto: *"precisamos nerfar o ataque básico, não faz sentido. (...)
+o jogador nunca vai se adaptar ao que está acontecendo, ele só vai spamar uma
+skill."* O diagnóstico estava certo e a causa era outra.
+
+### O que a medição disse, e o que ela desmentiu
+
+Com o ataque básico entregando o poder inteiro, de graça e sem recarga, **36%
+do dano do herói saía dele** e o bot soltava **2,2 skills por combate de doze
+turnos**. O Mago usava **uma** skill acima de 10% dos usos; Guerreiro, duas.
+
+A hipótese óbvia — o ataque básico está forte demais — foi testada e **está
+errada**. Mexer só nele não move o número:
+
+| `BASIC_ATTACK_POWER_MULT` | Regen | Guerreiro | Mago | Ladino | Distância | Dano do básico | Skills/luta |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 1,00 (antes) | 0 | 9,2 | 5,3 | 8,9 | 3,9 | 35,9% | 2,2 |
+| 0,90 | 0 | 8,1 | 5,2 | 8,4 | 3,2 | **35,2%** | 2,2 |
+| 1,00 | 2% | 10,2 | 5,8 | 10,5 | **4,7** | 19,3% | 2,9 |
+| 1,00 | 3% | 11,3 | 6,0 | 11,7 | **5,6** | 17,6% | 3,1 |
+| **0,90** | **2%** | **9,2** | **6,7** | **10,1** | **3,4** | **17,4%** | **3,1** |
+| 0,80 | 3% | 9,6 | 7,6 | 11,7 | 4,0 | 13,4% | 3,3 |
+
+250 runs por classe, seed 11, política competente, equipamento típico.
+
+Baixar o ataque básico de 1,0 para 0,9 sem mais nada move a fatia do dano dele
+de 35,9% para 35,2% — **nada** — e custa 1,1 andar ao Guerreiro. O herói não
+spamava o básico porque o básico era forte. Spamava porque **ficava sem mana no
+terceiro turno**: o Guerreiro entra no nível 1 com 60 de MP e a Investida custa
+20. A única recarga do jogo era o descanso de fim de andar.
+
+### A correção é um par, e nenhuma das duas metades funciona sozinha
+
+**`MP_REGEN_PERCENT_PER_TURN = 2`.** A mana deixa de ser um estoque gasto uma
+vez e vira ritmo: dá para bater agora e pagar a skill grande dali a três turnos.
+Sozinha, ela derruba o básico de 36% para 19% — mas leva a distância entre
+classes de 3,9 para **4,7 andares, acima do limite de 4,0**, porque Guerreiro e
+Ladino aproveitam a mana nova e o Mago quase não muda.
+
+**`BASIC_ATTACK_POWER_MULT = 0.90`.** É o nerf que paga a regeneração. Junto com
+ela, a distância cai para 3,4 e o Guerreiro fica exatamente onde estava (9,2).
+
+O par entrega o que foi pedido: básico de 36% para **17,4%** do dano, 2,2 para
+**3,1 skills por combate**, e o Mago passa a usar **duas** skills em vez de uma.
+Dificuldade preservada no Guerreiro, e o Mago — a classe mais fraca — sobe 1,4
+andar sem que nenhum número de classe fosse tocado.
+
+### Os monstros ganharam intenção
+
+*"Parece que os monstros não seguem uma lógica baseada na armadura deles."* Não
+seguiam mesmo, e por um defeito: `Monster.get_df()` devolvia a defesa crua e
+ignorava `active_buffs`. **Nenhum buff de monstro tinha efeito** — a Bênção
+Sombria do suporte gastava mana, turno e recarga para não mudar nada, e o
+arquétipo tank inteiro dependia disso. Corrigido junto com os outros achados da
+revisão do PR.
+
+Com o buff funcionando, a IA passou de estática para reativa. Antes, fora a cura
+de emergência, o monstro escolhia sempre a mesma skill do papel, e o uso passava
+por uma moeda (`skill_use_chance`) que ignorava a situação: um tank buffava a
+armadura no turno em que fosse sorteado, inclusive no último; um chefe com o
+herói a um golpe da morte podia dar um tapa.
+
+Agora existem quatro momentos, e três **furam a moeda**, porque jogada decisiva
+não é sorteio:
+
+| Momento | Quando | Quem |
+|---|---|---|
+| **Execução** | herói abaixo de 35% de vida | todo arquétipo com dano |
+| **Sobrevivência** | o próprio monstro ferido, com cura na mão | suporte |
+| **Desespero** | abaixo de 35% da própria vida | quem defende se fecha; quem não defende gasta o maior dano |
+| **Abertura** | primeiro turno | tank, elite, chefe, suporte |
+
+E a rotina do papel nunca relança um buff que já está no ar — outra forma de
+gastar turno em nada.
+
+**Catálogo de arquétipos:** todo papel exceto o trash passou a ter no mínimo
+duas intenções (eram cinco papéis com uma skill só, dependendo da moeda cair na
+hora certa). O trash continua sem skill de propósito: o arquétipo dele é
+acúmulo, e a ameaça é o número, não a jogada. Novas: Fúria (bruiser), Muralha e
+Impacto de Escudo (tank), Detonação Arcana (glass cannon), Esquiva Felina e
+Ferida Aberta (skirmisher), Presságio (controlador), Maldição (suporte), Pele de
+Ferro (elite), Ira Final (chefe).
+
+Custo isolado da IA nova, medido com o ataque básico ainda em 1,0: Guerreiro
+0,0, Mago +0,2, Ladino −1,0 andar. O Ladino é quem mais sente, e faz sentido —
+a Esquiva Felina do skirmisher e a Muralha do tank atacam exatamente o que ele
+faz.
+
+### O que isto expôs: 13 pares de skills dominadas
+
+Ao fixar o piso de "toda skill de dano tem de valer mais que bater", oito skills
+reprovaram. A causa não é o piso: é que **a tabela de preços das skills não é
+monótona**. Uma skill que custa mais mana e mais recarga entrega menos dano que
+a que a classe já ganha no nível 1.
+
+| Classe | Dominada | Domina |
+|---|---|---|
+| Guerreiro | `golpe_devastador` (nv 10, 50%, 30 MP, cd 3) | `golpe_poderoso` (nv 1, 60%, 15 MP, cd 1) |
+| Guerreiro | `golpe_duplo` (nv 9, 45%, 35 MP, cd 3) | `investida` (nv 1, 70%, 20 MP, cd 1) |
+| Guerreiro | `cutelada` (nv 5, 35%, 20 MP, cd 2) | `golpe_poderoso` |
+| Mago | `relampago` (nv 5), `explosao_arcana` (nv 7), `tempestade` (nv 13) | `bola_fogo` e `missil_magico` (nv 1) |
+| Ladino | `assassinato` (nv 9), `danca_laminas` (nv 13) | `ataque_furtivo` (nv 1) |
+
+Eficiência em dano por mana: as skills de nível 1 entregam de 3,2 a 4,0; as
+aprendidas depois, de 1,3 a 2,0. **O kit inicial é o kit final.**
+
+É a explicação, com causa, do achado que estava aberto desde o primeiro scout —
+"escolher skill vale −0,2 andar" e "10 skills recusadas por toda intenção". Não
+era o bot escolhendo mal nem as skills serem fracas: metade delas é
+matematicamente pior que o que o jogador já tem na mão. Corrigir isso é mexer na
+tabela de preços, e é o próximo passo.
+
 ## Como reproduzir
 
 Todo comando é determinístico: a mesma `--seed` devolve o mesmo resultado.
