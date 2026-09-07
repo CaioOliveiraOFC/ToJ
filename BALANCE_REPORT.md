@@ -78,6 +78,14 @@ existe para que isso não volte em silêncio.
 | Mago | 7,4 | 4 | 19,2% | andar médio 0,2 |
 | Ladino | 9,7 | 5 | 28,8% | andar médio 0,9 |
 
+> **Números superados.** A revisão do PR apontou duas divergências entre a
+> masmorra simulada e a de produção — o nível de cada monstro era fixado no
+> andar em vez de sortear `+0/+1/+2` (peso 70/25/5), e fugir não encerrava o
+> andar, encadeando o próximo combate no mesmo HP baixo que motivou a fuga.
+> Corrigidas as duas, a mesma medição dá **Guerreiro 8,8 · Mago 5,2 ·
+> Ladino 8,3**. A masmorra sempre foi mais dura que isto: quem estava errado
+> era o medidor. Distância entre classes: 3,6 andares (limite 4,0).
+
 - O bot que só ataca **não termina a masmorra** em nenhuma classe.
 - Distância entre a melhor e a pior classe: **3,0 andares**. Nenhum número de
   classe foi alterado em nenhuma das rodadas: os 3,5 anteriores caíram para 2,4

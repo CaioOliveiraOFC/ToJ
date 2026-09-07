@@ -18,7 +18,9 @@ from typing import Any, Literal
 
 from src.mechanics import combat as combat_mech
 from src.mechanics.monster_ai import decide_monster_action
+from src.shared import combat_topics as T
 from src.shared.constants import MAX_BATTLE_TURNS
+from src.shared.types import GameEvent
 
 ActionKind = Literal["attack", "skill", "item", "flee"]
 
@@ -113,6 +115,12 @@ def run_battle(
     r = rng if rng is not None else random.Random()
     out = BattleOutcome(hp_max=int(getattr(hero, "base_hp", hero.get_hp())))
 
+    # A passiva `death_ignore` promete "uma vez por COMBATE". A marca só era
+    # apagada no descanso de fim de andar, então da segunda luta do andar em
+    # diante a promessa não valia. O reset pertence à entrada do combate.
+    for entidade in (hero, *monsters):
+        entidade._death_ignore_used = False
+
     order = build_turn_order(hero, monsters)
     index = 0
     hero_turn = 0
@@ -174,8 +182,19 @@ def _run_hero_turn(
     out.action_counts[action.kind] = out.action_counts.get(action.kind, 0) + 1
 
     if action.kind == "flee":
-        if combat_mech.roll_flee_success(rng=rng):
-            out.fled = True
+        out.fled = combat_mech.roll_flee_success(rng=rng)
+        # A UI inscreve `_on_flee_result` neste tópico. Sem a publicação, o
+        # jogador que tentava fugir e falhava via o monstro agir sem nenhuma
+        # indicação de que a rolagem existiu.
+        if publish is not None:
+            publish(
+                T.COMBAT_FLEE_RESULT,
+                GameEvent(
+                    type="flee_result",
+                    payload={"hero": hero, "success": out.fled},
+                    source="mechanics.battle",
+                ),
+            )
         return
 
     target = action.target or pick_default_target(monsters)

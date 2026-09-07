@@ -77,7 +77,7 @@ class Item:
         )
 
 
-def _create_item_from_json(item_data: dict) -> Item:
+def create_item_from_json(item_data: dict) -> Item:
     """Cria um objeto Item a partir de dados do JSON."""
     return Item(
         item_id=item_data.get("id", ""),
@@ -115,7 +115,7 @@ def _load_all_items() -> dict[str, Item]:
 
     _ALL_ITEMS_CACHE = {}
     for item_data in items_list:
-        item = _create_item_from_json(item_data)
+        item = create_item_from_json(item_data)
         _ALL_ITEMS_CACHE[item.name] = item
 
     return _ALL_ITEMS_CACHE

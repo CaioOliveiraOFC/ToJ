@@ -4,7 +4,7 @@ import copy
 import random
 from typing import Any
 
-from src.content.items import Item
+from src.content.items import Item, create_item_from_json
 from src.data.loader import load_items_data
 
 
@@ -24,21 +24,11 @@ def _build_loot_table() -> list[Item]:
         if not item_data.get("droppable", True):
             continue
 
-        rarity = item_data.get("rarity", "Common")
-
-        item = Item(
-            item_id=item_data.get("id", ""),
-            name=item_data.get("name", ""),
-            description=item_data.get("description", ""),
-            rarity=rarity,
-            slot=item_data.get("slot", "Body"),
-            damage_bonus=item_data.get("damage_bonus", 0),
-            defense_bonus=item_data.get("defense_bonus", 0),
-            effect_type=item_data.get("effect_type"),
-            effect_value=item_data.get("effect_value", 0),
-            classes=item_data.get("classes"),
-        )
-        loot_table.append(item)
+        # Constrói pelo MESMO caminho da loja. A cópia manual daqui omitia
+        # `consumable`, então as 14 poções e elixires do jogo caíam do monstro
+        # com `consumable=False`: `is_potion` dava falso e o item não aparecia
+        # no menu de itens do combate. Poção achada em loot era poção morta.
+        loot_table.append(create_item_from_json(item_data))
 
     return loot_table
 

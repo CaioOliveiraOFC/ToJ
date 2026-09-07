@@ -20,7 +20,7 @@ from src.content.factories.dungeons import (
     apply_fountain_heal,
     roll_random_event,
 )
-from src.content.factories.monsters import generation_rules
+from src.content.factories.monsters import calculate_scaled_monster_level, generation_rules
 from src.content.shop import Shop
 from src.entities.heroes import Mage, Rogue, Warrior
 from src.mechanics.battle import run_battle
@@ -284,7 +284,16 @@ def simulate_run(
                 # O nível do encontro vem do ANDAR, não do herói — é assim que o
                 # jogo real gera monstros. Amarrar ao nível do herói esconderia
                 # justamente a defasagem que cria a dificuldade crescente.
-                monsters = build_encounter(name, floor)
+                #
+                # Em cima disso, cada monstro sorteia o próprio nível pelas
+                # regras do jogo (`level_variation`: +0/+1/+2 com peso 70/25/5,
+                # e os tetos de segurança contra RNG injusto). Fixar todo mundo
+                # no andar simulava uma masmorra 0,35 nível mais fraca que a de
+                # produção — e o atrito de recurso desses monstros acima do
+                # andar é justamente o que a ablação tenta medir.
+                monsters = build_encounter(
+                    name, floor, lambda: calculate_scaled_monster_level(floor, hero.get_level())
+                )
                 outcome = run_battle(hero, monsters, lambda h, m, t: decide(h, m, t), rng=rng, publish=None)
                 # Registrar ANTES de checar a morte. Sair primeiro descartava a
                 # luta que encerra a run — 100% das derrotas — e com ela o que o
@@ -295,6 +304,13 @@ def simulate_run(
                     telemetry.record_battle(outcome)
                 if not hero.get_isalive() or hero.get_hp() <= 0:
                     died = True
+                    break
+                if outcome.fled:
+                    # Fugir encerra o andar, como em `engine/loop.run_fight`, que
+                    # retorna e devolve o jogador ao mapa. Seguir para o próximo
+                    # encontro punia a fuga com a luta seguinte no mesmo HP baixo
+                    # que motivou a fuga — o oposto do que a mecânica promete, e
+                    # profundidade a menos em toda run que fugiu.
                     break
                 if outcome.hero_won:
                     _award(hero, monsters, essence, rng, cfg, telemetry, picker)
