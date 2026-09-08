@@ -86,16 +86,16 @@ def run_main_loop() -> None:
     while True:
         menu_result = call_main_menu()
 
-        if menu_result == 'quit':
+        if menu_result == "quit":
             break
-        elif menu_result == 'auto_test':
+        elif menu_result == "auto_test":
             if AutoTester is None:
                 screens.render_game_saved("AutoTester não disponível.")
                 continue
             player = Warrior("TestBot")
             tester = AutoTester()
             tester.run_test(player)
-        elif menu_result == 'test_hero':
+        elif menu_result == "test_hero":
             player = _create_test_hero()
             sleep(0.5)
             start_game(player, 1, None, slot=1)
@@ -117,4 +117,6 @@ def run_main_loop() -> None:
                 if player:
                     start_game(player, dungeon_level, map_state, slot=slot)
                 else:
-                    screens.render_game_saved("Falha ao carregar save. O arquivo pode estar corrompido.")
+                    screens.render_game_saved(
+                        "Falha ao carregar save. O arquivo pode estar corrompido."
+                    )

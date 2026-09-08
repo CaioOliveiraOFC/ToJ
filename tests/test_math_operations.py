@@ -73,7 +73,9 @@ class TestEscalonamentoCompartilhado:
     def test_mini_boss_recompensa_mais_que_monstro_do_mesmo_andar(self):
         for andar in (1, 5, 10, 15):
             assert mo.calculate_mini_boss_xp_reward(andar) > mo.calculate_monster_xp_reward(andar)
-            assert mo.calculate_mini_boss_coin_reward(andar) > mo.calculate_monster_coin_reward(andar)
+            assert mo.calculate_mini_boss_coin_reward(andar) > mo.calculate_monster_coin_reward(
+                andar
+            )
 
 
 # --------------------------------------------------------------------- XP
@@ -136,9 +138,7 @@ class TestGenerateEssenceMultiplier:
         sorteio = random.gauss(
             constants.ESSENCE_MULT_NORMAL_MEAN, constants.ESSENCE_MULT_NORMAL_STD
         )
-        bruto = max(
-            constants.ESSENCE_MULT_MIN, min(constants.ESSENCE_MULT_MAX, sorteio)
-        )
+        bruto = max(constants.ESSENCE_MULT_MIN, min(constants.ESSENCE_MULT_MAX, sorteio))
         random.seed(0)
         assert mo.generate_essence_multiplier(1) == round(bruto, 1)
 

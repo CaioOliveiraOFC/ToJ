@@ -14,7 +14,7 @@ else:
 
 def get_key() -> str:
     """Lê um único caractere do teclado sem precisar pressionar Enter (multi-plataforma).
-    
+
     Returns:
         - Caractere normal (a-z, 0-9, etc.)
         - "UP" para arrow up

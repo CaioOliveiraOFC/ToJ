@@ -124,11 +124,17 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
                                     # vender
                                     if old_item in player.inventory:
                                         if shop.sell_item(player, old_item, dungeon_level):
-                                            screens.render_shop_sell_success(old_item.name, sell_price)
+                                            screens.render_shop_sell_success(
+                                                old_item.name, sell_price
+                                            )
                                         else:
-                                            screens.render_shop_equip_failed("Falha ao vender item antigo")
+                                            screens.render_shop_equip_failed(
+                                                "Falha ao vender item antigo"
+                                            )
                                     else:
-                                        screens.render_shop_equip_failed("Item antigo não encontrado no inventário")
+                                        screens.render_shop_equip_failed(
+                                            "Item antigo não encontrado no inventário"
+                                        )
                                 elif sell_choice and sell_choice.lower() == "d":
                                     if old_item in player.inventory:
                                         player.remove_item_from_inventory(old_item)

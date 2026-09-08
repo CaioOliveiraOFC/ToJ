@@ -217,8 +217,8 @@ XP_LEVEL_RATIO = 1.195
 # 0.12 leva a variância a 8,2%, mas o andar médio cai para 8,95 e a distância só
 # melhora de 7,3 para 6,9: retorno decrescente, e a Essência vira constante.
 # 0.2 é o joelho da curva.
-ESSENCE_MULT_NORMAL_MEAN = 1.2   # Centro da curva gaussiana
-ESSENCE_MULT_NORMAL_STD = 0.2    # Desvio padrão (controla variação)
+ESSENCE_MULT_NORMAL_MEAN = 1.2  # Centro da curva gaussiana
+ESSENCE_MULT_NORMAL_STD = 0.2  # Desvio padrão (controla variação)
 # Limites do sorteio, a três desvios da média mais baixa e da mais alta. Antes
 # eram 0.5 e 3.0, faixa herdada de um desvio de 0.5: com 0.2 esses extremos
 # ficariam a mais de oito desvios, ou seja, nunca sairiam — e a tela de
@@ -325,13 +325,13 @@ ENCOUNTER_MAX_SIZE_DEEP = 3
 # monstro acertar e a classe fica imune. Com a relativa, a vantagem de quem
 # investe em agilidade é grande mas permanente e limitada.
 HIT_AGILITY_SWING = 30  # pontos percentuais máximos que a agilidade move
-HIT_CHANCE_FLOOR = 20   # nenhum defensor fica imune
-HIT_CHANCE_CEIL = 95    # nenhum atacante fica infalível
+HIT_CHANCE_FLOOR = 20  # nenhum defensor fica imune
+HIT_CHANCE_CEIL = 95  # nenhum atacante fica infalível
 
 # --- Efeitos de status ---
-MANA_BURN_PER_TICK = 12       # MP drenado por turno por "mana_burn"
-BLEED_DAMAGE_PERCENT = 4      # % do HP máximo por turno por "bleed"
-INVISIBLE_HIT_PENALTY = 45    # pontos percentuais de acerto perdidos contra alvo invisível
+MANA_BURN_PER_TICK = 12  # MP drenado por turno por "mana_burn"
+BLEED_DAMAGE_PERCENT = 4  # % do HP máximo por turno por "bleed"
+INVISIBLE_HIT_PENALTY = 45  # pontos percentuais de acerto perdidos contra alvo invisível
 
 # Duração, em turnos, dos buffs vindos de consumíveis.
 POTION_BUFF_DURATION = 3

@@ -55,4 +55,3 @@ class EventBus:
             h(event)
         for h in wildcard:
             h(event)
-

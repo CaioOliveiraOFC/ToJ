@@ -68,5 +68,3 @@ class Entity:
     def get_hp(self) -> int:
         """Retorna os pontos de vida atuais."""
         return int(self._hp)
-
-

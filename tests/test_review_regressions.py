@@ -94,8 +94,12 @@ class TestDeathIgnoreEPorCombate:
         heroi = self._heroi_com_death_ignore()
         monstros = [spawn_by_role("trash", 1)]
         run_battle(
-            heroi, monstros, lambda h, m, t: Action(kind="attack"),
-            rng=random.Random(7), publish=None, max_turns=1,
+            heroi,
+            monstros,
+            lambda h, m, t: Action(kind="attack"),
+            rng=random.Random(7),
+            publish=None,
+            max_turns=1,
         )
         assert heroi._death_ignore_used is False
 
@@ -104,8 +108,12 @@ class TestDeathIgnoreEPorCombate:
         monstro = spawn_by_role("trash", 1)
         monstro._death_ignore_used = True
         run_battle(
-            heroi, [monstro], lambda h, m, t: Action(kind="attack"),
-            rng=random.Random(7), publish=None, max_turns=1,
+            heroi,
+            [monstro],
+            lambda h, m, t: Action(kind="attack"),
+            rng=random.Random(7),
+            publish=None,
+            max_turns=1,
         )
         assert monstro._death_ignore_used is False
 
@@ -118,7 +126,8 @@ class TestFugaEPublicada:
 
         eventos: list[tuple[str, object]] = []
         run_battle(
-            Warrior("Teste"), [spawn_by_role("trash", 1)],
+            Warrior("Teste"),
+            [spawn_by_role("trash", 1)],
             lambda h, m, t: Action(kind="flee"),
             rng=random.Random(semente),
             publish=lambda topico, evento: eventos.append((topico, evento)),
@@ -225,8 +234,11 @@ class TestFugaEncerraOAndar:
         def sempre_foge(hero, monsters, decide, *, rng, publish=None, **kw):
             combates.append("luta")
             resultado = original(
-                hero, monsters, lambda h, m, t: Action(kind="flee"),
-                rng=random.Random(0), publish=None,
+                hero,
+                monsters,
+                lambda h, m, t: Action(kind="flee"),
+                rng=random.Random(0),
+                publish=None,
             )
             object.__setattr__(resultado, "fled", True)
             return resultado
@@ -234,7 +246,10 @@ class TestFugaEncerraOAndar:
         harness.run_battle = sempre_foge
         try:
             simulate_run(
-                "Warrior", iterations=1, seed=1, max_floor=3,
+                "Warrior",
+                iterations=1,
+                seed=1,
+                max_floor=3,
                 encounters_per_floor=lambda floor: ["trash_solo", "trash_solo", "trash_solo"],
             )
         finally:

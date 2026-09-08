@@ -214,7 +214,7 @@ def _render_battle_results(
         monster_name=monster.get_nick_name(),
         xp_gained=xp_gained,
         player_won=player_won,
-        dropped_item_name=getattr(dropped_item, 'name', None) if dropped_item else None,
+        dropped_item_name=getattr(dropped_item, "name", None) if dropped_item else None,
         level_up_messages=level_up_msgs,
         coins_gained=coins_gained,
         essence_multiplier=essence_multiplier,
@@ -264,12 +264,18 @@ def run_fight(
         if outcome.fled:
             return
 
-        xp_gained, player_won, dropped_item, level_up_msgs, coins_gained, levels_gained = process_post_battle(
-            player, monsters, essence_multiplier
+        xp_gained, player_won, dropped_item, level_up_msgs, coins_gained, levels_gained = (
+            process_post_battle(player, monsters, essence_multiplier)
         )
         _render_battle_results(
-            player, monsters[0], xp_gained, player_won, dropped_item,
-            level_up_msgs, coins_gained, essence_multiplier
+            player,
+            monsters[0],
+            xp_gained,
+            player_won,
+            dropped_item,
+            level_up_msgs,
+            coins_gained,
+            essence_multiplier,
         )
 
         if player_won and levels_gained > 0:
@@ -446,7 +452,7 @@ def _build_encounters(monsters: list, dungeon_level: int) -> list[list]:
     index = 0
     while index < len(rest):
         size = random.randint(1, max_size)
-        groups.append(rest[index:index + size])
+        groups.append(rest[index : index + size])
         index += size
     return groups
 
@@ -460,8 +466,12 @@ def _render_dungeon_screen(
     """Renderiza a tela principal da masmorra."""
     clear_screen()
     screens.render_dungeon_status(
-        dungeon_level, player.get_hp(), player.base_hp,
-        player.get_mp(), player.base_mp, essence_multiplier
+        dungeon_level,
+        player.get_hp(),
+        player.base_hp,
+        player.get_mp(),
+        player.base_mp,
+        essence_multiplier,
     )
     map_lines = game_map.draw_map()
     screens.render_map(map_lines)
@@ -493,17 +503,17 @@ def _handle_player_movement(
                 player.get_classname(),
                 player.get_level(),
                 dungeon_level,
-                "Derrotado na masmorra"
+                "Derrotado na masmorra",
             )
             delete_save(slot)
             return "player_died"
         # After defeating a monster, update the map grid to reflect the empty space
-        game_map.grid[game_map.player_pos['y']][game_map.player_pos['x']] = '.'
+        game_map.grid[game_map.player_pos["y"]][game_map.player_pos["x"]] = "."
 
         screens.render_continue_prompt()
         safe_get_key(allow_escape=False)
 
-    elif collided_object == 'level_complete':
+    elif collided_object == "level_complete":
         screens.render_level_complete(dungeon_level)
         safe_get_key(allow_escape=False)
         return "level_complete"
@@ -523,19 +533,21 @@ def _handle_player_input(
     Retorna 'quit' para sair, 'level_complete' para próximo nível,
     None para continuar.
     """
-    move = safe_get_key(valid_keys=['w', 'a', 's', 'd', 'i', 'c', 'q', 'p'])
+    move = safe_get_key(valid_keys=["w", "a", "s", "d", "i", "c", "q", "p"])
 
-    if move is None or move == 'q':
+    if move is None or move == "q":
         return "quit"
-    elif move == 'i':
+    elif move == "i":
         _get_game_publish()(topics.UI_OPEN_INVENTORY, {"player": player})
-    elif move == 'c':
+    elif move == "c":
         _get_game_publish()(topics.UI_OPEN_CHARACTER_STATUS, {"player": player})
-    elif move == 'p':
+    elif move == "p":
         save_game(player, dungeon_level, game_map.get_map_state(), slot=slot)
         screens.render_game_saved()
-    elif move in ['w', 'a', 's', 'd']:
-        return _handle_player_movement(player, game_map, dungeon_level, move, essence_multiplier, slot)
+    elif move in ["w", "a", "s", "d"]:
+        return _handle_player_movement(
+            player, game_map, dungeon_level, move, essence_multiplier, slot
+        )
 
     return None
 
@@ -572,13 +584,18 @@ def start_game(
                 # --- Evento aleatório (TASK-005) — 25% antes da extração ---
                 event_type = roll_random_event()
                 if event_type:
-                    _get_game_publish()(topics.UI_RANDOM_EVENT, {
-                        "player": player,
-                        "dungeon_level": dungeon_level,
-                        "event_type": event_type,
-                    })
+                    _get_game_publish()(
+                        topics.UI_RANDOM_EVENT,
+                        {
+                            "player": player,
+                            "dungeon_level": dungeon_level,
+                            "event_type": event_type,
+                        },
+                    )
                     if not player.get_isalive():
-                        _get_game_publish()(topics.UI_GAME_OVER, {"player_name": player.get_nick_name()})
+                        _get_game_publish()(
+                            topics.UI_GAME_OVER, {"player_name": player.get_nick_name()}
+                        )
                         add_trophy(
                             player.get_nick_name(),
                             player.get_classname(),
@@ -590,7 +607,10 @@ def start_game(
                         return
                 # Loja sempre disponível ao concluir o andar — inclusive para quem vai extrair,
                 # para não perder a recompensa do andar (corrige bug reportado).
-                _get_game_publish()(topics.UI_OPEN_SHOP, {"player": player, "shop": shop, "dungeon_level": dungeon_level})
+                _get_game_publish()(
+                    topics.UI_OPEN_SHOP,
+                    {"player": player, "shop": shop, "dungeon_level": dungeon_level},
+                )
                 # --- Decisão de extração (TASK-007) ---
                 # Sem meta-progressão nova: "preservar" = salvar o personagem
                 # no slot atual via save_game (xp/level/passivas/coins/inventário
@@ -598,14 +618,17 @@ def start_game(
                 # o fluxo histórico.
                 next_estimate = estimate_next_essence_multiplier(dungeon_level)
                 decision: dict[str, str | None] = {"choice": None}
-                _get_game_publish()(topics.UI_EXTRACTION_PROMPT, {
-                    "player": player,
-                    "dungeon_level": dungeon_level,
-                    "essence_multiplier": next_estimate,
-                    "is_estimate": True,
-                    "result": decision,
-                    "slot": slot,
-                })
+                _get_game_publish()(
+                    topics.UI_EXTRACTION_PROMPT,
+                    {
+                        "player": player,
+                        "dungeon_level": dungeon_level,
+                        "essence_multiplier": next_estimate,
+                        "is_estimate": True,
+                        "result": decision,
+                        "slot": slot,
+                    },
+                )
                 if decision.get("choice") == "extract":
                     save_game(player, dungeon_level, None, slot=slot)
                     screens.render_extraction_success(dungeon_level)

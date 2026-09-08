@@ -41,16 +41,18 @@ def list_slots() -> list[dict]:
         filepath = get_slot_file(i)
         if os.path.exists(filepath):
             try:
-                with open(filepath, 'r') as f:
+                with open(filepath, "r") as f:
                     data = json.load(f)
-                    slots.append({
-                        "slot": i,
-                        "occupied": True,
-                        "name": data.get("player_name", "?"),
-                        "class": data.get("player_class", "?"),
-                        "level": data.get("level", 0),
-                        "floor": data.get("dungeon_level", 0)
-                    })
+                    slots.append(
+                        {
+                            "slot": i,
+                            "occupied": True,
+                            "name": data.get("player_name", "?"),
+                            "class": data.get("player_class", "?"),
+                            "level": data.get("level", 0),
+                            "floor": data.get("dungeon_level", 0),
+                        }
+                    )
             except Exception:
                 slots.append({"slot": i, "occupied": False})
         else:
@@ -59,10 +61,7 @@ def list_slots() -> list[dict]:
 
 
 def save_game(
-    player: "Player",
-    dungeon_level: int,
-    map_state: dict | None = None,
-    slot: int = 1
+    player: "Player", dungeon_level: int, map_state: dict | None = None, slot: int = 1
 ) -> SaveResult:
     """Salva o estado atual do jogo num ficheiro JSON."""
     inventory_names = [item.name for item in player.inventory]
@@ -84,13 +83,13 @@ def save_game(
         "active_buffs": player.active_buffs,
         "active_effects": player.active_effects,
         "dungeon_level": dungeon_level,
-        "map_state": map_state
+        "map_state": map_state,
     }
 
     try:
         _ensure_save_dir()
         filepath = get_slot_file(slot)
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(save_data, f, indent=4)
         return {"success": True, "message": f"Jogo salvo no slot {slot}!"}
     except Exception as e:
@@ -98,9 +97,7 @@ def save_game(
 
 
 def load_game(
-    item_registry: ItemRegistry,
-    player_factory: dict[str, PlayerFactory],
-    slot: int = 1
+    item_registry: ItemRegistry, player_factory: dict[str, PlayerFactory], slot: int = 1
 ) -> tuple["Player" | None, int | None, dict | None]:
     """Carrega o estado do jogo a partir de um ficheiro JSON."""
     filepath = get_slot_file(slot)
@@ -108,7 +105,7 @@ def load_game(
         return None, None, None
 
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             save_data = json.load(f)
 
         player_class_name = save_data["player_class"]
@@ -206,11 +203,7 @@ def delete_save(slot: int) -> bool:
 
 
 def add_trophy(
-    player_name: str,
-    player_class: str,
-    level: int,
-    floor_reached: int,
-    cause: str = "Derrotado"
+    player_name: str, player_class: str, level: int, floor_reached: int, cause: str = "Derrotado"
 ) -> bool:
     """Adiciona uma entrada ao livro de troféus (personagens que morreram)."""
     _ensure_save_dir()
@@ -219,7 +212,7 @@ def add_trophy(
     trophies = []
     if os.path.exists(filepath):
         try:
-            with open(filepath, 'r') as f:
+            with open(filepath, "r") as f:
                 trophies = json.load(f)
         except Exception:
             trophies = []
@@ -230,12 +223,12 @@ def add_trophy(
         "level": level,
         "floor": floor_reached,
         "cause": cause,
-        "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
     }
     trophies.append(trophy)
 
     try:
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             json.dump(trophies, f, indent=4)
         return True
     except Exception:
@@ -251,7 +244,7 @@ def get_trophies() -> list[dict]:
         return []
 
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             return json.load(f)
     except Exception:
         return []

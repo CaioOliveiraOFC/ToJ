@@ -25,8 +25,13 @@ PRIORITY_ROLES = ("glass_cannon", "support", "controller")
 MANA_POTION_RATIO = 0.25
 # Efeitos de consumível que valem um turno no começo de um combate longo.
 COMBAT_ELIXIR_EFFECTS = (
-    "strength", "defense", "agility", "crit_chance",
-    "damage_reduction", "life_steal", "evasion",
+    "strength",
+    "defense",
+    "agility",
+    "crit_chance",
+    "damage_reduction",
+    "life_steal",
+    "evasion",
 )
 # A partir de quantos turnos estimados vale gastar um turno preparando buff.
 LONG_FIGHT_TURNS = 5
@@ -118,7 +123,13 @@ def random_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None
         options.append("item")
     kind = r.choice(options)
     if kind == "skill":
-        return Action(kind="skill", target=target, skill=r.choice(_usable_skills(hero, ("damage", "status", "buff", "heal", "damage_reduction"))))
+        return Action(
+            kind="skill",
+            target=target,
+            skill=r.choice(
+                _usable_skills(hero, ("damage", "status", "buff", "heal", "damage_reduction"))
+            ),
+        )
     if kind == "item":
         return Action(kind="item", item=r.choice(_healing_potions(hero)))
     return Action(kind="attack", target=target)
@@ -177,16 +188,14 @@ def smart_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None 
     if combate_longo and turn < OPENING_TURNS:
         ativos = _active_buff_stats(hero)
         buffs = [
-            s for s in _usable_skills(hero, ("buff", "damage_reduction"))
+            s
+            for s in _usable_skills(hero, ("buff", "damage_reduction"))
             if getattr(s, "effect_stat", "") not in ativos
         ]
         if buffs:
             return Action(kind="skill", target=hero, skill=buffs[0])
 
-        elixires = [
-            i for i in _combat_elixirs(hero)
-            if _elixir_stat(i) not in ativos
-        ]
+        elixires = [i for i in _combat_elixirs(hero) if _elixir_stat(i) not in ativos]
         if elixires:
             return Action(kind="item", item=elixires[0])
 

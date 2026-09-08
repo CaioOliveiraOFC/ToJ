@@ -36,6 +36,7 @@ if TYPE_CHECKING:
     from src.content.passives import PassiveCard
     from src.content.skills_loader import SkillCard
 
+
 def percentage(percent: int, whole: int, remainder: bool = True) -> int | float:
     """Calcula a porcentagem de um valor.
 
@@ -72,6 +73,7 @@ POTION_BUFFS: dict[str, tuple[str, str]] = {
 
 # Consumíveis que aplicam um status em vez de um buff de atributo.
 POTION_STATUSES = ("poison", "bleed", "stun", "fear", "true_damage", "death_ignore")
+
 
 class Player(Entity):
     """Classe base para personagens jogáveis (heróis).
@@ -361,8 +363,7 @@ class Player(Entity):
                 "duration": POTION_BUFF_DURATION,
             }
             msg = (
-                f"Você usou {item_name}. {label} +{effect_value} "
-                f"por {POTION_BUFF_DURATION} turnos!"
+                f"Você usou {item_name}. {label} +{effect_value} por {POTION_BUFF_DURATION} turnos!"
             )
         elif effect_type in POTION_STATUSES:
             self.active_effects[effect_type] = {
@@ -461,11 +462,7 @@ class Player(Entity):
         self._apply_passive_stats(passive)
 
     def get_passive_bonus(self, effect_type: str) -> float:
-        return sum(
-            float(p.effect_value)
-            for p in self.passives
-            if p.effect_type == effect_type
-        )
+        return sum(float(p.effect_value) for p in self.passives if p.effect_type == effect_type)
 
     @staticmethod
     def my_type() -> str:
@@ -557,7 +554,9 @@ class Player(Entity):
         messages: list[str] = []
         if 1 <= self.level <= INITIAL_SKILL_LEVELS and self.initial_skills_learned < self.level:
             initial_skills = get_initial_skills_for(self.get_classname())
-            while self.initial_skills_learned < self.level and self.initial_skills_learned < len(initial_skills):
+            while self.initial_skills_learned < self.level and self.initial_skills_learned < len(
+                initial_skills
+            ):
                 skill = initial_skills[self.initial_skills_learned]
                 new_key = self.initial_skills_learned + 1
                 self.skills[new_key] = skill

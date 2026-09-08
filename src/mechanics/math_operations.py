@@ -131,4 +131,3 @@ def estimate_next_essence_multiplier(dungeon_level: int) -> float:
     # Mostra a média como estimativa, clamped no mesmo intervalo
     clamped = max(ESSENCE_MULT_MIN, min(ESSENCE_MULT_MAX, mean))
     return round(clamped, 1)
-

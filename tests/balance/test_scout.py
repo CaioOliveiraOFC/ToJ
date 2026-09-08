@@ -102,15 +102,18 @@ class TestDerrota:
         # morre no primeiro combate. Se a batalha fatal fosse descartada, a
         # telemetria não teria batalha nenhuma.
         resultado = simulate_run(
-            "Mage", 20, 20, "greedy", 7, "naked",
+            "Mage",
+            20,
+            20,
+            "greedy",
+            7,
+            "naked",
             encounters_per_floor=lambda andar: ["boss_solo"],
         )
         telemetria = resultado["telemetry"]
         assert resultado["mean_floor"] == 0.0, "o cenário precisa matar toda run no andar 1"
         assert telemetria["defeats"] == 20
-        assert telemetria["battles"] == 20, (
-            "a luta que encerrou a run não entrou na telemetria"
-        )
+        assert telemetria["battles"] == 20, "a luta que encerrou a run não entrou na telemetria"
         assert telemetria["turns"] > 0
 
     def test_derrota_conta_a_run_que_o_heroi_nao_terminou(self):
@@ -136,14 +139,24 @@ class TestAblacao:
 
     def test_sem_passivas_a_run_nao_ganha_passiva(self):
         resultado = simulate_run(
-            "Warrior", 10, 5, "smart", 1337, "expected",
+            "Warrior",
+            10,
+            5,
+            "smart",
+            1337,
+            "expected",
             toggles=Toggles().without(passives=False),
         )
         assert resultado["passives_at_end_mean"] == 0
 
     def test_sem_essencia_o_xp_nao_e_multiplicado(self):
         resultado = simulate_run(
-            "Warrior", 10, 5, "smart", 1337, "expected",
+            "Warrior",
+            10,
+            5,
+            "smart",
+            1337,
+            "expected",
             toggles=Toggles().without(essence=False),
         )
         essencia = resultado["telemetry"]["essence"]
@@ -154,7 +167,12 @@ class TestAblacao:
 
         alvo = next(s for s in load_skills() if not s.is_initial and s.skill_class == "Warrior")
         resultado = simulate_run(
-            "Warrior", 20, 8, "smart", 1337, "expected",
+            "Warrior",
+            20,
+            8,
+            "smart",
+            1337,
+            "expected",
             toggles=Toggles().without(banned_skills=frozenset({alvo.id})),
         )
         assert alvo.id not in resultado["telemetry"]["skills"]["picked"]
@@ -179,7 +197,9 @@ class TestRelatorio:
 
     def test_texto_do_relatorio_menciona_os_sistemas(self, telemetria):
         relatorio = scout.ScoutReport(
-            iterations=RUNS, classes=["Warrior"], telemetry=telemetria,
+            iterations=RUNS,
+            classes=["Warrior"],
+            telemetry=telemetria,
             findings=scout.analyse_skills(telemetria) + scout.analyse_equipment(telemetria),
             baseline_mean_floor=5.0,
         )
@@ -190,8 +210,11 @@ class TestRelatorio:
         import json
 
         relatorio = scout.ScoutReport(
-            iterations=RUNS, classes=["Warrior"], telemetry=telemetria,
-            findings=scout.analyse_skills(telemetria), baseline_mean_floor=5.0,
+            iterations=RUNS,
+            classes=["Warrior"],
+            telemetry=telemetria,
+            findings=scout.analyse_skills(telemetria),
+            baseline_mean_floor=5.0,
         )
         assert json.dumps(relatorio.to_dict())
 
@@ -205,16 +228,16 @@ class TestAmostraPequena:
     """
 
     def test_amostra_curta_nao_declara_carta_morta(self):
-        curta = {"passives": {"offered": {"coracao_ferro": 40},
-                              "picked": {"coracao_ferro": 40}}}
+        curta = {"passives": {"offered": {"coracao_ferro": 40}, "picked": {"coracao_ferro": 40}}}
         assuntos = {f.subject for f in scout.analyse_passives(curta)}
         assert "nunca sorteadas" not in assuntos
 
     def test_amostra_longa_ainda_acusa_carta_morta(self):
         # A guarda não pode virar desculpa: com amostra grande a ausência volta
         # a ser achado.
-        longa = {"passives": {"offered": {"coracao_ferro": 4000},
-                              "picked": {"coracao_ferro": 4000}}}
+        longa = {
+            "passives": {"offered": {"coracao_ferro": 4000}, "picked": {"coracao_ferro": 4000}}
+        }
         mortas = [f for f in scout.analyse_passives(longa) if f.subject == "nunca sorteadas"]
         assert mortas and mortas[0].value > 0
 
@@ -293,14 +316,17 @@ class TestPoliticasDeEscolha:
 
     def test_a_run_aceita_cada_politica(self):
         for nome in POLICIES:
-            resultado = simulate_run("Warrior", 8, 4, "smart", 1337, "expected",
-                                     pick_policy=nome)
+            resultado = simulate_run("Warrior", 8, 4, "smart", 1337, "expected", pick_policy=nome)
             assert resultado["pick_policy"] == nome
 
     def test_comparacao_produz_taxa_por_politica(self):
         comparacao = scout.compare_pick_policies(
-            iterations=5, classes=["Warrior"], policy="smart",
-            loadout="expected", seed=1337, max_floor=12,
+            iterations=5,
+            classes=["Warrior"],
+            policy="smart",
+            loadout="expected",
+            seed=1337,
+            max_floor=12,
         )
         assert set(comparacao.mean_floor_by_policy) == set(POLICIES)
         assert comparacao.passive_pick_rate, "nenhuma taxa de escolha de passiva registrada"
@@ -324,8 +350,7 @@ class TestPoliticasDeEscolha:
             "random": {},
         }
         por_assunto = {
-            f.subject: f.detail
-            for f in scout._analyse_cards(comparacao.skill_pick_rate, "skills")
+            f.subject: f.detail for f in scout._analyse_cards(comparacao.skill_pick_rate, "skills")
         }
 
         assert "Apocalipse" in por_assunto.get("sem amostra suficiente", "")
@@ -336,8 +361,12 @@ class TestPoliticasDeEscolha:
 
     def test_comparacao_gera_achados_classificando_cartas(self):
         comparacao = scout.compare_pick_policies(
-            iterations=5, classes=["Warrior"], policy="smart",
-            loadout="expected", seed=1337, max_floor=12,
+            iterations=5,
+            classes=["Warrior"],
+            policy="smart",
+            loadout="expected",
+            seed=1337,
+            max_floor=12,
         )
         achados = scout.analyse_pick_policies(comparacao)
         assuntos = {f.subject for f in achados}

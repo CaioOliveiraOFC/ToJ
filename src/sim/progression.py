@@ -30,6 +30,8 @@ SKILL_CHOICE_MIN_LEVEL = 5
 TARGET_HEALING_POTIONS = 3
 # Fração do ouro que o bot aceita gastar em equipamento; o resto fica para poção.
 GEAR_BUDGET_RATIO = 0.6
+
+
 def pick_passive(hero, choices: list, rng: random.Random, picker: PickPolicy | None = None):
     """Escolhe uma passiva entre as oferecidas, pela política indicada.
 
@@ -45,9 +47,14 @@ def pick_skill(hero, choices: list, rng: random.Random, picker: PickPolicy | Non
     return (picker or get_pick_policy(DEFAULT_PICK_POLICY)).pick_skill(hero, choices, rng)
 
 
-def on_level_up(hero, levels_gained: int, rng: random.Random,
-                toggles: Toggles | None = None, telemetry=None,
-                picker: PickPolicy | None = None) -> None:
+def on_level_up(
+    hero,
+    levels_gained: int,
+    rng: random.Random,
+    toggles: Toggles | None = None,
+    telemetry=None,
+    picker: PickPolicy | None = None,
+) -> None:
     """Aplica as escolhas que o jogo oferece a cada nível ganho.
 
     Espelha `engine/loop.py`: uma passiva por nível, e uma skill nos níveis
@@ -57,7 +64,9 @@ def on_level_up(hero, levels_gained: int, rng: random.Random,
 
     if cfg.passives:
         for _ in range(levels_gained):
-            ofertas = [c for c in generate_passive_choices(count=3) if c.id not in cfg.banned_passives]
+            ofertas = [
+                c for c in generate_passive_choices(count=3) if c.id not in cfg.banned_passives
+            ]
             escolhida = pick_passive(hero, ofertas, rng, picker)
             if telemetry is not None:
                 telemetry.record_offer("passive", ofertas, escolhida)
@@ -123,8 +132,14 @@ def _peso_do_item(item) -> float:
     )
 
 
-def visit_shop(hero, shop: Shop, dungeon_level: int, rng: random.Random,
-               toggles: Toggles | None = None, telemetry=None) -> None:
+def visit_shop(
+    hero,
+    shop: Shop,
+    dungeon_level: int,
+    rng: random.Random,
+    toggles: Toggles | None = None,
+    telemetry=None,
+) -> None:
     """Gasta o ouro do andar como um jogador gastaria.
 
     Primeiro repõe cura, porque sem consumível o próximo andar vira aposta.
@@ -139,12 +154,14 @@ def visit_shop(hero, shop: Shop, dungeon_level: int, rng: random.Random,
         return
 
     curas = [
-        o for o in ofertas
+        o
+        for o in ofertas
         if getattr(o["item"], "consumable", False) and o["item"].effect_type == "max_hp"
     ]
     curas.sort(key=lambda o: -o["item"].effect_value)
     em_maos = sum(
-        1 for i in hero.inventory
+        1
+        for i in hero.inventory
         if getattr(i, "consumable", False) and getattr(i, "effect_type", None) == "max_hp"
     )
     for oferta in curas:
@@ -158,7 +175,8 @@ def visit_shop(hero, shop: Shop, dungeon_level: int, rng: random.Random,
 
     orcamento = int(hero.coins * GEAR_BUDGET_RATIO)
     equipamentos = [
-        o for o in ofertas
+        o
+        for o in ofertas
         if getattr(o["item"], "slot", None) in hero.equipment
         and not getattr(o["item"], "consumable", False)
     ]

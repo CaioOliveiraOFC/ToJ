@@ -171,9 +171,10 @@ def decide_monster_action(monster, hero, *, rng: random.Random | None = None, pu
             chosen, decisiva = _pick_skill(monster, hero, usable, r)
             if chosen is not None:
                 chance = int(getattr(monster, "skill_use_chance", 0))
-                sorteou = bool(chance) and r.randrange(
-                    PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX
-                ) <= chance
+                sorteou = (
+                    bool(chance)
+                    and r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= chance
+                )
                 if decisiva or sorteou:
                     target = monster if chosen.target == "self" else hero
                     combat_mech.apply_skill(monster, target, chosen, rng=r, publish=publish)

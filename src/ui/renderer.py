@@ -57,7 +57,9 @@ def show_status(entity) -> None:
     if hasattr(entity, "coins"):
         table.add_row("Moedas", f"[yellow]{entity.coins}[/yellow]")
 
-    console.print(Panel(table, title=f"[bold green]{title}[/bold green]", border_style="green", expand=False))
+    console.print(
+        Panel(table, title=f"[bold green]{title}[/bold green]", border_style="green", expand=False)
+    )
 
 
 def render_menu(options: tuple[str, ...] | list[str], prompt: str) -> None:
@@ -80,20 +82,44 @@ def render_battle_start_prompt() -> None:
 
 
 def render_compare_opponents(ennt1, ennt2) -> None:
-    console.print(Panel(Text("CONFRONTO", justify="center", style="bold yellow"), border_style="yellow"))
+    console.print(
+        Panel(Text("CONFRONTO", justify="center", style="bold yellow"), border_style="yellow")
+    )
 
     table = Table(show_header=False, expand=True, border_style="dim white")
     table.add_column(Text(ennt1.get_nick_name(), style="bold blue"), justify="left")
     table.add_column(Text("VS", style="bold white"), justify="center")
     table.add_column(Text(ennt2.get_nick_name(), style="bold magenta"), justify="right")
 
-    table.add_row(f"Nível: [green]{ennt1.get_level()}[/green]", "", f"Nível: [green]{ennt2.get_level()}[/green]")
-    table.add_row(f"HP: [red]{ennt1.get_hp()}[/red]/[dim red]{ennt1.base_hp}[/dim red]", "", f"HP: [red]{ennt2.get_hp()}[/red]/[dim red]{ennt2.base_hp}[/dim red]")
-    table.add_row(f"MP: [cyan]{ennt1.get_mp()}[/cyan]/[dim cyan]{ennt1.base_mp}[/dim cyan]", "", f"MP: [cyan]{ennt2.get_mp()}[/cyan]/[dim cyan]{ennt2.base_mp}[/dim cyan]")
-    table.add_row(f"Força: [yellow]{ennt1.get_st()}[/yellow]", "", f"Força: [yellow]{ennt2.get_st()}[/yellow]")
-    table.add_row(f"Agilidade: [green]{ennt1.get_ag()}[/green]", "", f"Agilidade: [green]{ennt2.get_ag()}[/green]")
-    table.add_row(f"Magia: [blue]{ennt1.get_mg()}[/blue]", "", f"Magia: [blue]{ennt2.get_mg()}[/blue]")
-    table.add_row(f"Defesa: [white]{ennt1.get_df()}[/white]", "", f"Defesa: [white]{ennt2.get_df()}[/white]")
+    table.add_row(
+        f"Nível: [green]{ennt1.get_level()}[/green]",
+        "",
+        f"Nível: [green]{ennt2.get_level()}[/green]",
+    )
+    table.add_row(
+        f"HP: [red]{ennt1.get_hp()}[/red]/[dim red]{ennt1.base_hp}[/dim red]",
+        "",
+        f"HP: [red]{ennt2.get_hp()}[/red]/[dim red]{ennt2.base_hp}[/dim red]",
+    )
+    table.add_row(
+        f"MP: [cyan]{ennt1.get_mp()}[/cyan]/[dim cyan]{ennt1.base_mp}[/dim cyan]",
+        "",
+        f"MP: [cyan]{ennt2.get_mp()}[/cyan]/[dim cyan]{ennt2.base_mp}[/dim cyan]",
+    )
+    table.add_row(
+        f"Força: [yellow]{ennt1.get_st()}[/yellow]", "", f"Força: [yellow]{ennt2.get_st()}[/yellow]"
+    )
+    table.add_row(
+        f"Agilidade: [green]{ennt1.get_ag()}[/green]",
+        "",
+        f"Agilidade: [green]{ennt2.get_ag()}[/green]",
+    )
+    table.add_row(
+        f"Magia: [blue]{ennt1.get_mg()}[/blue]", "", f"Magia: [blue]{ennt2.get_mg()}[/blue]"
+    )
+    table.add_row(
+        f"Defesa: [white]{ennt1.get_df()}[/white]", "", f"Defesa: [white]{ennt2.get_df()}[/white]"
+    )
 
     console.print(table)
     console.print("=" * console.width, style="dim white")
@@ -108,7 +134,9 @@ def render_battle_frame(player, monster, monsters=None) -> None:
     """
     console.clear()
 
-    console.print(Panel(Text("=== BATALHA ===", justify="center", style="bold red"), border_style="red"))
+    console.print(
+        Panel(Text("=== BATALHA ===", justify="center", style="bold red"), border_style="red")
+    )
 
     group = [m for m in (monsters or []) if m is not None] or ([monster] if monster else [])
 
@@ -134,7 +162,9 @@ def render_battle_frame(player, monster, monsters=None) -> None:
         )
         console.print(hp_table)
     else:
-        console.print(Text(f"{player.get_nick_name()}  VS  {len(group)} inimigos", style="bold blue"))
+        console.print(
+            Text(f"{player.get_nick_name()}  VS  {len(group)} inimigos", style="bold blue")
+        )
         console.print(Text(get_hp_bar(player), style="green"))
         enemy_table = Table(show_header=False, expand=True, box=None)
         enemy_table.add_column(style="bold blue", justify="right", width=4)
@@ -146,7 +176,11 @@ def render_battle_frame(player, monster, monsters=None) -> None:
                 f"{mob.get_nick_name()} [dim]({getattr(mob, 'role', '?')})[/dim]",
                 Text(get_hp_bar(mob), style="red"),
             )
-        console.print(Panel(enemy_table, title="[bold magenta]Inimigos[/bold magenta]", border_style="magenta"))
+        console.print(
+            Panel(
+                enemy_table, title="[bold magenta]Inimigos[/bold magenta]", border_style="magenta"
+            )
+        )
 
     console.print(
         f"MP: [cyan]{player.get_mp()}[/cyan]/[dim cyan]{player.base_mp}[/dim cyan]",
@@ -162,9 +196,15 @@ def render_target_select_panel(monsters) -> None:
     table.add_column("Inimigo", style="magenta")
     table.add_column("Vida", justify="right")
     for index, mob in enumerate(monsters, start=1):
-        table.add_row(f"{index}.", f"{mob.get_nick_name()} [dim]({getattr(mob, 'role', '?')})[/dim]", get_hp_bar(mob))
+        table.add_row(
+            f"{index}.",
+            f"{mob.get_nick_name()} [dim]({getattr(mob, 'role', '?')})[/dim]",
+            get_hp_bar(mob),
+        )
     table.add_row("0.", "Primeiro alvo", "")
-    console.print(Panel(table, title="[bold yellow]Escolha o alvo[/bold yellow]", border_style="yellow"))
+    console.print(
+        Panel(table, title="[bold yellow]Escolha o alvo[/bold yellow]", border_style="yellow")
+    )
 
 
 def render_physical_strike_result(attacker, defender, result: CombatResult) -> None:
@@ -226,7 +266,10 @@ def render_buff_applied(caster, buff_name: str) -> None:
 
 def render_flee_success_message() -> None:
     console.print(
-        Panel(Text("Você conseguiu fugir da batalha!", justify="center", style="green"), border_style="green")
+        Panel(
+            Text("Você conseguiu fugir da batalha!", justify="center", style="green"),
+            border_style="green",
+        )
     )
 
 
@@ -259,4 +302,3 @@ def render_turn_effect_message(entity, event: tuple[str, ...]) -> None:
             f"O buff [dim white]{buff}[/dim white] em [dim blue]{entity.get_nick_name()}[/dim blue] acabou.",
             justify="center",
         )
-

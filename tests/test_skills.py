@@ -72,10 +72,13 @@ def test_o_menu_so_enche_a_partir_do_nivel_9(classe):
     apareça aqui em vez de passar despercebido.
     """
     candidatas = {
-        nivel: len([
-            s for s in get_skills_for_class(classe)
-            if not s.is_initial and s.level_required <= nivel
-        ])
+        nivel: len(
+            [
+                s
+                for s in get_skills_for_class(classe)
+                if not s.is_initial and s.level_required <= nivel
+            ]
+        )
         for nivel in (5, 7, 9)
     }
     assert candidatas == {5: 2, 7: 3, 9: 4}, (
