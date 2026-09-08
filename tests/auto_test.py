@@ -5,8 +5,12 @@ from unittest.mock import patch
 from rich.console import Console
 
 
-class VictoryException(Exception): pass
-class TimeoutException(Exception): pass
+class VictoryError(Exception):
+    """O bot chegou ao fim da masmorra."""
+
+
+class BotStuckError(Exception):
+    """O bot travou: limite de ações, tecla repetida ou oscilação de posição."""
 
 class AutoTester:
     """Simula o comportamento de um jogador para testar crashes no fluxo do jogo em background."""
@@ -56,17 +60,17 @@ class AutoTester:
     def _check_victory_condition(self, level: int):
         """Verifica se o jogador atingiu o nível de vitória."""
         if level >= 20:
-            raise VictoryException("Nível 20 atingido!")
+            raise VictoryError("Nível 20 atingido!")
 
     def _check_timeout_conditions(self, choice: str):
         """Verifica condições de timeout (ações excessivas ou travamento)."""
         if self.metrics["actions"] > 50000:
-            raise TimeoutException("Limite de 50.000 ações atingido (Loop infinito evitado).")
+            raise BotStuckError("Limite de 50.000 ações atingido (Loop infinito evitado).")
 
         if choice == self.last_key:
             self.consecutive_key_count += 1
             if self.consecutive_key_count >= 100:
-                raise TimeoutException(f"Stopped because pressed '{choice}' 100 times consecutively (bot is completely stuck).")
+                raise BotStuckError(f"Stopped because pressed '{choice}' 100 times consecutively (bot is completely stuck).")
         else:
             self.consecutive_key_count = 1
 
@@ -211,9 +215,9 @@ class AutoTester:
 
         try:
             start_game_func(player)
-        except VictoryException:
+        except VictoryError:
             pass  # Simulação terminou com sucesso!
-        except TimeoutException as te:
+        except BotStuckError as te:
             self.metrics["errors"].append(f"Última Opção Selecionada: '{self.last_key}'\n{str(te)}")
         except Exception:
             import traceback
@@ -240,7 +244,7 @@ class AutoTester:
             self.position_history.pop(0)
 
         if self.position_history.count(pos) > 20:
-            raise TimeoutException(f"Stopped because bot is trapped or oscillating at position {pos}.")
+            raise BotStuckError(f"Stopped because bot is trapped or oscillating at position {pos}.")
 
         # Determinar todos os alvos (inimigos + saída)
         targets = set(self.current_map.enemies_pos.keys())

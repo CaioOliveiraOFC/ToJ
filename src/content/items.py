@@ -170,7 +170,7 @@ class Potion(Item):
 
 
 # Exporta ALL_ITEMS para compatibilidade (propriedade dinâmica)
-class _ALL_ITEMS_Dict:
+class _AllItemsDict:
     """Proxy para manter compatibilidade com ALL_ITEMS."""
     def __getitem__(self, key):
         return _load_all_items()[key]
@@ -194,4 +194,4 @@ class _ALL_ITEMS_Dict:
         return _load_all_items().get(key, default)
 
 
-ALL_ITEMS = _ALL_ITEMS_Dict()
+ALL_ITEMS = _AllItemsDict()

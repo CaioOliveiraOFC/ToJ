@@ -373,7 +373,6 @@ def navigate_shop_sell(
                 sell_price = 10
 
             prefix = ">" if real_index == current_index else " "
-            rarity_color = _get_rarity_color(getattr(item, "rarity", "Common"))
 
             panel_content += f"{prefix} [{real_index + 1:2}] {escape_markup(item.name)} - [green]+{sell_price} coins[/green]\n"
 
@@ -427,8 +426,8 @@ def navigate_inventory(
     """
 
     # Ordering: Equipables first (by slot), then Usables (by effect), then Others
-    SLOT_ORDER = {"Weapon": 1, "Helmet": 2, "Body": 3, "Legs": 4, "Shoes": 5, "Hands": 6, "Amulet": 7, "Ring": 8}
-    EFFECT_ORDER = {"max_hp": 1, "max_mp": 2, "strength": 3, "defense": 4, "agility": 5, "speed": 6, "evasion": 7, "crit_chance": 8, "crit_damage": 9, "life_steal": 10, "mana_regen": 11}
+    slot_order = {"Weapon": 1, "Helmet": 2, "Body": 3, "Legs": 4, "Shoes": 5, "Hands": 6, "Amulet": 7, "Ring": 8}
+    effect_order = {"max_hp": 1, "max_mp": 2, "strength": 3, "defense": 4, "agility": 5, "speed": 6, "evasion": 7, "crit_chance": 8, "crit_damage": 9, "life_steal": 10, "mana_regen": 11}
 
     def get_item_sort_key(item):
         slot = getattr(item, "slot", None)
@@ -438,10 +437,10 @@ def navigate_inventory(
         # Category: 1=Equippable, 2=Usable, 3=Other
         if is_equippable:
             category = 1
-            slot_order = SLOT_ORDER.get(slot, 99)
+            slot_order = slot_order.get(slot, 99)
         elif is_usable:
             category = 2
-            slot_order = EFFECT_ORDER.get(getattr(item, "effect_type", ""), 99)
+            slot_order = effect_order.get(getattr(item, "effect_type", ""), 99)
         else:
             category = 3
             slot_order = 99
@@ -666,7 +665,8 @@ def navigate_inventory(
             # Use ANSI escape sequence to clear screen and move cursor to top
             sys.stdout.write('\033[2J\033[H')
             sys.stdout.flush()
-        except:
+        except OSError:
+            # Terminal sem suporte a escape ANSI: o clear do renderer resolve.
             pass
         renderer.console.clear()
 

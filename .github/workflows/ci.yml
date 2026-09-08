@@ -1,0 +1,142 @@
+# Integração contínua do ToJ.
+#
+# Antes disto o repositório não tinha workflow nenhum: "suíte verde" era uma
+# afirmação sobre a máquina de quem rodou por último, e os checks "pending" que
+# apareciam no pull request eram AUSÊNCIA de verificação, não aprovação.
+#
+# São quatro jobs, e a divisão entre bloqueante e informativo é deliberada —
+# um check que sempre falha vira ruído e deixa de ser lido.
+name: CI
+
+# Pushes em branch de trabalho são cobertos pelo evento de pull request: gatilho
+# duplo faria toda execução rodar duas vezes, inclusive a suíte de minutos.
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Um push novo cancela a execução anterior da mesma referência: a suíte de
+# balanceamento leva minutos e não vale a pena rodar sobre commit superado.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_PADRAO: "3.11"
+  # Ruff fixado: versão nova traz regra nova, e regra nova em CI já configurada
+  # reprova código que não mudou. Subir a versão é uma decisão, não um efeito.
+  RUFF_VERSAO: "0.16.6"
+
+jobs:
+  testes:
+    name: Testes (${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Suíte rápida
+        run: python -m pytest -q
+
+  balanceamento:
+    name: Invariantes de balanceamento
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_PADRAO }}
+          cache: pip
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      # Simula runs completas de 20 andares; leva minutos e fica fora da
+      # execução padrão do pytest (`addopts` exclui `balance_full`). É a suíte
+      # que impede uma mudança de constante de passar despercebida.
+      - name: Suíte de balanceamento
+        timeout-minutes: 25
+        run: python -m pytest -q -m "balance or balance_full"
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_PADRAO }}
+          cache: pip
+
+      - name: Instalar ruff
+        run: pip install "ruff==${{ env.RUFF_VERSAO }}"
+
+      # BLOQUEANTE. E501 (linha longa) e W293 (espaço em linha vazia) ficam de
+      # fora porque o repositório já carrega 178 ocorrências delas, todas
+      # anteriores a este workflow. Ligar a régua cheia agora reprovaria código
+      # que ninguém tocou, e um check vermelho por padrão não é lido por
+      # ninguém. Tudo o que não é essas duas regras já está limpo e é gate.
+      - name: Regras de correção
+        run: ruff check src/ tests/ --ignore E501,W293 --output-format=github
+
+      # INFORMATIVO. Mede a dívida cosmética e a deixa visível no resumo da
+      # execução, para que dê para acompanhar se ela encolhe. Quando chegar a
+      # zero, apague o `--ignore` do passo acima e este passo junto.
+      - name: Dívida de formatação (não bloqueia)
+        if: always()
+        run: |
+          total=$(ruff check src/ tests/ --statistics 2>/dev/null | awk '/E501|W293/ {soma += $1} END {print soma + 0}')
+          echo "### Dívida de formatação" >> "$GITHUB_STEP_SUMMARY"
+          echo "\`E501\` + \`W293\` pendentes: **${total}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Eram 178 quando a CI foi criada. Zerando isso, o passo de lint" >> "$GITHUB_STEP_SUMMARY"
+          echo "pode passar a rodar a régua cheia." >> "$GITHUB_STEP_SUMMARY"
+
+  compat:
+    # INFORMATIVO por ora. `pyproject.toml` declara `requires-python = ">=3.10"`
+    # e nada no código usa sintaxe exclusiva de 3.11+, mas essa afirmação nunca
+    # foi executada em 3.10 nem em 3.12. Roda sem bloquear até acumular verde;
+    # depois vira matriz do job `testes` e este job deixa de existir.
+    name: Compatibilidade ${{ matrix.python }} (informativo)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Suíte rápida
+        run: python -m pytest -q

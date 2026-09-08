@@ -324,7 +324,6 @@ def process_post_battle(
     - levels_gained: quantidade de níveis ganhos
     """
     monsters = list(monster) if isinstance(monster, list) else [monster]
-    level_before = player.get_level()
 
     xp_base_reward = 0
     coins_base_reward = 0

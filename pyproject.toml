@@ -22,7 +22,13 @@ select = [
     "I",   # isort
     "N",   # pep8-naming
 ]
-ignore = []
+ignore = [
+    # `from src.shared import combat_topics as T` é convenção do projeto, usada
+    # em cinco arquivos: o alias curto mantém legível a linha de publicação de
+    # evento (`_emit(publish, T.COMBAT_PHYSICAL_STRIKE, ...)`). Renomear para
+    # minúscula alonga essas linhas sem ganhar clareza.
+    "N812",
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
