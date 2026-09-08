@@ -107,3 +107,116 @@ def test_subir_de_nivel_entrega_a_proxima_skill_inicial(classe, cls):
     nova = set(heroi.skills.values()) - set(antes.values())
     assert len(nova) == 1
     assert next(iter(nova)).is_initial
+
+
+# --- Regras de design da tabela de preços --------------------------------
+#
+# O primeiro scout registrou "escolher skill vale -0,2 andar", "10 skills
+# recusadas por toda intenção" e "3 escolhidas e nunca usadas", e por três
+# rodadas isso ficou anotado como conteúdo fraco. Não era. A tabela de preços
+# não era monótona: `golpe_devastador` (nível 10, 50%, 30 MP, recarga 3) perdia
+# em TODOS os eixos para `golpe_poderoso` (nível 1, 60%, 15 MP, recarga 1).
+# Eram 13 pares nessa situação. Metade do catálogo era matematicamente pior que
+# o que o jogador já tinha na mão, e nenhum bot ia escolher pior de propósito.
+#
+# As três regras abaixo são o que impede isso de voltar. Elas valem sobre os
+# dados, não sobre o motor — é uma regra de conteúdo, e é onde o defeito estava.
+
+SKILLS_DE_DANO = [s for s in load_skills() if s.effect_type == "damage"]
+CLASSES_COM_DANO = sorted({s.skill_class for s in SKILLS_DE_DANO})
+assert SKILLS_DE_DANO, "nenhuma skill de dano carregada: os testes abaixo não rodariam."
+
+
+def _eficiencia(skill) -> float:
+    return int(skill.effect_value) / max(1, int(skill.mana_cost))
+
+
+@pytest.mark.parametrize("classe", CLASSES_COM_DANO)
+def test_nenhuma_skill_de_dano_e_dominada(classe):
+    """Nenhuma skill pode custar mais e entregar menos que outra da classe.
+
+    "Custar mais" é o conjunto: mais mana, mais recarga e mais nível exigido.
+    Uma carta dominada nesses três eixos não é uma escolha difícil — é uma
+    escolha errada, e oferecê-la ao jogador gasta um slot do menu.
+    """
+    da_classe = [s for s in SKILLS_DE_DANO if s.skill_class == classe]
+    for a in da_classe:
+        for b in da_classe:
+            if a is b:
+                continue
+            pior_ou_igual = (
+                int(a.effect_value) <= int(b.effect_value)
+                and int(a.mana_cost) >= int(b.mana_cost)
+                and int(a.cooldown) >= int(b.cooldown)
+                and int(a.level_required) >= int(b.level_required)
+            )
+            estritamente_pior = (
+                int(a.effect_value) < int(b.effect_value)
+                or int(a.mana_cost) > int(b.mana_cost)
+                or int(a.cooldown) > int(b.cooldown)
+            )
+            assert not (pior_ou_igual and estritamente_pior), (
+                f"{a.id} (nv {a.level_required}, {a.effect_value}%, {a.mana_cost} MP, "
+                f"recarga {a.cooldown}) é dominada por {b.id} (nv {b.level_required}, "
+                f"{b.effect_value}%, {b.mana_cost} MP, recarga {b.cooldown})"
+            )
+
+
+@pytest.mark.parametrize("classe", CLASSES_COM_DANO)
+def test_a_skill_aprendida_bate_a_inicial(classe):
+    """Subir de nível tem de entregar mais poder que o kit de partida.
+
+    Sem esta regra, o kit inicial é o kit final: era o caso das doze skills
+    aprendidas do jogo, todas com dano abaixo da melhor skill de nível 1 da
+    própria classe.
+    """
+    da_classe = [s for s in SKILLS_DE_DANO if s.skill_class == classe]
+    iniciais = [s for s in da_classe if int(s.level_required) <= 1]
+    aprendidas = [s for s in da_classe if int(s.level_required) > 1]
+    if not iniciais or not aprendidas:
+        pytest.skip(f"{classe} não tem os dois grupos")
+
+    teto = max(int(s.effect_value) for s in iniciais)
+    for s in aprendidas:
+        assert int(s.effect_value) > teto, (
+            f"{s.id} é aprendida no nível {s.level_required} e entrega "
+            f"{s.effect_value}%, abaixo dos {teto}% que a classe já tem no nível 1"
+        )
+
+
+@pytest.mark.parametrize("classe", CLASSES_COM_DANO)
+def test_o_dano_cresce_com_o_nivel_exigido(classe):
+    """Duas skills da mesma classe: a de nível maior entrega mais.
+
+    É a promessa que o menu de escolha faz ao jogador. Quebrá-la transforma a
+    escolha num teste de memória sobre quais cartas são armadilha.
+    """
+    da_classe = sorted(
+        (s for s in SKILLS_DE_DANO if s.skill_class == classe),
+        key=lambda s: int(s.level_required),
+    )
+    for anterior, seguinte in zip(da_classe, da_classe[1:]):
+        if int(anterior.level_required) == int(seguinte.level_required):
+            continue
+        assert int(seguinte.effect_value) > int(anterior.effect_value), (
+            f"{seguinte.id} (nv {seguinte.level_required}) entrega "
+            f"{seguinte.effect_value}%, não mais que {anterior.id} "
+            f"(nv {anterior.level_required}, {anterior.effect_value}%)"
+        )
+
+
+def test_a_recarga_longa_e_paga_em_eficiencia():
+    """Recarga longa tem de render mais por mana, senão é só a mesma coisa mais rara.
+
+    Não é uma ordenação estrita: o kit de nível 1 é barato de propósito, para
+    ter função de preenchimento entre recargas. A regra é sobre as aprendidas.
+    """
+    aprendidas = [s for s in SKILLS_DE_DANO if int(s.level_required) > 1]
+    curtas = [_eficiencia(s) for s in aprendidas if int(s.cooldown) <= 2]
+    longas = [_eficiencia(s) for s in aprendidas if int(s.cooldown) >= 4]
+    if not curtas or not longas:
+        pytest.skip("catálogo sem os dois grupos")
+    assert min(longas) > max(curtas), (
+        "a skill de recarga longa não rende mais dano por mana que a de recarga curta: "
+        "trocar frequência por pico fica sem contrapartida"
+    )

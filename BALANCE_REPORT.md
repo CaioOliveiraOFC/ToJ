@@ -408,8 +408,69 @@ aprendidas depois, de 1,3 a 2,0. **O kit inicial é o kit final.**
 É a explicação, com causa, do achado que estava aberto desde o primeiro scout —
 "escolher skill vale −0,2 andar" e "10 skills recusadas por toda intenção". Não
 era o bot escolhendo mal nem as skills serem fracas: metade delas é
-matematicamente pior que o que o jogador já tem na mão. Corrigir isso é mexer na
-tabela de preços, e é o próximo passo.
+matematicamente pior que o que o jogador já tem na mão.
+
+### A tabela de preços passou a ter uma regra
+
+As doze skills **aprendidas** (nível exigido acima de 1) foram reprecificadas
+por uma curva; as **iniciais não foram tocadas**, porque resolver dominância
+tirando poder do jogador seria a direção contrária à que já foi escolhida para
+a paridade entre classes.
+
+```
+valor = teto_inicial_da_classe × (1 + 0,040·(nível−1)) × (1 + 0,10·(recarga−1))
+mana  = valor / (2,4 + 0,30·(recarga−1))
+```
+
+O `teto_inicial_da_classe` é o dano da melhor skill de nível 1 da classe — é o
+que garante que subir de nível entregue mais poder que o kit de partida. O
+prêmio de recarga é o que dá razão de existir a uma skill lenta: ela troca
+frequência por pico, e rende mais dano por mana em troca.
+
+| Classe | Skill | Nível | Dano | Mana |
+|---|---|---:|---|---|
+| Guerreiro | `cutelada` | 5 | 35 → **90** | 20 → 35 |
+| Guerreiro | `golpe_duplo` | 9 | 45 → **110** | 35 → 35 |
+| Guerreiro | `golpe_devastador` | 10 | 50 → **115** | 30 → 40 |
+| Guerreiro | `esmagar` | 15 | 80 → **140** | 50 → 40 |
+| Mago | `relampago` | 5 | 45 → **100** | 30 → 35 |
+| Mago | `explosao_arcana` | 7 | 60 → **120** | 40 → 40 |
+| Mago | `tempestade` | 13 | 75 → **140** | 50 → 45 |
+| Mago | `apocalipse` | 20 | 120 → **195** | 70 → 55 |
+| Ladino | `golpe_sombras` | 5 | 30 → **100** | 15 → 35 |
+| Ladino | `assassinato` | 9 | 60 → **125** | 40 → 40 |
+| Ladino | `danca_laminas` | 13 | 70 → **140** | 45 → 45 |
+| Ladino | `morte_subita` | 20 | 150 → **195** | 80 → 55 |
+
+Pares dominados: **13 → 0**. A pior razão skill/ataque-básico do catálogo sobe
+de 1,44 para 1,78.
+
+**O efeito na profundidade é pequeno, e isso é o achado.** 150 runs por classe,
+três seeds:
+
+| Classe | Antes da tabela | Depois |
+|---|---:|---:|
+| Guerreiro | 9,2 | 9,4 |
+| Mago | 6,7 | 7,2 |
+| Ladino | 10,1 | 10,2 |
+
+Quase nada, porque **a run mediana morre no andar 6** — antes de o herói chegar
+aos níveis em que essas skills existem. Consertar a tabela não deixa o jogo mais
+fácil; deixa a escolha de skill significar alguma coisa para quem chega lá. É
+exatamente o tipo de mudança que a ablação não captura e que só aparece na
+diversidade de uso:
+
+| Classe | Uso das skills, antes | Depois |
+|---|---|---|
+| Guerreiro | 1 skill acima de 10% | `investida` 51%, `golpe_poderoso` 22%, `golpe_devastador` 8% |
+| Mago | 1 skill acima de 10% | `bola_fogo` 59%, `explosao_arcana` 28%, `barreira_arcana` 11% |
+| Ladino | 3 skills acima de 10% | `ataque_furtivo` 46%, `assassinato` 32%, `passo_felino` 16% |
+
+Quatro regras novas em `tests/test_skills.py` fixam isso: nenhuma skill de dano
+pode ser dominada, toda skill aprendida bate o teto do kit inicial, o dano cresce
+com o nível exigido, e recarga longa é paga em eficiência. Dez delas falham nos
+dados anteriores.
+
 
 ## Como reproduzir
 

@@ -36,14 +36,12 @@ from src.shared.constants import BASIC_ATTACK_POWER_MULT  # noqa: E402
 # Uma skill de dano precisa valer pelo menos isto em ataques básicos. Abaixo
 # disso, gastar mana e recarga é matematicamente pior que não gastar nada.
 #
-# 1.4 é o que a skill mais barata do jogo entrega hoje (Golpe nas Sombras, 30%,
-# a 0,90 de ataque básico). Não é um número confortável, e o motivo de ele não
-# subir agora está registrado no relatório: a tabela de preços das skills tem
-# 13 pares dominados — skills que custam mais mana e mais recarga para entregar
-# MENOS dano que a skill que a classe já ganha no nível 1. Enquanto isso não for
-# arrumado, subir este piso só faria o teste reprovar o conteúdo em vez do
-# número que o conteúdo tem de errado.
-MIN_SKILL_TO_BASIC_RATIO = 1.4
+# Começou em 1,4 — o que a skill mais barata entregava enquanto a tabela de
+# preços tinha 13 pares dominados. Com a tabela arrumada, a pior razão do
+# catálogo é 1,78 (Golpe Poderoso, a skill mais barata do Guerreiro no nível 1).
+# O piso fica em 1,7 para deixar folga de arredondamento sem voltar a aceitar
+# uma skill que não paga o próprio custo.
+MIN_SKILL_TO_BASIC_RATIO = 1.7
 
 
 def _ferir(entidade, fracao: float) -> None:
