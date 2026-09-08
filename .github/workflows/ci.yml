@@ -4,8 +4,9 @@
 # afirmação sobre a máquina de quem rodou por último, e os checks "pending" que
 # apareciam no pull request eram AUSÊNCIA de verificação, não aprovação.
 #
-# São quatro jobs, e a divisão entre bloqueante e informativo é deliberada —
-# um check que sempre falha vira ruído e deixa de ser lido.
+# Três jobs, todos bloqueantes. Nasceu com um quarto job informativo
+# (`compat`, sem gate) para descobrir se o piso de 3.10 declarado no
+# `pyproject.toml` era verdade; era, e a matriz foi absorvida pelo job `testes`.
 name: CI
 
 # Pushes em branch de trabalho são cobertos pelo evento de pull request: gatilho
@@ -35,7 +36,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.11"]
+        # 3.10 é o piso declarado em `pyproject.toml` (`requires-python`).
+        # A matriz nasceu como job `compat` separado e sem gate, porque essa
+        # declaração nunca tinha sido executada. Duas execuções verdes em
+        # 3.10 e 3.12 depois, a promessa está verificada e vira gate.
+        python: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
 
@@ -111,32 +116,3 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "Eram 178 quando a CI foi criada. Zerando isso, o passo de lint" >> "$GITHUB_STEP_SUMMARY"
           echo "pode passar a rodar a régua cheia." >> "$GITHUB_STEP_SUMMARY"
-
-  compat:
-    # INFORMATIVO por ora. `pyproject.toml` declara `requires-python = ">=3.10"`
-    # e nada no código usa sintaxe exclusiva de 3.11+, mas essa afirmação nunca
-    # foi executada em 3.10 nem em 3.12. Roda sem bloquear até acumular verde;
-    # depois vira matriz do job `testes` e este job deixa de existir.
-    name: Compatibilidade ${{ matrix.python }} (informativo)
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    strategy:
-      fail-fast: false
-      matrix:
-        python: ["3.10", "3.12"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-          cache: pip
-
-      - name: Instalar dependências
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest
-
-      - name: Suíte rápida
-        run: python -m pytest -q

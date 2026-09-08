@@ -26,7 +26,7 @@ from src.mechanics import combat as cmb  # noqa: E402
 from src.shared import effects as fx  # noqa: E402
 from src.sim.encounters import build_encounter  # noqa: E402
 from src.sim.harness import ALL_CLASSES, make_hero, simulate, simulate_run  # noqa: E402
-from src.sim.metrics import curve_deltas, variance_explained  # noqa: E402
+from src.sim.metrics import curve_deltas, spread, variance_explained  # noqa: E402
 from tests.balance import thresholds as T  # noqa: E402
 
 pytestmark = pytest.mark.balance
@@ -320,9 +320,13 @@ class TestRunCompleta:
             assert T.MIN_CLASS_MEAN_FLOOR <= media <= T.MAX_CLASS_MEAN_FLOOR, (
                 f"{classe} chega em média ao andar {media:.1f}, fora da banda aceitável."
             )
-        spread = max(medias.values()) - min(medias.values())
-        assert spread <= T.MAX_CLASS_MEAN_FLOOR_SPREAD, (
-            f"Distância de {spread:.1f} andares entre a melhor e a pior classe: {medias}"
+        # `spread` vem de metrics.py em vez de ser recalculado aqui: era a
+        # mesma conta escrita em dois lugares, e a função lá estava morta —
+        # nenhuma chamada em todo o repositório. Duas cópias de uma fórmula
+        # divergem na primeira mudança.
+        distancia = spread(list(medias.values()))
+        assert distancia <= T.MAX_CLASS_MEAN_FLOOR_SPREAD, (
+            f"Distância de {distancia:.1f} andares entre a melhor e a pior classe: {medias}"
         )
 
     @pytest.mark.parametrize("classe", ALL_CLASSES)
