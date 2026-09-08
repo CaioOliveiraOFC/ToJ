@@ -81,7 +81,10 @@ def build_player_status(player, selected_item=None) -> str:
 
         if equipped_item:
             if slot == selected_slot:
-                content += f"  [{slot_label}] {escape_markup(equipped_item.name)} [yellow]<- será trocado[yellow]\n"
+                content += (
+                    f"  [{slot_label}] {escape_markup(equipped_item.name)} "
+                    "[yellow]<- será trocado[yellow]\n"
+                )
             else:
                 content += f"  [{slot_label}] {escape_markup(equipped_item.name)}\n"
         else:
@@ -234,13 +237,19 @@ def navigate_shop_buy(
                 equip_dmg = getattr(equipped_in_slot, "damage_bonus", 0)
                 equip_def = getattr(equipped_in_slot, "defense_bonus", 0)
                 if damage != equip_dmg or defense != equip_def:
-                    content += f"[dim]Equipado: {escape_markup(equipped_in_slot.name)} (Dano +{equip_dmg}, Defesa +{equip_def})[/dim]\n"
+                    content += (
+                        f"[dim]Equipado: {escape_markup(equipped_in_slot.name)} "
+                        f"(Dano +{equip_dmg}, Defesa +{equip_def})[/dim]\n"
+                    )
 
         effect_type = getattr(item, "effect_type", None)
         effect_value = getattr(item, "effect_value", 0)
         if effect_type and effect_value:
             if is_slot_empty:
-                content += f"[bold]Efeito:[/bold] [green]{effect_type} +{effect_value} (puro beneficio)[/green]\n"
+                content += (
+                    f"[bold]Efeito:[/bold] [green]{effect_type} +{effect_value} "
+                    "(puro beneficio)[/green]\n"
+                )
             else:
                 content += f"[bold]Efeito:[/bold] {effect_type} +{effect_value}\n"
 
@@ -386,7 +395,10 @@ def navigate_shop_sell(
 
             prefix = ">" if real_index == current_index else " "
 
-            panel_content += f"{prefix} [{real_index + 1:2}] {escape_markup(item.name)} - [green]+{sell_price} coins[/green]\n"
+            panel_content += (
+                f"{prefix} [{real_index + 1:2}] {escape_markup(item.name)} "
+                f"- [green]+{sell_price} coins[/green]\n"
+            )
 
         if total_pages > 1:
             panel_content += f"\n[dim]Página {current_page + 1}/{total_pages}[/dim]\n"
@@ -502,7 +514,10 @@ def navigate_inventory(
             "Epic": "magenta",
             "Legendary": "yellow",
         }.get(rarity, "white")
-        content = f"[bold {rarity_color}]{escape_markup(item.name)}[/bold {rarity_color}]  [dim][{rarity}][/dim]\n"
+        content = (
+            f"[bold {rarity_color}]{escape_markup(item.name)}[/bold {rarity_color}]"
+            f"  [dim][{rarity}][/dim]\n"
+        )
         content += f"[dim]{escape_markup(item.description)}[/dim]\n\n"
 
         slot_name = getattr(item, "slot", "Unknown")
@@ -567,13 +582,22 @@ def navigate_inventory(
                         f"  Efeito: [yellow]= Igual[/yellow] ({effect_type} +{effect_value})\n"
                     )
                 elif effect_type and equip_effect:
-                    content += f"  Efeito: [cyan]{effect_type} +{effect_value}[/cyan]  [dim]vs {equip_effect} +{equip_eff_val}[/dim]\n"
+                    content += (
+                        f"  Efeito: [cyan]{effect_type} +{effect_value}[/cyan]"
+                        f"  [dim]vs {equip_effect} +{equip_eff_val}[/dim]\n"
+                    )
                     has_any_diff = True
                 elif effect_type:
-                    content += f"  Efeito: [green]+ {effect_type} +{effect_value}[/green]  [dim](equipado sem efeito)[/dim]\n"
+                    content += (
+                        f"  Efeito: [green]+ {effect_type} +{effect_value}[/green]"
+                        "  [dim](equipado sem efeito)[/dim]\n"
+                    )
                     has_any_diff = True
                 elif equip_effect:
-                    content += f"  Efeito: [red]- {equip_effect} +{equip_eff_val}[/red]  [dim](novo sem efeito)[/dim]\n"
+                    content += (
+                        f"  Efeito: [red]- {equip_effect} +{equip_eff_val}[/red]"
+                        "  [dim](novo sem efeito)[/dim]\n"
+                    )
                     has_any_diff = True
             if not has_any_diff and damage == equip_damage and defense == equip_defense:
                 content += "  [dim]- Nenhuma mudança de status -[/dim]\n"
@@ -596,9 +620,15 @@ def navigate_inventory(
         else:
             # Sem item equipado no slot - mostra status base + upgrade
             if damage > 0:
-                content += f"[bold]Dano:[/bold] [green]+{damage}[/green]  [dim](slot vazio -> upgrade!)[/dim]\n"
+                content += (
+                    f"[bold]Dano:[/bold] [green]+{damage}[/green]"
+                    "  [dim](slot vazio -> upgrade!)[/dim]\n"
+                )
             if defense > 0:
-                content += f"[bold]Defesa:[/bold] [green]+{defense}[/green]  [dim](slot vazio -> upgrade!)[/dim]\n"
+                content += (
+                    f"[bold]Defesa:[/bold] [green]+{defense}[/green]"
+                    "  [dim](slot vazio -> upgrade!)[/dim]\n"
+                )
             effect_type = getattr(item, "effect_type", None)
             effect_value = getattr(item, "effect_value", 0)
             if effect_type and effect_value:
@@ -608,7 +638,8 @@ def navigate_inventory(
 
         # Raridade e classes
         if rarity in ("Epic", "Legendary"):
-            content += f"\n[bold]Raridade:[/bold] [{'magenta' if rarity == 'Epic' else 'yellow'}]{rarity}[/]  [bold]*[/bold]\n"
+            cor_raridade = "magenta" if rarity == "Epic" else "yellow"
+            content += f"\n[bold]Raridade:[/bold] [{cor_raridade}]{rarity}[/]  [bold]*[/bold]\n"
         else:
             content += f"\n[bold]Raridade:[/bold] {rarity}\n"
 
@@ -767,7 +798,11 @@ def navigate_inventory(
                     "Amulet": "Amuleto",
                     "Ring": "Anel",
                 }.get(slot, slot)
-                left_content += f"{prefix} [{real_index + 1:2}] [{rarity_color}]{escape_markup(item.name)}[/{rarity_color}]{qty_str}[dim] ({slot_label})[/dim]{price_str}{equipped_mark}\n"
+                left_content += (
+                    f"{prefix} [{real_index + 1:2}] "
+                    f"[{rarity_color}]{escape_markup(item.name)}[/{rarity_color}]"
+                    f"{qty_str}[dim] ({slot_label})[/dim]{price_str}{equipped_mark}\n"
+                )
 
             if total_pages > 1:
                 left_content += f"\n[dim]Página {current_page + 1}/{total_pages}[/dim]\n"
@@ -901,7 +936,8 @@ def navigate_inventory(
                         feedback_message = msg
                     else:
                         feedback_message = f"{selected_item.name} equipado."
-                # Stay inside loop so feedback remains visible - rebuild on next iteration handles single-item -> empty case
+                # Stay inside loop so feedback remains visible - rebuild on
+                # next iteration handles the single-item -> empty case
                 continue
 
         elif key in ("u", "U") and total_items > 0:
@@ -917,7 +953,8 @@ def navigate_inventory(
                     if isinstance(selected_item, Item):
                         msg = player.use_potion(selected_item)
                         feedback_message = f"{selected_item.name} usado."
-                    # Stay inside loop to keep feedback visible and handle single-item case (inventory may become empty)
+                    # Stay inside loop to keep feedback visible and handle
+                    # the single-item case (inventory may become empty)
                     continue
 
         elif key.lower() == "q":

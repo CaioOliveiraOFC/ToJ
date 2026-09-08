@@ -96,23 +96,16 @@ jobs:
       - name: Instalar ruff
         run: pip install "ruff==${{ env.RUFF_VERSAO }}"
 
-      # BLOQUEANTE. E501 (linha longa) e W293 (espaço em linha vazia) ficam de
-      # fora porque o repositório já carrega 178 ocorrências delas, todas
-      # anteriores a este workflow. Ligar a régua cheia agora reprovaria código
-      # que ninguém tocou, e um check vermelho por padrão não é lido por
-      # ninguém. Tudo o que não é essas duas regras já está limpo e é gate.
-      - name: Regras de correção
-        run: ruff check src/ tests/ --ignore E501,W293 --output-format=github
+      # A régua inteira, sem exceção. Nasceu com `--ignore E501,W293` porque o
+      # repositório carregava 178 ocorrências dessas duas regras, todas
+      # anteriores à CI, e um gate que reprova código que ninguém tocou vira
+      # ruído. A dívida foi zerada (`ruff format` no repositório inteiro, mais
+      # 35 quebras manuais que o formatador não podia fazer), então o buraco
+      # do gate fechou junto.
+      - name: Regras
+        run: ruff check src/ tests/ --output-format=github
 
-      # INFORMATIVO. Mede a dívida cosmética e a deixa visível no resumo da
-      # execução, para que dê para acompanhar se ela encolhe. Quando chegar a
-      # zero, apague o `--ignore` do passo acima e este passo junto.
-      - name: Dívida de formatação (não bloqueia)
-        if: always()
-        run: |
-          total=$(ruff check src/ tests/ --statistics 2>/dev/null | awk '/E501|W293/ {soma += $1} END {print soma + 0}')
-          echo "### Dívida de formatação" >> "$GITHUB_STEP_SUMMARY"
-          echo "\`E501\` + \`W293\` pendentes: **${total}**" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Eram 178 quando a CI foi criada. Zerando isso, o passo de lint" >> "$GITHUB_STEP_SUMMARY"
-          echo "pode passar a rodar a régua cheia." >> "$GITHUB_STEP_SUMMARY"
+      # Formatação deixa de ser opinião. Sem este passo, os 178 voltariam a
+      # crescer um arquivo novo por vez.
+      - name: Formatação
+        run: ruff format --check src/ tests/

@@ -330,7 +330,8 @@ def render_shop_purchase_success(item_name: str, price: int) -> None:
     renderer.console.print(
         Panel(
             Text.from_markup(
-                f"Você comprou [bold green]{item_name}[/bold green] por [bold yellow]{price}[/bold yellow] ouro.",
+                f"Você comprou [bold green]{item_name}[/bold green] "
+                f"por [bold yellow]{price}[/bold yellow] ouro.",
                 justify="center",
                 style="green",
             ),
@@ -400,7 +401,8 @@ def render_shop_sell_success(item_name: str, sell_price: int) -> None:
     renderer.console.print(
         Panel(
             Text(
-                f"Você vendeu [bold green]{item_name}[/bold green] por [bold yellow]{sell_price}[/bold yellow] ouro.",
+                f"Você vendeu [bold green]{item_name}[/bold green] "
+                f"por [bold yellow]{sell_price}[/bold yellow] ouro.",
                 justify="center",
                 style="green",
             ),
@@ -538,7 +540,8 @@ def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
     renderer.console.print(
         Panel(
             Text.from_markup(
-                f"Equipado: {old_item.name}\nNovo: {new_item.name}\n{resumo}\n\n[S] Equipar agora  |  [N] Manter na mochila",
+                f"Equipado: {old_item.name}\nNovo: {new_item.name}\n{resumo}\n\n"
+                "[S] Equipar agora  |  [N] Manter na mochila",
                 justify="center",
             ),
             border_style="cyan",

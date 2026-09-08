@@ -125,7 +125,8 @@ def game_over_screen(player_name="Aventureiro"):
     console.print(
         Panel(
             Text.from_markup(
-                "Pressione [bold green]qualquer tecla[/bold green] para retornar ao menu principal...",
+                "Pressione [bold green]qualquer tecla[/bold green] "
+                "para retornar ao menu principal...",
                 justify="center",
                 style="bold yellow",
             ),

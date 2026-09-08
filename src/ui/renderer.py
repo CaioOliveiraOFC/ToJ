@@ -210,7 +210,8 @@ def render_target_select_panel(monsters) -> None:
 def render_physical_strike_result(attacker, defender, result: CombatResult) -> None:
     if result.was_evaded:
         console.print(
-            f"[bold red]{attacker.get_nick_name()}[/bold red] [dim white]errou o ataque![/dim white]",
+            f"[bold red]{attacker.get_nick_name()}[/bold red] "
+            "[dim white]errou o ataque![/dim white]",
             justify="center",
         )
         return
@@ -220,7 +221,8 @@ def render_physical_strike_result(attacker, defender, result: CombatResult) -> N
     critical_msg = " [bold yellow]ATAQUE CRÍTICO![/bold yellow]" if result.was_critical else ""
 
     console.print(
-        f"[bold {att_color}]{attacker.get_nick_name()}[/bold {att_color}] causou [orange3]{result.damage}[/orange3] de dano em "
+        f"[bold {att_color}]{attacker.get_nick_name()}[/bold {att_color}] "
+        f"causou [orange3]{result.damage}[/orange3] de dano em "
         f"[bold {def_color}]{defender.get_nick_name()}[/bold {def_color}].{critical_msg}",
         justify="center",
     )
@@ -241,14 +243,16 @@ def render_skill_cast_banner(caster, skill) -> None:
 
 def render_heal_result(caster, heal_amount: int) -> None:
     console.print(
-        f"[bold green]{caster.get_nick_name()}[/bold green] recupera [bold cyan]{heal_amount}[/bold cyan] de HP!",
+        f"[bold green]{caster.get_nick_name()}[/bold green] "
+        f"recupera [bold cyan]{heal_amount}[/bold cyan] de HP!",
         justify="center",
     )
 
 
 def render_status_apply(target, effect: str) -> None:
     console.print(
-        f"[bold purple]{target.get_nick_name()}[/bold purple] está sob o efeito de [yellow]{effect}[/yellow]!",
+        f"[bold purple]{target.get_nick_name()}[/bold purple] "
+        f"está sob o efeito de [yellow]{effect}[/yellow]!",
         justify="center",
     )
 
@@ -259,7 +263,8 @@ def render_status_failed() -> None:
 
 def render_buff_applied(caster, buff_name: str) -> None:
     console.print(
-        f"[bold blue]{caster.get_nick_name()}[/bold blue] recebe o buff [bold yellow]{buff_name}[/bold yellow]!",
+        f"[bold blue]{caster.get_nick_name()}[/bold blue] "
+        f"recebe o buff [bold yellow]{buff_name}[/bold yellow]!",
         justify="center",
     )
 
@@ -282,23 +287,27 @@ def render_turn_effect_message(entity, event: tuple[str, ...]) -> None:
     if kind == "poison_tick":
         dmg = event[1]
         console.print(
-            f"[bold green4]{entity.get_nick_name()}[/bold green4] sofre [orange3]{dmg}[/orange3] de dano de veneno.",
+            f"[bold green4]{entity.get_nick_name()}[/bold green4] "
+            f"sofre [orange3]{dmg}[/orange3] de dano de veneno.",
             justify="center",
         )
     elif kind == "frozen":
         console.print(
-            f"[bold blue]{entity.get_nick_name()}[/bold blue] está [bold cyan]congelado[/bold cyan] e não pode se mover!",
+            f"[bold blue]{entity.get_nick_name()}[/bold blue] está "
+            "[bold cyan]congelado[/bold cyan] e não pode se mover!",
             justify="center",
         )
     elif kind == "effect_expired":
         eff = event[1]
         console.print(
-            f"O efeito [dim white]{eff}[/dim white] em [dim blue]{entity.get_nick_name()}[/dim blue] passou.",
+            f"O efeito [dim white]{eff}[/dim white] em "
+            f"[dim blue]{entity.get_nick_name()}[/dim blue] passou.",
             justify="center",
         )
     elif kind == "buff_expired":
         buff = event[1]
         console.print(
-            f"O buff [dim white]{buff}[/dim white] em [dim blue]{entity.get_nick_name()}[/dim blue] acabou.",
+            f"O buff [dim white]{buff}[/dim white] em "
+            f"[dim blue]{entity.get_nick_name()}[/dim blue] acabou.",
             justify="center",
         )

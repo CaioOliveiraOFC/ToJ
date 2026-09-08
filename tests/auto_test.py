@@ -70,7 +70,8 @@ class AutoTester:
             self.consecutive_key_count += 1
             if self.consecutive_key_count >= 100:
                 raise BotStuckError(
-                    f"Stopped because pressed '{choice}' 100 times consecutively (bot is completely stuck)."
+                    f"Stopped because pressed '{choice}' 100 times consecutively "
+                    "(bot is completely stuck)."
                 )
         else:
             self.consecutive_key_count = 1
@@ -264,7 +265,7 @@ class AutoTester:
             self.generate_report(real_print)
 
     def decide_map_move(self):
-        """BFS para encontrar o caminho real livre de paredes até o inimigo ou saída mais próxima."""
+        """Caminho livre de paredes até o inimigo ou a saída mais próxima (BFS)."""
         if not self.current_map:
             return random.choice(["w", "a", "s", "d"])
 
@@ -349,7 +350,8 @@ class AutoTester:
             f.write("- Alvo Principal: Chegar vivo ao Level 20.\n")
             f.write("- Limite de Hard Cap: 50.000 ações permitidas.\n")
             f.write(
-                "- Objetivo: Verificar integridade de código (Crashes) e progressão/balanceamento da XP.\n"
+                "- Objetivo: Verificar integridade de código (Crashes) e "
+                "progressão/balanceamento da XP.\n"
             )
             f.write("-" * 50 + "\n")
             f.write(f"Data/Hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")

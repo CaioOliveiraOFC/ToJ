@@ -82,7 +82,8 @@ def test_armadura_trade_off_def_vs_mobilidade():
     player.unequip("Body")
 
     assert def_pesada > def_leve
-    # Trade-off: Placa tem mais DEF mas perde velocidade (efeito), Cota tem menos DEF mas ganha agilidade
+    # Trade-off: Placa tem mais DEF mas perde velocidade (efeito); Cota tem
+    # menos DEF mas ganha agilidade.
     # Verifica que os efeitos são diferentes
     assert cota_leve.effect_type == "agility"
     assert placa_pesada.effect_type == "speed"

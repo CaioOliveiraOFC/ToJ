@@ -291,7 +291,8 @@ class Player(Entity):
 
         item_classes = getattr(item_to_equip, "classes", None)
         if item_classes is not None and self.get_classname() not in item_classes:
-            return f"Sua classe ({self.get_classname()}) não pode equipar {getattr(item_to_equip, 'name', 'Item')}."
+            nome = getattr(item_to_equip, "name", "Item")
+            return f"Sua classe ({self.get_classname()}) não pode equipar {nome}."
 
         if self.equipment[slot]:
             self.unequip(slot)
@@ -370,7 +371,10 @@ class Player(Entity):
                 "value": effect_value,
                 "duration": POTION_BUFF_DURATION,
             }
-            msg = f"Você usou {item_name}. Efeito {effect_type} ativo por {POTION_BUFF_DURATION} turnos!"
+            msg = (
+                f"Você usou {item_name}. "
+                f"Efeito {effect_type} ativo por {POTION_BUFF_DURATION} turnos!"
+            )
         else:
             msg = f"Você usou {item_name}, mas não teve efeito aparente."
 
