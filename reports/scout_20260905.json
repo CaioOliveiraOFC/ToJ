@@ -1,0 +1,877 @@
+{
+  "kind": "scout",
+  "iterations": 250,
+  "classes": [
+    "Warrior",
+    "Mage",
+    "Rogue"
+  ],
+  "baseline_mean_floor": 9.173333333333334,
+  "telemetry": {
+    "runs": 750,
+    "battles": 34726,
+    "turns": 348789,
+    "defeats": 545,
+    "skills": {
+      "uses": {
+        "investida": 13413,
+        "golpe_poderoso": 3355,
+        "escudo_protetor": 1197,
+        "fortalecimento": 1411,
+        "furia": 1643,
+        "esmagar": 125,
+        "imortal": 39,
+        "grito_guerra": 7,
+        "bola_fogo": 20094,
+        "drenar_vida": 186,
+        "barreira_arcana": 2244,
+        "missil_magico": 146,
+        "ressurgir": 10,
+        "escudo_magico": 1,
+        "apocalipse": 16,
+        "ataque_furtivo": 14217,
+        "golpe_baixo": 745,
+        "envenenar": 396,
+        "assassinato": 4418,
+        "passo_felino": 3711,
+        "sombra_rapida": 323,
+        "evasao": 164
+      },
+      "damage": {
+        "investida": 9976344,
+        "golpe_poderoso": 3135893,
+        "escudo_protetor": 0,
+        "fortalecimento": 0,
+        "furia": 0,
+        "esmagar": 164787,
+        "imortal": 0,
+        "grito_guerra": 0,
+        "bola_fogo": 13880655,
+        "drenar_vida": 0,
+        "barreira_arcana": 0,
+        "missil_magico": 47209,
+        "ressurgir": 0,
+        "escudo_magico": 0,
+        "apocalipse": 27148,
+        "ataque_furtivo": 11234378,
+        "golpe_baixo": 0,
+        "envenenar": 0,
+        "assassinato": 3578185,
+        "passo_felino": 0,
+        "sombra_rapida": 0,
+        "evasao": 0
+      },
+      "mp": {
+        "investida": 268260,
+        "golpe_poderoso": 50325,
+        "escudo_protetor": 29925,
+        "fortalecimento": 35275,
+        "furia": 65720,
+        "esmagar": 6250,
+        "imortal": 2340,
+        "grito_guerra": 140,
+        "bola_fogo": 502350,
+        "drenar_vida": 5580,
+        "barreira_arcana": 56100,
+        "missil_magico": 2920,
+        "ressurgir": 600,
+        "escudo_magico": 25,
+        "apocalipse": 1120,
+        "ataque_furtivo": 312774,
+        "golpe_baixo": 11175,
+        "envenenar": 7920,
+        "assassinato": 176720,
+        "passo_felino": 92775,
+        "sombra_rapida": 5814,
+        "evasao": 3280
+      },
+      "offered": {
+        "provocacao": 1136,
+        "cutelada": 1155,
+        "fortalecimento": 235,
+        "golpe_duplo": 533,
+        "resistencia_heroica": 166,
+        "golpe_devastador": 273,
+        "furia": 80,
+        "esmagar": 24,
+        "imortal": 8,
+        "relampago": 782,
+        "barreira_arcana": 225,
+        "explosao_arcana": 135,
+        "dreno_mana": 358,
+        "sono_profundo": 124,
+        "raio_congelante": 294,
+        "tempestade": 104,
+        "cura_menor": 68,
+        "apocalipse": 8,
+        "ressurgir": 18,
+        "golpe_sombras": 1094,
+        "envenenar": 797,
+        "passo_felino": 170,
+        "assassinato": 112,
+        "lancar_adaga": 426,
+        "evasao_perfeita": 184,
+        "cortina_fumaca": 61,
+        "fantasma": 23,
+        "danca_laminas": 137,
+        "morte_subita": 6
+      },
+      "picked": {
+        "fortalecimento": 175,
+        "golpe_devastador": 46,
+        "furia": 80,
+        "esmagar": 8,
+        "imortal": 8,
+        "barreira_arcana": 194,
+        "explosao_arcana": 135,
+        "apocalipse": 2,
+        "ressurgir": 18,
+        "envenenar": 236,
+        "passo_felino": 170,
+        "assassinato": 112,
+        "cortina_fumaca": 61
+      },
+      "basic_damage": 30144064
+    },
+    "passives": {
+      "offered": {
+        "passos_leves": 1655,
+        "reserva_arcana": 1758,
+        "musculos_aco": 1722,
+        "olho_aguia": 1761,
+        "pele_grossa": 1731,
+        "escudo_fe": 901,
+        "sede_sangue": 302,
+        "sangue_guerreiro": 1772,
+        "furia_berserker": 800,
+        "alma_eterna": 320,
+        "lamina_afiada": 793,
+        "coracao_ferro": 1740,
+        "essencia_viva": 800,
+        "sorte_iniciante": 1782,
+        "bebida_deuses": 798,
+        "mente_serena": 1798,
+        "reflexos_rapidos": 865,
+        "essencia_fluida": 808,
+        "maos_midas": 838,
+        "toque_dragao": 343,
+        "punho_atordoante": 312,
+        "pele_adamantio": 328,
+        "fome_batalha": 307,
+        "fortuna_absoluta": 71,
+        "bencao_divina": 326,
+        "coracao_tita": 72,
+        "lamina_lendaria": 72,
+        "essencia_pura": 60,
+        "imortalidade": 53
+      },
+      "picked": {
+        "musculos_aco": 588,
+        "pele_grossa": 1058,
+        "escudo_fe": 444,
+        "sangue_guerreiro": 1544,
+        "alma_eterna": 320,
+        "coracao_ferro": 1295,
+        "furia_berserker": 332,
+        "olho_aguia": 365,
+        "reserva_arcana": 139,
+        "essencia_fluida": 763,
+        "lamina_afiada": 211,
+        "passos_leves": 234,
+        "reflexos_rapidos": 20,
+        "bencao_divina": 320,
+        "coracao_tita": 72,
+        "toque_dragao": 140,
+        "mente_serena": 75,
+        "lamina_lendaria": 27,
+        "pele_adamantio": 157,
+        "sede_sangue": 92,
+        "bebida_deuses": 74,
+        "essencia_viva": 3,
+        "imortalidade": 18,
+        "fome_batalha": 2,
+        "punho_atordoante": 2,
+        "essencia_pura": 1
+      }
+    },
+    "equipment": {
+      "items_from_loot": 10170,
+      "items_equipped_from_loot": 1966,
+      "items_bought": 9836,
+      "items_equipped_from_shop": 6905,
+      "equipped_by_slot": {
+        "Amulet": 1257,
+        "Body": 1259,
+        "Weapon": 1777,
+        "Ring": 1343,
+        "Legs": 1061,
+        "Helmet": 642,
+        "Hands": 536,
+        "Shoes": 996
+      },
+      "power_naked_sum": 438319.0,
+      "power_equipped_sum": 519917,
+      "power_samples": 750
+    },
+    "economy": {
+      "gold_earned": 5756691,
+      "gold_on_gear": 631579,
+      "gold_on_consumables": 422457,
+      "gold_unspent": 4702655
+    },
+    "consumables": {
+      "max_hp": 4811
+    },
+    "essence": {
+      "rolls": 7425,
+      "sum": 9931.699999999993,
+      "xp_base": 8633524,
+      "xp_after": 12730510
+    },
+    "events": {
+      "counts": {
+        "altar": 532,
+        "merchant": 554,
+        "fountain": 597
+      },
+      "declined": {
+        "altar": 217
+      },
+      "fountain_healed": 431724,
+      "altar_hp_paid": 218891,
+      "altar_deaths": 0
+    }
+  },
+  "findings": [
+    {
+      "system": "skills",
+      "subject": "Golpe Poderoso",
+      "verdict": "SUSPEITA",
+      "detail": "  62.3 de dano por mana (2.3x a mediana), 4% do dano total",
+      "value": 62.31282662692499
+    },
+    {
+      "system": "skills",
+      "subject": "Cutelada",
+      "verdict": "ignorada",
+      "detail": "oferecida 1155x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Provocação",
+      "verdict": "ignorada",
+      "detail": "oferecida 1136x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Golpe nas Sombras",
+      "verdict": "ignorada",
+      "detail": "oferecida 1094x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Relâmpago",
+      "verdict": "ignorada",
+      "detail": "oferecida 782x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Golpe Duplo",
+      "verdict": "ignorada",
+      "detail": "oferecida 533x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Lançar Adaga",
+      "verdict": "ignorada",
+      "detail": "oferecida 426x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Dreno de Mana",
+      "verdict": "ignorada",
+      "detail": "oferecida 358x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Raio Congelante",
+      "verdict": "ignorada",
+      "detail": "oferecida 294x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Evasão Perfeita",
+      "verdict": "ignorada",
+      "detail": "oferecida 184x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Resistência Heróica",
+      "verdict": "ignorada",
+      "detail": "oferecida 166x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Dança das Lâminas",
+      "verdict": "ignorada",
+      "detail": "oferecida 137x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Sono Profundo",
+      "verdict": "ignorada",
+      "detail": "oferecida 124x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Tempestade",
+      "verdict": "ignorada",
+      "detail": "oferecida 104x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Cura Menor",
+      "verdict": "ignorada",
+      "detail": "oferecida 68x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "Fantasma",
+      "verdict": "ignorada",
+      "detail": "oferecida 23x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "skills",
+      "subject": "escolhidas mas nunca usadas",
+      "verdict": "morta",
+      "detail": "Cortina de Fumaça, Explosão Arcana, Golpe Devastador",
+      "value": 3
+    },
+    {
+      "system": "skills",
+      "subject": "ataque básico",
+      "verdict": "referência",
+      "detail": "42% do dano total sai do ataque gratuito",
+      "value": 0.4175733799086984
+    },
+    {
+      "system": "passivas",
+      "subject": "Mente Serena",
+      "verdict": "ignorada",
+      "detail": "oferecida 1798x, escolhida 4% das vezes",
+      "value": 0.04171301446051168
+    },
+    {
+      "system": "passivas",
+      "subject": "Sorte de Principiante",
+      "verdict": "ignorada",
+      "detail": "oferecida 1782x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "passivas",
+      "subject": "Reserva Arcana",
+      "verdict": "ignorada",
+      "detail": "oferecida 1758x, escolhida 8% das vezes",
+      "value": 0.07906712172923777
+    },
+    {
+      "system": "passivas",
+      "subject": "Passos Leves",
+      "verdict": "ignorada",
+      "detail": "oferecida 1655x, escolhida 14% das vezes",
+      "value": 0.14138972809667674
+    },
+    {
+      "system": "passivas",
+      "subject": "Reflexos Rápidos",
+      "verdict": "ignorada",
+      "detail": "oferecida 865x, escolhida 2% das vezes",
+      "value": 0.023121387283236993
+    },
+    {
+      "system": "passivas",
+      "subject": "Mãos de Midas",
+      "verdict": "ignorada",
+      "detail": "oferecida 838x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "passivas",
+      "subject": "Essência Fluída",
+      "verdict": "SUSPEITA",
+      "detail": "escolhida em 94% das 808 ofertas — é a escolha óbvia",
+      "value": 0.9443069306930693
+    },
+    {
+      "system": "passivas",
+      "subject": "Essência Viva",
+      "verdict": "ignorada",
+      "detail": "oferecida 800x, escolhida 0% das vezes",
+      "value": 0.00375
+    },
+    {
+      "system": "passivas",
+      "subject": "Bebida dos Deuses",
+      "verdict": "ignorada",
+      "detail": "oferecida 798x, escolhida 9% das vezes",
+      "value": 0.09273182957393483
+    },
+    {
+      "system": "passivas",
+      "subject": "Bênção Divina",
+      "verdict": "SUSPEITA",
+      "detail": "escolhida em 98% das 326 ofertas — é a escolha óbvia",
+      "value": 0.9815950920245399
+    },
+    {
+      "system": "passivas",
+      "subject": "Alma Eterna",
+      "verdict": "SUSPEITA",
+      "detail": "escolhida em 100% das 320 ofertas — é a escolha óbvia",
+      "value": 1.0
+    },
+    {
+      "system": "passivas",
+      "subject": "Punho Atordoante",
+      "verdict": "ignorada",
+      "detail": "oferecida 312x, escolhida 1% das vezes",
+      "value": 0.00641025641025641
+    },
+    {
+      "system": "passivas",
+      "subject": "Fome de Batalha",
+      "verdict": "ignorada",
+      "detail": "oferecida 307x, escolhida 1% das vezes",
+      "value": 0.006514657980456026
+    },
+    {
+      "system": "passivas",
+      "subject": "Coração de Titã",
+      "verdict": "SUSPEITA",
+      "detail": "escolhida em 100% das 72 ofertas — é a escolha óbvia",
+      "value": 1.0
+    },
+    {
+      "system": "passivas",
+      "subject": "Fortuna Absoluta",
+      "verdict": "ignorada",
+      "detail": "oferecida 71x, escolhida 0% das vezes",
+      "value": 0.0
+    },
+    {
+      "system": "passivas",
+      "subject": "Essência Pura",
+      "verdict": "ignorada",
+      "detail": "oferecida 60x, escolhida 2% das vezes",
+      "value": 0.016666666666666666
+    },
+    {
+      "system": "equipamento",
+      "subject": "contribuição no poder",
+      "verdict": "ok",
+      "detail": "+19% sobre o herói sem equipamento",
+      "value": 0.18616122048097394
+    },
+    {
+      "system": "equipamento",
+      "subject": "origem do que é equipado",
+      "verdict": "referência",
+      "detail": "22% de drop, 78% de loja",
+      "value": 0.0
+    },
+    {
+      "system": "economia",
+      "subject": "ouro sem destino",
+      "verdict": "SUSPEITA",
+      "detail": "82% do ouro nunca é gasto (1.054.036 gastos de 5.756.691 ganhos)",
+      "value": 0.8169024531627631
+    },
+    {
+      "system": "essência",
+      "subject": "efeito no XP",
+      "verdict": "referência",
+      "detail": "multiplica o XP em 1.47x na média (sorteio médio 1.34 em 7425 andares)",
+      "value": 0.47454388266019754
+    },
+    {
+      "system": "eventos",
+      "subject": "Fonte",
+      "verdict": "referência",
+      "detail": "597x, 723 de HP por visita",
+      "value": 431724
+    },
+    {
+      "system": "eventos",
+      "subject": "Altar",
+      "verdict": "referência",
+      "detail": "532x, 217 recusados, 0 mortes causadas",
+      "value": 0
+    },
+    {
+      "system": "eventos",
+      "subject": "frequência",
+      "verdict": "referência",
+      "detail": "1683 eventos em 750 runs",
+      "value": 1683
+    },
+    {
+      "system": "escolha",
+      "subject": "valor de escolher",
+      "verdict": "ok",
+      "detail": "escolher de propósito rende +1.8 andar sobre sortear",
+      "value": 1.7822222222222237
+    },
+    {
+      "system": "escolha",
+      "subject": "ranking de intenção",
+      "verdict": "referência",
+      "detail": "economy 12.2 > random 10.4 > offense 10.0 > survival 9.3",
+      "value": 0.0
+    },
+    {
+      "system": "passivas",
+      "subject": "recusadas por toda intenção",
+      "verdict": "morta",
+      "detail": "1 cartas: Reflexos Rápidos",
+      "value": 1
+    },
+    {
+      "system": "passivas",
+      "subject": "cartas de identidade",
+      "verdict": "ok",
+      "detail": "21 escolhidas por uma intenção só: Bebida dos Deuses, Coração de Ferro, Escudo da Fé, Essência Pura, Essência Viva, Fome de Batalha, Fortuna Absoluta, Lâmina Afiada",
+      "value": 21
+    },
+    {
+      "system": "skills",
+      "subject": "recusadas por toda intenção",
+      "verdict": "morta",
+      "detail": "10 cartas: Cura Menor, Cutelada, Dreno de Mana, Evasão Perfeita, Fantasma, Lançar Adaga, Provocação, Raio Congelante",
+      "value": 10
+    },
+    {
+      "system": "skills",
+      "subject": "levadas por toda intenção",
+      "verdict": "SUSPEITA",
+      "detail": "2 cartas: Assassinato, Explosão Arcana — não são opção, são a resposta certa",
+      "value": 2
+    },
+    {
+      "system": "skills",
+      "subject": "cartas de identidade",
+      "verdict": "ok",
+      "detail": "6 escolhidas por uma intenção só: Barreira Arcana, Cortina de Fumaça, Fortalecimento, Fúria, Golpe nas Sombras, Relâmpago",
+      "value": 6
+    },
+    {
+      "system": "skills",
+      "subject": "sem amostra suficiente",
+      "verdict": "referência",
+      "detail": "4 cartas oferecidas menos de 10x a alguma intenção, não classificadas: Apocalipse, Imortal, Morte Súbita, Ressurgir — aumente --policy-iterations para julgá-las",
+      "value": 4
+    }
+  ],
+  "ablation": [
+    {
+      "disabled": "essence",
+      "mean_floor": 3.8333333333333335,
+      "delta_floors": -5.417777777777777
+    },
+    {
+      "disabled": "passives",
+      "mean_floor": 4.8133333333333335,
+      "delta_floors": -4.437777777777778
+    },
+    {
+      "disabled": "shop",
+      "mean_floor": 5.475555555555555,
+      "delta_floors": -3.775555555555556
+    },
+    {
+      "disabled": "loot",
+      "mean_floor": 7.155555555555555,
+      "delta_floors": -2.0955555555555563
+    },
+    {
+      "disabled": "events",
+      "mean_floor": 8.62,
+      "delta_floors": -0.6311111111111121
+    },
+    {
+      "disabled": "skill_choice",
+      "mean_floor": 9.004444444444445,
+      "delta_floors": -0.24666666666666615
+    }
+  ],
+  "pick_policies": {
+    "mean_floor_by_policy": {
+      "survival": 9.251111111111111,
+      "offense": 10.006666666666666,
+      "economy": 12.175555555555556,
+      "random": 10.393333333333333
+    },
+    "choice_value_floors": 1.7822222222222237,
+    "passive_pick_rate": {
+      "survival": {
+        "passos_leves": 0.13713713713713713,
+        "reserva_arcana": 0.08221797323135756,
+        "musculos_aco": 0.34452975047984646,
+        "olho_aguia": 0.21009174311926607,
+        "pele_grossa": 0.6184340931615461,
+        "escudo_fe": 0.5018315018315018,
+        "sede_sangue": 0.32653061224489793,
+        "sangue_guerreiro": 0.8861111111111111,
+        "furia_berserker": 0.4198782961460446,
+        "alma_eterna": 1.0,
+        "lamina_afiada": 0.2785571142284569,
+        "coracao_ferro": 0.7404505386875612,
+        "essencia_viva": 0.006198347107438017,
+        "sorte_iniciante": 0.0,
+        "bebida_deuses": 0.09336099585062241,
+        "mente_serena": 0.0410958904109589,
+        "reflexos_rapidos": 0.025594149908592323,
+        "essencia_fluida": 0.9478079331941545,
+        "maos_midas": 0.0,
+        "toque_dragao": 0.4383561643835616,
+        "punho_atordoante": 0.01098901098901099,
+        "pele_adamantio": 0.4387755102040816,
+        "fome_batalha": 0.006172839506172839,
+        "fortuna_absoluta": 0.0,
+        "bencao_divina": 0.9735449735449735,
+        "coracao_tita": 1.0,
+        "lamina_lendaria": 0.3617021276595745,
+        "essencia_pura": 0.029411764705882353,
+        "imortalidade": 0.3225806451612903
+      },
+      "offense": {
+        "passos_leves": 0.509090909090909,
+        "reserva_arcana": 0.08289241622574955,
+        "musculos_aco": 0.8916382252559727,
+        "olho_aguia": 0.6614107883817427,
+        "pele_grossa": 0.1584070796460177,
+        "escudo_fe": 0.1763668430335097,
+        "sede_sangue": 0.8235294117647058,
+        "sangue_guerreiro": 0.30755711775043937,
+        "furia_berserker": 0.963302752293578,
+        "alma_eterna": 0.3798076923076923,
+        "lamina_afiada": 0.7584369449378331,
+        "coracao_ferro": 0.23370981754995657,
+        "essencia_viva": 0.009784735812133072,
+        "sorte_iniciante": 0.0,
+        "mente_serena": 0.046861184792219276,
+        "bebida_deuses": 0.016666666666666666,
+        "essencia_fluida": 0.4288389513108614,
+        "maos_midas": 0.0,
+        "reflexos_rapidos": 0.02460456942003515,
+        "pele_adamantio": 0.26288659793814434,
+        "fortuna_absoluta": 0.0,
+        "toque_dragao": 1.0,
+        "punho_atordoante": 0.5813953488372093,
+        "bencao_divina": 0.42783505154639173,
+        "essencia_pura": 0.024390243902439025,
+        "fome_batalha": 0.022988505747126436,
+        "lamina_lendaria": 0.7391304347826086,
+        "coracao_tita": 0.38461538461538464,
+        "imortalidade": 0.09090909090909091
+      },
+      "economy": {
+        "passos_leves": 0.0025031289111389237,
+        "reserva_arcana": 0.623642943305187,
+        "musculos_aco": 0.0698856416772554,
+        "olho_aguia": 0.013409961685823755,
+        "pele_grossa": 0.18181818181818182,
+        "escudo_fe": 0.049937578027465665,
+        "sede_sangue": 0.013201320132013201,
+        "sangue_guerreiro": 0.32387415175817397,
+        "furia_berserker": 0.10353535353535354,
+        "reflexos_rapidos": 0.0,
+        "essencia_fluida": 0.3629139072847682,
+        "maos_midas": 0.7527010804321729,
+        "lamina_afiada": 0.020858895705521473,
+        "mente_serena": 0.48495788206979545,
+        "alma_eterna": 0.4115853658536585,
+        "sorte_iniciante": 0.9004250151791136,
+        "essencia_viva": 0.9800531914893617,
+        "coracao_ferro": 0.24246153846153845,
+        "bebida_deuses": 0.7144670050761421,
+        "bencao_divina": 0.37410071942446044,
+        "fome_batalha": 0.99609375,
+        "toque_dragao": 0.1605351170568562,
+        "punho_atordoante": 0.0,
+        "pele_adamantio": 0.06333333333333334,
+        "imortalidade": 0.0,
+        "essencia_pura": 1.0,
+        "fortuna_absoluta": 0.746268656716418,
+        "coracao_tita": 0.532258064516129,
+        "lamina_lendaria": 0.0
+      },
+      "random": {
+        "passos_leves": 0.34545454545454546,
+        "reserva_arcana": 0.33178654292343385,
+        "musculos_aco": 0.3541495480690222,
+        "olho_aguia": 0.33014354066985646,
+        "pele_grossa": 0.3273296789350039,
+        "escudo_fe": 0.32748538011695905,
+        "sede_sangue": 0.34101382488479265,
+        "sangue_guerreiro": 0.33174980205859067,
+        "furia_berserker": 0.3435483870967742,
+        "alma_eterna": 0.32710280373831774,
+        "lamina_afiada": 0.3366174055829228,
+        "coracao_ferro": 0.343042071197411,
+        "essencia_viva": 0.34201954397394135,
+        "sorte_iniciante": 0.3108211818879509,
+        "mente_serena": 0.31675592960979343,
+        "bebida_deuses": 0.31932773109243695,
+        "essencia_fluida": 0.33671742808798644,
+        "pele_adamantio": 0.33495145631067963,
+        "fortuna_absoluta": 0.45614035087719296,
+        "reflexos_rapidos": 0.34915254237288135,
+        "fome_batalha": 0.33505154639175255,
+        "essencia_pura": 0.25,
+        "maos_midas": 0.33049403747870526,
+        "toque_dragao": 0.35909090909090907,
+        "punho_atordoante": 0.34951456310679613,
+        "bencao_divina": 0.28451882845188287,
+        "imortalidade": 0.2222222222222222,
+        "lamina_lendaria": 0.36507936507936506,
+        "coracao_tita": 0.4411764705882353
+      }
+    },
+    "skill_pick_rate": {
+      "survival": {
+        "provocacao": 0.0,
+        "cutelada": 0.0,
+        "fortalecimento": 0.7720588235294118,
+        "golpe_duplo": 0.0,
+        "resistencia_heroica": 0.0,
+        "golpe_devastador": 0.1437125748502994,
+        "furia": 1.0,
+        "esmagar": 0.375,
+        "relampago": 0.0,
+        "barreira_arcana": 0.8518518518518519,
+        "explosao_arcana": 1.0,
+        "dreno_mana": 0.0,
+        "sono_profundo": 0.0,
+        "raio_congelante": 0.0,
+        "tempestade": 0.0,
+        "cura_menor": 0.0,
+        "ressurgir": 1.0,
+        "golpe_sombras": 0.0,
+        "envenenar": 0.28112449799196787,
+        "passo_felino": 1.0,
+        "assassinato": 1.0,
+        "lancar_adaga": 0.0,
+        "evasao_perfeita": 0.0,
+        "cortina_fumaca": 1.0,
+        "fantasma": 0.0,
+        "danca_laminas": 0.0
+      },
+      "offense": {
+        "provocacao": 0.0,
+        "cutelada": 0.0,
+        "fortalecimento": 0.0,
+        "golpe_duplo": 0.7238095238095238,
+        "golpe_devastador": 0.9594594594594594,
+        "furia": 0.03225806451612903,
+        "resistencia_heroica": 0.0,
+        "esmagar": 1.0,
+        "imortal": 0.0,
+        "relampago": 0.47186147186147187,
+        "barreira_arcana": 0.0,
+        "explosao_arcana": 1.0,
+        "dreno_mana": 0.0,
+        "raio_congelante": 0.0,
+        "sono_profundo": 0.0,
+        "tempestade": 1.0,
+        "cura_menor": 0.0,
+        "golpe_sombras": 0.4794520547945205,
+        "envenenar": 0.0,
+        "passo_felino": 0.0,
+        "assassinato": 1.0,
+        "lancar_adaga": 0.0,
+        "evasao_perfeita": 0.0,
+        "danca_laminas": 1.0,
+        "cortina_fumaca": 0.0,
+        "fantasma": 0.0
+      },
+      "economy": {
+        "provocacao": 0.0,
+        "cutelada": 0.0,
+        "fortalecimento": 0.006339144215530904,
+        "golpe_duplo": 0.422680412371134,
+        "resistencia_heroica": 0.0,
+        "golpe_devastador": 0.9204545454545454,
+        "esmagar": 1.0,
+        "furia": 0.1875,
+        "imortal": 0.125,
+        "relampago": 0.31088082901554404,
+        "barreira_arcana": 0.0,
+        "explosao_arcana": 0.9047619047619048,
+        "dreno_mana": 0.0,
+        "raio_congelante": 0.0,
+        "sono_profundo": 0.0,
+        "tempestade": 1.0,
+        "cura_menor": 0.0,
+        "ressurgir": 0.0,
+        "apocalipse": 1.0,
+        "golpe_sombras": 0.1568836712913554,
+        "envenenar": 0.0,
+        "passo_felino": 0.9020979020979021,
+        "assassinato": 1.0,
+        "lancar_adaga": 0.0,
+        "danca_laminas": 1.0,
+        "fantasma": 0.0,
+        "cortina_fumaca": 0.04700854700854701,
+        "evasao_perfeita": 0.0,
+        "morte_subita": 1.0
+      },
+      "random": {
+        "provocacao": 0.0,
+        "cutelada": 0.0,
+        "fortalecimento": 0.22302158273381295,
+        "golpe_duplo": 0.1746031746031746,
+        "golpe_devastador": 0.2947976878612717,
+        "furia": 0.313953488372093,
+        "resistencia_heroica": 0.0,
+        "imortal": 0.3125,
+        "esmagar": 0.375,
+        "relampago": 0.2851985559566787,
+        "barreira_arcana": 0.20930232558139536,
+        "explosao_arcana": 0.391025641025641,
+        "dreno_mana": 0.0,
+        "raio_congelante": 0.0,
+        "tempestade": 0.3582089552238806,
+        "ressurgir": 0.38095238095238093,
+        "sono_profundo": 0.0,
+        "cura_menor": 0.0,
+        "golpe_sombras": 0.16881028938906753,
+        "envenenar": 0.1105121293800539,
+        "passo_felino": 0.4857142857142857,
+        "assassinato": 0.4074074074074074,
+        "lancar_adaga": 0.0,
+        "evasao_perfeita": 0.0,
+        "danca_laminas": 0.29896907216494845,
+        "cortina_fumaca": 0.24242424242424243,
+        "fantasma": 0.0,
+        "morte_subita": 0.36363636363636365
+      }
+    }
+  },
+  "elapsed_seconds": 277.53
+}

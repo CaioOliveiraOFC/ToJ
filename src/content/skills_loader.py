@@ -12,6 +12,7 @@ from src.shared.constants import (
     PASSIVE_LEGENDARY_WEIGHT,
     PASSIVE_RARE_WEIGHT,
 )
+from src.shared.registries import set_initial_skill_provider
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,11 @@ class SkillCard:
     is_initial: bool
     cooldown: int = 0
     stun_chance: int = 0
+    # Para skills de buff: qual atributo o buff modifica ("st", "ag", "df",
+    # "mg", "crit_chance", ...). Antes, o motor reconhecia buffs por nome
+    # literal, então qualquer buff cujo nome não estivesse na lista era um
+    # no-op silencioso. Nomear o alvo do efeito no dado resolve isso na origem.
+    effect_stat: str = ""
 
 
 _SKILL_REGISTRY: dict[str, SkillCard] | None = None
@@ -44,7 +50,10 @@ def _get_registry() -> dict[str, SkillCard]:
     if _SKILL_REGISTRY is None:
         data = load_json("skills.json")
         _SKILL_REGISTRY = {
-            s["id"]: SkillCard(**{k: s.get(k, 0) for k in SkillCard.__dataclass_fields__})
+            s["id"]: SkillCard(**{
+                k: s.get(k, "" if k == "effect_stat" else 0)
+                for k in SkillCard.__dataclass_fields__
+            })
             for s in data["skills"]
         }
     return _SKILL_REGISTRY
@@ -123,3 +132,9 @@ def generate_skill_choices(
         pool_weights.pop(idx)
 
     return chosen
+
+
+# Registra este módulo como a fonte de skills iniciais. `entities/` consulta o
+# registro em `shared/` e nunca importa de `content/`, como manda a regra 3 da
+# arquitetura: entidades não conhecem dados.
+set_initial_skill_provider(get_initial_skills)

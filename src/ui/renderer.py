@@ -99,36 +99,72 @@ def render_compare_opponents(ennt1, ennt2) -> None:
     console.print("=" * console.width, style="dim white")
 
 
-def render_battle_frame(player, monster) -> None:
+def render_battle_frame(player, monster, monsters=None) -> None:
+    """Desenha o quadro de batalha.
+
+    `monsters` lista o encontro inteiro. Com um inimigo só, o quadro é o de
+    sempre; com mais de um, cada inimigo ganha sua própria barra e um número,
+    porque escolher alvo exige ver em quem se está batendo.
+    """
     console.clear()
 
     console.print(Panel(Text("=== BATALHA ===", justify="center", style="bold red"), border_style="red"))
 
-    player_name_text = Text(player.get_nick_name(), style="bold blue")
-    monster_name_text = Text(monster.get_nick_name(), style="bold magenta")
-    vs_text = Text("VS", style="bold white")
+    group = [m for m in (monsters or []) if m is not None] or ([monster] if monster else [])
 
-    name_table = Table(show_header=False, expand=True, box=None)
-    name_table.add_column(justify="left")
-    name_table.add_column(justify="center")
-    name_table.add_column(justify="right")
-    name_table.add_row(player_name_text, vs_text, monster_name_text)
-    console.print(name_table)
+    if len(group) <= 1:
+        target = group[0] if group else monster
+        name_table = Table(show_header=False, expand=True, box=None)
+        name_table.add_column(justify="left")
+        name_table.add_column(justify="center")
+        name_table.add_column(justify="right")
+        name_table.add_row(
+            Text(player.get_nick_name(), style="bold blue"),
+            Text("VS", style="bold white"),
+            Text(target.get_nick_name(), style="bold magenta"),
+        )
+        console.print(name_table)
 
-    player_hp_bar = get_hp_bar(player)
-    monster_hp_bar = get_hp_bar(monster)
-
-    hp_table = Table(show_header=False, expand=True, box=None)
-    hp_table.add_column(justify="left")
-    hp_table.add_column(justify="right")
-    hp_table.add_row(Text(player_hp_bar, style="green"), Text(monster_hp_bar, style="red"))
-    console.print(hp_table)
+        hp_table = Table(show_header=False, expand=True, box=None)
+        hp_table.add_column(justify="left")
+        hp_table.add_column(justify="right")
+        hp_table.add_row(
+            Text(get_hp_bar(player), style="green"),
+            Text(get_hp_bar(target), style="red"),
+        )
+        console.print(hp_table)
+    else:
+        console.print(Text(f"{player.get_nick_name()}  VS  {len(group)} inimigos", style="bold blue"))
+        console.print(Text(get_hp_bar(player), style="green"))
+        enemy_table = Table(show_header=False, expand=True, box=None)
+        enemy_table.add_column(style="bold blue", justify="right", width=4)
+        enemy_table.add_column(style="bold magenta")
+        enemy_table.add_column(justify="right")
+        for index, mob in enumerate(group, start=1):
+            enemy_table.add_row(
+                f"{index}.",
+                f"{mob.get_nick_name()} [dim]({getattr(mob, 'role', '?')})[/dim]",
+                Text(get_hp_bar(mob), style="red"),
+            )
+        console.print(Panel(enemy_table, title="[bold magenta]Inimigos[/bold magenta]", border_style="magenta"))
 
     console.print(
         f"MP: [cyan]{player.get_mp()}[/cyan]/[dim cyan]{player.base_mp}[/dim cyan]",
         justify="left",
     )
     console.print("=" * console.width, style="dim white")
+
+
+def render_target_select_panel(monsters) -> None:
+    """Painel de escolha de alvo. Só aparece quando há mais de um inimigo vivo."""
+    table = Table(show_header=False, expand=True, border_style="dim white")
+    table.add_column("Chave", style="bold blue", justify="right")
+    table.add_column("Inimigo", style="magenta")
+    table.add_column("Vida", justify="right")
+    for index, mob in enumerate(monsters, start=1):
+        table.add_row(f"{index}.", f"{mob.get_nick_name()} [dim]({getattr(mob, 'role', '?')})[/dim]", get_hp_bar(mob))
+    table.add_row("0.", "Primeiro alvo", "")
+    console.print(Panel(table, title="[bold yellow]Escolha o alvo[/bold yellow]", border_style="yellow"))
 
 
 def render_physical_strike_result(attacker, defender, result: CombatResult) -> None:

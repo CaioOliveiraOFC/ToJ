@@ -9,20 +9,19 @@ import random
 from time import sleep
 from typing import TYPE_CHECKING
 
+from src.content.factories.dungeons import roll_random_event
 from src.content.factories.loot import get_loot
 from src.content.factories.monsters import (
     create_boss_for_level,
     generate_monsters_for_level,
 )
-from src.content.factories.dungeons import roll_random_event
 from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.content.skills_loader import generate_skill_choices
 from src.engine.events import EventBus
 from src.engine.map import MapOfGame
 from src.entities.monsters import Monster
-from src.mechanics import combat as combat_mech
-from src.mechanics.combat import PublishFn
+from src.mechanics import battle
 from src.mechanics.math_operations import (
     calculate_mini_boss_coin_reward,
     calculate_mini_boss_xp_reward,
@@ -35,6 +34,12 @@ from src.shared import combat_topics as topics
 from src.shared.constants import (
     BASE_MAP_HEIGHT,
     BASE_MAP_WIDTH,
+    ENCOUNTER_GROUP_MIN_FLOOR,
+    ENCOUNTER_LARGE_GROUP_MIN_FLOOR,
+    ENCOUNTER_MAX_SIZE_DEEP,
+    ENCOUNTER_MAX_SIZE_MID,
+    ENCOUNTER_MAX_SIZE_SHALLOW,
+    FLOOR_CLEAR_RESTORE_PERCENT,
     MAP_HEIGHT_INCREMENT_PER_5_LEVELS,
     MAP_WIDTH_INCREMENT_PER_5_LEVELS,
     MAX_WALL_PERCENT_CAP,
@@ -76,64 +81,52 @@ def _get_game_publish() -> callable:
     return publish
 
 
-def _run_human_battle_turn(
-    player: "Player",
-    monster: "Monster",
-    rng: random.Random | None,
-    publish: PublishFn,
-) -> str | None:
-    """
-    Motor de escolhas do turno do jogador (sem Rich aqui — só orquestração e teclas).
+def _choose_target(player: "Player", monsters: list) -> "Monster | None":
+    """Seleção de alvo quando o encontro tem mais de um monstro.
 
-    Retorna ``\"flee\"`` se a fuga for bem-sucedida; caso contrário ``None``.
+    Escolher alvo é a decisão tática mais básica que existe, e ela não existia:
+    o combate era sempre um contra um. Com um monstro só, não há pergunta a
+    fazer — a função devolve o único alvo direto.
     """
-    action_taken = False
-    while not action_taken:
-        screens.render_battle_frame(player, monster)
+    living = battle.alive(monsters)
+    if len(living) <= 1:
+        return living[0] if living else None
+
+    screens.render_target_select_panel(living)
+    keys = [str(i) for i in range(1, len(living) + 1)] + ["0"]
+    choice = safe_get_key(keys)
+    if choice == "0" or not choice or not choice.isdigit():
+        return living[0]
+    index = int(choice) - 1
+    return living[index] if 0 <= index < len(living) else living[0]
+
+
+def _human_decision(player: "Player", monsters: list, turn: int = 0) -> battle.Action:
+    """Lê a ação do jogador para o turno dele.
+
+    Só orquestra teclas e devolve a decisão; quem aplica a regra é
+    `mechanics.battle`, o mesmo código que o simulador de balanceamento usa.
+    """
+    while True:
+        living = battle.alive(monsters)
+        primary = living[0] if living else None
+        screens.render_battle_frame(player, primary, living)
         screens.render_battle_action_panel()
 
         choice = safe_get_key(valid_keys=["1", "2", "3", "4"])
 
         if choice == "1":
-            combat_mech.resolve_physical_attack(
-                player, monster, player.get_avg_damage(), "", rng=rng, publish=publish
-            )
-            action_taken = True
+            target = _choose_target(player, monsters)
+            return battle.Action(kind="attack", target=target)
 
-        elif choice == "2":
+        if choice == "2":
             if not player.skills:
                 screens.render_battle_no_skills_message()
                 sleep(0.5)
                 continue
-
-            while True:
-                screens.render_battle_frame(player, monster)
-                screens.render_skill_select_panel(player)
-
-                skill_keys = [str(k) for k in player.skills.keys()] + ["0"]
-                skill_choice = safe_get_key(skill_keys)
-
-                if skill_choice == "0":
-                    break
-
-                if skill_choice and skill_choice.isdigit() and int(skill_choice) in player.skills:
-                    chosen_skill = player.skills[int(skill_choice)]
-                    # Cooldown check
-                    remaining = 0
-                    if hasattr(player, "skill_cooldowns"):
-                        remaining = player.skill_cooldowns.get(getattr(chosen_skill, "id", ""), 0)
-                    if remaining > 0:
-                        screens.render_skill_on_cooldown_message(chosen_skill.name, remaining)
-                        sleep(0.5)
-                        continue
-                    if player.get_mp() < chosen_skill.mana_cost:
-                        screens.render_battle_insufficient_mana_message()
-                        sleep(0.5)
-                        continue
-
-                    combat_mech.apply_skill(player, monster, chosen_skill, rng=rng, publish=publish)
-                    action_taken = True
-                    break
+            action = _pick_skill_action(player, monsters, primary)
+            if action is not None:
+                return action
 
         elif choice == "3":
             potions = [item for item in player.inventory if item.is_potion]
@@ -141,110 +134,68 @@ def _run_human_battle_turn(
                 screens.render_battle_no_potions_message()
                 sleep(0.5)
                 continue
-
-            while True:
-                screens.render_battle_frame(player, monster)
-                screens.render_potion_select_panel(potions)
-
-                potion_keys = [str(i) for i in range(1, len(potions) + 1)] + ["0"]
-                potion_choice = safe_get_key(potion_keys)
-
-                if potion_choice == "0":
-                    break
-
-                if potion_choice and potion_choice.isdigit():
-                    if 0 < int(potion_choice) <= len(potions):
-                        player.use_potion(potions[int(potion_choice) - 1])
-                        action_taken = True
-                        sleep(0.8)
-                        break
-
-                    screens.render_battle_invalid_potion_message()
-                    sleep(0.5)
+            action = _pick_potion_action(player, potions, primary, living)
+            if action is not None:
+                return action
 
         elif choice == "4":
-            if combat_mech.roll_flee_success(rng=rng):
-                if publish:
-                    publish(
-                        topics.COMBAT_FLEE_RESULT,
-                        GameEvent(
-                            type="flee_result",
-                            payload={"success": True},
-                            source="engine.loop",
-                        ),
-                    )
-                player.rest()
-                return "flee"
-            if publish:
-                publish(
-                    topics.COMBAT_FLEE_RESULT,
-                    GameEvent(type="flee_result", payload={"success": False}, source="engine.loop"),
-                )
-            action_taken = True
-
-    return None
+            return battle.Action(kind="flee")
 
 
-def _determine_turn_order(player: "Player", monster: "Monster") -> list:
-    """Determina a ordem de turnos baseada na agilidade."""
-    turn_order = [player, monster]
-    if player.get_ag() < monster.get_ag():
-        turn_order = [monster, player]
-    return turn_order
+def _pick_skill_action(player, monsters, primary) -> "battle.Action | None":
+    """Menu de skills. Devolve None se o jogador voltar sem escolher."""
+    while True:
+        screens.render_battle_frame(player, primary, battle.alive(monsters))
+        screens.render_skill_select_panel(player)
 
+        skill_keys = [str(k) for k in player.skills.keys()] + ["0"]
+        skill_choice = safe_get_key(skill_keys)
 
-def _process_monster_turn(
-    monster: "Monster",
-    player: "Player",
-    rng: random.Random | None,
-    publish: PublishFn,
-) -> None:
-    """Processa o turno do monstro (ataque automático)."""
-    screens.render_battle_frame(player, monster)
-    combat_mech.resolve_physical_attack(
-        monster, player, monster.get_avg_damage(), "", rng=rng, publish=publish
-    )
+        if skill_choice == "0":
+            return None
 
-
-def _run_battle_loop(
-    player: "Player",
-    monster: "Monster",
-    turn_order: list,
-    rng: random.Random | None,
-    publish: PublishFn,
-) -> bool:
-    """
-    Executa o loop principal da batalha.
-    Retorna True se o jogador fugiu, False caso contrário.
-    """
-    attacker_index = 0
-
-    while player.get_isalive() and monster.get_isalive():
-        attacker = turn_order[attacker_index]
-        defender = turn_order[(attacker_index + 1) % 2]
-
-        screens.render_battle_frame(player, monster)
-        screens.render_turn_banner(attacker)
-
-        skip_turn = combat_mech.process_turn_start_effects(attacker, rng=rng, publish=publish)
-        if skip_turn:
-            attacker_index = (attacker_index + 1) % 2
+        if not (skill_choice and skill_choice.isdigit() and int(skill_choice) in player.skills):
             continue
 
-        if attacker.my_type() == "Human":
-            outcome = _run_human_battle_turn(player, monster, rng, publish)
-            if outcome == "flee":
-                return True
-        else:
-            _process_monster_turn(monster, player, rng, publish)
+        skill = player.skills[int(skill_choice)]
+        remaining = player.skill_cooldowns.get(getattr(skill, "id", ""), 0)
+        if remaining > 0:
+            screens.render_skill_on_cooldown_message(skill.name, remaining)
+            sleep(0.5)
+            continue
+        if player.get_mp() < skill.mana_cost:
+            screens.render_battle_insufficient_mana_message()
+            sleep(0.5)
+            continue
 
-        if defender.get_hp() <= 0:
-            defender.set_isalive(False)
-            break
+        # Skill que age sobre o próprio herói não pede alvo.
+        if skill.effect_type in ("heal", "buff") or getattr(skill, "target", "enemy") == "self":
+            return battle.Action(kind="skill", skill=skill, target=player)
+        return battle.Action(kind="skill", skill=skill, target=_choose_target(player, monsters))
 
-        attacker_index = (attacker_index + 1) % 2
 
-    return False
+def _pick_potion_action(player, potions, primary, living) -> "battle.Action | None":
+    """Menu de consumíveis. Devolve None se o jogador voltar sem escolher."""
+    while True:
+        screens.render_battle_frame(player, primary, living)
+        screens.render_potion_select_panel(potions)
+
+        potion_keys = [str(i) for i in range(1, len(potions) + 1)] + ["0"]
+        potion_choice = safe_get_key(potion_keys)
+
+        if potion_choice == "0":
+            return None
+        if potion_choice and potion_choice.isdigit() and 0 < int(potion_choice) <= len(potions):
+            return battle.Action(kind="item", item=potions[int(potion_choice) - 1])
+        screens.render_battle_invalid_potion_message()
+        sleep(0.5)
+
+
+def _on_turn_start(actor, player, monsters) -> None:
+    """Redesenha a tela e anuncia de quem é o turno."""
+    living = battle.alive(monsters)
+    screens.render_battle_frame(player, living[0] if living else None, living)
+    screens.render_turn_banner(actor)
 
 
 def _render_battle_results(
@@ -272,11 +223,16 @@ def _render_battle_results(
 
 def run_fight(
     player: "Player",
-    monster: "Monster",
+    monster: "Monster | list",
     rng: random.Random | None = None,
     essence_multiplier: float = 1.0,
 ) -> None:
-    """Loop principal de batalha: mecânica publica eventos; UI reage via inscrições no bus."""
+    """Loop principal de batalha: mecânica publica eventos; UI reage via inscrições no bus.
+
+    Aceita um monstro ou uma lista deles. A assinatura de um monstro só é mantida
+    porque o mapa entrega um encontro por vez, e porque o combate era 1 contra 1
+    até aqui — escolher alvo passa a existir quando o encontro tem mais de um.
+    """
     rng = rng or random.Random()
     bus = EventBus()
     cleanup_combat = register_combat_ui_handlers(bus)
@@ -289,23 +245,30 @@ def run_fight(
             event = GameEvent(type=topic, payload=payload_or_event)
             bus.publish(topic, event)
 
+    monsters = list(monster) if isinstance(monster, list) else [monster]
     level_before = player.get_level()
 
     try:
-        screens.render_fight_intro(player, monster)
+        screens.render_fight_intro(player, monsters[0])
         safe_get_key(allow_escape=False)
 
-        turn_order = _determine_turn_order(player, monster)
-        player_fled = _run_battle_loop(player, monster, turn_order, rng, publish)
+        outcome = battle.run_battle(
+            player,
+            monsters,
+            _human_decision,
+            rng=rng,
+            publish=publish,
+            on_turn_start=_on_turn_start,
+        )
 
-        if player_fled:
+        if outcome.fled:
             return
 
         xp_gained, player_won, dropped_item, level_up_msgs, coins_gained, levels_gained = process_post_battle(
-            player, monster, essence_multiplier
+            player, monsters, essence_multiplier
         )
         _render_battle_results(
-            player, monster, xp_gained, player_won, dropped_item,
+            player, monsters[0], xp_gained, player_won, dropped_item,
             level_up_msgs, coins_gained, essence_multiplier
         )
 
@@ -330,7 +293,7 @@ def run_fight(
 
 def fight(
     player: "Player",
-    monster: "Monster",
+    monster: "Monster | list",
     rng: random.Random | None = None,
     essence_multiplier: float = 1.0,
 ) -> None:
@@ -340,14 +303,17 @@ def fight(
 
 def process_post_battle(
     player: "Player",
-    monster: "Monster",
+    monster: "Monster | list",
     essence_multiplier: float = 1.0,
 ) -> tuple[int, bool, object | None, list[str], int, int]:
     """
-    Processa a lógica de pós-combate (XP, loot, moedas, level up, rest).
+    Processa a lógica de pós-combate (XP, loot, moedas, level up).
 
     Esta função pertence à camada de engine - ela pode importar de
     mechanics/ e content/, e pode mutar estado de entidades.
+
+    Recompensa por monstro do encontro: um encontro com três inimigos deve pagar
+    mais que um com um, senão a composição vira punição pura.
 
     Retorna tupla com:
     - xp_gained: quantidade de XP ganha
@@ -357,34 +323,39 @@ def process_post_battle(
     - coins_gained: quantidade de moedas ganhas
     - levels_gained: quantidade de níveis ganhos
     """
-    level_before = player.get_level()
+    monsters = list(monster) if isinstance(monster, list) else [monster]
 
-    # Cálculo de XP base
-    xp_base_reward = calculate_monster_xp_reward(monster.level)
-    if getattr(monster, "is_boss", False):
-        xp_base_reward = calculate_mini_boss_xp_reward(monster.level)
-
-    # Cálculo de moedas
-    coins_base_reward = calculate_monster_coin_reward(monster.level)
-    if getattr(monster, "is_boss", False):
-        coins_base_reward = calculate_mini_boss_coin_reward(monster.level)
+    xp_base_reward = 0
+    coins_base_reward = 0
+    for mob in monsters:
+        if getattr(mob, "is_boss", False):
+            xp_base_reward += calculate_mini_boss_xp_reward(mob.level)
+            coins_base_reward += calculate_mini_boss_coin_reward(mob.level)
+        else:
+            xp_base_reward += calculate_monster_xp_reward(mob.level)
+            coins_base_reward += calculate_monster_coin_reward(mob.level)
 
     player_won = player.get_isalive()
     dropped_item = None
     coins_gained = 0
 
+    # Passivas de essência e de ouro eram lidas por ninguém: `essence_bonus`
+    # (4 cartas) e `gold_drop_bonus` (2 cartas) não apareciam em nenhum cálculo.
+    essence_passive = 1 + player.get_passive_bonus("essence_bonus") / 100
+    gold_passive = 1 + player.get_passive_bonus("gold_drop_bonus") / 100
+
     if not player_won:
-        pity_xp = int((xp_base_reward // 10) * essence_multiplier)
-        pity_coins = coins_base_reward // 10
+        pity_xp = int((xp_base_reward // 10) * essence_multiplier * essence_passive)
+        pity_coins = int((coins_base_reward // 10) * gold_passive)
         player.add_xp_points(pity_xp)
         player.earn_coins(pity_coins)
         xp_gained = pity_xp
         coins_gained = pity_coins
     else:
-        xp_gained = int(xp_base_reward * essence_multiplier)
+        xp_gained = int(xp_base_reward * essence_multiplier * essence_passive)
         player.add_xp_points(xp_gained)
-        player.earn_coins(coins_base_reward)
-        coins_gained = coins_base_reward
+        coins_gained = int(coins_base_reward * gold_passive)
+        player.earn_coins(coins_gained)
         dropped_item = get_loot()
         if dropped_item:
             player.add_item_to_inventory(dropped_item)
@@ -399,7 +370,10 @@ def process_post_battle(
                 break
             level_up_messages.extend(msgs)
             levels_gained += 1
-        player.rest()
+
+    # Sem `rest()`: curar por completo depois de cada vitória tornava todo
+    # combate independente do anterior e zerava o atrito do andar. Poções,
+    # skills de cura e a Fonte existem justamente para pagar esse custo.
 
     return xp_gained, player_won, dropped_item, level_up_messages, coins_gained, levels_gained
 
@@ -438,15 +412,43 @@ def _setup_dungeon_map(
         game_map.place_exit()
         monsters_to_place = generate_monsters_for_level(dungeon_level, player.level)
 
-        # Gerar Mini-Chefe a cada 5 níveis
-        if dungeon_level % 5 == 0:
-            boss = create_boss_for_level(dungeon_level)
-            monsters_to_place.append(boss)
+        # Os monstros do andar são distribuídos em encontros, não um por casa:
+        # um encontro composto exige escolha de alvo, que é a decisão tática mais
+        # básica do jogo e que não existia enquanto o combate era 1 contra 1.
+        for group in _build_encounters(monsters_to_place, dungeon_level):
+            game_map.place_enemy(group)
 
-        for monster in monsters_to_place:
-            game_map.place_enemy(monster)
+        # Mini-chefe a cada 5 níveis, sempre sozinho: ele já é o encontro.
+        if dungeon_level % 5 == 0:
+            game_map.place_enemy([create_boss_for_level(dungeon_level)])
 
     return game_map
+
+
+def _build_encounters(monsters: list, dungeon_level: int) -> list[list]:
+    """Agrupa os monstros do andar em encontros.
+
+    Andares rasos mantêm inimigos isolados, para ensinar; a partir do andar 4 os
+    grupos aparecem, e ficam maiores conforme a profundidade. Elites e chefes
+    nunca entram em grupo — eles já são o encontro.
+    """
+    solos = [m for m in monsters if getattr(m, "is_boss", False)]
+    rest = [m for m in monsters if not getattr(m, "is_boss", False)]
+
+    if dungeon_level < ENCOUNTER_GROUP_MIN_FLOOR:
+        max_size = ENCOUNTER_MAX_SIZE_SHALLOW
+    elif dungeon_level < ENCOUNTER_LARGE_GROUP_MIN_FLOOR:
+        max_size = ENCOUNTER_MAX_SIZE_MID
+    else:
+        max_size = ENCOUNTER_MAX_SIZE_DEEP
+
+    groups: list[list] = [[m] for m in solos]
+    index = 0
+    while index < len(rest):
+        size = random.randint(1, max_size)
+        groups.append(rest[index:index + size])
+        index += size
+    return groups
 
 
 def _render_dungeon_screen(
@@ -482,7 +484,7 @@ def _handle_player_movement(
     """
     collided_object = game_map.move_player(move)
 
-    if isinstance(collided_object, Monster):
+    if isinstance(collided_object, list) or isinstance(collided_object, Monster):
         fight(player, collided_object, essence_multiplier=essence_multiplier)
         if not player.get_isalive():
             _get_game_publish()(topics.UI_GAME_OVER, {"player_name": player.get_nick_name()})
@@ -564,7 +566,9 @@ def start_game(
             if result == "quit":
                 return
             elif result == "level_complete":
-                player.rest()
+                # Descanso parcial, não cura completa: o andar é a unidade de
+                # risco, e chegar ferido ao próximo é o que dá peso à extração.
+                player.recover(FLOOR_CLEAR_RESTORE_PERCENT)
                 # --- Evento aleatório (TASK-005) — 25% antes da extração ---
                 event_type = roll_random_event()
                 if event_type:

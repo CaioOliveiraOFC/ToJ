@@ -1,5 +1,5 @@
-from src.shared.constants import RARITY_MULTIPLIERS
 from src.data.loader import load_json
+from src.shared.constants import RARITY_MULTIPLIERS
 
 
 class Item:
@@ -31,6 +31,7 @@ class Item:
         price: int = 50,
         shop_min_floor: int = 1,
         shop_max_floor: int | None = None,
+        consumable: bool = False,
     ) -> None:
         self.id: str = item_id
         self.name: str = name
@@ -47,6 +48,7 @@ class Item:
         self.price: int = price
         self.shop_min_floor: int = shop_min_floor
         self.shop_max_floor: int | None = shop_max_floor
+        self.consumable: bool = consumable
 
         if effect_type and effect_value:
             multiplier = RARITY_MULTIPLIERS.get(rarity, 1.0)
@@ -55,9 +57,14 @@ class Item:
 
     @property
     def is_potion(self) -> bool:
-        """Verifica se o item é uma poção (legacy)."""
-        return self.effect_type in ("max_hp", "max_mp", "agility", "strength", "defense")
-    
+        """Verifica se o item é um consumível.
+
+        Antes isto adivinhava pelo `effect_type`, então qualquer amuleto ou
+        armadura com bônus de vida contava como poção: aparecia na lista de
+        poções do combate e era destruído ao ser "bebido". Agora o dado diz.
+        """
+        return bool(self.consumable)
+
     @property
     def is_usable(self) -> bool:
         """Verifica se o item pode ser usado (não é equipamento)."""
@@ -70,7 +77,7 @@ class Item:
         )
 
 
-def _create_item_from_json(item_data: dict) -> Item:
+def create_item_from_json(item_data: dict) -> Item:
     """Cria um objeto Item a partir de dados do JSON."""
     return Item(
         item_id=item_data.get("id", ""),
@@ -88,6 +95,7 @@ def _create_item_from_json(item_data: dict) -> Item:
         price=item_data.get("price", 50),
         shop_min_floor=item_data.get("shop_min_floor", 1),
         shop_max_floor=item_data.get("shop_max_floor", None),
+        consumable=item_data.get("consumable", False),
     )
 
 
@@ -107,7 +115,7 @@ def _load_all_items() -> dict[str, Item]:
 
     _ALL_ITEMS_CACHE = {}
     for item_data in items_list:
-        item = _create_item_from_json(item_data)
+        item = create_item_from_json(item_data)
         _ALL_ITEMS_CACHE[item.name] = item
 
     return _ALL_ITEMS_CACHE
@@ -162,28 +170,28 @@ class Potion(Item):
 
 
 # Exporta ALL_ITEMS para compatibilidade (propriedade dinâmica)
-class _ALL_ITEMS_Dict:
+class _AllItemsDict:
     """Proxy para manter compatibilidade com ALL_ITEMS."""
     def __getitem__(self, key):
         return _load_all_items()[key]
-    
+
     def __contains__(self, key):
         return key in _load_all_items()
-    
+
     def keys(self):
         return _load_all_items().keys()
-    
+
     def values(self):
         return _load_all_items().values()
-    
+
     def items(self):
         return _load_all_items().items()
-    
+
     def __len__(self):
         return len(_load_all_items())
-    
+
     def get(self, key, default=None):
         return _load_all_items().get(key, default)
 
 
-ALL_ITEMS = _ALL_ITEMS_Dict()
+ALL_ITEMS = _AllItemsDict()

@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "A dungeon crawler RPG game"
 readme = "README.md"
 requires-python = ">=3.10"
+dependencies = ["rich", "pyfiglet"]
 
 [tool.ruff]
 target-version = "py310"
@@ -21,7 +22,13 @@ select = [
     "I",   # isort
     "N",   # pep8-naming
 ]
-ignore = []
+ignore = [
+    # `from src.shared import combat_topics as T` é convenção do projeto, usada
+    # em cinco arquivos: o alias curto mantém legível a linha de publicação de
+    # evento (`_emit(publish, T.COMBAT_PHYSICAL_STRIKE, ...)`). Renomear para
+    # minúscula alonga essas linhas sem ganhar clareza.
+    "N812",
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -33,6 +40,15 @@ ignore_missing_imports = true
 warn_unused_ignores = true
 show_error_codes = true
 
+[project.optional-dependencies]
+dev = ["pytest", "ruff", "mypy"]
+
 [tool.pytest.ini_options]
 # auto_test.py é um harness standalone que roda o jogo inteiro (não é pytest)
-addopts = "--ignore=tests/auto_test.py"
+# balance_full fica fora da execução padrão: simula runs de 20 andares e leva
+# minutos. Rode com `-m balance_full` ao fechar uma mudança de balanceamento.
+addopts = "--ignore=tests/auto_test.py -m 'not balance_full'"
+markers = [
+    "balance: invariantes de balanceamento (simulação headless)",
+    "balance_full: runs completas de masmorra; lento, roda sob demanda",
+]

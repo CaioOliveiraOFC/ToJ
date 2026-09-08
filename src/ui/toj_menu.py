@@ -8,10 +8,10 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from src.ui.prompts import safe_get_key, get_key
+from src.storage.save_manager import get_trophies, list_slots
+from src.ui.prompts import get_key, safe_get_key
 from src.ui.screens import menu
 from src.ui.utils import clear_screen
-from src.storage.save_manager import list_slots, get_trophies
 
 console = Console()
 
@@ -201,7 +201,7 @@ def _prompt_for_name() -> str | None:
             border_style="cyan"
         ))
         console.print("[dim](Pressione ESC para cancelar)[/dim]\n")
-        
+
         name = console.input("[bold green]Nome:[/bold green] ").strip()
         if not name:
             console.print(Panel(

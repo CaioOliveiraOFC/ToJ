@@ -11,8 +11,8 @@ from src.ui import screens
 from src.ui.character_status_flow import run_character_status_flow
 from src.ui.extraction_flow import run_extraction_prompt
 from src.ui.inventory_flow import run_inventory_flow_v2
-from src.ui.random_event_flow import run_random_event
 from src.ui.passive_flow import run_passive_selection_flow
+from src.ui.random_event_flow import run_random_event
 from src.ui.shop_flow import run_shop_flow
 from src.ui.skill_flow import (
     run_skill_selection_flow,

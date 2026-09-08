@@ -1,0 +1,185 @@
+"""Progressão do herói durante uma run simulada.
+
+A simulação de run media um herói que subia de nível mas nunca escolhia passiva,
+nunca aprendia skill nova, nunca pegava loot e nunca trocava de equipamento na
+loja. Ele atravessava vinte andares com quatro skills comuns, o equipamento do
+andar 1 e nenhuma passiva — enquanto o jogo real dá dezenove passivas, oito
+escolhas de skill, drops a cada vitória e uma loja entre andares.
+
+Medir assim subestima o poder do jogador por larga margem, e todo o
+balanceamento calibrado em cima disso mede um jogo que ninguém joga. Este módulo
+reproduz o que o `engine/loop.py` faz entre combates, com as mesmas funções de
+conteúdo, para que a simulação e o jogo cheguem ao andar 20 com o mesmo herói.
+"""
+
+from __future__ import annotations
+
+import random
+
+from src.content.factories.loot import get_loot
+from src.content.passives import generate_passive_choices
+from src.content.shop import Shop
+from src.content.skills_loader import generate_skill_choices
+from src.mechanics.math_operations import generate_essence_multiplier
+from src.sim.pick_policies import DEFAULT_PICK_POLICY, PickPolicy, get_pick_policy
+from src.sim.toggles import Toggles
+
+# O jogo oferece escolha de skill nos níveis ímpares a partir deste.
+SKILL_CHOICE_MIN_LEVEL = 5
+# Quantos consumíveis de cura o bot tenta manter em mãos ao sair da loja.
+TARGET_HEALING_POTIONS = 3
+# Fração do ouro que o bot aceita gastar em equipamento; o resto fica para poção.
+GEAR_BUDGET_RATIO = 0.6
+def pick_passive(hero, choices: list, rng: random.Random, picker: PickPolicy | None = None):
+    """Escolhe uma passiva entre as oferecidas, pela política indicada.
+
+    A ordem de preferência vive em `sim/pick_policies.py`, e não aqui, porque o
+    scout precisa comparar políticas diferentes: ranking de carta tirado de um
+    único jeito de jogar é o ranking daquele jeito de jogar, não do conteúdo.
+    """
+    return (picker or get_pick_policy(DEFAULT_PICK_POLICY)).pick_passive(hero, choices, rng)
+
+
+def pick_skill(hero, choices: list, rng: random.Random, picker: PickPolicy | None = None):
+    """Escolhe uma skill nova entre as oferecidas, e qual substituir."""
+    return (picker or get_pick_policy(DEFAULT_PICK_POLICY)).pick_skill(hero, choices, rng)
+
+
+def on_level_up(hero, levels_gained: int, rng: random.Random,
+                toggles: Toggles | None = None, telemetry=None,
+                picker: PickPolicy | None = None) -> None:
+    """Aplica as escolhas que o jogo oferece a cada nível ganho.
+
+    Espelha `engine/loop.py`: uma passiva por nível, e uma skill nos níveis
+    ímpares a partir de `SKILL_CHOICE_MIN_LEVEL`.
+    """
+    cfg = toggles or Toggles()
+
+    if cfg.passives:
+        for _ in range(levels_gained):
+            ofertas = [c for c in generate_passive_choices(count=3) if c.id not in cfg.banned_passives]
+            escolhida = pick_passive(hero, ofertas, rng, picker)
+            if telemetry is not None:
+                telemetry.record_offer("passive", ofertas, escolhida)
+            if escolhida is not None:
+                hero.add_passive(escolhida)
+
+    if not cfg.skill_choice:
+        return
+
+    nivel = hero.get_level()
+    for lvl in range(nivel - levels_gained + 1, nivel + 1):
+        if lvl >= SKILL_CHOICE_MIN_LEVEL and lvl % 2 == 1:
+            conhecidas = [s.id for s in hero.skills.values()]
+            ofertas = generate_skill_choices(hero.get_classname(), lvl, conhecidas, count=3)
+            ofertas = [o for o in ofertas if o.id not in cfg.banned_skills]
+            nova, slot = pick_skill(hero, ofertas, rng, picker)
+            if telemetry is not None:
+                telemetry.record_offer("skill", ofertas, nova)
+            if nova is not None and slot is not None:
+                hero.skills[slot] = nova
+
+
+def collect_loot(hero, rng: random.Random, toggles: Toggles | None = None, telemetry=None) -> None:
+    """Recolhe o drop do combate e equipa se for melhor que o item atual.
+
+    O jogo dropa item a cada vitória. Ignorar isso na simulação corta a principal
+    fonte de equipamento da run.
+    """
+    if toggles is not None and not toggles.loot:
+        return
+    item = get_loot()
+    if item is None:
+        return
+    hero.add_item_to_inventory(item)
+    if telemetry is not None:
+        telemetry.items_from_loot += 1
+    if equip_if_better(hero, item) and telemetry is not None:
+        telemetry.items_equipped_from_loot += 1
+        telemetry.equipped_by_slot[str(item.slot)] += 1
+
+
+def equip_if_better(hero, item) -> bool:
+    """Equipa o item se ele render mais que o ocupante do slot."""
+    slot = getattr(item, "slot", None)
+    if not slot or slot not in hero.equipment:
+        return False
+    classes = getattr(item, "classes", None)
+    if classes and hero.get_classname() not in classes:
+        return False
+
+    atual = hero.equipment[slot]
+    if atual is not None and _peso_do_item(atual) >= _peso_do_item(item):
+        return False
+    return bool(hero.equip(item))
+
+
+def _peso_do_item(item) -> float:
+    """Quanto um item vale, somando dano, defesa e efeito passivo."""
+    return (
+        float(getattr(item, "damage_bonus", 0))
+        + float(getattr(item, "defense_bonus", 0))
+        + float(getattr(item, "effect_value", 0)) / 4
+    )
+
+
+def visit_shop(hero, shop: Shop, dungeon_level: int, rng: random.Random,
+               toggles: Toggles | None = None, telemetry=None) -> None:
+    """Gasta o ouro do andar como um jogador gastaria.
+
+    Primeiro repõe cura, porque sem consumível o próximo andar vira aposta.
+    Depois melhora equipamento, dentro de uma fração do ouro restante — guardar
+    tudo para uma compra futura é uma decisão que nenhum jogador de permadeath
+    toma.
+    """
+    if toggles is not None and not toggles.shop:
+        return
+    ofertas = shop.get_available_items(dungeon_level, hero.get_classname())
+    if not ofertas:
+        return
+
+    curas = [
+        o for o in ofertas
+        if getattr(o["item"], "consumable", False) and o["item"].effect_type == "max_hp"
+    ]
+    curas.sort(key=lambda o: -o["item"].effect_value)
+    em_maos = sum(
+        1 for i in hero.inventory
+        if getattr(i, "consumable", False) and getattr(i, "effect_type", None) == "max_hp"
+    )
+    for oferta in curas:
+        while em_maos < TARGET_HEALING_POTIONS and hero.coins >= oferta["price"]:
+            if not shop.buy_item(hero, oferta["item"], dungeon_level):
+                break
+            em_maos += 1
+            if telemetry is not None:
+                telemetry.items_bought += 1
+                telemetry.gold_on_consumables += int(oferta["price"])
+
+    orcamento = int(hero.coins * GEAR_BUDGET_RATIO)
+    equipamentos = [
+        o for o in ofertas
+        if getattr(o["item"], "slot", None) in hero.equipment
+        and not getattr(o["item"], "consumable", False)
+    ]
+    equipamentos.sort(key=lambda o: -_peso_do_item(o["item"]))
+    for oferta in equipamentos:
+        item = oferta["item"]
+        if oferta["price"] > orcamento or oferta["price"] > hero.coins:
+            continue
+        atual = hero.equipment.get(item.slot)
+        if atual is not None and _peso_do_item(atual) >= _peso_do_item(item):
+            continue
+        if shop.buy_item(hero, item, dungeon_level):
+            orcamento -= oferta["price"]
+            if telemetry is not None:
+                telemetry.items_bought += 1
+                telemetry.gold_on_gear += int(oferta["price"])
+            if equip_if_better(hero, item) and telemetry is not None:
+                telemetry.items_equipped_from_shop += 1
+                telemetry.equipped_by_slot[str(item.slot)] += 1
+
+
+def floor_essence_multiplier(dungeon_level: int) -> float:
+    """Multiplicador de Essência do andar, como o jogo sorteia."""
+    return generate_essence_multiplier(dungeon_level)

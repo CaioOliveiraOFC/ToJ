@@ -18,7 +18,13 @@ __pycache__*
 # Dados gerados
 savegame.json
 saves/
-reports/
+reports/*
+# Exceto a evidência citada no BALANCE_REPORT.md: um relatório que ninguém
+# consegue abrir não é evidência de nada. A lista é nominal de propósito —
+# curinga aqui faria toda execução do simulador aparecer no `git status`.
+!reports/baseline_20260904.json
+!reports/validation_20260905.json
+!reports/scout_20260905.json
 
 # IDEs
 .idea/

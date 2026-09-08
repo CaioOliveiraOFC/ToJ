@@ -38,16 +38,13 @@ MONSTER_BASE_MG = 50
 MONSTER_BASE_DF = 30
 
 # --- Sistema de XP e Moedas ---
-XP_INITIAL_COST = 3000
-XP_GROWTH_PER_LEVEL = 750
-MONSTER_BASE_XP_REWARD = 50
-MONSTER_XP_SCALING_PER_LEVEL = 20
+MONSTER_BASE_XP_REWARD = 45
 MONSTER_BASE_COIN_REWARD = 30
-MONSTER_COIN_SCALING_PER_LEVEL = 10
-MINI_BOSS_COIN_MULTIPLIER = 3
 
 # --- Mini-Bosses ---
-MINI_BOSS_LEVEL_BONUS = 2
+# O chefe já custa 2,4x o orçamento do andar. Somar níveis a isso empilhava dois
+# multiplicadores e transformava o andar 5 num muro, não num portão.
+MINI_BOSS_LEVEL_BONUS = 1
 MINI_BOSS_BASE_HP = 150
 MINI_BOSS_HP_SCALING_PER_LEVEL = 40
 MINI_BOSS_BASE_STRENGTH = 80
@@ -80,6 +77,8 @@ CRIT_CHANCE_HIGH = 25  # Para Rogue com Ataque Furtivo
 CRIT_CHANCE_DEFAULT = 10
 BASE_HIT_CHANCE = 85
 POISON_DAMAGE_PER_TICK = 5
+# Divisor da agilidade no dano de veneno: quem é mais ágil sangra mais rápido.
+POISON_AGILITY_DIVISOR = 5
 
 # Ranges e cálculos de combate
 PERCENTAGE_RANGE_MIN = 1
@@ -88,6 +87,27 @@ FLEE_RANGE_MAX = 2  # randrange(0, 2) = 0 ou 1 (50% chance)
 
 # --- COMBAT_DESIGN.md: Constantes de Calibração ---
 DEFENSE_K = 100  # Curva de mitigação: k/(k+defense)
+# Fração do BASE_POWER que sai num ataque básico.
+#
+# Valia 1.0: o ataque básico é gratuito, não tem recarga e entregava o poder
+# inteiro, enquanto a skill custa mana, tem recarga e paga apenas
+# `1 + effect_value/100` em cima do MESMO número. A skill de dano mediana do
+# jogo (65%) valia 1,65 ataque de graça.
+#
+# ATENÇÃO ao que a medição mostrou, porque é o contrário do que parece: mexer
+# só neste número NÃO tira o jogo do ataque básico. Medido a 250 runs por
+# classe, com a regeneração de mana em zero, baixar de 1,0 para 0,9 move a
+# fatia do dano vinda do básico de 35,9% para 35,2% — ou seja, nada — e derruba
+# o Guerreiro de 9,2 para 8,1 andares. O herói não spamava básico porque o
+# básico era forte; spamava porque ficava sem mana no terceiro turno. Quem
+# conserta o spam é MP_REGEN_PERCENT_PER_TURN.
+#
+# O papel deste número é outro, e é indispensável: a regeneração sozinha
+# (1,0 / 2%) leva a distância entre classes de 3,9 para 4,7 andares, acima do
+# limite de 4,0, porque Guerreiro e Ladino aproveitam a mana nova e o Mago quase
+# não muda. Com 0.90 junto, a distância cai para 3,4 e o Guerreiro fica
+# exatamente onde estava (9,2). É o nerf que paga a regeneração.
+BASIC_ATTACK_POWER_MULT = 0.90
 XMULT_CAP = 5.0  # Teto de multiplicadores puros
 CRIT_CHANCE_CAP = 75  # % máximo de chance crítica
 CRIT_DAMAGE_BASE = 1.5  # Multiplicador padrão de crítico
@@ -104,31 +124,52 @@ DEFAULT_WALL_PERCENTAGE = 0.2
 MAP_BORDER_OFFSET = 1  # Offset para evitar bordas
 MIN_EMPTY_TILES_START = 1
 
-# --- Stats Base de Heróis ---
-# Balanceado: Mage buff minimo (96->99, 23->25) para corrigir 5 andares de gap
-WARRIOR_BASE_HP = 104
-WARRIOR_BASE_MP = 30
-WARRIOR_BASE_ST = 104
-WARRIOR_BASE_AG = 5
+# --- Stats Base de Heróis (nível 1) ---
+# Os três perfis distribuem o mesmo orçamento de poder de ataque no nível 1
+# (100 pontos, aplicando CLASS_WEIGHTS) de formas diferentes, e a diferença
+# entre as classes está em HP, defesa e agilidade — não em quem bate mais.
+# Antes, o Mago tinha 21,8x de crescimento de poder contra 5,6x do Guerreiro,
+# porque o peso de classe alto dele multiplicava justamente o atributo que
+# crescia mais rápido.
+#
+# O orçamento trocado entre os eixos é o que dá identidade: quem ganha em dano
+# paga em sobrevivência, e o inverso. Poder de ataque no nível 1, aplicando
+# CLASS_WEIGHTS, contra HP efetivo (HP vezes a mitigação da defesa):
+#
+#   Guerreiro:  54*1.6 + 30*0.4 =  98    EHP 440*1.32 = 581
+#   Mago:       30*0.3 + 52*1.9 = 108    EHP 370*1.26 = 466
+#   Ladino:     48*0.8 + 32*0.4 + 26*1.7 =  95   EHP 370*1.25 = 463 + esquiva
+#
+# A distância de HP efetivo entre a classe mais dura e a mais frágil é de 25%.
+# Com 45%, que era a versão anterior destes números, o Guerreiro dominava a run:
+# numa masmorra decidida por atrito, HP efetivo vale mais que pico de dano, e
+# uma vantagem grande demais nesse eixo não é identidade, é dominância.
+WARRIOR_BASE_HP = 440
+WARRIOR_BASE_MP = 60
+WARRIOR_BASE_ST = 54
+WARRIOR_BASE_AG = 10
 WARRIOR_BASE_MG = 30
-WARRIOR_BASE_DF = 30
+WARRIOR_BASE_DF = 32
 
-MAGE_BASE_HP = 99
-MAGE_BASE_MP = 100
-MAGE_BASE_ST = 32
-MAGE_BASE_AG = 5
-MAGE_BASE_MG = 100
-MAGE_BASE_DF = 25
+MAGE_BASE_HP = 370
+MAGE_BASE_MP = 140
+MAGE_BASE_ST = 30
+MAGE_BASE_AG = 8
+MAGE_BASE_MG = 52
+MAGE_BASE_DF = 26
 
-ROGUE_BASE_HP = 99
-ROGUE_BASE_MP = 50
-ROGUE_BASE_ST = 75
-ROGUE_BASE_AG = 15
-ROGUE_BASE_MG = 66
-ROGUE_BASE_DF = 20
+ROGUE_BASE_HP = 370
+ROGUE_BASE_MP = 90
+ROGUE_BASE_ST = 48
+ROGUE_BASE_AG = 26
+ROGUE_BASE_MG = 32
+ROGUE_BASE_DF = 25
 
 # --- Progressão de Level Up ---
-# Balanceado: Mage ganha HP growth 8 (antes 0)
+# Todos os atributos de todas as classes crescem pela mesma razão GROWTH_RATE,
+# a mesma que os monstros usam. As constantes por classe abaixo não são mais
+# lidas pelo motor; ficam registradas porque documentam o modelo antigo, em que
+# cada classe crescia a uma taxa própria e o herói divergia do monstro.
 WARRIOR_HP_GROWTH_PERCENT = 20
 WARRIOR_ST_GROWTH_PERCENT = 10
 
@@ -139,19 +180,56 @@ MAGE_MG_GROWTH_PERCENT = 18
 ROGUE_ST_GROWTH_PERCENT = 16
 ROGUE_AGILITY_GROWTH_PERCENT = 18
 ROGUE_HP_GROWTH_PERCENT = 8
+# Teto histórico de agilidade. Com a chance de acerto relativa ele deixou de ser
+# necessário: a vantagem de agilidade é limitada pela própria fórmula, e travar
+# o atributo no nível 12 congelava a identidade do Ladino.
 AGILITY_CAP = 95
 
 # Fórmulas
 DAMAGE_FORMULA_DIVISOR = 3  # (ST + MG) // 3
 SKILL_LEVEL_SCALING = 0.08  # +8% dano de skill por nível
-XP_BASE_COST = 100
-XP_EXPONENT = 1.5  # level ** 1.5
+# Custo de XP do nível 1 e razão de crescimento do custo. A razão é maior que
+# GROWTH_RATE de propósito: o número de combates por nível sobe ao longo da run
+# (cerca de 3 no nível 1, cerca de 14 no nível 19), então o herói fica
+# progressivamente atrás do andar. É essa defasagem que cria dificuldade
+# crescente, em vez de inflar os números do monstro.
+XP_BASE_COST = 140
+XP_LEVEL_RATIO = 1.195
 
 # --- Multiplicador de Essência por Andar ---
-ESSENCE_MULT_MIN = 0.5
-ESSENCE_MULT_MAX = 3.0
+# O sorteio da Essência dos cinco primeiros andares explicava 38,7% da variância
+# da profundidade final da run: os 25% mais azarados paravam no andar 3,8 e os
+# 25% mais sortudos no 16,2, uma distância de 12,4 andares decidida por um
+# número que o jogador não controla. Para comparação, escolher carta de
+# propósito em vez de sortear vale 1,5 andar. A run era da moeda, não do
+# jogador.
+#
+# O desvio caiu de 0.5 para 0.2. A média não mudou, então o ritmo do jogo não
+# muda: o andar médio vai de 9,49 para 9,19. O que muda é o peso da sorte —
+# a variância explicada cai para 12,6% e a distância entre azarado e sortudo,
+# para 7,3 andares.
+#
+# Medido também um desvio que cresce com o andar (sorte só onde ela não decide
+# mais). Perdeu para o desvio fixo nos três eixos: 14,7% de variância explicada
+# contra 12,6%, mesma distância, e andar médio menor. A ideia era melhor que o
+# resultado.
+#
+# 0.12 leva a variância a 8,2%, mas o andar médio cai para 8,95 e a distância só
+# melhora de 7,3 para 6,9: retorno decrescente, e a Essência vira constante.
+# 0.2 é o joelho da curva.
 ESSENCE_MULT_NORMAL_MEAN = 1.2   # Centro da curva gaussiana
-ESSENCE_MULT_NORMAL_STD = 0.5    # Desvio padrão (controla variação)
+ESSENCE_MULT_NORMAL_STD = 0.2    # Desvio padrão (controla variação)
+# Limites do sorteio, a três desvios da média mais baixa e da mais alta. Antes
+# eram 0.5 e 3.0, faixa herdada de um desvio de 0.5: com 0.2 esses extremos
+# ficariam a mais de oito desvios, ou seja, nunca sairiam — e a tela de
+# extração prometeria ao jogador uma faixa que o sorteio não entrega.
+ESSENCE_MULT_MIN = 0.6
+ESSENCE_MULT_MAX = 2.2
+# Faixas de leitura na tela: um desvio abaixo da média é andar ruim, um desvio
+# acima é andar bom. Derivadas, e não digitadas, para que mexer no desvio não
+# deixe a cor da tela mentindo sobre o sorteio.
+ESSENCE_MULT_POOR = round(ESSENCE_MULT_NORMAL_MEAN - ESSENCE_MULT_NORMAL_STD, 2)
+ESSENCE_MULT_GOOD = round(ESSENCE_MULT_NORMAL_MEAN + ESSENCE_MULT_NORMAL_STD, 2)
 
 # Pesos de raridade para sorteio de passivas
 PASSIVE_COMMON_WEIGHT = 60
@@ -173,6 +251,10 @@ RANDOM_EVENT_FOUNTAIN_HEAL_PERCENT = 50  # % da vida máxima curada
 DEFAULT_SKILL_COOLDOWN = 0  # sem cooldown por padrão
 STUN_DURATION = 1  # turnos perdidos quando atordoado
 STUN_CHANCE_DEFAULT = 15  # % base para aplicar stun em ações com stun
+# Chance de atordoar da skill Esmagar, nomeada porque o motor a aplica direto.
+ESMAGAR_STUN_CHANCE = 30
+# Nome da skill que carrega esse atordoamento embutido no motor.
+ESMAGAR_SKILL_NAME = "Esmagar"
 DAMAGE_REDUCTION_DURATION = 3  # turnos que dura a redução de dano
 DAMAGE_REDUCTION_DEFAULT_PERCENT = 30  # % de dano reduzido
 
@@ -183,3 +265,111 @@ MINI_BOSS_COIN_SCALING_PER_LEVEL = 15
 # Essência com progressão suave por andar
 ESSENCE_MULT_LEVEL_BONUS = 0.02  # +0.02 de média por andar
 ESSENCE_MULT_MAX_BONUS = 0.4  # teto do bônus acumulado
+
+# --- Laço de batalha ---
+# Teto de turnos por batalha. Existe só como rede de segurança contra um empate
+# infinito (dois lados que não conseguem se matar); nenhum combate balanceado
+# deve chegar perto disso.
+MAX_BATTLE_TURNS = 200
+
+# =====================================================================
+# MODELO DE ORÇAMENTO (rebalanceamento)
+# =====================================================================
+# Uma única razão de crescimento para herói e monstro. Antes, o herói crescia em
+# percentual composto e o monstro em soma fixa: uma curva geométrica contra uma
+# aritmética, que divergem para sempre por construção. Com a mesma razão dos dois
+# lados, a razão poder-do-herói / HP-do-monstro fica constante ao longo dos 20
+# níveis, e a dificuldade passa a ser controlada de propósito, não por acidente.
+GROWTH_RATE = 1.12
+
+# --- Orçamento do monstro (perfil "bruiser" no nível 1) ---
+# Os arquétipos em content/factories/archetypes.py multiplicam estes valores.
+MONSTER_BUDGET_HP = 420
+MONSTER_BUDGET_ATTACK = 88
+MONSTER_BUDGET_DEFENSE = 20
+MONSTER_BUDGET_AGILITY = 8
+MONSTER_BUDGET_MP = 60
+# `Monster.avg_damage` é derivado de (st + mg) // DAMAGE_FORMULA_DIVISOR. Para
+# que o ataque do orçamento apareça exatamente nesse valor, st e mg recebem
+# metade do divisor cada: 1.5 = DAMAGE_FORMULA_DIVISOR / 2.
+MONSTER_ATTACK_TO_STAT_RATIO = 1.5
+# Abaixo desta fração da vida, um monstro com cura prioriza se curar.
+MONSTER_HEAL_HP_RATIO = 0.5
+# Abaixo desta fração da vida, o monstro entra em desespero: gasta o que tiver
+# para não morrer de graça — defesa se for tank, o maior dano se não for.
+MONSTER_DESPERATE_HP_RATIO = 0.35
+# Acima desta fração de vida do herói o monstro não tenta executar. Abaixo dela,
+# qualquer arquétipo com dano guardado usa a maior skill que tiver, ignorando a
+# rolagem de `skill_use_chance`: um golpe que mata vale mais que a média.
+MONSTER_EXECUTE_HP_RATIO = 0.35
+# Quantos turnos do início do combate contam como abertura. Um buff de defesa
+# lançado no primeiro turno de uma luta de dez rende os três turnos inteiros;
+# lançado no oitavo, rende um. Tank, elite, chefe e suporte abrem buffando.
+MONSTER_OPENER_TURNS = 1
+# Papel usado quando nada mais é indicado (carregamento de save antigo, por exemplo).
+DEFAULT_MONSTER_ROLE = "bruiser"
+
+# --- Composição de encontros por profundidade ---
+# Andares rasos mantêm inimigos isolados, para ensinar; grupos aparecem a partir
+# de ENCOUNTER_GROUP_MIN_FLOOR e ficam maiores conforme a profundidade. Elites e
+# chefes nunca entram em grupo: eles já são o encontro.
+ENCOUNTER_GROUP_MIN_FLOOR = 4
+ENCOUNTER_LARGE_GROUP_MIN_FLOOR = 10
+ENCOUNTER_MAX_SIZE_SHALLOW = 1
+ENCOUNTER_MAX_SIZE_MID = 2
+ENCOUNTER_MAX_SIZE_DEEP = 3
+
+# --- Acerto relativo ---
+# A chance de acerto usa a diferença *relativa* de agilidade, não a absoluta.
+# Com a diferença absoluta, uma agilidade que cresce sem teto zera a chance de o
+# monstro acertar e a classe fica imune. Com a relativa, a vantagem de quem
+# investe em agilidade é grande mas permanente e limitada.
+HIT_AGILITY_SWING = 30  # pontos percentuais máximos que a agilidade move
+HIT_CHANCE_FLOOR = 20   # nenhum defensor fica imune
+HIT_CHANCE_CEIL = 95    # nenhum atacante fica infalível
+
+# --- Efeitos de status ---
+MANA_BURN_PER_TICK = 12       # MP drenado por turno por "mana_burn"
+BLEED_DAMAGE_PERCENT = 4      # % do HP máximo por turno por "bleed"
+INVISIBLE_HIT_PENALTY = 45    # pontos percentuais de acerto perdidos contra alvo invisível
+
+# Duração, em turnos, dos buffs vindos de consumíveis.
+POTION_BUFF_DURATION = 3
+# Níveis em que o herói aprende as skills iniciais da classe, uma por nível.
+INITIAL_SKILL_LEVELS = 4
+
+# --- Descanso entre andares ---
+# Concluir um andar devolve parte dos recursos. Não tudo: a cura completa a cada
+# andar era uma das cinco fontes de cura gratuita que tornavam cada combate
+# independente do anterior. Não zero: uma run de 20 andares em uma única barra
+# de vida não é difícil, é impossível. O andar é a unidade de risco, e o que
+# sobra de vida no fim dele é o que dá peso à decisão de extrair.
+# Mana devolvida por turno de combate, em % do MP máximo.
+#
+# Valia 0: a única mana do combate era a do pool, e a única recarga era o
+# descanso de fim de andar (FLOOR_CLEAR_RESTORE_PERCENT). O Guerreiro entra no
+# nível 1 com 60 de MP e a Investida custa 20 — três usos e acabou. Medido: 2,2
+# skills por combate de doze turnos, e 36% do dano do herói saindo do ataque
+# básico. Isso não é o jogador escolhendo bater; é o jogador sem alternativa, e
+# um combate cuja melhor jogada é sempre a mesma não admite adaptação.
+#
+# Com regeneração por turno, a mana deixa de ser um estoque que se gasta uma vez
+# e vira ritmo: dá para bater agora e pagar a skill grande dali a três turnos.
+# A 2%, o básico cai de 36% para 17% do dano, o herói passa a soltar 3,1 skills
+# por combate, e o Mago passa a usar duas skills diferentes em vez de uma —
+# o "spam de uma skill só" era, na origem, falta de recurso para uma segunda.
+#
+# 2% e não mais: a 3% o Guerreiro sobe para 11,3 andares e a distância entre
+# classes vai a 5,6, acima do limite de 4,0. A regeneração é forte demais para
+# ser dada sozinha; ela vem acompanhada do nerf em BASIC_ATTACK_POWER_MULT.
+#
+# Vale para monstro também, e é o que sustenta o arquétipo num combate longo:
+# um tank sem mana no turno 8 volta a ser um saco de pancada.
+MP_REGEN_PERCENT_PER_TURN = 2
+
+FLOOR_CLEAR_RESTORE_PERCENT = 29
+
+# --- Level up ---
+# Subir de nível restaura parte dos recursos, não tudo. Cura completa a cada
+# nível era uma das cinco fontes de cura gratuita que zeravam o atrito da run.
+LEVEL_UP_RESTORE_PERCENT = 30

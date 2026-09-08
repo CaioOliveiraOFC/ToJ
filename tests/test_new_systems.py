@@ -7,12 +7,9 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import pytest
 
 from src.mechanics import combat as cmb
 from src.shared.constants import (
-    DAMAGE_REDUCTION_DEFAULT_PERCENT,
-    DAMAGE_REDUCTION_DURATION,
     STUN_DURATION,
 )
 
@@ -153,7 +150,7 @@ class TestStunChance:
         # Vamos testar com seed 1
         random.seed(1)
         # Para determinismo, usamos rng injetado
-        res = cmb.apply_skill(caster, target, skill, rng=random.Random(1))
+        cmb.apply_skill(caster, target, skill, rng=random.Random(1))
         # Verifica se stun foi aplicado (depende do roll interno de stun após hit)
         # Como stun é 30%, com seed 1 o segundo roll após hit/crit pode ser <=30
         # Se não, testa com seed que garante

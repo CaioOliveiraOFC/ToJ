@@ -10,6 +10,7 @@ from src.shared.constants import (
     MONSTER_BASE_MP,
     MONSTER_BASE_ST,
 )
+from src.shared.effects import sum_buffs
 
 
 class Monster(Entity):
@@ -77,9 +78,35 @@ class Monster(Entity):
         self.active_effects: dict[str, object] = {}
         self.active_buffs: dict[str, object] = {}
 
+        # Papel no encontro (ver content/factories/archetypes.py). O default
+        # mantém o monstro histórico: bruiser sem skills, só ataque básico.
+        self.role: str = "bruiser"
+        self.skills: list = []
+        self.skill_cooldowns: dict[str, int] = {}
+        self.skill_use_chance: int = 0
+        self.resistances: dict[str, int] = {}
+        # Turnos já tomados NESTE combate. A IA usa para saber se está na
+        # abertura, quando um buff de duração rende todos os turnos à frente.
+        self.turns_taken: int = 0
+
+    def get_stat(self, stat: str) -> int:
+        """Valor de um atributo somando os buffs ativos que o modificam.
+
+        Existia só no `Player`. O monstro devolvia o atributo cru, então todo
+        buff que ele lançava era escrito em `active_buffs` e nunca lido: a
+        Bênção Sombria do suporte gastava mana, turno e recarga para não mudar
+        nada. Um arquétipo cujo comportamento não altera o combate não é um
+        arquétipo — é uma animação.
+        """
+        return int(getattr(self, f"base_{stat}")) + sum_buffs(self, stat)
+
     def get_avg_damage(self) -> int:
-        """Retorna o dano médio do monstro."""
-        return self.avg_damage
+        """BASE_POWER do monstro, derivado dos atributos COM buffs.
+
+        Deriva em vez de devolver `self.avg_damage` congelado no spawn, para
+        que um buff de força valha dano — como já vale no herói.
+        """
+        return max(1, (self.get_st() + self.get_mg()) // DAMAGE_FORMULA_DIVISOR)
 
     @staticmethod
     def my_type() -> str:
@@ -95,19 +122,19 @@ class Monster(Entity):
         return self._mp
 
     def get_ag(self) -> int:
-        """Retorna a agilidade do monstro."""
-        return self._ag
+        """Retorna a agilidade do monstro, com buffs aplicados."""
+        return self.get_stat("ag")
 
     def get_df(self) -> int:
-        """Retorna a defesa do monstro."""
-        return self._df
+        """Retorna a defesa do monstro, com buffs aplicados."""
+        return self.get_stat("df")
 
     def get_st(self) -> int:
-        """Retorna a força do monstro."""
-        return self._st
+        """Retorna a força do monstro, com buffs aplicados."""
+        return self.get_stat("st")
 
     def get_mg(self) -> int:
-        """Retorna a magia do monstro."""
-        return self._mg
+        """Retorna a magia do monstro, com buffs aplicados."""
+        return self.get_stat("mg")
 
 
