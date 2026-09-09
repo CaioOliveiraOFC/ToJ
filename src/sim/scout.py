@@ -374,10 +374,17 @@ def analyse_skills(telemetry: dict) -> list[Finding]:
     A pergunta "esta skill é forte demais" tem duas metades: quanto ela entrega
     por unidade de mana, e quanto do dano total passa por ela. Uma skill cara e
     devastadora pode estar certa; uma skill barata que entrega o mesmo não está.
+
+    O que esta função **não** responde é se a carta é boa: `telemetry` vem de
+    `collect`, que roda uma política de escolha só. Julgar "ignorada" a partir
+    dela mede a prioridade daquele bot, não a força da carta — e é literalmente
+    o erro que já produziu conclusão publicada errada nesta base. Quem classifica
+    escolha é `_analyse_cards`, que compara as quatro políticas e separa carta
+    fraca de carta de identidade de build.
     """
     dados = telemetry.get("skills", {})
     uses, damage, mp = dados.get("uses", {}), dados.get("damage", {}), dados.get("mp", {})
-    offered, picked = dados.get("offered", {}), dados.get("picked", {})
+    picked = dados.get("picked", {})
     basico = dados.get("basic_damage", 0)
 
     catalogo = {s.id: s for s in load_skills()}
@@ -416,20 +423,6 @@ def analyse_skills(telemetry: dict) -> list[Finding]:
                 )
             )
 
-    for sid, vezes in sorted(offered.items(), key=lambda kv: -kv[1]):
-        nome = catalogo[sid].name if sid in catalogo else sid
-        taxa = picked.get(sid, 0) / vezes if vezes else 0
-        if vezes >= 10 and taxa <= LOW_PICK_RATE:
-            achados.append(
-                Finding(
-                    "skills",
-                    nome,
-                    "ignorada",
-                    f"oferecida {vezes}x, escolhida {taxa:.0%} das vezes",
-                    taxa,
-                )
-            )
-
     nunca_usadas = [
         catalogo[sid].name for sid in catalogo if sid in picked and uses.get(sid, 0) == 0
     ]
@@ -439,6 +432,8 @@ def analyse_skills(telemetry: dict) -> list[Finding]:
                 "skills",
                 "escolhidas mas nunca usadas",
                 "morta",
+                # Sob a política de escolha padrão: outra política escolhe outras
+                # cartas, então isto é cobertura da amostra, não veredito da carta.
                 ", ".join(sorted(nunca_usadas)[:6]),
                 len(nunca_usadas),
             )
@@ -458,37 +453,19 @@ def analyse_skills(telemetry: dict) -> list[Finding]:
 
 
 def analyse_passives(telemetry: dict) -> list[Finding]:
-    """Quais passivas o jogador leva quando pode escolher."""
+    """O que a tabela de passivas oferece — não o que o jogador escolhe.
+
+    Pelo mesmo motivo de `analyse_skills`: a telemetria de `collect` é de uma
+    política de escolha só. Sob `survival`, `max_hp` é a prioridade 1 e
+    `gold_drop_bonus` é a 13 de 13, então toda passiva de ouro sairia daqui como
+    "ignorada" — quando entre as quatro políticas ela é carta de identidade da
+    build de economia. Sobra aqui só o que independe de quem escolhe: se o
+    sorteio chega a pôr a carta na mesa.
+    """
     dados = telemetry.get("passives", {})
-    offered, picked = dados.get("offered", {}), dados.get("picked", {})
+    offered = dados.get("offered", {})
     catalogo = {p.id: p for p in load_passives()}
     achados: list[Finding] = []
-
-    for pid, vezes in sorted(offered.items(), key=lambda kv: -kv[1]):
-        if vezes < 10:
-            continue
-        nome = catalogo[pid].name if pid in catalogo else pid
-        taxa = picked.get(pid, 0) / vezes
-        if taxa >= 0.9:
-            achados.append(
-                Finding(
-                    "passivas",
-                    nome,
-                    "SUSPEITA",
-                    f"escolhida em {taxa:.0%} das {vezes} ofertas — é a escolha óbvia",
-                    taxa,
-                )
-            )
-        elif taxa <= LOW_PICK_RATE:
-            achados.append(
-                Finding(
-                    "passivas",
-                    nome,
-                    "ignorada",
-                    f"oferecida {vezes}x, escolhida {taxa:.0%} das vezes",
-                    taxa,
-                )
-            )
 
     # Conteúdo morto e amostra pequena produzem o mesmo sintoma — a carta não
     # aparece —, mas só o primeiro é problema. `generate_passive_choices` é

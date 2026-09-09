@@ -298,6 +298,29 @@ jogo aparecem, então eram sempre elas as condenadas. `Ressurgir` estava na list
 de fracas por esse motivo, e `Apocalipse` e `Morte Súbita` estavam na de
 identidade. Para julgá-las, `--policy-iterations` maior.
 
+### O relatório dizia as duas coisas ao mesmo tempo
+
+A comparação acima entrou no scout, mas as análises antigas continuaram lá do
+lado. `analyse_skills` e `analyse_passives` recebem a telemetria de `collect`,
+que roda com **uma** política de escolha (`DEFAULT_PICK_POLICY = "survival"`), e
+mesmo assim emitiam veredito sobre a carta: `ignorada` abaixo de 15% de escolha,
+`SUSPEITA — é a escolha óbvia` acima de 90%.
+
+O mesmo relatório saía, então, afirmando duas coisas incompatíveis sobre a mesma
+carta. Sob `survival`, `max_hp` é a prioridade 1 e `gold_drop_bonus` é a 13 de
+13: toda passiva de ouro aparecia como carta ignorada no bloco de passivas,
+enquanto três parágrafos acima ela constava como identidade da build de
+economia. O bloco single-policy não media a força da carta — media a lista de
+prioridades daquele bot, e chamava isso de conteúdo morto.
+
+Os dois vereditos de escolha saíram de `analyse_skills` e `analyse_passives`.
+Quem classifica carta é `_analyse_cards`, com as quatro políticas. O que sobrou
+nas duas funções é o que não depende de quem escolhe: dano por mana, fatia do
+dano total, e se o sorteio chega a pôr a carta na mesa.
+
+É o mesmo padrão dos outros defeitos do medidor: nada levantou exceção, a suíte
+ficou verde, e o relatório saiu bonito com o número errado dentro.
+
 ## O combate voltou a ter escolha
 
 O pedido era direto: *"precisamos nerfar o ataque básico, não faz sentido. (...)

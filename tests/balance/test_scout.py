@@ -186,6 +186,15 @@ class TestRelatorio:
     """O scout precisa produzir destaques legíveis a partir da telemetria."""
 
     def test_produz_achados_em_todos_os_sistemas(self, telemetria):
+        """Cada sistema precisa de voz no relatório — de quem tem amostra para falar.
+
+        "passivas" saiu desta lista de propósito: as análises de política única
+        deixaram de julgar escolha de carta, e o que sobra em `analyse_passives`
+        (carta que o sorteio nunca põe na mesa) só dispara quando a amostra era
+        grande o bastante para prever a aparição. Quem fala de passiva agora é
+        `_analyse_cards`, comparando as quatro políticas — coberto em
+        `TestVereditoDeEscolhaVemDeUmaPoliticaSo`.
+        """
         achados = (
             scout.analyse_skills(telemetria)
             + scout.analyse_passives(telemetria)
@@ -193,7 +202,7 @@ class TestRelatorio:
             + scout.analyse_essence_and_events(telemetria)
         )
         sistemas = {f.system for f in achados}
-        assert {"skills", "passivas", "equipamento", "economia", "essência"} <= sistemas
+        assert {"skills", "equipamento", "economia", "essência"} <= sistemas
 
     def test_texto_do_relatorio_menciona_os_sistemas(self, telemetria):
         relatorio = scout.ScoutReport(
@@ -372,3 +381,59 @@ class TestPoliticasDeEscolha:
         assuntos = {f.subject for f in achados}
         assert "valor de escolher" in assuntos
         assert "ranking de intenção" in assuntos
+
+
+class TestVereditoDeEscolhaVemDeUmaPoliticaSo:
+    """Nenhuma análise de política única pode julgar se uma carta é boa.
+
+    `collect` roda com `DEFAULT_PICK_POLICY` e mais nada. Sob `survival`,
+    `gold_drop_bonus` é a prioridade 13 de 13, então toda passiva de ouro caía
+    como "ignorada" — e foi publicado que o jogo tinha 13 passivas mortas.
+    Entre as quatro políticas ela é carta de identidade da build de economia:
+    o número medido era a prioridade do bot, não a força da carta.
+
+    Quem classifica escolha é `_analyse_cards`, com as quatro políticas.
+    """
+
+    @staticmethod
+    def _vereditos(achados):
+        return {f.verdict for f in achados}
+
+    def test_analyse_skills_nao_chama_carta_de_ignorada(self):
+        # Uma skill oferecida muito e nunca escolhida por ESTE bot.
+        telemetria = {
+            "skills": {
+                "offered": {"cutelada": 400},
+                "picked": {"cutelada": 0},
+                "uses": {},
+                "damage": {},
+                "mp": {},
+                "basic_damage": 100,
+            }
+        }
+        achados = scout.analyse_skills(telemetria)
+        assert "ignorada" not in self._vereditos(achados), (
+            "veredito de escolha saindo de uma política só: é a prioridade do bot, "
+            "não a força da carta"
+        )
+
+    def test_analyse_passives_nao_julga_taxa_de_escolha(self):
+        telemetria = {
+            "passives": {
+                # Uma recusada por este bot, uma levada sempre por este bot.
+                "offered": {"reflexos_rapidos": 400, "coracao_de_ferro": 400},
+                "picked": {"reflexos_rapidos": 0, "coracao_de_ferro": 400},
+            }
+        }
+        vereditos = self._vereditos(scout.analyse_passives(telemetria))
+        assert "ignorada" not in vereditos
+        assert "SUSPEITA" not in vereditos, (
+            "'escolha óbvia' com uma política só descreve o bot, não o jogo"
+        )
+
+    def test_a_classificacao_de_carta_continua_existindo_no_lugar_certo(self):
+        # A regra acima não pode ter apagado a análise — só movido de lugar.
+        comparacao = scout.PolicyComparison()
+        comparacao.skill_pick_rate = {nome: {"cutelada": 0.0} for nome in DELIBERATE_POLICIES}
+        achados = scout._analyse_cards(comparacao.skill_pick_rate, "skills")
+        assert any(f.verdict == "morta" for f in achados)
