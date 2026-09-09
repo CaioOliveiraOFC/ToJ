@@ -74,6 +74,11 @@ def save_game(
         "player_name": player.get_nick_name(),
         "level": player.get_level(),
         "xp": player.xp_points,
+        # HP e MP precisam ser gravados. Sem eles o herói era reconstruído no
+        # nível salvo com os recursos no máximo, e extrair virava cura total
+        # gratuita — a jogada ótima passava a ser sair e voltar a cada aperto.
+        "hp": player.get_hp(),
+        "mp": player.get_mp(),
         "coins": player.coins,
         "inventory": inventory_names,
         "equipment": equipment_names,
@@ -175,6 +180,16 @@ def load_game(
                 passive = get_passive_by_id(pid)
                 if passive:
                     player.add_passive_load(passive)
+
+        # Restaurar por último: passivas e equipamento alteram `base_hp`/`base_mp`,
+        # então o teto só é conhecido depois deles. Save antigo (sem os campos)
+        # mantém o comportamento anterior e entra com os recursos cheios.
+        hp_salvo = save_data.get("hp")
+        if hp_salvo is not None:
+            player._hp = max(1, min(int(hp_salvo), player.base_hp))
+        mp_salvo = save_data.get("mp")
+        if mp_salvo is not None:
+            player._mp = max(0, min(int(mp_salvo), player.base_mp))
 
         dungeon_level = save_data["dungeon_level"]
         map_state = save_data.get("map_state", None)

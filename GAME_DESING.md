@@ -100,10 +100,9 @@ rebalanceamento porque a medição mostrou que a Essência dos primeiros andares
 explicava **38,7% da variância** da profundidade final — e o objetivo era derrubar
 isso para ~12,8%.
 
-> **Isto é um conflito, não uma melhoria.** "Caos" é um dos três pilares declarados,
-> e a faixa larga era intencional. Uma métrica disse que a sorte pesava muito e o
-> número foi estreitado sem que este documento fosse consultado. Ver **Decisões
-> pendentes, D1**.
+> A faixa foi estreitada sem que este documento fosse consultado, o que era um
+> conflito com o pilar "Caos". **Resolvido: a faixa estreitada foi ratificada** —
+> ver **Decisões pendentes, D1**, que registra a decisão e o porquê.
 
 **`[implementado]`** Passivas influenciam o ganho de Essência: 4 cartas com
 `essence_bonus` (+10% a +60%).
@@ -281,13 +280,15 @@ com nome, classe, nível, andar alcançado e causa.
 **`[não existe]`** O troféu não guarda Elo (não há Arena) nem nada que seja lido na
 run seguinte. É um registro de mortos, não uma progressão.
 
-**`[bug]`** **Extrair e recarregar devolve a vida cheia e regenera o andar.** O save
-não grava HP nem MP, então o personagem é reconstruído no nível salvo com os recursos
-no máximo. E a extração grava `map_state = None`, então o andar é gerado de novo e
-pode ser refeito para receber as recompensas outra vez.
+**`[implementado]`** O save grava **HP e MP**, e a extração grava o **próximo**
+andar. Antes não gravava nenhum dos dois: o herói era reconstruído no nível salvo com
+os recursos no máximo, e a extração gravava o andar recém-concluído, que o jogador
+então refazia e cujas recompensas recebia de novo.
 
-> Enquanto isso existir, nenhum número sobre risco de extração significa coisa alguma.
-> É o primeiro conserto de qualquer trabalho sobre o laço de extração.
+> Era a jogada ótima do jogo — cura total gratuita e um moedor infinito de XP e ouro.
+> Estratégia degenerada não é um defeito entre outros: ela anula todas as demais
+> decisões, porque nenhuma escolha de recurso importa se dá para resetar. Corrigido,
+> com regressões em `tests/test_extraction.py`.
 
 ---
 
@@ -332,15 +333,19 @@ Python 3.10, 3.11 e 3.12.
 
 As perguntas abertas, com o que se sabe de cada uma. Nenhuma tem resposta ainda.
 
-### D1 — A faixa da Essência volta para 0.5x–3.0x?
+### D1 — A faixa da Essência — **DECIDIDO: fica em 0.6x–2.2x**
 
-O documento pedia a faixa larga e chamava a sorte de pilar ("Caos"). A medição
-mostrou que ela explicava 38,7% da profundidade final, e a faixa foi estreitada para
-0.6x–2.2x, derrubando o peso da sorte para ~12,8%.
+O documento pedia 0.5x–3.0x e chamava a sorte de pilar ("Caos"). A medição mostrou
+que ela explicava 38,7% da profundidade final; a faixa foi estreitada para 0.6x–2.2x
+e o peso da sorte caiu para ~12,8%.
 
-**A pergunta é se 38,7% era problema ou era o jogo.** Um jogo cuja frase-guia é
-"xadrez com a morte" quer que a habilidade decida; um jogo cujo pilar é "Caos" quer
-que o sorteio decida. Os dois estão escritos no mesmo documento.
+A pergunta era se 38,7% era problema ou era o jogo — "xadrez com a morte" quer que a
+habilidade decida, "Caos" quer que o sorteio decida, e os dois estão escritos aqui.
+
+**Decisão: a faixa estreitada fica.** O pilar "Caos" continua valendo, mas se expressa
+no que ainda é sorteado — composição do encontro, carta oferecida, drop, evento — e
+não numa moeda que decide a run inteira antes do jogador agir. A especificação
+original de 0.5x–3.0x está superada por esta decisão.
 
 ### D2 — O que consome ouro?
 

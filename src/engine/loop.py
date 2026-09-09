@@ -630,7 +630,11 @@ def start_game(
                     },
                 )
                 if decision.get("choice") == "extract":
-                    save_game(player, dungeon_level, None, slot=slot)
+                    # `dungeon_level + 1`: a extração acontece com o andar atual
+                    # JÁ concluído. Salvar o andar corrente fazia o jogador
+                    # refazê-lo ao voltar e receber as recompensas de novo —
+                    # um moedor infinito de XP e ouro sem risco nenhum.
+                    save_game(player, dungeon_level + 1, None, slot=slot)
                     screens.render_extraction_success(dungeon_level)
                     return
                 dungeon_level += 1
