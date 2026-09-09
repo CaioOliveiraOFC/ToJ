@@ -25,6 +25,7 @@ reports/*
 !reports/baseline_20260904.json
 !reports/validation_20260905.json
 !reports/scout_20260905.json
+!reports/scout_20260909.json
 
 # IDEs
 .idea/

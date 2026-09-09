@@ -235,7 +235,11 @@ disso. Com a checagem de golpe letal, a taxa de vitória dele naquele encontro v
 a 76,8%, a cura cai de 231 para 43 usos, e o andar médio sobe de 5,8 para 8,2 —
 sem alterar um único número de balanceamento.
 
-### O que o scout encontra agora
+### O que o scout encontrou em 05/09, antes das correções de combate e preço
+
+Este bloco é registro do que motivou as correções que vêm depois, não o estado
+atual do jogo — o ataque básico já não responde por 38% do dano, e a tabela de
+preços já mudou. A medição de hoje está no fim desta seção.
 
 250 runs por classe, ablação com 150, comparação de intenções com 150
 (`reports/scout_20260905.json`):
@@ -268,9 +272,9 @@ Quatro problemas que a métrica de profundidade sozinha não mostrava:
    que competir consigo mesma: falta preço alto o bastante ou item bom o
    bastante para o ouro ter destino.
 
-### Escolher vale 1,1 andar — mas a calibração usou a pior intenção
+### Escolher vale ~2 andares — mas a calibração usou a pior intenção
 
-Com 150 runs por política:
+Com 150 runs por política, em 05/09:
 
     economy 12,2  >  random 10,4  >  offense 10,0  >  survival 9,3
 
@@ -320,6 +324,36 @@ dano total, e se o sorteio chega a pôr a carta na mesa.
 
 É o mesmo padrão dos outros defeitos do medidor: nada levantou exceção, a suíte
 ficou verde, e o relatório saiu bonito com o número errado dentro.
+
+### A medição depois da correção (09/09)
+
+250 runs por classe, 150 por política, andar médio 9,7
+(`reports/scout_20260909.json`). Cada carta aparece uma vez só, e a classificação
+é a cross-policy:
+
+    economy 12,7  >  random 10,7  >  offense 10,4  >  survival 9,9
+
+Escolher de propósito rende **+2,0 andares** sobre sortear. `survival`, a
+política que calibrou o jogo, continua em último — 2,8 andares atrás de
+`economy`.
+
+| Sistema | Recusada por toda intenção | Identidade de build | Levada por todas | Sem amostra |
+|---|---:|---:|---:|---:|
+| Passivas (29) | 1 (Reflexos Rápidos) | 22 | 0 | — |
+| Skills | 9 | 6 | 2 (Assassinato, Explosão Arcana) | 3 |
+
+Duas coisas que este scout expõe e que continuam abertas:
+
+- **`Cortina de Fumaça` aparece em duas listas**: é carta de identidade (uma
+  intenção a escolhe) e ao mesmo tempo "escolhida mas nunca usada". Isso não é
+  contradição — é a política de escolha valorizando uma carta que a política de
+  **combate** não sabe usar. O defeito está no bot de combate, não na carta.
+- **85% do ouro nunca é gasto** (1,02 milhão de 6,92 milhões ganhos). Piorou em
+  relação aos 82% de 05/09, porque a renda cresce em progressão geométrica e o
+  preço, em progressão linear. É a decisão D2 do `GAME_DESING.md`, ainda aberta.
+
+O ataque básico caiu de 38% para **17%** do dano total, e a Essência multiplica o
+XP em 1,49x (sorteio médio 1,35 em 7.755 andares).
 
 ## O combate voltou a ter escolha
 
