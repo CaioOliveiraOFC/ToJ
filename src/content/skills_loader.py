@@ -50,10 +50,12 @@ def _get_registry() -> dict[str, SkillCard]:
     if _SKILL_REGISTRY is None:
         data = load_json("skills.json")
         _SKILL_REGISTRY = {
-            s["id"]: SkillCard(**{
-                k: s.get(k, "" if k == "effect_stat" else 0)
-                for k in SkillCard.__dataclass_fields__
-            })
+            s["id"]: SkillCard(
+                **{
+                    k: s.get(k, "" if k == "effect_stat" else 0)
+                    for k in SkillCard.__dataclass_fields__
+                }
+            )
             for s in data["skills"]
         }
     return _SKILL_REGISTRY
@@ -106,10 +108,9 @@ def generate_skill_choices(
     all_skills = get_skills_for_class(class_name)
     # Filtrar: nível compatível, não é inicial, não está na lista do jogador
     available = [
-        s for s in all_skills
-        if s.level_required <= player_level
-        and not s.is_initial
-        and s.id not in player_skill_ids
+        s
+        for s in all_skills
+        if s.level_required <= player_level and not s.is_initial and s.id not in player_skill_ids
     ]
 
     weights_map = {

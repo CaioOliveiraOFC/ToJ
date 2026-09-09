@@ -36,7 +36,8 @@ class Toggles:
     def label(self) -> str:
         """Nome curto do que foi desligado, para aparecer no relatório."""
         desligados = [
-            nome for nome in ("passives", "skill_choice", "loot", "shop", "events", "essence")
+            nome
+            for nome in ("passives", "skill_choice", "loot", "shop", "events", "essence")
             if not getattr(self, nome)
         ]
         if self.banned_skills:

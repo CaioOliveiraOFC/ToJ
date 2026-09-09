@@ -333,7 +333,9 @@ def apply_skill(
 
     if skill.effect_type == "damage":
         total_base = skill_damage_base(caster, skill)
-        strike = resolve_physical_attack(caster, target, total_base, str(skill.name), rng=r, publish=None)
+        strike = resolve_physical_attack(
+            caster, target, total_base, str(skill.name), rng=r, publish=None
+        )
         # Stun chance específica da skill (se houver)
         stun_chance_skill = int(getattr(skill, "stun_chance", 0) or 0)
         if strike and not strike.was_evaded and stun_chance_skill:
@@ -419,7 +421,11 @@ def apply_skill(
         return out
 
     if skill.effect_type == "damage_reduction":
-        value = int(skill.effect_value) if isinstance(skill.effect_value, int) else DAMAGE_REDUCTION_DEFAULT_PERCENT
+        value = (
+            int(skill.effect_value)
+            if isinstance(skill.effect_value, int)
+            else DAMAGE_REDUCTION_DEFAULT_PERCENT
+        )
         duration = int(skill.duration) if skill.duration else DAMAGE_REDUCTION_DURATION
         # Aplica no alvo indicado pelo skill (self -> caster, enemy -> target)
         recipient = caster if getattr(skill, "target", "self") == "self" else target

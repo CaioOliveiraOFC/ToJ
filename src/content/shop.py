@@ -28,7 +28,7 @@ class Shop:
 
     def get_available_items(self, dungeon_level: int, player_class: str) -> list[dict]:
         """Retorna uma lista de itens disponíveis para compra na loja, com seus preços.
-        
+
         Progressão por andar:
         - Andar 1-3: 8-10 itens (Common + 1-2 Rare)
         - Andar 4-6: 12-15 itens (Common + Rare)

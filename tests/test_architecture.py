@@ -79,9 +79,9 @@ def runtime_imports(tree: ast.AST) -> list[tuple[str, int]]:
     for node in ast.walk(tree):
         if isinstance(node, ast.If):
             test = node.test
-            is_type_checking = (
-                isinstance(test, ast.Name) and test.id == "TYPE_CHECKING"
-            ) or (isinstance(test, ast.Attribute) and test.attr == "TYPE_CHECKING")
+            is_type_checking = (isinstance(test, ast.Name) and test.id == "TYPE_CHECKING") or (
+                isinstance(test, ast.Attribute) and test.attr == "TYPE_CHECKING"
+            )
             if is_type_checking:
                 for child in ast.walk(node):
                     if hasattr(child, "lineno"):
@@ -89,7 +89,11 @@ def runtime_imports(tree: ast.AST) -> list[tuple[str, int]]:
 
     found: list[tuple[str, int]] = []
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.module and node.lineno not in type_checking_lines:
+        if (
+            isinstance(node, ast.ImportFrom)
+            and node.module
+            and node.lineno not in type_checking_lines
+        ):
             found.append((node.module, node.lineno))
         elif isinstance(node, ast.Import) and node.lineno not in type_checking_lines:
             for alias in node.names:
@@ -215,13 +219,19 @@ class TestRegra5DadosEmJSON:
         dados = json.loads((SRC / "data" / "monsters.json").read_text(encoding="utf-8"))
         geracao = dados["generation"]
         for chave in (
-            "base_count", "min_monsters", "scaling_per_3_levels",
-            "advanced_role_min_floor", "advanced_roles", "elite_spawn_chance",
+            "base_count",
+            "min_monsters",
+            "scaling_per_3_levels",
+            "advanced_role_min_floor",
+            "advanced_roles",
+            "elite_spawn_chance",
             "level_variation",
         ):
             assert chave in geracao, f"generation.{chave} ausente do JSON."
 
-    @pytest.mark.parametrize("arquivo", ["items.json", "skills.json", "passives.json", "monsters.json"])
+    @pytest.mark.parametrize(
+        "arquivo", ["items.json", "skills.json", "passives.json", "monsters.json"]
+    )
     def test_json_de_conteudo_e_valido_e_versionado(self, arquivo):
         dados = json.loads((SRC / "data" / arquivo).read_text(encoding="utf-8"))
         assert dados.get("version"), f"{arquivo} sem campo version."
@@ -241,8 +251,13 @@ class TestConstantesNomeadas:
 
     def test_modulos_de_regra_nao_escondem_numeros_de_balanceamento(self):
         suspeitos = []
-        for modulo in ("mechanics/combat.py", "mechanics/battle.py", "mechanics/monster_ai.py",
-                       "entities/heroes.py", "entities/monsters.py"):
+        for modulo in (
+            "mechanics/combat.py",
+            "mechanics/battle.py",
+            "mechanics/monster_ai.py",
+            "entities/heroes.py",
+            "entities/monsters.py",
+        ):
             path = SRC / modulo
             tree = ast.parse(path.read_text(encoding="utf-8"))
             for node in ast.walk(tree):
@@ -250,8 +265,8 @@ class TestConstantesNomeadas:
                     if node.value in self.IGNORADOS or isinstance(node.value, bool):
                         continue
                     suspeitos.append(f"{modulo}:{node.lineno} — {node.value}")
-        assert not suspeitos, (
-            "Números de balanceamento fora de shared/constants.py:\n" + "\n".join(suspeitos)
+        assert not suspeitos, "Números de balanceamento fora de shared/constants.py:\n" + "\n".join(
+            suspeitos
         )
 
     def test_constantes_de_balanceamento_existem_e_sao_coerentes(self):

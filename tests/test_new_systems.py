@@ -29,28 +29,76 @@ class StubEntity:
         self.skill_cooldowns = {}
         self.passive_bonus = {}
 
-    def get_nick_name(self): return self._name
-    def get_ag(self): return self._ag
-    def get_df(self): return self._df
-    def get_hp(self): return self._hp
-    def get_mp(self): return self._mp
-    def get_level(self): return self.level
-    def get_classname(self): return self._classname
-    def get_passive_bonus(self, _): return 0
-    def get_avg_damage(self): return 30
-    def take_damage(self, amt): self._hp -= amt
-    def heal(self, amt): self._hp = min(self._hp + amt, 100)
-    def reduce_mp(self, cost): self._mp -= cost
-    def set_isalive(self, v): self._alive = v
-    def get_isalive(self): return self._alive
+    def get_nick_name(self):
+        return self._name
+
+    def get_ag(self):
+        return self._ag
+
+    def get_df(self):
+        return self._df
+
+    def get_hp(self):
+        return self._hp
+
+    def get_mp(self):
+        return self._mp
+
+    def get_level(self):
+        return self.level
+
+    def get_classname(self):
+        return self._classname
+
+    def get_passive_bonus(self, _):
+        return 0
+
+    def get_avg_damage(self):
+        return 30
+
+    def take_damage(self, amt):
+        self._hp -= amt
+
+    def heal(self, amt):
+        self._hp = min(self._hp + amt, 100)
+
+    def reduce_mp(self, cost):
+        self._mp -= cost
+
+    def set_isalive(self, v):
+        self._alive = v
+
+    def get_isalive(self):
+        return self._alive
 
 
-def make_skill(sid="test", name="Teste", cooldown=2, effect_type="damage", effect_value=10, stun_chance=0, mana=10, duration=0, chance=100):
+def make_skill(
+    sid="test",
+    name="Teste",
+    cooldown=2,
+    effect_type="damage",
+    effect_value=10,
+    stun_chance=0,
+    mana=10,
+    duration=0,
+    chance=100,
+):
     return SimpleNamespace(
-        id=sid, name=name, cooldown=cooldown, effect_type=effect_type,
-        effect_value=effect_value, stun_chance=stun_chance, mana_cost=mana,
-        duration=duration, chance=chance, target="enemy", skill_class="Warrior",
-        level_required=1, rarity="Common", is_initial=False, description="test",
+        id=sid,
+        name=name,
+        cooldown=cooldown,
+        effect_type=effect_type,
+        effect_value=effect_value,
+        stun_chance=stun_chance,
+        mana_cost=mana,
+        duration=duration,
+        chance=chance,
+        target="enemy",
+        skill_class="Warrior",
+        level_required=1,
+        rarity="Common",
+        is_initial=False,
+        description="test",
     )
 
 
@@ -158,7 +206,9 @@ class TestStunChance:
         target2 = StubEntity()
         target2.active_effects["stun"] = {"duration": STUN_DURATION}
         assert cmb.process_turn_start_effects(target2) is True
-        assert "stun" not in target2.active_effects or target2.active_effects["stun"]["duration"] == 0
+        assert (
+            "stun" not in target2.active_effects or target2.active_effects["stun"]["duration"] == 0
+        )
 
     def test_stun_faz_perder_turno(self):
         entity = StubEntity()

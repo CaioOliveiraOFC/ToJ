@@ -12,15 +12,12 @@ class VictoryError(Exception):
 class BotStuckError(Exception):
     """O bot travou: limite de ações, tecla repetida ou oscilação de posição."""
 
+
 class AutoTester:
     """Simula o comportamento de um jogador para testar crashes no fluxo do jogo em background."""
+
     def __init__(self):
-        self.metrics = {
-            "actions": 0,
-            "combats": 0,
-            "crashes": 0,
-            "errors": []
-        }
+        self.metrics = {"actions": 0, "combats": 0, "crashes": 0, "errors": []}
         self.current_map = None
         self.patchers = []
         self.player_ref = None
@@ -44,9 +41,11 @@ class AutoTester:
 
     def _create_mocked_draw(self, original_draw):
         """Cria a função mock para draw_map."""
+
         def mocked_draw(map_self):
             self.current_map = map_self
             return original_draw(map_self)
+
         return mocked_draw
 
     def _update_progress_bar(self, level: int, real_print):
@@ -54,7 +53,7 @@ class AutoTester:
         pct = min(100, int((level / 20) * 100))
         bar_len = 20
         filled = int((pct / 100) * bar_len)
-        bar = '=' * filled + '-' * (bar_len - filled)
+        bar = "=" * filled + "-" * (bar_len - filled)
         real_print(f"\rProgresso Simulação: [{bar}] {pct}% (Lvl {level}/20)", end="", flush=True)
 
     def _check_victory_condition(self, level: int):
@@ -70,14 +69,17 @@ class AutoTester:
         if choice == self.last_key:
             self.consecutive_key_count += 1
             if self.consecutive_key_count >= 100:
-                raise BotStuckError(f"Stopped because pressed '{choice}' 100 times consecutively (bot is completely stuck).")
+                raise BotStuckError(
+                    f"Stopped because pressed '{choice}' 100 times consecutively "
+                    "(bot is completely stuck)."
+                )
         else:
             self.consecutive_key_count = 1
 
     def _determine_bot_choice(self, valid_keys):
         """Determina a escolha do bot baseada nas teclas válidas disponíveis."""
         if valid_keys is None:
-            return 'a'
+            return "a"
 
         # Extração entre andares: sempre CONTINUAR para exercitar a run completa
         if valid_keys == ["1", "2"]:
@@ -89,32 +91,47 @@ class AutoTester:
             return seq[self.metrics["actions"] % len(seq)]
 
         # Skills em combate: respeita cooldown
-        if valid_keys and "0" in valid_keys and self.player_ref and hasattr(self.player_ref, "skill_cooldowns"):
+        if (
+            valid_keys
+            and "0" in valid_keys
+            and self.player_ref
+            and hasattr(self.player_ref, "skill_cooldowns")
+        ):
             # Detecta menu de skills (chaves são slots numéricos)
             try:
-                skill_keys = [k for k in valid_keys if k != "0" and k.isdigit() and int(k) in self.player_ref.skills]
+                skill_keys = [
+                    k
+                    for k in valid_keys
+                    if k != "0" and k.isdigit() and int(k) in self.player_ref.skills
+                ]
                 if skill_keys:
-                    available = [k for k in skill_keys if self.player_ref.skill_cooldowns.get(self.player_ref.skills[int(k)].id, 0) == 0]
+                    available = [
+                        k
+                        for k in skill_keys
+                        if self.player_ref.skill_cooldowns.get(self.player_ref.skills[int(k)].id, 0)
+                        == 0
+                    ]
                     if available:
                         return available[0]
                     return "0"  # todas em cooldown, volta
             except Exception:
                 pass
 
-        if 'w' in valid_keys and self.current_map:
+        if "w" in valid_keys and self.current_map:
             return self.decide_map_move()
-        elif '1' in valid_keys and '4' in valid_keys:
+        elif "1" in valid_keys and "4" in valid_keys:
             self.metrics["combats"] += 1
-            return '1'
-        elif '1' in valid_keys and '0' in valid_keys:
-            return '0'
-        elif 'x' in valid_keys:
-            return 'x'
+            return "1"
+        elif "1" in valid_keys and "0" in valid_keys:
+            return "0"
+        elif "x" in valid_keys:
+            return "x"
         else:
             return valid_keys[0]
 
     def _create_mocked_safe_get_key(self, real_print):
         """Cria a função mock para safe_get_key."""
+
         def mocked_safe_get_key(valid_keys=None, allow_escape=True):
             self.metrics["actions"] += 1
             level = self.player_ref.get_level() if self.player_ref else 1
@@ -127,24 +144,30 @@ class AutoTester:
 
             self.last_key = choice
             return choice
+
         return mocked_safe_get_key
 
     def _setup_mock_patchers(self, mocked_safe_get_key, mocked_draw):
         """Configura todos os mocks necessários para o teste."""
         real_print = builtins.print
 
-        def mocked_input(prompt=""): return ""
-        def mocked_console_input(console_self, prompt="", **kwargs): return ""
+        def mocked_input(prompt=""):
+            return ""
+
+        def mocked_console_input(console_self, prompt="", **kwargs):
+            return ""
 
         def mocked_print(*args, **kwargs):
-            kwargs['file'] = self.log_buffer
+            kwargs["file"] = self.log_buffer
             real_print(*args, **kwargs)
 
         original_console_print = Console.print
+
         def mocked_console_print(console_self, *args, **kwargs):
             original_console_print(self.mock_console, *args, **kwargs)
 
-        def mocked_sleep(*args, **kwargs): pass
+        def mocked_sleep(*args, **kwargs):
+            pass
 
         def mocked_save_game(*args, **kwargs):
             return {"success": True, "message": "Mocked save (AutoTester - nao toca no disco)"}
@@ -155,43 +178,53 @@ class AutoTester:
         def mocked_add_trophy(*args, **kwargs):
             return True
 
-        self.patchers.extend([
-            patch("src.engine.loop.safe_get_key", side_effect=mocked_safe_get_key),
-            patch("src.ui.prompts.safe_get_key", side_effect=mocked_safe_get_key),
-            # Fluxos pós-harness (loja/menus navegáveis) leem get_key() cru —
-            # sem estes patches a simulação bloqueia no teclado real.
-            # 'q' fecha loja/inventário imediatamente e devolve o controle ao mapa.
-            patch("src.ui.shop_flow.get_key", side_effect=lambda: "q"),
-            patch("src.ui.navigation_menu.get_key", side_effect=lambda: "q"),
-            patch("src.ui.toj_menu.get_key", side_effect=lambda: "q"),
-            # Fluxos importam safe_get_key por nome — patchar o módulo de origem
-            # não afeta essas referências; cobrir cada namespace importador.
-            patch("src.ui.passive_flow.safe_get_key", side_effect=mocked_safe_get_key),
-            patch("src.ui.skill_flow.safe_get_key", side_effect=mocked_safe_get_key),
-            patch("src.ui.extraction_flow.safe_get_key", side_effect=mocked_safe_get_key),
-            patch("src.ui.random_event_flow.safe_get_key", side_effect=mocked_safe_get_key),
-            patch("src.ui.character_status_flow.get_key", side_effect=lambda: "q"),
-            patch("src.ui.toj_menu.safe_get_key", side_effect=mocked_safe_get_key),
-            # AutoTester nao pode tocar nos saves reais — mocka persistencia
-            patch("src.storage.save_manager.save_game", side_effect=mocked_save_game),
-            patch("src.storage.save_manager.delete_save", side_effect=mocked_delete_save),
-            patch("src.storage.save_manager.add_trophy", side_effect=mocked_add_trophy),
-            patch("src.engine.loop.save_game", side_effect=mocked_save_game),
-            patch("src.engine.loop.delete_save", side_effect=mocked_delete_save),
-            patch("src.engine.loop.add_trophy", side_effect=mocked_add_trophy),
-            patch("src.engine.bootstrap.save_game", side_effect=mocked_save_game, create=True),
-            patch("src.engine.bootstrap.delete_save", side_effect=mocked_delete_save, create=True),
-            patch("src.engine.bootstrap.add_trophy", side_effect=mocked_add_trophy, create=True),
-            patch("builtins.input", side_effect=mocked_input),
-            patch("builtins.print", side_effect=mocked_print),
-            patch("rich.console.Console.input", side_effect=mocked_console_input, autospec=True),
-            patch("rich.console.Console.print", side_effect=mocked_console_print, autospec=True),
-            patch("src.engine.map.MapOfGame.draw_map", side_effect=mocked_draw, autospec=True),
-            patch("src.engine.loop.sleep", side_effect=mocked_sleep, create=True),
-            patch("src.ui.screens.sleep", side_effect=mocked_sleep, create=True),
-            patch("src.ui.combat_event_handlers.sleep", side_effect=mocked_sleep, create=True),
-            patch("src.ui.toj_menu.sleep", side_effect=mocked_sleep, create=True),
-        ])
+        self.patchers.extend(
+            [
+                patch("src.engine.loop.safe_get_key", side_effect=mocked_safe_get_key),
+                patch("src.ui.prompts.safe_get_key", side_effect=mocked_safe_get_key),
+                # Fluxos pós-harness (loja/menus navegáveis) leem get_key() cru —
+                # sem estes patches a simulação bloqueia no teclado real.
+                # 'q' fecha loja/inventário imediatamente e devolve o controle ao mapa.
+                patch("src.ui.shop_flow.get_key", side_effect=lambda: "q"),
+                patch("src.ui.navigation_menu.get_key", side_effect=lambda: "q"),
+                patch("src.ui.toj_menu.get_key", side_effect=lambda: "q"),
+                # Fluxos importam safe_get_key por nome — patchar o módulo de origem
+                # não afeta essas referências; cobrir cada namespace importador.
+                patch("src.ui.passive_flow.safe_get_key", side_effect=mocked_safe_get_key),
+                patch("src.ui.skill_flow.safe_get_key", side_effect=mocked_safe_get_key),
+                patch("src.ui.extraction_flow.safe_get_key", side_effect=mocked_safe_get_key),
+                patch("src.ui.random_event_flow.safe_get_key", side_effect=mocked_safe_get_key),
+                patch("src.ui.character_status_flow.get_key", side_effect=lambda: "q"),
+                patch("src.ui.toj_menu.safe_get_key", side_effect=mocked_safe_get_key),
+                # AutoTester nao pode tocar nos saves reais — mocka persistencia
+                patch("src.storage.save_manager.save_game", side_effect=mocked_save_game),
+                patch("src.storage.save_manager.delete_save", side_effect=mocked_delete_save),
+                patch("src.storage.save_manager.add_trophy", side_effect=mocked_add_trophy),
+                patch("src.engine.loop.save_game", side_effect=mocked_save_game),
+                patch("src.engine.loop.delete_save", side_effect=mocked_delete_save),
+                patch("src.engine.loop.add_trophy", side_effect=mocked_add_trophy),
+                patch("src.engine.bootstrap.save_game", side_effect=mocked_save_game, create=True),
+                patch(
+                    "src.engine.bootstrap.delete_save", side_effect=mocked_delete_save, create=True
+                ),
+                patch(
+                    "src.engine.bootstrap.add_trophy", side_effect=mocked_add_trophy, create=True
+                ),
+                patch("builtins.input", side_effect=mocked_input),
+                patch("builtins.print", side_effect=mocked_print),
+                patch(
+                    "rich.console.Console.input", side_effect=mocked_console_input, autospec=True
+                ),
+                patch(
+                    "rich.console.Console.print", side_effect=mocked_console_print, autospec=True
+                ),
+                patch("src.engine.map.MapOfGame.draw_map", side_effect=mocked_draw, autospec=True),
+                patch("src.engine.loop.sleep", side_effect=mocked_sleep, create=True),
+                patch("src.ui.screens.sleep", side_effect=mocked_sleep, create=True),
+                patch("src.ui.combat_event_handlers.sleep", side_effect=mocked_sleep, create=True),
+                patch("src.ui.toj_menu.sleep", side_effect=mocked_sleep, create=True),
+            ]
+        )
         return real_print
 
     def run_test(self, player):
@@ -221,6 +254,7 @@ class AutoTester:
             self.metrics["errors"].append(f"Última Opção Selecionada: '{self.last_key}'\n{str(te)}")
         except Exception:
             import traceback
+
             self.metrics["crashes"] += 1
             error_msg = f"Última Opção Selecionada: '{self.last_key}'\n{traceback.format_exc()}"
             self.metrics["errors"].append(error_msg)
@@ -231,11 +265,11 @@ class AutoTester:
             self.generate_report(real_print)
 
     def decide_map_move(self):
-        """BFS para encontrar o caminho real livre de paredes até o inimigo ou saída mais próxima."""
+        """Caminho livre de paredes até o inimigo ou a saída mais próxima (BFS)."""
         if not self.current_map:
-            return random.choice(['w', 'a', 's', 'd'])
+            return random.choice(["w", "a", "s", "d"])
 
-        py, px = self.current_map.player_pos['y'], self.current_map.player_pos['x']
+        py, px = self.current_map.player_pos["y"], self.current_map.player_pos["x"]
         grid = self.current_map.grid
 
         pos = (py, px)
@@ -249,22 +283,23 @@ class AutoTester:
         # Determinar todos os alvos (inimigos + saída)
         targets = set(self.current_map.enemies_pos.keys())
         if self.current_map.exit_pos:
-            targets.add((self.current_map.exit_pos['y'], self.current_map.exit_pos['x']))
+            targets.add((self.current_map.exit_pos["y"], self.current_map.exit_pos["x"]))
 
         if not targets:
-            return random.choice(['w', 'a', 's', 'd'])
+            return random.choice(["w", "a", "s", "d"])
 
         # BFS a partir do jogador para encontrar o caminho mais curto até qualquer alvo
         from collections import deque
+
         queue = deque()
         queue.append((py, px, []))  # (y, x, caminho de moves até aqui)
         visited = {(py, px)}
 
         dir_map = {
-            (-1, 0): 'w',
-            (1, 0):  's',
-            (0, -1): 'a',
-            (0, 1):  'd',
+            (-1, 0): "w",
+            (1, 0): "s",
+            (0, -1): "a",
+            (0, 1): "d",
         }
 
         while queue:
@@ -272,7 +307,7 @@ class AutoTester:
 
             # Se chegou num alvo, retornar o primeiro passo do caminho
             if (cy, cx) in targets and (cy, cx) != (py, px):
-                return path[0] if path else random.choice(['w', 'a', 's', 'd'])
+                return path[0] if path else random.choice(["w", "a", "s", "d"])
 
             for (dy, dx), move in dir_map.items():
                 ny, nx = cy + dy, cx + dx
@@ -286,15 +321,14 @@ class AutoTester:
 
                 tile = grid[ny][nx]
                 # Tiles passáveis: vazio, morte de inimigo, saída, posição de inimigo
-                if tile == '#':
+                if tile == "#":
                     continue
 
                 visited.add((ny, nx))
                 queue.append((ny, nx, path + [move]))
 
         # BFS não encontrou nenhum alvo (mapa totalmente bloqueado) — move aleatório
-        return random.choice(['w', 'a', 's', 'd'])
-
+        return random.choice(["w", "a", "s", "d"])
 
     def generate_report(self, real_print):
         import os
@@ -309,13 +343,16 @@ class AutoTester:
         final_level = self.player_ref.get_level() if self.player_ref else 0
 
         with open(filename, "w", encoding="utf-8") as f:
-            f.write("="*50 + "\n")
+            f.write("=" * 50 + "\n")
             f.write("  RELATÓRIO DE SIMULAÇÃO AUTO-TEST  \n")
-            f.write("="*50 + "\n")
+            f.write("=" * 50 + "\n")
             f.write("Contexto do Agente de Teste:\n")
             f.write("- Alvo Principal: Chegar vivo ao Level 20.\n")
             f.write("- Limite de Hard Cap: 50.000 ações permitidas.\n")
-            f.write("- Objetivo: Verificar integridade de código (Crashes) e progressão/balanceamento da XP.\n")
+            f.write(
+                "- Objetivo: Verificar integridade de código (Crashes) e "
+                "progressão/balanceamento da XP.\n"
+            )
             f.write("-" * 50 + "\n")
             f.write(f"Data/Hora: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"Nível Final Alcançado: {final_level}/20\n")
@@ -324,15 +361,15 @@ class AutoTester:
             f.write(f"Crashes: {self.metrics['crashes']}\n\n")
 
             if self.metrics["errors"]:
-                f.write("="*50 + "\n")
+                f.write("=" * 50 + "\n")
                 f.write("  LOG DE ERROS (TRACEBACKS)  \n")
-                f.write("="*50 + "\n")
+                f.write("=" * 50 + "\n")
                 for err in self.metrics["errors"]:
                     f.write(err + "\n")
 
-            f.write("\n" + "="*50 + "\n")
+            f.write("\n" + "=" * 50 + "\n")
             f.write("  LOG DE INTERFACE CAPTURADO  \n")
-            f.write("="*50 + "\n")
+            f.write("=" * 50 + "\n")
             if self.log_buffer:
                 f.write(self.log_buffer.getvalue())
 

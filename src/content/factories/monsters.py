@@ -137,9 +137,8 @@ def generate_monsters_for_level(dungeon_level: int, player_level: int = 1) -> li
         monsters.append(create_monster(_name_for(role, level), level, role))
 
     # Elite: o marco do andar. Testa se a build funciona, sem ser um chefe.
-    if (
-        dungeon_level >= int(generation["advanced_role_min_floor"])
-        and random.random() < float(generation["elite_spawn_chance"])
+    if dungeon_level >= int(generation["advanced_role_min_floor"]) and random.random() < float(
+        generation["elite_spawn_chance"]
     ):
         level = calculate_scaled_monster_level(dungeon_level, player_level)
         monsters.append(create_monster(_name_for("elite", level), level, "elite"))

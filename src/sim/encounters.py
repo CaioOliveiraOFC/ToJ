@@ -45,12 +45,14 @@ def _legacy_boss(level: int, level_fn: LevelFn | None = None) -> list:
 def _solo(role: str) -> EncounterFactory:
     def factory(level: int, level_fn: LevelFn | None = None) -> list:
         return [spawn_by_role(role, _nivel(level, role, level_fn))]
+
     return factory
 
 
 def _group(*roles: str) -> EncounterFactory:
     def factory(level: int, level_fn: LevelFn | None = None) -> list:
         return [spawn_by_role(role, _nivel(level, role, level_fn)) for role in roles]
+
     return factory
 
 
@@ -79,14 +81,31 @@ ENCOUNTERS: dict[str, EncounterFactory] = {
 }
 
 # Conjuntos usados pelos testes e pelo runner.
-SOLO_ENCOUNTERS = [name for name in ENCOUNTERS if name.endswith("_solo") and not name.startswith("legacy")]
-GROUP_ENCOUNTERS = ["trash_pair", "trash_trio", "tank_plus_glass", "controller_plus_bruiser",
-                    "skirmisher_pair", "support_plus_bruiser", "elite_plus_2_trash"]
+SOLO_ENCOUNTERS = [
+    name for name in ENCOUNTERS if name.endswith("_solo") and not name.startswith("legacy")
+]
+GROUP_ENCOUNTERS = [
+    "trash_pair",
+    "trash_trio",
+    "tank_plus_glass",
+    "controller_plus_bruiser",
+    "skirmisher_pair",
+    "support_plus_bruiser",
+    "elite_plus_2_trash",
+]
 MATRIX_ENCOUNTERS = SOLO_ENCOUNTERS + GROUP_ENCOUNTERS
 # Encontros que representam o andar comum. Boss e elite ficam de fora: eles são
 # marcos, e misturá-los na média esconde o que o andar comum está fazendo.
-ROUTINE_ENCOUNTERS = ["trash_solo", "trash_pair", "trash_trio", "bruiser_solo",
-                      "tank_solo", "glass_solo", "skirmisher_solo", "controller_solo"]
+ROUTINE_ENCOUNTERS = [
+    "trash_solo",
+    "trash_pair",
+    "trash_trio",
+    "bruiser_solo",
+    "tank_solo",
+    "glass_solo",
+    "skirmisher_solo",
+    "controller_solo",
+]
 
 
 def build_encounter(name: str, level: int, level_fn: LevelFn | None = None) -> list:

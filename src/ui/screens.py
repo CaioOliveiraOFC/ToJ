@@ -33,7 +33,10 @@ def menu(options: tuple[str, ...] | list[str], prompt: str) -> None:
 def render_fight_intro(player: "Player", monster: "Monster") -> None:
     renderer.console.clear()
     renderer.console.print(
-        Panel(Text("--- Início da Batalha ---", justify="center", style="bold green"), border_style="green")
+        Panel(
+            Text("--- Início da Batalha ---", justify="center", style="bold green"),
+            border_style="green",
+        )
     )
     renderer.render_compare_opponents(player, monster)
     renderer.render_battle_start_prompt()
@@ -71,13 +74,20 @@ def render_battle_action_panel() -> None:
     action_menu_table.add_row("3.", "Usar Item")
     action_menu_table.add_row("4.", "Tentar Fugir")
     renderer.console.print(
-        Panel(action_menu_table, title="[bold yellow]Escolha sua ação[/bold yellow]", border_style="yellow")
+        Panel(
+            action_menu_table,
+            title="[bold yellow]Escolha sua ação[/bold yellow]",
+            border_style="yellow",
+        )
     )
 
 
 def render_battle_no_skills_message() -> None:
     renderer.console.print(
-        Panel(Text("Você não tem habilidades para usar!", justify="center", style="red"), border_style="red")
+        Panel(
+            Text("Você não tem habilidades para usar!", justify="center", style="red"),
+            border_style="red",
+        )
     )
 
 
@@ -92,28 +102,49 @@ def render_skill_select_panel(player: "Player") -> None:
         if hasattr(player, "skill_cooldowns"):
             cooldown_remaining = player.skill_cooldowns.get(getattr(skill, "id", ""), 0)
         if cooldown_remaining > 0:
-            skill_table.add_row(str(key) + ".", f"[dim]{skill.name} (recarga: {cooldown_remaining})[/dim]", f"{skill.mana_cost} MP", f"[red]{cooldown_remaining} turnos[/red]")
+            skill_table.add_row(
+                str(key) + ".",
+                f"[dim]{skill.name} (recarga: {cooldown_remaining})[/dim]",
+                f"{skill.mana_cost} MP",
+                f"[red]{cooldown_remaining} turnos[/red]",
+            )
         else:
             skill_table.add_row(str(key) + ".", skill.name, f"{skill.mana_cost} MP", "")
     skill_table.add_row("0.", "Voltar", "", "")
     renderer.console.print(
-        Panel(skill_table, title="[bold yellow]Escolha uma habilidade[/bold yellow]", border_style="yellow")
+        Panel(
+            skill_table,
+            title="[bold yellow]Escolha uma habilidade[/bold yellow]",
+            border_style="yellow",
+        )
     )
 
 
 def render_skill_on_cooldown_message(skill_name: str, remaining: int) -> None:
     renderer.console.print(
-        Panel(Text(f"{skill_name} está em recarga por {remaining} turno(s)!", justify="center", style="yellow"), border_style="yellow")
+        Panel(
+            Text(
+                f"{skill_name} está em recarga por {remaining} turno(s)!",
+                justify="center",
+                style="yellow",
+            ),
+            border_style="yellow",
+        )
     )
 
 
 def render_battle_insufficient_mana_message() -> None:
-    renderer.console.print(Panel(Text("Mana insuficiente!", justify="center", style="red"), border_style="red"))
+    renderer.console.print(
+        Panel(Text("Mana insuficiente!", justify="center", style="red"), border_style="red")
+    )
 
 
 def render_battle_no_potions_message() -> None:
     renderer.console.print(
-        Panel(Text("Você não tem poções para usar!", justify="center", style="red"), border_style="red")
+        Panel(
+            Text("Você não tem poções para usar!", justify="center", style="red"),
+            border_style="red",
+        )
     )
 
 
@@ -123,10 +154,16 @@ def render_potion_select_panel(potions: list[object]) -> None:
     potion_table.add_column("Poção", style="cyan")
     potion_table.add_column("Descrição", style="dim white")
     for i, potion in enumerate(potions, 1):
-        potion_table.add_row(str(i) + ".", getattr(potion, "name", "?"), getattr(potion, "description", ""))
+        potion_table.add_row(
+            str(i) + ".", getattr(potion, "name", "?"), getattr(potion, "description", "")
+        )
     potion_table.add_row("0.", "Voltar", "")
     renderer.console.print(
-        Panel(potion_table, title="[bold yellow]Escolha uma poção[/bold yellow]", border_style="yellow")
+        Panel(
+            potion_table,
+            title="[bold yellow]Escolha uma poção[/bold yellow]",
+            border_style="yellow",
+        )
     )
 
 
@@ -154,7 +191,10 @@ def render_post_battle(
     """
     if not player_won:
         renderer.console.print(
-            Panel(Text("Você foi derrotado...", justify="center", style="bold red"), border_style="red")
+            Panel(
+                Text("Você foi derrotado...", justify="center", style="bold red"),
+                border_style="red",
+            )
         )
     else:
         renderer.console.print(
@@ -220,11 +260,18 @@ def render_shop_main(shop: object, player_coins: int, has_equipable: bool = Fals
     )
 
     if has_equipable:
-        shop_options = {"1": "Comprar Itens", "2": "Vender Itens", "3": "Equipar da Mochila", "4": "Sair da Loja"}
+        shop_options = {
+            "1": "Comprar Itens",
+            "2": "Vender Itens",
+            "3": "Equipar da Mochila",
+            "4": "Sair da Loja",
+        }
     else:
         shop_options = {"1": "Comprar Itens", "2": "Vender Itens", "3": "Sair da Loja"}
 
-    options_table = Table(show_header=False, expand=True, highlight=True, row_styles=["none", "dim"])
+    options_table = Table(
+        show_header=False, expand=True, highlight=True, row_styles=["none", "dim"]
+    )
     options_table.add_column("Opção", style="bold blue", justify="right")
     options_table.add_column("Descrição", style="cyan")
 
@@ -249,7 +296,11 @@ def render_shop_buy_menu(items_for_sale: list[dict], player_coins: int) -> None:
     if not items_for_sale:
         renderer.console.print(
             Panel(
-                Text("O mercador não tem nada para vender no momento.", justify="center", style="dim white"),
+                Text(
+                    "O mercador não tem nada para vender no momento.",
+                    justify="center",
+                    style="dim white",
+                ),
                 border_style="dim white",
             )
         )
@@ -265,7 +316,9 @@ def render_shop_buy_menu(items_for_sale: list[dict], player_coins: int) -> None:
     for i, item_data in enumerate(items_for_sale, 1):
         item = item_data["item"]
         price = item_data["price"]
-        item_table.add_row(str(i), item.name, str(price), getattr(item, "description", "Sem descrição"))
+        item_table.add_row(
+            str(i), item.name, str(price), getattr(item, "description", "Sem descrição")
+        )
     item_table.add_row("0", "Voltar", "", "")
 
     renderer.console.print(item_table)
@@ -277,7 +330,8 @@ def render_shop_purchase_success(item_name: str, price: int) -> None:
     renderer.console.print(
         Panel(
             Text.from_markup(
-                f"Você comprou [bold green]{item_name}[/bold green] por [bold yellow]{price}[/bold yellow] ouro.",
+                f"Você comprou [bold green]{item_name}[/bold green] "
+                f"por [bold yellow]{price}[/bold yellow] ouro.",
                 justify="center",
                 style="green",
             ),
@@ -291,7 +345,11 @@ def render_shop_insufficient_gold() -> None:
     """Renderiza mensagem de ouro insuficiente."""
     renderer.console.print(
         Panel(
-            Text("Você não tem ouro suficiente para comprar este item.", justify="center", style="red"),
+            Text(
+                "Você não tem ouro suficiente para comprar este item.",
+                justify="center",
+                style="red",
+            ),
             border_style="red",
         )
     )
@@ -313,7 +371,10 @@ def render_shop_sell_menu(
 
     if not inventory:
         renderer.console.print(
-            Panel(Text("Você não tem itens para vender.", justify="center", style="dim white"), border_style="dim white")
+            Panel(
+                Text("Você não tem itens para vender.", justify="center", style="dim white"),
+                border_style="dim white",
+            )
         )
         sleep(0.8)
         return
@@ -326,7 +387,9 @@ def render_shop_sell_menu(
 
     for i, item in enumerate(inventory, 1):
         sell_price = int(shop.get_price(item, dungeon_level) * 0.5)
-        player_inventory_table.add_row(str(i), item.name, str(sell_price), getattr(item, "description", "Sem descrição"))
+        player_inventory_table.add_row(
+            str(i), item.name, str(sell_price), getattr(item, "description", "Sem descrição")
+        )
     player_inventory_table.add_row("0", "Voltar", "", "")
 
     renderer.console.print(player_inventory_table)
@@ -338,7 +401,8 @@ def render_shop_sell_success(item_name: str, sell_price: int) -> None:
     renderer.console.print(
         Panel(
             Text(
-                f"Você vendeu [bold green]{item_name}[/bold green] por [bold yellow]{sell_price}[/bold yellow] ouro.",
+                f"Você vendeu [bold green]{item_name}[/bold green] "
+                f"por [bold yellow]{sell_price}[/bold yellow] ouro.",
                 justify="center",
                 style="green",
             ),
@@ -351,7 +415,10 @@ def render_shop_sell_success(item_name: str, sell_price: int) -> None:
 def render_shop_invalid_choice() -> None:
     """Renderiza mensagem de escolha inválida na loja."""
     renderer.console.print(
-        Panel(Text("Escolha inválida. Tente novamente.", justify="center", style="red"), border_style="red")
+        Panel(
+            Text("Escolha inválida. Tente novamente.", justify="center", style="red"),
+            border_style="red",
+        )
     )
     sleep(0.8)
 
@@ -360,7 +427,11 @@ def render_shop_farewell() -> None:
     """Renderiza mensagem de despedida da loja."""
     renderer.console.print(
         Panel(
-            Text("Você se despede do mercador e volta à aventura.", justify="center", style="dim white"),
+            Text(
+                "Você se despede do mercador e volta à aventura.",
+                justify="center",
+                style="dim white",
+            ),
             border_style="dim white",
         )
     )
@@ -370,9 +441,14 @@ def render_shop_farewell() -> None:
 def render_shop_equip_prompt(item_name: str, slot: str, bonus_text: str) -> None:
     """Prompt interativo para equipar direto da loja quando slot vazio."""
     slot_names = {
-        "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
-        "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
-        "Amulet": "Amuleto", "Ring": "Anel",
+        "Weapon": "Arma",
+        "Helmet": "Elmo",
+        "Body": "Armadura",
+        "Legs": "Perneiras",
+        "Shoes": "Botas",
+        "Hands": "Mãos",
+        "Amulet": "Amuleto",
+        "Ring": "Anel",
     }
     slot_label = slot_names.get(slot, slot)
     body = Text(justify="center")
@@ -388,15 +464,22 @@ def render_shop_equip_prompt(item_name: str, slot: str, bonus_text: str) -> None
 def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
     """Mostra comparação simples antigo vs novo ao trocar na loja."""
     slot_names = {
-        "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
-        "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
-        "Amulet": "Amuleto", "Ring": "Anel",
+        "Weapon": "Arma",
+        "Helmet": "Elmo",
+        "Body": "Armadura",
+        "Legs": "Perneiras",
+        "Shoes": "Botas",
+        "Hands": "Mãos",
+        "Amulet": "Amuleto",
+        "Ring": "Anel",
     }
     slot_label = slot_names.get(slot, slot)
-    renderer.console.print(Panel(
-        Text(f"Trocar equipamento - {slot_label}", justify="center", style="bold yellow"),
-        border_style="yellow",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(f"Trocar equipamento - {slot_label}", justify="center", style="bold yellow"),
+            border_style="yellow",
+        )
+    )
     table = Table(show_header=True, expand=True, border_style="dim white")
     table.add_column("Atributo", style="bold white")
     table.add_column("Equipado", style="cyan", justify="center")
@@ -454,19 +537,30 @@ def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
         resumo = "[bold red]<< Downgrade geral[/bold red]"
     else:
         resumo = "[bold yellow]== Equivalente[/bold yellow] -- escolha por efeito/raridade"
-    renderer.console.print(Panel(
-        Text.from_markup(f"Equipado: {old_item.name}\nNovo: {new_item.name}\n{resumo}\n\n[S] Equipar agora  |  [N] Manter na mochila", justify="center"),
-        border_style="cyan",
-        title="Equipar?",
-    ))
+    renderer.console.print(
+        Panel(
+            Text.from_markup(
+                f"Equipado: {old_item.name}\nNovo: {new_item.name}\n{resumo}\n\n"
+                "[S] Equipar agora  |  [N] Manter na mochila",
+                justify="center",
+            ),
+            border_style="cyan",
+            title="Equipar?",
+        )
+    )
 
 
 def render_shop_old_sell_prompt(old_item_name: str, sell_price: int, slot: str) -> None:
     """Pergunta se deseja vender/descartar o item antigo após troca."""
     slot_names = {
-        "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
-        "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
-        "Amulet": "Amuleto", "Ring": "Anel",
+        "Weapon": "Arma",
+        "Helmet": "Elmo",
+        "Body": "Armadura",
+        "Legs": "Perneiras",
+        "Shoes": "Botas",
+        "Hands": "Mãos",
+        "Amulet": "Amuleto",
+        "Ring": "Anel",
     }
     label = slot_names.get(slot, slot)
     body = Text(justify="center")
@@ -477,56 +571,81 @@ def render_shop_old_sell_prompt(old_item_name: str, sell_price: int, slot: str) 
 
 
 def render_shop_old_discarded(item_name: str) -> None:
-    renderer.console.print(Panel(
-        Text(f"{item_name} descartado.", justify="center", style="dim"),
-        border_style="dim",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(f"{item_name} descartado.", justify="center", style="dim"),
+            border_style="dim",
+        )
+    )
     sleep(0.6)
 
 
 def render_shop_old_kept(item_name: str) -> None:
-    renderer.console.print(Panel(
-        Text(f"{item_name} mantido na mochila.", justify="center", style="dim"),
-        border_style="dim",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(f"{item_name} mantido na mochila.", justify="center", style="dim"),
+            border_style="dim",
+        )
+    )
     sleep(0.6)
 
 
 def render_shop_equip_inventory_empty() -> None:
-    renderer.console.print(Panel(
-        Text("Nenhum item equipável na mochila.", justify="center", style="dim white"),
-        border_style="dim white",
-    ))
+    renderer.console.print(
+        Panel(
+            Text("Nenhum item equipável na mochila.", justify="center", style="dim white"),
+            border_style="dim white",
+        )
+    )
     sleep(0.8)
 
 
 def render_shop_equip_success(item_name: str, slot: str) -> None:
     slot_names = {
-        "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
-        "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
-        "Amulet": "Amuleto", "Ring": "Anel",
+        "Weapon": "Arma",
+        "Helmet": "Elmo",
+        "Body": "Armadura",
+        "Legs": "Perneiras",
+        "Shoes": "Botas",
+        "Hands": "Mãos",
+        "Amulet": "Amuleto",
+        "Ring": "Anel",
     }
     slot_label = slot_names.get(slot, slot)
-    renderer.console.print(Panel(
-        Text(f"{item_name} equipado em {slot_label}! Bônus aplicado.", justify="center", style="bold green"),
-        border_style="green",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(
+                f"{item_name} equipado em {slot_label}! Bônus aplicado.",
+                justify="center",
+                style="bold green",
+            ),
+            border_style="green",
+        )
+    )
     sleep(0.8)
 
 
 def render_shop_equip_failed(msg: str) -> None:
-    renderer.console.print(Panel(
-        Text(f"Não foi possível equipar: {msg}", justify="center", style="red"),
-        border_style="red",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(f"Não foi possível equipar: {msg}", justify="center", style="red"),
+            border_style="red",
+        )
+    )
     sleep(0.8)
 
 
 def render_shop_kept_in_inventory(item_name: str) -> None:
-    renderer.console.print(Panel(
-        Text(f"{item_name} guardado na mochila. Equipe quando quiser via inventário (I).", justify="center", style="dim"),
-        border_style="dim",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(
+                f"{item_name} guardado na mochila. Equipe quando quiser via inventário (I).",
+                justify="center",
+                style="dim",
+            ),
+            border_style="dim",
+        )
+    )
     sleep(0.6)
 
 
@@ -540,7 +659,7 @@ def _create_inventory_header_panel(player: "Player") -> Panel:
     return Panel(
         Text("Mochila e Equipamentos", justify="center", style="bold green"),
         border_style="green",
-        subtitle=f"Ouro: [bold yellow]{player.coins}[/bold yellow]"
+        subtitle=f"Ouro: [bold yellow]{player.coins}[/bold yellow]",
     )
 
 
@@ -550,7 +669,7 @@ def _create_equipment_table(player: "Player") -> Table:
         title="[bold cyan]--- Equipamento ---[/bold cyan]",
         show_header=False,
         expand=True,
-        border_style="dim cyan"
+        border_style="dim cyan",
     )
     equip_table.add_column("Slot", style="bold blue")
     equip_table.add_column("Item", style="cyan")
@@ -573,7 +692,7 @@ def _create_inventory_table(player: "Player") -> Table | None:
         title="[bold magenta]--- Itens na Mochila ---[/bold magenta]",
         show_header=True,
         expand=True,
-        border_style="dim magenta"
+        border_style="dim magenta",
     )
     inv_table.add_column("ID", style="bold blue", justify="right")
     inv_table.add_column("Item", style="cyan")
@@ -590,13 +709,17 @@ def _render_empty_inventory_message() -> None:
     renderer.console.print(
         Panel(
             Text("Sua mochila está vazia.", justify="center", style="dim white"),
-            border_style="dim white"
+            border_style="dim white",
         )
     )
 
 
 def render_dungeon_status(
-    dungeon_level: int, hp: int, max_hp: int, mp: int, max_mp: int,
+    dungeon_level: int,
+    hp: int,
+    max_hp: int,
+    mp: int,
+    max_mp: int,
     essence_multiplier: float = 1.0,
 ) -> None:
     """Renderiza o status da masmorra na parte superior da tela."""
@@ -627,20 +750,34 @@ def render_dungeon_controls() -> None:
 
 def render_game_saved(message: str = "Jogo salvo!") -> None:
     """Renderiza mensagem de confirmação de salvamento."""
-    renderer.console.print(Panel(Text(message, justify="center", style="green"), border_style="green"))
+    renderer.console.print(
+        Panel(Text(message, justify="center", style="green"), border_style="green")
+    )
     sleep(0.8)
 
 
 def render_level_complete(dungeon_level: int) -> None:
     """Renderiza mensagem de conclusão de nível."""
-    renderer.console.print(Panel(
-        Text(f"Você completou a Masmorra Nível {dungeon_level}!", justify="center", style="bold green"),
-        border_style="green"
-    ))
-    renderer.console.print(Panel(
-        Text("Pressione qualquer tecla para avançar para o próximo nível...", justify="center", style="yellow"),
-        border_style="yellow"
-    ))
+    renderer.console.print(
+        Panel(
+            Text(
+                f"Você completou a Masmorra Nível {dungeon_level}!",
+                justify="center",
+                style="bold green",
+            ),
+            border_style="green",
+        )
+    )
+    renderer.console.print(
+        Panel(
+            Text(
+                "Pressione qualquer tecla para avançar para o próximo nível...",
+                justify="center",
+                style="yellow",
+            ),
+            border_style="yellow",
+        )
+    )
 
 
 def render_extraction_prompt(
@@ -654,13 +791,18 @@ def render_extraction_prompt(
     essence_multiplier: float = 1.0,
 ) -> None:
     """Tela de decisão entre EXTRAIR (preservar) e CONTINUAR (arriscar)."""
-    renderer.console.print(Panel(
-        Text("- Decisão de Extração -", justify="center", style="bold yellow"),
-        border_style="yellow",
-    ))
+    renderer.console.print(
+        Panel(
+            Text("- Decisão de Extração -", justify="center", style="bold yellow"),
+            border_style="yellow",
+        )
+    )
     body = Text(justify="center")
     body.append(f"Andar concluído: {dungeon_level}\n", style="bold cyan")
-    body.append(f"Aventureiro: {player_name}  |  Nível: {level}  |  HP: {hp}/{max_hp}  |  Ouro: {coins}\n", style="white")
+    body.append(
+        f"Aventureiro: {player_name}  |  Nível: {level}  |  HP: {hp}/{max_hp}  |  Ouro: {coins}\n",
+        style="white",
+    )
     body.append(f"Essência acumulada (XP): {xp_points}\n", style="bold green")
     body.append(
         f"Estimativa para o próximo andar: ~{essence_multiplier}x "
@@ -669,29 +811,49 @@ def render_extraction_prompt(
     )
     body.append("Valor exato só é sorteado ao entrar - pode variar.\n\n", style="dim")
     body.append("Se você CONTINUAR e morrer no próximo andar,\n", style="bold red")
-    body.append("toda a essência, nível e progresso desta run serão perdidos (permadeath).\n", style="red")
+    body.append(
+        "toda a essência, nível e progresso desta run serão perdidos (permadeath).\n", style="red"
+    )
     body.append("Se você EXTRAIR, a run encerra agora e seu personagem\n", style="bold green")
     body.append("é preservado com tudo que conquistou até aqui.\n", style="green")
     renderer.console.print(Panel(body, border_style="cyan", title="Extrair ou Continuar?"))
-    renderer.console.print(Text("[1] EXTRAIR  - encerrar e preservar  |  [2] CONTINUAR - descer", justify="center", style="bold white"))
+    renderer.console.print(
+        Text(
+            "[1] EXTRAIR  - encerrar e preservar  |  [2] CONTINUAR - descer",
+            justify="center",
+            style="bold white",
+        )
+    )
     renderer.console.print(Text("Escolha 1 ou 2 e pressione ENTER.", justify="center", style="dim"))
 
 
 def render_extraction_success(dungeon_level: int) -> None:
     """Confirmação após extração bem-sucedida."""
-    renderer.console.print(Panel(
-        Text(f"Extração concluída no andar {dungeon_level}!\nSeu progresso foi preservado.", justify="center", style="bold green"),
-        border_style="green",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(
+                f"Extração concluída no andar {dungeon_level}!\nSeu progresso foi preservado.",
+                justify="center",
+                style="bold green",
+            ),
+            border_style="green",
+        )
+    )
     sleep(0.8)
 
 
 def render_continue_prompt() -> None:
     """Renderiza prompt para continuar jornada."""
-    renderer.console.print(Panel(
-        Text("Pressione qualquer tecla para continuar sua jornada...", justify="center", style="yellow"),
-        border_style="yellow"
-    ))
+    renderer.console.print(
+        Panel(
+            Text(
+                "Pressione qualquer tecla para continuar sua jornada...",
+                justify="center",
+                style="yellow",
+            ),
+            border_style="yellow",
+        )
+    )
 
 
 def render_map(map_lines: list[str]) -> None:
@@ -700,15 +862,15 @@ def render_map(map_lines: list[str]) -> None:
     for line in map_lines:
         colored_line = Text()
         for char in line:
-            if char == '@':
+            if char == "@":
                 colored_line.append(char, style="bold green")
-            elif char == '&':
+            elif char == "&":
                 colored_line.append(char, style="bold red")
-            elif char == 'B':
+            elif char == "B":
                 colored_line.append(char, style="bold magenta")
-            elif char == 'X':
+            elif char == "X":
                 colored_line.append(char, style="dim")
-            elif char == 'D':
+            elif char == "D":
                 colored_line.append(char, style="bold yellow")
             else:
                 colored_line.append(char, style="white")
@@ -738,10 +900,7 @@ def render_passive_selection(choices: list) -> None:
         description = getattr(card, "description", "")
         renderer.console.print(
             Panel(
-                Text.from_markup(
-                    f"[bold {color}]{name}[/bold {color}]\n"
-                    f"[dim]{description}[/dim]"
-                ),
+                Text.from_markup(f"[bold {color}]{name}[/bold {color}]\n[dim]{description}[/dim]"),
                 title=f"[bold]{i}. [{rarity}] [{category}][/bold]",
                 border_style=color,
             )
@@ -804,12 +963,8 @@ def render_skill_selection(choices: list) -> None:
             )
         )
     renderer.console.print(
-        Panel(
-            Text("Pressione 0 para cancelar", justify="center", style="dim"),
-            border_style="dim"
-        )
+        Panel(Text("Pressione 0 para cancelar", justify="center", style="dim"), border_style="dim")
     )
-
 
 
 def render_skill_replacement_choice(player: "Player", new_skill: object) -> None:
@@ -840,7 +995,11 @@ def render_skill_replacement_choice(player: "Player", new_skill: object) -> None
     # Mostra as 4 skills atuais
     renderer.console.print(
         Panel(
-            Text("Escolha qual skill substituir (1-4) ou 0 para cancelar:", justify="center", style="bold yellow"),
+            Text(
+                "Escolha qual skill substituir (1-4) ou 0 para cancelar:",
+                justify="center",
+                style="bold yellow",
+            ),
             border_style="yellow",
         )
     )
@@ -879,19 +1038,25 @@ def render_skill_acquired(message: str) -> None:
 def render_skill_not_replaced() -> None:
     """Renderiza mensagem de que a skill não foi substituída."""
     renderer.console.print(
-        Panel(Text("Skill não substituída.", justify="center", style="bold yellow"), border_style="yellow")
+        Panel(
+            Text("Skill não substituída.", justify="center", style="bold yellow"),
+            border_style="yellow",
+        )
     )
     sleep(1.0)
 
 
 # --- Eventos Aleatórios (TASK-005) ---
 
+
 def render_merchant_event(offers: list[dict], coins: int) -> None:
     """Tela do Mercador Errante: mostra ofertas raras com preço."""
-    renderer.console.print(Panel(
-        Text("- Mercador Errante -", justify="center", style="bold yellow"),
-        border_style="yellow",
-    ))
+    renderer.console.print(
+        Panel(
+            Text("- Mercador Errante -", justify="center", style="bold yellow"),
+            border_style="yellow",
+        )
+    )
     body = Text(justify="center")
     body.append("Um mercador surge da neblina com itens raros.\n", style="italic cyan")
     body.append(f"Seu ouro: {coins}\n\n", style="bold white")
@@ -909,19 +1074,25 @@ def render_merchant_event(offers: list[dict], coins: int) -> None:
 
 
 def render_merchant_purchase_success(item_name: str, price: int) -> None:
-    renderer.console.print(Panel(
-        Text(f"Você comprou {item_name} por {price} ouro!", justify="center", style="bold green"),
-        border_style="green",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(
+                f"Você comprou {item_name} por {price} ouro!", justify="center", style="bold green"
+            ),
+            border_style="green",
+        )
+    )
     sleep(0.8)
 
 
 def render_altar_event(cost_hp: int, player_hp: int, max_hp: int) -> None:
     """Tela do Altar: escolha de risco/recompensa."""
-    renderer.console.print(Panel(
-        Text("- Altar Sombrio -", justify="center", style="bold red"),
-        border_style="red",
-    ))
+    renderer.console.print(
+        Panel(
+            Text("- Altar Sombrio -", justify="center", style="bold red"),
+            border_style="red",
+        )
+    )
     body = Text(justify="center")
     body.append("O altar pulsa com energia sombria.\n", style="italic white")
     body.append(f"Sacrifício: {cost_hp} HP (você tem {player_hp}/{max_hp})\n", style="bold red")
@@ -933,38 +1104,52 @@ def render_altar_event(cost_hp: int, player_hp: int, max_hp: int) -> None:
 
 
 def render_altar_success() -> None:
-    renderer.console.print(Panel(
-        Text("O altar consome seu sangue e concede a Benção do Altar!", justify="center", style="bold magenta"),
-        border_style="magenta",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(
+                "O altar consome seu sangue e concede a Benção do Altar!",
+                justify="center",
+                style="bold magenta",
+            ),
+            border_style="magenta",
+        )
+    )
     sleep(0.8)
 
 
 def render_altar_refused() -> None:
-    renderer.console.print(Panel(
-        Text("Você recusa o pacto e se afasta do altar.", justify="center", style="dim"),
-        border_style="dim",
-    ))
+    renderer.console.print(
+        Panel(
+            Text("Você recusa o pacto e se afasta do altar.", justify="center", style="dim"),
+            border_style="dim",
+        )
+    )
     sleep(0.6)
 
 
 def render_altar_no_hp() -> None:
-    renderer.console.print(Panel(
-        Text("Você está fraco demais para o sacrifício.", justify="center", style="bold red"),
-        border_style="red",
-    ))
+    renderer.console.print(
+        Panel(
+            Text("Você está fraco demais para o sacrifício.", justify="center", style="bold red"),
+            border_style="red",
+        )
+    )
     sleep(0.8)
 
 
 def render_fountain_event(heal_amount: int, player_hp: int, max_hp: int) -> None:
     """Tela da Fonte: cura sem custo."""
-    renderer.console.print(Panel(
-        Text("- Fonte Cristalina -", justify="center", style="bold blue"),
-        border_style="blue",
-    ))
+    renderer.console.print(
+        Panel(
+            Text("- Fonte Cristalina -", justify="center", style="bold blue"),
+            border_style="blue",
+        )
+    )
     body = Text(justify="center")
     body.append("Águas cristalinas brilham à sua frente.\n", style="italic cyan")
-    body.append(f"Beber cura {heal_amount} HP (você tem {player_hp}/{max_hp})\n\n", style="bold green")
+    body.append(
+        f"Beber cura {heal_amount} HP (você tem {player_hp}/{max_hp})\n\n", style="bold green"
+    )
     body.append("[1] Beber da fonte  |  [2] Ignorar\n", style="white")
     renderer.console.print(Panel(body, border_style="blue"))
 
@@ -973,18 +1158,22 @@ def render_fountain_healed(healed: int, potion_name: str | None = None) -> None:
     text = f"Você bebeu e recuperou {healed} HP!"
     if potion_name:
         text += f"\nEncontrou: {potion_name}!"
-    renderer.console.print(Panel(
-        Text(text, justify="center", style="bold green"),
-        border_style="green",
-    ))
+    renderer.console.print(
+        Panel(
+            Text(text, justify="center", style="bold green"),
+            border_style="green",
+        )
+    )
     sleep(0.8)
 
 
 def render_fountain_ignored() -> None:
-    renderer.console.print(Panel(
-        Text("Você ignora a fonte e segue em frente.", justify="center", style="dim"),
-        border_style="dim",
-    ))
+    renderer.console.print(
+        Panel(
+            Text("Você ignora a fonte e segue em frente.", justify="center", style="dim"),
+            border_style="dim",
+        )
+    )
     sleep(0.5)
 
 
@@ -994,7 +1183,9 @@ def render_character_status(player) -> None:
 
     # Cabeçalho
     title = f"{player.get_nick_name()} - {player.get_classname()}  |  Nível {player.get_level()}"
-    renderer.console.print(Panel(Text(title, justify="center", style="bold cyan"), border_style="cyan"))
+    renderer.console.print(
+        Panel(Text(title, justify="center", style="bold cyan"), border_style="cyan")
+    )
 
     # XP
     try:
@@ -1005,8 +1196,14 @@ def render_character_status(player) -> None:
         xp_atual = getattr(player, "xp_points", 0)
         xp_needed = 0
         xp_total = 0
-    xp_text = f"XP: {xp_atual} / {xp_total}  (falta {xp_needed} pro próximo nível)" if xp_total else f"XP: {xp_atual}"
-    renderer.console.print(Panel(Text(xp_text, justify="center", style="green"), border_style="green"))
+    xp_text = (
+        f"XP: {xp_atual} / {xp_total}  (falta {xp_needed} pro próximo nível)"
+        if xp_total
+        else f"XP: {xp_atual}"
+    )
+    renderer.console.print(
+        Panel(Text(xp_text, justify="center", style="green"), border_style="green")
+    )
 
     # HP/MP
     try:
@@ -1017,27 +1214,46 @@ def render_character_status(player) -> None:
     except Exception:
         hp = max_hp = mp = max_mp = 0
     hp_mp_text = f"HP: {hp}/{max_hp}   |   MP: {mp}/{max_mp}"
-    renderer.console.print(Panel(Text(hp_mp_text, justify="center", style="bold white"), border_style="white"))
+    renderer.console.print(
+        Panel(Text(hp_mp_text, justify="center", style="bold white"), border_style="white")
+    )
 
     # Atributos base
     try:
-        atk = player.get_avg_damage() if hasattr(player, "get_avg_damage") else getattr(player, "avg_damage", 0)
+        atk = (
+            player.get_avg_damage()
+            if hasattr(player, "get_avg_damage")
+            else getattr(player, "avg_damage", 0)
+        )
         base_df = getattr(player, "base_df", getattr(player, "base_ag", 0))
         base_ag = getattr(player, "base_ag", 0)
         base_st = getattr(player, "base_st", 0)
         base_mg = getattr(player, "base_mg", 0)
-        attrs_text = f"ATK: {atk}  |  DEF: {base_df}  |  AGI: {base_ag}  |  ST: {base_st}  |  MG: {base_mg}"
+        attrs_text = (
+            f"ATK: {atk}  |  DEF: {base_df}  |  AGI: {base_ag}  |  ST: {base_st}  |  MG: {base_mg}"
+        )
     except Exception:
         attrs_text = "Atributos indisponíveis"
-    renderer.console.print(Panel(Text(attrs_text, justify="center", style="yellow"), border_style="yellow", title="Atributos"))
+    renderer.console.print(
+        Panel(
+            Text(attrs_text, justify="center", style="yellow"),
+            border_style="yellow",
+            title="Atributos",
+        )
+    )
 
     # Equipamento
     if hasattr(player, "equipment") and isinstance(player.equipment, dict):
         equip_lines = []
         slot_names = {
-            "Weapon": "Arma", "Helmet": "Elmo", "Body": "Armadura",
-            "Legs": "Perneiras", "Shoes": "Botas", "Hands": "Mãos",
-            "Amulet": "Amuleto", "Ring": "Anel",
+            "Weapon": "Arma",
+            "Helmet": "Elmo",
+            "Body": "Armadura",
+            "Legs": "Perneiras",
+            "Shoes": "Botas",
+            "Hands": "Mãos",
+            "Amulet": "Amuleto",
+            "Ring": "Anel",
         }
         has_any = False
         for slot, item in player.equipment.items():
@@ -1053,7 +1269,9 @@ def render_character_status(player) -> None:
             equip_text = "\n".join(equip_lines) if equip_lines else "Nenhum equipamento"
     else:
         equip_text = "Nenhum equipamento"
-    renderer.console.print(Panel(Text.from_markup(equip_text), border_style="magenta", title="Equipamento"))
+    renderer.console.print(
+        Panel(Text.from_markup(equip_text), border_style="magenta", title="Equipamento")
+    )
 
     # Passivas
     passives = getattr(player, "passives", [])
@@ -1067,7 +1285,9 @@ def render_character_status(player) -> None:
         passive_text = "\n".join(passive_lines)
     else:
         passive_text = "[dim]Nenhuma passiva ativa[/dim]"
-    renderer.console.print(Panel(Text.from_markup(passive_text), border_style="blue", title="Passivas"))
+    renderer.console.print(
+        Panel(Text.from_markup(passive_text), border_style="blue", title="Passivas")
+    )
 
     # Cooldowns
     cooldowns = getattr(player, "skill_cooldowns", {})
@@ -1078,6 +1298,7 @@ def render_character_status(player) -> None:
             skill_name = sid
             try:
                 from src.content.skills_loader import get_skill_by_id
+
                 sc = get_skill_by_id(sid)
                 if sc:
                     skill_name = sc.name
@@ -1087,7 +1308,9 @@ def render_character_status(player) -> None:
         cd_text = "\n".join(cd_lines)
     else:
         cd_text = "[dim]Nenhum cooldown ativo[/dim]"
-    renderer.console.print(Panel(Text.from_markup(cd_text), border_style="yellow", title="Cooldowns"))
+    renderer.console.print(
+        Panel(Text.from_markup(cd_text), border_style="yellow", title="Cooldowns")
+    )
 
     # Efeitos temporários
     active_effects = getattr(player, "active_effects", {})
@@ -1105,6 +1328,10 @@ def render_character_status(player) -> None:
         effect_text = "\n".join(effect_lines)
     else:
         effect_text = "[dim]Nenhum efeito temporário[/dim]"
-    renderer.console.print(Panel(Text.from_markup(effect_text), border_style="red", title="Efeitos Temporários"))
+    renderer.console.print(
+        Panel(Text.from_markup(effect_text), border_style="red", title="Efeitos Temporários")
+    )
 
-    renderer.console.print(Panel(Text("[Q] Voltar", justify="center", style="dim"), border_style="dim"))
+    renderer.console.print(
+        Panel(Text("[Q] Voltar", justify="center", style="dim"), border_style="dim")
+    )

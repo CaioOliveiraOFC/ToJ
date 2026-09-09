@@ -71,9 +71,17 @@ class Item:
         if not self.effect_type or self.effect_value <= 0:
             return False
         return self.effect_type in (
-            "max_hp", "max_mp", "agility", "strength", "defense",
-            "speed", "evasion", "crit_chance", "crit_damage",
-            "life_steal", "mana_regen"
+            "max_hp",
+            "max_mp",
+            "agility",
+            "strength",
+            "defense",
+            "speed",
+            "evasion",
+            "crit_chance",
+            "crit_damage",
+            "life_steal",
+            "mana_regen",
         )
 
 
@@ -140,6 +148,7 @@ def reload_items() -> None:
 # --- COMPATIBILIDADE COM CÓDIGO EXISTENTE ---
 # Para acesso direto via Item class (não recomendado, use get_all_items())
 
+
 def __getattr__(name: str) -> Item:
     items = _load_all_items()
     if name in items:
@@ -154,24 +163,29 @@ _load_all_items()
 # --- COMPATIBILIDADE COM CÓDIGO EXISTENTE ---
 # Para manter compatibilidade com código que espera classes separadas
 
+
 class Weapon(Item):
     """Classe de compatibilidade para armas."""
+
     pass
 
 
 class Armor(Item):
     """Classe de compatibilidade para armaduras."""
+
     pass
 
 
 class Potion(Item):
     """Classe de compatibilidade para poções."""
+
     pass
 
 
 # Exporta ALL_ITEMS para compatibilidade (propriedade dinâmica)
 class _AllItemsDict:
     """Proxy para manter compatibilidade com ALL_ITEMS."""
+
     def __getitem__(self, key):
         return _load_all_items()[key]
 

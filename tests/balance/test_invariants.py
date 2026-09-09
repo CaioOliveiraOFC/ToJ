@@ -26,7 +26,7 @@ from src.mechanics import combat as cmb  # noqa: E402
 from src.shared import effects as fx  # noqa: E402
 from src.sim.encounters import build_encounter  # noqa: E402
 from src.sim.harness import ALL_CLASSES, make_hero, simulate, simulate_run  # noqa: E402
-from src.sim.metrics import curve_deltas, variance_explained  # noqa: E402
+from src.sim.metrics import curve_deltas, spread, variance_explained  # noqa: E402
 from tests.balance import thresholds as T  # noqa: E402
 
 pytestmark = pytest.mark.balance
@@ -127,22 +127,31 @@ class TestCoberturaDeEfeitos:
 
     def test_toda_skill_de_buff_declara_o_atributo_que_modifica(self):
         mortas = [
-            s.id for s in load_skills()
+            s.id
+            for s in load_skills()
             if s.effect_type == "buff" and s.effect_stat not in self.STATS_CONHECIDOS
         ]
         assert not mortas, f"Buffs sem efeito no motor: {mortas}"
 
     def test_todo_status_de_skill_tem_tratamento_no_motor(self):
         mortos = [
-            (s.id, s.effect_value) for s in load_skills()
+            (s.id, s.effect_value)
+            for s in load_skills()
             if s.effect_type == "status" and str(s.effect_value) not in self.STATUS_CONHECIDOS
         ]
         assert not mortos, f"Status sem tratamento no motor: {mortos}"
 
     def test_toda_passiva_e_consumida_por_alguma_regra(self):
         consumidas = self.STATS_CONHECIDOS | {
-            "max_hp", "max_mp", "strength", "defense", "agility",
-            "essence_bonus", "gold_drop_bonus", "potion_heal_bonus", "death_ignore",
+            "max_hp",
+            "max_mp",
+            "strength",
+            "defense",
+            "agility",
+            "essence_bonus",
+            "gold_drop_bonus",
+            "potion_heal_bonus",
+            "death_ignore",
         }
         mortas = [p.id for p in load_passives() if p.effect_type not in consumidas]
         assert not mortas, f"Passivas sem efeito: {mortas}"
@@ -150,7 +159,8 @@ class TestCoberturaDeEfeitos:
     def test_todo_consumivel_produz_algum_efeito(self):
         tratados = set(POTION_BUFFS) | set(POTION_STATUSES) | {"max_hp", "max_mp"}
         mortos = [
-            i.name for i in get_all_items().values()
+            i.name
+            for i in get_all_items().values()
             if getattr(i, "consumable", False) and i.effect_type not in tratados
         ]
         assert not mortos, f"Consumíveis sem efeito: {mortos}"
@@ -159,7 +169,8 @@ class TestCoberturaDeEfeitos:
         # Sem cura comprável, remover a cura gratuita torna a run impossível em
         # vez de difícil. O catálogo original não tinha um único consumível.
         curas = [
-            i for i in get_all_items().values()
+            i
+            for i in get_all_items().values()
             if getattr(i, "consumable", False) and i.effect_type == "max_hp"
         ]
         assert len(curas) >= 3
@@ -233,7 +244,9 @@ class TestAtrito:
 
     @pytest.mark.parametrize("classe", ALL_CLASSES)
     def test_combate_de_rotina_custa_recurso(self, classe):
-        resultado = simulate(classe, "bruiser_solo", 8, T.FAST_ITERATIONS, "smart", loadout="expected")
+        resultado = simulate(
+            classe, "bruiser_solo", 8, T.FAST_ITERATIONS, "smart", loadout="expected"
+        )
         assert resultado.hp_left_pct_on_win < T.MAX_HP_LEFT_ON_WIN, (
             f"{classe} termina o combate com {resultado.hp_left_pct_on_win:.0%} da vida: "
             "o combate não custou nada."
@@ -246,13 +259,15 @@ class TestAtrito:
 class TestEncontros:
     """Nenhum encontro pode ser decorativo, nenhum pode ser um muro."""
 
-    @pytest.mark.parametrize("encontro", ["trash_solo", "bruiser_solo", "tank_solo",
-                                          "elite_solo", "boss_solo"])
+    @pytest.mark.parametrize(
+        "encontro", ["trash_solo", "bruiser_solo", "tank_solo", "elite_solo", "boss_solo"]
+    )
     def test_duracao_dentro_da_banda(self, encontro):
         minimo, maximo = T.TTK_BANDS[encontro]
         for level in (5, 15):
-            resultado = simulate("Warrior", encontro, level, T.FAST_ITERATIONS,
-                                 "smart", loadout="expected")
+            resultado = simulate(
+                "Warrior", encontro, level, T.FAST_ITERATIONS, "smart", loadout="expected"
+            )
             assert minimo <= resultado.turns_mean <= maximo, (
                 f"{encontro} no nível {level} dura {resultado.turns_mean:.1f} turnos, "
                 f"fora da banda {minimo}-{maximo}."
@@ -263,19 +278,24 @@ class TestEncontros:
         # para nenhuma decisão — nem para punir uma decisão ruim.
         for encontro in ("trash_solo", "bruiser_solo"):
             for level in (1, 10, 20):
-                resultado = simulate("Mage", encontro, level, T.FAST_ITERATIONS,
-                                     "smart", loadout="expected")
+                resultado = simulate(
+                    "Mage", encontro, level, T.FAST_ITERATIONS, "smart", loadout="expected"
+                )
                 assert resultado.turns_mean >= T.MIN_TTK_ANY_ENCOUNTER
 
-    @pytest.mark.parametrize("encontro", ["elite_solo", "boss_solo", "tank_plus_glass",
-                                          "trash_trio", "skirmisher_pair"])
+    @pytest.mark.parametrize(
+        "encontro", ["elite_solo", "boss_solo", "tank_plus_glass", "trash_trio", "skirmisher_pair"]
+    )
     def test_marco_de_andar_cobra_um_preco(self, encontro):
         # Um encontro isolado começado com a vida cheia não deve matar — a
         # dificuldade mora na sequência. O que mede se ele importa é o custo:
         # antes do rebalanceamento, o jogador terminava toda luta com a vida
         # cheia, porque `rest()` rodava depois de cada vitória.
         custos = [
-            1 - simulate(c, encontro, 12, T.FAST_ITERATIONS, "smart", loadout="expected").hp_left_pct_on_win
+            1
+            - simulate(
+                c, encontro, 12, T.FAST_ITERATIONS, "smart", loadout="expected"
+            ).hp_left_pct_on_win
             for c in ALL_CLASSES
         ]
         assert max(custos) >= T.MIN_HP_COST_MILESTONE, (
@@ -320,9 +340,13 @@ class TestRunCompleta:
             assert T.MIN_CLASS_MEAN_FLOOR <= media <= T.MAX_CLASS_MEAN_FLOOR, (
                 f"{classe} chega em média ao andar {media:.1f}, fora da banda aceitável."
             )
-        spread = max(medias.values()) - min(medias.values())
-        assert spread <= T.MAX_CLASS_MEAN_FLOOR_SPREAD, (
-            f"Distância de {spread:.1f} andares entre a melhor e a pior classe: {medias}"
+        # `spread` vem de metrics.py em vez de ser recalculado aqui: era a
+        # mesma conta escrita em dois lugares, e a função lá estava morta —
+        # nenhuma chamada em todo o repositório. Duas cópias de uma fórmula
+        # divergem na primeira mudança.
+        distancia = spread(list(medias.values()))
+        assert distancia <= T.MAX_CLASS_MEAN_FLOOR_SPREAD, (
+            f"Distância de {distancia:.1f} andares entre a melhor e a pior classe: {medias}"
         )
 
     @pytest.mark.parametrize("classe", ALL_CLASSES)
@@ -419,9 +443,7 @@ class TestArquetipos:
             # suporte nas skills. O que nenhum arquétipo pode ser é forte em
             # tudo sem pagar por isso em lugar nenhum.
             barato_ou_por_skill = max(eixos) <= 1.0 or arquetipo.skills
-            assert redistribui or barato_ou_por_skill, (
-                f"{papel} não troca nada por nada: {eixos}"
-            )
+            assert redistribui or barato_ou_por_skill, f"{papel} não troca nada por nada: {eixos}"
 
     def test_todo_arquetipo_declara_ameaca_e_counterplay(self):
         for papel, arquetipo in all_archetypes().items():
@@ -458,8 +480,7 @@ class TestPesoDaSorte:
     @pytest.mark.balance_full
     @pytest.mark.parametrize("classe", ALL_CLASSES)
     def test_a_essencia_sorteada_nao_decide_a_run(self, classe):
-        dados = simulate_run(classe, 20, T.FAST_RUN_ITERATIONS, "smart",
-                             loadout="expected")
+        dados = simulate_run(classe, 20, T.FAST_RUN_ITERATIONS, "smart", loadout="expected")
         explicado = variance_explained(
             dados["early_essence_by_run"],
             [float(d) for d in dados["deepest_by_run"]],
@@ -474,8 +495,9 @@ class TestPesoDaSorte:
         # A média do sorteio não mudou, então o andar médio tem de continuar na
         # banda. Se cair fora, quem mexeu no desvio mexeu na média junto.
         medias = {
-            classe: simulate_run(classe, 20, T.FAST_RUN_ITERATIONS, "smart",
-                                 loadout="expected")["mean_floor"]
+            classe: simulate_run(classe, 20, T.FAST_RUN_ITERATIONS, "smart", loadout="expected")[
+                "mean_floor"
+            ]
             for classe in ALL_CLASSES
         }
         for classe, media in medias.items():
@@ -603,13 +625,18 @@ class TestReprodutibilidade:
     """
 
     def test_mesma_seed_produz_a_mesma_run(self):
-        kwargs = dict(hero_class="Warrior", max_floor=12, iterations=15,
-                      policy="smart", seed=99, loadout="expected")
+        kwargs = dict(
+            hero_class="Warrior",
+            max_floor=12,
+            iterations=15,
+            policy="smart",
+            seed=99,
+            loadout="expected",
+        )
         primeira = simulate_run(**kwargs)
         segunda = simulate_run(**kwargs)
         assert primeira == segunda, (
-            "duas execuções com a mesma seed divergiram: algum sorteio escapa "
-            "do gerador semeado."
+            "duas execuções com a mesma seed divergiram: algum sorteio escapa do gerador semeado."
         )
 
     def test_seeds_diferentes_produzem_runs_diferentes(self):
@@ -620,8 +647,9 @@ class TestReprodutibilidade:
         pares davam a mesma média — 3% de chance de este teste reprovar por
         coincidência, sem nada de errado no código.
         """
-        kwargs = dict(hero_class="Warrior", max_floor=12, iterations=15,
-                      policy="smart", loadout="expected")
+        kwargs = dict(
+            hero_class="Warrior", max_floor=12, iterations=15, policy="smart", loadout="expected"
+        )
         assert simulate_run(seed=99, **kwargs) != simulate_run(seed=4242, **kwargs)
 
     def test_a_simulacao_devolve_o_gerador_global_como_encontrou(self):

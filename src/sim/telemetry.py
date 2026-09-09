@@ -155,5 +155,3 @@ class RunTelemetry:
                 "altar_deaths": self.altar_deaths,
             },
         }
-
-

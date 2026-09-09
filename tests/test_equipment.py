@@ -82,7 +82,8 @@ def test_armadura_trade_off_def_vs_mobilidade():
     player.unequip("Body")
 
     assert def_pesada > def_leve
-    # Trade-off: Placa tem mais DEF mas perde velocidade (efeito), Cota tem menos DEF mas ganha agilidade
+    # Trade-off: Placa tem mais DEF mas perde velocidade (efeito); Cota tem
+    # menos DEF mas ganha agilidade.
     # Verifica que os efeitos são diferentes
     assert cota_leve.effect_type == "agility"
     assert placa_pesada.effect_type == "speed"
@@ -172,14 +173,30 @@ def test_catalogo_tem_minimo_12_novos_itens_com_tradeoff():
     all_items = get_all_items()
     # Verifica que os 24 novos itens existem
     new_ids = [
-        "lamina_veloz", "clava_pesada", "adaga_sangrenta",
-        "cota_leve", "placa_pesada", "manto_curandeiro",
-        "espada_vinganca", "cajado_equilibrio", "arco_precisao",
-        "armadura_espinhos", "tunica_fluxo", "colete_resistencia",
-        "lamina_tempestade", "cajado_vazio", "arco_silencio",
-        "armadura_fenrir", "manto_etereo", "colete_sombra",
-        "espada_eclipse", "cajado_oblivion", "adaga_vazio",
-        "armadura_tita", "tunica_arquimago", "manto_assassino",
+        "lamina_veloz",
+        "clava_pesada",
+        "adaga_sangrenta",
+        "cota_leve",
+        "placa_pesada",
+        "manto_curandeiro",
+        "espada_vinganca",
+        "cajado_equilibrio",
+        "arco_precisao",
+        "armadura_espinhos",
+        "tunica_fluxo",
+        "colete_resistencia",
+        "lamina_tempestade",
+        "cajado_vazio",
+        "arco_silencio",
+        "armadura_fenrir",
+        "manto_etereo",
+        "colete_sombra",
+        "espada_eclipse",
+        "cajado_oblivion",
+        "adaga_vazio",
+        "armadura_tita",
+        "tunica_arquimago",
+        "manto_assassino",
     ]
     for nid in new_ids:
         assert nid in [item.id for item in all_items.values()], f"Item {nid} não encontrado"
@@ -196,6 +213,7 @@ def test_catalogo_tem_minimo_12_novos_itens_com_tradeoff():
 
     # Verifica distribuição por raridade
     from collections import Counter
+
     rarity_counts = Counter()
     for nid in new_ids:
         item = next(i for i in all_items.values() if i.id == nid)

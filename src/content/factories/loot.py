@@ -40,7 +40,7 @@ _LOOT_TABLE: list[Item] | None = None
 def get_loot() -> Item | None:
     """
     Gerador procedural que lê definições do JSON.
-    
+
     Mantém o mesmo comportamento: chance configurável de dropar um item (cópia).
     O código Python atua como injetor, instanciando objetos a partir dos dados JSON.
     """

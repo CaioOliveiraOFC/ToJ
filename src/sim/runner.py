@@ -70,8 +70,13 @@ def cmd_baseline(args) -> None:
             for encounter in encounters:
                 for policy in args.policies.split(","):
                     result = simulate(
-                        hero_class, encounter, level, args.iterations,
-                        policy.strip(), args.seed, args.loadout,
+                        hero_class,
+                        encounter,
+                        level,
+                        args.iterations,
+                        policy.strip(),
+                        args.seed,
+                        args.loadout,
                     )
                     rows.append(result.to_dict())
                     print(
@@ -112,24 +117,34 @@ def cmd_matrix(args) -> None:
         for hero_class in classes:
             cells = []
             for encounter in encounters:
-                smart = simulate(hero_class, encounter, level, args.iterations, "smart",
-                                 args.seed, args.loadout)
-                greedy = simulate(hero_class, encounter, level, args.iterations, "greedy",
-                                  args.seed, args.loadout)
-                rows.append({
-                    "level": level, "hero_class": hero_class, "encounter": encounter,
-                    "win_rate_smart": smart.win_rate, "win_rate_greedy": greedy.win_rate,
-                    "skill_gap": skill_gap(smart.win_rate, greedy.win_rate),
-                    "turns_mean": smart.turns_mean,
-                    "hp_left_pct_on_win": smart.hp_left_pct_on_win,
-                })
+                smart = simulate(
+                    hero_class, encounter, level, args.iterations, "smart", args.seed, args.loadout
+                )
+                greedy = simulate(
+                    hero_class, encounter, level, args.iterations, "greedy", args.seed, args.loadout
+                )
+                rows.append(
+                    {
+                        "level": level,
+                        "hero_class": hero_class,
+                        "encounter": encounter,
+                        "win_rate_smart": smart.win_rate,
+                        "win_rate_greedy": greedy.win_rate,
+                        "skill_gap": skill_gap(smart.win_rate, greedy.win_rate),
+                        "turns_mean": smart.turns_mean,
+                        "hp_left_pct_on_win": smart.hp_left_pct_on_win,
+                    }
+                )
                 cells.append(f"{smart.win_rate:>14.1%}")
             if args.format == "table":
                 print(f"{hero_class:10}" + "".join(cells))
 
     payload = {
-        "kind": "matrix", "iterations": args.iterations, "seed": args.seed,
-        "loadout": args.loadout, "elapsed_seconds": round(time.time() - started, 2),
+        "kind": "matrix",
+        "iterations": args.iterations,
+        "seed": args.seed,
+        "loadout": args.loadout,
+        "elapsed_seconds": round(time.time() - started, 2),
         "results": rows,
     }
     if args.out:
@@ -144,8 +159,13 @@ def cmd_run(args) -> None:
     for hero_class in _classes(args.classes):
         for policy in args.policies.split(","):
             data = simulate_run(
-                hero_class, args.max_floor, args.iterations, policy.strip(),
-                args.seed, args.loadout, pick_policy=getattr(args, "pick_policy", DEFAULT_PICK_POLICY),
+                hero_class,
+                args.max_floor,
+                args.iterations,
+                policy.strip(),
+                args.seed,
+                args.loadout,
+                pick_policy=getattr(args, "pick_policy", DEFAULT_PICK_POLICY),
             )
             rows.append(data)
             print(
@@ -154,8 +174,11 @@ def cmd_run(args) -> None:
                 f"{data['reached_20_rate']:.1%}"
             )
     payload = {
-        "kind": "run", "iterations": args.iterations, "seed": args.seed,
-        "loadout": args.loadout, "elapsed_seconds": round(time.time() - started, 2),
+        "kind": "run",
+        "iterations": args.iterations,
+        "seed": args.seed,
+        "loadout": args.loadout,
+        "elapsed_seconds": round(time.time() - started, 2),
         "results": rows,
     }
     if args.out:
@@ -169,9 +192,13 @@ def cmd_compare(args) -> None:
     changed = []
     for row in reference["results"]:
         current = simulate(
-            row["hero_class"], row["encounter"], row["level"],
-            args.iterations or row["iterations"], row["policy"],
-            reference.get("seed", 1337), row.get("loadout", "expected"),
+            row["hero_class"],
+            row["encounter"],
+            row["level"],
+            args.iterations or row["iterations"],
+            row["policy"],
+            reference.get("seed", 1337),
+            row.get("loadout", "expected"),
         )
         delta = current.win_rate - row["win_rate"]
         if abs(delta) > args.tolerance:
@@ -181,8 +208,10 @@ def cmd_compare(args) -> None:
                 f"{row['policy']:6} {row['win_rate']:.1%} -> {current.win_rate:.1%} "
                 f"({delta:+.1%})"
             )
-    print(f"\n{len(changed)} de {len(reference['results'])} cenários fora da tolerância "
-          f"de {args.tolerance:.0%}")
+    print(
+        f"\n{len(changed)} de {len(reference['results'])} cenários fora da tolerância "
+        f"de {args.tolerance:.0%}"
+    )
 
 
 def cmd_scout(args) -> None:
@@ -261,27 +290,38 @@ def build_parser() -> argparse.ArgumentParser:
     common(p_run, iterations=500)
     p_run.add_argument("--policies", default="smart,greedy")
     p_run.add_argument("--max-floor", type=int, default=20)
-    p_run.add_argument("--pick-policy", default=DEFAULT_PICK_POLICY,
-                       choices=sorted(POLICIES),
-                       help="como o bot escolhe passiva e skill ao subir de nível")
+    p_run.add_argument(
+        "--pick-policy",
+        default=DEFAULT_PICK_POLICY,
+        choices=sorted(POLICIES),
+        help="como o bot escolhe passiva e skill ao subir de nível",
+    )
     p_run.set_defaults(func=cmd_run)
 
-    p_scout = sub.add_parser("scout", help="destaques por sistema (skills, passivas, itens, eventos)")
+    p_scout = sub.add_parser(
+        "scout", help="destaques por sistema (skills, passivas, itens, eventos)"
+    )
     p_scout.add_argument("--classes", default="all")
     p_scout.add_argument("--iterations", type=int, default=60)
     p_scout.add_argument("--policy", default="smart", choices=["smart", "greedy", "random"])
     p_scout.add_argument("--loadout", default="expected", choices=["naked", "expected", "best"])
     p_scout.add_argument("--seed", type=int, default=1337)
     p_scout.add_argument("--max-floor", type=int, default=20)
-    p_scout.add_argument("--ablate", action="store_true",
-                         help="desliga cada sistema e mede o delta de profundidade")
+    p_scout.add_argument(
+        "--ablate", action="store_true", help="desliga cada sistema e mede o delta de profundidade"
+    )
     p_scout.add_argument("--ablation-iterations", type=int, default=40)
-    p_scout.add_argument("--per-skill", action="store_true",
-                         help="ablação carta a carta das skills (lento)")
-    p_scout.add_argument("--per-passive", action="store_true",
-                         help="ablação carta a carta das passivas (lento)")
-    p_scout.add_argument("--no-pick-policies", action="store_true",
-                         help="pula a comparação entre políticas de escolha de carta")
+    p_scout.add_argument(
+        "--per-skill", action="store_true", help="ablação carta a carta das skills (lento)"
+    )
+    p_scout.add_argument(
+        "--per-passive", action="store_true", help="ablação carta a carta das passivas (lento)"
+    )
+    p_scout.add_argument(
+        "--no-pick-policies",
+        action="store_true",
+        help="pula a comparação entre políticas de escolha de carta",
+    )
     p_scout.add_argument("--policy-iterations", type=int, default=40)
     p_scout.add_argument("--out")
     p_scout.set_defaults(func=cmd_scout)

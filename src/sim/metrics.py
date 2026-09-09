@@ -66,7 +66,5 @@ def variance_explained(xs: list[float], ys: list[float]) -> float:
     media_x = statistics.fmean(xs)
     media_y = statistics.fmean(ys)
     covariancia = sum((x - media_x) * (y - media_y) for x, y in zip(xs, ys))
-    dispersao = (
-        sum((x - media_x) ** 2 for x in xs) * sum((y - media_y) ** 2 for y in ys)
-    ) ** 0.5
+    dispersao = (sum((x - media_x) ** 2 for x in xs) * sum((y - media_y) ** 2 for y in ys)) ** 0.5
     return (covariancia / dispersao) ** 2 if dispersao else 0.0

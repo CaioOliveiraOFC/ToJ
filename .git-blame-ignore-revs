@@ -1,0 +1,8 @@
+# Revisões que só mexem em formatação. `git blame` deve pulá-las para não
+# atribuir cada linha a uma reformatação em vez de a quem escreveu o código.
+#
+# Ative de uma vez por clone:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# style: adota ruff format no repositório inteiro
+e76931fa15324ecef9b2399f0e5b0ba818738c23

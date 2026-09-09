@@ -277,7 +277,9 @@ def simulate_run(
                 cedo.append(essence)
             if telemetry is not None:
                 telemetry.essence_rolls.append(essence)
-            fights = encounters_per_floor(floor) if encounters_per_floor else _default_floor_plan(floor)
+            fights = (
+                encounters_per_floor(floor) if encounters_per_floor else _default_floor_plan(floor)
+            )
             died = False
 
             for name in fights:
@@ -294,7 +296,9 @@ def simulate_run(
                 monsters = build_encounter(
                     name, floor, lambda: calculate_scaled_monster_level(floor, hero.get_level())
                 )
-                outcome = run_battle(hero, monsters, lambda h, m, t: decide(h, m, t), rng=rng, publish=None)
+                outcome = run_battle(
+                    hero, monsters, lambda h, m, t: decide(h, m, t), rng=rng, publish=None
+                )
                 # Registrar ANTES de checar a morte. Sair primeiro descartava a
                 # luta que encerra a run — 100% das derrotas — e com ela o que o
                 # herói fez no combate mais difícil que enfrentou: a duração
@@ -379,8 +383,9 @@ def _power_without_equipment(hero) -> float:
         hero.equipment.update(equipado)
 
 
-def _apply_random_event(hero, shop, floor: int, rng: random.Random,
-                        toggles=None, telemetry=None) -> None:
+def _apply_random_event(
+    hero, shop, floor: int, rng: random.Random, toggles=None, telemetry=None
+) -> None:
     """Evento aleatório de andar, com a mesma chance do jogo.
 
     O Altar cobra vida por um buff e pode matar; a Fonte cura; o Mercador é uma
@@ -437,11 +442,24 @@ def _default_floor_plan(floor: int) -> list[str]:
     if floor <= 5:
         plan = ["trash_solo", "trash_pair", "bruiser_solo", "skirmisher_solo"]
     elif floor <= 10:
-        plan = ["trash_pair", "bruiser_solo", "glass_solo", "skirmisher_solo",
-                "tank_solo", "controller_solo"]
+        plan = [
+            "trash_pair",
+            "bruiser_solo",
+            "glass_solo",
+            "skirmisher_solo",
+            "tank_solo",
+            "controller_solo",
+        ]
     else:
-        plan = ["trash_trio", "bruiser_solo", "tank_plus_glass", "controller_plus_bruiser",
-                "skirmisher_pair", "support_plus_bruiser", "glass_solo"]
+        plan = [
+            "trash_trio",
+            "bruiser_solo",
+            "tank_plus_glass",
+            "controller_plus_bruiser",
+            "skirmisher_pair",
+            "support_plus_bruiser",
+            "glass_solo",
+        ]
 
     count = min(len(plan), 3 + floor // 4)
     fights = [plan[(floor + i) % len(plan)] for i in range(count)]
@@ -450,16 +468,22 @@ def _default_floor_plan(floor: int) -> list[str]:
     # Mini-chefe a cada 5 andares, como `engine/loop.py` faz.
     if floor % 5 == 0:
         fights.append("boss_solo")
-    elif (
-        floor >= int(regras["advanced_role_min_floor"])
-        and random.random() < float(regras["elite_spawn_chance"])
+    elif floor >= int(regras["advanced_role_min_floor"]) and random.random() < float(
+        regras["elite_spawn_chance"]
     ):
         fights.append("elite_solo")
     return fights
 
 
-def _award(hero, monsters: list, essence: float, rng: random.Random,
-           toggles: Toggles | None = None, telemetry=None, picker=None) -> None:
+def _award(
+    hero,
+    monsters: list,
+    essence: float,
+    rng: random.Random,
+    toggles: Toggles | None = None,
+    telemetry=None,
+    picker=None,
+) -> None:
     """Aplica XP, ouro, loot e as escolhas de nível, como o jogo faz.
 
     Espelha `engine.loop.process_post_battle`: a Essência multiplica o XP, as

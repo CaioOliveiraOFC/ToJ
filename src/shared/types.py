@@ -78,4 +78,3 @@ class SaveData:
     coins: int
     dungeon_level: int
     map_state: MapState | None = None
-

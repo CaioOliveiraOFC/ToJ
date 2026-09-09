@@ -136,5 +136,3 @@ class Monster(Entity):
     def get_mg(self) -> int:
         """Retorna a magia do monstro, com buffs aplicados."""
         return self.get_stat("mg")
-
-

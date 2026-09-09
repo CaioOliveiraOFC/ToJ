@@ -150,7 +150,8 @@ class TestSaveComEquipamento:
 
         heroi = Warrior("Teste")
         arma = next(
-            i for i in get_all_items().values()
+            i
+            for i in get_all_items().values()
             if getattr(i, "slot", None) == "Weapon"
             and (not getattr(i, "classes", None) or "Warrior" in i.classes)
         )
@@ -171,7 +172,8 @@ class TestSaveComEquipamento:
         heroi = Warrior("Equipado")
         heroi.set_level(6)
         arma = next(
-            i for i in get_all_items().values()
+            i
+            for i in get_all_items().values()
             if getattr(i, "slot", None) == "Weapon"
             and (not getattr(i, "classes", None) or "Warrior" in i.classes)
         )
