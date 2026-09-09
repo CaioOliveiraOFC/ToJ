@@ -17,6 +17,7 @@ pode ser rara e decisiva (atribuição baixa, ablação alta).
 
 from __future__ import annotations
 
+import math
 import statistics
 from dataclasses import dataclass, field
 
@@ -662,8 +663,9 @@ def ablate(
 
     resultados = []
     for nome, toggles in variantes:
-        profundidades = [
-            simulate_run(
+        profundidades, erros = [], []
+        for c in classes:
+            resultado = simulate_run(
                 c,
                 max_floor,
                 iterations,
@@ -672,19 +674,47 @@ def ablate(
                 loadout,
                 toggles=toggles,
                 collect_telemetry=False,
-            )["mean_floor"]
-            for c in classes
-        ]
+            )
+            profundidades.append(resultado["mean_floor"])
+            erros.append(_erro_padrao(resultado["deepest_by_run"]))
         media = statistics.fmean(profundidades)
         resultados.append(
             {
                 "disabled": nome,
                 "mean_floor": media,
                 "delta_floors": media - baseline,
+                "margin_floors": _margem_da_diferenca(erros),
             }
         )
     resultados.sort(key=lambda r: r["delta_floors"])
     return resultados
+
+
+def _erro_padrao(valores: list[int | float]) -> float:
+    """Erro padrão da média de uma amostra."""
+    if len(valores) < 2:
+        return 0.0
+    return statistics.pstdev(valores) / math.sqrt(len(valores))
+
+
+def _margem_da_diferenca(erros_por_classe: list[float]) -> float:
+    """Margem de 95% para o delta entre a run completa e a run com o sistema off.
+
+    A profundidade de uma run é bimodal — a run morre cedo ou vai fundo, e quase
+    não existe caso médio —, então o desvio padrão por run fica em torno de 8
+    andares para uma média de 9 a 12. Um delta menor que esta margem não é um
+    efeito pequeno: é um número que a amostra não distingue de zero.
+
+    Ordem de grandeza, com 3 classes: detectar meio andar pede ~2.000 runs por
+    braço; um andar, ~500; dois andares, ~125. É por isso que a margem viaja
+    junto com o delta em vez de o relatório comparar contra um limiar fixo — o
+    limiar não sabe com quantas runs foi medido.
+    """
+    if not erros_por_classe:
+        return 0.0
+    agregado = math.sqrt(sum(e * e for e in erros_por_classe)) / len(erros_por_classe)
+    # sqrt(2): a diferença entre dois braços de variância parecida.
+    return 1.96 * agregado * math.sqrt(2)
 
 
 def run_scout(
@@ -792,16 +822,34 @@ def format_report(report: ScoutReport) -> str:
 
     if report.ablation:
         linhas += ["", "ABLAÇÃO — andares perdidos ao desligar o sistema", "-" * 78]
+        sem_resolucao = False
         for entrada in report.ablation:
             delta = entrada["delta_floors"]
-            marca = "  " if abs(delta) >= NEGLIGIBLE_ABLATION_FLOORS else " ?"
+            margem = entrada.get("margin_floors", 0.0)
+            # Três estados, não dois. O relatório antes só distinguia "muda
+            # bastante" de "muda pouco", e chamava o segundo de sistema que não
+            # sustenta nada — mesmo quando a amostra não tinha resolução para
+            # separar aquele delta de zero. Um sistema já foi condenado assim.
+            if margem and abs(delta) < margem:
+                marca, nota = " ?", f" ±{margem:.1f} — dentro do ruído"
+            elif abs(delta) < NEGLIGIBLE_ABLATION_FLOORS:
+                marca, nota = " ·", f" ±{margem:.1f} — medido, e é pequeno"
+            else:
+                marca, nota = "  ", f" ±{margem:.1f}"
+            sem_resolucao |= marca == " ?"
             linhas.append(
                 f"{marca} {entrada['disabled']:28} {entrada['mean_floor']:5.1f} "
-                f"({delta:+.1f} andares)"
+                f"({delta:+.1f} andares){nota}"
             )
         linhas.append(
-            f"\n  '?' marca sistema cuja remoção muda menos de "
-            f"{NEGLIGIBLE_ABLATION_FLOORS} andar: não está sustentando nada."
+            "\n  '·' o sistema mede pouco de verdade: menos de "
+            f"{NEGLIGIBLE_ABLATION_FLOORS} andar, com a amostra dando conta de ver isso."
         )
+        if sem_resolucao:
+            linhas.append(
+                "  '?' a amostra NÃO distingue esse delta de zero. Não é achado de "
+                "design, é falta de runs — aumente --ablation-iterations antes de "
+                "concluir qualquer coisa sobre esse sistema."
+            )
 
     return "\n".join(linhas) + "\n"

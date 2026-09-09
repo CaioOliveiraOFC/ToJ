@@ -9,6 +9,7 @@ só que com zeros.
 
 from __future__ import annotations
 
+import statistics
 import sys
 from pathlib import Path
 
@@ -437,3 +438,68 @@ class TestVereditoDeEscolhaVemDeUmaPoliticaSo:
         comparacao.skill_pick_rate = {nome: {"cutelada": 0.0} for nome in DELIBERATE_POLICIES}
         achados = scout._analyse_cards(comparacao.skill_pick_rate, "skills")
         assert any(f.verdict == "morta" for f in achados)
+
+
+class TestAblacaoConheceOProprioErro:
+    """Um delta menor que a margem não é achado de design, é falta de runs.
+
+    A profundidade de uma run é bimodal: desvio padrão de ~8 andares para uma
+    média de 9 a 12. Com 150 runs por braço a margem de 95% fica em ±1,05 andar,
+    então os deltas de `skill_choice` (−0,8) e `events` (−0,3) que já foram
+    publicados como "sistema que não sustenta nada" eram indistinguíveis de zero.
+    O limiar fixo de 0,5 andar não sabia com quantas runs tinha sido medido.
+    """
+
+    def test_cada_entrada_traz_a_propria_margem(self):
+        resultado = scout.ablate(
+            iterations=4,
+            classes=["Warrior"],
+            policy="smart",
+            loadout="expected",
+            seed=1337,
+            max_floor=6,
+            baseline=5.0,
+        )
+        assert resultado, "ablação não produziu entrada nenhuma"
+        for entrada in resultado:
+            assert "margin_floors" in entrada
+            assert entrada["margin_floors"] >= 0.0
+
+    def test_amostra_menor_tem_margem_maior(self):
+        def margem(iterations):
+            saida = scout.ablate(
+                iterations=iterations,
+                classes=["Warrior"],
+                policy="smart",
+                loadout="expected",
+                seed=1337,
+                max_floor=6,
+                baseline=5.0,
+            )
+            return statistics.fmean(e["margin_floors"] for e in saida)
+
+        assert margem(4) > margem(32), (
+            "a margem não encolhe com mais runs: não está saindo da amostra"
+        )
+
+    def test_o_relatorio_separa_ruido_de_efeito_pequeno(self):
+        relatorio = scout.ScoutReport(
+            iterations=10,
+            classes=["Warrior"],
+            telemetry={},
+            findings=[],
+            baseline_mean_floor=10.0,
+        )
+        relatorio.ablation = [
+            # Pequeno e medido: a amostra enxerga.
+            {"disabled": "medido", "mean_floor": 9.7, "delta_floors": -0.3, "margin_floors": 0.1},
+            # Grande, mas a margem é maior ainda: não dá para concluir.
+            {"disabled": "ruido", "mean_floor": 8.0, "delta_floors": -2.0, "margin_floors": 3.0},
+        ]
+        texto = scout.format_report(relatorio)
+        linha_medido = next(ln for ln in texto.splitlines() if "medido" in ln)
+        linha_ruido = next(ln for ln in texto.splitlines() if "ruido" in ln)
+        assert "dentro do ruído" in linha_ruido
+        assert "dentro do ruído" not in linha_medido, (
+            "delta pequeno com margem menor ainda é medição, não ruído"
+        )
