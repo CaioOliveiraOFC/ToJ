@@ -251,10 +251,9 @@ RANDOM_EVENT_FOUNTAIN_HEAL_PERCENT = 50  # % da vida máxima curada
 DEFAULT_SKILL_COOLDOWN = 0  # sem cooldown por padrão
 STUN_DURATION = 1  # turnos perdidos quando atordoado
 STUN_CHANCE_DEFAULT = 15  # % base para aplicar stun em ações com stun
-# Chance de atordoar da skill Esmagar, nomeada porque o motor a aplica direto.
-ESMAGAR_STUN_CHANCE = 30
-# Nome da skill que carrega esse atordoamento embutido no motor.
-ESMAGAR_SKILL_NAME = "Esmagar"
+# Esmagar teve as suas duas constantes removidas: o motor a atordoava por nome,
+# em cima do `stun_chance` que a própria skill já declara no JSON. Valor de skill
+# é dado, e mora no JSON — o motor lê, não redeclara.
 DAMAGE_REDUCTION_DURATION = 3  # turnos que dura a redução de dano
 DAMAGE_REDUCTION_DEFAULT_PERCENT = 30  # % de dano reduzido
 

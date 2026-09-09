@@ -20,8 +20,6 @@ from src.shared.constants import (
     DAMAGE_REDUCTION_DEFAULT_PERCENT,
     DAMAGE_REDUCTION_DURATION,
     DEFENSE_K,
-    ESMAGAR_SKILL_NAME,
-    ESMAGAR_STUN_CHANCE,
     FLEE_RANGE_MAX,
     HIT_AGILITY_SWING,
     HIT_CHANCE_CEIL,
@@ -221,21 +219,17 @@ def resolve_physical_attack(
     damage = int(damage * fx.outgoing_damage_multiplier(attacker))
     damage = max(1, int(damage * fx.incoming_damage_multiplier(defender)))
 
-    # Stun: por skill nomeada, ou pela passiva de atordoamento do atacante.
-    stun_chance = (
-        ESMAGAR_STUN_CHANCE
-        if skill_name == ESMAGAR_SKILL_NAME
-        else int(fx.combat_modifier(attacker, "stun_chance"))
-    )
-    if stun_chance and r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= stun_chance:
-        if hasattr(defender, "active_effects"):
-            defender.active_effects["stun"] = {"duration": STUN_DURATION}
-            _emit(
-                publish,
-                T.COMBAT_TURN_EFFECT,
-                type_="turn_effect",
-                payload={"entity": defender, "kind": "stun_applied"},
-            )
+    # Stun da PASSIVA do atacante. O stun que a skill carrega é rolado por
+    # `apply_skill`, a partir do `stun_chance` do JSON.
+    #
+    # Aqui havia um caso especial: se o nome da skill fosse "Esmagar", esta
+    # rolagem usava uma constante do motor em vez da passiva. Como `apply_skill`
+    # também rola o `stun_chance` da skill, Esmagar atordoava por dois caminhos
+    # independentes — o JSON declarava 30% e o jogo entregava 46% —, e a passiva
+    # de atordoamento do herói era silenciosamente descartada em todo golpe de
+    # Esmagar, que é justamente onde ela deveria valer mais.
+    stun_chance = int(fx.combat_modifier(attacker, "stun_chance"))
+    _try_apply_stun(defender, stun_chance, r, publish)
 
     defender.take_damage(damage)
     fx.wake_on_damage(defender)
@@ -273,6 +267,28 @@ def resolve_physical_attack(
         payload={"attacker": attacker, "defender": defender, "strike": strike},
     )
     return strike
+
+
+def _try_apply_stun(target, chance: int, r: random.Random, publish: PublishFn) -> bool:
+    """Rola atordoamento e aplica em `target`. Devolve se atordoou.
+
+    Existe para que os três caminhos que atordoam — passiva do atacante, skill de
+    dano e skill de status — usem a mesma rolagem e a mesma duração. Enquanto o
+    código estava duplicado, o ramo de status simplesmente não tinha a sua cópia:
+    `Golpe Baixo` declara 15% de atordoamento no JSON e entregava 0%.
+    """
+    if not chance or not hasattr(target, "active_effects"):
+        return False
+    if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > int(chance):
+        return False
+    target.active_effects["stun"] = {"duration": STUN_DURATION}
+    _emit(
+        publish,
+        T.COMBAT_TURN_EFFECT,
+        type_="turn_effect",
+        payload={"entity": target, "kind": "stun_applied"},
+    )
+    return True
 
 
 def _survive_lethal_blow(entity) -> bool:
@@ -336,18 +352,10 @@ def apply_skill(
         strike = resolve_physical_attack(
             caster, target, total_base, str(skill.name), rng=r, publish=None
         )
-        # Stun chance específica da skill (se houver)
-        stun_chance_skill = int(getattr(skill, "stun_chance", 0) or 0)
-        if strike and not strike.was_evaded and stun_chance_skill:
-            if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= stun_chance_skill:
-                if hasattr(target, "active_effects"):
-                    target.active_effects["stun"] = {"duration": STUN_DURATION}
-                    _emit(
-                        publish,
-                        T.COMBAT_TURN_EFFECT,
-                        type_="turn_effect",
-                        payload={"entity": target, "kind": "stun_applied"},
-                    )
+        # Stun que a skill carrega. Só rola se o golpe conectou: um ataque
+        # esquivado não atordoa.
+        if strike and not strike.was_evaded:
+            _try_apply_stun(target, int(getattr(skill, "stun_chance", 0) or 0), r, publish)
         out = SkillApplyResult(kind="damage", mp_spent=int(skill.mana_cost), strike=strike)
         _emit(
             publish,
@@ -376,6 +384,11 @@ def apply_skill(
     if skill.effect_type == "status":
         if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= int(skill.chance):
             target.active_effects[str(skill.effect_value)] = {"duration": int(skill.duration)}
+            # O atordoamento da skill também vale aqui. Este ramo não o rolava:
+            # o bloco existia só na versão de dano, então `Golpe Baixo` aplicava
+            # `weakened` em 100% das vezes e nunca os seus 15% de atordoamento.
+            # Só rola quando o status pegou — uma skill que falhou não atordoa.
+            _try_apply_stun(target, int(getattr(skill, "stun_chance", 0) or 0), r, publish)
             out = SkillApplyResult(
                 kind="status",
                 mp_spent=int(skill.mana_cost),
