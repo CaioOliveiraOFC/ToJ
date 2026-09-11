@@ -14,6 +14,7 @@ from src.shared.constants import (
     MAGE_BASE_MG,
     MAGE_BASE_MP,
     MAGE_BASE_ST,
+    MAGIC_SHIELD_ABSORB_PERCENT,
     POTION_BUFF_DURATION,
     ROGUE_BASE_AG,
     ROGUE_BASE_DF,
@@ -662,12 +663,24 @@ class Warrior(Player):
 
 
 class Mage(Player):
-    """Mago — maior pico de dano, menor HP efetivo, refém de MP.
+    """Mago — converte mana em sobrevivência; sem mana, é o mais frágil.
 
-    Identidade: vence rápido ou não vence. Tem o burst para derrubar um alvo
-    antes que ele aja, e o menor orçamento de sobrevivência para quando isso
-    falha. Fraqueza: contra o controlador, que rouba turnos e queima mana.
+    Identidade: a reserva de mana é o recurso dele para as duas coisas, atacar e
+    aguentar. A barreira arcana absorve parte de cada golpe cobrando MP, então
+    toda skill lançada é vida que ele deixa de ter depois — e um Mago sem mana
+    fica com o pior orçamento de sobrevivência do jogo.
+
+    É a terceira resposta à mesma pergunta: o Guerreiro absorve com HP e defesa,
+    o Ladino evita com agilidade, o Mago paga. Antes da barreira ele não tinha
+    resposta nenhuma — mesma vida do Ladino, sem a esquiva — e morria no andar 4
+    contra encontros comuns.
+
+    Fraqueza: contra o controlador, que rouba turnos e queima mana, atacando a
+    ofensiva e a defesa dele de uma vez.
     """
+
+    # Fração de cada golpe que a barreira pode absorver, se houver mana.
+    magic_shield_percent = MAGIC_SHIELD_ABSORB_PERCENT
 
     CLASS_BASE = {
         "hp": MAGE_BASE_HP,

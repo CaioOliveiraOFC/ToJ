@@ -319,6 +319,25 @@ MONSTER_EXECUTE_HP_RATIO = 0.35
 # fim do jogo.
 SKILL_COST_REFERENCE_MP = 97
 
+# --- Barreira arcana: a mitigação do Mago ---
+# Cada classe tem a sua forma de não morrer. O Guerreiro absorve com HP e
+# defesa; o Ladino evita com agilidade; o Mago não tinha nenhuma. Medido no
+# nível 4: HP efetivo 760 contra 749 do Ladino, mas com agilidade 11 contra 38 —
+# ou seja, a mesma vida sem a esquiva que a compensa, e apenas +5% de dano sobre
+# o Guerreiro para pagar por 20% menos vida que ele. O resultado é que o Mago
+# morria no andar 4 contra os encontros mais banais do jogo, enquanto as outras
+# classes chegavam ao 6 e ao 7.
+#
+# A reserva de mana era a compensação escrita, e ela só paga em luta longa — o
+# Mago morria antes de a reserva valer alguma coisa. A barreira converte mana em
+# sobrevivência imediata e faz a reserva pesar desde o primeiro andar.
+#
+# Fração máxima de um golpe que a barreira pode absorver.
+MAGIC_SHIELD_ABSORB_PERCENT = 35
+# Dano absorvido por ponto de mana. É o preço da conversão, e é ele que cria a
+# decisão: mana gasta aguentando não lança skill.
+MAGIC_SHIELD_DAMAGE_PER_MP = 2.0
+
 SKILL_BONUS_WOUNDED_RATIO = 0.35
 SKILL_BONUS_HEALTHY_RATIO = 0.80
 # Quantos turnos do início do combate contam como abertura. Um buff de defesa

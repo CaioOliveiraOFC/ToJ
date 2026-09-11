@@ -25,6 +25,7 @@ from src.shared.constants import (
     HIT_CHANCE_CEIL,
     HIT_CHANCE_FLOOR,
     INVISIBLE_HIT_PENALTY,
+    MAGIC_SHIELD_DAMAGE_PER_MP,
     MANA_BURN_PER_TICK,
     MP_REGEN_PERCENT_PER_TURN,
     PERCENTAGE_RANGE_MAX,
@@ -271,6 +272,7 @@ def resolve_physical_attack(
     # defensor que reduzem o dano recebido (damage_reduction ativo ou passivo).
     damage = int(damage * fx.outgoing_damage_multiplier(attacker))
     damage = max(1, int(damage * fx.incoming_damage_multiplier(defender)))
+    damage = _absorve_com_barreira(defender, damage, publish)
 
     # Stun da PASSIVA do atacante. O stun que a skill carrega é rolado por
     # `apply_skill`, a partir do `stun_chance` do JSON.
@@ -342,6 +344,45 @@ def _try_apply_stun(target, chance: int, r: random.Random, publish: PublishFn) -
         payload={"entity": target, "kind": "stun_applied"},
     )
     return True
+
+
+def _absorve_com_barreira(defender, damage: int, publish: PublishFn) -> int:
+    """Barreira arcana: troca mana por dano evitado. Devolve o dano que passa.
+
+    Existe porque cada classe precisa de uma forma de não morrer, e o Mago não
+    tinha nenhuma: mesma vida efetiva do Ladino, sem a esquiva que a compensa, e
+    +5% de dano sobre o Guerreiro para pagar por 20% menos vida. A reserva de
+    mana era a compensação escrita, mas só rendia em luta longa — e ele morria
+    no andar 4, contra os encontros mais comuns do jogo.
+
+    Absorver custa MP, então a decisão não é de graça: o que a barreira gasta
+    aguentando é skill que não será lançada. É essa tensão que faz a reserva
+    pesar, em vez de ser um número grande parado na ficha.
+    """
+    fracao = int(getattr(defender, "magic_shield_percent", 0) or 0)
+    if fracao <= 0 or damage <= 1:
+        return damage
+
+    mana = int(getattr(defender, "get_mp", lambda: 0)())
+    if mana <= 0:
+        return damage
+
+    desejado = int(damage * fracao / 100)
+    # O que a mana em caixa realmente cobre: sem isso, um Mago seco continuaria
+    # absorvendo e a barreira viraria redução de dano gratuita.
+    possivel = min(desejado, int(mana * MAGIC_SHIELD_DAMAGE_PER_MP))
+    if possivel <= 0:
+        return damage
+
+    custo = max(1, int(possivel / MAGIC_SHIELD_DAMAGE_PER_MP))
+    defender.reduce_mp(custo)
+    _emit(
+        publish,
+        T.COMBAT_TURN_EFFECT,
+        type_="turn_effect",
+        payload={"entity": defender, "kind": "magic_shield", "absorbed": possivel, "mp": custo},
+    )
+    return max(1, damage - possivel)
 
 
 def _survive_lethal_blow(entity) -> bool:
