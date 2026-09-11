@@ -272,7 +272,7 @@ def resolve_physical_attack(
     # defensor que reduzem o dano recebido (damage_reduction ativo ou passivo).
     damage = int(damage * fx.outgoing_damage_multiplier(attacker))
     damage = max(1, int(damage * fx.incoming_damage_multiplier(defender)))
-    damage = _absorve_com_barreira(defender, damage, publish)
+    damage = _absorve_com_egide(defender, damage, publish)
 
     # Stun da PASSIVA do atacante. O stun que a skill carrega é rolado por
     # `apply_skill`, a partir do `stun_chance` do JSON.
@@ -346,8 +346,13 @@ def _try_apply_stun(target, chance: int, r: random.Random, publish: PublishFn) -
     return True
 
 
-def _absorve_com_barreira(defender, damage: int, publish: PublishFn) -> int:
-    """Barreira arcana: troca mana por dano evitado. Devolve o dano que passa.
+def _absorve_com_egide(defender, damage: int, publish: PublishFn) -> int:
+    """Égide de Mana: troca mana por dano evitado. Devolve o dano que passa.
+
+    O nome distingue esta mitigação passiva da skill `Barreira Arcana`, que é
+    outra coisa: um buff de defesa que o Mago escolhe lançar. As duas reduzem
+    dano e ambas são do Mago, então dividir o nome garantiria confusão assim que
+    a mecânica ganhasse voz na tela — que é o que acabou de acontecer.
 
     Existe porque cada classe precisa de uma forma de não morrer, e o Mago não
     tinha nenhuma: mesma vida efetiva do Ladino, sem a esquiva que a compensa, e
@@ -438,9 +443,15 @@ def apply_skill(
     custo = skill_mana_cost(caster, skill)
     caster.reduce_mp(custo)
 
-    # Aplica cooldown após uso bem-sucedido (se houver)
+    # Aplica cooldown após uso bem-sucedido (se houver).
+    #
+    # `+ 1` porque a recarga é gravada no turno do uso e decrementada no início
+    # do turno SEGUINTE do mesmo ator, antes de ele agir. Sem o ajuste,
+    # `cooldown: 1` virava zero e sumia antes da primeira chance de reusar — ou
+    # seja, quatro skills do JSON declaravam uma recarga que não existia. Com
+    # ele, `cooldown: N` bloqueia exatamente N turnos do ator.
     if skill_id and hasattr(caster, "skill_cooldowns") and skill_cooldown > 0:
-        caster.skill_cooldowns[skill_id] = skill_cooldown
+        caster.skill_cooldowns[skill_id] = skill_cooldown + 1
 
     if skill.effect_type == "damage":
         total_base = skill_damage_base(caster, skill, target)

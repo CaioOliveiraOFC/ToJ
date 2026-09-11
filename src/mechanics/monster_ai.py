@@ -47,6 +47,7 @@ from src.shared.constants import (
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
 )
+from src.shared.effects import control_weight
 
 # Papéis cuja identidade é aguentar. Eles abrem o combate se fechando, e é isso
 # que obriga o jogador a trazer dano contínuo em vez de uma explosão só.
@@ -70,21 +71,55 @@ def _valor(skill) -> int:
     return int(bruto) if bruto.lstrip("-").isdigit() else 0
 
 
+def _valor_de_status(skill) -> float:
+    """Quanto um status vale como jogada, na mesma métrica que o herói usa.
+
+    `_valor` devolve 0 para todo status, porque `effect_value` deles é um nome
+    (`"stun"`, `"fear"`, `"mana_burn"`) e não um número. Com isso `_maior` virava
+    `max` de chave constante — que devolve o primeiro elemento. A comparação
+    existia na forma e não na prática: o `controller`, cujas três skills são
+    status, lançava sempre `Torpor` e nunca `Queima de Mana` ou `Presságio`,
+    apesar de `monsters.json` declarar para ele "Nega turnos e recurso".
+
+    A métrica é a mesma que o herói aplica em
+    `src/sim/policies.py::_valor_de_controle`: peso da família vezes duração
+    vezes chance de aplicar. O peso vem de `control_weight`, que já existia e
+    cujo docstring afirmava servir "na hora de lançá-la" — servia, mas só para o
+    herói. `src/mechanics/` não a importava.
+
+    A camada de mecânica não pode importar de `src/sim/`, então o que é
+    compartilhado é `control_weight`, em `src/shared/`.
+    """
+    duracao = max(1, int(getattr(skill, "duration", 1) or 1))
+    chance = float(getattr(skill, "chance", 100) or 100) / 100
+    return control_weight(str(getattr(skill, "effect_value", ""))) * duracao * chance
+
+
 def _maior(skills: list):
     """A skill de maior valor da lista. `None` para lista vazia."""
-    return max(skills, key=_valor) if skills else None
+    if not skills:
+        return None
+    if all(s.effect_type == "status" for s in skills):
+        return max(skills, key=_valor_de_status)
+    return max(skills, key=_valor)
 
 
-def _ja_esta_no_ar(monster, skill) -> bool:
+def _ja_esta_no_ar(monster, skill, target=None) -> bool:
     """Evita relançar o que já está ativo — gastar turno em nada é o defeito."""
     if skill.effect_type == "damage_reduction":
         return "damage_reduction" in getattr(monster, "active_effects", {})
     if skill.effect_type == "buff":
         return str(skill.name) in getattr(monster, "active_buffs", {})
+    if skill.effect_type == "status" and target is not None:
+        # O status vive no ALVO, não em quem lança — por isso o alvo precisa
+        # chegar até aqui. Sem isto o monstro reaplicava `Torpor` num herói já
+        # atordoado, pagando MP por uma duração renovada que não muda nada. A
+        # chave é `effect_value`, a mesma que o motor grava em `combat.py`.
+        return str(skill.effect_value) in (getattr(target, "active_effects", {}) or {})
     return False
 
 
-def _usable_skills(monster) -> list:
+def _usable_skills(monster, target=None) -> list:
     """Skills que o monstro pode usar agora: MP suficiente, fora de recarga e
     que ainda mudem alguma coisa."""
     skills = getattr(monster, "skills", None) or []
@@ -94,7 +129,7 @@ def _usable_skills(monster) -> list:
         for s in skills
         if monster.get_mp() >= monster.skill_mana_cost(s)
         and cooldowns.get(s.id, 0) <= 0
-        and not _ja_esta_no_ar(monster, s)
+        and not _ja_esta_no_ar(monster, s, target)
     ]
 
 
@@ -145,16 +180,15 @@ def _pick_skill(monster, hero, usable: list, rng: random.Random) -> tuple[object
     # 5. Rotina do papel. Aqui a moeda ainda vale: é a variação que impede o
     #    encontro de virar um roteiro decorado.
     if role == "controller":
-        return (statuses or damages or defensivas)[0], False
+        return (_maior(statuses) or _maior(damages) or _maior(defensivas)), False
     if role == "support":
-        return (heals or defensivas or statuses or damages)[0], False
+        return (_maior(heals) or _maior(defensivas) or _maior(statuses) or _maior(damages)), False
     if role == "tank":
         return (_maior(defensivas) or _maior(damages) or _maior(statuses)), False
     if role in ("glass_cannon", "boss", "elite", "bruiser", "skirmisher"):
         return (_maior(damages) or _maior(statuses) or _maior(defensivas)), False
 
-    pool = damages or statuses or defensivas
-    return (pool[0] if pool else None), False
+    return (_maior(damages) or _maior(statuses) or _maior(defensivas)), False
 
 
 def decide_monster_action(monster, hero, *, rng: random.Random | None = None, publish=None) -> None:
@@ -166,7 +200,7 @@ def decide_monster_action(monster, hero, *, rng: random.Random | None = None, pu
     """
     r = rng if rng is not None else random
     try:
-        usable = _usable_skills(monster)
+        usable = _usable_skills(monster, hero)
         if usable:
             chosen, decisiva = _pick_skill(monster, hero, usable, r)
             if chosen is not None:

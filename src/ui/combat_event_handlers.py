@@ -56,8 +56,18 @@ def _on_turn_effect(ev: GameEvent) -> None:
     kind = p["kind"]
     if kind == "poison_tick":
         renderer.render_turn_effect_message(entity, ("poison_tick", str(p["damage"])))
-    elif kind == "frozen":
-        renderer.render_turn_effect_message(entity, ("frozen",))
+    elif kind in ("frozen", "stun", "sleep"):
+        # Os três roubam o turno. Só `frozen` chegava à tela: o jogador atordoava
+        # o inimigo e não via, o que torna impossível aprender que vale atordoar.
+        renderer.render_turn_effect_message(entity, (kind,))
+    elif kind == "stun_applied":
+        renderer.render_turn_effect_message(entity, ("stun_applied",))
+    elif kind == "mana_burn_tick":
+        renderer.render_turn_effect_message(entity, ("mana_burn_tick", str(p["amount"])))
+    elif kind == "magic_shield":
+        renderer.render_turn_effect_message(
+            entity, ("magic_shield", str(p["absorbed"]), str(p["mp"]))
+        )
     elif kind == "effect_expired":
         renderer.render_turn_effect_message(entity, ("effect_expired", str(p["name"])))
     elif kind == "buff_expired":

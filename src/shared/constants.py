@@ -319,7 +319,10 @@ MONSTER_EXECUTE_HP_RATIO = 0.35
 # fim do jogo.
 SKILL_COST_REFERENCE_MP = 97
 
-# --- Barreira arcana: a mitigação do Mago ---
+# --- Égide de Mana: a mitigação passiva do Mago ---
+# Nome distinto da skill `Barreira Arcana`, que é um buff de defesa lançado pelo
+# jogador. As duas são do Mago e as duas reduzem dano; o nome compartilhado só
+# não confundia enquanto esta aqui era invisível.
 # Cada classe tem a sua forma de não morrer. O Guerreiro absorve com HP e
 # defesa; o Ladino evita com agilidade; o Mago não tinha nenhuma. Medido no
 # nível 4: HP efetivo 760 contra 749 do Ladino, mas com agilidade 11 contra 38 —

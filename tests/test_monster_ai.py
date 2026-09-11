@@ -243,3 +243,95 @@ class TestCatalogoDeArquetipos:
 
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))
+
+
+class TestMonstroEscolheControlePorValor:
+    """O monstro precisa comparar status, não pegar o primeiro do JSON.
+
+    `_valor` lê `effect_value` numérico, e todo status tem nome no lugar do
+    número (`"stun"`, `"fear"`, `"mana_burn"`). Devolvia 0 para todos, então
+    `max(..., key=_valor)` retornava o primeiro elemento: a comparação existia na
+    forma e não na prática.
+
+    O `controller` era o caso grave — as três skills dele são status, e
+    `monsters.json` declara `threat: "Nega turnos e recurso."`. Ele lançava
+    sempre `Torpor` e nunca `Queima de Mana`, então negava turno e jamais
+    recurso. O `counterplay` que o próprio JSON declara para ele ("não depender
+    de MP") é exatamente a fraqueza da Égide do Mago, que ficava sem ser exercida.
+    """
+
+    @staticmethod
+    def _controller():
+        from src.content.factories.monsters import create_monster
+
+        return create_monster("ctrl", 12, "controller")
+
+    def test_status_deixa_de_empatar_em_zero(self):
+        from src.mechanics.monster_ai import _valor_de_status
+
+        monstro = self._controller()
+        valores = {s.name: _valor_de_status(s) for s in monstro.skills}
+        assert len(set(valores.values())) > 1, (
+            f"todas as skills de status valem o mesmo ({valores}) — a escolha "
+            "volta a ser a ordem do arquivo"
+        )
+
+    def test_a_escolha_segue_o_valor_e_nao_a_ordem_do_arquivo(self):
+        from src.mechanics.monster_ai import _maior, _valor_de_status
+
+        monstro = self._controller()
+        skills = list(monstro.skills)
+        escolhida = _maior(skills)
+        melhor = max(skills, key=_valor_de_status)
+        assert escolhida is melhor
+        assert escolhida is not skills[0] or _valor_de_status(skills[0]) == _valor_de_status(melhor)
+
+    def test_roubar_turno_pesa_mais_que_enfraquecer(self):
+        """A métrica é a mesma do herói: família × duração × chance."""
+        from src.shared.effects import control_weight
+
+        assert control_weight("stun") > control_weight("weakened")
+        assert control_weight("poison") > control_weight("fear")
+
+
+class TestMonstroNaoRelancaStatusAtivo:
+    """Relançar um status que já está no alvo é turno e MP jogados fora.
+
+    A regra já existia para `buff` e `damage_reduction` (`TestTurnoDesperdicado`),
+    e `status` tinha ficado de fora do código e do teste — o mesmo padrão do
+    `stun_chance` que faltava no ramo de status do motor.
+
+    O status vive no ALVO, não em quem lança, então `_ja_esta_no_ar` precisava
+    receber o alvo; antes ela só olhava o próprio monstro e era estruturalmente
+    incapaz de ver isso.
+    """
+
+    @staticmethod
+    def _controller():
+        from src.content.factories.monsters import create_monster
+
+        return create_monster("ctrl", 12, "controller")
+
+    def test_status_ja_ativo_no_alvo_sai_das_usaveis(self):
+        from src.mechanics.monster_ai import _usable_skills
+
+        monstro = self._controller()
+        heroi = Warrior("alvo")
+        torpor = next(s for s in monstro.skills if str(s.effect_value) == "stun")
+
+        assert torpor in _usable_skills(monstro, heroi)
+        heroi.active_effects["stun"] = {"duration": 1}
+        assert torpor not in _usable_skills(monstro, heroi), (
+            "o monstro relança o atordoamento num herói já atordoado"
+        )
+
+    def test_as_outras_continuam_disponiveis(self):
+        """Bloquear o repetido não pode calar o monstro."""
+        from src.mechanics.monster_ai import _usable_skills
+
+        monstro = self._controller()
+        heroi = Warrior("alvo")
+        heroi.active_effects["stun"] = {"duration": 1}
+        assert _usable_skills(monstro, heroi), (
+            "o monstro ficou sem jogada nenhuma por causa de um status ativo"
+        )

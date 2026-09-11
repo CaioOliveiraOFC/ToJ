@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
@@ -103,51 +105,61 @@ def make_skill(
 
 
 class TestCooldown:
-    def test_skill_entra_em_cooldown_apos_uso(self):
-        caster = StubEntity()
-        target = StubEntity()
-        skill = make_skill(cooldown=2)
+    """A recarga é medida em TURNOS BLOQUEADOS, não no valor do contador.
+
+    O contador interno é detalhe de implementação: ele é gravado no turno do uso
+    e decrementado no início do turno seguinte do mesmo ator, antes de ele agir.
+    Fixar o número fazia o teste passar enquanto `cooldown: 1` não bloqueava
+    turno nenhum — quatro skills do JSON declaravam uma recarga inexistente. O
+    que o jogador percebe, e o que estas regras medem, é por quantos turnos a
+    carta fica indisponível.
+    """
+
+    @staticmethod
+    def _turnos_bloqueados(cooldown: int, limite: int = 8) -> int:
+        """Quantos turnos do ator a skill fica indisponível depois de usada."""
+        caster = StubEntity(mp=10_000)
+        target = StubEntity(hp=10**9)
+        skill = make_skill(cooldown=cooldown)
         cmb.apply_skill(caster, target, skill, rng=random.Random(0))
-        assert caster.skill_cooldowns[skill.id] == 2
+
+        bloqueados = 0
+        for _ in range(limite):
+            cmb.process_turn_start_effects(caster)
+            resultado = cmb.apply_skill(caster, target, skill, rng=random.Random(0))
+            if resultado.mp_spent > 0:
+                return bloqueados
+            bloqueados += 1
+        return bloqueados
+
+    @pytest.mark.parametrize("cooldown", [1, 2, 3, 4])
+    def test_a_recarga_bloqueia_os_turnos_que_declara(self, cooldown):
+        assert self._turnos_bloqueados(cooldown) == cooldown
+
+    def test_sem_recarga_a_skill_sai_todo_turno(self):
+        assert self._turnos_bloqueados(0) == 0
 
     def test_skill_em_cooldown_nao_consome_mp_nem_aplica(self):
         caster = StubEntity(mp=100)
         target = StubEntity(hp=100)
         skill = make_skill(cooldown=3)
-        # Primeiro uso
         cmb.apply_skill(caster, target, skill, rng=random.Random(0))
         mp_after_first = caster.get_mp()
         hp_before = target.get_hp()
-        # Segundo uso imediato deve ser bloqueado
         res = cmb.apply_skill(caster, target, skill, rng=random.Random(0))
         assert res.mp_spent == 0
         assert caster.get_mp() == mp_after_first
         assert target.get_hp() == hp_before
 
-    def test_cooldown_decrementa_por_turno(self):
-        caster = StubEntity()
-        target = StubEntity()
+    def test_a_recarga_expira_e_a_skill_volta(self):
+        caster = StubEntity(mp=10_000)
+        target = StubEntity(hp=10**9)
         skill = make_skill(cooldown=2)
         cmb.apply_skill(caster, target, skill, rng=random.Random(0))
-        assert caster.skill_cooldowns[skill.id] == 2
-        cmb.process_turn_start_effects(caster)
-        assert caster.skill_cooldowns[skill.id] == 1
-        cmb.process_turn_start_effects(caster)
+        for _ in range(3):
+            cmb.process_turn_start_effects(caster)
         assert skill.id not in caster.skill_cooldowns
-
-    def test_cooldown_com_seed_fixa_deterministico(self):
-        random.seed(42)
-        caster = StubEntity()
-        target = StubEntity()
-        skill = make_skill(cooldown=1)
-        cmb.apply_skill(caster, target, skill)
-        assert caster.skill_cooldowns[skill.id] == 1
-        # Próximo turno expira
-        cmb.process_turn_start_effects(caster)
-        assert skill.id not in caster.skill_cooldowns
-        # Pode usar novamente
-        res = cmb.apply_skill(caster, target, skill, rng=random.Random(42))
-        assert res.mp_spent == 10
+        assert cmb.apply_skill(caster, target, skill, rng=random.Random(0)).mp_spent > 0
 
 
 class TestDamageReduction:

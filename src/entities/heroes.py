@@ -163,7 +163,10 @@ class Player(Entity):
                 continue
             if key == "df":
                 total += float(getattr(item, "defense_bonus", 0))
-            if getattr(item, "effect_type", None) in sources:
+            # `elif`: os dois ramos não eram exclusivos, então um item com
+            # `defense_bonus` E `effect_type: "defense"` somava as duas vias e
+            # rendia mais defesa do que declara. Afeta `amuleto_argila`.
+            elif getattr(item, "effect_type", None) in sources:
                 total += float(getattr(item, "effect_value", 0))
         return total
 
@@ -666,12 +669,12 @@ class Mage(Player):
     """Mago — converte mana em sobrevivência; sem mana, é o mais frágil.
 
     Identidade: a reserva de mana é o recurso dele para as duas coisas, atacar e
-    aguentar. A barreira arcana absorve parte de cada golpe cobrando MP, então
+    aguentar. A Égide de Mana absorve parte de cada golpe cobrando MP, então
     toda skill lançada é vida que ele deixa de ter depois — e um Mago sem mana
     fica com o pior orçamento de sobrevivência do jogo.
 
     É a terceira resposta à mesma pergunta: o Guerreiro absorve com HP e defesa,
-    o Ladino evita com agilidade, o Mago paga. Antes da barreira ele não tinha
+    o Ladino evita com agilidade, o Mago paga. Antes da Égide ele não tinha
     resposta nenhuma — mesma vida do Ladino, sem a esquiva — e morria no andar 4
     contra encontros comuns.
 

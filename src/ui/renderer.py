@@ -291,6 +291,32 @@ def render_turn_effect_message(entity, event: tuple[str, ...]) -> None:
             f"sofre [orange3]{dmg}[/orange3] de dano de veneno.",
             justify="center",
         )
+    elif kind in ("stun", "sleep"):
+        rotulo = "atordoado" if kind == "stun" else "dormindo"
+        console.print(
+            f"[bold blue]{entity.get_nick_name()}[/bold blue] está "
+            f"[bold yellow]{rotulo}[/bold yellow] e perde o turno!",
+            justify="center",
+        )
+    elif kind == "stun_applied":
+        console.print(
+            f"[bold blue]{entity.get_nick_name()}[/bold blue] foi "
+            "[bold yellow]atordoado[/bold yellow]!",
+            justify="center",
+        )
+    elif kind == "mana_burn_tick":
+        console.print(
+            f"[bold blue]{entity.get_nick_name()}[/bold blue] perde "
+            f"[bold magenta]{event[1]}[/bold magenta] de mana drenada.",
+            justify="center",
+        )
+    elif kind == "magic_shield":
+        console.print(
+            f"A Égide de [bold blue]{entity.get_nick_name()}[/bold blue] absorve "
+            f"[bold cyan]{event[1]}[/bold cyan] de dano "
+            f"([bold magenta]{event[2]}[/bold magenta] de mana).",
+            justify="center",
+        )
     elif kind == "frozen":
         console.print(
             f"[bold blue]{entity.get_nick_name()}[/bold blue] está "

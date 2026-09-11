@@ -118,3 +118,82 @@ class TestCondicoesDeBonusExistemNoMotor:
 def _skills() -> list[dict]:
     caminho = RAIZ / "src" / "data" / "skills.json"
     return json.loads(caminho.read_text(encoding="utf-8"))["skills"]
+
+
+class TestDescricaoDizOQueACartaFaz:
+    """A descrição é a única coisa que o jogador lê antes de gastar o recurso.
+
+    Ela é renderizada literalmente (`src/ui/screens.py`), então uma descrição
+    desatualizada não é um detalhe de texto: é o jogo declarando um efeito e
+    entregando outro. Três casos reais que estas regras fecham:
+
+    - `fortalecimento` prometia "+15 Força" e dava +48 — o rebalanceamento mudou
+      `effect_value` de 17 skills e as descrições ficaram para trás;
+    - `imortal` prometia "Ignora morte 1 vez" e é um buff de redução de dano —
+      `death_ignore` existe, mas como passiva, não nesta carta;
+    - `morte_subita` prometia "insta-kill (50%)", mecânica que o motor nunca teve.
+      O `chance: 50` que sustentava a promessa nem era lido: `skill.chance` só
+      vale no ramo de status.
+    """
+
+    # Palavras que descrevem mecânica: se aparecem, a carta precisa ter o campo.
+    PROMESSAS = {
+        "insta-kill": "não existe execução instantânea no motor",
+        "ignora morte": "`death_ignore` é passiva, não efeito de skill",
+    }
+
+    def test_nenhuma_descricao_promete_mecanica_inexistente(self):
+        quebradas = []
+        for skill in _skills():
+            texto = skill.get("description", "").lower()
+            for termo, motivo in self.PROMESSAS.items():
+                if termo in texto:
+                    quebradas.append(f"{skill['id']}: '{termo}' — {motivo}")
+        assert not quebradas, "descrições prometendo o que o jogo não faz: " + "; ".join(quebradas)
+
+    def test_a_descricao_de_buff_cita_o_percentual_certo(self):
+        """O buff é percentual do atributo, então número fixo mente em todo nível.
+
+        `buff_value` converte `effect_value` em percentual do atributo base, e o
+        atributo cresce com o nível: "+15 Força" só seria verdade num nível.
+        """
+        erradas = []
+        for skill in _skills():
+            if skill["effect_type"] != "buff":
+                continue
+            valor = int(skill["effect_value"])
+            if str(valor) not in skill.get("description", ""):
+                erradas.append(f"{skill['id']} (vale {valor}): {skill['description']!r}")
+        assert not erradas, "descrições de buff que não citam o próprio valor: " + "; ".join(
+            erradas
+        )
+
+    def test_a_descricao_de_dano_avisa_a_condicao(self):
+        """A condição é o que decide a jogada — omiti-la esconde a decisão.
+
+        Sem ela o jogador não tem como saber que Assassinato cobra mais de um
+        alvo ferido, e a carta volta a ser 'aperte quando acender'.
+        """
+        sem_aviso = [
+            s["id"]
+            for s in _skills()
+            if s["effect_type"] == "damage"
+            and s.get("bonus_condition")
+            and str(s.get("bonus_percent", 0)) not in s.get("description", "")
+        ]
+        assert not sem_aviso, (
+            f"skills com bônus condicional que a descrição não menciona: {sem_aviso}"
+        )
+
+    def test_chance_so_existe_onde_o_motor_a_le(self):
+        """`skill.chance` só é consultado no ramo de status (`combat.py`).
+
+        Fora dele o campo é dado morto — e foi um dado morto que sustentou a
+        promessa de insta-kill de `morte_subita` por toda a vida do arquivo.
+        """
+        mortas = [
+            s["id"] for s in _skills() if s["effect_type"] != "status" and int(s["chance"]) != 100
+        ]
+        assert not mortas, (
+            f"`chance` != 100 em skills que não são de status, onde o motor a ignora: {mortas}"
+        )
