@@ -9,6 +9,7 @@ import random
 from time import sleep
 from typing import TYPE_CHECKING
 
+from src.content.economy import pay_interest
 from src.content.factories.dungeons import roll_random_event
 from src.content.factories.loot import get_loot
 from src.content.factories.monsters import (
@@ -46,6 +47,7 @@ from src.shared.constants import (
     MIN_WALL_PERCENT,
     WALL_PERCENT_PER_LEVEL,
 )
+from src.shared.economy import interest_cap
 from src.shared.types import GameEvent
 from src.storage.save_manager import add_trophy, delete_save, save_game
 from src.ui import screens
@@ -57,6 +59,39 @@ from src.ui.utils import clear_screen
 if TYPE_CHECKING:
     from src.entities.heroes import Player
     from src.entities.monsters import Monster
+
+# Ordem canônica de fim de andar. Existe escrita porque a sequência é regra de
+# jogo, não detalhe de laço: o simulador roda a mesma, e `tests/test_economy.py`
+# a verifica nos dois. Antes, o jogo descansava ANTES do evento e o simulador
+# descansava DEPOIS da loja — dois jogos diferentes medindo um ao outro.
+#
+#   1. recompensa do último combate (durante o combate)
+#   2. evento aleatório
+#   3. descanso gratuito parcial
+#   4. loja: comprar, vender, recuperação paga
+#   5. juros, sobre o saldo que sobrou
+#   6. extração ou avanço
+#
+# Os juros por último são o ponto todo: pagos antes da loja, renderiam sobre
+# dinheiro que o jogador já ia gastar, e "guardar capital" deixaria de competir
+# com "gastar agora". Um pagamento por andar concluído, travado no herói
+# (`last_interest_floor`) para sobreviver a save/load.
+FIM_DE_ANDAR = ("evento", "descanso", "loja", "juros", "extracao")
+
+
+def _economia_da_run(player) -> dict:
+    """Livro-caixa da run, fechado no momento da morte.
+
+    O saldo em mão entra como `gold_lost_on_death` porque é exatamente isso:
+    permadeath, não há banco, e o ouro que ele estava guardando não comprou
+    nada. Separar esse número do que foi gasto é o que permite distinguir
+    "estava poupando para algo" de "não havia o que comprar".
+    """
+    livro = dict(getattr(player, "ledger", {}))
+    livro["gold_lost_on_death"] = int(getattr(player, "coins", 0))
+    ganho = livro.get("gold_earned", 0)
+    livro["gold_utilization_rate"] = round(livro.get("gold_spent", 0) / ganho, 3) if ganho else 0.0
+    return livro
 
 
 _game_event_bus: EventBus | None = None
@@ -365,6 +400,7 @@ def process_post_battle(
         dropped_item = get_loot()
         if dropped_item:
             player.add_item_to_inventory(dropped_item)
+            player.ledger["items_dropped"] = player.ledger.get("items_dropped", 0) + 1
 
     level_up_messages: list[str] = []
     levels_gained = 0
@@ -504,6 +540,7 @@ def _handle_player_movement(
                 player.get_level(),
                 dungeon_level,
                 "Derrotado na masmorra",
+                economy=_economia_da_run(player),
             )
             delete_save(slot)
             return "player_died"
@@ -578,9 +615,8 @@ def start_game(
             if result == "quit":
                 return
             elif result == "level_complete":
-                # Descanso parcial, não cura completa: o andar é a unidade de
-                # risco, e chegar ferido ao próximo é o que dá peso à extração.
-                player.recover(FLOOR_CLEAR_RESTORE_PERCENT)
+                # ORDEM DE FIM DE ANDAR (ver `FIM_DE_ANDAR` no topo do módulo):
+                # evento → descanso gratuito → loja → juros → extração/avanço.
                 # --- Evento aleatório (TASK-005) — 25% antes da extração ---
                 event_type = roll_random_event()
                 if event_type:
@@ -602,15 +638,29 @@ def start_game(
                             player.get_level(),
                             dungeon_level,
                             "Altar sombrio",
+                            economy=_economia_da_run(player),
                         )
                         delete_save(slot)
                         return
+                # Descanso parcial, não cura completa: o andar é a unidade de
+                # risco, e chegar ferido ao próximo é o que dá peso à extração.
+                # Vem DEPOIS do evento para que o estado de vida com que o
+                # jogador entra na loja seja o definitivo — é sobre ele que a
+                # decisão de comprar recuperação é tomada.
+                player.recover(FLOOR_CLEAR_RESTORE_PERCENT)
                 # Loja sempre disponível ao concluir o andar — inclusive para quem vai extrair,
                 # para não perder a recompensa do andar (corrige bug reportado).
                 _get_game_publish()(
                     topics.UI_OPEN_SHOP,
                     {"player": player, "shop": shop, "dungeon_level": dungeon_level},
                 )
+                # Juros por último, sobre o que sobrou da loja. Pagá-los antes
+                # seria render sobre dinheiro que o jogador já ia gastar: o
+                # rendimento viraria automático e "guardar capital" deixaria de
+                # ser uma decisão concorrente de "gastar agora".
+                juros = pay_interest(player, dungeon_level)
+                if juros > 0:
+                    screens.render_interest_paid(juros, player.coins, interest_cap(dungeon_level))
                 # --- Decisão de extração (TASK-007) ---
                 # Sem meta-progressão nova: "preservar" = salvar o personagem
                 # no slot atual via save_game (xp/level/passivas/coins/inventário

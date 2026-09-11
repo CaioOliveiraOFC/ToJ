@@ -64,13 +64,79 @@ RARITY_MULTIPLIERS = {
     "Legendary": 1.52,  # ~1.15 * 1.15 * 1.15
 }
 
-# --- Sistema de Economia (Loja) ---
-BASE_SHOP_PRICE = 10
-POTION_PRICE_MULTIPLIER = 2
-WEAPON_PRICE_MULTIPLIER = 10
-ARMOR_PRICE_MULTIPLIER = 10
-SHOP_DUNGEON_LEVEL_SCALING_DIVISOR = 20
-SELL_PRICE_FACTOR = 0.5
+# =====================================================================
+# ECONOMIA
+# =====================================================================
+# "Ouro compra opções." O dinheiro do jogo precisa produzir decisão recorrente
+# entre gastar para sobreviver, gastar para ficar mais forte, e guardar capital.
+#
+# O defeito que estas constantes corrigem era estrutural, não de valor: a renda
+# crescia geometricamente (×1,12 por nível do monstro, e mais monstros por andar)
+# e o preço crescia linearmente (+5% por andar). No andar 15 o jogador comprava a
+# loja inteira, e a partir dali o ouro não comprava opção nenhuma.
+#
+# A âncora agora é uma só — a renda esperada do andar — e todo preço é proporção
+# dela. As cinco constantes mortas que moravam aqui (`BASE_SHOP_PRICE`,
+# `POTION/WEAPON/ARMOR_PRICE_MULTIPLIER`, `SHOP_DUNGEON_LEVEL_SCALING_DIVISOR`)
+# foram removidas: nenhuma tinha um único leitor, e constante morta em arquivo de
+# balanceamento é convite a calibrar o que não está ligado em lugar nenhum.
+
+# --- Renda esperada do andar ---
+# Medido no gerador real de andares: a renda de um andar, dividida pelo valor de
+# um monstro do nível dele, vale 3,1 no andar 1, 9,2 no 10, 13,4 no 15 e para de
+# crescer em ~14 do 16 em diante — é onde o plano de andar deixa de ganhar
+# encontros. A reta abaixo reproduz a curva com erro < 8%.
+FLOOR_INCOME_BASE_UNITS = 3.0
+FLOOR_INCOME_UNITS_PER_FLOOR = 0.75
+FLOOR_INCOME_MAX_UNITS = 14.0
+
+# --- Juros ---
+# Pagos ao concluir o andar, sobre o ouro que sobrou depois da loja. O cap é uma
+# fração da renda do andar: rendimento nunca compete com jogar o andar, e como o
+# cap cresce na curva da renda enquanto o juro composto cresceria mais rápido, a
+# fortuna grande rende em linha reta e perde peso relativo. Não é dinheiro
+# infinito; é a decisão "gasto agora ou mantenho capital?".
+INTEREST_RATE_PERCENT = 5
+INTEREST_CAP_INCOME_RATIO = 0.25
+
+# --- Preço, em proporção à renda esperada do andar ---
+# O `price` do JSON passa a ser o valor RELATIVO dentro da raridade; a escala
+# absoluta vem daqui. O alvo de design é que o jogador encontre, no mesmo andar,
+# coisas que consegue comprar, coisas que compraria sacrificando outra decisão, e
+# coisas que ainda não alcança.
+GEAR_PRICE_INCOME_RATIO = {
+    "Common": 0.75,
+    "Rare": 1.40,
+    "Epic": 2.40,
+    "Legendary": 5.00,
+}
+# Consumível tem tabela própria: pela raridade, uma poção pequena seria um
+# equipamento Common, e ninguém compra três equipamentos Common por andar.
+CONSUMABLE_PRICE_INCOME_RATIO = {
+    "Common": 0.18,
+    "Rare": 0.32,
+    "Epic": 0.55,
+    "Legendary": 0.90,
+}
+
+# --- Venda ---
+# Era 0,5, e três chamadores nem liam a constante: usavam um `0.5` escrito à mão.
+# A 50% o loot virava renda principal e acumular para revender era a estratégia
+# dominante. Entre 20% e 25% a venda vira o que deve ser: válvula de descarte e
+# recuperação parcial de valor. A variação dentro da faixa é derivada do id do
+# item (ver `shared/economy.sell_factor`), não sorteada — o preço na tela e o
+# preço pago têm de ser o mesmo número.
+SELL_PRICE_MIN_FACTOR = 0.20
+SELL_PRICE_MAX_FACTOR = 0.25
+
+# --- Recuperação paga (entre andares, na loja) ---
+# Combate ruim passa a ter consequência econômica sem virar sentença de morte: o
+# jogador não precisa morrer por ter terminado mal um combate, mas talvez precise
+# gastar parte da recompensa para reparar o dano. Cobrado sobre o que é de fato
+# restaurado — quem está a 90% paga por 10%, não por um passo inteiro.
+RECOVERY_STEP_PERCENT = 25
+RECOVERY_HP_STEP_INCOME_RATIO = 0.22
+RECOVERY_MP_STEP_INCOME_RATIO = 0.18
 
 # --- Mecânicas de Combate ---
 CRIT_CHANCE_HIGH = 25  # Para Rogue com Ataque Furtivo
@@ -420,7 +486,12 @@ INITIAL_SKILL_LEVELS = 4
 # um tank sem mana no turno 8 volta a ser um saco de pancada.
 MP_REGEN_PERCENT_PER_TURN = 2
 
-FLOOR_CLEAR_RESTORE_PERCENT = 29
+# 29 → 25: o descanso gratuito continua existindo (uma run de 20 andares numa
+# única barra de vida não é difícil, é impossível), mas perde força para abrir
+# espaço à recuperação paga. Se o andar sempre devolvesse o suficiente, gastar
+# ouro em cura nunca seria decisão — e "combate ruim custa dinheiro" é metade do
+# que faz o ouro comprar opções.
+FLOOR_CLEAR_RESTORE_PERCENT = 25
 
 # --- Level up ---
 # Subir de nível restaura parte dos recursos, não tudo. Cura completa a cada

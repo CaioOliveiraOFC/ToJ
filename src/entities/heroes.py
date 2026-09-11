@@ -121,6 +121,24 @@ class Player(Entity):
         self.kill_streak = 0
         self.wins = 0
         self.coins = 0
+        # Livro-caixa da run. Permadeath: o ouro morre com o personagem e não
+        # existe banco global — isto é histórico, não recurso. Serve para
+        # responder "para onde foi o dinheiro desta run", que é a pergunta que
+        # o balanceamento econômico precisa fazer e hoje não conseguia.
+        self.ledger: dict[str, int] = {
+            "gold_earned": 0,
+            "gold_spent": 0,
+            "max_gold_held": 0,
+            "purchases": 0,
+            "interest_payments": 0,
+            "items_dropped": 0,
+            "items_sold": 0,
+            "items_equipped": 0,
+        }
+        # Último andar cujos juros já foram pagos. Mora no herói, e não no laço
+        # de jogo, porque é salvo com ele: sem isso, carregar um save no meio do
+        # andar pagaria os juros daquele andar de novo.
+        self.last_interest_floor = 0
         self.skill_points = 0
         self.unspent_attribute_points: int = 0
         self.inventory: list[object] = []
@@ -258,27 +276,53 @@ class Player(Entity):
             return True
         return False
 
-    def spend_coins(self, amount: int) -> bool:
-        """Gasta moedas se houver saldo suficiente.
+    def spend_coins(self, amount: int, source: str = "other") -> bool:
+        """Gasta moedas se houver saldo suficiente, e registra a saída.
+
+        Todo ouro que sai do jogador passa por aqui — loja, mercador errante,
+        recuperação paga. É por isso que o livro-caixa é escrito neste ponto e
+        não em cada chamador: um chamador novo que esquecesse de registrar
+        produziria ouro que some do saldo sem aparecer na contabilidade, e a
+        taxa de utilização mediria errado sem dar sinal nenhum.
 
         Args:
             amount: Quantidade de moedas a gastar.
+            source: Em que o ouro foi gasto (`gear`, `consumable`, `recovery`).
 
         Returns:
             True se a transação foi bem-sucedida, False caso contrário.
         """
-        if self.coins >= amount:
-            self.coins -= amount
-            return True
-        return False
+        if amount < 0 or self.coins < amount:
+            return False
+        self.coins -= amount
+        self.ledger["gold_spent"] += amount
+        self.ledger[f"gold_spent_on_{source}"] = (
+            self.ledger.get(f"gold_spent_on_{source}", 0) + amount
+        )
+        self.ledger["purchases"] += 1
+        return True
 
-    def earn_coins(self, amount: int) -> None:
-        """Adiciona moedas ao jogador.
+    def earn_coins(self, amount: int, source: str = "combat") -> None:
+        """Adiciona moedas ao jogador, e registra a entrada.
 
         Args:
             amount: Quantidade de moedas a adicionar.
+            source: De onde veio (`combat`, `sale`, `interest`, `event`).
         """
+        if amount <= 0:
+            return
         self.coins += amount
+        self.ledger["gold_earned"] += amount
+        self.ledger[f"gold_from_{source}"] = self.ledger.get(f"gold_from_{source}", 0) + amount
+        if source == "interest":
+            self.ledger["interest_payments"] += 1
+        self.ledger["max_gold_held"] = max(self.ledger["max_gold_held"], self.coins)
+
+    def restore_mp(self, amount: int) -> int:
+        """Devolve mana, sem passar do máximo. Retorna o que de fato entrou."""
+        antes = self._mp
+        self._mp = min(self.base_mp, self._mp + max(0, int(amount)))
+        return int(self._mp - antes)
 
     def equip(self, item_to_equip: object) -> str | None:
         """Equipa um item no slot correspondente.
@@ -307,6 +351,7 @@ class Player(Entity):
         if item_to_equip in self.inventory:
             self.inventory.remove(item_to_equip)
         self.equipment[slot] = item_to_equip
+        self.ledger["items_equipped"] = self.ledger.get("items_equipped", 0) + 1
         # Sem soma de atributo aqui: o bônus é lido dinamicamente das
         # propriedades, o que evita contabilidade duplicada. E sem `rest()`:
         # equipar um item era uma cura completa gratuita e ilimitada.

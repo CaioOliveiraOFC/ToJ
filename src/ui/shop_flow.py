@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src.content.items import get_all_items
+from src.content.economy import buy_recovery, recovery_offers
 from src.ui import screens
 from src.ui.navigation_menu import navigate_shop_buy, navigate_shop_sell
 from src.ui.prompts import get_key
@@ -44,22 +44,55 @@ def run_shop_flow(player: "Player", shop: object, dungeon_level: int) -> None:
 
         choice = get_key()
 
+        sair = "5" if has_equipable else "4"
+        recuperar = "4" if has_equipable else "3"
+
         if choice == "1":
             _run_buy_flow(player, shop, dungeon_level)
         elif choice == "2":
             _run_sell_flow(player, shop, dungeon_level)
-        elif choice == "3":
-            if has_equipable:
-                _run_equip_in_shop_flow(player, shop, dungeon_level)
-            else:
-                screens.render_shop_farewell()
-                break
-        elif choice == "4" or (choice and choice.lower() == "q"):
+        elif choice == "3" and has_equipable:
+            _run_equip_in_shop_flow(player, shop, dungeon_level)
+        elif choice == recuperar:
+            _run_recovery_flow(player, dungeon_level)
+        elif choice == sair or (choice and choice.lower() == "q"):
             screens.render_shop_farewell()
             break
-        elif choice and choice.lower() == "q":
-            screens.render_shop_farewell()
-            break
+
+
+def _run_recovery_flow(player: "Player", dungeon_level: int) -> None:
+    """Compra de recuperação entre andares.
+
+    O descanso de fim de andar continua gratuito e parcial; isto é o resto. É o
+    que faz um combate mal jogado ter consequência econômica em vez de ser
+    apagado de graça — e é a terceira opção concorrendo pelo mesmo ouro que
+    equipamento e poção.
+    """
+    while True:
+        ofertas = recovery_offers(player, dungeon_level)
+        screens.render_recovery_menu(
+            ofertas,
+            player.coins,
+            player.get_hp(),
+            int(player.base_hp),
+            player.get_mp(),
+            int(player.base_mp),
+        )
+        if not ofertas:
+            get_key()
+            return
+
+        validas = [str(i) for i in range(1, len(ofertas) + 1)] + ["0"]
+        escolha = get_key()
+        if escolha not in validas or escolha == "0":
+            return
+
+        oferta = ofertas[int(escolha) - 1]
+        paga = buy_recovery(player, dungeon_level, oferta["resource"])
+        if paga is None:
+            screens.render_shop_insufficient_gold()
+        else:
+            screens.render_recovery_success(paga["label"], paga["amount"], paga["price"])
 
 
 def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
@@ -118,7 +151,7 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
                                 screens.render_shop_equip_success(item_to_buy.name, slot)
                                 # old_item agora está no inventário — oferece
                                 # vender ou descartar sem sair da loja
-                                sell_price = int(shop.get_price(old_item, dungeon_level) * 0.5)
+                                sell_price = shop.get_sell_price(old_item, dungeon_level)
                                 screens.render_shop_old_sell_prompt(old_item.name, sell_price, slot)
                                 sell_choice = get_key()
                                 if sell_choice and sell_choice.lower() in ("s", "y", "1"):
@@ -205,7 +238,7 @@ def _run_equip_in_shop_flow(player: "Player", shop: object, dungeon_level: int) 
                     msg = player.equip(item_to_equip)
                     if "não pode" not in str(msg).lower():
                         screens.render_shop_equip_success(item_to_equip.name, slot)
-                        sell_price = int(shop.get_price(old_item, dungeon_level) * 0.5)
+                        sell_price = shop.get_sell_price(old_item, dungeon_level)
                         screens.render_shop_old_sell_prompt(old_item.name, sell_price, slot)
                         sell_choice = get_key()
                         if sell_choice and sell_choice.lower() in ("s", "y", "1"):
@@ -246,8 +279,10 @@ def _run_sell_flow(player: "Player", shop: object, dungeon_level: int) -> None:
 
         item_to_sell = player.inventory[selected_idx]
 
+        # O preço tem de ser lido ANTES da venda: depois, o item já saiu do
+        # inventário. A versão anterior recalculava do preço-base do JSON, sem
+        # o andar e com um `0.5` próprio, então a tela anunciava um valor e o
+        # saldo recebia outro.
+        sell_price = shop.get_sell_price(item_to_sell, dungeon_level)
         if shop.sell_item(player, item_to_sell, dungeon_level):
-            all_items = get_all_items()
-            base_item = all_items.get(item_to_sell.name)
-            sell_price = int(base_item.price * 0.5) if base_item else 10
             screens.render_shop_sell_success(item_to_sell.name, sell_price)

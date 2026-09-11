@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import random
 
+from src.content.economy import buy_recovery
 from src.content.factories.loot import get_loot
 from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
@@ -30,6 +31,13 @@ SKILL_CHOICE_MIN_LEVEL = 5
 TARGET_HEALING_POTIONS = 3
 # Fração do ouro que o bot aceita gastar em equipamento; o resto fica para poção.
 GEAR_BUDGET_RATIO = 0.6
+# Até onde o bot repara a vida na loja, e quanto do ouro aceita queimar nisso.
+# Não é cura completa: pagar para encher a barra toda todo andar consumiria o
+# ouro que compra poder, e a decisão "reparar ou equipar" é justamente a que a
+# economia precisa produzir. 70% é o suficiente para o andar seguinte ser
+# jogável; o resto o descanso gratuito devolve.
+RECOVERY_TARGET_HP_PERCENT = 70
+RECOVERY_BUDGET_RATIO = 0.5
 
 
 def pick_passive(hero, choices: list, rng: random.Random, picker: PickPolicy | None = None):
@@ -149,6 +157,9 @@ def visit_shop(
     """
     if toggles is not None and not toggles.shop:
         return
+
+    _repair(hero, dungeon_level, telemetry)
+
     ofertas = shop.get_available_items(dungeon_level, hero.get_classname())
     if not ofertas:
         return
@@ -171,7 +182,7 @@ def visit_shop(
             em_maos += 1
             if telemetry is not None:
                 telemetry.items_bought += 1
-                telemetry.gold_on_consumables += int(oferta["price"])
+                telemetry.gold_spent_on_consumables += int(oferta["price"])
 
     orcamento = int(hero.coins * GEAR_BUDGET_RATIO)
     equipamentos = [
@@ -192,10 +203,28 @@ def visit_shop(
             orcamento -= oferta["price"]
             if telemetry is not None:
                 telemetry.items_bought += 1
-                telemetry.gold_on_gear += int(oferta["price"])
+                telemetry.gold_spent_on_gear += int(oferta["price"])
             if equip_if_better(hero, item) and telemetry is not None:
                 telemetry.items_equipped_from_shop += 1
                 telemetry.equipped_by_slot[str(item.slot)] += 1
+
+
+def _repair(hero, dungeon_level: int, telemetry=None) -> None:
+    """Compra recuperação até a vida ficar jogável, dentro de um orçamento.
+
+    Vem antes da loja de itens porque é a decisão que o jogador toma primeiro:
+    chegar ao andar seguinte com 20% de vida é a forma mais comum de perder a
+    run, e nenhum equipamento comprado agora compensa isso.
+    """
+    orcamento = int(hero.coins * RECOVERY_BUDGET_RATIO)
+    while orcamento > 0 and hero.get_hp() * 100 / max(1, hero.base_hp) < RECOVERY_TARGET_HP_PERCENT:
+        paga = buy_recovery(hero, dungeon_level, "hp")
+        if paga is None or paga["price"] > orcamento:
+            break
+        orcamento -= int(paga["price"])
+        if telemetry is not None:
+            telemetry.gold_spent_on_recovery += int(paga["price"])
+            telemetry.recovery_purchases += 1
 
 
 def floor_essence_multiplier(dungeon_level: int) -> float:

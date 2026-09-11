@@ -3,10 +3,8 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
+from src.content.economy import price_of, sell_value_of
 from src.content.items import Item, get_all_items
-from src.shared.constants import (
-    SELL_PRICE_FACTOR,
-)
 
 if TYPE_CHECKING:
     from src.entities.heroes import Player
@@ -19,12 +17,13 @@ class Shop:
         pass
 
     def get_price(self, item: Item, dungeon_level: int) -> int:
-        """Calcula o preço de um item baseado no preço base do JSON e nível da dungeon."""
-        base_price = getattr(item, "price", 50)
+        """Preço do item neste andar.
 
-        price = base_price * (1 + (dungeon_level * 0.05))
-
-        return int(price)
+        Delega a `content/economy.py`: a loja não tem fórmula própria. A que
+        morava aqui (`base * (1 + andar*0.05)`) crescia linearmente contra uma
+        renda geométrica, e era uma de quatro cópias espalhadas pelo projeto.
+        """
+        return price_of(item, dungeon_level)
 
     def get_available_items(self, dungeon_level: int, player_class: str) -> list[dict]:
         """Retorna uma lista de itens disponíveis para compra na loja, com seus preços.
@@ -80,10 +79,15 @@ class Shop:
         random.shuffle(available_items)
         return available_items[:max_items]
 
+    def get_sell_price(self, item: Item, dungeon_level: int) -> int:
+        """Quanto a loja paga pelo item. A tela e a transação chamam esta."""
+        return sell_value_of(item, dungeon_level)
+
     def buy_item(self, player: "Player", item_to_buy: Item, dungeon_level: int) -> bool:
         """Permite ao jogador comprar um item da loja."""
         price = self.get_price(item_to_buy, dungeon_level)
-        if player.spend_coins(price):
+        categoria = "consumable" if getattr(item_to_buy, "consumable", False) else "gear"
+        if player.spend_coins(price, source=categoria):
             player.add_item_to_inventory(item_to_buy)
             return True
         return False
@@ -91,7 +95,7 @@ class Shop:
     def sell_item(self, player: "Player", item_to_sell: Item, dungeon_level: int) -> bool:
         """Permite ao jogador vender um item para a loja."""
         if player.remove_item_from_inventory(item_to_sell):
-            sell_price = int(self.get_price(item_to_sell, dungeon_level) * SELL_PRICE_FACTOR)
-            player.earn_coins(sell_price)
+            player.earn_coins(self.get_sell_price(item_to_sell, dungeon_level), source="sale")
+            player.ledger["items_sold"] = player.ledger.get("items_sold", 0) + 1
             return True
         return False

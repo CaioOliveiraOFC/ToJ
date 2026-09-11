@@ -14,6 +14,7 @@ import random
 import statistics
 from dataclasses import asdict, dataclass, field
 
+from src.content.economy import pay_interest
 from src.content.factories.dungeons import (
     altar_hp_cost,
     apply_altar_blessing,
@@ -326,13 +327,23 @@ def simulate_run(
             survival[floor] += 1
             level_at_floor[floor].append(hero.get_level())
 
-            # Fim do andar, na ordem do jogo: evento aleatório, loja, descanso.
+            # Fim do andar, na ordem canônica do jogo (`engine.loop.FIM_DE_ANDAR`):
+            # evento → descanso gratuito → loja → juros. O simulador descansava
+            # DEPOIS da loja, então o bot comprava olhando uma vida que não era
+            # a que ele levaria para o andar seguinte — e com recuperação paga
+            # na loja essa inversão passaria a mudar quanto ele gasta.
             if cfg.events:
                 _apply_random_event(hero, shop, floor, rng, cfg, telemetry)
             if not hero.get_isalive() or hero.get_hp() <= 0:
                 break
-            progression.visit_shop(hero, shop, floor, rng, cfg, telemetry)
             hero.recover(FLOOR_CLEAR_RESTORE_PERCENT)
+            progression.visit_shop(hero, shop, floor, rng, cfg, telemetry)
+            juros = pay_interest(hero, floor)
+            if telemetry is not None and juros > 0:
+                telemetry.gold_from_interest += juros
+                telemetry.interest_payments += 1
+            if telemetry is not None:
+                telemetry.max_gold_held = max(telemetry.max_gold_held, hero.coins)
 
         deepest.append(reached)
         early_essence.append(statistics.fmean(cedo) if cedo else 1.0)
@@ -345,6 +356,17 @@ def simulate_run(
             # ficaria de fora da contagem.
             telemetry.defeats += int(not hero.get_isalive() or hero.get_hp() <= 0)
             telemetry.gold_unspent += hero.coins
+            # Venda vem do livro-caixa do herói: quem registra a venda é
+            # `Shop.sell_item`, que o jogo e o simulador compartilham. Contar de
+            # novo aqui seria um segundo contador para o mesmo evento.
+            telemetry.gold_from_sales += hero.ledger.get("gold_from_sale", 0)
+            telemetry.items_sold += hero.ledger.get("items_sold", 0)
+            # Permadeath: o ouro não vira banco nem passa para outro
+            # personagem. O que ele deixou de comprar morreu com ele, e é essa
+            # a métrica que diz se a economia está oferecendo decisões ou só
+            # acumulando moeda.
+            if not hero.get_isalive() or hero.get_hp() <= 0:
+                telemetry.gold_lost_on_death += hero.coins
             telemetry.final_power_equipped.append(hero.get_avg_damage())
             telemetry.final_power_naked.append(_power_without_equipment(hero))
 

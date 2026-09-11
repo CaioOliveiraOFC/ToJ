@@ -266,10 +266,16 @@ def render_shop_main(shop: object, player_coins: int, has_equipable: bool = Fals
             "1": "Comprar Itens",
             "2": "Vender Itens",
             "3": "Equipar da Mochila",
-            "4": "Sair da Loja",
+            "4": "Recuperar Vida/Mana",
+            "5": "Sair da Loja",
         }
     else:
-        shop_options = {"1": "Comprar Itens", "2": "Vender Itens", "3": "Sair da Loja"}
+        shop_options = {
+            "1": "Comprar Itens",
+            "2": "Vender Itens",
+            "3": "Recuperar Vida/Mana",
+            "4": "Sair da Loja",
+        }
 
     options_table = Table(
         show_header=False, expand=True, highlight=True, row_styles=["none", "dim"]
@@ -282,6 +288,82 @@ def render_shop_main(shop: object, player_coins: int, has_equipable: bool = Fals
 
     renderer.console.print(options_table)
     renderer.console.print("\n")
+
+
+def render_recovery_menu(
+    offers: list[dict], player_coins: int, hp: int, max_hp: int, mp: int, max_mp: int
+) -> None:
+    """Menu de recuperação paga: o preço do combate mal jogado, em ouro."""
+    renderer.console.clear()
+    renderer.console.print(
+        Panel(
+            Text("Curandeiro do Mercado", justify="center", style="bold green"),
+            border_style="green",
+            subtitle=(
+                f"Ouro: [bold yellow]{player_coins}[/bold yellow]  |  "
+                f"HP {hp}/{max_hp}  |  MP {mp}/{max_mp}"
+            ),
+        )
+    )
+
+    if not offers:
+        renderer.console.print(
+            Panel(
+                Text("Você já está inteiro. Guarde o seu ouro.", justify="center", style="cyan"),
+                border_style="cyan",
+            )
+        )
+        return
+
+    tabela = Table(show_header=True, expand=True, row_styles=["none", "dim"])
+    tabela.add_column("Opção", style="bold blue", justify="right")
+    tabela.add_column("Recuperar", style="cyan")
+    tabela.add_column("Preço", style="yellow", justify="right")
+    for i, oferta in enumerate(offers, 1):
+        pode = "" if player_coins >= oferta["price"] else " [red](sem ouro)[/red]"
+        tabela.add_row(
+            f"{i}.",
+            f"+{oferta['amount']} de {oferta['label']}{pode}",
+            str(oferta["price"]),
+        )
+    tabela.add_row("0.", "Voltar", "")
+    renderer.console.print(tabela)
+    renderer.console.print("\n")
+
+
+def render_recovery_success(label: str, amount: int, price: int) -> None:
+    renderer.console.print(
+        Panel(
+            Text.from_markup(
+                f"+[bold green]{amount}[/bold green] de {label} por "
+                f"[bold yellow]{price}[/bold yellow] de ouro.",
+                justify="center",
+            ),
+            border_style="green",
+        )
+    )
+
+
+def render_interest_paid(amount: int, saldo: int, cap: int) -> None:
+    """Juros do andar concluído.
+
+    Mostra o teto junto: sem ele, o jogador que bateu no cap vê um número menor
+    do que esperava e não tem como saber por quê — e "guardar capital" deixa de
+    ser uma decisão informada.
+    """
+    if amount <= 0:
+        return
+    renderer.console.print(
+        Panel(
+            Text.from_markup(
+                f"Juros do andar: [bold yellow]+{amount}[/bold yellow] de ouro "
+                f"(teto {cap}).  Saldo: [bold yellow]{saldo}[/bold yellow].",
+                justify="center",
+            ),
+            title="[bold green]Rendimento[/bold green]",
+            border_style="green",
+        )
+    )
 
 
 def render_shop_buy_menu(items_for_sale: list[dict], player_coins: int) -> None:
@@ -388,7 +470,7 @@ def render_shop_sell_menu(
     player_inventory_table.add_column("Descrição", style="dim white")
 
     for i, item in enumerate(inventory, 1):
-        sell_price = int(shop.get_price(item, dungeon_level) * 0.5)
+        sell_price = shop.get_sell_price(item, dungeon_level)
         player_inventory_table.add_row(
             str(i), item.name, str(sell_price), getattr(item, "description", "Sem descrição")
         )

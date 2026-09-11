@@ -539,7 +539,7 @@ def analyse_equipment(telemetry: dict) -> list[Finding]:
         )
 
     ganho_ouro = economia.get("gold_earned", 0)
-    gasto = economia.get("gold_on_gear", 0) + economia.get("gold_on_consumables", 0)
+    gasto = economia.get("gold_spent", 0)
     if ganho_ouro:
         ocioso = 1 - gasto / ganho_ouro
         veredito = "SUSPEITA" if ocioso > 0.5 else "ok"

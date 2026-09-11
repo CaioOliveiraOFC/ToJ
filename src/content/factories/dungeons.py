@@ -20,6 +20,10 @@ from src.shared.constants import (
 
 RANDOM_EVENT_TYPES: tuple[str, ...] = ("merchant", "altar", "fountain")
 
+# O Mercador Errante vende pelo preço da loja com 10% de desconto. É o que o
+# diferencia da loja de fim de andar; o número era literal no meio do laço.
+MERCHANT_DISCOUNT = 0.9
+
 
 def roll_random_event(rng: random.Random | None = None) -> str | None:
     """Sorteia se um evento ocorre e qual tipo.
@@ -79,9 +83,12 @@ def get_merchant_offers(dungeon_level: int, rng: random.Random | None = None) ->
         name = getattr(item, "name", str(item))
         if name not in seen:
             seen.add(name)
-            # Preço com leve desconto do errante (-10%)
-            base_price = getattr(item, "price", 50)
-            price = int(base_price * (1 + dungeon_level * 0.05) * 0.9)
+            # Preço com leve desconto do errante, em cima do preço central:
+            # a cópia da fórmula que morava aqui deixava o mercador fora de
+            # qualquer recalibração da economia.
+            from src.content.economy import price_of
+
+            price = max(1, int(price_of(item, dungeon_level) * MERCHANT_DISCOUNT))
             offers.append({"item": item, "price": price})
         attempts += 1
 

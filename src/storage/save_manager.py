@@ -80,6 +80,11 @@ def save_game(
         "hp": player.get_hp(),
         "mp": player.get_mp(),
         "coins": player.coins,
+        # Livro-caixa e trava de juros. A trava precisa ser salva: sem ela,
+        # carregar um save feito depois de concluir o andar pagaria os juros
+        # daquele andar de novo, e salvar/carregar em laço imprimiria moeda.
+        "ledger": dict(getattr(player, "ledger", {})),
+        "last_interest_floor": int(getattr(player, "last_interest_floor", 0)),
         "inventory": inventory_names,
         "equipment": equipment_names,
         "passives": passive_ids,
@@ -154,6 +159,10 @@ def load_game(
 
         player.xp_points = save_data["xp"]
         player.coins = save_data["coins"]
+        # `.get` com o padrão do herói: saves anteriores a esta economia não têm
+        # os campos, e um KeyError aqui torna o save velho ilegível.
+        player.ledger.update(save_data.get("ledger") or {})
+        player.last_interest_floor = int(save_data.get("last_interest_floor", 0))
 
         # Reconstrói o inventário (pula itens que não existem mais no registro)
         player.inventory = []
@@ -218,9 +227,20 @@ def delete_save(slot: int) -> bool:
 
 
 def add_trophy(
-    player_name: str, player_class: str, level: int, floor_reached: int, cause: str = "Derrotado"
+    player_name: str,
+    player_class: str,
+    level: int,
+    floor_reached: int,
+    cause: str = "Derrotado",
+    economy: dict | None = None,
 ) -> bool:
-    """Adiciona uma entrada ao livro de troféus (personagens que morreram)."""
+    """Adiciona uma entrada ao livro de troféus (personagens que morreram).
+
+    `economy` é o livro-caixa da run. Permadeath: o ouro não vira banco nem
+    passa para outro personagem — o que fica é o registro de para onde ele foi,
+    que é o que permite olhar depois e perguntar se a economia ofereceu
+    decisões ou só acumulou moeda.
+    """
     _ensure_save_dir()
     filepath = os.path.join(SAVE_DIR, TROPHY_FILE)
 
@@ -239,6 +259,7 @@ def add_trophy(
         "floor": floor_reached,
         "cause": cause,
         "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "economy": dict(economy or {}),
     }
     trophies.append(trophy)
 

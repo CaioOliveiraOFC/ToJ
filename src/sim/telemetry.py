@@ -44,9 +44,20 @@ class RunTelemetry:
     items_bought: int = 0
     items_equipped_from_shop: int = 0
     gold_earned: int = 0
-    gold_on_gear: int = 0
-    gold_on_consumables: int = 0
+    gold_spent_on_gear: int = 0
+    gold_spent_on_consumables: int = 0
+    gold_spent_on_recovery: int = 0
+    gold_from_sales: int = 0
+    gold_from_interest: int = 0
     gold_unspent: int = 0
+    # Permadeath: ouro não gasto no fim da run é ouro que nunca comprou nada.
+    # Separar o que sobrou vivo do que morreu junto é o que distingue "o jogador
+    # está guardando para uma compra" de "a economia não tinha o que oferecer".
+    gold_lost_on_death: int = 0
+    max_gold_held: int = 0
+    interest_payments: int = 0
+    recovery_purchases: int = 0
+    items_sold: int = 0
     equipped_by_slot: dict[str, int] = field(default_factory=lambda: defaultdict(int))
     final_power_naked: list[float] = field(default_factory=list)
     final_power_equipped: list[float] = field(default_factory=list)
@@ -73,6 +84,33 @@ class RunTelemetry:
     # permite perguntar "o que ele estava fazendo quando morreu" — a pergunta
     # mais útil num jogo de permadeath.
     defeats: int = 0
+
+    @property
+    def purchases(self) -> int:
+        """Quantas transações de compra a run fez, de qualquer tipo.
+
+        Derivada, não contada à parte: um contador próprio ficaria em zero no dia
+        em que alguém acrescentasse um jeito novo de gastar e esquecesse de
+        incrementá-lo — e um zero em telemetria não parece defeito, parece dado.
+        """
+        return self.items_bought + self.recovery_purchases
+
+    @property
+    def gold_spent(self) -> int:
+        """Todo ouro que saiu do jogador, por destino."""
+        return (
+            self.gold_spent_on_gear + self.gold_spent_on_consumables + self.gold_spent_on_recovery
+        )
+
+    @property
+    def gold_utilization_rate(self) -> float:
+        """Fatia da renda que virou decisão, em vez de saldo parado.
+
+        É a métrica-chave desta fase: se ela é baixa, o ouro não está comprando
+        opção nenhuma — ou porque não há o que comprar, ou porque o preço está
+        desconectado da renda. Não tem meta ainda; existe para ser observada.
+        """
+        return (self.gold_spent / self.gold_earned) if self.gold_earned else 0.0
 
     def record_battle(self, outcome) -> None:
         """Soma o que uma batalha entregou, por skill e por consumível."""
@@ -133,9 +171,22 @@ class RunTelemetry:
             },
             "economy": {
                 "gold_earned": self.gold_earned,
-                "gold_on_gear": self.gold_on_gear,
-                "gold_on_consumables": self.gold_on_consumables,
+                "gold_spent": self.gold_spent,
+                "gold_spent_on_gear": self.gold_spent_on_gear,
+                "gold_spent_on_consumables": self.gold_spent_on_consumables,
+                "gold_spent_on_recovery": self.gold_spent_on_recovery,
+                "gold_from_sales": self.gold_from_sales,
+                "gold_from_interest": self.gold_from_interest,
                 "gold_unspent": self.gold_unspent,
+                "gold_lost_on_death": self.gold_lost_on_death,
+                "max_gold_held": self.max_gold_held,
+                "purchases": self.purchases,
+                "interest_payments": self.interest_payments,
+                "recovery_purchases": self.recovery_purchases,
+                "items_dropped": self.items_from_loot,
+                "items_equipped": self.items_equipped_from_loot + self.items_equipped_from_shop,
+                "items_sold": self.items_sold,
+                "gold_utilization_rate": self.gold_utilization_rate,
             },
             "consumables": dict(self.consumables_used),
             # Somas e contagens, nunca médias: o agregador soma bloco a bloco,
