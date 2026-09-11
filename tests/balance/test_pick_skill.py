@@ -179,3 +179,56 @@ class TestODeckMontadoEJogavel:
         assert any(s.effect_type != "damage" for s in deck), (
             "survival deveria levar utilidade depois de garantir o dano mínimo"
         )
+
+
+class TestODeckCobreMaisDeUmTipo:
+    """Quatro cartas do tipo favorito não é build, é a ordem da intenção obedecida.
+
+    `survival` lista `status` atrás de cura e buff. O Mago começa com uma de
+    cada, então o deck enchia antes de sobrar espaço para controle — e ele
+    terminava a run sem nunca poder congelar ninguém, apesar de o documento de
+    design chamá-lo de Controlador.
+
+    Não era preferência: medido, o deck com a carta que ele nunca escolhia caía
+    de 14% para 6% de mortes contra o chefe do andar 5, e de 28% para 22% contra
+    o inimigo de dano alto do andar 6. A carta era boa; a regra de montagem é que
+    não a alcançava.
+    """
+
+    @staticmethod
+    def _monta_deck(politica: str, classe: str, rodadas: int = 10):
+        from src.content.skills_loader import load_skills
+
+        ofertas = [s for s in load_skills() if s.skill_class == classe]
+        heroi = make_hero(classe, 20, "naked")
+        heroi.skills = {}
+        rng = random.Random(0)
+        for _ in range(rodadas):
+            nova, slot = POLICIES[politica].pick_skill(heroi, rng.sample(ofertas, 3), rng)
+            if nova is not None and slot is not None:
+                heroi.skills[slot] = nova
+        return list(heroi.skills.values())
+
+    @pytest.mark.parametrize("classe", ["Warrior", "Mage", "Rogue"])
+    @pytest.mark.parametrize("politica", sorted(SKILL_PRIORITIES))
+    def test_o_deck_tem_mais_de_um_tipo(self, politica, classe):
+        deck = self._monta_deck(politica, classe)
+        tipos = {s.effect_type for s in deck}
+        assert len(tipos) >= 2, (
+            f"{politica}/{classe} montou um deck de um tipo só ({tipos}): {[s.name for s in deck]}"
+        )
+
+    def test_o_mago_alcanca_o_proprio_controle(self):
+        """O arquétipo declarado precisa ser alcançável pela regra de montagem."""
+        from src.shared.effects import TURN_SKIPPING_STATUSES
+
+        alcancou = False
+        for politica in SKILL_PRIORITIES:
+            deck = self._monta_deck(politica, "Mage")
+            alcancou |= any(
+                str(getattr(s, "effect_value", "")) in TURN_SKIPPING_STATUSES for s in deck
+            )
+        assert alcancou, (
+            "nenhuma intenção monta um Mago com controle que rouba turno — "
+            "o 'Controlador' do design não controla nada"
+        )

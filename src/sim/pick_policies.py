@@ -20,6 +20,7 @@ sortear, o sistema de escolha é decorativo.
 
 from __future__ import annotations
 
+import collections
 import random
 from dataclasses import dataclass
 
@@ -193,19 +194,33 @@ class PickPolicy:
         com_dano = sum(1 for s in equipadas if s.effect_type == "damage")
         falta_dano = com_dano < MIN_DAMAGE_SKILLS
 
-        def chave(skill) -> tuple[int, int, float]:
-            """Menor é melhor: primeiro o que o deck precisa, depois a intenção.
+        tipos_no_deck = {s.effect_type for s in equipadas}
 
-            O primeiro campo existe porque a ordem da intenção é estrita, e
-            estrita demais: `survival` lista dano por último, então uma política
-            que só a obedecesse montava um deck de quatro buffs — com a mesma
-            carta repetida — e o herói não matava mais nada. Enquanto o deck não
-            tem o mínimo de dano, uma carta de dano ganha de qualquer outra;
-            depois disso a intenção volta a mandar.
+        def chave(skill) -> tuple[int, int, int, float]:
+            """Menor é melhor: o que o deck precisa, cobertura, e só então a intenção.
+
+            Três critérios, e cada um corrige um jeito diferente de montar um
+            deck que ninguém jogaria.
+
+            1. Mínimo de dano. A ordem da intenção é estrita demais: `survival`
+               lista dano por último, então obedecê-la ao pé da letra montava um
+               deck de quatro buffs e o herói não matava mais nada.
+
+            2. Cobertura de tipo. Um jogador competente diversifica; a ordem
+               estrita leva quatro cartas do tipo favorito. Era o que tirava o
+               controle do Mago: `survival` põe `status` atrás de cura e buff, e
+               ele já começa com uma de cada — o deck enchia antes de sobrar
+               espaço para congelar alguém. Medido, a carta que ele nunca
+               escolhia cortava as mortes contra chefe de 14% para 6%, e contra
+               o inimigo de dano alto de 28% para 22%. O "Controlador" do
+               documento de design não controlava nada.
+
+            3. A intenção, que decide entre cartas igualmente úteis ao deck.
             """
             urgente = 0 if (falta_dano and skill.effect_type == "damage") else 1
+            cobre = 0 if skill.effect_type not in tipos_no_deck else 1
             posicao = ordem.index(skill.effect_type) if skill.effect_type in ordem else len(ordem)
-            return (urgente, posicao, -_skill_value(skill))
+            return (urgente, cobre, posicao, -_skill_value(skill))
 
         # Carta repetida não é escolha: o segundo exemplar não acrescenta nada
         # ao deck, e o bot chegava a levar `Fortalecimento` duas vezes.
@@ -226,7 +241,15 @@ class PickPolicy:
             )
         ] or list(hero.skills)
 
-        pior = max(descartaveis, key=lambda k: chave(hero.skills[k]))
+        # Sacrificar de dentro do tipo mais repetido preserva a cobertura: sem
+        # isso, trocar a única carta de um tipo por outra de tipo já presente
+        # desfaz a diversidade que o critério acima acabou de montar.
+        repeticoes = collections.Counter(s.effect_type for s in equipadas)
+
+        def custo_de_perder(k) -> tuple[int, tuple[int, int, int, float]]:
+            return (repeticoes[hero.skills[k].effect_type], chave(hero.skills[k]))
+
+        pior = max(descartaveis, key=custo_de_perder)
         if chave(nova) >= chave(hero.skills[pior]):
             return None, None
         return nova, pior
