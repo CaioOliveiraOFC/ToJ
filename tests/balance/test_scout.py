@@ -64,7 +64,7 @@ class TestTelemetria:
         assert equipamento["power_equipped_sum"] >= equipamento["power_naked_sum"], (
             "equipar não pode reduzir o poder"
         )
-        assert telemetria["economy"]["gold_earned"] > 0
+        assert telemetria["economy"]["gold_from_combat"] > 0
 
     def test_essencia_fica_dentro_do_intervalo_do_jogo(self, telemetria):
         from src.shared.constants import ESSENCE_MULT_MAX, ESSENCE_MULT_MIN

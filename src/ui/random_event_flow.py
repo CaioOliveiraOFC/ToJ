@@ -38,7 +38,10 @@ def run_merchant_event(player: "Player", dungeon_level: int) -> None:
             price = entry["price"]
             item = entry["item"]
             if player.coins >= price:
-                player.spend_coins(price)
+                # Categoria explícita: sem ela o gasto do Mercador caía em
+                # "other" e sumia da soma por destino do livro-caixa.
+                categoria = "consumable" if getattr(item, "consumable", False) else "gear"
+                player.spend_coins(price, source=categoria)
                 player.add_item_to_inventory(item)
                 screens.render_merchant_purchase_success(getattr(item, "name", "?"), price)
                 offers.pop(idx)

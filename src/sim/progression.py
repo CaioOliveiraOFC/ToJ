@@ -150,14 +150,18 @@ def visit_shop(
 ) -> None:
     """Gasta o ouro do andar como um jogador gastaria.
 
-    Primeiro repõe cura, porque sem consumível o próximo andar vira aposta.
-    Depois melhora equipamento, dentro de uma fração do ouro restante — guardar
-    tudo para uma compra futura é uma decisão que nenhum jogador de permadeath
-    toma.
+    Na ordem em que um jogador resolve as coisas: primeiro descarta o que a
+    mochila acumulou, porque isso é ouro parado e não disputa orçamento com
+    nada; depois repara a vida, porque chegar ao andar seguinte ferido é a forma
+    mais comum de perder a run; depois repõe cura, porque sem consumível o
+    próximo andar vira aposta; e só então melhora equipamento, dentro de uma
+    fração do ouro restante — guardar tudo para uma compra futura é uma decisão
+    que nenhum jogador de permadeath toma.
     """
     if toggles is not None and not toggles.shop:
         return
 
+    _vender_dominados(hero, shop, dungeon_level)
     _repair(hero, dungeon_level, telemetry)
 
     ofertas = shop.get_available_items(dungeon_level, hero.get_classname())
@@ -207,6 +211,57 @@ def visit_shop(
             if equip_if_better(hero, item) and telemetry is not None:
                 telemetry.items_equipped_from_shop += 1
                 telemetry.equipped_by_slot[str(item.slot)] += 1
+
+
+def _vender_dominados(hero, shop: Shop, dungeon_level: int) -> None:
+    """Converte em ouro o que a mochila acumulou e não serve mais para nada.
+
+    O bot nunca vendia nada, e sem venda a faixa de 20–25% da Economia V1 era um
+    número que ninguém tinha medido. A política é a mais simples que ainda é
+    defensável — item claramente dominado, e nada além disso. Não é IA de
+    inventário: não tenta prever build futura, não especula com preço, não
+    guarda peça para um slot que talvez melhore.
+
+    A ordem importa e é a parte fácil de errar: **veste antes de descartar**.
+    Um item cujo slot está vazio não tem com o que ser comparado, e a regra de
+    "pior que o equipado" o trataria como lixo justamente quando ele é a única
+    coisa que o herói tem para aquele slot. `equip_if_better` já resolve o slot
+    vazio (equipa) e o upgrade (troca); o que sobra depois dele é, por
+    construção, o que o herói olhou e recusou.
+    """
+    for item in list(hero.inventory):
+        if getattr(item, "consumable", False):
+            continue
+        equip_if_better(hero, item)
+
+    for item in list(hero.inventory):
+        if _descartavel(hero, item):
+            # `shop.sell_item` é a função do jogo real, e já escreve o
+            # livro-caixa do herói (`gold_from_sale`, `items_sold`). Nenhum
+            # contador aqui: um segundo contador para o mesmo evento é como os
+            # dois `gold_earned` com significados diferentes nasceram.
+            shop.sell_item(hero, item, dungeon_level)
+
+
+def _descartavel(hero, item) -> bool:
+    """O item está na mochila e não há motivo visível para mantê-lo lá."""
+    if getattr(item, "consumable", False):
+        return False
+    slot = getattr(item, "slot", None)
+    if not slot or slot not in hero.equipment:
+        return False
+
+    # Classe errada: o herói não pode equipá-lo em nenhuma circunstância.
+    classes = getattr(item, "classes", None)
+    if classes and hero.get_classname() not in classes:
+        return True
+
+    atual = hero.equipment[slot]
+    if atual is None:
+        # Slot vazio e item utilizável: `equip_if_better` acabou de rodar, então
+        # chegar aqui significa que ele recusou — não vender por precaução.
+        return False
+    return _peso_do_item(item) <= _peso_do_item(atual)
 
 
 def _repair(hero, dungeon_level: int, telemetry=None) -> None:

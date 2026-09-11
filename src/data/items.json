@@ -26,7 +26,6 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -46,7 +45,6 @@
       "droppable": true,
       "price": 40,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -66,7 +64,6 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -84,7 +81,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -104,7 +100,6 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 2,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -124,7 +119,6 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 2,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -144,7 +138,6 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -164,7 +157,6 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -182,7 +174,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -202,7 +193,6 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -220,7 +210,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -240,7 +229,6 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -260,7 +248,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -278,7 +265,6 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -298,7 +284,6 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -318,7 +303,6 @@
       "droppable": true,
       "price": 40,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -338,7 +322,6 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 2,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -356,7 +339,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -374,7 +356,6 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -394,7 +375,6 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -412,7 +392,6 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -432,7 +411,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -452,7 +430,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -470,7 +447,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -488,7 +464,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -506,7 +481,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -526,7 +500,6 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -546,7 +519,6 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -566,7 +538,6 @@
       "droppable": true,
       "price": 110,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -586,7 +557,6 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -606,7 +576,6 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -626,7 +595,6 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -646,7 +614,6 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -667,7 +634,6 @@
       "droppable": true,
       "price": 115,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -687,7 +653,6 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -707,7 +672,6 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -727,7 +691,6 @@
       "droppable": true,
       "price": 100,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -745,7 +708,6 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -765,7 +727,6 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -785,7 +746,6 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -803,7 +763,6 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -823,7 +782,6 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -843,7 +801,6 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -863,7 +820,6 @@
       "droppable": true,
       "price": 180,
       "shop_min_floor": 7,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -881,7 +837,6 @@
       "droppable": true,
       "price": 70,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -899,7 +854,6 @@
       "droppable": true,
       "price": 65,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -917,7 +871,6 @@
       "droppable": true,
       "price": 70,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -937,7 +890,6 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -957,7 +909,6 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -975,7 +926,6 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -993,7 +943,6 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1011,7 +960,6 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1029,7 +977,6 @@
       "droppable": true,
       "price": 60,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1047,7 +994,6 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1291,7 +1237,6 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1309,7 +1254,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1327,7 +1271,6 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1345,7 +1288,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1363,7 +1305,6 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1381,7 +1322,6 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1399,7 +1339,6 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1417,7 +1356,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1435,7 +1373,6 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1453,7 +1390,6 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 2,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1471,7 +1407,6 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1489,7 +1424,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1507,7 +1441,6 @@
       "droppable": true,
       "price": 10,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1525,7 +1458,6 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1543,7 +1475,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1561,7 +1492,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1579,7 +1509,6 @@
       "droppable": true,
       "price": 10,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1597,7 +1526,6 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1615,7 +1543,6 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1633,7 +1560,6 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1651,7 +1577,6 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1669,7 +1594,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1687,7 +1611,6 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 2,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1705,7 +1628,6 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1723,7 +1645,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1741,7 +1662,6 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1759,7 +1679,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1777,7 +1696,6 @@
       "droppable": true,
       "price": 60,
       "shop_min_floor": 2,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1795,7 +1713,6 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1813,7 +1730,6 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 2,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1831,7 +1747,6 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1849,7 +1764,6 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1867,7 +1781,6 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1885,7 +1798,6 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1903,7 +1815,6 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1921,7 +1832,6 @@
       "droppable": true,
       "price": 40,
       "shop_min_floor": 2,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1939,7 +1849,6 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1957,7 +1866,6 @@
       "droppable": true,
       "price": 150,
       "shop_min_floor": 7,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1975,7 +1883,6 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -1993,7 +1900,6 @@
       "droppable": true,
       "price": 160,
       "shop_min_floor": 7,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2011,7 +1917,6 @@
       "droppable": true,
       "price": 95,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2029,7 +1934,6 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 7,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2047,7 +1951,6 @@
       "droppable": true,
       "price": 100,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2065,7 +1968,6 @@
       "droppable": true,
       "price": 90,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2083,7 +1985,6 @@
       "droppable": true,
       "price": 150,
       "shop_min_floor": 7,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2101,7 +2002,6 @@
       "droppable": true,
       "price": 170,
       "shop_min_floor": 8,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2119,7 +2019,6 @@
       "droppable": true,
       "price": 80,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2137,7 +2036,6 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 7,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2155,7 +2053,6 @@
       "droppable": true,
       "price": 75,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2173,7 +2070,6 @@
       "droppable": true,
       "price": 95,
       "shop_min_floor": 7,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2191,7 +2087,6 @@
       "droppable": true,
       "price": 75,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2209,7 +2104,6 @@
       "droppable": true,
       "price": 75,
       "shop_min_floor": 6,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2227,7 +2121,6 @@
       "droppable": true,
       "price": 85,
       "shop_min_floor": 7,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2245,7 +2138,6 @@
       "droppable": true,
       "price": 110,
       "shop_min_floor": 8,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2263,7 +2155,6 @@
       "droppable": true,
       "price": 100,
       "shop_min_floor": 7,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2281,7 +2172,6 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2301,7 +2191,6 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2321,7 +2210,6 @@
       "droppable": true,
       "price": 60,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2339,7 +2227,6 @@
       "droppable": true,
       "price": 40,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2359,7 +2246,6 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2379,7 +2265,6 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2399,7 +2284,6 @@
       "droppable": true,
       "price": 150,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2419,7 +2303,6 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2439,7 +2322,6 @@
       "droppable": true,
       "price": 135,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2459,7 +2341,6 @@
       "droppable": true,
       "price": 160,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2480,7 +2361,6 @@
       "droppable": true,
       "price": 145,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {
@@ -2498,7 +2378,6 @@
       "droppable": true,
       "price": 155,
       "shop_min_floor": 5,
-      "shop_max_floor": 15,
       "consumable": false
     },
     {

@@ -454,17 +454,32 @@ class TestOrdemDeFimDeAndar:
 
 
 class TestTelemetriaEconomica:
-    def test_a_taxa_de_utilizacao_e_calculada(self):
+    def test_a_taxa_de_utilizacao_usa_o_inflow_liquido(self):
+        """O denominador é combate + juros + venda, e está documentado."""
         from src.sim.telemetry import RunTelemetry
 
         t = RunTelemetry()
-        t.gold_earned = 1000
+        t.gold_from_combat = 600
+        t.gold_from_interest = 200
+        t.gold_from_sales = 200
         t.gold_spent_on_gear = 300
         t.gold_spent_on_consumables = 100
         t.gold_spent_on_recovery = 100
+        assert t.total_liquid_gold_inflow == 1000
         assert t.gold_spent == 500
         assert t.gold_utilization_rate == 0.5
         assert t.to_dict()["economy"]["gold_utilization_rate"] == 0.5
+
+    def test_venda_e_juros_nao_entram_na_renda_primaria(self):
+        """Vender é converter item em ouro, não criar riqueza."""
+        from src.sim.telemetry import RunTelemetry
+
+        t = RunTelemetry()
+        t.gold_from_combat = 100
+        t.gold_from_interest = 50
+        t.gold_from_sales = 70
+        assert t.gold_from_primary_income == 100
+        assert t.total_liquid_gold_inflow == 220
 
     def test_sem_renda_a_taxa_nao_divide_por_zero(self):
         from src.sim.telemetry import RunTelemetry
@@ -475,7 +490,9 @@ class TestTelemetriaEconomica:
         from src.sim.telemetry import RunTelemetry
 
         esperadas = {
-            "gold_earned",
+            "gold_from_combat",
+            "gold_from_primary_income",
+            "total_liquid_gold_inflow",
             "gold_spent",
             "gold_unspent",
             "gold_from_interest",
@@ -492,3 +509,282 @@ class TestTelemetriaEconomica:
             "interest_payments",
         }
         assert esperadas <= set(RunTelemetry().to_dict()["economy"])
+
+
+class TestLojaEmMasmorraInfinita:
+    """A masmorra é infinita; a loja não pode parar num andar arbitrário.
+
+    121 itens — 100% dos equipamentos vendáveis e 0% dos consumíveis — carregavam
+    `shop_max_floor: 15`. Não era design por item: era o default de quando o jogo
+    acabava no andar 20. O efeito era o andar 16 em diante oferecer só poção.
+    """
+
+    def test_equipamento_continua_a_venda_depois_do_15(self):
+        import random
+
+        loja = Shop()
+        for andar in (16, 20, 25, 40, 120):
+            random.seed(andar)
+            equipamentos = [
+                o
+                for o in loja.get_available_items(andar, "Warrior")
+                if not getattr(o["item"], "consumable", False)
+            ]
+            assert len(equipamentos) >= 5, f"andar {andar}: só {len(equipamentos)} equipamentos"
+
+    def test_nenhum_teto_arbitrario_novo_no_catalogo(self):
+        """Nem 999, nem 9999, nem 15 de volta: a correção foi deleção."""
+        from src.data.loader import load_items_data
+
+        com_teto = [
+            i
+            for i in load_items_data()["items"]
+            if i.get("sold_in_shop") and i.get("shop_max_floor") is not None
+        ]
+        assert not com_teto, (
+            "item vendável voltou a declarar teto de andar sem razão documentada: "
+            f"{[i['id'] for i in com_teto][:5]}"
+        )
+
+    def test_shop_min_floor_continua_valendo(self):
+        """Desbloqueio continua sendo desbloqueio."""
+        loja = Shop()
+        atrasados = [i for i in get_all_items().values() if getattr(i, "shop_min_floor", 1) > 1]
+        assert atrasados
+        for item in atrasados:
+            antes = item.shop_min_floor - 1
+            ofertas = {o["item"].id for o in loja.get_available_items(antes, "Warrior")}
+            assert item.id not in ofertas, f"{item.id} apareceu no andar {antes}"
+
+    def test_a_mistura_de_raridades_da_loja_nao_muda_com_a_profundidade(self):
+        """Nenhum scaling novo por andar — nem para cima, nem para baixo.
+
+        Isto NÃO cobra 60/28/10/2: aquela é a tabela de loot. A loja tem os
+        filtros dela. O que se cobra aqui é só que a proporção do andar 16 seja
+        a mesma do andar 60.
+        """
+        import collections
+        import random
+
+        loja = Shop()
+
+        def mistura(andar: int) -> dict[str, float]:
+            contagem = collections.Counter()
+            for i in range(120):
+                random.seed(andar * 1000 + i)
+                for oferta in loja.get_available_items(andar, "Warrior"):
+                    contagem[oferta["item"].rarity] += 1
+            total = sum(contagem.values())
+            return {r: c / total for r, c in contagem.items()}
+
+        raso, fundo = mistura(16), mistura(60)
+        assert raso.keys() == fundo.keys()
+        for raridade in raso:
+            assert abs(raso[raridade] - fundo[raridade]) < 0.03, (
+                f"{raridade}: {raso[raridade]:.1%} no andar 16 contra "
+                f"{fundo[raridade]:.1%} no 60 — isso é scaling por profundidade"
+            )
+
+    def test_legendary_continua_fora_da_loja_em_qualquer_profundidade(self):
+        import random
+
+        loja = Shop()
+        for andar in (10, 25, 50, 200):
+            random.seed(andar)
+            assert not [
+                o
+                for o in loja.get_available_items(andar, "Warrior")
+                if o["item"].rarity == "Legendary"
+            ]
+
+
+class TestVendaNoSimulador:
+    """O bot não vendia nada, então a faixa de 20–25% nunca foi medida."""
+
+    def _com_arma(self, forte: bool):
+        from src.sim.progression import _descartavel
+
+        heroi = Warrior("Bot")
+        armas = sorted(
+            (i for i in get_all_items().values() if i.slot == "Weapon" and not i.classes),
+            key=lambda i: i.damage_bonus,
+        )
+        return heroi, armas, _descartavel
+
+    def test_vende_item_claramente_inferior(self):
+        heroi, armas, descartavel = self._com_arma(True)
+        boa, ruim = armas[-1], armas[0]
+        heroi.inventory.append(boa)
+        heroi.equip(boa)
+        heroi.inventory.append(ruim)
+        assert descartavel(heroi, ruim)
+
+    def test_nao_vende_upgrade(self):
+        heroi, armas, descartavel = self._com_arma(True)
+        boa, ruim = armas[-1], armas[0]
+        heroi.inventory.append(ruim)
+        heroi.equip(ruim)
+        heroi.inventory.append(boa)
+        assert not descartavel(heroi, boa), "vendeu o upgrade que deveria equipar"
+
+    def test_nao_vende_o_que_esta_equipado(self):
+        """Item equipado sai do inventário, então nem chega ao descarte."""
+        heroi, armas, _ = self._com_arma(True)
+        arma = armas[-1]
+        heroi.inventory.append(arma)
+        heroi.equip(arma)
+        assert arma not in heroi.inventory
+        assert heroi.equipment["Weapon"] is arma
+
+    def test_nao_vende_item_utilizavel_de_slot_vazio(self):
+        """Veste antes de descartar: slot vazio não tem com o que comparar."""
+        from src.sim.progression import _vender_dominados
+
+        heroi = Warrior("Bot")
+        arma = next(i for i in get_all_items().values() if i.slot == "Weapon" and not i.classes)
+        heroi.inventory.append(arma)
+        assert heroi.equipment["Weapon"] is None
+        _vender_dominados(heroi, Shop(), 5)
+        assert heroi.equipment["Weapon"] is arma, "vendeu o item que deveria ter equipado"
+        assert heroi.coins == 0
+
+    def test_nao_vende_consumivel(self):
+        from src.sim.progression import _descartavel
+
+        heroi = Warrior("Bot")
+        pocao = get_all_items()["Poção de Cura Pequena"]
+        assert not descartavel_seguro(heroi, pocao, _descartavel)
+
+    def test_vende_item_de_outra_classe(self):
+        from src.sim.progression import _descartavel
+
+        heroi = Warrior("Bot")
+        alheio = next(
+            i for i in get_all_items().values() if i.classes and "Warrior" not in i.classes
+        )
+        heroi.inventory.append(alheio)
+        assert _descartavel(heroi, alheio)
+
+    def test_a_venda_do_bot_usa_a_funcao_do_jogo(self):
+        """Mesma `Shop.sell_item`, mesmo preço, sem fórmula duplicada."""
+        from src.sim.progression import _vender_dominados
+
+        loja = Shop()
+        heroi, armas, _ = self._com_arma(True)
+        boa, ruim = armas[-1], armas[0]
+        heroi.inventory.append(boa)
+        heroi.equip(boa)
+        heroi.inventory.append(ruim)
+        esperado = loja.get_sell_price(ruim, 7)
+        _vender_dominados(heroi, loja, 7)
+        assert heroi.coins == esperado
+
+    def test_o_ouro_de_venda_chega_a_telemetria(self):
+        from src.sim.harness import simulate_run
+
+        r = simulate_run("Warrior", 8, 6, "smart", loadout="expected", collect_telemetry=True)
+        economia = r["telemetry"]["economy"]
+        assert economia["items_sold"] > 0, "o bot ainda não vende nada"
+        assert economia["gold_from_sales"] > 0
+        assert economia["gold_from_sales"] <= economia["total_liquid_gold_inflow"]
+
+
+def descartavel_seguro(heroi, item, fn) -> bool:
+    heroi.inventory.append(item)
+    return fn(heroi, item)
+
+
+class TestTelemetriaPorFaixa:
+    def test_o_andar_cai_na_faixa_certa(self):
+        from src.sim.telemetry import band_index, band_label
+
+        assert [band_index(f) for f in (1, 5, 6, 10, 11, 20, 21, 25)] == [0, 0, 1, 1, 2, 3, 4, 4]
+        assert band_label(0) == "1-5"
+        assert band_label(4) == "21-25"
+
+    def test_as_faixas_nao_tem_teto(self):
+        """A masmorra é infinita: o andar 137 tem faixa como qualquer outro."""
+        from src.sim.telemetry import band_index, band_label
+
+        assert band_label(band_index(137)) == "136-140"
+
+    def test_o_livro_caixa_e_creditado_a_faixa_do_andar(self):
+        from src.sim.telemetry import RunTelemetry
+
+        t = RunTelemetry()
+        t.start_run()
+        livro = {"gold_from_combat": 0, "gold_from_interest": 0, "gold_from_sale": 0}
+
+        livro["gold_from_combat"] = 100
+        t.record_floor(3, livro, coins=40)
+        livro["gold_from_combat"] = 250
+        livro["gold_from_interest"] = 10
+        t.record_floor(7, livro, coins=90)
+
+        assert t.by_band[0].gold_from_combat == 100
+        assert t.by_band[0].gold_from_interest == 0
+        assert t.by_band[1].gold_from_combat == 150, "o delta do andar foi para a faixa errada"
+        assert t.by_band[1].gold_from_interest == 10
+        assert t.by_band[0].carrying_balance == 40
+
+    def test_juros_e_venda_nao_viram_recompensa_de_combate(self):
+        from src.sim.telemetry import RunTelemetry
+
+        t = RunTelemetry()
+        t.start_run()
+        t.record_floor(2, {"gold_from_interest": 30, "gold_from_sale": 70}, coins=100)
+        faixa = t.by_band[0]
+        assert faixa.gold_from_combat == 0
+        assert faixa.gold_from_interest == 30
+        assert faixa.gold_from_sales == 70
+        assert faixa.total_liquid_gold_inflow == 100
+
+    def test_conta_andares_e_runs_observados(self):
+        """Sem o tamanho da amostra, a média da faixa profunda engana."""
+        from src.sim.telemetry import RunTelemetry
+
+        t = RunTelemetry()
+        for _ in range(3):
+            t.start_run()
+            for andar in (1, 2, 3):
+                t.record_floor(andar, {}, coins=0)
+        t.start_run()
+        for andar in (1, 2, 3, 6, 7):
+            t.record_floor(andar, {}, coins=0)
+
+        assert t.by_band[0].floors_observed == 12
+        assert t.by_band[0].runs_observed == 4
+        assert t.by_band[1].floors_observed == 2
+        assert t.by_band[1].runs_observed == 1
+
+    def test_uma_run_nova_nao_herda_o_livro_da_anterior(self):
+        from src.sim.telemetry import RunTelemetry
+
+        t = RunTelemetry()
+        t.start_run()
+        t.record_floor(1, {"gold_from_combat": 500}, coins=0)
+        t.start_run()
+        t.record_floor(1, {"gold_from_combat": 80}, coins=0)
+        assert t.by_band[0].gold_from_combat == 580, (
+            "o retrato do livro atravessou a fronteira da run e produziu delta negativo"
+        )
+
+    def test_interest_payments_ignora_pagamento_zero(self, heroi):
+        """Definição: contam só os pagamentos maiores que zero."""
+        assert economy.pay_interest(heroi, 3) == 0
+        assert heroi.ledger["interest_payments"] == 0
+        heroi.earn_coins(500)
+        assert economy.pay_interest(heroi, 4) > 0
+        assert heroi.ledger["interest_payments"] == 1
+
+    def test_a_serializacao_traz_as_faixas(self):
+        from src.sim.telemetry import RunTelemetry
+
+        t = RunTelemetry()
+        t.start_run()
+        t.record_floor(12, {"gold_from_combat": 900}, coins=300)
+        faixa = t.to_dict()["economy_by_band"]["11-15"]
+        assert faixa["gold_from_combat"] == 900
+        assert faixa["floors_observed"] == 1
+        assert faixa["runs_observed"] == 1
+        assert faixa["carrying_balance"] == 300

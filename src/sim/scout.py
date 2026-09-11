@@ -538,7 +538,10 @@ def analyse_equipment(telemetry: dict) -> list[Finding]:
             )
         )
 
-    ganho_ouro = economia.get("gold_earned", 0)
+    # Denominador explícito: inflow LÍQUIDO (combate + juros + venda), o mesmo
+    # de `RunTelemetry.gold_utilization_rate`. Antes era só o combate, e a
+    # fração saía inflada por não contar dois terços do que entrava.
+    ganho_ouro = economia.get("total_liquid_gold_inflow", 0)
     gasto = economia.get("gold_spent", 0)
     if ganho_ouro:
         ocioso = 1 - gasto / ganho_ouro

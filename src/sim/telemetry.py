@@ -12,12 +12,123 @@ a Essência multiplicou e o que os eventos aleatórios fizeram.
 
 É atribuição, não causalidade: um número alto aqui aponta o suspeito. Quem
 condena é a ablação em `sim/scout.py`, que desliga o sistema e mede o delta.
+
+Definições econômicas
+---------------------
+Duas leituras da economia já saíram confusas por falta destas definições — "55%
+utilizado" e "54% parado" foram publicados lado a lado com denominadores
+diferentes, como se somassem 100%. Não somam: o primeiro é razão de FLUXO, o
+segundo é ESTOQUE sobre fluxo. As três categorias são distintas e não se
+misturam:
+
+    gold_from_primary_income = combate
+        Riqueza NOVA. É o único ouro que o jogo cria do nada.
+
+    total_liquid_gold_inflow = combate + juros + venda
+        Ouro líquido que entrou nas mãos do jogador. Venda entra aqui e NÃO em
+        `primary_income`: vender é converter item em ouro, não criar riqueza —
+        o item sai do inventário na mesma transação. Separar as duas é o que
+        permite distinguir "o jogador gasta pouco" de "os juros estão
+        imprimindo dinheiro demais".
+
+    gold_spent = equipamento + consumível + recuperação
+        Ouro MOVIMENTADO: o que virou decisão.
+
+    gold_utilization_rate = gold_spent / total_liquid_gold_inflow
+        Razão de fluxo. O denominador é o inflow líquido, sempre.
+
+    carrying_balance = saldo ao fim do andar
+        ESTOQUE. Média por andar observado, nunca percentual de fluxo.
+
+    interest_payments = pagamentos de juros MAIORES QUE ZERO
+        Andar concluído com saldo zero não conta. Contá-lo mediria "quantos
+        andares foram concluídos", que já se sabe por `floors_observed`, e
+        esconderia o que a métrica existe para mostrar: em quantos andares o
+        jogador tinha de fato capital rendendo.
 """
 
 from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass, field
+
+# Faixas de cinco andares, geradas sem teto: a masmorra é infinita, e um limite
+# superior aqui repetiria o erro do `shop_max_floor`, que fazia a loja sumir no
+# andar 16 porque alguém escreveu 15 quando o jogo acabava no 20.
+BAND_SIZE = 5
+
+
+def band_index(floor: int) -> int:
+    return (max(1, int(floor)) - 1) // BAND_SIZE
+
+
+def band_label(index: int) -> str:
+    return f"{index * BAND_SIZE + 1}-{(index + 1) * BAND_SIZE}"
+
+
+@dataclass
+class BandTotals:
+    """A economia de uma faixa de profundidade.
+
+    `floors_observed` e `runs_observed` não são enfeite. A faixa 21-25 só contém
+    quem sobreviveu até lá — os melhores equipados, os que gastaram bem —, e ler
+    a média dela ao lado da faixa 1-5, onde está a população inteira, compara
+    dois grupos diferentes como se fossem o mesmo. Nenhuma média daqui deve ser
+    lida sem o tamanho da amostra ao lado.
+    """
+
+    floors_observed: int = 0
+    runs_observed: int = 0
+    gold_from_combat: int = 0
+    gold_from_interest: int = 0
+    gold_from_sales: int = 0
+    gold_spent_on_gear: int = 0
+    gold_spent_on_consumables: int = 0
+    gold_spent_on_recovery: int = 0
+    purchases: int = 0
+    items_sold: int = 0
+    interest_payments: int = 0
+    # Soma dos saldos ao fim de cada andar da faixa; a média sai na serialização.
+    carrying_balance_sum: int = 0
+
+    @property
+    def gold_spent_total(self) -> int:
+        return (
+            self.gold_spent_on_gear + self.gold_spent_on_consumables + self.gold_spent_on_recovery
+        )
+
+    @property
+    def total_liquid_gold_inflow(self) -> int:
+        return self.gold_from_combat + self.gold_from_interest + self.gold_from_sales
+
+    @property
+    def gold_utilization_rate(self) -> float:
+        entrada = self.total_liquid_gold_inflow
+        return (self.gold_spent_total / entrada) if entrada else 0.0
+
+    @property
+    def carrying_balance(self) -> float:
+        """ESTOQUE: saldo médio ao fim de um andar desta faixa."""
+        return (self.carrying_balance_sum / self.floors_observed) if self.floors_observed else 0.0
+
+    def to_dict(self) -> dict:
+        return {
+            "floors_observed": self.floors_observed,
+            "runs_observed": self.runs_observed,
+            "gold_from_combat": self.gold_from_combat,
+            "gold_from_interest": self.gold_from_interest,
+            "gold_from_sales": self.gold_from_sales,
+            "total_liquid_gold_inflow": self.total_liquid_gold_inflow,
+            "gold_spent_total": self.gold_spent_total,
+            "gold_spent_on_gear": self.gold_spent_on_gear,
+            "gold_spent_on_consumables": self.gold_spent_on_consumables,
+            "gold_spent_on_recovery": self.gold_spent_on_recovery,
+            "purchases": self.purchases,
+            "items_sold": self.items_sold,
+            "interest_payments": self.interest_payments,
+            "carrying_balance": round(self.carrying_balance, 1),
+            "gold_utilization_rate": round(self.gold_utilization_rate, 4),
+        }
 
 
 @dataclass
@@ -43,7 +154,7 @@ class RunTelemetry:
     items_equipped_from_loot: int = 0
     items_bought: int = 0
     items_equipped_from_shop: int = 0
-    gold_earned: int = 0
+    gold_from_combat: int = 0
     gold_spent_on_gear: int = 0
     gold_spent_on_consumables: int = 0
     gold_spent_on_recovery: int = 0
@@ -77,6 +188,9 @@ class RunTelemetry:
     altar_deaths: int = 0
     event_declined: dict[str, int] = field(default_factory=lambda: defaultdict(int))
 
+    # --- Economia por faixa de profundidade ---
+    by_band: dict[int, BandTotals] = field(default_factory=lambda: defaultdict(BandTotals))
+
     # --- Combate ---
     battles: int = 0
     turns: int = 0
@@ -103,14 +217,66 @@ class RunTelemetry:
         )
 
     @property
+    def gold_from_primary_income(self) -> int:
+        """Riqueza nova: só recompensa de combate. Nem juros, nem venda."""
+        return self.gold_from_combat
+
+    @property
+    def total_liquid_gold_inflow(self) -> int:
+        """Todo ouro líquido que entrou nas mãos do jogador. Ver o cabeçalho."""
+        return self.gold_from_combat + self.gold_from_interest + self.gold_from_sales
+
+    @property
     def gold_utilization_rate(self) -> float:
-        """Fatia da renda que virou decisão, em vez de saldo parado.
+        """Fatia do inflow líquido que virou decisão, em vez de saldo parado.
 
         É a métrica-chave desta fase: se ela é baixa, o ouro não está comprando
         opção nenhuma — ou porque não há o que comprar, ou porque o preço está
         desconectado da renda. Não tem meta ainda; existe para ser observada.
         """
-        return (self.gold_spent / self.gold_earned) if self.gold_earned else 0.0
+        entrada = self.total_liquid_gold_inflow
+        return (self.gold_spent / entrada) if entrada else 0.0
+
+    def start_run(self) -> None:
+        """Zera o retrato do livro-caixa: uma run nova começa com herói novo."""
+        self._ledger_anterior = {}
+        self._bandas_desta_run = set()
+
+    def record_floor(self, floor: int, ledger: dict, coins: int) -> None:
+        """Credita à faixa deste andar o que o livro-caixa do herói mudou nele.
+
+        Por diferença do livro, e não por contadores próprios: o livro já é
+        escrito em `earn_coins`/`spend_coins`, por onde TODO o ouro do jogo
+        passa, e já vem separado por origem e destino. A atribuição sai correta
+        por construção, e uma fonte de ouro nova entra na telemetria por faixa
+        sem ninguém precisar lembrar de incrementar coisa nenhuma aqui.
+        """
+        anterior = getattr(self, "_ledger_anterior", {})
+
+        def delta(chave: str) -> int:
+            return int(ledger.get(chave, 0)) - int(anterior.get(chave, 0))
+
+        indice = band_index(floor)
+        faixa = self.by_band[indice]
+        faixa.floors_observed += 1
+        faixa.gold_from_combat += delta("gold_from_combat")
+        faixa.gold_from_interest += delta("gold_from_interest")
+        faixa.gold_from_sales += delta("gold_from_sale")
+        faixa.gold_spent_on_gear += delta("gold_spent_on_gear")
+        faixa.gold_spent_on_consumables += delta("gold_spent_on_consumable")
+        faixa.gold_spent_on_recovery += delta("gold_spent_on_recovery")
+        faixa.purchases += delta("purchases")
+        faixa.items_sold += delta("items_sold")
+        faixa.interest_payments += delta("interest_payments")
+        faixa.carrying_balance_sum += int(coins)
+
+        bandas = getattr(self, "_bandas_desta_run", set())
+        if indice not in bandas:
+            bandas.add(indice)
+            faixa.runs_observed += 1
+        self._bandas_desta_run = bandas
+
+        self._ledger_anterior = dict(ledger)
 
     def record_battle(self, outcome) -> None:
         """Soma o que uma batalha entregou, por skill e por consumível."""
@@ -170,7 +336,13 @@ class RunTelemetry:
                 "power_samples": len(self.final_power_naked),
             },
             "economy": {
-                "gold_earned": self.gold_earned,
+                # Nomes explícitos: `gold_earned` significava "só combate" aqui
+                # e "tudo" no livro-caixa do herói. Dois denominadores com o
+                # mesmo nome é como saiu a leitura de "55% utilizado, 54%
+                # parado" — números que nunca deveriam ter sido lidos juntos.
+                "gold_from_combat": self.gold_from_combat,
+                "gold_from_primary_income": self.gold_from_primary_income,
+                "total_liquid_gold_inflow": self.total_liquid_gold_inflow,
                 "gold_spent": self.gold_spent,
                 "gold_spent_on_gear": self.gold_spent_on_gear,
                 "gold_spent_on_consumables": self.gold_spent_on_consumables,
@@ -187,6 +359,10 @@ class RunTelemetry:
                 "items_equipped": self.items_equipped_from_loot + self.items_equipped_from_shop,
                 "items_sold": self.items_sold,
                 "gold_utilization_rate": self.gold_utilization_rate,
+            },
+            "economy_by_band": {
+                band_label(indice): faixa.to_dict()
+                for indice, faixa in sorted(self.by_band.items())
             },
             "consumables": dict(self.consumables_used),
             # Somas e contagens, nunca médias: o agregador soma bloco a bloco,

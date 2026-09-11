@@ -34,6 +34,20 @@ class Shop:
         - Andar 7-9: 15-18 itens (Common + Rare + 1-2 Epic se andar >= 10)
         - Andar 10-14: 18-22 itens (Common + Rare + Epic)
         - Andar 15+: 22-25 itens (Common + Rare + Epic, sem Legendary)
+
+        Todo filtro aqui é DESBLOQUEIO, nunca curva por profundidade: um andar
+        mais fundo libera coisa, e nunca muda a proporção entre raridades. A
+        masmorra é infinita, então a loja do andar 80 tem de ser a mesma do
+        andar 16. A distribuição 60/28/10/2 de `items.json` é do **loot**
+        (`factories/loot.py`), não daqui — a loja tem os filtros dela.
+
+        `shop_max_floor` deixou de ser o que era. Ele estava declarado como 15
+        em 121 itens — 100% dos equipamentos vendáveis e 0% dos consumíveis —,
+        o que não é decisão por item, é o default de quando a masmorra acabava
+        no andar 20. O efeito era a loja parar de vender equipamento no andar
+        16 e o ouro não comprar mais nada. Os 121 valores foram removidos do
+        JSON; o campo continua sendo lido, para o caso de alguém querer um item
+        genuinamente limitado no tempo, e quem o declarar precisa dizer por quê.
         """
         all_items = get_all_items()
         available_items = []

@@ -269,6 +269,8 @@ def simulate_run(
         # mesma seed produz runs diferentes.
         random.seed(seed + i)
         hero = make_hero(hero_class, 1, loadout)
+        if telemetry is not None:
+            telemetry.start_run()
         reached = 0
         cedo: list[float] = []
 
@@ -339,11 +341,14 @@ def simulate_run(
             hero.recover(FLOOR_CLEAR_RESTORE_PERCENT)
             progression.visit_shop(hero, shop, floor, rng, cfg, telemetry)
             juros = pay_interest(hero, floor)
-            if telemetry is not None and juros > 0:
-                telemetry.gold_from_interest += juros
-                telemetry.interest_payments += 1
             if telemetry is not None:
+                if juros > 0:
+                    telemetry.gold_from_interest += juros
+                    telemetry.interest_payments += 1
                 telemetry.max_gold_held = max(telemetry.max_gold_held, hero.coins)
+                # Último passo do andar, depois dos juros: o retrato do
+                # livro-caixa fecha a faixa com tudo o que aconteceu aqui.
+                telemetry.record_floor(floor, hero.ledger, hero.coins)
 
         deepest.append(reached)
         early_essence.append(statistics.fmean(cedo) if cedo else 1.0)
@@ -538,7 +543,7 @@ def _award(
     if telemetry is not None:
         telemetry.xp_base += xp
         telemetry.xp_after_essence += xp_final
-        telemetry.gold_earned += coins_final
+        telemetry.gold_from_combat += coins_final
     progression.collect_loot(hero, rng, toggles, telemetry)
 
     # Contar pela mudança de nível, não pelo retorno de `level_up`: com
