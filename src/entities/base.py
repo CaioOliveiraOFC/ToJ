@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from src.shared.constants import SKILL_COST_REFERENCE_MP
+from src.shared.formulas import geometric
+
 
 class Entity:
     """Classe base para todas as entidades do jogo (estado puro).
@@ -45,15 +48,21 @@ class Entity:
         cobrar, sem poder importar `mechanics/`. Um custo calculado num lugar e
         exibido em outro é como a tela promete 25 e o motor tira 67.
 
-        Cartas com `mana_cost_percent` pagam essa fração da mana máxima; as
-        demais pagam o valor absoluto do JSON. Nunca zero: skill de graça não
+        Cartas com `mana_cost_percent` pagam essa fração da mana de REFERÊNCIA do
+        nível — não da própria. A diferença é a identidade das classes: cobrar
+        uma fração da mana de quem lança faz todo mundo lançar o mesmo número de
+        skills, e a reserva do Mago deixa de valer alguma coisa. Com a
+        referência comum, quem tem mana acima dela lança mais vezes, que é o
+        ponto de ter mais mana.
+
+        As demais pagam o valor absoluto do JSON. Nunca zero: skill de graça não
         tem decisão por trás.
         """
         percentual = float(getattr(skill, "mana_cost_percent", 0) or 0)
         if percentual <= 0:
             return int(getattr(skill, "mana_cost", 0) or 0)
-        teto = int(getattr(self, "base_mp", 0) or 0)
-        return max(1, int(teto * percentual / 100))
+        referencia = geometric(SKILL_COST_REFERENCE_MP, int(getattr(self, "level", 1) or 1))
+        return max(1, int(referencia * percentual / 100))
 
     def reduce_mp(self, cost: int) -> None:
         """Reduz MP da entidade pelo custo especificado.

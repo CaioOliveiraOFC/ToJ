@@ -304,6 +304,21 @@ MONSTER_EXECUTE_HP_RATIO = 0.35
 # Limiares das condições de bônus das skills de dano. O mesmo 0.35 do execute
 # do monstro: a regra vale para os dois lados da luta, e o jogador que aprendeu
 # a ler o momento de execução do inimigo já sabe ler o seu.
+# Mana de referência no nível 1, usada para converter o custo percentual de uma
+# skill em pontos de MP. É a média das três classes (60, 140, 90).
+#
+# O custo é percentual DESTA curva, e não da mana de quem lança. Cobrar uma
+# fração da mana própria fazia toda classe lançar o mesmo número de skills — dez
+# — e apagava a reserva do Mago, que é a identidade dele: antes ele lançava 31
+# skills contra 16 do Guerreiro. Como o dano das duas classes é praticamente
+# igual e o Mago tem menos HP e menos defesa, tirar a mana o deixou estritamente
+# pior que o Guerreiro.
+#
+# Com a referência comum, quem tem mana acima dela lança mais vezes, e o custo
+# continua acompanhando a progressão geométrica em vez de virar irrelevante no
+# fim do jogo.
+SKILL_COST_REFERENCE_MP = 97
+
 SKILL_BONUS_WOUNDED_RATIO = 0.35
 SKILL_BONUS_HEALTHY_RATIO = 0.80
 # Quantos turnos do início do combate contam como abertura. Um buff de defesa
