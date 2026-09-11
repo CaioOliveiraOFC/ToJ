@@ -332,8 +332,20 @@ SKILL_COST_REFERENCE_MP = 97
 # Mago morria antes de a reserva valer alguma coisa. A barreira converte mana em
 # sobrevivência imediata e faz a reserva pesar desde o primeiro andar.
 #
-# Fração máxima de um golpe que a barreira pode absorver.
-MAGIC_SHIELD_ABSORB_PERCENT = 35
+# Fração máxima de um golpe que a barreira pode absorver. Calibrada por
+# varredura contra o espalhamento de profundidade entre as três classes, com
+# 200 runs por ponto — o 35 que veio antes dela era chute e levava o Mago de
+# último a primeiro, de 9,1 para 18,5 andares:
+#
+#      0%  Guerreiro 15,5  Mago  9,3  Ladino 14,6   espalhamento 6,20
+#     10%                  Mago 14,5                espalhamento 1,07
+#     15%                  Mago 15,2                espalhamento 0,98
+#     20%                  Mago 17,3                espalhamento 2,69
+#
+# Em 15% o espalhamento fica abaixo da margem de erro da própria medição
+# (±0,95 com essa amostra): as três classes empatam dentro do que a simulação
+# consegue distinguir, que é o alvo — não um número redondo.
+MAGIC_SHIELD_ABSORB_PERCENT = 15
 # Dano absorvido por ponto de mana. É o preço da conversão, e é ele que cria a
 # decisão: mana gasta aguentando não lança skill.
 MAGIC_SHIELD_DAMAGE_PER_MP = 2.0
