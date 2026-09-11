@@ -43,6 +43,55 @@ LONG_FIGHT_TURNS = 5
 OPENING_TURNS = 2
 
 
+def _melhor(candidatos: list, valor) -> object:
+    """O melhor candidato por `valor`, com a ordem do deck como desempate.
+
+    Existe porque a política pegava `lista[0]` em toda decisão que tinha mais de
+    uma opção — buff, controle, cura, poção. `lista[0]` é a ordem de inserção do
+    deck, não uma preferência: a segunda skill de cura que o herói aprendesse
+    jamais seria lançada, e uma carta aprendida tarde aparecia no relatório como
+    "escolhida mas nunca usada". `Cortina de Fumaça` foi escolhida 75 vezes e
+    lançada zero.
+    """
+    return max(candidatos, key=valor)
+
+
+def _valor_de_cura(skill) -> float:
+    """Cura em percentual do HP máximo — é assim que o motor a aplica."""
+    return _numero(getattr(skill, "effect_value", 0))
+
+
+def _valor_de_buff(skill) -> float:
+    """Quanto o buff entrega, descontado o tempo que ele dura.
+
+    Um buff de +30 por 2 turnos vale menos que um de +20 por 5. Sem a duração,
+    a comparação premia o número grande e curto.
+    """
+    return _numero(getattr(skill, "effect_value", 0)) * max(1, int(getattr(skill, "duration", 1)))
+
+
+def _valor_de_controle(skill) -> float:
+    """Controle que rouba turno vale mais que o que só enfraquece."""
+    from src.shared.effects import TURN_SKIPPING_STATUSES
+
+    efeito = str(getattr(skill, "effect_value", ""))
+    duracao = max(1, int(getattr(skill, "duration", 1)))
+    chance = _numero(getattr(skill, "chance", 100)) / 100
+    peso = 3.0 if efeito in TURN_SKIPPING_STATUSES else 1.0
+    return peso * duracao * chance
+
+
+def _valor_de_item(item) -> float:
+    return _numero(getattr(item, "effect_value", 0))
+
+
+def _numero(valor) -> float:
+    try:
+        return float(valor)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def _hp_ratio(entity) -> float:
     return entity.get_hp() / max(1, int(getattr(entity, "base_hp", 1)))
 
@@ -164,9 +213,9 @@ def smart_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None 
     #    próprio jogo, e a calibração saiu em cima disso.
     if ratio < HEAL_HP_RATIO and letal is None:
         if heal_skills:
-            return Action(kind="skill", target=hero, skill=heal_skills[0])
+            return Action(kind="skill", target=hero, skill=_melhor(heal_skills, _valor_de_cura))
         if potions:
-            return Action(kind="item", item=potions[0])
+            return Action(kind="item", item=_melhor(potions, _valor_de_item))
 
     if letal is not None:
         alvo, skill = letal
@@ -193,17 +242,17 @@ def smart_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None 
             if getattr(s, "effect_stat", "") not in ativos
         ]
         if buffs:
-            return Action(kind="skill", target=hero, skill=buffs[0])
+            return Action(kind="skill", target=hero, skill=_melhor(buffs, _valor_de_buff))
 
         elixires = [i for i in _combat_elixirs(hero) if _elixir_stat(i) not in ativos]
         if elixires:
-            return Action(kind="item", item=elixires[0])
+            return Action(kind="item", item=_melhor(elixires, _valor_de_item))
 
     # 5. Repor mana quando ela é o gargalo e há poção em mãos.
     if _mp_ratio(hero) < MANA_POTION_RATIO and hero.skills:
         mana = _mana_potions(hero)
         if mana:
-            return Action(kind="item", item=mana[0])
+            return Action(kind="item", item=_melhor(mana, _valor_de_item))
 
     # 6. Controle. Atordoar um alvo economiza mais vida do que qualquer skill de
     #    dano gasta em MP, e vale sempre que o efeito não estiver ativo. Já um
@@ -219,7 +268,7 @@ def smart_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None 
             and (str(s.effect_value) in TURN_SKIPPING_STATUSES or turn < OPENING_TURNS)
         ]
         if control:
-            return Action(kind="skill", target=target, skill=control[0])
+            return Action(kind="skill", target=target, skill=_melhor(control, _valor_de_controle))
 
     # 7. Otimizar dano: usar a skill só quando ela bate mais que o ataque básico,
     #    que é gratuito. Skill que não supera o básico é MP jogado fora.

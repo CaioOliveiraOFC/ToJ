@@ -89,6 +89,10 @@ SKILL_PRIORITIES: dict[str, tuple[str, ...]] = {
 # vale como um dano médio: nem descartável, nem a melhor carta da mão.
 STATUS_SKILL_VALUE = 25.0
 
+# Quantas skills o herói carrega ao mesmo tempo. Era um 4 literal dentro da
+# política de escolha, onde ninguém procuraria pelo teto de deck do jogo.
+MAX_EQUIPPED_SKILLS = 4
+
 
 def _skill_value(skill) -> float:
     """Valor bruto de uma skill, para comparar candidatas."""
@@ -130,27 +134,46 @@ class PickPolicy:
         Devolve `(None, None)` quando nenhuma oferta supera o que o herói já tem
         — trocar por algo pior é desperdiçar a escolha, e um bot que troca
         sempre mede um jogador que não olha a carta.
+
+        A comparação é feita pela MESMA chave que escolhe a carta: primeiro o
+        lugar do tipo na ordem da intenção, e só dentro do mesmo tipo pelo valor.
+        Antes a troca comparava `effect_value` puro entre tipos diferentes, e
+        esses números não medem a mesma coisa: 140 de uma skill de dano é
+        percentual de dano, 30 de um buff é ponto de atributo, e status não tem
+        número nenhum (entra com a constante 25). Com o deck cheio de skills de
+        dano, isso barrava 22 das 24 cartas de status, buff e cura — nenhuma
+        alcançava os 60 da pior skill de dano.
+
+        O efeito no relatório era pior que no jogo: o scout declarava nove
+        dessas cartas "recusadas por toda intenção", que é o seu veredito de
+        carta fraca. Elas nunca tinham sido oferecidas a um bot capaz de aceitá-las.
         """
         if not choices:
             return None, None
 
-        if self.deliberate:
-            ordem = SKILL_PRIORITIES[self.name]
-            nova = min(
-                choices,
-                key=lambda s: (
-                    ordem.index(s.effect_type) if s.effect_type in ordem else len(ordem),
-                    -_skill_value(s),
-                ),
-            )
-        else:
+        if not self.deliberate:
+            # Grupo de controle: escolhe e troca ao acaso. Se ele também filtrasse
+            # a troca por valor, o "acaso" herdaria a preferência por dano e
+            # deixaria de ser referência para o valor da escolha deliberada.
             nova = rng.choice(choices)
+            if len(hero.skills) < MAX_EQUIPPED_SKILLS:
+                return nova, max(hero.skills, default=0) + 1
+            return nova, rng.choice(sorted(hero.skills))
 
-        if len(hero.skills) < 4:
+        ordem = SKILL_PRIORITIES[self.name]
+
+        def chave(skill) -> tuple[int, float]:
+            """Menor é melhor: tipo preferido primeiro, valor alto depois."""
+            posicao = ordem.index(skill.effect_type) if skill.effect_type in ordem else len(ordem)
+            return (posicao, -_skill_value(skill))
+
+        nova = min(choices, key=chave)
+
+        if len(hero.skills) < MAX_EQUIPPED_SKILLS:
             return nova, max(hero.skills, default=0) + 1
 
-        pior = min(hero.skills, key=lambda k: _skill_value(hero.skills[k]))
-        if _skill_value(nova) <= _skill_value(hero.skills[pior]):
+        pior = max(hero.skills, key=lambda k: chave(hero.skills[k]))
+        if chave(nova) >= chave(hero.skills[pior]):
             return None, None
         return nova, pior
 
