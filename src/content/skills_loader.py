@@ -39,6 +39,17 @@ class SkillCard:
     # literal, então qualquer buff cujo nome não estivesse na lista era um
     # no-op silencioso. Nomear o alvo do efeito no dado resolve isso na origem.
     effect_stat: str = ""
+    # Custo em percentual da mana MÁXIMA de quem lança. `mana_cost` é o custo
+    # absoluto herdado: ele fica como piso e como valor de exibição para
+    # conteúdo que ainda não migrou, mas quem tem percentual paga o percentual.
+    #
+    # A razão é a mesma que já obrigou poções e curas a virarem percentuais: a
+    # mana do herói cresce em progressão geométrica e o número do JSON não
+    # crescia. No andar 5 o Mago gastava 74% da mana num andar e ficava seco em
+    # 57% das runs; no andar 20 gastava 1%. O custo deixava de existir
+    # exatamente onde o jogador tem mais skills para escolher, e a decisão
+    # virava "use sempre a de maior dano".
+    mana_cost_percent: float = 0.0
 
 
 _SKILL_REGISTRY: dict[str, SkillCard] | None = None

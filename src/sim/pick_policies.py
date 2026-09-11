@@ -88,18 +88,45 @@ SKILL_PRIORITIES: dict[str, tuple[str, ...]] = {
 # Valor atribuído a uma skill de status, que não tem valor numérico. Controle
 # vale como um dano médio: nem descartável, nem a melhor carta da mão.
 STATUS_SKILL_VALUE = 25.0
+# Divisor que mantém o valor de um status na mesma ordem de grandeza da
+# constante acima depois de multiplicado por peso, duração e chance.
+STATUS_VALUE_NORMALISER = 4.0
 
 # Quantas skills o herói carrega ao mesmo tempo. Era um 4 literal dentro da
 # política de escolha, onde ninguém procuraria pelo teto de deck do jogo.
 MAX_EQUIPPED_SKILLS = 4
+# Quantas dessas precisam causar dano. Um herói sem skill de dano depende do
+# ataque básico para matar tudo, o que não é uma build: é um bot quebrado.
+MIN_DAMAGE_SKILLS = 2
 
 
 def _skill_value(skill) -> float:
-    """Valor bruto de uma skill, para comparar candidatas."""
+    """Valor bruto de uma skill, para comparar candidatas do mesmo tipo.
+
+    Só é comparável dentro de um tipo: em dano é percentual de dano, em buff é
+    ponto de atributo, em cura é percentual de HP. `pick_skill` respeita isso.
+    """
     try:
         return float(skill.effect_value)
     except (TypeError, ValueError):
-        return STATUS_SKILL_VALUE
+        return _status_value(skill)
+
+
+def _status_value(skill) -> float:
+    """Valor de uma skill de controle, que não traz número no JSON.
+
+    Todas as oito recebiam a mesma constante, então empatavam e o desempate era
+    a ordem da oferta: `Raio Congelante` — o único controle do Mago que rouba o
+    turno — valia o mesmo que um enfraquecimento, e por isso nunca era levada.
+    O que distingue uma da outra é o que o efeito faz, por quanto tempo, e com
+    que chance de pegar.
+    """
+    from src.shared.effects import control_weight
+
+    peso = control_weight(str(getattr(skill, "effect_value", "")))
+    duracao = max(1, int(getattr(skill, "duration", 1) or 1))
+    chance = _numeric(getattr(skill, "chance", 100)) / 100 or 1.0
+    return STATUS_SKILL_VALUE * peso * duracao * chance / STATUS_VALUE_NORMALISER
 
 
 @dataclass(frozen=True)
@@ -161,18 +188,45 @@ class PickPolicy:
             return nova, rng.choice(sorted(hero.skills))
 
         ordem = SKILL_PRIORITIES[self.name]
+        equipadas = list(hero.skills.values())
+        ja_no_deck = {getattr(s, "id", None) for s in equipadas}
+        com_dano = sum(1 for s in equipadas if s.effect_type == "damage")
+        falta_dano = com_dano < MIN_DAMAGE_SKILLS
 
-        def chave(skill) -> tuple[int, float]:
-            """Menor é melhor: tipo preferido primeiro, valor alto depois."""
+        def chave(skill) -> tuple[int, int, float]:
+            """Menor é melhor: primeiro o que o deck precisa, depois a intenção.
+
+            O primeiro campo existe porque a ordem da intenção é estrita, e
+            estrita demais: `survival` lista dano por último, então uma política
+            que só a obedecesse montava um deck de quatro buffs — com a mesma
+            carta repetida — e o herói não matava mais nada. Enquanto o deck não
+            tem o mínimo de dano, uma carta de dano ganha de qualquer outra;
+            depois disso a intenção volta a mandar.
+            """
+            urgente = 0 if (falta_dano and skill.effect_type == "damage") else 1
             posicao = ordem.index(skill.effect_type) if skill.effect_type in ordem else len(ordem)
-            return (posicao, -_skill_value(skill))
+            return (urgente, posicao, -_skill_value(skill))
 
-        nova = min(choices, key=chave)
+        # Carta repetida não é escolha: o segundo exemplar não acrescenta nada
+        # ao deck, e o bot chegava a levar `Fortalecimento` duas vezes.
+        candidatas = [c for c in choices if getattr(c, "id", None) not in ja_no_deck] or choices
+        nova = min(candidatas, key=chave)
 
         if len(hero.skills) < MAX_EQUIPPED_SKILLS:
             return nova, max(hero.skills, default=0) + 1
 
-        pior = max(hero.skills, key=lambda k: chave(hero.skills[k]))
+        # A carta a sacrificar nunca pode ser a última fonte de dano do deck.
+        descartaveis = [
+            k
+            for k in hero.skills
+            if not (
+                hero.skills[k].effect_type == "damage"
+                and com_dano <= MIN_DAMAGE_SKILLS
+                and nova.effect_type != "damage"
+            )
+        ] or list(hero.skills)
+
+        pior = max(descartaveis, key=lambda k: chave(hero.skills[k]))
         if chave(nova) >= chave(hero.skills[pior]):
             return None, None
         return nova, pior

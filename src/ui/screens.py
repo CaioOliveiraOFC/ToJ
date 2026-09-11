@@ -105,11 +105,13 @@ def render_skill_select_panel(player: "Player") -> None:
             skill_table.add_row(
                 str(key) + ".",
                 f"[dim]{skill.name} (recarga: {cooldown_remaining})[/dim]",
-                f"{skill.mana_cost} MP",
+                f"{player.skill_mana_cost(skill)} MP",
                 f"[red]{cooldown_remaining} turnos[/red]",
             )
         else:
-            skill_table.add_row(str(key) + ".", skill.name, f"{skill.mana_cost} MP", "")
+            skill_table.add_row(
+                str(key) + ".", skill.name, f"{player.skill_mana_cost(skill)} MP", ""
+            )
     skill_table.add_row("0.", "Voltar", "", "")
     renderer.console.print(
         Panel(
@@ -915,7 +917,7 @@ def render_passive_acquired(message: str) -> None:
     sleep(1.5)
 
 
-def render_skill_selection(choices: list) -> None:
+def render_skill_selection(choices: list, player: "Player" | None = None) -> None:
     """Renderiza as 3 cartas de skills para escolha."""
     rarity_colors = {
         "Common": "white",
@@ -934,7 +936,11 @@ def render_skill_selection(choices: list) -> None:
         color = rarity_colors.get(getattr(card, "rarity", "Common"), "white")
         name = getattr(card, "name", "?")
         rarity = getattr(card, "rarity", "")
-        mana_cost = getattr(card, "mana_cost", 0)
+        # O custo percentual só existe em relação a um herói. Sem ele, cai no
+        # valor absoluto do JSON em vez de exibir um número inventado.
+        mana_cost = (
+            player.skill_mana_cost(card) if player is not None else getattr(card, "mana_cost", 0)
+        )
         effect_type = getattr(card, "effect_type", "")
         effect_value = getattr(card, "effect_value", 0)
         description = getattr(card, "description", "")
@@ -985,7 +991,8 @@ def render_skill_replacement_choice(player: "Player", new_skill: object) -> None
             Text.from_markup(
                 f"[bold]Nova Habilidade:[/bold]\n"
                 f"[bold {color_new}]{new_skill.name}[/bold {color_new}]\n"
-                f"[dim]Custo: {new_skill.mana_cost} MP | {new_skill.description}[/dim]"
+                f"[dim]Custo: {player.skill_mana_cost(new_skill)} MP "
+                f"| {new_skill.description}[/dim]"
             ),
             title="[bold green]Nova Skill[/bold green]",
             border_style="green",
@@ -1013,7 +1020,7 @@ def render_skill_replacement_choice(player: "Player", new_skill: object) -> None
             Panel(
                 Text.from_markup(
                     f"[bold {color}]{key}. {skill.name}[/bold {color}]\n"
-                    f"[dim]Custo: {skill.mana_cost} MP | {skill.description}[/dim]"
+                    f"[dim]Custo: {player.skill_mana_cost(skill)} MP | {skill.description}[/dim]"
                 ),
                 border_style=color,
             )

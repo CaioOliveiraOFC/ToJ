@@ -72,13 +72,12 @@ def _valor_de_buff(skill) -> float:
 
 def _valor_de_controle(skill) -> float:
     """Controle que rouba turno vale mais que o que só enfraquece."""
-    from src.shared.effects import TURN_SKIPPING_STATUSES
+    from src.shared.effects import control_weight
 
     efeito = str(getattr(skill, "effect_value", ""))
     duracao = max(1, int(getattr(skill, "duration", 1)))
     chance = _numero(getattr(skill, "chance", 100)) / 100
-    peso = 3.0 if efeito in TURN_SKIPPING_STATUSES else 1.0
-    return peso * duracao * chance
+    return control_weight(efeito) * duracao * chance
 
 
 def _valor_de_item(item) -> float:
@@ -108,7 +107,7 @@ def _usable_skills(hero, kinds: tuple[str, ...]) -> list:
         s
         for s in hero.skills.values()
         if s.effect_type in kinds
-        and hero.get_mp() >= int(s.mana_cost)
+        and hero.get_mp() >= hero.skill_mana_cost(s)
         and cooldowns.get(s.id, 0) <= 0
     ]
 

@@ -128,3 +128,54 @@ class TestBotUsaAMelhorOpcaoNaoAPrimeira:
         congelar = SKILLS["raio_congelante"]  # frozen: rouba o turno
         enfraquecer = SKILLS["provocacao"]  # weakened: só reduz dano
         assert policies._valor_de_controle(congelar) > policies._valor_de_controle(enfraquecer)
+
+
+class TestODeckMontadoEJogavel:
+    """A ordem da intenção é estrita demais para ser a única regra.
+
+    `SKILL_PRIORITIES["survival"]` lista `damage` por último. Obedecida ao pé da
+    letra, ela montava um deck de quatro buffs — com a mesma carta repetida — e
+    o herói passava a depender do ataque básico para matar tudo. Medido: a
+    política escolhia 10% de dano, 45% de status e 41% de buff, e a profundidade
+    média caía de 9,2 para 6,1 andares. Não era build: era bot quebrado.
+    """
+
+    @staticmethod
+    def _monta_deck(politica: str, classe: str = "Warrior", rodadas: int = 8):
+        from src.content.skills_loader import load_skills
+
+        ofertas = [s for s in load_skills() if s.skill_class == classe]
+        heroi = make_hero(classe, 20, "naked")
+        heroi.skills = {}
+        rng = random.Random(0)
+        for _ in range(rodadas):
+            nova, slot = POLICIES[politica].pick_skill(heroi, rng.sample(ofertas, 3), rng)
+            if nova is not None and slot is not None:
+                heroi.skills[slot] = nova
+        return list(heroi.skills.values())
+
+    @pytest.mark.parametrize("politica", sorted(SKILL_PRIORITIES))
+    def test_o_deck_tem_como_matar(self, politica):
+        from src.sim.pick_policies import MIN_DAMAGE_SKILLS
+
+        deck = self._monta_deck(politica)
+        com_dano = sum(1 for s in deck if s.effect_type == "damage")
+        assert com_dano >= MIN_DAMAGE_SKILLS, (
+            f"{politica} montou um deck com {com_dano} skill(s) de dano: {[s.name for s in deck]}"
+        )
+
+    @pytest.mark.parametrize("politica", sorted(SKILL_PRIORITIES))
+    def test_o_deck_nao_repete_carta(self, politica):
+        deck = self._monta_deck(politica)
+        ids = [s.id for s in deck]
+        assert len(ids) == len(set(ids)), (
+            f"{politica} levou carta repetida: {[s.name for s in deck]} — "
+            "o segundo exemplar não acrescenta nada"
+        )
+
+    def test_a_intencao_ainda_manda_depois_do_minimo(self):
+        """A garantia de dano não pode transformar toda política em 'só dano'."""
+        deck = self._monta_deck("survival")
+        assert any(s.effect_type != "damage" for s in deck), (
+            "survival deveria levar utilidade depois de garantir o dano mínimo"
+        )

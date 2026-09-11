@@ -139,6 +139,21 @@ def basic_attack_power(attacker) -> int:
     return max(1, int(attacker.get_avg_damage() * BASIC_ATTACK_POWER_MULT))
 
 
+def skill_mana_cost(caster, skill) -> int:
+    """Quanto de mana a skill custa para ESTE lançador.
+
+    Delega para a entidade, que é quem conhece o próprio teto de mana. Existe
+    como ponta única de leitura para os pontos que antes liam `skill.mana_cost`
+    solto — política de escolha, bot de combate, IA do monstro e laço do jogo —,
+    porque um custo conferido num lugar e cobrado em outro deixa o herói lançar
+    o que não pode pagar.
+    """
+    metodo = getattr(caster, "skill_mana_cost", None)
+    if callable(metodo):
+        return int(metodo(skill))
+    return int(getattr(skill, "mana_cost", 0) or 0)
+
+
 def skill_damage_base(caster, skill) -> int:
     """BASE_POWER total de uma skill de dano, antes de defesa e crítico.
 
@@ -341,7 +356,8 @@ def apply_skill(
         type_="skill_cast",
         payload={"caster": caster, "skill": skill},
     )
-    caster.reduce_mp(int(skill.mana_cost))
+    custo = skill_mana_cost(caster, skill)
+    caster.reduce_mp(custo)
 
     # Aplica cooldown após uso bem-sucedido (se houver)
     if skill_id and hasattr(caster, "skill_cooldowns") and skill_cooldown > 0:
@@ -356,7 +372,7 @@ def apply_skill(
         # esquivado não atordoa.
         if strike and not strike.was_evaded:
             _try_apply_stun(target, int(getattr(skill, "stun_chance", 0) or 0), r, publish)
-        out = SkillApplyResult(kind="damage", mp_spent=int(skill.mana_cost), strike=strike)
+        out = SkillApplyResult(kind="damage", mp_spent=custo, strike=strike)
         _emit(
             publish,
             T.COMBAT_SKILL_OUTCOME,
@@ -372,7 +388,7 @@ def apply_skill(
         heal_amount = max(1, int(max_hp * int(skill.effect_value) / 100))
         heal_amount += int(heal_amount * fx.combat_modifier(caster, "potion_heal_bonus") / 100)
         caster.heal(heal_amount)
-        out = SkillApplyResult(kind="heal", mp_spent=int(skill.mana_cost), heal_amount=heal_amount)
+        out = SkillApplyResult(kind="heal", mp_spent=custo, heal_amount=heal_amount)
         _emit(
             publish,
             T.COMBAT_SKILL_OUTCOME,
@@ -391,14 +407,14 @@ def apply_skill(
             _try_apply_stun(target, int(getattr(skill, "stun_chance", 0) or 0), r, publish)
             out = SkillApplyResult(
                 kind="status",
-                mp_spent=int(skill.mana_cost),
+                mp_spent=custo,
                 status_effect=str(skill.effect_value),
                 status_success=True,
             )
         else:
             out = SkillApplyResult(
                 kind="status",
-                mp_spent=int(skill.mana_cost),
+                mp_spent=custo,
                 status_effect=str(skill.effect_value),
                 status_success=False,
             )
@@ -422,7 +438,7 @@ def apply_skill(
         }
         out = SkillApplyResult(
             kind="buff",
-            mp_spent=int(skill.mana_cost),
+            mp_spent=custo,
             buff_name=str(skill.name),
         )
         _emit(
@@ -445,7 +461,7 @@ def apply_skill(
         recipient.active_effects["damage_reduction"] = {"value": value, "duration": duration}
         out = SkillApplyResult(
             kind="buff",
-            mp_spent=int(skill.mana_cost),
+            mp_spent=custo,
             buff_name="damage_reduction",
         )
         _emit(

@@ -37,6 +37,24 @@ class Entity:
         cap = int(getattr(self, "base_hp", cur))
         self._hp = min(cap, cur + int(amount))
 
+    def skill_mana_cost(self, skill) -> int:
+        """Quanto esta entidade paga para lançar `skill`.
+
+        Mora aqui, e não no motor, porque quem lança é quem tem o teto de mana —
+        e porque `ui/` precisa mostrar o mesmo número que `mechanics/` vai
+        cobrar, sem poder importar `mechanics/`. Um custo calculado num lugar e
+        exibido em outro é como a tela promete 25 e o motor tira 67.
+
+        Cartas com `mana_cost_percent` pagam essa fração da mana máxima; as
+        demais pagam o valor absoluto do JSON. Nunca zero: skill de graça não
+        tem decisão por trás.
+        """
+        percentual = float(getattr(skill, "mana_cost_percent", 0) or 0)
+        if percentual <= 0:
+            return int(getattr(skill, "mana_cost", 0) or 0)
+        teto = int(getattr(self, "base_mp", 0) or 0)
+        return max(1, int(teto * percentual / 100))
+
     def reduce_mp(self, cost: int) -> None:
         """Reduz MP da entidade pelo custo especificado.
 

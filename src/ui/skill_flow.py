@@ -19,7 +19,7 @@ def run_skill_selection_flow(player: "Player", choices: list["SkillCard"]) -> "S
         A skill escolhida ou None se cancelado.
     """
     while True:
-        screens.render_skill_selection(choices)
+        screens.render_skill_selection(choices, player)
         choice = safe_get_key(valid_keys=["1", "2", "3", "0"])
         if choice == "0":
             return None

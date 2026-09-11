@@ -50,6 +50,28 @@ OUTGOING_DAMAGE_PENALTY = {"weakened": 30, "fear": 20}
 # Status que drenam MP por turno.
 RESOURCE_DRAIN = ("mana_burn",)
 
+
+# Quanto vale um turno de controle, por família de status. Serve para comparar
+# duas cartas de controle entre si — na escolha da carta e na hora de lançá-la.
+#
+# Sem isto, as duas camadas tratavam todo status como equivalente: a política de
+# escolha dava a mesma constante para os oito, e o bot de combate pegava o
+# primeiro da lista. `Raio Congelante`, que rouba o turno inteiro do inimigo,
+# empatava com `Golpe Baixo`, que só reduz o dano dele — e quem decidia era a
+# ordem em que as cartas tinham entrado no deck.
+#
+# Roubar o turno vale mais que qualquer outra coisa: é o dano do inimigo inteiro
+# a zero naquela rodada. Dano por turno vem depois, porque acumula. O resto
+# apenas reduz uma parcela.
+def control_weight(effect: str) -> float:
+    """Peso de um status como controle. Maior é melhor."""
+    if effect in TURN_SKIPPING_STATUSES:
+        return 3.0
+    if effect in DAMAGE_OVER_TIME:
+        return 2.0
+    return 1.0
+
+
 # `sleep` acorda ao levar dano — dormir para sempre seria atordoamento eterno,
 # não sono, e removeria o counterplay de simplesmente bater no alvo.
 BREAKS_ON_DAMAGE = ("sleep",)

@@ -163,7 +163,7 @@ def _pick_skill_action(player, monsters, primary) -> "battle.Action | None":
             screens.render_skill_on_cooldown_message(skill.name, remaining)
             sleep(0.5)
             continue
-        if player.get_mp() < skill.mana_cost:
+        if player.get_mp() < player.skill_mana_cost(skill):
             screens.render_battle_insufficient_mana_message()
             sleep(0.5)
             continue

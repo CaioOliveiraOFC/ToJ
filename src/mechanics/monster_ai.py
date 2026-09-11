@@ -92,7 +92,7 @@ def _usable_skills(monster) -> list:
     return [
         s
         for s in skills
-        if monster.get_mp() >= int(s.mana_cost)
+        if monster.get_mp() >= monster.skill_mana_cost(s)
         and cooldowns.get(s.id, 0) <= 0
         and not _ja_esta_no_ar(monster, s)
     ]

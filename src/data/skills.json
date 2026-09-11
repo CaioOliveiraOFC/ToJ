@@ -24,7 +24,8 @@
       "is_initial": true,
       "cooldown": 1,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 4.5
     },
     {
       "id": "investida",
@@ -42,7 +43,8 @@
       "is_initial": true,
       "cooldown": 1,
       "stun_chance": 15,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 5.06
     },
     {
       "id": "escudo_protetor",
@@ -60,7 +62,8 @@
       "is_initial": true,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": "df"
+      "effect_stat": "df",
+      "mana_cost_percent": 9.33
     },
     {
       "id": "grito_guerra",
@@ -78,7 +81,8 @@
       "is_initial": true,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": "st"
+      "effect_stat": "st",
+      "mana_cost_percent": 8.53
     },
     {
       "id": "golpe_devastador",
@@ -96,7 +100,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 10.28
     },
     {
       "id": "bola_fogo",
@@ -114,7 +119,8 @@
       "is_initial": true,
       "cooldown": 1,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 5.61
     },
     {
       "id": "missil_magico",
@@ -132,7 +138,8 @@
       "is_initial": true,
       "cooldown": 1,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 4.78
     },
     {
       "id": "drenar_vida",
@@ -150,7 +157,8 @@
       "is_initial": true,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 5.31
     },
     {
       "id": "escudo_magico",
@@ -168,7 +176,8 @@
       "is_initial": true,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": "df"
+      "effect_stat": "df",
+      "mana_cost_percent": 8.53
     },
     {
       "id": "raio_congelante",
@@ -186,7 +195,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 7.82
     },
     {
       "id": "cura_menor",
@@ -204,7 +214,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 9.94
     },
     {
       "id": "ataque_furtivo",
@@ -222,7 +233,8 @@
       "is_initial": true,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 6.62
     },
     {
       "id": "golpe_baixo",
@@ -240,7 +252,8 @@
       "is_initial": true,
       "cooldown": 2,
       "stun_chance": 15,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 5.31
     },
     {
       "id": "evasao",
@@ -258,7 +271,8 @@
       "is_initial": true,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": "evasion"
+      "effect_stat": "evasion",
+      "mana_cost_percent": 5.31
     },
     {
       "id": "sombra_rapida",
@@ -276,7 +290,8 @@
       "is_initial": true,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": "ag"
+      "effect_stat": "ag",
+      "mana_cost_percent": 7.72
     },
     {
       "id": "lancar_adaga",
@@ -294,7 +309,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 12.92
     },
     {
       "id": "cortina_fumaca",
@@ -312,7 +328,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": "ag"
+      "effect_stat": "ag",
+      "mana_cost_percent": 11.68
     },
     {
       "id": "cutelada",
@@ -330,7 +347,8 @@
       "is_initial": false,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 7.28
     },
     {
       "id": "provocacao",
@@ -348,7 +366,8 @@
       "is_initial": false,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 6.12
     },
     {
       "id": "fortalecimento",
@@ -366,7 +385,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": "st"
+      "effect_stat": "st",
+      "mana_cost_percent": 11.68
     },
     {
       "id": "golpe_duplo",
@@ -384,7 +404,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 9.9
     },
     {
       "id": "resistencia_heroica",
@@ -402,7 +423,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": "damage_reduction"
+      "effect_stat": "damage_reduction",
+      "mana_cost_percent": 7.97
     },
     {
       "id": "furia",
@@ -420,7 +442,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": "st"
+      "effect_stat": "st",
+      "mana_cost_percent": 16.32
     },
     {
       "id": "esmagar",
@@ -438,7 +461,8 @@
       "is_initial": false,
       "cooldown": 4,
       "stun_chance": 30,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 13.77
     },
     {
       "id": "imortal",
@@ -456,7 +480,8 @@
       "is_initial": false,
       "cooldown": 5,
       "stun_chance": 0,
-      "effect_stat": "damage_reduction"
+      "effect_stat": "damage_reduction",
+      "mana_cost_percent": 19.47
     },
     {
       "id": "relampago",
@@ -474,7 +499,8 @@
       "is_initial": false,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 7.93
     },
     {
       "id": "barreira_arcana",
@@ -492,7 +518,8 @@
       "is_initial": false,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": "df"
+      "effect_stat": "df",
+      "mana_cost_percent": 9.33
     },
     {
       "id": "explosao_arcana",
@@ -510,7 +537,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 10.65
     },
     {
       "id": "dreno_mana",
@@ -528,7 +556,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 6.12
     },
     {
       "id": "sono_profundo",
@@ -546,7 +575,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 13.43
     },
     {
       "id": "tempestade",
@@ -564,7 +594,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 12.16
     },
     {
       "id": "ressurgir",
@@ -582,7 +613,8 @@
       "is_initial": false,
       "cooldown": 5,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 20.64
     },
     {
       "id": "apocalipse",
@@ -600,7 +632,8 @@
       "is_initial": false,
       "cooldown": 5,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 20.64
     },
     {
       "id": "golpe_sombras",
@@ -618,7 +651,8 @@
       "is_initial": false,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 7.93
     },
     {
       "id": "envenenar",
@@ -636,7 +670,8 @@
       "is_initial": false,
       "cooldown": 2,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 14.16
     },
     {
       "id": "passo_felino",
@@ -654,7 +689,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": "ag"
+      "effect_stat": "ag",
+      "mana_cost_percent": 12.61
     },
     {
       "id": "assassinato",
@@ -672,7 +708,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 11.03
     },
     {
       "id": "evasao_perfeita",
@@ -690,7 +727,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": "evasion"
+      "effect_stat": "evasion",
+      "mana_cost_percent": 8.9
     },
     {
       "id": "danca_laminas",
@@ -708,7 +746,8 @@
       "is_initial": false,
       "cooldown": 3,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 12.16
     },
     {
       "id": "fantasma",
@@ -726,7 +765,8 @@
       "is_initial": false,
       "cooldown": 4,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 6.93
     },
     {
       "id": "morte_subita",
@@ -744,7 +784,8 @@
       "is_initial": false,
       "cooldown": 5,
       "stun_chance": 0,
-      "effect_stat": ""
+      "effect_stat": "",
+      "mana_cost_percent": 20.64
     }
   ]
 }
