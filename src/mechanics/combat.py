@@ -31,6 +31,8 @@ from src.shared.constants import (
     PERCENTAGE_RANGE_MIN,
     POISON_AGILITY_DIVISOR,
     POISON_DAMAGE_PER_TICK,
+    SKILL_BONUS_HEALTHY_RATIO,
+    SKILL_BONUS_WOUNDED_RATIO,
     STUN_DURATION,
     XMULT_CAP,
 )
@@ -154,7 +156,41 @@ def skill_mana_cost(caster, skill) -> int:
     return int(getattr(skill, "mana_cost", 0) or 0)
 
 
-def skill_damage_base(caster, skill) -> int:
+def bonus_condition_met(caster, skill, target) -> bool:
+    """A condição situacional da skill está satisfeita contra este alvo?
+
+    Sem alvo não há situação para ler, então o bônus não conta — é o caso da
+    estimativa feita fora de um combate.
+    """
+    condicao = str(getattr(skill, "bonus_condition", "") or "")
+    if not condicao or target is None:
+        return False
+
+    efeitos = getattr(target, "active_effects", {}) or {}
+    if condicao == "target_controlled":
+        return any(e in fx.TURN_SKIPPING_STATUSES for e in efeitos)
+    if condicao == "target_afflicted":
+        return bool(efeitos)
+    if condicao == "target_wounded":
+        return _fracao_de_vida(target) <= SKILL_BONUS_WOUNDED_RATIO
+    if condicao == "target_healthy":
+        return _fracao_de_vida(target) >= SKILL_BONUS_HEALTHY_RATIO
+    if condicao == "caster_wounded":
+        return _fracao_de_vida(caster) <= SKILL_BONUS_WOUNDED_RATIO
+    # Condição desconhecida nunca dispara. `tests/test_data_integrity.py` recusa
+    # uma grafia fora de `BONUS_CONDITIONS` antes que ela chegue até aqui: um
+    # bônus que nunca acontece é exatamente o tipo de placebo que passa despercebido.
+    return False
+
+
+def _fracao_de_vida(entidade) -> float:
+    teto = int(getattr(entidade, "base_hp", 0) or 0)
+    if teto <= 0:
+        return 1.0
+    return max(0.0, entidade.get_hp() / teto)
+
+
+def skill_damage_base(caster, skill, target=None) -> int:
     """BASE_POWER total de uma skill de dano, antes de defesa e crítico.
 
     `effect_value` é um **percentual sobre o poder base**, não uma soma fixa.
@@ -169,6 +205,8 @@ def skill_damage_base(caster, skill) -> int:
     """
     base_power = caster.get_avg_damage()
     bonus_percent = int(skill.effect_value)
+    if bonus_condition_met(caster, skill, target):
+        bonus_percent += int(getattr(skill, "bonus_percent", 0) or 0)
     return max(1, int(base_power * (1 + bonus_percent / 100)))
 
 
@@ -364,7 +402,7 @@ def apply_skill(
         caster.skill_cooldowns[skill_id] = skill_cooldown
 
     if skill.effect_type == "damage":
-        total_base = skill_damage_base(caster, skill)
+        total_base = skill_damage_base(caster, skill, target)
         strike = resolve_physical_attack(
             caster, target, total_base, str(skill.name), rng=r, publish=None
         )

@@ -50,6 +50,13 @@ class SkillCard:
     # exatamente onde o jogador tem mais skills para escolher, e a decisão
     # virava "use sempre a de maior dano".
     mana_cost_percent: float = 0.0
+    # Condição situacional que rende `bonus_percent` de dano a mais. Existe para
+    # que uma skill de dano seja mais do que um ataque básico caro: sem ela, a
+    # decisão "qual skill uso" é aritmética fixa — sempre a de maior valor —, e
+    # o deck não precisa ser lido, só ordenado. Com ela, congelar o alvo passa a
+    # valer o turno que custou, porque a skill seguinte cobra por isso.
+    bonus_condition: str = ""
+    bonus_percent: int = 0
 
 
 _SKILL_REGISTRY: dict[str, SkillCard] | None = None

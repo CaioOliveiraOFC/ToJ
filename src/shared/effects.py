@@ -63,6 +63,19 @@ RESOURCE_DRAIN = ("mana_burn",)
 # Roubar o turno vale mais que qualquer outra coisa: é o dano do inimigo inteiro
 # a zero naquela rodada. Dano por turno vem depois, porque acumula. O resto
 # apenas reduz uma parcela.
+# Condições que uma skill de dano pode exigir para render o bônus. O nome vive
+# aqui porque o dado (JSON) e o motor precisam concordar sobre a grafia, e uma
+# condição escrita errada seria um bônus que nunca acontece — placebo silencioso,
+# que é o defeito mais caro que esta base já teve.
+BONUS_CONDITIONS = (
+    "target_controlled",  # alvo perdendo o turno: atordoado, congelado, dormindo
+    "target_afflicted",  # alvo sob qualquer status
+    "target_wounded",  # alvo abaixo do limiar de execução
+    "target_healthy",  # alvo ainda intacto: recompensa a abertura
+    "caster_wounded",  # quem lança está abaixo do limiar: golpe de desespero
+)
+
+
 def control_weight(effect: str) -> float:
     """Peso de um status como controle. Maior é melhor."""
     if effect in TURN_SKIPPING_STATUSES:

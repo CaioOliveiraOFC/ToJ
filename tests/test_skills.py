@@ -141,27 +141,52 @@ def test_nenhuma_skill_de_dano_e_dominada(classe):
     "Custar mais" é o conjunto: mais mana, mais recarga e mais nível exigido.
     Uma carta dominada nesses três eixos não é uma escolha difícil — é uma
     escolha errada, e oferecê-la ao jogador gasta um slot do menu.
+
+    Os dois lados da comparação mudaram de campo e a regra teve de acompanhar,
+    senão ela passa a medir outra coisa:
+
+    - o custo é `mana_cost_percent`, não `mana_cost`. O absoluto ficou como
+      valor de conteúdo não migrado, e comparar dois números em unidades
+      diferentes deixaria a dominação passar despercebida;
+    - o poder é um INTERVALO. Com condição situacional, a mesma carta entrega
+      `effect_value` quando a situação não ajuda e `+ bonus_percent` quando
+      ajuda. Dominar exige entregar mais nas duas pontas: uma carta que perde no
+      piso e ganha no teto não é pior, é outra aposta — e é exatamente a decisão
+      que a condição existe para criar.
     """
     da_classe = [s for s in SKILLS_DE_DANO if s.skill_class == classe]
+
+    def piso(s) -> int:
+        return int(s.effect_value)
+
+    def teto(s) -> int:
+        return int(s.effect_value) + int(getattr(s, "bonus_percent", 0) or 0)
+
+    def custo(s) -> float:
+        return float(getattr(s, "mana_cost_percent", 0) or 0) or float(s.mana_cost)
+
     for a in da_classe:
         for b in da_classe:
             if a is b:
                 continue
             pior_ou_igual = (
-                int(a.effect_value) <= int(b.effect_value)
-                and int(a.mana_cost) >= int(b.mana_cost)
+                piso(a) <= piso(b)
+                and teto(a) <= teto(b)
+                and custo(a) >= custo(b)
                 and int(a.cooldown) >= int(b.cooldown)
                 and int(a.level_required) >= int(b.level_required)
             )
             estritamente_pior = (
-                int(a.effect_value) < int(b.effect_value)
-                or int(a.mana_cost) > int(b.mana_cost)
+                piso(a) < piso(b)
+                or teto(a) < teto(b)
+                or custo(a) > custo(b)
                 or int(a.cooldown) > int(b.cooldown)
             )
             assert not (pior_ou_igual and estritamente_pior), (
-                f"{a.id} (nv {a.level_required}, {a.effect_value}%, {a.mana_cost} MP, "
-                f"recarga {a.cooldown}) é dominada por {b.id} (nv {b.level_required}, "
-                f"{b.effect_value}%, {b.mana_cost} MP, recarga {b.cooldown})"
+                f"{a.id} (nv {a.level_required}, {piso(a)}-{teto(a)}%, "
+                f"{custo(a):.2f} de mana, recarga {a.cooldown}) é dominada por "
+                f"{b.id} (nv {b.level_required}, {piso(b)}-{teto(b)}%, "
+                f"{custo(b):.2f} de mana, recarga {b.cooldown})"
             )
 
 

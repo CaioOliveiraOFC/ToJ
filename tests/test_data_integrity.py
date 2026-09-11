@@ -67,3 +67,54 @@ def test_todo_registro_tem_nome_legivel(arquivo: Path):
             assert not MOJIBAKE.search(texto), (
                 f"{arquivo.name}: {campo} de {registro.get('id')!r} = {texto!r}"
             )
+
+
+class TestCondicoesDeBonusExistemNoMotor:
+    """Uma condição com grafia errada é um bônus que nunca acontece.
+
+    É o defeito mais caro que esta base já teve, em três variantes: buff que o
+    motor não reconhecia pelo nome, passiva de essência que ninguém lia, e
+    `stun_chance` num ramo que não o consultava. Nenhuma levantou exceção; todas
+    saíram como carta bonita na tela que não fazia nada. Esta regra fecha a porta
+    na origem, no dado, antes de o motor ver a carta.
+    """
+
+    def test_toda_condicao_declarada_e_conhecida(self):
+        from src.shared.effects import BONUS_CONDITIONS
+
+        desconhecidas = [
+            (s["id"], s["bonus_condition"])
+            for s in _skills()
+            if s.get("bonus_condition") and s["bonus_condition"] not in BONUS_CONDITIONS
+        ]
+        assert not desconhecidas, (
+            "condições que o motor não sabe avaliar (o bônus nunca dispara): "
+            f"{desconhecidas}. Conhecidas: {BONUS_CONDITIONS}"
+        )
+
+    def test_condicao_e_bonus_andam_juntos(self):
+        """Um sem o outro é sempre erro: ou bônus de zero, ou bônus sem gatilho."""
+        quebradas = [
+            s["id"]
+            for s in _skills()
+            if bool(s.get("bonus_condition")) != bool(s.get("bonus_percent"))
+        ]
+        assert not quebradas, f"condição sem bônus, ou bônus sem condição: {quebradas}"
+
+    def test_toda_skill_de_dano_tem_uma_situacao(self):
+        """Sem condição, uma skill de dano é um ataque básico caro.
+
+        A escolha entre elas vira aritmética fixa — sempre a de maior valor — e
+        o deck deixa de precisar ser lido.
+        """
+        sem = [
+            s["id"]
+            for s in _skills()
+            if s["effect_type"] == "damage" and not s.get("bonus_condition")
+        ]
+        assert not sem, f"skills de dano sem condição situacional: {sem}"
+
+
+def _skills() -> list[dict]:
+    caminho = RAIZ / "src" / "data" / "skills.json"
+    return json.loads(caminho.read_text(encoding="utf-8"))["skills"]

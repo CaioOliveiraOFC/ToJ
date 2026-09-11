@@ -191,3 +191,107 @@ class TestSkillMudaOEstado:
             if antes != depois:
                 return
         pytest.fail(f"{skill.id} não mudou nada em 60 usos: a carta é placebo")
+
+
+class TestCondicaoSituacionalDaSkill:
+    """Uma skill de dano sem situação é um ataque básico caro.
+
+    Se toda skill entrega o mesmo contra qualquer alvo, "qual eu uso" é
+    aritmética fixa — sempre a de maior valor —, o deck não precisa ser lido e
+    controlar o inimigo não paga o turno que custou. A condição é o que liga uma
+    carta à outra: atordoar passa a valer porque a skill seguinte cobra por isso.
+    """
+
+    @staticmethod
+    def _criar_situacao(alvo, heroi, condicao: str) -> None:
+        if condicao == "target_wounded":
+            alvo._hp = max(1, int(alvo.base_hp * 0.2))
+        elif condicao == "caster_wounded":
+            heroi._hp = max(1, int(heroi.base_hp * 0.2))
+        elif condicao == "target_controlled":
+            alvo.active_effects["stun"] = {"duration": 1}
+        elif condicao == "target_afflicted":
+            alvo.active_effects["poison"] = {"duration": 2}
+
+    @staticmethod
+    def _quebrar_situacao(alvo, heroi, condicao: str) -> None:
+        alvo.active_effects.clear()
+        alvo._hp = alvo.base_hp
+        heroi._hp = heroi.base_hp
+        if condicao == "target_healthy":
+            # A única cuja ausência é o alvo ferido, não o alvo intacto.
+            alvo._hp = max(1, int(alvo.base_hp * 0.5))
+
+    @pytest.mark.parametrize(
+        "skill",
+        [s for s in SKILLS.values() if getattr(s, "bonus_condition", "")],
+        ids=lambda s: s.id,
+    )
+    def test_a_condicao_muda_o_dano(self, skill):
+        classe = skill.skill_class
+        if classe not in ("Warrior", "Mage", "Rogue"):
+            classe = "Warrior"
+        condicao = skill.bonus_condition
+
+        heroi = make_hero(classe, 20, "naked")
+        alvo = _alvo_imortal()
+        self._quebrar_situacao(alvo, heroi, condicao)
+        sem = combat.skill_damage_base(heroi, skill, alvo)
+
+        heroi = make_hero(classe, 20, "naked")
+        alvo = _alvo_imortal()
+        self._quebrar_situacao(alvo, heroi, condicao)
+        self._criar_situacao(alvo, heroi, condicao)
+        if condicao == "target_healthy":
+            alvo._hp = alvo.base_hp
+        com = combat.skill_damage_base(heroi, skill, alvo)
+
+        assert com > sem, (
+            f"{skill.id} declara bônus de {skill.bonus_percent}% com "
+            f"'{condicao}' e entrega o mesmo dano nos dois casos: o bônus é placebo"
+        )
+
+    def test_sem_alvo_a_condicao_nao_conta(self):
+        """A estimativa fora de combate não pode inventar um bônus."""
+        skill = SKILLS["assassinato"]
+        heroi = make_hero("Rogue", 20, "naked")
+        assert not combat.bonus_condition_met(heroi, skill, None)
+
+    def test_nenhuma_carta_depende_de_alvo_controlado(self):
+        """`target_controlled` mede 0% de disparo: nenhuma carta pode contar com ela.
+
+        A sinergia parecia óbvia — atordoe, depois bata forte no alvo sem turno —
+        e é impossível com a mecânica atual. `STUN_DURATION` é 1, e a duração de
+        um status é consumida no turno do PRÓPRIO afetado: o monstro perde a vez
+        e o efeito expira antes de o herói voltar a agir. Ele nunca vê o alvo
+        controlado. Medido em jogo: o Guerreiro atordoa em 41% das lutas e a
+        condição dispara em 0% das avaliações. Com `STUN_DURATION = 2` sobe para
+        6%, o que não paga dobrar o valor de todo atordoamento do jogo.
+
+        A condição continua implementada no motor, e volta a valer no dia em que
+        o atordoamento durar mais. Até lá, uma carta que dependa dela cobra mana
+        por um bônus que não acontece — placebo, que é o defeito que esta suíte
+        existe para impedir.
+        """
+        dependentes = [
+            s.id
+            for s in SKILLS.values()
+            if getattr(s, "bonus_condition", "") == "target_controlled"
+        ]
+        assert not dependentes, (
+            f"{dependentes} dependem de 'target_controlled', que dispara 0% das vezes. "
+            "Para usá-la, o atordoamento precisa durar além do turno do alvo."
+        )
+
+    def test_a_condicao_de_controle_continua_funcionando_no_motor(self):
+        """Se um dia o atordoamento durar mais, a condição precisa estar de pé."""
+        heroi = make_hero("Warrior", 20, "naked")
+        falsa = type(
+            "S",
+            (),
+            {"bonus_condition": "target_controlled", "bonus_percent": 50, "effect_value": 100},
+        )()
+        alvo = _alvo_imortal()
+        assert not combat.bonus_condition_met(heroi, falsa, alvo)
+        alvo.active_effects["stun"] = {"duration": 1}
+        assert combat.bonus_condition_met(heroi, falsa, alvo)

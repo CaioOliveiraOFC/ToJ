@@ -301,6 +301,11 @@ MONSTER_DESPERATE_HP_RATIO = 0.35
 # qualquer arquétipo com dano guardado usa a maior skill que tiver, ignorando a
 # rolagem de `skill_use_chance`: um golpe que mata vale mais que a média.
 MONSTER_EXECUTE_HP_RATIO = 0.35
+# Limiares das condições de bônus das skills de dano. O mesmo 0.35 do execute
+# do monstro: a regra vale para os dois lados da luta, e o jogador que aprendeu
+# a ler o momento de execução do inimigo já sabe ler o seu.
+SKILL_BONUS_WOUNDED_RATIO = 0.35
+SKILL_BONUS_HEALTHY_RATIO = 0.80
 # Quantos turnos do início do combate contam como abertura. Um buff de defesa
 # lançado no primeiro turno de uma luta de dez rende os três turnos inteiros;
 # lançado no oitavo, rende um. Tank, elite, chefe e suporte abrem buffando.

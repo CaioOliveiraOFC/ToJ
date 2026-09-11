@@ -15,7 +15,7 @@
       "level_required": 1,
       "mana_cost": 15,
       "effect_type": "damage",
-      "effect_value": 60,
+      "effect_value": 54,
       "description": "Um ataque focado que causa dano extra.",
       "target": "enemy",
       "duration": 0,
@@ -25,7 +25,9 @@
       "cooldown": 1,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 4.5
+      "mana_cost_percent": 4.5,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 8
     },
     {
       "id": "investida",
@@ -34,7 +36,7 @@
       "level_required": 1,
       "mana_cost": 20,
       "effect_type": "damage",
-      "effect_value": 70,
+      "effect_value": 55,
       "description": "Carrega contra o inimigo com força bruta.",
       "target": "enemy",
       "duration": 0,
@@ -44,7 +46,9 @@
       "cooldown": 1,
       "stun_chance": 15,
       "effect_stat": "",
-      "mana_cost_percent": 5.06
+      "mana_cost_percent": 5.06,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 22
     },
     {
       "id": "escudo_protetor",
@@ -91,7 +95,7 @@
       "level_required": 10,
       "mana_cost": 40,
       "effect_type": "damage",
-      "effect_value": 115,
+      "effect_value": 103,
       "description": "Um ataque extremamente poderoso que causa dano massivo.",
       "target": "enemy",
       "duration": 0,
@@ -101,7 +105,9 @@
       "cooldown": 3,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 10.28
+      "mana_cost_percent": 10.28,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 60
     },
     {
       "id": "bola_fogo",
@@ -110,7 +116,7 @@
       "level_required": 1,
       "mana_cost": 25,
       "effect_type": "damage",
-      "effect_value": 80,
+      "effect_value": 68,
       "description": "Lança uma bola de fogo que causa dano mágico.",
       "target": "enemy",
       "duration": 0,
@@ -120,7 +126,9 @@
       "cooldown": 1,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 5.61
+      "mana_cost_percent": 5.61,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 45
     },
     {
       "id": "missil_magico",
@@ -129,7 +137,7 @@
       "level_required": 1,
       "mana_cost": 20,
       "effect_type": "damage",
-      "effect_value": 65,
+      "effect_value": 54,
       "description": "Lança um míssil de energia pura.",
       "target": "enemy",
       "duration": 0,
@@ -139,7 +147,9 @@
       "cooldown": 1,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 4.78
+      "mana_cost_percent": 4.78,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 15
     },
     {
       "id": "drenar_vida",
@@ -224,7 +234,7 @@
       "level_required": 1,
       "mana_cost": 22,
       "effect_type": "damage",
-      "effect_value": 80,
+      "effect_value": 54,
       "description": "Golpe pelas costas com alta chance de crítico. Caro e com recarga.",
       "target": "enemy",
       "duration": 0,
@@ -234,7 +244,9 @@
       "cooldown": 2,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 6.62
+      "mana_cost_percent": 6.62,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 37
     },
     {
       "id": "golpe_baixo",
@@ -338,7 +350,7 @@
       "level_required": 5,
       "mana_cost": 35,
       "effect_type": "damage",
-      "effect_value": 90,
+      "effect_value": 78,
       "description": "Golpe amplo que atinge com força.",
       "target": "enemy",
       "duration": 0,
@@ -348,7 +360,9 @@
       "cooldown": 2,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 7.28
+      "mana_cost_percent": 7.28,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 45
     },
     {
       "id": "provocacao",
@@ -395,7 +409,7 @@
       "level_required": 9,
       "mana_cost": 35,
       "effect_type": "damage",
-      "effect_value": 110,
+      "effect_value": 96,
       "description": "Dois golpes rápidos.",
       "target": "enemy",
       "duration": 0,
@@ -405,7 +419,9 @@
       "cooldown": 3,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 9.9
+      "mana_cost_percent": 9.9,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 55
     },
     {
       "id": "resistencia_heroica",
@@ -452,7 +468,7 @@
       "level_required": 15,
       "mana_cost": 40,
       "effect_type": "damage",
-      "effect_value": 140,
+      "effect_value": 119,
       "description": "Golpe devastador com chance de atordoar.",
       "target": "enemy",
       "duration": 0,
@@ -462,7 +478,9 @@
       "cooldown": 4,
       "stun_chance": 30,
       "effect_stat": "",
-      "mana_cost_percent": 13.77
+      "mana_cost_percent": 13.77,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 70
     },
     {
       "id": "imortal",
@@ -490,7 +508,7 @@
       "level_required": 5,
       "mana_cost": 35,
       "effect_type": "damage",
-      "effect_value": 100,
+      "effect_value": 85,
       "description": "Raio elétrico que causa dano.",
       "target": "enemy",
       "duration": 0,
@@ -500,7 +518,9 @@
       "cooldown": 2,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 7.93
+      "mana_cost_percent": 7.93,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 50
     },
     {
       "id": "barreira_arcana",
@@ -528,7 +548,7 @@
       "level_required": 7,
       "mana_cost": 40,
       "effect_type": "damage",
-      "effect_value": 120,
+      "effect_value": 106,
       "description": "Explosão mágica em área.",
       "target": "enemy",
       "duration": 0,
@@ -538,7 +558,9 @@
       "cooldown": 3,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 10.65
+      "mana_cost_percent": 10.65,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 55
     },
     {
       "id": "dreno_mana",
@@ -585,7 +607,7 @@
       "level_required": 13,
       "mana_cost": 45,
       "effect_type": "damage",
-      "effect_value": 140,
+      "effect_value": 124,
       "description": "Tormenta mágica devastadora.",
       "target": "enemy",
       "duration": 0,
@@ -595,7 +617,9 @@
       "cooldown": 3,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 12.16
+      "mana_cost_percent": 12.16,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 60
     },
     {
       "id": "ressurgir",
@@ -623,7 +647,7 @@
       "level_required": 20,
       "mana_cost": 55,
       "effect_type": "damage",
-      "effect_value": 195,
+      "effect_value": 179,
       "description": "O fim de tudo.",
       "target": "enemy",
       "duration": 0,
@@ -633,7 +657,9 @@
       "cooldown": 5,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 20.64
+      "mana_cost_percent": 20.64,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 80
     },
     {
       "id": "golpe_sombras",
@@ -642,7 +668,7 @@
       "level_required": 5,
       "mana_cost": 35,
       "effect_type": "damage",
-      "effect_value": 100,
+      "effect_value": 88,
       "description": "Ataque furtivo das sombras.",
       "target": "enemy",
       "duration": 0,
@@ -652,7 +678,9 @@
       "cooldown": 2,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 7.93
+      "mana_cost_percent": 7.93,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 45
     },
     {
       "id": "envenenar",
@@ -699,7 +727,7 @@
       "level_required": 9,
       "mana_cost": 40,
       "effect_type": "damage",
-      "effect_value": 125,
+      "effect_value": 106,
       "description": "Golpe crítico (80% chance).",
       "target": "enemy",
       "duration": 0,
@@ -709,7 +737,9 @@
       "cooldown": 3,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 11.03
+      "mana_cost_percent": 11.03,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 65
     },
     {
       "id": "evasao_perfeita",
@@ -737,7 +767,7 @@
       "level_required": 13,
       "mana_cost": 45,
       "effect_type": "damage",
-      "effect_value": 140,
+      "effect_value": 126,
       "description": "Múltiplos golpes rápidos.",
       "target": "enemy",
       "duration": 0,
@@ -747,7 +777,9 @@
       "cooldown": 3,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 12.16
+      "mana_cost_percent": 12.16,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 55
     },
     {
       "id": "fantasma",
@@ -775,7 +807,7 @@
       "level_required": 20,
       "mana_cost": 55,
       "effect_type": "damage",
-      "effect_value": 195,
+      "effect_value": 168,
       "description": "Chance de insta-kill (50%).",
       "target": "enemy",
       "duration": 0,
@@ -785,7 +817,9 @@
       "cooldown": 5,
       "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 20.64
+      "mana_cost_percent": 20.64,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 90
     }
   ]
 }

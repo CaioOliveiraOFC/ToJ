@@ -333,8 +333,15 @@ def _estimate_basic_damage(hero, target) -> int:
 
 
 def _estimate_skill_damage(hero, skill, target) -> int:
+    """Dano estimado da skill CONTRA ESTE ALVO, agora.
+
+    O alvo entra na conta porque a skill pode ter condição situacional: um golpe
+    de execução vale mais contra o inimigo ferido, e nada contra o inteiro.
+    Estimar sem o alvo faria o bot escolher sempre a de maior valor nominal e
+    nunca ler a situação — que é justamente o que a condição existe para criar.
+    """
     mitigation = 100 / (100 + max(0, target.get_df()))
-    return max(1, int(combat_mech.skill_damage_base(hero, skill) * mitigation))
+    return max(1, int(combat_mech.skill_damage_base(hero, skill, target) * mitigation))
 
 
 POLICIES = {
