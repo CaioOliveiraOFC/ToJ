@@ -78,9 +78,10 @@ def apply_loadout(hero, loadout: str, level: int) -> None:
         # Uma peça de duas mãos já ocupou esta posição, ou a categoria não cabe
         # aqui neste personagem.
         candidatos = [i for i in candidatos if posicao in hero.available_positions_for(i)]
-        chosen = _best_for_floor(candidatos, level, cap_ratio)
-        if chosen is not None:
-            ja_escolhidos.append(chosen)
+        escolhido = _best_for_floor(candidatos, level, cap_ratio)
+        if escolhido is not None:
+            ja_escolhidos.append(escolhido)
+            chosen = escolhido.instance()
             hero.add_item_to_inventory(chosen)
             hero.equip(chosen, posicao)
 
@@ -94,7 +95,7 @@ def apply_loadout(hero, loadout: str, level: int) -> None:
     if potions:
         best_potion = max(potions, key=lambda i: getattr(i, "effect_value", 0))
         for _ in range(3 if loadout == "expected" else 5):
-            hero.add_item_to_inventory(best_potion)
+            hero.add_item_to_inventory(best_potion.instance())
 
     passives = load_passives()
     if passives:

@@ -52,6 +52,9 @@ class Shop:
         all_items = get_all_items()
         available_items = []
 
+        # `.instance()` em cada oferta: sem isso, comprar e aprimorar uma espada
+        # aprimoraria a definição do catálogo — e com ela toda Espada de Ferro
+        # do jogo, inclusive as que ainda estão à venda.
         for item in all_items.values():
             if not getattr(item, "sold_in_shop", False):
                 continue
@@ -75,7 +78,7 @@ class Shop:
                 continue
 
             price = self.get_price(item, dungeon_level)
-            available_items.append({"item": item, "price": price})
+            available_items.append({"item": item.instance(), "price": price})
 
         # Define quantos itens mostrar conforme o andar
         if dungeon_level <= 3:

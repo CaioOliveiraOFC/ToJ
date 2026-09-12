@@ -83,11 +83,11 @@ def build_player_status(player, selected_item=None) -> str:
         if equipped_item:
             if slot == selected_slot:
                 content += (
-                    f"  [{slot_label}] {escape_markup(equipped_item.name)} "
+                    f"  [{slot_label}] {escape_markup(equipped_item.display_name)} "
                     "[yellow]<- será trocado[yellow]\n"
                 )
             else:
-                content += f"  [{slot_label}] {escape_markup(equipped_item.name)}\n"
+                content += f"  [{slot_label}] {escape_markup(equipped_item.display_name)}\n"
         else:
             if selected_slot == slot:
                 content += f"  [{slot_label}] [green]<- upgrade![green]\n"
@@ -240,7 +240,7 @@ def navigate_shop_buy(
 
     def build_item_details(item) -> str:
         """Constrói o conteúdo do painel de detalhes - com destaque para slot vazio."""
-        content = f"[bold]Nome:[/bold] {escape_markup(item.name)}\n\n"
+        content = f"[bold]Nome:[/bold] {escape_markup(item.display_name)}\n\n"
         content += f"[bold]Descrição:[/bold]\n{escape_markup(item.description)}\n\n"
 
         slot_name = getattr(item, "slot", "Unknown")
@@ -327,7 +327,7 @@ def navigate_shop_buy(
                 coin_str = f"[red]{coin_str}[/red]"
 
             left_content += (
-                f"{prefix} [{real_index + 1:2}] {escape_markup(item.name)} - {coin_str}\n"
+                f"{prefix} [{real_index + 1:2}] {escape_markup(item.display_name)} - {coin_str}\n"
             )
 
         if total_pages > 1:
@@ -432,7 +432,7 @@ def navigate_shop_sell(
             prefix = ">" if real_index == current_index else " "
 
             panel_content += (
-                f"{prefix} [{real_index + 1:2}] {escape_markup(item.name)} "
+                f"{prefix} [{real_index + 1:2}] {escape_markup(item.display_name)} "
                 f"- [green]+{sell_price} coins[/green]\n"
             )
 
@@ -552,7 +552,7 @@ def navigate_inventory(
             "Legendary": "yellow",
         }.get(rarity, "white")
         content = (
-            f"[bold {rarity_color}]{escape_markup(item.name)}[/bold {rarity_color}]"
+            f"[bold {rarity_color}]{escape_markup(item.display_name)}[/bold {rarity_color}]"
             f"  [dim][{rarity}][/dim]\n"
         )
         content += f"[dim]{escape_markup(item.description)}[/dim]\n\n"
@@ -837,7 +837,7 @@ def navigate_inventory(
                 }.get(slot, slot)
                 left_content += (
                     f"{prefix} [{real_index + 1:2}] "
-                    f"[{rarity_color}]{escape_markup(item.name)}[/{rarity_color}]"
+                    f"[{rarity_color}]{escape_markup(item.display_name)}[/{rarity_color}]"
                     f"{qty_str}[dim] ({slot_label})[/dim]{price_str}{equipped_mark}\n"
                 )
 
@@ -935,7 +935,7 @@ def navigate_inventory(
                 selected_item = sorted_inventory[current_index]
                 if isinstance(selected_item, Item):
                     msg = player.use_potion(selected_item)
-                    feedback_message = f"{selected_item.name} usado."
+                    feedback_message = f"{selected_item.display_name} usado."
                 pending_action = None
                 # Stay inside loop to keep feedback visible and handle single-item -> empty
                 continue
@@ -966,11 +966,11 @@ def navigate_inventory(
                     slot = _find_equipped_slot_by_item(player, selected_item)
                     if slot:
                         player.unequip(slot)
-                        feedback_message = f"{selected_item.name} desequipado."
+                        feedback_message = f"{selected_item.display_name} desequipado."
                 else:
                     msg = equipar_escolhendo_posicao(player, selected_item)
                     if selected_item in player.equipment.values():
-                        feedback_message = f"{selected_item.name} equipado."
+                        feedback_message = f"{selected_item.display_name} equipado."
                     else:
                         feedback_message = msg
                 # Stay inside loop so feedback remains visible - rebuild on
@@ -989,7 +989,7 @@ def navigate_inventory(
                 else:
                     if isinstance(selected_item, Item):
                         msg = player.use_potion(selected_item)
-                        feedback_message = f"{selected_item.name} usado."
+                        feedback_message = f"{selected_item.display_name} usado."
                     # Stay inside loop to keep feedback visible and handle
                     # the single-item case (inventory may become empty)
                     continue

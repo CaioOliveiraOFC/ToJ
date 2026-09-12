@@ -66,12 +66,49 @@ def list_slots() -> list[dict]:
     return slots
 
 
+def _serializar(item) -> dict | None:
+    """O exemplar em disco: a definição pelo nome, mais o estado dele.
+
+    Só o nome não basta desde que existe `+N`: duas Espadas de Ferro podem estar
+    +3 e +17, e o nome é a mesma chave para as duas. Campos com valor default
+    não são gravados, então um save sem aprimoramento nenhum continua do mesmo
+    tamanho de antes.
+    """
+    if item is None:
+        return None
+    registro: dict = {"name": item.name}
+    rank = int(getattr(item, "enhancement_level", 0) or 0)
+    if rank:
+        registro["enhancement_level"] = rank
+    return registro
+
+
+def _desserializar(registro, item_registry):
+    """Reconstrói o exemplar. Aceita o formato antigo (só o nome).
+
+    Save anterior ao `+N` guardava strings; elas viram exemplares +0, sem
+    migração de arquivo. Sempre devolve uma INSTÂNCIA, nunca a definição do
+    catálogo: dois exemplares carregados do mesmo nome precisam ser objetos
+    diferentes, ou aprimorar um aprimoraria o outro.
+    """
+    if not registro:
+        return None
+    nome = registro if isinstance(registro, str) else registro.get("name")
+    definicao = item_registry.get(nome)
+    if definicao is None:
+        return None
+    item = definicao.instance()
+    if isinstance(registro, dict):
+        item.enhancement_level = max(0, int(registro.get("enhancement_level", 0) or 0))
+    return item
+
+
 def save_game(
     player: "Player", dungeon_level: int, map_state: dict | None = None, slot: int = 1
 ) -> SaveResult:
     """Salva o estado atual do jogo num ficheiro JSON."""
-    inventory_names = [item.name for item in player.inventory]
-    equipment_names = {slot: item.name if item else None for slot, item in player.equipment.items()}
+    inventory_names = [_serializar(item) for item in player.inventory]
+    equipment_names = {slot: _serializar(item) for slot, item in player.equipment.items()}
     passive_ids = [p.id for p in player.passives]
     skills_data = {str(k): v.id for k, v in player.skills.items()}
 
@@ -172,14 +209,14 @@ def load_game(
 
         # Reconstrói o inventário (pula itens que não existem mais no registro)
         player.inventory = []
-        for name in save_data["inventory"]:
-            item = item_registry.get(name)
+        for registro in save_data["inventory"]:
+            item = _desserializar(registro, item_registry)
             if item:
                 player.inventory.append(item)
 
-        for slot, item_name in save_data["equipment"].items():
-            if item_name:
-                item_to_equip = item_registry.get(item_name)
+        for slot, registro in save_data["equipment"].items():
+            if registro:
+                item_to_equip = _desserializar(registro, item_registry)
                 if item_to_equip is None:
                     continue
                 posicao = POSICAO_LEGADA.get(slot, slot)

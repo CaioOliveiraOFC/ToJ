@@ -11,7 +11,14 @@ Este módulo não depende de nada, nem de outros módulos do projeto.
 
 from __future__ import annotations
 
-from src.shared.constants import GROWTH_RATE, XP_BASE_COST, XP_LEVEL_SOFTENER
+import math
+
+from src.shared.constants import (
+    ENHANCEMENT_RATE,
+    GROWTH_RATE,
+    XP_BASE_COST,
+    XP_LEVEL_SOFTENER,
+)
 
 
 def geometric(base: float, level: int, rate: float = GROWTH_RATE) -> int:
@@ -53,3 +60,22 @@ def xp_for_level(level: int) -> int:
     nivel = max(1, level)
     amortecedor = (nivel + XP_LEVEL_SOFTENER) / (1 + XP_LEVEL_SOFTENER)
     return int(XP_BASE_COST * amortecedor * GROWTH_RATE ** (nivel - 1))
+
+
+def enhancement_multiplier(level: int) -> float:
+    """Quanto um item aprimorado `+level` rende sobre a própria base.
+
+    `1 + ENHANCEMENT_RATE * sqrt(N)`. Três propriedades, e as três são exigência
+    e não gosto:
+
+    - `f(0) = 1,0`: item sem rank vale exatamente o que o catálogo declara, o que
+      mantém todo o balanceamento atual inalterado enquanto os drops nascem +0;
+    - monotônica e sem teto: o rank é infinito porque a masmorra é infinita, e
+      nenhum número mágico decide onde a progressão do item acaba;
+    - marginal decrescente: `f(1001) - f(1000)` é 2400 vezes menor que
+      `f(1) - f(0)`, então rank altíssimo não vira poder absurdo.
+
+    Função ÚNICA de propósito. Espalhar isto pelos consumidores é como o dano
+    ficou com nove multiplicadores soltos antes da centralização.
+    """
+    return 1.0 + ENHANCEMENT_RATE * math.sqrt(max(0, int(level)))

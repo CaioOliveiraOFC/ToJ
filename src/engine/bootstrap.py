@@ -60,19 +60,23 @@ def _create_test_hero() -> Warrior:
 
     health_potion = all_items.get("Poção de Cura Grande")
     if health_potion:
+        health_potion = health_potion.instance()
         player.add_item_to_inventory(health_potion)
 
     mana_potion = all_items.get("Poção de Mana Grande")
     if mana_potion:
+        mana_potion = mana_potion.instance()
         player.add_item_to_inventory(mana_potion)
 
     sword = all_items.get("Espada Longa")
     if sword:
+        sword = sword.instance()
         player.add_item_to_inventory(sword)
         player.equip(sword)
 
     armor = all_items.get("Peitoral de Ferro")
     if armor:
+        armor = armor.instance()
         player.add_item_to_inventory(armor)
         player.equip(armor)
 

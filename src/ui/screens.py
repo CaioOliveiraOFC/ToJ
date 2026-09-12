@@ -422,7 +422,7 @@ def render_shop_buy_menu(items_for_sale: list[dict], player_coins: int) -> None:
         item = item_data["item"]
         price = item_data["price"]
         item_table.add_row(
-            str(i), item.name, str(price), getattr(item, "description", "Sem descrição")
+            str(i), item.display_name, str(price), getattr(item, "description", "Sem descrição")
         )
     item_table.add_row("0", "Voltar", "", "")
 
@@ -493,7 +493,10 @@ def render_shop_sell_menu(
     for i, item in enumerate(inventory, 1):
         sell_price = shop.get_sell_price(item, dungeon_level)
         player_inventory_table.add_row(
-            str(i), item.name, str(sell_price), getattr(item, "description", "Sem descrição")
+            str(i),
+            item.display_name,
+            str(sell_price),
+            getattr(item, "description", "Sem descrição"),
         )
     player_inventory_table.add_row("0", "Voltar", "", "")
 
@@ -645,7 +648,7 @@ def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
     renderer.console.print(
         Panel(
             Text.from_markup(
-                f"Equipado: {old_item.name}\nNovo: {new_item.name}\n{resumo}\n\n"
+                f"Equipado: {old_item.display_name}\nNovo: {new_item.display_name}\n{resumo}\n\n"
                 "[S] Equipar agora  |  [N] Manter na mochila",
                 justify="center",
             ),
@@ -763,7 +766,7 @@ def _create_equipment_table(player: "Player") -> Table:
 
     for slot, item in player.equipment.items():
         if item:
-            equip_table.add_row(slot.capitalize(), item.name)
+            equip_table.add_row(slot.capitalize(), item.display_name)
         else:
             equip_table.add_row(slot.capitalize(), "[dim]Vazio[/dim]")
 
@@ -786,7 +789,7 @@ def _create_inventory_table(player: "Player") -> Table | None:
     inv_table.add_column("Tipo", style="yellow")
 
     for i, item in enumerate(player.inventory):
-        inv_table.add_row(str(i + 1), item.name, item.__class__.__name__)
+        inv_table.add_row(str(i + 1), item.display_name, item.__class__.__name__)
 
     return inv_table
 

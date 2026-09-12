@@ -127,19 +127,19 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
             if slot and hasattr(player, "equipment"):
                 old_item = player.occupant_for(item_to_buy)
             if shop.buy_item(player, item_to_buy, dungeon_level):
-                screens.render_shop_purchase_success(item_to_buy.name, price)
+                screens.render_shop_purchase_success(item_to_buy.display_name, price)
                 # Remove o item da lista (não rerrola, mantém os outros)
                 items_for_sale.pop(selected_idx)
                 # Oferece equipar diretamente na loja — com comparativo e opção de vender o antigo
                 if slot and hasattr(player, "equipment"):
                     if old_item is None:
                         bonus_text = _bonus_text(item_to_buy)
-                        screens.render_shop_equip_prompt(item_to_buy.name, slot, bonus_text)
+                        screens.render_shop_equip_prompt(item_to_buy.display_name, slot, bonus_text)
                         equip_choice = get_key()
                         if equip_choice and equip_choice.lower() in ("s", "y", "1", "e"):
                             msg = equipar_escolhendo_posicao(player, item_to_buy)
                             if item_to_buy in player.equipment.values():
-                                screens.render_shop_equip_success(item_to_buy.name, slot)
+                                screens.render_shop_equip_success(item_to_buy.display_name, slot)
                             else:
                                 screens.render_shop_equip_failed(msg)
                         else:
@@ -152,18 +152,20 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
                             # tenta equipar; old_item ainda é referência válida
                             msg = equipar_escolhendo_posicao(player, item_to_buy)
                             if item_to_buy in player.equipment.values():
-                                screens.render_shop_equip_success(item_to_buy.name, slot)
+                                screens.render_shop_equip_success(item_to_buy.display_name, slot)
                                 # old_item agora está no inventário — oferece
                                 # vender ou descartar sem sair da loja
                                 sell_price = shop.get_sell_price(old_item, dungeon_level)
-                                screens.render_shop_old_sell_prompt(old_item.name, sell_price, slot)
+                                screens.render_shop_old_sell_prompt(
+                                    old_item.display_name, sell_price, slot
+                                )
                                 sell_choice = get_key()
                                 if sell_choice and sell_choice.lower() in ("s", "y", "1"):
                                     # vender
                                     if old_item in player.inventory:
                                         if shop.sell_item(player, old_item, dungeon_level):
                                             screens.render_shop_sell_success(
-                                                old_item.name, sell_price
+                                                old_item.display_name, sell_price
                                             )
                                         else:
                                             screens.render_shop_equip_failed(
@@ -221,12 +223,12 @@ def _run_equip_in_shop_flow(player: "Player", shop: object, dungeon_level: int) 
         old_item = player.occupant_for(item_to_equip) if slot else None
         if old_item is None:
             bonus_text = _bonus_text(item_to_equip)
-            screens.render_shop_equip_prompt(item_to_equip.name, slot, bonus_text)
+            screens.render_shop_equip_prompt(item_to_equip.display_name, slot, bonus_text)
             choice = get_key()
             if choice and choice.lower() in ("s", "y", "1", "e"):
                 msg = equipar_escolhendo_posicao(player, item_to_equip)
                 if item_to_equip in player.equipment.values():
-                    screens.render_shop_equip_success(item_to_equip.name, slot)
+                    screens.render_shop_equip_success(item_to_equip.display_name, slot)
                 else:
                     screens.render_shop_equip_failed(msg)
             else:
@@ -241,14 +243,16 @@ def _run_equip_in_shop_flow(player: "Player", shop: object, dungeon_level: int) 
                 if choice and choice.lower() in ("s", "y", "1", "e"):
                     msg = equipar_escolhendo_posicao(player, item_to_equip)
                     if item_to_equip in player.equipment.values():
-                        screens.render_shop_equip_success(item_to_equip.name, slot)
+                        screens.render_shop_equip_success(item_to_equip.display_name, slot)
                         sell_price = shop.get_sell_price(old_item, dungeon_level)
-                        screens.render_shop_old_sell_prompt(old_item.name, sell_price, slot)
+                        screens.render_shop_old_sell_prompt(old_item.display_name, sell_price, slot)
                         sell_choice = get_key()
                         if sell_choice and sell_choice.lower() in ("s", "y", "1"):
                             if old_item in player.inventory:
                                 if shop.sell_item(player, old_item, dungeon_level):
-                                    screens.render_shop_sell_success(old_item.name, sell_price)
+                                    screens.render_shop_sell_success(
+                                        old_item.display_name, sell_price
+                                    )
                                 else:
                                     screens.render_shop_equip_failed("Falha ao vender item antigo")
                         elif sell_choice and sell_choice.lower() == "d":
@@ -289,4 +293,4 @@ def _run_sell_flow(player: "Player", shop: object, dungeon_level: int) -> None:
         # saldo recebia outro.
         sell_price = shop.get_sell_price(item_to_sell, dungeon_level)
         if shop.sell_item(player, item_to_sell, dungeon_level):
-            screens.render_shop_sell_success(item_to_sell.name, sell_price)
+            screens.render_shop_sell_success(item_to_sell.display_name, sell_price)

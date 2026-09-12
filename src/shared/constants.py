@@ -36,6 +36,15 @@ MINI_BOSS_LEVEL_BONUS = 1
 MINI_BOSS_BASE_XP_REWARD = 120
 
 # --- Sistema de Raridade ---
+# Quanto cada rank de aprimoramento (+N) vale. Entra numa raiz quadrada, e não
+# numa razão: `1 + taxa * sqrt(N)` cresce para sempre, mas cada rank rende menos
+# que o anterior, então +1000 é forte sem ser absurdo (5,7x a base).
+#
+# Raiz e não logaritmo porque o log entrega quase tudo no primeiro rank — o +1
+# valeria mais que os ranks 10 a 100 somados, e uma escada de upgrade em que o
+# primeiro degrau é o melhor negócio é uma escada quebrada.
+ENHANCEMENT_RATE = 0.15
+
 RARITY_MULTIPLIERS = {
     "Common": 1.0,
     "Rare": 1.15,

@@ -1,5 +1,8 @@
+import copy
+
 from src.data.loader import load_json
 from src.shared.constants import RARITY_MULTIPLIERS
+from src.shared.formulas import enhancement_multiplier
 
 
 class Item:
@@ -35,16 +38,17 @@ class Item:
         status_resistances: dict[str, int] | None = None,
         hands_required: int = 1,
         hand_type: str | None = None,
+        enhancement_level: int = 0,
     ) -> None:
         self.id: str = item_id
         self.name: str = name
         self.description: str = description
         self.rarity: str = rarity
         self.slot: str = slot
-        self.damage_bonus: int = damage_bonus
-        self.defense_bonus: int = defense_bonus
+        self.base_damage_bonus: int = damage_bonus
+        self.base_defense_bonus: int = defense_bonus
         self.effect_type: str | None = effect_type
-        self.effect_value: int = effect_value
+        self.base_effect_value: int = effect_value
         self.classes: list[str] | None = classes
         self.sold_in_shop: bool = sold_in_shop
         self.droppable: bool = droppable
@@ -62,16 +66,102 @@ class Item:
         # Quantas MÃOS a peça toma: 1 ocupa uma posição, 2 toma as duas. Fonte
         # única — não existe `two_handed` ao lado, porque dois campos para o
         # mesmo fato divergem no primeiro item que declarar só um deles.
-        self.hands_required: int = max(1, int(hands_required or 1))
+        #
+        # O contrato é fechado: o personagem tem duas mãos, então 3 não é um
+        # número maior, é um erro. Um clamp silencioso transformaria a digitação
+        # errada num item de duas mãos que ninguém pediu.
+        if int(hands_required) not in (1, 2):
+            raise ValueError(
+                f"hands_required deve ser 1 ou 2, não {hands_required!r} (item {item_id!r})"
+            )
+        self.hands_required: int = int(hands_required)
         # O que a peça É — sword, dagger, mace, staff, shield, orb, focus, wand.
         # Descritivo por enquanto: nada no motor lê isto. Existe para que
         # proficiência e requisitos tenham onde se apoiar sem migrar o catálogo.
         self.hand_type: str | None = hand_type
 
+        # Rank de aprimoramento. Pertence ao EXEMPLAR, não à definição: duas
+        # Espadas de Ferro podem estar +3 e +17 ao mesmo tempo. Sem teto — a
+        # masmorra é infinita, e um cap aqui seria o fim da progressão do item.
+        self.enhancement_level: int = max(0, int(enhancement_level or 0))
+
         if effect_type and effect_value:
             multiplier = RARITY_MULTIPLIERS.get(rarity, 1.0)
             if effect_type in ("max_hp", "max_mp", "agility", "strength", "defense"):
-                self.effect_value = int(effect_value * multiplier)
+                self.base_effect_value = int(effect_value * multiplier)
+
+    # O que `+N` fortalece: os stats BASE da própria peça. É exatamente o
+    # conjunto que `Player.EQUIP_STAT_SOURCES` consome — Camada A, resolução de
+    # atributo. Fica de fora tudo que é modificador de combate (evasão, crítico,
+    # roubo de vida) e todo efeito especial (`stun`, `death_ignore`): um item +20
+    # não deve atordoar mais só porque foi aprimorado, e resistência a status
+    # muito menos, porque 100% é imunidade e o rank não tem teto.
+    ENHANCEABLE_EFFECTS = frozenset(
+        {"max_hp", "max_mp", "strength", "agility", "speed", "magic_damage", "defense"}
+    )
+
+    def _enhanced(self, base: int) -> int:
+        """A base deste exemplar, com o rank aplicado.
+
+        Derivado a cada leitura, nunca acumulado no campo: a base original
+        continua respondível, e não há deriva de arredondamento por aplicar o
+        multiplicador repetidas vezes.
+
+        Valor negativo passa intacto. `defense_bonus` desce a -3 e `effect_value`
+        a -5 no catálogo: são desvantagens declaradas da peça, e multiplicá-las
+        faria aprimorar a Placa Pesada dobrar a lentidão dela.
+        """
+        if base <= 0 or self.enhancement_level <= 0:
+            return int(base)
+        return int(base * enhancement_multiplier(self.enhancement_level) + 0.5)
+
+    @property
+    def damage_bonus(self) -> int:
+        return self._enhanced(self.base_damage_bonus)
+
+    @property
+    def defense_bonus(self) -> int:
+        return self._enhanced(self.base_defense_bonus)
+
+    @property
+    def effect_value(self) -> int:
+        """O efeito da peça, aprimorado SÓ se for um atributo base."""
+        if self.effect_type in self.ENHANCEABLE_EFFECTS:
+            return self._enhanced(self.base_effect_value)
+        return int(self.base_effect_value)
+
+    @property
+    def display_name(self) -> str:
+        """Como a peça se apresenta. `name` continua sendo a chave do catálogo.
+
+        Anexar " +27" ao `name` contaminaria busca no registro e leitura de save,
+        que resolvem a definição pelo nome.
+        """
+        if self.enhancement_level <= 0:
+            return self.name
+        return f"{self.name} +{self.enhancement_level}"
+
+    def increase_enhancement(self, amount: int = 1) -> int:
+        """Sobe o rank deste exemplar. Devolve o novo rank.
+
+        Sem custo e sem chance de falha: a origem (Ferreiro, ouro, material) é
+        conteúdo de outra rodada. Isto é só a mecânica do item.
+        """
+        self.enhancement_level = max(0, self.enhancement_level + int(amount))
+        return self.enhancement_level
+
+    def instance(self) -> "Item":
+        """Um exemplar novo desta definição.
+
+        `get_all_items()` devolve objetos COMPARTILHADOS: sem esta cópia,
+        aprimorar a espada do jogador aprimoraria todas as Espadas de Ferro do
+        jogo, inclusive as que ainda estão na loja. Chamado onde um item entra no
+        mundo — loja, drop, save, loadout — e não em quem só lê o catálogo.
+        """
+        novo = copy.copy(self)
+        novo.status_resistances = dict(self.status_resistances)
+        novo.classes = list(self.classes) if self.classes is not None else None
+        return novo
 
     @property
     def is_potion(self) -> bool:
@@ -124,6 +214,7 @@ def create_item_from_json(item_data: dict) -> Item:
         consumable=item_data.get("consumable", False),
         status_resistances=item_data.get("status_resistances"),
         hands_required=item_data.get("hands_required", 1),
+        enhancement_level=item_data.get("enhancement_level", 0),
         hand_type=item_data.get("hand_type"),
     )
 
