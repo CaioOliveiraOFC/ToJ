@@ -185,7 +185,6 @@ def hit_chance(attacker, defender) -> int:
     swing = 0.0 if total <= 0 else HIT_AGILITY_SWING * (att_ag - def_ag) / total
 
     chance = BASE_HIT_CHANCE + swing
-    chance -= fx.combat_modifier(defender, "dodge_chance")
     chance -= fx.combat_modifier(defender, "evasion")
     if "invisible" in getattr(defender, "active_effects", {}):
         chance -= INVISIBLE_HIT_PENALTY

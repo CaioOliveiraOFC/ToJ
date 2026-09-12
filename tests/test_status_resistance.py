@@ -266,11 +266,3 @@ class TestDePontaAPonta:
         assert danos[0] == danos[1], "o anel de resistência mexeu no dano"
         assert "frozen" in nu.active_effects
         assert "frozen" not in protegido.active_effects
-
-    def test_o_combate_nao_conhece_equipamento(self):
-        """`combat.py` não pode citar equipamento em lugar nenhum."""
-        fonte = (Path(__file__).resolve().parents[1] / "src" / "mechanics" / "combat.py").read_text(
-            encoding="utf-8"
-        )
-        for palavra in ("equipment", "status_resistances", "weapon_percent"):
-            assert palavra not in fonte, f"combat.py cita {palavra}"

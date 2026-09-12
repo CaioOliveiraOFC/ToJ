@@ -131,7 +131,7 @@
       "category": "Combate",
       "rarity": "Rare",
       "description": "+8% chance de esquiva",
-      "effect_type": "dodge_chance",
+      "effect_type": "evasion",
       "effect_value": 8
     },
     {

@@ -34,7 +34,6 @@ COMBAT_MODIFIERS = (
     "damage_reduction",
     "life_steal",
     "mana_regen",
-    "dodge_chance",
     "stun_chance",
 )
 
@@ -190,16 +189,21 @@ def sum_buffs(entity, stat: str) -> int:
 
 
 def combat_modifier(entity, kind: str) -> float:
-    """Valor total de um modificador de combate: buffs somados às passivas.
+    """Valor total de um modificador de combate: buff, passiva e equipamento.
 
-    Buff e passiva somam porque representam a mesma coisa por caminhos
-    diferentes — uma poção de crítico e a passiva Lâmina Afiada devem se
-    acumular, não competir.
+    As três somam porque representam a mesma coisa por caminhos diferentes —
+    uma poção de crítico e a passiva Lâmina Afiada devem se acumular, não
+    competir. E as três são fontes SEPARADAS: equipamento não entra por
+    `get_passive_bonus`, ou "de onde veio este número?" deixa de ter resposta.
+
+    Duck typing, como o resto do módulo: o monstro não tem equipamento e não
+    tem o método, então soma zero sem precisar de exceção.
     """
     total = float(sum_buffs(entity, kind))
-    getter = getattr(entity, "get_passive_bonus", None)
-    if callable(getter):
-        total += float(getter(kind))
+    for fonte in ("get_passive_bonus", "get_equipment_bonus"):
+        getter = getattr(entity, fonte, None)
+        if callable(getter):
+            total += float(getter(kind))
     return total
 
 

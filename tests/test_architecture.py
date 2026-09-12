@@ -217,3 +217,79 @@ class TestConstantesNomeadas:
         assert k.BOSS_FLOOR_INTERVAL >= 1
         assert 0 < k.HIT_CHANCE_FLOOR < k.HIT_CHANCE_CEIL <= 100
         assert 0 < k.FLOOR_CLEAR_RESTORE_PERCENT < 100
+
+
+# Nomes que `mechanics/combat.py` não pode tocar. O motor pergunta a atributo
+# resolvido (`get_df`, `get_status_resistance`, `combat_modifier`) e nunca abre a
+# ficha do personagem para procurar item: é o que permite herói e monstro
+# passarem pelo mesmo golpe, e é o que faz uma família nova de equipamento não
+# precisar de exceção dentro do combate.
+ESTRUTURAS_DE_EQUIPAMENTO = frozenset(
+    {
+        "equipment",
+        "equipment_percent",
+        "weapon_percent",
+        "status_resistances",
+        "get_equipment_bonus",
+        "EQUIP_COMBAT_EFFECTS",
+        "EQUIP_STAT_SOURCES",
+    }
+)
+
+
+def nomes_de_codigo(tree: ast.AST) -> set[tuple[str, int]]:
+    """Identificadores que o arquivo realmente USA — sem comentários nem prosa.
+
+    Substitui uma busca textual por substring, que era frágil nos dois sentidos:
+    reprovava um comentário explicando a regra (punir a documentação da própria
+    regra que o teste protege) e não pegava `getattr(x, "equipment")`, que passava
+    só por sorte de grafia. Comentários não existem na AST, então o falso positivo
+    some por construção.
+
+    Strings entram apenas quando são argumento de `getattr`/`hasattr`/`setattr` —
+    que é acesso a atributo escrito por extenso, não docstring.
+    """
+    encontrados: set[tuple[str, int]] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Attribute):
+            encontrados.add((node.attr, node.lineno))
+        elif isinstance(node, ast.Name):
+            encontrados.add((node.id, node.lineno))
+        elif isinstance(node, ast.keyword) and node.arg:
+            encontrados.add((node.arg, node.lineno))
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            if node.func.id in ("getattr", "hasattr", "setattr"):
+                for arg in node.args[1:2]:
+                    if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                        encontrados.add((arg.value, arg.lineno))
+    return encontrados
+
+
+class TestCombateNaoConheceEquipamento:
+    """O golpe não sabe que equipamento existe.
+
+    Camada A resolve atributo em `entities/`; Camada B resolve golpe em
+    `combat.py`. Se o combate começar a ler equipamento direto, cada dimensão
+    nova (`+N`, gemas, encantamentos) vira um `if` dentro do funil, e o monstro
+    — que não tem equipamento — passa a precisar de exceção em cada um deles.
+    """
+
+    def test_combat_nao_acessa_estruturas_de_equipamento(self):
+        path = SRC / "mechanics" / "combat.py"
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        violacoes = [
+            f"combat.py:{lineno} acessa {nome}"
+            for nome, lineno in sorted(nomes_de_codigo(tree), key=lambda x: x[1])
+            if nome in ESTRUTURAS_DE_EQUIPAMENTO
+        ]
+        assert not violacoes, "Combate lendo equipamento:\n" + "\n".join(violacoes)
+
+    def test_a_regra_pega_acesso_dinamico_que_o_texto_perdia(self):
+        """Prova de carga: `getattr(x, "equipment")` também é violação."""
+        tree = ast.parse('def f(d):\n    return getattr(d, "equipment", None)\n')
+        assert any(nome in ESTRUTURAS_DE_EQUIPAMENTO for nome, _ in nomes_de_codigo(tree))
+
+    def test_a_regra_ignora_comentario_e_docstring(self):
+        """Explicar a regra num comentário não pode derrubar o teste."""
+        tree = ast.parse('"""Nada aqui lê equipment."""\n# nem equipment_percent\nx = 1\n')
+        assert not [nome for nome, _ in nomes_de_codigo(tree) if nome in ESTRUTURAS_DE_EQUIPAMENTO]

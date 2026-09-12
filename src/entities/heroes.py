@@ -175,6 +175,38 @@ class Player(Entity):
         "df": ("defense",),
     }
 
+    # Quais modificadores de COMBATE o equipamento pode alimentar. Lista de
+    # permissão, e não "qualquer effect_type que o item declare": o catálogo tem
+    # 58 itens de equipamento declarando efeitos que nada lê, e um canal genérico
+    # acordaria os 58 de uma vez — sem ninguém ter decidido que deviam acordar,
+    # e sem ninguém ter medido o que isso faz com o jogo.
+    #
+    # É a diferença entre um canal e um alçapão. Cada família nova entra aqui por
+    # escolha, numa rodada que mede o impacto dela. Um `effect_type` novo no JSON
+    # nunca deve mudar gameplay sozinho: foi assim que 58 itens viraram placebo.
+    EQUIP_COMBAT_EFFECTS = frozenset({"evasion", "damage_reduction"})
+
+    def get_equipment_bonus(self, kind: str) -> float:
+        """Quanto o que está equipado acrescenta a um modificador de combate.
+
+        Fonte PRÓPRIA, ao lado de buff e passiva — não um disfarce de passiva.
+        `shared/effects.combat_modifier` soma as três por caminhos separados,
+        para que a pergunta "de onde veio este número?" continue tendo resposta.
+
+        Derivado do equipamento atual, nunca copiado para o personagem: tirar a
+        peça devolve o valor de antes, sem resíduo. Mesma escolha de
+        `equipment_percent` e `get_status_resistance`, pelo mesmo motivo.
+        """
+        if kind not in self.EQUIP_COMBAT_EFFECTS:
+            return 0.0
+        total = 0.0
+        for item in self.equipment.values():
+            if item is None:
+                continue
+            if getattr(item, "effect_type", None) == kind:
+                total += float(getattr(item, "effect_value", 0) or 0)
+        return total
+
     def equipment_percent(self, key: str) -> float:
         """Soma, em percentual, o que o equipamento acrescenta a um atributo."""
         total = 0.0
