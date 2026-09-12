@@ -317,24 +317,21 @@ def resolve_physical_attack(
     crit_chance += int(fx.combat_modifier(attacker, "crit_chance"))
     crit_chance = min(crit_chance, CRIT_CHANCE_CAP)
 
-    xmult_mods: list[float] = []
     is_critical = r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= crit_chance
-    if is_critical:
-        crit_damage = CRIT_DAMAGE_BASE + fx.combat_modifier(attacker, "crit_damage") / 100
-        xmult_mods.append(crit_damage)
 
+    mods = damage_modifiers(attacker, defender, is_critical=is_critical)
     damage = _calculate_damage(
         base_power=float(base_damage),
-        flat_mods=None,
-        mult_mods=None,
-        xmult_mods=xmult_mods if xmult_mods else None,
+        flat_mods=mods.flat,
+        mult_mods=mods.mult,
+        xmult_mods=mods.xmult,
         defense_target=defender.get_df(),
+        mitigation=mods.mitigation,
     )
 
-    # Status do atacante que reduzem o dano causado (weakened, fear) e status do
-    # defensor que reduzem o dano recebido (damage_reduction ativo ou passivo).
-    damage = int(damage * fx.outgoing_damage_multiplier(attacker))
-    damage = max(1, int(damage * fx.incoming_damage_multiplier(defender)))
+    # A Égide fica fora do funil de propósito: não é modificador, é STATE. Ela
+    # consome mana do defensor, e o quanto ela absorve depende do saldo — uma
+    # subtração com custo, não um fator.
     damage = _absorve_com_egide(defender, damage, publish)
 
     # Stun da PASSIVA do atacante. O stun que a skill carrega é rolado por
