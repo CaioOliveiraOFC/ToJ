@@ -7,6 +7,17 @@ bug da refatoração.
 
 Mudança deliberada de balanceamento pode alterá-los — nesse caso o commit tem de
 dizer isso, e regravá-los é parte da mudança, não um conserto.
+
+Regravados quando o herói de medição ganhou a segunda mão: o loadout `expected`
+passou a equipar `Weapon2`, e `weapon_percent` subiu junto (Guerreiro 8 -> 16).
+A mudança é de CONTEÚDO, não do funil: 149 x (1,16/1,08) = 160,0, que é o valor
+novo, e `monstro_contra_mago_com_egide` não se mexeu porque o atacante ali é o
+monstro, que não tem equipamento.
+
+Isto expõe uma fragilidade destes cenários: eles usam `make_hero(..., "expected")`,
+então congelam o catálogo junto com a matemática, e toda mudança de loadout os
+derruba sem que o pipeline tenha mudado. Uma fixture de equipamento explícita
+resolveria — fica registrado, não é desta rodada.
 """
 
 from __future__ import annotations
@@ -128,13 +139,13 @@ CENARIOS = {
 
 # Gravados contra o motor pré-centralização.
 GOLDEN = {
-    "basico_sem_crit": 149,
-    "basico_com_crit": 223,
-    "skill_de_dano": 281,
-    "skill_com_condicao": 453,
-    "atacante_com_fear": 119,
-    "defensor_com_reducao": 104,
-    "dois_redutores": 83,
+    "basico_sem_crit": 160,
+    "basico_com_crit": 240,
+    "skill_de_dano": 300,
+    "skill_com_condicao": 476,
+    "atacante_com_fear": 128,
+    "defensor_com_reducao": 112,
+    "dois_redutores": 89,
     "monstro_contra_mago_com_egide": 87,
 }
 

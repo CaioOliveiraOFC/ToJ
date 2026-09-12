@@ -132,19 +132,14 @@ def equip_if_better(hero, item) -> bool:
 
 
 def _posicoes_do_bot(hero, item) -> tuple[str, ...]:
-    """As posições que o BOT considera: uma por categoria, a primeira.
+    """As posições que o BOT considera — todas as que o personagem tem.
 
-    O personagem passou a ter duas posições de arma e duas de anel. O bot do
-    simulador NÃO passa a usá-las: com `Weapon2` e `Ring2` livres, toda arma e
-    todo anel do chão deixariam de ser dominados — o bot pararia de vender,
-    encheria as duas mãos e a medição de poder mudaria de significado, sem
-    ninguém ter desenhado dual wield.
-
-    Manter uma posição por categoria reproduz exatamente a heurística anterior.
-    A segunda entra aqui quando houver regra de dual wield para medir.
+    Duas mãos e dois anéis são anatomia, não capacidade opcional: o bot que
+    ignorasse a segunda posição mediria um personagem que não existe. A peça
+    de duas mãos já sai daqui filtrada, porque `available_positions_for` sabe
+    que ela toma o par.
     """
-    posicoes = hero.available_positions_for(item)
-    return posicoes[:1]
+    return hero.available_positions_for(item)
 
 
 def _pior_ocupante(hero, posicoes):

@@ -179,12 +179,13 @@ class Player(Entity):
         "Ring": ("Ring1", "Ring2"),
     }
 
-    # Se a classe consegue segurar uma segunda arma. Capacidade explícita e
-    # simples, não um sistema de proficiência: o Ladino luta com duas lâminas, o
-    # Mago precisa da mão livre. O Guerreiro pode, e é por isso que a pergunta é
-    # um método que recebe o item — a regra por arma entra ali quando existir,
-    # sem mudar quem chama.
-    can_dual_wield = False
+    # As duas posições de mão. Toda classe tem as duas: `Weapon2` não é "a
+    # segunda arma do dual wield", é a segunda mão — onde cabe escudo, orbe,
+    # foco ou uma segunda lâmina. O Mago não tem menos mãos que o Guerreiro.
+    #
+    # Restrição futura pertence ao ITEM (`classes`, proficiência, requisito), e
+    # não ao fato de a classe ser Mago. Anatomia não se negocia por classe.
+    HAND_POSITIONS = ("Weapon1", "Weapon2")
 
     @classmethod
     def category_of(cls, position: str) -> str:
@@ -203,18 +204,31 @@ class Player(Entity):
             return cls.CATEGORY_POSITIONS[category]
         return (category,) if category in cls.EQUIPMENT_POSITIONS else ()
 
-    def can_use_offhand_weapon(self, item: object) -> bool:
-        """Se `item` pode ocupar a segunda posição de arma.
+    @staticmethod
+    def hands_required(item: object) -> int:
+        """Quantas mãos a peça toma. Sem o campo, uma."""
+        return max(1, int(getattr(item, "hands_required", 1) or 1))
 
-        Três negativas, todas explícitas: a classe não segura duas armas; a
-        própria peça é de duas mãos; ou a mão principal já está ocupada por uma
-        peça de duas mãos.
+    def can_equip_in_hand(self, item: object, position: str) -> bool:
+        """Se `item` pode ocupar esta posição de mão.
+
+        Duas regras, e nenhuma delas olha a classe:
+
+        - peça de duas mãos entra só pela primeira posição, e leva a outra junto;
+        - nenhuma peça entra numa mão que uma peça de duas mãos já ocupa.
+
+        Espada + escudo, cajado + orbe e duas adagas são todos o mesmo caso:
+        duas peças de uma mão em duas posições de mão.
         """
-        if not self.can_dual_wield:
+        if position not in self.HAND_POSITIONS:
             return False
-        if getattr(item, "two_handed", False):
-            return False
-        return not getattr(self.equipment.get("Weapon1"), "two_handed", False)
+        if self.hands_required(item) > 1:
+            return position == self.HAND_POSITIONS[0]
+        return not any(
+            self.hands_required(self.equipment.get(outra)) > 1
+            for outra in self.HAND_POSITIONS
+            if outra != position
+        )
 
     def free_position_for(self, item: object) -> str | None:
         """Primeira posição livre para o item, ou `None` se todas estão ocupadas.
@@ -247,9 +261,9 @@ class Player(Entity):
         principal segura uma peça de duas mãos.
         """
         posicoes = self.positions_for(getattr(item, "slot", None))
-        if "Weapon2" in posicoes and not self.can_use_offhand_weapon(item):
-            posicoes = tuple(p for p in posicoes if p != "Weapon2")
-        return posicoes
+        return tuple(
+            p for p in posicoes if p not in self.HAND_POSITIONS or self.can_equip_in_hand(item, p)
+        )
 
     # Qual campo do item alimenta cada atributo. O bônus do item é lido como
     # PERCENTUAL do atributo, não como soma fixa: a melhor arma do jogo dava +30
@@ -530,11 +544,12 @@ class Player(Entity):
 
         if self.equipment[slot]:
             self.unequip(slot)
-        # Uma arma de duas mãos toma a mão secundária ao entrar. Ela NÃO é
-        # escrita nas duas posições: os agregadores somam `equipment.values()`,
-        # e a mesma peça em dois lugares contaria os bônus dela duas vezes.
-        if slot == "Weapon1" and getattr(item_to_equip, "two_handed", False):
-            self.unequip("Weapon2")
+        # Uma peça de duas mãos toma a outra mão ao entrar. Ela NÃO é escrita
+        # nas duas posições: os agregadores somam `equipment.values()`, e a mesma
+        # peça em dois lugares contaria os bônus dela duas vezes.
+        if slot == self.HAND_POSITIONS[0] and self.hands_required(item_to_equip) > 1:
+            for outra in self.HAND_POSITIONS[1:]:
+                self.unequip(outra)
         # `remove` sem guarda levantava ValueError quando o item não estava no
         # inventário — o que acontecia em todo carregamento de save com
         # equipamento, porque load_game já havia retirado o item. A exceção era
@@ -892,9 +907,6 @@ class Warrior(Player):
     Fraqueza: contra o tank, que também ganha por atrito e tem mais HP.
     """
 
-    # Segura duas armas: é a classe do peso e da mão firme.
-    can_dual_wield = True
-
     CLASS_BASE = {
         "hp": WARRIOR_BASE_HP,
         "mp": WARRIOR_BASE_MP,
@@ -967,9 +979,6 @@ class Rogue(Player):
     ele nunca fica imune como ficava antes. Fraqueza: contra o skirmisher, que
     tem agilidade suficiente para anular essa vantagem.
     """
-
-    # Duas lâminas são a identidade da classe.
-    can_dual_wield = True
 
     CLASS_BASE = {
         "hp": ROGUE_BASE_HP,

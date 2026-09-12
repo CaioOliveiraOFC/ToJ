@@ -33,7 +33,8 @@ class Item:
         shop_max_floor: int | None = None,
         consumable: bool = False,
         status_resistances: dict[str, int] | None = None,
-        two_handed: bool = False,
+        hands_required: int = 1,
+        hand_type: str | None = None,
     ) -> None:
         self.id: str = item_id
         self.name: str = name
@@ -58,10 +59,14 @@ class Item:
         # mesma ideia. Quem soma é `Player.get_status_resistance`; o combate não
         # sabe que equipamento existe.
         self.status_resistances: dict[str, int] = dict(status_resistances or {})
-        # Peça que ocupa as duas mãos: bloqueia a posição `Weapon2` enquanto
-        # estiver equipada. Nenhum item do catálogo declara isto ainda — o campo
-        # existe para que a segunda arma não nasça impossibilitando a de duas mãos.
-        self.two_handed: bool = bool(two_handed)
+        # Quantas MÃOS a peça toma: 1 ocupa uma posição, 2 toma as duas. Fonte
+        # única — não existe `two_handed` ao lado, porque dois campos para o
+        # mesmo fato divergem no primeiro item que declarar só um deles.
+        self.hands_required: int = max(1, int(hands_required or 1))
+        # O que a peça É — sword, dagger, mace, staff, shield, orb, focus, wand.
+        # Descritivo por enquanto: nada no motor lê isto. Existe para que
+        # proficiência e requisitos tenham onde se apoiar sem migrar o catálogo.
+        self.hand_type: str | None = hand_type
 
         if effect_type and effect_value:
             multiplier = RARITY_MULTIPLIERS.get(rarity, 1.0)
@@ -118,7 +123,8 @@ def create_item_from_json(item_data: dict) -> Item:
         shop_max_floor=item_data.get("shop_max_floor", None),
         consumable=item_data.get("consumable", False),
         status_resistances=item_data.get("status_resistances"),
-        two_handed=item_data.get("two_handed", False),
+        hands_required=item_data.get("hands_required", 1),
+        hand_type=item_data.get("hand_type"),
     )
 
 

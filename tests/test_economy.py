@@ -612,10 +612,17 @@ class TestVendaNoSimulador:
         return heroi, armas, _descartavel
 
     def test_vende_item_claramente_inferior(self):
+        """Com as DUAS mãos ocupadas por peças melhores, a terceira é dominada.
+
+        Antes bastava uma arma equipada para a segunda ser descartável. O
+        personagem tem duas mãos, então uma segunda arma tem onde ir — e só a
+        partir da terceira existe algo a vender.
+        """
         heroi, armas, descartavel = self._com_arma(True)
-        boa, ruim = armas[-1], armas[0]
-        heroi.inventory.append(boa)
-        heroi.equip(boa)
+        boa, segunda, ruim = armas[-1], armas[-2], armas[0]
+        for arma in (boa, segunda):
+            heroi.inventory.append(arma)
+            heroi.equip(arma)
         heroi.inventory.append(ruim)
         assert descartavel(heroi, ruim)
 
@@ -671,9 +678,10 @@ class TestVendaNoSimulador:
 
         loja = Shop()
         heroi, armas, _ = self._com_arma(True)
-        boa, ruim = armas[-1], armas[0]
-        heroi.inventory.append(boa)
-        heroi.equip(boa)
+        boa, segunda, ruim = armas[-1], armas[-2], armas[0]
+        for arma in (boa, segunda):
+            heroi.inventory.append(arma)
+            heroi.equip(arma)
         heroi.inventory.append(ruim)
         esperado = loja.get_sell_price(ruim, 7)
         _vender_dominados(heroi, loja, 7)

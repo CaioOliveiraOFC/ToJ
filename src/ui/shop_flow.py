@@ -6,7 +6,11 @@ from typing import TYPE_CHECKING
 
 from src.content.economy import buy_recovery, recovery_offers
 from src.ui import screens
-from src.ui.navigation_menu import navigate_shop_buy, navigate_shop_sell
+from src.ui.navigation_menu import (
+    equipar_escolhendo_posicao,
+    navigate_shop_buy,
+    navigate_shop_sell,
+)
 from src.ui.prompts import get_key
 
 if TYPE_CHECKING:
@@ -133,8 +137,8 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
                         screens.render_shop_equip_prompt(item_to_buy.name, slot, bonus_text)
                         equip_choice = get_key()
                         if equip_choice and equip_choice.lower() in ("s", "y", "1", "e"):
-                            msg = player.equip(item_to_buy)
-                            if "não pode" not in str(msg).lower():
+                            msg = equipar_escolhendo_posicao(player, item_to_buy)
+                            if item_to_buy in player.equipment.values():
                                 screens.render_shop_equip_success(item_to_buy.name, slot)
                             else:
                                 screens.render_shop_equip_failed(msg)
@@ -146,8 +150,8 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
                         equip_choice = get_key()
                         if equip_choice and equip_choice.lower() in ("s", "y", "1", "e"):
                             # tenta equipar; old_item ainda é referência válida
-                            msg = player.equip(item_to_buy)
-                            if "não pode" not in str(msg).lower():
+                            msg = equipar_escolhendo_posicao(player, item_to_buy)
+                            if item_to_buy in player.equipment.values():
                                 screens.render_shop_equip_success(item_to_buy.name, slot)
                                 # old_item agora está no inventário — oferece
                                 # vender ou descartar sem sair da loja
@@ -220,8 +224,8 @@ def _run_equip_in_shop_flow(player: "Player", shop: object, dungeon_level: int) 
             screens.render_shop_equip_prompt(item_to_equip.name, slot, bonus_text)
             choice = get_key()
             if choice and choice.lower() in ("s", "y", "1", "e"):
-                msg = player.equip(item_to_equip)
-                if "não pode" not in str(msg).lower():
+                msg = equipar_escolhendo_posicao(player, item_to_equip)
+                if item_to_equip in player.equipment.values():
                     screens.render_shop_equip_success(item_to_equip.name, slot)
                 else:
                     screens.render_shop_equip_failed(msg)
@@ -235,8 +239,8 @@ def _run_equip_in_shop_flow(player: "Player", shop: object, dungeon_level: int) 
                 screens.render_shop_swap_comparison(item_to_equip, old_item, slot)
                 choice = get_key()
                 if choice and choice.lower() in ("s", "y", "1", "e"):
-                    msg = player.equip(item_to_equip)
-                    if "não pode" not in str(msg).lower():
+                    msg = equipar_escolhendo_posicao(player, item_to_equip)
+                    if item_to_equip in player.equipment.values():
                         screens.render_shop_equip_success(item_to_equip.name, slot)
                         sell_price = shop.get_sell_price(old_item, dungeon_level)
                         screens.render_shop_old_sell_prompt(old_item.name, sell_price, slot)

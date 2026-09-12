@@ -98,10 +98,10 @@ def build_player_status(player, selected_item=None) -> str:
 
 
 # Sentinela para distinguir "o jogador cancelou" de "equipe onde quiser".
-_CANCELADO = object()
+CANCELADO = object()
 
 
-def _escolher_posicao(player, item):
+def escolher_posicao(player, item):
     """Qual posição o jogador quer usar. `None` deixa o personagem decidir.
 
     Só pergunta quando a escolha existe: mais de uma posição possível e nenhuma
@@ -117,7 +117,19 @@ def _escolher_posicao(player, item):
     escolha = get_key()
     if escolha and escolha.isdigit() and 1 <= int(escolha) <= len(posicoes):
         return posicoes[int(escolha) - 1]
-    return _CANCELADO
+    return CANCELADO
+
+
+def equipar_escolhendo_posicao(player, item) -> str:
+    """Equipa perguntando a posição quando não há vaga na categoria.
+
+    Mesma capacidade na mochila e na loja: sem isto, comprar um segundo anel na
+    loja sempre substituía o primeiro, e só o inventário deixava escolher.
+    """
+    posicao = escolher_posicao(player, item)
+    if posicao is CANCELADO:
+        return "Cancelado: nada foi trocado."
+    return player.equip(item, posicao)
 
 
 def _find_equipped_slot_by_item(player, item) -> str | None:
@@ -956,15 +968,11 @@ def navigate_inventory(
                         player.unequip(slot)
                         feedback_message = f"{selected_item.name} desequipado."
                 else:
-                    posicao = _escolher_posicao(player, selected_item)
-                    if posicao is _CANCELADO:
-                        feedback_message = "Cancelado."
-                        continue
-                    msg = player.equip(selected_item, posicao)
-                    if "não pode" in msg.lower() or "não pode" in str(msg).lower():
-                        feedback_message = msg
-                    else:
+                    msg = equipar_escolhendo_posicao(player, selected_item)
+                    if selected_item in player.equipment.values():
                         feedback_message = f"{selected_item.name} equipado."
+                    else:
+                        feedback_message = msg
                 # Stay inside loop so feedback remains visible - rebuild on
                 # next iteration handles the single-item -> empty case
                 continue

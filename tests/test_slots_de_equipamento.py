@@ -8,8 +8,11 @@ slots é a próxima rodada.
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -30,29 +33,52 @@ def test_dois_aneis_diferentes_ocupam_as_duas_posicoes_e_somam():
     assert h.get_equipment_bonus("evasion") == 10
 
 
-def test_classe_compatível_mantém_duas_armas_e_a_incompativel_troca():
-    espada = _item("Espada", "Weapon", damage_bonus=8)
-    adaga = _item("Adaga", "Weapon", damage_bonus=5)
+def test_toda_classe_tem_duas_maos():
+    """Duas mãos são anatomia, não capacidade de classe.
 
-    ladino = Rogue("Prova")
-    ladino.equip(espada)
-    ladino.equip(adaga)
-    assert (ladino.equipment["Weapon1"], ladino.equipment["Weapon2"]) == (espada, adaga)
-    # Uma arma só: o dano é o de antes. Duas: somam, e o balanceamento é outra rodada.
-    assert ladino.weapon_percent() == 13
+    O Mago não tem menos mãos que o Guerreiro. Se uma combinação for proibida
+    depois, a proibição vem do ITEM — `classes`, proficiência, requisito.
+    """
+    for classe in (Warrior, Rogue, Mage):
+        h = classe("Prova")
+        h.equip(_item("Espada", "Weapon", damage_bonus=8, hand_type="sword"))
+        h.equip(_item("Escudo", "Weapon", defense_bonus=6, hand_type="shield"))
+        assert h.equipment["Weapon1"].name == "Espada", classe.__name__
+        assert h.equipment["Weapon2"].name == "Escudo", classe.__name__
 
-    mago = Mage("Prova")
-    mago.equip(espada)
-    mago.equip(adaga)
-    assert mago.equipment["Weapon1"] is adaga, "a segunda arma devia ter substituído a primeira"
-    assert mago.equipment["Weapon2"] is None
-    assert mago.weapon_percent() == 5
+
+COMBINACOES_DE_MAO = [
+    ("Espada + Escudo", ("sword", 10, 0), ("shield", 0, 6)),
+    ("Cajado + Orbe", ("staff", 7, 0), ("orb", 0, 2)),
+    ("Adaga + Adaga", ("dagger", 5, 0), ("dagger", 5, 0)),
+    ("Espada + Espada", ("sword", 10, 0), ("sword", 8, 0)),
+    ("Varinha + Foco", ("wand", 4, 0), ("focus", 0, 1)),
+]
+
+
+@pytest.mark.parametrize("nome,primeira,segunda", COMBINACOES_DE_MAO)
+def test_combinacoes_de_duas_maos_coexistem(nome, primeira, segunda):
+    """A anatomia suporta as combinações, e cada peça contribui com o que declara."""
+    h = Mage("Prova")  # a classe que antes não podia usar a segunda mão
+    pecas = []
+    for i, (tipo, dano, defesa) in enumerate((primeira, segunda)):
+        peca = _item(
+            f"{nome}-{i}", "Weapon", damage_bonus=dano, defense_bonus=defesa, hand_type=tipo
+        )
+        pecas.append(peca)
+        h.equip(peca)
+    assert h.equipment["Weapon1"] is pecas[0], nome
+    assert h.equipment["Weapon2"] is pecas[1], nome
+    # Ocupar uma mão não é o mesmo que somar dano: o escudo declara zero e
+    # contribui zero, e a defesa dele entra pelo caminho da defesa.
+    assert h.weapon_percent() == primeira[1] + segunda[1]
+    assert h.equipment_percent("df") == primeira[2] + segunda[2]
 
 
 def test_arma_de_duas_maos_bloqueia_a_secundaria():
     h = Rogue("Prova")
     h.equip(_item("Adaga", "Weapon", damage_bonus=5))
-    h.equip(_item("Montante", "Weapon", damage_bonus=12, two_handed=True))
+    h.equip(_item("Montante", "Weapon", damage_bonus=12, hands_required=2))
     assert h.equipment["Weapon1"].name == "Montante"
     assert h.equipment["Weapon2"] is None, "a peça de duas mãos deixou a secundária ocupada"
     # E não é escrita nas duas posições: contaria o dano dela duas vezes.
@@ -101,11 +127,6 @@ def test_save_antigo_carrega_weapon_e_ring_nas_primeiras_posicoes():
     assert h.equipment["Weapon2"] is h.equipment["Ring2"] is h.equipment["Accessory"] is None
 
 
-import json  # noqa: E402
-
-import pytest  # noqa: E402
-
-
 @pytest.fixture
 def save_isolado(tmp_path, monkeypatch):
     """`save_manager` apontando para um diretório temporário."""
@@ -138,7 +159,7 @@ class TestDuasMaos:
     def test_two_handed_devolve_as_duas_armas_anteriores(self):
         h = Rogue("Prova")
         a, b = _item("A", "Weapon", damage_bonus=8), _item("B", "Weapon", damage_bonus=5)
-        montante = _item("Montante", "Weapon", damage_bonus=12, two_handed=True)
+        montante = _item("Montante", "Weapon", damage_bonus=12, hands_required=2)
         for peca in (a, b, montante):
             h.inventory.append(peca)
         h.equip(a)
@@ -155,7 +176,7 @@ class TestDuasMaos:
 
     def test_segunda_arma_e_recusada_sem_perder_o_item(self):
         h = Rogue("Prova")
-        montante = _item("Montante", "Weapon", damage_bonus=12, two_handed=True)
+        montante = _item("Montante", "Weapon", damage_bonus=12, hands_required=2)
         adaga = _item("Adaga", "Weapon", damage_bonus=5)
         h.inventory += [montante, adaga]
         h.equip(montante)
@@ -166,7 +187,7 @@ class TestDuasMaos:
 
     def test_tirar_a_de_duas_maos_libera_a_secundaria(self):
         h = Rogue("Prova")
-        montante = _item("Montante", "Weapon", damage_bonus=12, two_handed=True)
+        montante = _item("Montante", "Weapon", damage_bonus=12, hands_required=2)
         adaga = _item("Adaga", "Weapon", damage_bonus=5)
         h.inventory += [montante, adaga]
         h.equip(montante)
@@ -174,7 +195,7 @@ class TestDuasMaos:
 
         h.equip(adaga)
         assert h.equipment["Weapon1"] is adaga
-        assert h.can_use_offhand_weapon(_item("Outra", "Weapon"))
+        assert h.can_equip_in_hand(_item("Outra", "Weapon"), "Weapon2")
 
 
 class TestUnequip:
@@ -220,7 +241,7 @@ class TestSaveRoundTrip:
     PECAS = {
         "Espada": {"slot": "Weapon", "damage_bonus": 8},
         "Adaga": {"slot": "Weapon", "damage_bonus": 5},
-        "Montante": {"slot": "Weapon", "damage_bonus": 12, "two_handed": True},
+        "Montante": {"slot": "Weapon", "damage_bonus": 12, "hands_required": 2},
         "Anel A": {"slot": "Ring", "effect_type": "evasion", "effect_value": 4},
         "Anel B": {"slot": "Ring", "effect_type": "evasion", "effect_value": 6},
         "Grimório": {"slot": "Accessory", "defense_bonus": 3},
@@ -278,15 +299,18 @@ class TestSaveRoundTrip:
         assert carregado.equipment["Weapon2"] is None
 
     def test_peca_recusada_no_carregamento_volta_para_a_mochila(self, save_isolado):
-        """Um Ladino com duas armas, carregado como Mago: nada pode evaporar.
+        """Peça restrita por classe, num save carregado por outra: nada evapora.
 
         `load_game` retirava a peça do inventário ANTES de tentar equipar, e a
         recusa a apagava do jogo.
         """
         registro = self._registro()
-        heroi = Rogue("DualWield")
+        exclusiva = _item("Lâmina do Ladino", slot="Weapon", damage_bonus=9, classes=["Rogue"])
+        registro._pecas["Lâmina do Ladino"] = exclusiva
+
+        heroi = Rogue("Restrito")
         heroi.equip(registro.get("Espada"), position="Weapon1")
-        heroi.equip(registro.get("Adaga"), position="Weapon2")
+        heroi.equip(exclusiva, position="Weapon2")
         save_isolado.save_game(heroi, 3, None, slot=1)
 
         caminho = save_isolado.get_slot_file(1)
@@ -297,7 +321,7 @@ class TestSaveRoundTrip:
         carregado, _, _ = save_isolado.load_game(registro, _fabricas(), slot=1)
         assert carregado.equipment["Weapon1"].name == "Espada"
         assert carregado.equipment["Weapon2"] is None
-        assert [i.name for i in carregado.inventory] == ["Adaga"]
+        assert [i.name for i in carregado.inventory] == ["Lâmina do Ladino"]
 
     def test_accessory_sobrevive_ao_round_trip(self, save_isolado):
         registro = self._registro()
@@ -319,13 +343,13 @@ class TestSelecaoDePosicao:
         return _item(nome, "Ring")
 
     def test_nao_pergunta_quando_ha_vaga_ou_posicao_unica(self):
-        from src.ui.navigation_menu import _escolher_posicao
+        from src.ui.navigation_menu import escolher_posicao
 
         h = Warrior("Prova")
-        assert _escolher_posicao(h, self._anel("X")) is None
+        assert escolher_posicao(h, self._anel("X")) is None
         h.equip(self._anel("A"))
-        assert _escolher_posicao(h, self._anel("X")) is None, "havia Ring2 livre"
-        assert _escolher_posicao(h, _item("Elmo", "Helmet")) is None, "categoria de posição única"
+        assert escolher_posicao(h, self._anel("X")) is None, "havia Ring2 livre"
+        assert escolher_posicao(h, _item("Elmo", "Helmet")) is None, "categoria de posição única"
 
     def test_pergunta_e_respeita_a_escolha_quando_tudo_esta_ocupado(self, monkeypatch):
         import src.ui.navigation_menu as nm
@@ -336,6 +360,68 @@ class TestSelecaoDePosicao:
         monkeypatch.setattr(nm.screens, "render_position_choice", lambda *a, **k: None)
 
         monkeypatch.setattr(nm, "get_key", lambda: "2")
-        assert nm._escolher_posicao(h, self._anel("X")) == "Ring2"
+        assert nm.escolher_posicao(h, self._anel("X")) == "Ring2"
         monkeypatch.setattr(nm, "get_key", lambda: "c")
-        assert nm._escolher_posicao(h, self._anel("X")) is nm._CANCELADO
+        assert nm.escolher_posicao(h, self._anel("X")) is nm.CANCELADO
+
+
+class TestSimuladorRepresentaAAnatomia:
+    """O herói de medição precisa ter as mesmas mãos que o jogador."""
+
+    @pytest.mark.parametrize("classe", ["Warrior", "Mage", "Rogue"])
+    def test_loadout_preenche_as_duas_maos_e_os_dois_aneis(self, classe):
+        from src.sim.harness import make_hero
+
+        h = make_hero(classe, 8, "expected")
+        for posicao in ("Weapon1", "Weapon2", "Ring1", "Ring2"):
+            assert h.equipment[posicao] is not None, f"{classe} sem {posicao}"
+
+    @pytest.mark.parametrize("classe", ["Warrior", "Mage", "Rogue"])
+    def test_loadout_nunca_repete_a_mesma_instancia(self, classe):
+        """A mesma peça em duas posições seria contada duas vezes por todo
+        agregador que soma `equipment.values()`."""
+        from src.sim.harness import make_hero
+
+        equipadas = [v for v in make_hero(classe, 8, "expected").equipment.values() if v]
+        assert len({id(v) for v in equipadas}) == len(equipadas)
+
+
+class TestLojaTemAMesmaEscolha:
+    """A loja e a mochila usam o mesmo helper: paridade por construção."""
+
+    def _com_dois_aneis(self):
+        h = Warrior("Prova")
+        h.equip(_item("A", "Ring", effect_type="evasion", effect_value=4))
+        h.equip(_item("B", "Ring", effect_type="evasion", effect_value=6))
+        return h
+
+    def test_a_loja_usa_o_mesmo_helper_do_inventario(self):
+        from src.ui import navigation_menu, shop_flow
+
+        assert shop_flow.equipar_escolhendo_posicao is navigation_menu.equipar_escolhendo_posicao
+
+    def test_respeita_a_posicao_escolhida(self, monkeypatch):
+        import src.ui.navigation_menu as nm
+
+        h = self._com_dois_aneis()
+        primeiro = h.equipment["Ring1"]
+        novo = _item("C", "Ring", effect_type="evasion", effect_value=9)
+        monkeypatch.setattr(nm.screens, "render_position_choice", lambda *a, **k: None)
+        monkeypatch.setattr(nm, "get_key", lambda: "2")
+
+        nm.equipar_escolhendo_posicao(h, novo)
+        assert h.equipment["Ring1"] is primeiro
+        assert h.equipment["Ring2"] is novo
+
+    def test_cancelar_nao_altera_nada(self, monkeypatch):
+        import src.ui.navigation_menu as nm
+
+        h = self._com_dois_aneis()
+        antes = dict(h.equipment)
+        novo = _item("C", "Ring")
+        monkeypatch.setattr(nm.screens, "render_position_choice", lambda *a, **k: None)
+        monkeypatch.setattr(nm, "get_key", lambda: "c")
+
+        nm.equipar_escolhendo_posicao(h, novo)
+        assert h.equipment == antes
+        assert novo not in h.equipment.values()

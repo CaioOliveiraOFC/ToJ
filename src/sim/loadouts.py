@@ -61,17 +61,28 @@ def apply_loadout(hero, loadout: str, level: int) -> None:
     hero_class = hero.get_classname()
     cap_ratio = 0.99 if loadout == "best" else min(0.85, 0.25 + level * 0.03)
 
-    # Uma peça por CATEGORIA, não por posição. `Ring1` e `Ring2` aceitam o mesmo
-    # `slot: "Ring"`, e preencher as duas com a melhor opção daria ao herói de
-    # medição dois anéis idênticos e duas armas idênticas — dobrando bônus que
-    # nenhum jogador real teria. O loadout representa o que um jogador daquele
-    # nível plausivelmente carrega; a segunda posição é decisão de conteúdo, e
-    # entra aqui quando houver dual wield para medir.
-    for categoria in dict.fromkeys(hero.category_of(p) for p in hero.EQUIPMENT_POSITIONS):
-        chosen = _best_for_floor(_equippable(items, categoria, hero_class), level, cap_ratio)
+    # Percorre POSIÇÕES: o personagem tem duas mãos e dois anéis, e o herói de
+    # medição precisa representar isso, ou mede um jogo que ninguém joga.
+    #
+    # `_ja_escolhidos` garante peças DISTINTAS: a mesma instância nas duas mãos
+    # seria contada duas vezes por todo agregador que soma `equipment.values()`.
+    # A segunda posição recebe a melhor opção que ainda não foi usada.
+    ja_escolhidos: list = []
+    for posicao in hero.EQUIPMENT_POSITIONS:
+        categoria = hero.category_of(posicao)
+        candidatos = [
+            i
+            for i in _equippable(items, categoria, hero_class)
+            if not any(i is escolhido for escolhido in ja_escolhidos)
+        ]
+        # Uma peça de duas mãos já ocupou esta posição, ou a categoria não cabe
+        # aqui neste personagem.
+        candidatos = [i for i in candidatos if posicao in hero.available_positions_for(i)]
+        chosen = _best_for_floor(candidatos, level, cap_ratio)
         if chosen is not None:
+            ja_escolhidos.append(chosen)
             hero.add_item_to_inventory(chosen)
-            hero.equip(chosen)
+            hero.equip(chosen, posicao)
 
     # Poções de cura: o recurso que dá sentido ao atrito. Sem elas, medir um
     # andar inteiro sem cura mede um jogo que ninguém joga.
