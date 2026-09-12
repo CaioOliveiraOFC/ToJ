@@ -550,14 +550,27 @@ class Player(Entity):
         return getattr(item_to_equip, "name", "Item")
 
     def unequip(self, slot: str) -> str | None:
-        """Desequipa um item do slot especificado.
+        """Desequipa um item da posição indicada.
+
+        Recebe POSIÇÃO (`Weapon1`), não categoria (`Weapon`). Uma posição que
+        não existe levanta erro em vez de devolver `None`: as duas respostas
+        eram indistinguíveis, então `unequip("Weapon")` — a grafia de antes das
+        11 posições — parecia funcionar e deixava a arma equipada.
 
         Args:
-            slot: Slot do item a ser desequipado.
+            slot: Posição física a esvaziar.
 
         Returns:
-            Mensagem de confirmação ou None se slot estava vazio.
+            Nome da peça retirada, ou None se a posição estava vazia.
+
+        Raises:
+            KeyError: se a posição não existe neste personagem.
         """
+        if slot not in self.equipment:
+            raise KeyError(
+                f"{slot!r} não é uma posição de equipamento. "
+                f"Posições: {', '.join(self.EQUIPMENT_POSITIONS)}"
+            )
         item_to_unequip = self.equipment.get(slot)
         if not item_to_unequip:
             return None

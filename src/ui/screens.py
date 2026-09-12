@@ -557,6 +557,24 @@ def render_shop_equip_prompt(item_name: str, slot: str, bonus_text: str) -> None
     renderer.console.print(Panel(body, border_style="green", title="Equipar agora?"))
 
 
+def render_position_choice(item_name: str, ocupantes: list[tuple[str, str]]) -> None:
+    """Pergunta qual peça sai quando todas as posições da categoria estão cheias.
+
+    Só aparece com mais de uma posição possível e nenhuma livre: com vaga, o
+    personagem resolve sozinho. Sem isto, um segundo anel sempre substituía o
+    primeiro, e o jogador não tinha como escolher.
+    """
+    body = Text(justify="left")
+    body.append(f"{item_name}\n\n", style="bold cyan")
+    body.append("Todas as posições estão ocupadas. Qual peça sai?\n\n", style="yellow")
+    for i, (posicao, ocupante) in enumerate(ocupantes, start=1):
+        body.append(f"  [{i}] ", style="bold white")
+        body.append(f"{SLOT_LABELS.get(posicao, posicao)}: ", style="white")
+        body.append(f"{ocupante}\n", style="dim")
+    body.append("\n  [C] Cancelar", style="dim")
+    renderer.console.print(Panel(body, border_style="cyan", title="Substituir qual?"))
+
+
 def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
     """Mostra comparação simples antigo vs novo ao trocar na loja."""
     slot_names = SLOT_LABELS

@@ -9,7 +9,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from src.content.items import Item, get_all_items
-from src.ui import renderer
+from src.ui import renderer, screens
 from src.ui.prompts import get_key
 from src.ui.screens import SLOT_LABELS
 
@@ -95,6 +95,29 @@ def build_player_status(player, selected_item=None) -> str:
                 content += f"  [{slot_label}] [dim]Vazio[dim]\n"
 
     return content
+
+
+# Sentinela para distinguir "o jogador cancelou" de "equipe onde quiser".
+_CANCELADO = object()
+
+
+def _escolher_posicao(player, item):
+    """Qual posição o jogador quer usar. `None` deixa o personagem decidir.
+
+    Só pergunta quando a escolha existe: mais de uma posição possível e nenhuma
+    livre. Com vaga, ou com uma posição só, não há o que perguntar — e uma
+    pergunta sem alternativa é atrito, não decisão.
+    """
+    posicoes = player.available_positions_for(item)
+    if len(posicoes) < 2 or player.free_position_for(item) is not None:
+        return None
+
+    ocupantes = [(p, getattr(player.equipment[p], "name", "—")) for p in posicoes]
+    screens.render_position_choice(getattr(item, "name", "Item"), ocupantes)
+    escolha = get_key()
+    if escolha and escolha.isdigit() and 1 <= int(escolha) <= len(posicoes):
+        return posicoes[int(escolha) - 1]
+    return _CANCELADO
 
 
 def _find_equipped_slot_by_item(player, item) -> str | None:
@@ -933,7 +956,11 @@ def navigate_inventory(
                         player.unequip(slot)
                         feedback_message = f"{selected_item.name} desequipado."
                 else:
-                    msg = player.equip(selected_item)
+                    posicao = _escolher_posicao(player, selected_item)
+                    if posicao is _CANCELADO:
+                        feedback_message = "Cancelado."
+                        continue
+                    msg = player.equip(selected_item, posicao)
                     if "não pode" in msg.lower() or "não pode" in str(msg).lower():
                         feedback_message = msg
                     else:

@@ -182,10 +182,18 @@ def load_game(
                 item_to_equip = item_registry.get(item_name)
                 if item_to_equip is None:
                     continue
-                if item_to_equip in player.inventory:
-                    player.inventory.remove(item_to_equip)
                 posicao = POSICAO_LEGADA.get(slot, slot)
                 player.equip(item_to_equip, posicao if posicao in player.equipment else None)
+                # `equip` pode recusar: classe errada, ou uma posição que este
+                # personagem não tem (um save com arma secundária carregado por
+                # quem não empunha duas). A peça recusada volta para a mochila.
+                # Antes ela era retirada do inventário ANTES da tentativa e
+                # sumia do jogo — o save perdia o item em silêncio.
+                if (
+                    item_to_equip not in player.equipment.values()
+                    and item_to_equip not in player.inventory
+                ):
+                    player.inventory.append(item_to_equip)
 
         player.active_buffs = save_data.get("active_buffs", {})
         player.active_effects = save_data.get("active_effects", {})

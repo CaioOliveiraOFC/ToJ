@@ -99,3 +99,243 @@ def test_save_antigo_carrega_weapon_e_ring_nas_primeiras_posicoes():
     assert h.equipment["Ring1"].name == "Anel"
     assert h.equipment["Helmet"].name == "Elmo"
     assert h.equipment["Weapon2"] is h.equipment["Ring2"] is h.equipment["Accessory"] is None
+
+
+import json  # noqa: E402
+
+import pytest  # noqa: E402
+
+
+@pytest.fixture
+def save_isolado(tmp_path, monkeypatch):
+    """`save_manager` apontando para um diretório temporário."""
+    from src.storage import save_manager
+
+    monkeypatch.setattr(save_manager, "SAVE_DIR", str(tmp_path), raising=False)
+    monkeypatch.setattr(
+        save_manager, "get_slot_file", lambda slot: str(tmp_path / f"slot_{slot}.json")
+    )
+    return save_manager
+
+
+class _Registro:
+    """Registro de itens de teste, com a interface que `load_game` usa."""
+
+    def __init__(self, pecas):
+        self._pecas = pecas
+
+    def get(self, nome):
+        return self._pecas.get(nome)
+
+
+def _fabricas():
+    return {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
+
+
+class TestDuasMaos:
+    """As TRANSIÇÕES, não só o estado final: nada pode ser duplicado nem perdido."""
+
+    def test_two_handed_devolve_as_duas_armas_anteriores(self):
+        h = Rogue("Prova")
+        a, b = _item("A", "Weapon", damage_bonus=8), _item("B", "Weapon", damage_bonus=5)
+        montante = _item("Montante", "Weapon", damage_bonus=12, two_handed=True)
+        for peca in (a, b, montante):
+            h.inventory.append(peca)
+        h.equip(a)
+        h.equip(b)
+
+        h.equip(montante)
+        assert h.equipment["Weapon1"] is montante
+        assert h.equipment["Weapon2"] is None
+        assert h.inventory.count(a) == 1 and h.inventory.count(b) == 1
+        # Nem perdida nem duplicada: cada peça existe uma vez, em um lugar só.
+        for peca in (a, b, montante):
+            equipadas = sum(1 for v in h.equipment.values() if v is peca)
+            assert equipadas + h.inventory.count(peca) == 1
+
+    def test_segunda_arma_e_recusada_sem_perder_o_item(self):
+        h = Rogue("Prova")
+        montante = _item("Montante", "Weapon", damage_bonus=12, two_handed=True)
+        adaga = _item("Adaga", "Weapon", damage_bonus=5)
+        h.inventory += [montante, adaga]
+        h.equip(montante)
+
+        assert h.equip(adaga, position="Weapon2").startswith("Adaga não vai")
+        assert h.equipment["Weapon2"] is None
+        assert adaga in h.inventory, "a peça recusada sumiu"
+
+    def test_tirar_a_de_duas_maos_libera_a_secundaria(self):
+        h = Rogue("Prova")
+        montante = _item("Montante", "Weapon", damage_bonus=12, two_handed=True)
+        adaga = _item("Adaga", "Weapon", damage_bonus=5)
+        h.inventory += [montante, adaga]
+        h.equip(montante)
+        h.unequip("Weapon1")
+
+        h.equip(adaga)
+        assert h.equipment["Weapon1"] is adaga
+        assert h.can_use_offhand_weapon(_item("Outra", "Weapon"))
+
+
+class TestUnequip:
+    """Posição inexistente não pode parecer posição vazia."""
+
+    def test_posicao_inexistente_levanta_erro(self):
+        h = Warrior("Prova")
+        with pytest.raises(KeyError):
+            h.unequip("Weapon")  # a grafia de antes das 11 posições
+
+    def test_posicao_valida_e_vazia_devolve_none(self):
+        assert Warrior("Prova").unequip("Weapon2") is None
+
+
+class TestDoisAneis:
+    def test_permanecem_equipados_e_somam_uma_vez_cada(self):
+        h = Warrior("Prova")
+        h.equip(_item("A", "Ring", effect_type="evasion", effect_value=4))
+        h.equip(_item("B", "Ring", effect_type="evasion", effect_value=6))
+        assert h.get_equipment_bonus("evasion") == 10
+
+    def test_trocar_o_segundo_nao_mexe_no_primeiro(self):
+        h = Warrior("Prova")
+        primeiro = _item("A", "Ring", effect_type="evasion", effect_value=4)
+        h.equip(primeiro)
+        h.equip(_item("B", "Ring", effect_type="evasion", effect_value=6))
+        h.unequip("Ring2")
+        h.equip(_item("C", "Ring", effect_type="evasion", effect_value=9), position="Ring2")
+        assert h.equipment["Ring1"] is primeiro
+        assert h.get_equipment_bonus("evasion") == 13
+
+    def test_remover_um_tira_so_a_contribuicao_dele(self):
+        h = Warrior("Prova")
+        h.equip(_item("A", "Ring", effect_type="evasion", effect_value=4))
+        h.equip(_item("B", "Ring", effect_type="evasion", effect_value=6))
+        h.unequip("Ring1")
+        assert h.get_equipment_bonus("evasion") == 6
+
+
+class TestSaveRoundTrip:
+    """O save de verdade, por `save_game`/`load_game` — não um mapeamento à mão."""
+
+    PECAS = {
+        "Espada": {"slot": "Weapon", "damage_bonus": 8},
+        "Adaga": {"slot": "Weapon", "damage_bonus": 5},
+        "Montante": {"slot": "Weapon", "damage_bonus": 12, "two_handed": True},
+        "Anel A": {"slot": "Ring", "effect_type": "evasion", "effect_value": 4},
+        "Anel B": {"slot": "Ring", "effect_type": "evasion", "effect_value": 6},
+        "Grimório": {"slot": "Accessory", "defense_bonus": 3},
+        "Elmo": {"slot": "Helmet", "defense_bonus": 2},
+    }
+
+    def _registro(self):
+        return _Registro({nome: _item(nome, **kw) for nome, kw in self.PECAS.items()})
+
+    def test_save_antigo_cai_nas_primeiras_posicoes(self, save_isolado):
+        """`Weapon`/`Ring` de um save anterior às 11 posições."""
+        registro = self._registro()
+        heroi = Warrior("Antigo")
+        heroi.equip(registro.get("Espada"))
+        save_isolado.save_game(heroi, 3, None, slot=1)
+
+        caminho = save_isolado.get_slot_file(1)
+        dados = json.loads(open(caminho, encoding="utf-8").read())
+        dados["equipment"] = {"Weapon": "Espada", "Ring": "Anel A", "Helmet": "Elmo"}
+        open(caminho, "w", encoding="utf-8").write(json.dumps(dados))
+
+        carregado, _, _ = save_isolado.load_game(registro, _fabricas(), slot=1)
+        assert carregado.equipment["Weapon1"].name == "Espada"
+        assert carregado.equipment["Ring1"].name == "Anel A"
+        assert carregado.equipment["Helmet"].name == "Elmo"
+        assert carregado.equipment["Weapon2"] is None
+        assert carregado.equipment["Ring2"] is None
+        assert carregado.equipment["Accessory"] is None
+
+    def test_save_novo_preserva_todas_as_posicoes(self, save_isolado):
+        registro = self._registro()
+        heroi = Rogue("Novo")
+        esperado = {
+            "Weapon1": "Espada",
+            "Weapon2": "Adaga",
+            "Ring1": "Anel A",
+            "Ring2": "Anel B",
+            "Accessory": "Grimório",
+        }
+        for posicao, nome in esperado.items():
+            heroi.equip(registro.get(nome), position=posicao)
+        save_isolado.save_game(heroi, 3, None, slot=1)
+
+        carregado, _, _ = save_isolado.load_game(registro, _fabricas(), slot=1)
+        assert {p: carregado.equipment[p].name for p in esperado} == esperado
+
+    def test_save_com_arma_de_duas_maos(self, save_isolado):
+        registro = self._registro()
+        heroi = Rogue("DuasMaos")
+        heroi.equip(registro.get("Montante"))
+        save_isolado.save_game(heroi, 3, None, slot=1)
+
+        carregado, _, _ = save_isolado.load_game(registro, _fabricas(), slot=1)
+        assert carregado.equipment["Weapon1"].name == "Montante"
+        assert carregado.equipment["Weapon2"] is None
+
+    def test_peca_recusada_no_carregamento_volta_para_a_mochila(self, save_isolado):
+        """Um Ladino com duas armas, carregado como Mago: nada pode evaporar.
+
+        `load_game` retirava a peça do inventário ANTES de tentar equipar, e a
+        recusa a apagava do jogo.
+        """
+        registro = self._registro()
+        heroi = Rogue("DualWield")
+        heroi.equip(registro.get("Espada"), position="Weapon1")
+        heroi.equip(registro.get("Adaga"), position="Weapon2")
+        save_isolado.save_game(heroi, 3, None, slot=1)
+
+        caminho = save_isolado.get_slot_file(1)
+        dados = json.loads(open(caminho, encoding="utf-8").read())
+        dados["player_class"] = "Mage"
+        open(caminho, "w", encoding="utf-8").write(json.dumps(dados))
+
+        carregado, _, _ = save_isolado.load_game(registro, _fabricas(), slot=1)
+        assert carregado.equipment["Weapon1"].name == "Espada"
+        assert carregado.equipment["Weapon2"] is None
+        assert [i.name for i in carregado.inventory] == ["Adaga"]
+
+    def test_accessory_sobrevive_ao_round_trip(self, save_isolado):
+        registro = self._registro()
+        heroi = Warrior("Acessorio")
+        heroi.equip(registro.get("Grimório"))
+        assert heroi.equipment["Accessory"].name == "Grimório"
+        save_isolado.save_game(heroi, 3, None, slot=1)
+
+        carregado, _, _ = save_isolado.load_game(registro, _fabricas(), slot=1)
+        assert carregado.equipment["Accessory"].name == "Grimório"
+        assert carregado.unequip("Accessory") == "Grimório"
+        assert carregado.equipment["Accessory"] is None
+
+
+class TestSelecaoDePosicao:
+    """A pergunta só aparece quando existe escolha."""
+
+    def _anel(self, nome):
+        return _item(nome, "Ring")
+
+    def test_nao_pergunta_quando_ha_vaga_ou_posicao_unica(self):
+        from src.ui.navigation_menu import _escolher_posicao
+
+        h = Warrior("Prova")
+        assert _escolher_posicao(h, self._anel("X")) is None
+        h.equip(self._anel("A"))
+        assert _escolher_posicao(h, self._anel("X")) is None, "havia Ring2 livre"
+        assert _escolher_posicao(h, _item("Elmo", "Helmet")) is None, "categoria de posição única"
+
+    def test_pergunta_e_respeita_a_escolha_quando_tudo_esta_ocupado(self, monkeypatch):
+        import src.ui.navigation_menu as nm
+
+        h = Warrior("Prova")
+        h.equip(self._anel("A"))
+        h.equip(self._anel("B"))
+        monkeypatch.setattr(nm.screens, "render_position_choice", lambda *a, **k: None)
+
+        monkeypatch.setattr(nm, "get_key", lambda: "2")
+        assert nm._escolher_posicao(h, self._anel("X")) == "Ring2"
+        monkeypatch.setattr(nm, "get_key", lambda: "c")
+        assert nm._escolher_posicao(h, self._anel("X")) is nm._CANCELADO
