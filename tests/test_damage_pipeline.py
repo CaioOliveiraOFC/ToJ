@@ -1,0 +1,151 @@
+"""O golpe passa por um funil matemático só, e o funil não muda o jogo.
+
+Os valores abaixo foram gravados contra o motor antes da centralização. Eles não
+são alvo de balanceamento: são a prova de que mover multiplicações para dentro do
+pipeline não mexeu em dano nenhum. Se um deles mudar por causa de refatoração, é
+bug da refatoração.
+
+Mudança deliberada de balanceamento pode alterá-los — nesse caso o commit tem de
+dizer isso, e regravá-los é parte da mudança, não um conserto.
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from src.content.factories.archetypes import spawn_by_role  # noqa: E402
+from src.content.skills_loader import load_skills  # noqa: E402
+from src.mechanics import combat as cmb  # noqa: E402
+from src.sim.harness import make_hero  # noqa: E402
+
+
+class RngRoteirizado:
+    """RNG determinístico: devolve a sequência dada, repetindo o último valor.
+
+    Fixar a rolagem é o que torna o dano comparável: sem isso, "antes == depois"
+    dependeria de acerto e crítico caírem iguais por sorte.
+    """
+
+    def __init__(self, *valores: int) -> None:
+        self._v = list(valores) or [1]
+        self._i = 0
+
+    def randrange(self, a: int, b: int) -> int:
+        valor = self._v[min(self._i, len(self._v) - 1)]
+        self._i += 1
+        return valor
+
+    def random(self) -> float:
+        return 0.5
+
+
+ACERTA_SEM_CRIT = (1, 100)
+ACERTA_COM_CRIT = (1, 1)
+
+
+def _skill(nome: str):
+    return next(s for s in load_skills() if s.name == nome)
+
+
+def _golpe(atacante, defensor, base: int, nome: str, rolagem) -> int:
+    hp = defensor.get_hp()
+    cmb.resolve_physical_attack(atacante, defensor, base, nome, rng=RngRoteirizado(*rolagem))
+    return hp - defensor.get_hp()
+
+
+# --- os oito cenários -------------------------------------------------------
+
+
+def basico_sem_crit() -> int:
+    h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
+    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+
+
+def basico_com_crit() -> int:
+    h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
+    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_COM_CRIT)
+
+
+def skill_de_dano() -> int:
+    h, m = make_hero("Mage", 8, "expected"), spawn_by_role("tank", 8)
+    sk = _skill("Bola de Fogo")
+    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT)
+
+
+def skill_com_condicao() -> int:
+    h, m = make_hero("Rogue", 8, "expected"), spawn_by_role("trash", 8)
+    sk = next(
+        s
+        for s in load_skills()
+        if s.bonus_condition == "target_wounded"
+        and s.effect_type == "damage"
+        and s.skill_class == "Rogue"
+    )
+    m._hp = max(1, int(m.base_hp * 0.10))
+    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT)
+
+
+def atacante_com_fear() -> int:
+    h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
+    h.active_effects["fear"] = {"duration": 3}
+    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+
+
+def defensor_com_reducao() -> int:
+    h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
+    m.active_effects["damage_reduction"] = {"value": 30, "duration": 3}
+    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+
+
+def dois_redutores() -> int:
+    h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
+    h.active_effects["fear"] = {"duration": 3}
+    m.active_effects["damage_reduction"] = {"value": 30, "duration": 3}
+    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+
+
+def monstro_contra_mago_com_egide() -> int:
+    m, h = spawn_by_role("bruiser", 8), make_hero("Mage", 8, "expected")
+    return _golpe(m, h, cmb.basic_attack_power(m), "", ACERTA_SEM_CRIT)
+
+
+CENARIOS = {
+    "basico_sem_crit": basico_sem_crit,
+    "basico_com_crit": basico_com_crit,
+    "skill_de_dano": skill_de_dano,
+    "skill_com_condicao": skill_com_condicao,
+    "atacante_com_fear": atacante_com_fear,
+    "defensor_com_reducao": defensor_com_reducao,
+    "dois_redutores": dois_redutores,
+    "monstro_contra_mago_com_egide": monstro_contra_mago_com_egide,
+}
+
+# Gravados contra o motor pré-centralização.
+GOLDEN = {
+    "basico_sem_crit": 149,
+    "basico_com_crit": 223,
+    "skill_de_dano": 281,
+    "skill_com_condicao": 453,
+    "atacante_com_fear": 119,
+    "defensor_com_reducao": 104,
+    "dois_redutores": 83,
+    "monstro_contra_mago_com_egide": 87,
+}
+
+
+@pytest.mark.parametrize("nome", sorted(CENARIOS))
+def test_o_dano_de_cada_cenario_nao_mudou(nome):
+    assert CENARIOS[nome]() == GOLDEN[nome]
+
+
+def test_o_cenario_da_egide_realmente_gasta_mana():
+    """Sem isto, o cenário passaria mesmo que a égide parasse de existir."""
+    m, h = spawn_by_role("bruiser", 8), make_hero("Mage", 8, "expected")
+    mp = h.get_mp()
+    _golpe(m, h, cmb.basic_attack_power(m), "", ACERTA_SEM_CRIT)
+    assert h.get_mp() < mp
