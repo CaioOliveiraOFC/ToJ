@@ -191,6 +191,28 @@ class Player(Entity):
                 total += float(getattr(item, "effect_value", 0))
         return total
 
+    def get_status_resistance(self, status: str) -> float:
+        """Resistência própria mais a soma do que está equipado, capada em 100.
+
+        Somada e não composta: 40% de anel, 35% de colar e 25% de armadura dão
+        imunidade, e é justamente esse o pacto — se o jogador gastou três slots
+        para não congelar, ele não congela. Acima de 100 o excedente se perde,
+        sem conversão em outro bônus e sem retorno decrescente.
+
+        Derivada do equipamento atual, nunca copiada para o personagem: tirar o
+        anel devolve a resistência ao valor de antes, sem resíduo. É a mesma
+        escolha de `equipment_percent`, e pelo mesmo motivo.
+
+        O combate continua perguntando só `get_status_resistance` e não sabe que
+        equipamento existe.
+        """
+        total = super().get_status_resistance(status)
+        for item in self.equipment.values():
+            if item is None:
+                continue
+            total += float((getattr(item, "status_resistances", None) or {}).get(status, 0) or 0)
+        return max(0.0, min(100.0, total))
+
     def weapon_percent(self) -> float:
         """Percentual de dano acrescentado pela arma equipada."""
         return float(getattr(self.equipment.get("Weapon"), "damage_bonus", 0))

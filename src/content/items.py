@@ -32,6 +32,7 @@ class Item:
         shop_min_floor: int = 1,
         shop_max_floor: int | None = None,
         consumable: bool = False,
+        status_resistances: dict[str, int] | None = None,
     ) -> None:
         self.id: str = item_id
         self.name: str = name
@@ -49,6 +50,13 @@ class Item:
         self.shop_min_floor: int = shop_min_floor
         self.shop_max_floor: int | None = shop_max_floor
         self.consumable: bool = consumable
+        # Resistência a status negativo que o item concede, por nome canônico
+        # (ver `shared/effects.negative_statuses`). Um dicionário, e não um campo
+        # por status: um colar pode dar frio e atordoamento ao mesmo tempo, e
+        # `frozen_resistance`, `stun_resistance`, … seriam trinta campos para a
+        # mesma ideia. Quem soma é `Player.get_status_resistance`; o combate não
+        # sabe que equipamento existe.
+        self.status_resistances: dict[str, int] = dict(status_resistances or {})
 
         if effect_type and effect_value:
             multiplier = RARITY_MULTIPLIERS.get(rarity, 1.0)
@@ -104,6 +112,7 @@ def create_item_from_json(item_data: dict) -> Item:
         shop_min_floor=item_data.get("shop_min_floor", 1),
         shop_max_floor=item_data.get("shop_max_floor", None),
         consumable=item_data.get("consumable", False),
+        status_resistances=item_data.get("status_resistances"),
     )
 
 

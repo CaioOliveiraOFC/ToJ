@@ -15,6 +15,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.content.factories.archetypes import spawn_by_role  # noqa: E402
+from src.content.items import Item  # noqa: E402
 from src.content.skills_loader import load_skills  # noqa: E402
 from src.mechanics import combat as cmb  # noqa: E402
 from src.shared import effects as fx  # noqa: E402
@@ -163,3 +164,113 @@ def test_o_vocabulario_e_o_do_motor():
     }
     assert "invisible" not in canonicos, "estado benéfico não é resistível"
     assert "damage_reduction" not in canonicos, "buff que o lançador põe em si mesmo"
+
+
+# --- equipamento como fonte de resistência -----------------------------------
+
+
+def _item(slot: str, **resistencias) -> Item:
+    """Item de prova. Não entra no catálogo: existe só para exercitar o caminho."""
+    return Item(
+        item_id=f"prova_{slot.lower()}",
+        name=f"Prova {slot}",
+        description="",
+        slot=slot,
+        status_resistances=resistencias,
+    )
+
+
+def _com(heroi, *itens):
+    for item in itens:
+        heroi.inventory.append(item)
+        heroi.equip(item)
+    return heroi
+
+
+class TestEquipamentoContribui:
+    def test_um_item_soma(self):
+        h = _com(make_hero("Warrior", 8, "naked"), _item("Ring", frozen=50))
+        assert h.get_status_resistance("frozen") == 50
+
+    def test_varios_itens_somam(self):
+        h = _com(
+            make_hero("Warrior", 8, "naked"),
+            _item("Ring", frozen=40),
+            _item("Amulet", frozen=35),
+            _item("Body", frozen=25),
+        )
+        assert h.get_status_resistance("frozen") == 100
+
+    def test_a_soma_e_capada_em_cem(self):
+        """Sem overflow, sem conversão em outro bônus, sem retorno decrescente."""
+        h = _com(
+            make_hero("Warrior", 8, "naked"),
+            _item("Ring", frozen=70),
+            _item("Amulet", frozen=60),
+        )
+        assert h.get_status_resistance("frozen") == 100
+
+    def test_resistencias_nao_vazam_entre_status(self):
+        h = _com(make_hero("Warrior", 8, "naked"), _item("Ring", frozen=100))
+        assert h.get_status_resistance("frozen") == 100
+        for outro in fx.negative_statuses():
+            if outro != "frozen":
+                assert h.get_status_resistance(outro) == 0, outro
+
+    def test_um_item_pode_dar_mais_de_uma_resistencia(self):
+        h = _com(make_hero("Warrior", 8, "naked"), _item("Amulet", frozen=25, stun=15))
+        assert h.get_status_resistance("frozen") == 25
+        assert h.get_status_resistance("stun") == 15
+
+    def test_desequipar_nao_deixa_residuo(self):
+        """A resistência é derivada do equipamento atual, nunca copiada."""
+        h = make_hero("Warrior", 8, "naked")
+        h.resistances["frozen"] = 10
+        anel = _item("Ring", frozen=90)
+        _com(h, anel)
+        assert h.get_status_resistance("frozen") == 100
+        h.unequip("Ring")
+        assert h.get_status_resistance("frozen") == 10
+
+    def test_a_resistencia_propria_soma_com_a_do_item(self):
+        h = make_hero("Warrior", 8, "naked")
+        h.resistances["stun"] = 20
+        _com(h, _item("Ring", stun=30))
+        assert h.get_status_resistance("stun") == 50
+
+
+class TestDePontaAPonta:
+    def test_anel_de_imunidade_impede_o_status_e_nao_o_dano(self):
+        """O caso C: 100% de Frozen no ataque contra 100% de resistência.
+
+        O golpe machuca igual; o congelamento não acontece. É o teste que prova
+        que dano e status são resolvidos por caminhos separados.
+        """
+        atacante = spawn_by_role("bruiser", 8)
+        nu = make_hero("Warrior", 8, "naked")
+        protegido = _com(make_hero("Warrior", 8, "naked"), _item("Ring", frozen=100))
+
+        danos = []
+        for alvo in (nu, protegido):
+            hp = alvo.get_hp()
+            cmb.resolve_physical_attack(
+                atacante,
+                alvo,
+                cmb.basic_attack_power(atacante),
+                "",
+                rng=RngRoteirizado(*ACERTA_SEM_CRIT),
+            )
+            danos.append(hp - alvo.get_hp())
+            cmb.try_apply_status(alvo, "frozen", 100, 3, RngRoteirizado(1))
+
+        assert danos[0] == danos[1], "o anel de resistência mexeu no dano"
+        assert "frozen" in nu.active_effects
+        assert "frozen" not in protegido.active_effects
+
+    def test_o_combate_nao_conhece_equipamento(self):
+        """`combat.py` não pode citar equipamento em lugar nenhum."""
+        fonte = (Path(__file__).resolve().parents[1] / "src" / "mechanics" / "combat.py").read_text(
+            encoding="utf-8"
+        )
+        for palavra in ("equipment", "status_resistances", "weapon_percent"):
+            assert palavra not in fonte, f"combat.py cita {palavra}"

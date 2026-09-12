@@ -244,3 +244,27 @@ class TestDadosVemDoJSON:
         dados = json.loads((RAIZ / "src" / "data" / arquivo).read_text(encoding="utf-8"))
         assert dados.get("version"), f"{arquivo} sem campo version."
         assert dados.get("description"), f"{arquivo} sem descrição."
+
+
+class TestResistenciaDeItemUsaOVocabulario:
+    """Um item não pode declarar resistência a um status que não existe.
+
+    `frost`, `freeze` e `congelado` seriam três placebos silenciosos: o campo
+    fica no JSON, o motor soma zero e ninguém percebe. A grafia canônica é a que
+    `shared/effects.negative_statuses()` devolve.
+    """
+
+    def test_toda_resistencia_declarada_tem_nome_canonico(self):
+        from src.shared.effects import negative_statuses
+
+        canonicos = set(negative_statuses())
+        invalidas = []
+        for arquivo in DADOS:
+            dados = json.loads(arquivo.read_text(encoding="utf-8"))
+            for item in dados.get("items", []):
+                for nome, valor in (item.get("status_resistances") or {}).items():
+                    if nome not in canonicos:
+                        invalidas.append(f"{item['id']}: {nome}")
+                    if not 0 <= int(valor) <= 100:
+                        invalidas.append(f"{item['id']}: {nome}={valor} fora de 0..100")
+        assert not invalidas, f"resistências inválidas: {invalidas}"
