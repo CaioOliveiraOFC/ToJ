@@ -634,7 +634,7 @@ class TestVendaNoSimulador:
         heroi.inventory.append(arma)
         heroi.equip(arma)
         assert arma not in heroi.inventory
-        assert heroi.equipment["Weapon"] is arma
+        assert heroi.equipment["Weapon1"] is arma
 
     def test_nao_vende_item_utilizavel_de_slot_vazio(self):
         """Veste antes de descartar: slot vazio não tem com o que comparar."""
@@ -643,9 +643,9 @@ class TestVendaNoSimulador:
         heroi = Warrior("Bot")
         arma = next(i for i in get_all_items().values() if i.slot == "Weapon" and not i.classes)
         heroi.inventory.append(arma)
-        assert heroi.equipment["Weapon"] is None
+        assert heroi.equipment["Weapon1"] is None
         _vender_dominados(heroi, Shop(), 5)
-        assert heroi.equipment["Weapon"] is arma, "vendeu o item que deveria ter equipado"
+        assert heroi.equipment["Weapon1"] is arma, "vendeu o item que deveria ter equipado"
         assert heroi.coins == 0
 
     def test_nao_vende_consumivel(self):

@@ -140,16 +140,7 @@ class Player(Entity):
         self.skill_points = 0
         self.unspent_attribute_points: int = 0
         self.inventory: list[object] = []
-        self.equipment = {
-            "Weapon": None,
-            "Helmet": None,
-            "Body": None,
-            "Legs": None,
-            "Shoes": None,
-            "Hands": None,
-            "Amulet": None,
-            "Ring": None,
-        }
+        self.equipment = {posicao: None for posicao in self.EQUIPMENT_POSITIONS}
         self.skills: dict[int, SkillCard] = {}
         self.initial_skills_learned: int = 0
         self.active_effects: dict[str, object] = {}
@@ -159,6 +150,106 @@ class Player(Entity):
         # Resistência a status negativo, por nome canônico. Vazio: nenhum herói
         # nasce resistente. Ver `Entity.get_status_resistance`.
         self.resistances: dict[str, int] = {}
+
+    # As posições físicas do personagem, na ordem em que a UI as mostra.
+    #
+    # POSIÇÃO não é CATEGORIA. O item declara a categoria em que se encaixa
+    # ("Weapon", "Ring"), o personagem tem as posições onde ela cabe
+    # ("Weapon1"/"Weapon2", "Ring1"/"Ring2"). Separar os dois evita duplicar o
+    # catálogo inteiro para dizer que uma adaga serve nas duas mãos.
+    EQUIPMENT_POSITIONS = (
+        "Helmet",
+        "Amulet",
+        "Weapon1",
+        "Weapon2",
+        "Body",
+        "Legs",
+        "Hands",
+        "Shoes",
+        "Ring1",
+        "Ring2",
+        "Accessory",
+    )
+
+    # Categoria declarada pelo item -> posições que a aceitam, em ordem de
+    # preferência. Duas posições da mesma categoria são EQUIVALENTES: não há
+    # anel esquerdo e direito, só a primeira livre.
+    CATEGORY_POSITIONS: dict[str, tuple[str, ...]] = {
+        "Weapon": ("Weapon1", "Weapon2"),
+        "Ring": ("Ring1", "Ring2"),
+    }
+
+    # Se a classe consegue segurar uma segunda arma. Capacidade explícita e
+    # simples, não um sistema de proficiência: o Ladino luta com duas lâminas, o
+    # Mago precisa da mão livre. O Guerreiro pode, e é por isso que a pergunta é
+    # um método que recebe o item — a regra por arma entra ali quando existir,
+    # sem mudar quem chama.
+    can_dual_wield = False
+
+    @classmethod
+    def category_of(cls, position: str) -> str:
+        """A categoria de item que uma posição aceita. `Ring2` -> `Ring`."""
+        for categoria, posicoes in cls.CATEGORY_POSITIONS.items():
+            if position in posicoes:
+                return categoria
+        return position
+
+    @classmethod
+    def positions_for(cls, category: str | None) -> tuple[str, ...]:
+        """As posições que aceitam uma categoria de item."""
+        if not category:
+            return ()
+        if category in cls.CATEGORY_POSITIONS:
+            return cls.CATEGORY_POSITIONS[category]
+        return (category,) if category in cls.EQUIPMENT_POSITIONS else ()
+
+    def can_use_offhand_weapon(self, item: object) -> bool:
+        """Se `item` pode ocupar a segunda posição de arma.
+
+        Três negativas, todas explícitas: a classe não segura duas armas; a
+        própria peça é de duas mãos; ou a mão principal já está ocupada por uma
+        peça de duas mãos.
+        """
+        if not self.can_dual_wield:
+            return False
+        if getattr(item, "two_handed", False):
+            return False
+        return not getattr(self.equipment.get("Weapon1"), "two_handed", False)
+
+    def free_position_for(self, item: object) -> str | None:
+        """Primeira posição livre para o item, ou `None` se todas estão ocupadas.
+
+        Não decide substituição: quem escolhe qual peça sai é quem chama, e é
+        por isso que `equip` aceita uma posição explícita.
+        """
+        for posicao in self.available_positions_for(item):
+            if self.equipment.get(posicao) is None:
+                return posicao
+        return None
+
+    def occupant_for(self, item: object) -> object | None:
+        """A peça que sairia se este item fosse equipado agora, ou `None`.
+
+        A UI comparava contra `equipment[item.slot]`, o que deixou de existir
+        para arma e anel. Havendo posição livre, nada sai — e é isso que faz o
+        segundo anel aparecer como aquisição, não como troca.
+        """
+        posicoes = self.available_positions_for(item)
+        if not posicoes:
+            return None
+        return self.equipment.get(self.free_position_for(item) or posicoes[0])
+
+    def available_positions_for(self, item: object) -> tuple[str, ...]:
+        """As posições que este item pode ocupar NESTE personagem, agora.
+
+        Difere de `positions_for` por aplicar as regras do portador: a segunda
+        arma só aparece para quem consegue usá-la, e some enquanto a mão
+        principal segura uma peça de duas mãos.
+        """
+        posicoes = self.positions_for(getattr(item, "slot", None))
+        if "Weapon2" in posicoes and not self.can_use_offhand_weapon(item):
+            posicoes = tuple(p for p in posicoes if p != "Weapon2")
+        return posicoes
 
     # Qual campo do item alimenta cada atributo. O bônus do item é lido como
     # PERCENTUAL do atributo, não como soma fixa: a melhor arma do jogo dava +30
@@ -259,8 +350,22 @@ class Player(Entity):
         return max(0.0, min(100.0, total))
 
     def weapon_percent(self) -> float:
-        """Percentual de dano acrescentado pela arma equipada."""
-        return float(getattr(self.equipment.get("Weapon"), "damage_bonus", 0))
+        """Percentual de dano acrescentado pelas armas equipadas.
+
+        Soma as posições de arma, como todo agregador de equipamento já faz. Com
+        uma arma só o resultado é o mesmo de antes, que é o requisito desta
+        rodada; com duas, somar é a menor regra que deixa a segunda existir.
+
+        Quanto uma segunda arma DEVE render — soma, média, penalidade — é
+        balanceamento de dual wield, e fica para quando houver conteúdo de duas
+        armas para medir. Hoje nenhum personagem gerado equipa duas.
+        """
+        return float(
+            sum(
+                getattr(self.equipment.get(posicao), "damage_bonus", 0) or 0
+                for posicao in self.CATEGORY_POSITIONS["Weapon"]
+            )
+        )
 
     def _scaled(self, key: str) -> int:
         """Valor do atributo no nível atual: base do nível 1 vezes a razão comum."""
@@ -394,26 +499,42 @@ class Player(Entity):
         self._mp = min(self.base_mp, self._mp + max(0, int(amount)))
         return int(self._mp - antes)
 
-    def equip(self, item_to_equip: object) -> str | None:
+    def equip(self, item_to_equip: object, position: str | None = None) -> str | None:
         """Equipa um item no slot correspondente.
+
+        A categoria do item ("Weapon", "Ring") não é a posição onde ele fica
+        ("Weapon1", "Ring2"). Sem `position`, ocupa a primeira posição livre da
+        categoria; com todas ocupadas, substitui a primeira — que é o
+        comportamento de antes, quando cada categoria tinha uma posição só.
 
         Args:
             item_to_equip: Item a ser equipado.
+            position: Posição física específica. A UI passa quando o jogador
+                escolhe qual anel trocar; sem ela o personagem decide.
 
         Returns:
             Mensagem de confirmação ou mensagem de erro.
         """
-        slot = getattr(item_to_equip, "slot", None)
-        if not slot or slot not in self.equipment:
-            return f"{getattr(item_to_equip, 'name', 'Item')} não pode ser equipado."
+        nome = getattr(item_to_equip, "name", "Item")
+        disponiveis = self.available_positions_for(item_to_equip)
+        if not disponiveis:
+            return f"{nome} não pode ser equipado."
+        if position is not None and position not in disponiveis:
+            return f"{nome} não vai em {position}."
 
         item_classes = getattr(item_to_equip, "classes", None)
         if item_classes is not None and self.get_classname() not in item_classes:
-            nome = getattr(item_to_equip, "name", "Item")
             return f"Sua classe ({self.get_classname()}) não pode equipar {nome}."
+
+        slot = position or self.free_position_for(item_to_equip) or disponiveis[0]
 
         if self.equipment[slot]:
             self.unequip(slot)
+        # Uma arma de duas mãos toma a mão secundária ao entrar. Ela NÃO é
+        # escrita nas duas posições: os agregadores somam `equipment.values()`,
+        # e a mesma peça em dois lugares contaria os bônus dela duas vezes.
+        if slot == "Weapon1" and getattr(item_to_equip, "two_handed", False):
+            self.unequip("Weapon2")
         # `remove` sem guarda levantava ValueError quando o item não estava no
         # inventário — o que acontecia em todo carregamento de save com
         # equipamento, porque load_game já havia retirado o item. A exceção era
@@ -758,6 +879,9 @@ class Warrior(Player):
     Fraqueza: contra o tank, que também ganha por atrito e tem mais HP.
     """
 
+    # Segura duas armas: é a classe do peso e da mão firme.
+    can_dual_wield = True
+
     CLASS_BASE = {
         "hp": WARRIOR_BASE_HP,
         "mp": WARRIOR_BASE_MP,
@@ -830,6 +954,9 @@ class Rogue(Player):
     ele nunca fica imune como ficava antes. Fraqueza: contra o skirmisher, que
     tem agilidade suficiente para anular essa vantagem.
     """
+
+    # Duas lâminas são a identidade da classe.
+    can_dual_wield = True
 
     CLASS_BASE = {
         "hp": ROGUE_BASE_HP,

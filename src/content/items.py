@@ -33,6 +33,7 @@ class Item:
         shop_max_floor: int | None = None,
         consumable: bool = False,
         status_resistances: dict[str, int] | None = None,
+        two_handed: bool = False,
     ) -> None:
         self.id: str = item_id
         self.name: str = name
@@ -57,6 +58,10 @@ class Item:
         # mesma ideia. Quem soma é `Player.get_status_resistance`; o combate não
         # sabe que equipamento existe.
         self.status_resistances: dict[str, int] = dict(status_resistances or {})
+        # Peça que ocupa as duas mãos: bloqueia a posição `Weapon2` enquanto
+        # estiver equipada. Nenhum item do catálogo declara isto ainda — o campo
+        # existe para que a segunda arma não nasça impossibilitando a de duas mãos.
+        self.two_handed: bool = bool(two_handed)
 
         if effect_type and effect_value:
             multiplier = RARITY_MULTIPLIERS.get(rarity, 1.0)
@@ -113,6 +118,7 @@ def create_item_from_json(item_data: dict) -> Item:
         shop_max_floor=item_data.get("shop_max_floor", None),
         consumable=item_data.get("consumable", False),
         status_resistances=item_data.get("status_resistances"),
+        two_handed=item_data.get("two_handed", False),
     )
 
 

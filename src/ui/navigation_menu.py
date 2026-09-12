@@ -11,6 +11,7 @@ from rich.table import Table
 from src.content.items import Item, get_all_items
 from src.ui import renderer
 from src.ui.prompts import get_key
+from src.ui.screens import SLOT_LABELS
 
 if TYPE_CHECKING:
     pass
@@ -36,13 +37,22 @@ def build_player_status(player, selected_item=None) -> str:
     def_bonus = 0
     if selected_item:
         selected_slot = getattr(selected_item, "slot", None)
-        equipped_item = player.equipment.get(selected_slot) if selected_slot else None
+        equipped_item = player.occupant_for(selected_item) if selected_slot else None
 
         if selected_slot == "Weapon":
             new_damage = getattr(selected_item, "damage_bonus", 0)
             equipped_damage = getattr(equipped_item, "damage_bonus", 0) if equipped_item else 0
             atk_bonus = new_damage - equipped_damage
-        elif selected_slot in ("Helmet", "Body", "Legs", "Shoes", "Hands", "Amulet", "Ring"):
+        elif selected_slot in (
+            "Helmet",
+            "Body",
+            "Legs",
+            "Shoes",
+            "Hands",
+            "Amulet",
+            "Ring",
+            "Accessory",
+        ):
             new_def = getattr(selected_item, "defense_bonus", 0)
             equipped_def = getattr(equipped_item, "defense_bonus", 0) if equipped_item else 0
             def_bonus = new_def - equipped_def
@@ -63,16 +73,7 @@ def build_player_status(player, selected_item=None) -> str:
     content += f"[bold]AGI:[/bold] {player.base_ag}\n\n"
     content += f"[bold]Ouro:[/bold] {player.coins}\n\n"
     content += "[bold]Equipamentos:[/bold]\n"
-    slot_names = {
-        "Weapon": "Arma",
-        "Helmet": "Elmo",
-        "Body": "Armadura",
-        "Legs": "Perneiras",
-        "Shoes": "Botas",
-        "Hands": "Mãos",
-        "Amulet": "Amuleto",
-        "Ring": "Anel",
-    }
+    slot_names = SLOT_LABELS
 
     selected_slot = getattr(selected_item, "slot", None) if selected_item else None
 
@@ -459,6 +460,7 @@ def navigate_inventory(
         "Hands": 6,
         "Amulet": 7,
         "Ring": 8,
+        "Accessory": 9,
     }
     effect_order = {
         "max_hp": 1,
@@ -816,7 +818,7 @@ def navigate_inventory(
             middle_content = "[dim]Selecione um item[/dim]\n"
         else:
             selected_item = sorted_inventory[current_index]
-            equipped_in_slot = player.equipment.get(getattr(selected_item, "slot", None))
+            equipped_in_slot = player.occupant_for(selected_item)
             qty = item_counts.get(getattr(selected_item, "id", selected_item.name), 1)
             middle_content = build_item_details(selected_item, equipped_in_slot, quantity=qty)
 

@@ -157,7 +157,7 @@ class TestSaveComEquipamento:
         )
         # `load_game` chama `equip` com o item já retirado do inventário.
         assert heroi.equip(arma) == arma.name
-        assert heroi.equipment["Weapon"] is arma
+        assert heroi.equipment["Weapon1"] is arma
 
     def test_round_trip_de_save_com_equipamento(self, tmp_path, monkeypatch):
         from src.content.items import ALL_ITEMS, get_all_items
@@ -190,4 +190,4 @@ class TestSaveComEquipamento:
         assert carregado is not None, "Save com equipamento não carregou."
         assert carregado.get_level() == 6
         assert andar == 3
-        assert carregado.equipment["Weapon"] is not None
+        assert carregado.equipment["Weapon1"] is not None

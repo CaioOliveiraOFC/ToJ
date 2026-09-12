@@ -82,7 +82,7 @@ class TestEvasion:
         assert h.get_equipment_bonus("evasion") == 8
         assert cmb.hit_chance(m, h) == antes - 8
 
-        h.unequip("Ring")
+        h.unequip("Ring1")
         assert h.get_equipment_bonus("evasion") == 0
         assert cmb.hit_chance(m, h) == antes, "desequipar deixou resíduo"
 
@@ -90,14 +90,14 @@ class TestEvasion:
         """Trocar o item troca o valor: nada foi gravado no personagem."""
         h = _heroi()
         h.equip(_item("evasion", 8))
-        h.unequip("Ring")
+        h.unequip("Ring1")
         h.equip(_item("evasion", 3))
         assert h.get_equipment_bonus("evasion") == 3
 
     def test_respeita_o_piso_que_ja_existia(self):
         """`HIT_CHANCE_FLOOR` já é o teto de evasão. Não criamos um segundo."""
         h, m = _heroi(), spawn_by_role("bruiser", 8)
-        h.equipment["Ring"] = _item("evasion", 500)
+        h.equipment["Ring1"] = _item("evasion", 500)
         assert cmb.hit_chance(m, h) == cmb.HIT_CHANCE_FLOOR
 
     def test_varios_slots_somam(self):

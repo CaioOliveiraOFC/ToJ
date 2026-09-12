@@ -121,7 +121,7 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
             # captura equipado antes da compra para comparativo
             old_item = None
             if slot and hasattr(player, "equipment"):
-                old_item = player.equipment.get(slot)
+                old_item = player.occupant_for(item_to_buy)
             if shop.buy_item(player, item_to_buy, dungeon_level):
                 screens.render_shop_purchase_success(item_to_buy.name, price)
                 # Remove o item da lista (não rerrola, mantém os outros)
@@ -214,7 +214,7 @@ def _run_equip_in_shop_flow(player: "Player", shop: object, dungeon_level: int) 
             equipables = [it for it in player.inventory if getattr(it, "slot", None)]
             continue
         slot = getattr(item_to_equip, "slot", None)
-        old_item = player.equipment.get(slot) if slot else None
+        old_item = player.occupant_for(item_to_equip) if slot else None
         if old_item is None:
             bonus_text = _bonus_text(item_to_equip)
             screens.render_shop_equip_prompt(item_to_equip.name, slot, bonus_text)

@@ -8,6 +8,12 @@ from typing import TYPE_CHECKING
 from src.content.passives import get_passive_by_id
 from src.content.skills_loader import get_skill_by_id
 
+# Save antigo guardava uma posição por categoria ("Weapon", "Ring"); o personagem
+# agora tem duas de cada. A peça salva entra na primeira, e `Weapon2`, `Ring2` e
+# `Accessory` nascem vazios. Mapear na leitura, em vez de migrar o arquivo, mantém
+# saves de versões anteriores carregáveis sem tocar em nada em disco.
+POSICAO_LEGADA = {"Weapon": "Weapon1", "Ring": "Ring1"}
+
 if TYPE_CHECKING:
     from src.entities.heroes import Player
 
@@ -178,7 +184,8 @@ def load_game(
                     continue
                 if item_to_equip in player.inventory:
                     player.inventory.remove(item_to_equip)
-                player.equip(item_to_equip)
+                posicao = POSICAO_LEGADA.get(slot, slot)
+                player.equip(item_to_equip, posicao if posicao in player.equipment else None)
 
         player.active_buffs = save_data.get("active_buffs", {})
         player.active_effects = save_data.get("active_effects", {})

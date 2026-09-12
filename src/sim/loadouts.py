@@ -61,8 +61,14 @@ def apply_loadout(hero, loadout: str, level: int) -> None:
     hero_class = hero.get_classname()
     cap_ratio = 0.99 if loadout == "best" else min(0.85, 0.25 + level * 0.03)
 
-    for slot in ("Weapon", "Helmet", "Body", "Legs", "Shoes", "Hands", "Amulet", "Ring"):
-        chosen = _best_for_floor(_equippable(items, slot, hero_class), level, cap_ratio)
+    # Uma peça por CATEGORIA, não por posição. `Ring1` e `Ring2` aceitam o mesmo
+    # `slot: "Ring"`, e preencher as duas com a melhor opção daria ao herói de
+    # medição dois anéis idênticos e duas armas idênticas — dobrando bônus que
+    # nenhum jogador real teria. O loadout representa o que um jogador daquele
+    # nível plausivelmente carrega; a segunda posição é decisão de conteúdo, e
+    # entra aqui quando houver dual wield para medir.
+    for categoria in dict.fromkeys(hero.category_of(p) for p in hero.EQUIPMENT_POSITIONS):
+        chosen = _best_for_floor(_equippable(items, categoria, hero_class), level, cap_ratio)
         if chosen is not None:
             hero.add_item_to_inventory(chosen)
             hero.equip(chosen)

@@ -229,7 +229,7 @@ class TestEquipamentoContribui:
         anel = _item("Ring", frozen=90)
         _com(h, anel)
         assert h.get_status_resistance("frozen") == 100
-        h.unequip("Ring")
+        h.unequip("Ring1")
         assert h.get_status_resistance("frozen") == 10
 
     def test_a_resistencia_propria_soma_com_a_do_item(self):

@@ -26,6 +26,27 @@ if TYPE_CHECKING:
     from src.entities.monsters import Monster
 
 
+# Rótulo de cada POSIÇÃO de equipamento, na ordem em que a ficha as mostra. As
+# duas últimas entradas são CATEGORIAS de item, não posições: a mochila lista o
+# item pela categoria que ele declara ("Weapon"), e a ficha pela posição que ele
+# ocupa ("Weapon1"). O mesmo mapa atende os dois.
+SLOT_LABELS = {
+    "Helmet": "Elmo",
+    "Amulet": "Amuleto",
+    "Weapon1": "Arma 1",
+    "Weapon2": "Arma 2",
+    "Body": "Armadura",
+    "Legs": "Perneiras",
+    "Hands": "Mãos",
+    "Shoes": "Botas",
+    "Ring1": "Anel 1",
+    "Ring2": "Anel 2",
+    "Accessory": "Acessório",
+    "Weapon": "Arma",
+    "Ring": "Anel",
+}
+
+
 def menu(options: tuple[str, ...] | list[str], prompt: str) -> None:
     renderer.render_menu(options, prompt)
 
@@ -524,16 +545,7 @@ def render_shop_farewell() -> None:
 
 def render_shop_equip_prompt(item_name: str, slot: str, bonus_text: str) -> None:
     """Prompt interativo para equipar direto da loja quando slot vazio."""
-    slot_names = {
-        "Weapon": "Arma",
-        "Helmet": "Elmo",
-        "Body": "Armadura",
-        "Legs": "Perneiras",
-        "Shoes": "Botas",
-        "Hands": "Mãos",
-        "Amulet": "Amuleto",
-        "Ring": "Anel",
-    }
+    slot_names = SLOT_LABELS
     slot_label = slot_names.get(slot, slot)
     body = Text(justify="center")
     body.append(f"Slot {slot_label} está vazio!\n", style="bold green")
@@ -547,16 +559,7 @@ def render_shop_equip_prompt(item_name: str, slot: str, bonus_text: str) -> None
 
 def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
     """Mostra comparação simples antigo vs novo ao trocar na loja."""
-    slot_names = {
-        "Weapon": "Arma",
-        "Helmet": "Elmo",
-        "Body": "Armadura",
-        "Legs": "Perneiras",
-        "Shoes": "Botas",
-        "Hands": "Mãos",
-        "Amulet": "Amuleto",
-        "Ring": "Anel",
-    }
+    slot_names = SLOT_LABELS
     slot_label = slot_names.get(slot, slot)
     renderer.console.print(
         Panel(
@@ -636,16 +639,7 @@ def render_shop_swap_comparison(new_item, old_item, slot: str) -> None:
 
 def render_shop_old_sell_prompt(old_item_name: str, sell_price: int, slot: str) -> None:
     """Pergunta se deseja vender/descartar o item antigo após troca."""
-    slot_names = {
-        "Weapon": "Arma",
-        "Helmet": "Elmo",
-        "Body": "Armadura",
-        "Legs": "Perneiras",
-        "Shoes": "Botas",
-        "Hands": "Mãos",
-        "Amulet": "Amuleto",
-        "Ring": "Anel",
-    }
+    slot_names = SLOT_LABELS
     label = slot_names.get(slot, slot)
     body = Text(justify="center")
     body.append(f"{old_item_name} foi para a mochila (slot {label}).\n", style="white")
@@ -685,16 +679,7 @@ def render_shop_equip_inventory_empty() -> None:
 
 
 def render_shop_equip_success(item_name: str, slot: str) -> None:
-    slot_names = {
-        "Weapon": "Arma",
-        "Helmet": "Elmo",
-        "Body": "Armadura",
-        "Legs": "Perneiras",
-        "Shoes": "Botas",
-        "Hands": "Mãos",
-        "Amulet": "Amuleto",
-        "Ring": "Anel",
-    }
+    slot_names = SLOT_LABELS
     slot_label = slot_names.get(slot, slot)
     renderer.console.print(
         Panel(
@@ -1334,16 +1319,7 @@ def render_character_status(player) -> None:
     # Equipamento
     if hasattr(player, "equipment") and isinstance(player.equipment, dict):
         equip_lines = []
-        slot_names = {
-            "Weapon": "Arma",
-            "Helmet": "Elmo",
-            "Body": "Armadura",
-            "Legs": "Perneiras",
-            "Shoes": "Botas",
-            "Hands": "Mãos",
-            "Amulet": "Amuleto",
-            "Ring": "Anel",
-        }
+        slot_names = SLOT_LABELS
         has_any = False
         for slot, item in player.equipment.items():
             label = slot_names.get(slot, slot)

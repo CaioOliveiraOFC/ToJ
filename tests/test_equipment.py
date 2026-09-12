@@ -25,7 +25,7 @@ def test_equip_muda_atk_e_def():
     assert player.get_avg_damage() == base_atk + 5
     assert player.base_df == base_def
     # Desequipa
-    player.unequip("Weapon")
+    player.unequip("Weapon1")
     assert player.get_avg_damage() == base_atk
     assert player.base_df == base_def
 
@@ -46,14 +46,14 @@ def test_trade_off_arma_alta_vs_baixa():
     player.equip(lamina)
     atk_lamina = player.get_avg_damage()
     eff_lamina = getattr(lamina, "effect_value", 0)
-    player.unequip("Weapon")
+    player.unequip("Weapon1")
 
     # Equipa Clava
     player.inventory.append(clava)
     player.equip(clava)
     atk_clava = player.get_avg_damage()
     eff_clava = getattr(clava, "effect_value", 0)
-    player.unequip("Weapon")
+    player.unequip("Weapon1")
 
     # Lâmina tem mais ATK mas Clava tem DEF (via slot Hands? não, Weapon DEF não conta)
     # Trade-off real: Lâmina dano puro vs Clava dano menor mas com DEF bonus ignorado para Weapon

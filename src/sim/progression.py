@@ -118,17 +118,46 @@ def collect_loot(hero, rng: random.Random, toggles: Toggles | None = None, telem
 
 def equip_if_better(hero, item) -> bool:
     """Equipa o item se ele render mais que o ocupante do slot."""
-    slot = getattr(item, "slot", None)
-    if not slot or slot not in hero.equipment:
+    posicoes = _posicoes_do_bot(hero, item)
+    if not posicoes:
         return False
     classes = getattr(item, "classes", None)
     if classes and hero.get_classname() not in classes:
         return False
 
-    atual = hero.equipment[slot]
+    atual = _pior_ocupante(hero, posicoes)
     if atual is not None and _peso_do_item(atual) >= _peso_do_item(item):
         return False
     return bool(hero.equip(item))
+
+
+def _posicoes_do_bot(hero, item) -> tuple[str, ...]:
+    """As posições que o BOT considera: uma por categoria, a primeira.
+
+    O personagem passou a ter duas posições de arma e duas de anel. O bot do
+    simulador NÃO passa a usá-las: com `Weapon2` e `Ring2` livres, toda arma e
+    todo anel do chão deixariam de ser dominados — o bot pararia de vender,
+    encheria as duas mãos e a medição de poder mudaria de significado, sem
+    ninguém ter desenhado dual wield.
+
+    Manter uma posição por categoria reproduz exatamente a heurística anterior.
+    A segunda entra aqui quando houver regra de dual wield para medir.
+    """
+    posicoes = hero.available_positions_for(item)
+    return posicoes[:1]
+
+
+def _pior_ocupante(hero, posicoes):
+    """A peça mais fraca entre as posições da categoria, ou `None` se há vaga.
+
+    Com duas posições para a mesma categoria, a comparação certa é contra a que
+    sairia — a pior — e não contra uma chave fixa. Havendo posição livre, não há
+    nada para comparar: o item entra.
+    """
+    ocupantes = [hero.equipment.get(p) for p in posicoes]
+    if any(o is None for o in ocupantes):
+        return None
+    return min(ocupantes, key=_peso_do_item)
 
 
 def _peso_do_item(item) -> float:
@@ -192,7 +221,7 @@ def visit_shop(
     equipamentos = [
         o
         for o in ofertas
-        if getattr(o["item"], "slot", None) in hero.equipment
+        if hero.positions_for(getattr(o["item"], "slot", None))
         and not getattr(o["item"], "consumable", False)
     ]
     equipamentos.sort(key=lambda o: -_peso_do_item(o["item"]))
@@ -200,7 +229,7 @@ def visit_shop(
         item = oferta["item"]
         if oferta["price"] > orcamento or oferta["price"] > hero.coins:
             continue
-        atual = hero.equipment.get(item.slot)
+        atual = _pior_ocupante(hero, _posicoes_do_bot(hero, item))
         if atual is not None and _peso_do_item(atual) >= _peso_do_item(item):
             continue
         if shop.buy_item(hero, item, dungeon_level):
@@ -247,8 +276,8 @@ def _descartavel(hero, item) -> bool:
     """O item está na mochila e não há motivo visível para mantê-lo lá."""
     if getattr(item, "consumable", False):
         return False
-    slot = getattr(item, "slot", None)
-    if not slot or slot not in hero.equipment:
+    posicoes = _posicoes_do_bot(hero, item)
+    if not posicoes:
         return False
 
     # Classe errada: o herói não pode equipá-lo em nenhuma circunstância.
@@ -256,10 +285,10 @@ def _descartavel(hero, item) -> bool:
     if classes and hero.get_classname() not in classes:
         return True
 
-    atual = hero.equipment[slot]
+    atual = _pior_ocupante(hero, posicoes)
     if atual is None:
-        # Slot vazio e item utilizável: `equip_if_better` acabou de rodar, então
-        # chegar aqui significa que ele recusou — não vender por precaução.
+        # Posição vazia e item utilizável: `equip_if_better` acabou de rodar,
+        # então chegar aqui significa que ele recusou — não vender por precaução.
         return False
     return _peso_do_item(item) <= _peso_do_item(atual)
 
