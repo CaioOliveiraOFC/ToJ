@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import random
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from src.shared import combat_topics as T
@@ -75,16 +75,72 @@ def _apply_xmult_cap(xmult_raw: float) -> float:
     return min(xmult_raw, XMULT_CAP)
 
 
+@dataclass(frozen=True)
+class DamageModifiers:
+    """Os quatro baldes de um golpe. Um recipiente, não um framework.
+
+    `flat`       soma antes de qualquer percentual, em pontos de dano.
+    `mult`       percentuais ADITIVOS entre si: +10% e +20% resolvem ×1,30.
+    `xmult`      amplificações MULTIPLICATIVAS: ×1,2 e ×1,5 resolvem ×1,8.
+                 É este produto — e só ele — que `XMULT_CAP` limita.
+    `mitigation` redutores multiplicativos (medo, redução de dano). Ficam fora
+                 do cap de propósito: um cap sobre amplificação só faz sentido
+                 sobre termos ≥ 1. Se um redutor entrasse no mesmo produto, o
+                 teto passaria a medir o saldo entre ataque e defesa, e um
+                 crítico absurdo passaria por baixo dele acompanhado de uma
+                 redução forte.
+
+    A defesa não é balde: `k/(k+df)` é função não-linear do atributo já
+    resolvido do defensor, e é a única etapa com retorno decrescente por
+    construção. Mistura-la aqui esconderia isso e diluiria o cap.
+    """
+
+    flat: list[int] = field(default_factory=list)
+    mult: list[float] = field(default_factory=list)
+    xmult: list[float] = field(default_factory=list)
+    mitigation: list[float] = field(default_factory=list)
+
+
+def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifiers:
+    """Reúne tudo o que modifica ESTE golpe, dos dois lados.
+
+    É o ponto único onde uma fonte nova de poder entra: gema, encantamento,
+    `+N` ou o que vier declara em qual balde cai e aparece aqui. Enquanto a
+    coleta estiver em um lugar só, nenhuma fonte volta a multiplicar por fora
+    do funil.
+
+    Lê atacante e defensor pelo mesmo caminho (`fx.combat_modifier`), que já
+    resolve herói e monstro por duck typing.
+    """
+    xmult: list[float] = []
+    if is_critical:
+        xmult.append(CRIT_DAMAGE_BASE + fx.combat_modifier(attacker, "crit_damage") / 100)
+
+    return DamageModifiers(
+        xmult=xmult,
+        # Status do atacante que reduzem o dano que ele causa (weakened, fear) e
+        # do defensor que reduzem o que ele recebe (redução ativa e passiva).
+        mitigation=[
+            fx.outgoing_damage_multiplier(attacker),
+            fx.incoming_damage_multiplier(defender),
+        ],
+    )
+
+
 def _calculate_damage(
     base_power: float,
     flat_mods: list[int] | None = None,
     mult_mods: list[float] | None = None,
     xmult_mods: list[float] | None = None,
     defense_target: int = 0,
+    mitigation: list[float] | None = None,
 ) -> int:
-    """
-    Pipeline completo de dano:
-    ((BASE_POWER + ΣFLAT) × ΠMULT × ΠXMULT_capped) × DEFENSE_MODIFIER
+    """O funil: todo dano de golpe sai daqui.
+
+        (BASE + ΣFLAT) × (1 + Σ+MULT) × Π×MULT_capado × DEFESA × Π_mitigação
+
+    Amplificação e mitigação são produtos separados porque só o primeiro é
+    capado — ver `DamageModifiers`.
     """
     flat_total = sum(flat_mods) if flat_mods else 0
     mult_total = 1.0 + sum(mult_mods) if mult_mods else 1.0
@@ -98,7 +154,14 @@ def _calculate_damage(
     def_mod = _defense_modifier(defense_target)
 
     raw = (base_power + flat_total) * mult_total * xmult_capped * def_mod
-    return max(1, int(raw))
+    dano = max(1, int(raw))
+
+    # Truncando a cada termo, e não no produto: é o que o motor já fazia quando
+    # estas multiplicações eram três linhas soltas aqui fora. Multiplicar tudo
+    # de uma vez e truncar no fim mudaria o dano de alguns golpes por 1 ponto.
+    for redutor in mitigation or ():
+        dano = int(dano * redutor)
+    return max(1, dano)
 
 
 def hit_chance(attacker, defender) -> int:
