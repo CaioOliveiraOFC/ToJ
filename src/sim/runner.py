@@ -251,6 +251,43 @@ def _write(path: str, payload: dict) -> None:
     print(f"Escrito: {target}")
 
 
+def cmd_progression(args) -> None:
+    """Trajetória de nível por perfil de combate, sem simular combate.
+
+    Os perfis são cenários de diagnóstico, não regra de jogo: `engagement` é a
+    fração dos encontros do andar que o jogador enfrenta, e quanto um jogador
+    real enfrenta depende do mapa. Nenhum desses números existe no produto.
+    """
+    from src.sim import xp_model as xp
+
+    andares = [f for f in (1, 5, 10, 15, 20, 25, 50, 100, 200, 500, 1000) if f <= args.max_floor]
+    perfis = (("baixo", 0.50), ("normal", 0.75), ("alto", 1.00))
+
+    for essencia in ("expected", "neutral"):
+        print(f"\n=== Essência {essencia} ===")
+        cab = f"{'perfil':<8}" + "".join(f"{'F' + str(f):>8}" for f in andares)
+        print(cab + "   inclinação 20→" + str(min(args.max_floor, 1000)))
+        for nome, engajamento in perfis:
+            traj = xp.level_trajectory(args.max_floor, engajamento, essencia)
+            deltas = "".join(f"{xp.level_delta(traj, f):>+8.1f}" for f in andares)
+            fim = min(args.max_floor, 1000)
+            inclinacao = xp.delta_slope(traj, 20, fim) if fim > 20 else 0.0
+            print(f"{nome:<8}{deltas}   {inclinacao:+.5f}")
+
+    print("\n=== detalhe, perfil normal / Essência esperada ===")
+    traj = xp.level_trajectory(args.max_floor, 0.75, "expected")
+    print(
+        f"{'andar':>6}{'nível':>8}{'nív. encontro':>15}{'delta':>8}"
+        f"{'XP do andar':>16}{'XP p/ subir':>16}"
+    )
+    for linha in xp.trajectory_rows(traj, andares):
+        print(
+            f"{linha['floor']:>6}{linha['hero_level']:>8}"
+            f"{linha['expected_monster_level']:>15.2f}{linha['level_delta']:>+8.2f}"
+            f"{linha['floor_xp']:>16.3g}{linha['xp_next_level']:>16.3g}"
+        )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="src.sim.runner", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -325,6 +362,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_scout.add_argument("--policy-iterations", type=int, default=40)
     p_scout.add_argument("--out")
     p_scout.set_defaults(func=cmd_scout)
+
+    p_prog = sub.add_parser(
+        "progression", help="trajetória de nível contra o nível esperado do encontro"
+    )
+    p_prog.add_argument("--max-floor", type=int, default=1000)
+    p_prog.set_defaults(func=cmd_progression)
 
     p_cmp = sub.add_parser("compare", help="compara contra uma baseline")
     p_cmp.add_argument("--against", required=True)

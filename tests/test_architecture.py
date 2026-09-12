@@ -273,10 +273,19 @@ class TestConstantesNomeadas:
         from src.shared import constants as k
 
         assert k.GROWTH_RATE > 1.0
-        assert k.XP_LEVEL_RATIO > k.GROWTH_RATE, (
-            "O custo de nível precisa crescer mais rápido que os atributos, "
-            "senão o herói nunca fica atrás do andar."
+        # Era `XP_LEVEL_RATIO > GROWTH_RATE`: o custo de nível crescia numa razão
+        # exponencial própria, maior que a de tudo o mais. Isso não deixava o
+        # herói "um pouco atrás do andar" — fazia a defasagem crescer sem limite
+        # (153 níveis no andar 500), porque a produção de XP de um andar tem
+        # forma `andar × 1,12^andar` e o custo tinha forma `1,195^nível`.
+        # O custo agora tem a mesma forma da produção; o amortecedor só decide
+        # onde a banda se estabiliza.
+        assert k.XP_LEVEL_SOFTENER >= 0
+        assert not hasattr(k, "XP_LEVEL_RATIO"), (
+            "XP_LEVEL_RATIO voltou: a curva de XP não pode ter razão exponencial "
+            "própria, senão volta a divergir da produção do andar."
         )
+        assert k.BOSS_FLOOR_INTERVAL >= 1
         assert 0 < k.HIT_CHANCE_FLOOR < k.HIT_CHANCE_CEIL <= 100
         assert 0 < k.FLOOR_CLEAR_RESTORE_PERCENT < 100
 

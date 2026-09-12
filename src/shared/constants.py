@@ -260,7 +260,29 @@ SKILL_LEVEL_SCALING = 0.08  # +8% dano de skill por nível
 # progressivamente atrás do andar. É essa defasagem que cria dificuldade
 # crescente, em vez de inflar os números do monstro.
 XP_BASE_COST = 140
-XP_LEVEL_RATIO = 1.195
+# Amortecedor do começo da curva de XP, não constante de balanceamento.
+#
+# O custo de nível precisa ter a MESMA FORMA que a produção de XP de um andar,
+# senão as duas curvas se separam para sempre. A produção é `andar × 1,12^andar`
+# — o número de monstros cresce linearmente (`3 + andar//3`) e o valor de cada um
+# cresce geometricamente. Por isso o custo é `nível × 1,12^nível`.
+#
+# A curva anterior era `1,195^(nível-1)`, exponencial pura. Sobrava o fator
+# linear, e ele aparecia como divergência: o nível do herói convergia para 0,64
+# do andar, ficando 17 níveis atrás no andar 100 e 153 no andar 500. Trocar
+# apenas a razão para 1,12 inverte o defeito — o fator linear vira deriva
+# logarítmica para cima, +24 níveis no andar 100.
+#
+# Este 6 só faz o custo do nível 1 continuar valendo exatamente XP_BASE_COST e a
+# faixa já calibrada (níveis 1-20) continuar reconhecível. Ele desloca ONDE a
+# banda se estabiliza; não muda o fato de ela se estabilizar, que vem da forma.
+XP_LEVEL_SOFTENER = 6
+
+# O mini-chefe aparece a cada N andares. Estava escrito como `% 5` em dois
+# lugares (`engine/loop.py` e `sim/harness.py`), e o `boss_spawn_chance: 0.1` de
+# monsters.json não tem um único leitor — quem modelasse o andar por ele
+# contaria metade dos chefes.
+BOSS_FLOOR_INTERVAL = 5
 
 # --- Multiplicador de Essência por Andar ---
 # O sorteio da Essência dos cinco primeiros andares explicava 38,7% da variância

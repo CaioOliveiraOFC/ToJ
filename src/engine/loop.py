@@ -35,6 +35,7 @@ from src.shared import combat_topics as topics
 from src.shared.constants import (
     BASE_MAP_HEIGHT,
     BASE_MAP_WIDTH,
+    BOSS_FLOOR_INTERVAL,
     ENCOUNTER_GROUP_MIN_FLOOR,
     ENCOUNTER_LARGE_GROUP_MIN_FLOOR,
     ENCOUNTER_MAX_SIZE_DEEP,
@@ -460,8 +461,8 @@ def _setup_dungeon_map(
         for group in _build_encounters(monsters_to_place, dungeon_level):
             game_map.place_enemy(group)
 
-        # Mini-chefe a cada 5 níveis, sempre sozinho: ele já é o encontro.
-        if dungeon_level % 5 == 0:
+        # Mini-chefe a cada N andares, sempre sozinho: ele já é o encontro.
+        if dungeon_level % BOSS_FLOOR_INTERVAL == 0:
             game_map.place_enemy([create_boss_for_level(dungeon_level)])
 
     return game_map

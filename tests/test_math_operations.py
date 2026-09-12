@@ -6,8 +6,9 @@ do herói. O que resta aqui é recompensa e progressão.
 
   Monstro:   XP e moedas = base * GROWTH_RATE^(nível-1)
   Mini-chefe: mesma forma, nível efetivo = andar + MINI_BOSS_LEVEL_BONUS
-  Custo de nível: XP_BASE_COST * XP_LEVEL_RATIO^(nível-1), com
-                  XP_LEVEL_RATIO > GROWTH_RATE de propósito
+  Custo de nível: XP_BASE_COST * (nível + amortecedor)/(1 + amortecedor) *
+                  GROWTH_RATE^(nível-1) — a mesma forma da produção de XP de
+                  um andar, que é o que impede as duas curvas de divergirem
   Essência: gauss truncada em [0.5, 3.0], arredondada a 1 casa.
 """
 
@@ -26,7 +27,6 @@ from src.shared.constants import (  # noqa: E402
     MONSTER_BASE_COIN_REWARD,
     MONSTER_BASE_XP_REWARD,
     XP_BASE_COST,
-    XP_LEVEL_RATIO,
 )
 from src.shared.formulas import geometric, xp_for_level  # noqa: E402
 
@@ -60,9 +60,13 @@ class TestEscalonamentoCompartilhado:
         assert mo.calculate_monster_xp_reward(10) == geometric(MONSTER_BASE_XP_REWARD, 10)
 
     def test_custo_de_xp_cresce_mais_rapido_que_a_recompensa(self):
-        # É essa diferença que faz o número de combates por nível subir ao longo
-        # da run, colocando o herói progressivamente atrás do andar.
-        assert XP_LEVEL_RATIO > GROWTH_RATE
+        # Continua crescendo mais rápido — mas por um fator LINEAR no nível, não
+        # por uma razão exponencial própria. A razão exponencial fazia a
+        # defasagem herói↔andar crescer para sempre; o fator linear é o que a
+        # produção de um andar já tem (`3 + andar//3` monstros), então as duas
+        # curvas passam a ter a mesma forma. Ver `tests/test_progression_contract.py`.
+        crescimento = xp_for_level(200) / xp_for_level(100)
+        assert crescimento > GROWTH_RATE**100
 
     def test_combates_por_nivel_sobem_com_o_nivel(self):
         def combates(nivel):

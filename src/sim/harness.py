@@ -25,7 +25,7 @@ from src.content.factories.monsters import calculate_scaled_monster_level, gener
 from src.content.shop import Shop
 from src.entities.heroes import Mage, Rogue, Warrior
 from src.mechanics.battle import run_battle
-from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
+from src.shared.constants import BOSS_FLOOR_INTERVAL, FLOOR_CLEAR_RESTORE_PERCENT
 from src.sim import progression
 from src.sim.encounters import build_encounter
 from src.sim.loadouts import apply_loadout
@@ -492,8 +492,8 @@ def _default_floor_plan(floor: int) -> list[str]:
     fights = [plan[(floor + i) % len(plan)] for i in range(count)]
 
     regras = generation_rules()
-    # Mini-chefe a cada 5 andares, como `engine/loop.py` faz.
-    if floor % 5 == 0:
+    # Mini-chefe a cada N andares, como `engine/loop.py` faz.
+    if floor % BOSS_FLOOR_INTERVAL == 0:
         fights.append("boss_solo")
     elif floor >= int(regras["advanced_role_min_floor"]) and random.random() < float(
         regras["elite_spawn_chance"]
