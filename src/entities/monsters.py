@@ -108,6 +108,16 @@ class Monster(Entity):
         """
         return max(1, (self.get_st() + self.get_mg()) // DAMAGE_FORMULA_DIVISOR)
 
+    def get_passive_bonus(self, effect_type: str) -> float:
+        """Modificadores de combate vindos de passivas. O monstro ainda não tem.
+
+        Existe explícito porque `shared/effects.combat_modifier` procura este
+        método por duck typing: sem ele, o monstro entra no cálculo pela metade
+        e ninguém percebe. Devolver zero é a resposta correta hoje, e é aqui que
+        equipamento de monstro vai entrar quando existir.
+        """
+        return 0.0
+
     @staticmethod
     def my_type() -> str:
         """Retorna o tipo da entidade (COM = Computador)."""
