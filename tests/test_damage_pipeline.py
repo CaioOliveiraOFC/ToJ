@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.content.factories.archetypes import spawn_by_role  # noqa: E402
 from src.content.skills_loader import load_skills  # noqa: E402
 from src.mechanics import combat as cmb  # noqa: E402
+from src.shared.constants import XMULT_CAP  # noqa: E402
 from src.sim.harness import make_hero  # noqa: E402
 
 
@@ -149,3 +150,61 @@ def test_o_cenario_da_egide_realmente_gasta_mana():
     mp = h.get_mp()
     _golpe(m, h, cmb.basic_attack_power(m), "", ACERTA_SEM_CRIT)
     assert h.get_mp() < mp
+
+
+# --- os quatro contratos ----------------------------------------------------
+
+
+class TestLinguagemDePoder:
+    """As quatro regras da linguagem. Tudo o mais é consequência delas."""
+
+    def test_mult_e_aditivo(self):
+        """+10% e +20% resolvem ×1,30, nunca ×1,10 × 1,20."""
+        base = 1000.0
+        somado = cmb._calculate_damage(base, mult_mods=[0.10, 0.20])
+        assert somado == cmb._calculate_damage(base, mult_mods=[0.30])
+        assert somado < cmb._calculate_damage(base, xmult_mods=[1.10, 1.20])
+
+    def test_xmult_e_multiplicativo(self):
+        """×1,2 e ×1,5 resolvem ×1,8, nunca ×2,7.
+
+        Comparado com tolerância porque o produto binário de 1,2 por 1,5 é
+        1,7999999999999998 e o funil trunca para inteiro — a diferença é de um
+        ponto de dano, não de regra.
+        """
+        base = 1000.0
+        assert cmb._calculate_damage(base, xmult_mods=[1.2, 1.5]) == pytest.approx(
+            cmb._calculate_damage(base, xmult_mods=[1.8]), abs=1
+        )
+        assert cmb._calculate_damage(base, xmult_mods=[1.2, 1.5]) < cmb._calculate_damage(
+            base, xmult_mods=[2.7]
+        )
+
+    def test_o_cap_limita_so_a_amplificacao(self):
+        """Redutor não entra no produto capado — senão o teto mede o saldo.
+
+        Se mitigação e amplificação dividissem o mesmo produto, uma redução
+        forte deixaria um crítico absurdo passar por baixo do teto.
+        """
+        base = 1000.0
+        no_teto = cmb._calculate_damage(base, xmult_mods=[XMULT_CAP])
+        assert cmb._calculate_damage(base, xmult_mods=[XMULT_CAP * 4]) == no_teto
+
+        com_redutor = cmb._calculate_damage(base, xmult_mods=[XMULT_CAP * 4], mitigation=[0.5])
+        assert com_redutor == pytest.approx(no_teto * 0.5, abs=1)
+
+    def test_um_golpe_passa_uma_vez_pelo_funil(self, monkeypatch):
+        """Impede que a próxima fonte de poder volte a multiplicar por fora."""
+        chamadas = []
+        original = cmb._calculate_damage
+
+        def espiao(*args, **kwargs):
+            chamadas.append(1)
+            return original(*args, **kwargs)
+
+        monkeypatch.setattr(cmb, "_calculate_damage", espiao)
+        h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
+        cmb.resolve_physical_attack(
+            h, m, cmb.basic_attack_power(h), "", rng=RngRoteirizado(*ACERTA_SEM_CRIT)
+        )
+        assert len(chamadas) == 1

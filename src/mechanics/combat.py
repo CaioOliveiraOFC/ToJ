@@ -201,6 +201,12 @@ def basic_attack_power(attacker) -> int:
 
     Vive aqui, ao lado de `skill_damage_base`, porque a política do simulador
     precisa estimar o dano com a mesma fórmula que o motor aplica.
+
+    Não é modificador e por isso não vira balde de `DamageModifiers`: as duas
+    funções respondem "qual é o BASE desta ação", que é a entrada do funil, não
+    algo que o modifica. Transformá-las em `+MULT` também mudaria dano — o
+    truncamento passaria a acontecer depois, e 23 de 120 combinações de classe e
+    nível saíam 1 ponto diferentes.
     """
     return max(1, int(attacker.get_avg_damage() * BASIC_ATTACK_POWER_MULT))
 
