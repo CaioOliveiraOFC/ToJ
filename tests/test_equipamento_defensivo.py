@@ -154,7 +154,7 @@ class TestDamageReduction:
 class TestComposicao:
     """Buff, passiva e equipamento são fontes SEPARADAS que somam."""
 
-    @pytest.mark.parametrize("efeito", ["evasion", "damage_reduction"])
+    @pytest.mark.parametrize("efeito", ["evasion", "damage_reduction", "crit_chance", "life_steal"])
     def test_as_tres_fontes_somam(self, efeito):
         h = _heroi()
         h.active_buffs["Buff de Prova"] = {"stat": efeito, "value": 5, "duration": 3}
@@ -170,19 +170,142 @@ class TestComposicao:
         assert h.get_equipment_bonus("evasion") == 9.0
 
 
+class TestCritico:
+    """`crit_chance` e `crit_damage` chegam pelo canal, sem fórmula nova."""
+
+    def test_item_aumenta_a_chance_real_de_critico(self):
+        """Rolagem 30: fora do padrão (10), dentro do que o anel promete (10+50)."""
+        rolagem = (1, 30)
+        danos = []
+        for h in (_heroi(), _heroi()):
+            if danos:  # o segundo herói leva o anel
+                h.equip(_item("crit_chance", 50))
+            m = spawn_by_role("bruiser", 8)
+            hp = m.get_hp()
+            cmb.resolve_physical_attack(
+                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(*rolagem)
+            )
+            danos.append(hp - m.get_hp())
+        assert danos[1] > danos[0], "o anel não converteu a rolagem 30 em crítico"
+
+    def test_item_de_crit_damage_engorda_o_critico_pelo_xmult(self):
+        nu, com_anel = _heroi(), _heroi()
+        com_anel.equip(_item("crit_damage", 40))
+
+        def golpe(h):
+            m = spawn_by_role("bruiser", 8)
+            hp = m.get_hp()
+            cmb.resolve_physical_attack(
+                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 1)
+            )
+            return hp - m.get_hp()
+
+        assert golpe(com_anel) > golpe(nu)
+        # E entra no bucket certo: `xmult`, não um multiplicador solto.
+        m = spawn_by_role("bruiser", 8)
+        mods = cmb.damage_modifiers(com_anel, m, is_critical=True)
+        assert mods.xmult == [pytest.approx(cmb.CRIT_DAMAGE_BASE + 0.40)]
+        assert mods.flat == [] and mods.mult == []
+
+    def test_o_cap_de_chance_critica_continua_valendo(self):
+        h = _heroi()
+        h.equip(_item("crit_chance", 500))
+        chance = min(
+            cmb.CRIT_CHANCE_DEFAULT + int(fx.combat_modifier(h, "crit_chance")), cmb.CRIT_CHANCE_CAP
+        )
+        assert chance == cmb.CRIT_CHANCE_CAP
+
+
+class TestLifeSteal:
+    """Cura depois do dano causado, no ponto do combate que já existia."""
+
+    def test_item_cura_o_atacante(self):
+        nu, com_anel = _heroi(), _heroi()
+        com_anel.equip(_item("life_steal", 25))
+        for h in (nu, com_anel):
+            h._hp = h.base_hp // 2
+        antes = {id(h): h.get_hp() for h in (nu, com_anel)}
+        for h in (nu, com_anel):
+            m = spawn_by_role("bruiser", 8)
+            cmb.resolve_physical_attack(
+                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 100)
+            )
+        assert nu.get_hp() == antes[id(nu)], "sem item não devia curar"
+        assert com_anel.get_hp() > antes[id(com_anel)]
+
+    def test_nao_cura_quando_o_golpe_erra(self):
+        """A cura depende do dano, e é isso que a ordem do combate já garantia."""
+        h = _heroi()
+        h.equip(_item("life_steal", 25))
+        h._hp = h.base_hp // 2
+        antes = h.get_hp()
+        m = spawn_by_role("bruiser", 8)
+        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(100))
+        assert h.get_hp() == antes
+
+
+class TestManaRegen:
+    """Mesmo consumidor que buff e poção já usavam: o início do turno."""
+
+    def test_item_aumenta_o_mp_recuperado_no_turno(self):
+        nu, com_cajado = _heroi(), _heroi()
+        com_cajado.equip(_item("mana_regen", 20, "Weapon"))
+        for h in (nu, com_cajado):
+            h._mp = 0
+            cmb.process_turn_start_effects(h)
+        assert com_cajado.get_mp() == nu.get_mp() + 20
+
+    def test_nao_passa_do_teto_de_mana(self):
+        h = _heroi()
+        h.equip(_item("mana_regen", 9999, "Weapon"))
+        cmb.process_turn_start_effects(h)
+        assert h.get_mp() == h.base_mp
+
+
+class TestDeathIgnore:
+    """Binário por combate, e agora a regra pergunta pela mecânica, não pela fonte."""
+
+    def _golpe_letal(self, h, m):
+        h._hp = 1
+        cmb.resolve_physical_attack(
+            m, h, cmb.basic_attack_power(m) * 50, "", rng=_RngRoteirizado(1, 100)
+        )
+
+    def test_item_sozinho_salva_uma_vez(self):
+        h, m = _heroi(), spawn_by_role("bruiser", 8)
+        h.equip(_item("death_ignore", 1, "Amulet"))
+        self._golpe_letal(h, m)
+        assert h.get_isalive() and h.get_hp() == 1
+
+    def test_o_segundo_golpe_letal_no_mesmo_combate_mata(self):
+        h, m = _heroi(), spawn_by_role("bruiser", 8)
+        h.equip(_item("death_ignore", 1, "Amulet"))
+        self._golpe_letal(h, m)
+        self._golpe_letal(h, m)
+        assert not h.get_isalive()
+
+    def test_dois_itens_nao_dao_duas_vidas(self):
+        """O teste é `> 0`, não uma soma: `death_ignore` não empilha."""
+        h, m = _heroi(), spawn_by_role("bruiser", 8)
+        h.equip(_item("death_ignore", 1, "Amulet"))
+        h.equip(_item("death_ignore", 1, "Ring"))
+        assert fx.combat_modifier(h, "death_ignore") == 2.0, "premissa: as fontes somam"
+        self._golpe_letal(h, m)
+        self._golpe_letal(h, m)
+        assert not h.get_isalive(), "dois amuletos deram duas ressurreições"
+
+    def test_sem_o_efeito_o_golpe_letal_mata(self):
+        h, m = _heroi(), spawn_by_role("bruiser", 8)
+        self._golpe_letal(h, m)
+        assert not h.get_isalive()
+
+
 class TestAtivacaoControlada:
     """O canal não pode acordar família que não foi aprovada nesta rodada."""
 
-    NAO_ATIVADOS = [
-        "crit_chance",
-        "crit_damage",
-        "life_steal",
-        "mana_regen",
-        "death_ignore",
-        "magic_resist",
-        "fire_resist",
-        "true_damage",
-    ]
+    # Backlog consciente: on-hit precisa de resolução de proc, e os dois últimos
+    # não têm mecânica nenhuma. Ver KNOWN_BACKLOG em test_data_integrity.
+    NAO_ATIVADOS = ["stun", "bleed", "poison", "fear", "true_damage", "armageddon"]
 
     @pytest.mark.parametrize("efeito", NAO_ATIVADOS)
     def test_continua_placebo(self, efeito):
@@ -191,31 +314,29 @@ class TestAtivacaoControlada:
         assert h.get_equipment_bonus(efeito) == 0.0
         assert fx.combat_modifier(h, efeito) == 0.0
 
-    def test_crit_chance_de_item_nao_muda_o_golpe(self):
-        """O caso completo, e não só o modificador: o golpe não vê o item.
-
-        A rolagem de crítico é 30: acima do padrão (10) e dentro do que o item
-        prometeria (10 + 50). Se o canal acordasse `crit_chance` sem ninguém
-        pedir, este golpe viraria crítico e o dano subiria.
-        """
-        rolagem = (1, 30)
-        nu, com_anel = _heroi(), _heroi()
-        com_anel.equip(_item("crit_chance", 50))
-
-        danos = []
-        for h in (nu, com_anel):
-            m = spawn_by_role("bruiser", 8)
-            hp = m.get_hp()
+    def test_efeito_on_hit_nao_aplica_status_no_alvo(self):
+        """O caso completo: uma arma de `stun` não atordoa ninguém ainda."""
+        h, m = _heroi(), spawn_by_role("bruiser", 8)
+        h.equip(_item("stun", 100, "Weapon"))
+        for _ in range(20):
             cmb.resolve_physical_attack(
-                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(*rolagem)
+                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 100)
             )
-            danos.append(hp - m.get_hp())
-
-        assert danos[0] == danos[1], "o anel de crítico mudou o golpe"
+        assert "stun" not in m.active_effects
 
     def test_a_lista_de_permissao_e_exatamente_esta(self):
         """Se alguém acrescentar uma família, que seja de propósito e visível."""
-        assert Player.EQUIP_COMBAT_EFFECTS == frozenset({"evasion", "damage_reduction"})
+        assert Player.EQUIP_COMBAT_EFFECTS == frozenset(
+            {
+                "evasion",
+                "damage_reduction",
+                "crit_chance",
+                "crit_damage",
+                "life_steal",
+                "mana_regen",
+                "death_ignore",
+            }
+        )
 
 
 class TestProvaDeCarga:

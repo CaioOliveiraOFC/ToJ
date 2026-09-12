@@ -68,8 +68,6 @@ POTION_BUFFS: dict[str, tuple[str, str]] = {
     "life_steal": ("life_steal", "Roubo de Vida"),
     "mana_regen": ("mana_regen", "Regeneração de Mana"),
     "damage_reduction": ("damage_reduction", "Redução de Dano"),
-    "magic_resist": ("damage_reduction", "Resistência Mágica"),
-    "fire_resist": ("damage_reduction", "Resistência ao Fogo"),
 }
 
 # Consumíveis que aplicam um status em vez de um buff de atributo.
@@ -184,7 +182,22 @@ class Player(Entity):
     # É a diferença entre um canal e um alçapão. Cada família nova entra aqui por
     # escolha, numa rodada que mede o impacto dela. Um `effect_type` novo no JSON
     # nunca deve mudar gameplay sozinho: foi assim que 58 itens viraram placebo.
-    EQUIP_COMBAT_EFFECTS = frozenset({"evasion", "damage_reduction"})
+    #
+    # O critério para entrar: a mecânica já existe, já tem consumidor funcional no
+    # motor, e só faltava o equipamento chegar até ela. Ficam de fora os efeitos
+    # on-hit (`stun`, `bleed`, `poison`, `fear`), que precisam de resolução de proc
+    # que ainda não existe, e os que não têm mecânica nenhuma.
+    EQUIP_COMBAT_EFFECTS = frozenset(
+        {
+            "evasion",  # hit_chance()
+            "damage_reduction",  # incoming_damage_multiplier() -> mitigation
+            "crit_chance",  # resolve_physical_attack()
+            "crit_damage",  # damage_modifiers() -> xmult
+            "life_steal",  # resolve_physical_attack(), depois do dano
+            "mana_regen",  # process_turn_start_effects()
+            "death_ignore",  # _survive_lethal_blow()
+        }
+    )
 
     def get_equipment_bonus(self, kind: str) -> float:
         """Quanto o que está equipado acrescenta a um modificador de combate.

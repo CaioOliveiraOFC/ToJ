@@ -505,14 +505,21 @@ def _absorve_com_egide(defender, damage: int, publish: PublishFn) -> int:
 
 
 def _survive_lethal_blow(entity) -> bool:
-    """Passiva `death_ignore`: sobrevive com 1 de HP a um golpe letal, uma vez por combate.
+    """`death_ignore`: sobrevive com 1 de HP a um golpe letal, uma vez por combate.
 
-    Uma vez por combate, e não uma vez por run, porque uma passiva que ressuscita
+    Uma vez por combate, e não uma vez por run, porque um efeito que ressuscita
     para sempre transforma qualquer encontro perdido em encontro vencido e apaga
     a decisão de fugir.
+
+    Pergunta pela MECÂNICA, não pela fonte: antes lia `get_passive_bonus` direto,
+    então o Amuleto da Imortalidade era decoração e só a passiva valia. Agora
+    passiva, buff e equipamento chegam pela mesma porta.
+
+    O teste é `> 0`, e não uma soma de vidas: dois amuletos não dão duas
+    ressurreições. É um estado binário por combate, guardado em
+    `_death_ignore_used` — e é isso que impede o efeito de virar uma pilha.
     """
-    getter = getattr(entity, "get_passive_bonus", None)
-    if not callable(getter) or getter("death_ignore") <= 0:
+    if fx.combat_modifier(entity, "death_ignore") <= 0:
         return False
     if getattr(entity, "_death_ignore_used", False):
         return False

@@ -294,7 +294,7 @@
       "rarity": "Common",
       "damage_bonus": 0,
       "defense_bonus": 2,
-      "effect_type": "magic_resist",
+      "effect_type": "damage_reduction",
       "effect_value": 3,
       "classes": [
         "Mage"
@@ -718,7 +718,7 @@
       "rarity": "Rare",
       "damage_bonus": 0,
       "defense_bonus": 3,
-      "effect_type": "magic_resist",
+      "effect_type": "damage_reduction",
       "effect_value": 8,
       "classes": [
         "Mage"
@@ -773,7 +773,7 @@
       "rarity": "Rare",
       "damage_bonus": 0,
       "defense_bonus": 4,
-      "effect_type": "magic_resist",
+      "effect_type": "damage_reduction",
       "effect_value": 12,
       "classes": [
         "Mage"
@@ -1122,7 +1122,7 @@
       "rarity": "Epic",
       "damage_bonus": 0,
       "defense_bonus": 10,
-      "effect_type": "fire_resist",
+      "effect_type": "damage_reduction",
       "effect_value": 20,
       "classes": null,
       "sold_in_shop": false,

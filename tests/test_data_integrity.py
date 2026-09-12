@@ -268,3 +268,89 @@ class TestResistenciaDeItemUsaOVocabulario:
                     if not 0 <= int(valor) <= 100:
                         invalidas.append(f"{item['id']}: {nome}={valor} fora de 0..100")
         assert not invalidas, f"resistências inválidas: {invalidas}"
+
+
+class TestEfeitoDeEquipamentoEConhecido:
+    """Um `effect_type` de equipamento é suportado, é backlog, ou é erro.
+
+    A auditoria encontrou 58 itens de equipamento declarando um efeito que nada
+    lê. Nenhum deles foi escrito de má-fé: cada um pareceu funcionar quando foi
+    adicionado, porque o JSON aceita qualquer palavra e o motor ignora em
+    silêncio o que não conhece.
+
+    Esta guarda não exige que o backlog esteja implementado — exigir isso hoje
+    forçaria acordar tudo de uma vez, que é exatamente o que estamos evitando.
+    Ela exige apenas que todo nome no catálogo seja um nome que ALGUÉM decidiu:
+    ou já funciona, ou está numa lista de espera com data. Um nome fora das duas
+    é erro de digitação ou conteúdo novo nascendo placebo.
+    """
+
+    # Efeitos que o motor consome hoje quando o item está equipado.
+    SUPPORTED = frozenset(
+        {
+            # Camada A: atributos, via `Player.equipment_percent`.
+            "max_hp",
+            "max_mp",
+            "strength",
+            "agility",
+            "speed",
+            "magic_damage",
+            "defense",
+            # Camada B: modificadores de combate, via `Player.get_equipment_bonus`.
+            "evasion",
+            "damage_reduction",
+            "crit_chance",
+            "crit_damage",
+            "life_steal",
+            "mana_regen",
+            "death_ignore",
+        }
+    )
+
+    # Backlog consciente. Cada entrada tem um motivo, não é uma amnistia geral.
+    KNOWN_BACKLOG = {
+        "stun": "on-hit: precisa de resolução de proc, que ainda não existe",
+        "bleed": "on-hit: idem",
+        "poison": "on-hit: idem",
+        "fear": "on-hit: idem",
+        "true_damage": "sem mecânica: 'ignora defesa' ainda não é um conceito do motor",
+        "armageddon": "sem mecânica: o nome não corresponde a nada",
+    }
+
+    def test_todo_effect_type_de_equipamento_e_suportado_ou_backlog(self):
+        conhecidos = self.SUPPORTED | set(self.KNOWN_BACKLOG)
+        desconhecidos = []
+        for arquivo in DADOS:
+            dados = json.loads(arquivo.read_text(encoding="utf-8"))
+            for item in dados.get("items", []):
+                if item.get("consumable"):
+                    continue
+                efeito = item.get("effect_type")
+                if efeito and efeito not in conhecidos:
+                    desconhecidos.append(f"{item['id']}: {efeito}")
+        assert not desconhecidos, (
+            "effect_type de equipamento fora de SUPPORTED ∪ KNOWN_BACKLOG — "
+            "conteúdo novo nascendo placebo, ou erro de grafia:\n" + "\n".join(desconhecidos)
+        )
+
+    def test_supported_bate_com_o_que_o_motor_realmente_le(self):
+        """A lista não pode virar promessa: ela espelha o código, ou não vale."""
+        from src.entities.heroes import Player
+
+        atributos = {nome for fontes in Player.EQUIP_STAT_SOURCES.values() for nome in fontes}
+        assert self.SUPPORTED == atributos | set(Player.EQUIP_COMBAT_EFFECTS)
+
+    def test_backlog_e_supported_nao_se_sobrepoem(self):
+        """Um efeito ligado não pode continuar listado como pendente."""
+        assert not (self.SUPPORTED & set(self.KNOWN_BACKLOG))
+
+    def test_o_backlog_nao_guarda_efeito_que_ninguem_declara(self):
+        """Backlog sem item é lista de desejos. Some quando o último item sai."""
+        declarados = set()
+        for arquivo in DADOS:
+            dados = json.loads(arquivo.read_text(encoding="utf-8"))
+            for item in dados.get("items", []):
+                if not item.get("consumable") and item.get("effect_type"):
+                    declarados.add(item["effect_type"])
+        orfaos = sorted(set(self.KNOWN_BACKLOG) - declarados)
+        assert not orfaos, f"backlog sem nenhum item que o declare: {orfaos}"
