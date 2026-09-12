@@ -38,6 +38,13 @@ COMBAT_MODIFIERS = (
     "stun_chance",
 )
 
+# Os status negativos que um alvo pode resistir. É a união das famílias abaixo,
+# montada a partir delas para não virar uma segunda lista que envelhece sozinha.
+#
+# Ficam de fora, e de propósito: `damage_reduction` (buff que o lançador põe em
+# si mesmo), `invisible` (benéfico) e os rótulos de poção `true_damage` e
+# `death_ignore` — ninguém resiste ao próprio consumível.
+
 # Status que fazem a entidade perder o turno.
 TURN_SKIPPING_STATUSES = ("frozen", "stun", "sleep")
 
@@ -74,6 +81,43 @@ BONUS_CONDITIONS = (
     "target_healthy",  # alvo ainda intacto: recompensa a abertura
     "caster_wounded",  # quem lança está abaixo do limiar: golpe de desespero
 )
+
+
+def negative_statuses() -> tuple[str, ...]:
+    """Os status resistíveis, na grafia que o motor usa."""
+    return (
+        TURN_SKIPPING_STATUSES + DAMAGE_OVER_TIME + tuple(OUTGOING_DAMAGE_PENALTY) + RESOURCE_DRAIN
+    )
+
+
+def status_resistance(entity, status: str) -> float:
+    """Quanto `entity` resiste a `status`, em percentual de 0 a 100.
+
+    Resistência a STATUS não é resistência a DANO: ela muda a chance de o estado
+    pegar, e não o tamanho do golpe. Um alvo com 100% de resistência a `frozen`
+    leva o dano inteiro e simplesmente não congela.
+
+    Lê por duck typing, como o resto do módulo. Sem o método ou sem o campo,
+    devolve zero — que é o que todo personagem e todo monstro têm hoje.
+    """
+    getter = getattr(entity, "get_status_resistance", None)
+    if callable(getter):
+        return _clamp_percent(getter(status))
+    return _clamp_percent((getattr(entity, "resistances", None) or {}).get(status, 0))
+
+
+def effective_status_chance(base_chance: float, resistance: float) -> float:
+    """`base × (1 - resistência/100)`, com as duas pontas presas em 0..100.
+
+    100% de resistência resulta em 0%, sem piso: se o jogador pagou o preço da
+    imunidade, a imunidade é real. Um "mínimo de 5%" transformaria o item mais
+    caro do jogo em quase-imunidade, que é outra coisa.
+    """
+    return _clamp_percent(_clamp_percent(base_chance) * (1 - _clamp_percent(resistance) / 100))
+
+
+def _clamp_percent(valor) -> float:
+    return max(0.0, min(100.0, float(valor or 0)))
 
 
 def control_weight(effect: str) -> float:

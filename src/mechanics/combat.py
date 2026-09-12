@@ -104,10 +104,13 @@ class DamageModifiers:
 def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifiers:
     """Reúne tudo o que modifica ESTE golpe, dos dois lados.
 
-    É o ponto único onde uma fonte nova de poder entra: gema, encantamento,
-    `+N` ou o que vier declara em qual balde cai e aparece aqui. Enquanto a
-    coleta estiver em um lugar só, nenhuma fonte volta a multiplicar por fora
-    do funil.
+    É o ponto único da CAMADA B — o golpe. Entra aqui o que modifica um ataque
+    específico: crítico, efeitos de combate, mitigação, e futuramente
+    encantamentos. Não entra o que resolve atributo: nível, item base, `+N` e
+    gemas são camada A e já chegam resolvidos dentro de `base_power`.
+
+    Enquanto a coleta do golpe estiver em um lugar só, nenhuma fonte volta a
+    multiplicar por fora do funil.
 
     Lê atacante e defensor pelo mesmo caminho (`fx.combat_modifier`), que já
     resolve herói e monstro por duck typing.
@@ -390,26 +393,72 @@ def resolve_physical_attack(
     return strike
 
 
+def try_apply_status(
+    target,
+    status: str,
+    base_chance: float,
+    duration: int,
+    r: random.Random,
+    publish: PublishFn = None,
+    *,
+    applied_kind: str | None = None,
+) -> bool:
+    """Tenta aplicar um status negativo. Devolve se pegou.
+
+    O único caminho de aplicação de status vindo de um ataque. Responde, nesta
+    ordem: qual era a chance base, quanto o alvo resiste, qual a chance efetiva,
+    rolou, aplica ou não.
+
+    Dano e status são resolvidos em separado de propósito. Um golpe pode tirar a
+    vida inteira e mesmo assim não congelar; um alvo com 100% de resistência a
+    `frozen` leva o dano normalmente. Por isso resistência a status não entra em
+    `DamageModifiers.mitigation` — são sistemas vizinhos, não o mesmo sistema.
+
+    Chance efetiva zero não consome rolagem, que é o que `_try_apply_stun` já
+    fazia quando a chance era zero. Sem consumir, a imunidade também não desloca
+    o RNG do resto do turno.
+    """
+    if not hasattr(target, "active_effects"):
+        return False
+
+    chance = fx.effective_status_chance(base_chance, fx.status_resistance(target, status))
+    if chance <= 0:
+        if base_chance > 0:
+            _emit(
+                publish,
+                T.COMBAT_TURN_EFFECT,
+                type_="turn_effect",
+                payload={"entity": target, "kind": "status_resisted", "status": status},
+            )
+        return False
+
+    if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > chance:
+        return False
+
+    target.active_effects[status] = {"duration": int(duration)}
+    if applied_kind:
+        _emit(
+            publish,
+            T.COMBAT_TURN_EFFECT,
+            type_="turn_effect",
+            payload={"entity": target, "kind": applied_kind},
+        )
+    return True
+
+
 def _try_apply_stun(target, chance: int, r: random.Random, publish: PublishFn) -> bool:
-    """Rola atordoamento e aplica em `target`. Devolve se atordoou.
+    """Rola atordoamento pelo resolvedor central. Devolve se atordoou.
 
     Existe para que os três caminhos que atordoam — passiva do atacante, skill de
     dano e skill de status — usem a mesma rolagem e a mesma duração. Enquanto o
     código estava duplicado, o ramo de status simplesmente não tinha a sua cópia:
     `Golpe Baixo` declara 15% de atordoamento no JSON e entregava 0%.
     """
-    if not chance or not hasattr(target, "active_effects"):
+    if not chance:
         return False
-    if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > int(chance):
-        return False
-    target.active_effects["stun"] = {"duration": STUN_DURATION}
-    _emit(
-        publish,
-        T.COMBAT_TURN_EFFECT,
-        type_="turn_effect",
-        payload={"entity": target, "kind": "stun_applied"},
+    return try_apply_status(
+        target, "stun", int(chance), STUN_DURATION, r, publish, applied_kind="stun_applied"
     )
-    return True
 
 
 def _absorve_com_egide(defender, damage: int, publish: PublishFn) -> int:
@@ -554,8 +603,14 @@ def apply_skill(
         return out
 
     if skill.effect_type == "status":
-        if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= int(skill.chance):
-            target.active_effects[str(skill.effect_value)] = {"duration": int(skill.duration)}
+        if try_apply_status(
+            target,
+            str(skill.effect_value),
+            int(skill.chance),
+            int(skill.duration),
+            r,
+            publish,
+        ):
             # O atordoamento da skill também vale aqui. Este ramo não o rolava:
             # o bloco existia só na versão de dano, então `Golpe Baixo` aplicava
             # `weakened` em 100% das vezes e nunca os seus 15% de atordoamento.

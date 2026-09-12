@@ -18,6 +18,19 @@ class Entity:
         level: Nível da entidade.
     """
 
+    def get_status_resistance(self, status: str) -> float:
+        """Resistência a um status negativo, em percentual de 0 a 100.
+
+        Herói e monstro respondem por aqui, e os dois começam em zero. É o único
+        ponto que o combate consulta, então um item que dê `+40% de resistência a
+        atordoamento` entra somando neste retorno — sem exceção nova dentro do
+        combate.
+
+        Não confundir com resistência a DANO: esta muda a chance de o estado
+        pegar, não o tamanho do golpe.
+        """
+        return float((getattr(self, "resistances", None) or {}).get(status, 0) or 0)
+
     def reduce_hp(self, quantty: int) -> None:
         """Reduz HP da entidade pela quantidade especificada.
 

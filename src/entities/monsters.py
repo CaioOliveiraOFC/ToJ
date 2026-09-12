@@ -113,8 +113,10 @@ class Monster(Entity):
 
         Existe explícito porque `shared/effects.combat_modifier` procura este
         método por duck typing: sem ele, o monstro entra no cálculo pela metade
-        e ninguém percebe. Devolver zero é a resposta correta hoje, e é aqui que
-        equipamento de monstro vai entrar quando existir.
+        e ninguém percebe. Devolver zero é a resposta correta hoje.
+
+        Equipamento de monstro, quando existir, não entra por aqui: item não se
+        disfarça de passiva. Ele terá o próprio caminho, como o herói tem.
         """
         return 0.0
 

@@ -158,6 +158,9 @@ class Player(Entity):
         self.active_buffs: dict[str, dict[str, object]] = {}
         self.passives: list[PassiveCard] = []
         self.skill_cooldowns: dict[str, int] = {}
+        # Resistência a status negativo, por nome canônico. Vazio: nenhum herói
+        # nasce resistente. Ver `Entity.get_status_resistance`.
+        self.resistances: dict[str, int] = {}
 
     # Qual campo do item alimenta cada atributo. O bônus do item é lido como
     # PERCENTUAL do atributo, não como soma fixa: a melhor arma do jogo dava +30

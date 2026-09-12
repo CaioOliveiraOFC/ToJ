@@ -62,6 +62,8 @@ def _on_turn_effect(ev: GameEvent) -> None:
         renderer.render_turn_effect_message(entity, (kind,))
     elif kind == "stun_applied":
         renderer.render_turn_effect_message(entity, ("stun_applied",))
+    elif kind == "status_resisted":
+        renderer.render_turn_effect_message(entity, ("status_resisted", str(p["status"])))
     elif kind == "mana_burn_tick":
         renderer.render_turn_effect_message(entity, ("mana_burn_tick", str(p["amount"])))
     elif kind == "magic_shield":

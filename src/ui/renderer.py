@@ -304,6 +304,14 @@ def render_turn_effect_message(entity, event: tuple[str, ...]) -> None:
             "[bold yellow]atordoado[/bold yellow]!",
             justify="center",
         )
+    elif kind == "status_resisted":
+        # Resistir precisa ser visível: é a única forma de o jogador aprender
+        # que o equipamento defensivo dele está trabalhando.
+        console.print(
+            f"[bold blue]{entity.get_nick_name()}[/bold blue] resiste a "
+            f"[bold yellow]{event[1]}[/bold yellow]!",
+            justify="center",
+        )
     elif kind == "mana_burn_tick":
         console.print(
             f"[bold blue]{entity.get_nick_name()}[/bold blue] perde "
