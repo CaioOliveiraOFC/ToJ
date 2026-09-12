@@ -1135,7 +1135,7 @@ def render_skill_not_replaced() -> None:
     sleep(1.0)
 
 
-# --- Eventos Aleatórios (TASK-005) ---
+# --- Eventos Aleatórios ---
 
 
 def render_merchant_event(offers: list[dict], coins: int) -> None:

@@ -618,7 +618,7 @@ def start_game(
             elif result == "level_complete":
                 # ORDEM DE FIM DE ANDAR (ver `FIM_DE_ANDAR` no topo do módulo):
                 # evento → descanso gratuito → loja → juros → extração/avanço.
-                # --- Evento aleatório (TASK-005) — 25% antes da extração ---
+                # --- Evento aleatório — 25% antes da extração ---
                 event_type = roll_random_event()
                 if event_type:
                     _get_game_publish()(
@@ -662,7 +662,7 @@ def start_game(
                 juros = pay_interest(player, dungeon_level)
                 if juros > 0:
                     screens.render_interest_paid(juros, player.coins, interest_cap(dungeon_level))
-                # --- Decisão de extração (TASK-007) ---
+                # --- Decisão de extração ---
                 # Sem meta-progressão nova: "preservar" = salvar o personagem
                 # no slot atual via save_game (xp/level/passivas/coins/inventário
                 # já com o resultado da loja) e encerrar a run. Continuar mantém

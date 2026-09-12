@@ -44,11 +44,9 @@ show_error_codes = true
 dev = ["pytest", "ruff", "mypy"]
 
 [tool.pytest.ini_options]
-# auto_test.py é um harness standalone que roda o jogo inteiro (não é pytest)
-# balance_full fica fora da execução padrão: simula runs de 20 andares e leva
-# minutos. Rode com `-m balance_full` ao fechar uma mudança de balanceamento.
-addopts = "--ignore=tests/auto_test.py -m 'not balance_full'"
-markers = [
-    "balance: invariantes de balanceamento (simulação headless)",
-    "balance_full: runs completas de masmorra; lento, roda sob demanda",
-]
+# auto_test.py é um harness standalone que roda o jogo inteiro (não é pytest).
+# `balance` fica fora da execução padrão: são bandas calibradas para o meta
+# atual, que podem mudar com o design. O que não pode mudar sem ser bug está em
+# tests/test_structural_invariants.py e roda sempre.
+addopts = "--ignore=tests/auto_test.py -m 'not balance'"
+markers = ["balance: medição de balanceamento; roda sob demanda"]

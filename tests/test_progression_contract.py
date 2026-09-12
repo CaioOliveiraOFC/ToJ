@@ -1,18 +1,11 @@
 """O contrato de progressão de nível numa masmorra infinita.
 
-O jogo se diz infinito, mas a progressão tinha teto matemático. A produção de XP
-de um andar tem forma `andar × 1,12^andar` — o número de monstros cresce
-linearmente (`3 + andar//3`) e o valor de cada um cresce geometricamente. O custo
-de nível era `140 × 1,195^(nível-1)`, exponencial puro. Formas diferentes não
-fecham: o nível do herói convergia para 0,64 do andar e a defasagem crescia
-linearmente para sempre — 17 níveis atrás no andar 100, 153 no andar 500.
+A grandeza protegida é `nível do herói − nível esperado do encontro`. Estar
+atrás é dificuldade; ficar **cada vez mais** atrás é a run ter teto matemático,
+e é isso que estes testes impedem.
 
-Estes testes fixam **propriedades**, não números. Nenhum depende de
-`XP_LEVEL_SOFTENER` valer 6: se alguém recalibrar o amortecedor, a banda se move e
-os testes continuam válidos. O que eles não deixam voltar é a **divergência**.
-
-A grandeza do contrato é `nível do herói − nível esperado do encontro`. Estar
-atrás é dificuldade; ficar cada vez mais atrás é a run ter teto.
+São propriedades, não números: nenhum depende de `XP_LEVEL_SOFTENER` valer 6. Se
+alguém recalibrar o amortecedor, a banda se move e os testes continuam válidos.
 """
 
 import statistics
@@ -143,11 +136,8 @@ class TestModeloUsaAsRegrasReais:
             real = statistics.fmean(generate_essence_multiplier(andar) for _ in range(6000))
             assert xp.expected_essence(andar) == pytest.approx(real, abs=0.02)
 
-    def test_o_chefe_segue_a_regra_real_e_nao_o_json_morto(self):
-        """`boss_spawn_chance: 0.1` não tem leitor; a regra é a cada 5 andares."""
-        from src.content.factories.monsters import generation_rules
-
-        assert 1.0 / BOSS_FLOOR_INTERVAL != generation_rules().get("boss_spawn_chance")
+    def test_o_chefe_entra_pela_regra_de_intervalo(self):
+        """Um chefe a cada `BOSS_FLOOR_INTERVAL` andares, não por chance de spawn."""
         sem_chefe = xp.expected_monsters(10) - 1.0 / BOSS_FLOOR_INTERVAL
         assert xp.expected_monsters(10) - sem_chefe == pytest.approx(0.2)
 
@@ -184,36 +174,32 @@ class TestNaoDivergencia:
             f"{perfil}/{essencia}: {inclinacao:+.5f} nível por andar entre os andares 20 e {FUNDO}"
         )
 
-    def test_evitar_combate_custa_niveis_mas_estabiliza(self, trajetorias):
-        baixo, normal = trajetorias[("baixo", "expected")], trajetorias[("normal", "expected")]
-        distante = normal[FUNDO] - baixo[FUNDO]
-        meio = normal[FUNDO // 2] - baixo[FUNDO // 2]
-        assert distante > 0, "evitar combate deixou de custar alguma coisa"
-        assert abs(distante - meio) <= 2, (
-            f"a distância baixo↔normal ainda cresce: {meio} no andar {FUNDO // 2}, "
-            f"{distante} no {FUNDO}"
-        )
+    @pytest.mark.parametrize(
+        "perfil,sinal", [("baixo", -1), ("alto", +1)], ids=["evitar_combate", "limpar_tudo"]
+    )
+    def test_a_distancia_entre_perfis_estabiliza(self, trajetorias, perfil, sinal):
+        """Jogar mais rende níveis e jogar menos custa — sem crescer para sempre.
 
-    def test_limpar_tudo_rende_niveis_mas_estabiliza(self, trajetorias):
-        alto, normal = trajetorias[("alto", "expected")], trajetorias[("normal", "expected")]
-        distante = alto[FUNDO] - normal[FUNDO]
-        meio = alto[FUNDO // 2] - normal[FUNDO // 2]
-        assert distante > 0, "limpar tudo deixou de render alguma coisa"
+        É o que transforma rota em decisão: a diferença precisa existir (senão a
+        escolha não vale nada) e precisa parar de crescer (senão evitar um
+        encontro no andar 10 condena a run no 500).
+        """
+        outro, normal = trajetorias[(perfil, "expected")], trajetorias[("normal", "expected")]
+        distante = sinal * (outro[FUNDO] - normal[FUNDO])
+        meio = sinal * (outro[FUNDO // 2] - normal[FUNDO // 2])
+        assert distante > 0, f"o perfil {perfil} deixou de se distinguir do normal"
         assert abs(distante - meio) <= 2, (
-            f"a distância normal↔alto ainda cresce: {meio} no andar {FUNDO // 2}, "
+            f"a distância {perfil}↔normal ainda cresce: {meio} no andar {FUNDO // 2}, "
             f"{distante} no {FUNDO}"
         )
 
     def test_essencia_desloca_a_curva_sem_inclina_la(self, trajetorias):
         """Essência é vantagem, não requisito estrutural.
 
-        Ela pode adiantar o herói; não pode ser a única coisa que impede a
-        progressão de divergir. Quem tira Essência neutra a run inteira fica
-        atrás — e fica atrás por uma distância que para de crescer.
+        Que ela não incline nenhuma das curvas já é coberto pelo teste acima,
+        que roda os seis perfis. O que falta provar é que a vantagem que ela dá
+        para de crescer: senão, jogar sem sorte de Essência vira condenação.
         """
-        com = xp.delta_slope(trajetorias[("normal", "expected")], 20, FUNDO)
-        sem = xp.delta_slope(trajetorias[("normal", "neutral")], 20, FUNDO)
-        assert abs(com - sem) < self.LIMITE
         vantagem_meio = (
             trajetorias[("normal", "expected")][FUNDO // 2]
             - trajetorias[("normal", "neutral")][FUNDO // 2]

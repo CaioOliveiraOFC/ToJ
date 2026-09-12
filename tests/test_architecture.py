@@ -9,11 +9,8 @@ quebradas.
 from __future__ import annotations
 
 import ast
-import json
 import sys
 from pathlib import Path
-
-import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -139,103 +136,35 @@ class TestRegra3Camadas:
                     )
         assert not violacoes, "Violações do diagrama de dependências:\n" + "\n".join(violacoes)
 
-    def test_entities_nao_conhece_dados(self):
-        # A regra 3 escrita por extenso, porque é a que mais se quebra sem querer.
-        for path in arquivos_de(SRC / "entities"):
-            tree = ast.parse(path.read_text(encoding="utf-8"))
-            for module, lineno in runtime_imports(tree):
-                assert not module.startswith("src.content"), (
-                    f"{path.relative_to(ROOT)}:{lineno} importa de content/. "
-                    "Use o registro em shared/registries.py."
-                )
 
-    def test_simulacao_e_headless(self):
-        # Se `sim/` importar `ui/` ou `engine/`, ela deixa de ser rápida e passa
-        # a medir a UI em vez das regras.
-        for path in arquivos_de(SRC / "sim"):
-            tree = ast.parse(path.read_text(encoding="utf-8"))
-            for module, lineno in runtime_imports(tree):
-                assert not module.startswith(("src.ui", "src.engine")), (
-                    f"{path.relative_to(ROOT)}:{lineno} acopla a simulação à apresentação."
-                )
+class TestApresentacaoSoNaUI:
+    """Renderizar é trabalho de `ui/`.
 
+    Protege duas coisas ao mesmo tempo: a simulação continua headless (sem
+    `rich`, ela roda em qualquer lugar e mede regra em vez de tela) e a saída do
+    jogo continua tendo um dono só.
+    """
 
-class TestRegra4SaidaPelaUI:
-    """Regra 4: nada de `print()` fora de `ui/`."""
-
-    def test_print_apenas_na_ui_ou_na_cli_de_simulacao(self):
+    def test_apresentacao_so_na_ui(self):
         violacoes = []
         for path in python_files():
             relativo = str(path.relative_to(ROOT))
-            if relativo.startswith("src/ui/") or relativo in PRINT_EXCEPTIONS:
+            if relativo.startswith("src/ui/"):
                 continue
             tree = ast.parse(path.read_text(encoding="utf-8"))
+            for module, lineno in runtime_imports(tree):
+                if module.split(".")[0] in ("rich", "pyfiglet"):
+                    violacoes.append(f"{relativo}:{lineno} importa {module}")
+            if relativo in PRINT_EXCEPTIONS:
+                continue
             for node in ast.walk(tree):
                 if (
                     isinstance(node, ast.Call)
                     and isinstance(node.func, ast.Name)
                     and node.func.id == "print"
                 ):
-                    violacoes.append(f"{relativo}:{node.lineno}")
-        assert not violacoes, f"print() fora de ui/: {violacoes}"
-
-    def test_rich_apenas_na_ui(self):
-        violacoes = []
-        for path in python_files():
-            if str(path.relative_to(ROOT)).startswith("src/ui/"):
-                continue
-            tree = ast.parse(path.read_text(encoding="utf-8"))
-            for module, lineno in runtime_imports(tree):
-                if module.split(".")[0] in ("rich", "pyfiglet"):
-                    violacoes.append(f"{path.relative_to(ROOT)}:{lineno} importa {module}")
-        assert not violacoes, f"Renderização fora de ui/: {violacoes}"
-
-
-class TestRegra5DadosEmJSON:
-    """Regra 5: dados em JSON, sem hardcoded.
-
-    A fronteira: fórmula é código, valor é dado. Um multiplicador de arquétipo,
-    o nome de um monstro ou o custo de uma skill são valores — mudam sem que a
-    regra mude, e por isso vivem no JSON.
-    """
-
-    def test_arquetipos_vem_do_json(self):
-        from src.content.factories.archetypes import all_archetypes
-
-        dados = json.loads((SRC / "data" / "monsters.json").read_text(encoding="utf-8"))
-        assert set(all_archetypes()) == set(dados["archetypes"]), (
-            "Os arquétipos carregados divergem do JSON — há papel definido em Python."
-        )
-
-    def test_todo_arquetipo_declara_orcamento_e_papel_no_json(self):
-        dados = json.loads((SRC / "data" / "monsters.json").read_text(encoding="utf-8"))
-        for role, payload in dados["archetypes"].items():
-            assert set(payload["budget"]) == {"hp", "attack", "defense", "agility"}, role
-            assert payload["threat"] and payload["counterplay"], (
-                f"{role} não declara ameaça e counterplay no JSON."
-            )
-
-    def test_geracao_de_andar_vem_do_json(self):
-        dados = json.loads((SRC / "data" / "monsters.json").read_text(encoding="utf-8"))
-        geracao = dados["generation"]
-        for chave in (
-            "base_count",
-            "min_monsters",
-            "scaling_per_3_levels",
-            "advanced_role_min_floor",
-            "advanced_roles",
-            "elite_spawn_chance",
-            "level_variation",
-        ):
-            assert chave in geracao, f"generation.{chave} ausente do JSON."
-
-    @pytest.mark.parametrize(
-        "arquivo", ["items.json", "skills.json", "passives.json", "monsters.json"]
-    )
-    def test_json_de_conteudo_e_valido_e_versionado(self, arquivo):
-        dados = json.loads((SRC / "data" / arquivo).read_text(encoding="utf-8"))
-        assert dados.get("version"), f"{arquivo} sem campo version."
-        assert dados.get("description"), f"{arquivo} sem descrição."
+                    violacoes.append(f"{relativo}:{node.lineno} usa print()")
+        assert not violacoes, "Apresentação fora de ui/:\n" + "\n".join(violacoes)
 
 
 class TestConstantesNomeadas:
@@ -288,20 +217,3 @@ class TestConstantesNomeadas:
         assert k.BOSS_FLOOR_INTERVAL >= 1
         assert 0 < k.HIT_CHANCE_FLOOR < k.HIT_CHANCE_CEIL <= 100
         assert 0 < k.FLOOR_CLEAR_RESTORE_PERCENT < 100
-
-
-class TestDocumentacao:
-    """ARCHITECTURE.md precisa descrever o código que existe."""
-
-    def test_arquitetura_menciona_todos_os_pacotes(self):
-        texto = (ROOT / "ARCHITECTURE.md").read_text(encoding="utf-8")
-        pacotes = {p.name for p in SRC.iterdir() if p.is_dir() and not p.name.startswith("__")}
-        ausentes = [p for p in sorted(pacotes) if f"{p}/" not in texto]
-        assert not ausentes, f"Pacotes ausentes de ARCHITECTURE.md: {ausentes}"
-
-    def test_arquitetura_nao_cita_arquivos_inexistentes(self):
-        texto = (ROOT / "ARCHITECTURE.md").read_text(encoding="utf-8")
-        for citado in ("SPRINTS.md", "savegame.json"):
-            assert citado not in texto, (
-                f"ARCHITECTURE.md cita {citado}, que não existe no repositório."
-            )

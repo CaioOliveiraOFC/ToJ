@@ -1,4 +1,4 @@
-"""Eventos aleatórios de masmorra (TASK-005).
+"""Eventos aleatórios de masmorra.
 
 Sistema simples sorteado ao entrar num andar, antes da decisão de
 extração. Probabilidade configurável via RANDOM_EVENT_CHANCE (25%).

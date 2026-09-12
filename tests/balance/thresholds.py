@@ -1,8 +1,8 @@
 """Limiares da suíte de balanceamento.
 
-Todo número aqui saiu de medição, não de escolha. A referência é
-`reports/baseline_20260904.json` (o estado anterior) e as execuções de
-`python -m src.sim.runner run --iterations 500` sobre o estado atual.
+Todo número aqui saiu de medição, não de escolha, e pode mudar quando o design
+mudar — por isso a suíte que os usa é `-m balance` e não bloqueia a suíte padrão.
+Para remedir: `python -m src.sim.runner run --iterations 500`.
 
 A run simulada roda os mesmos sistemas do jogo: escolha de passiva por nível,
 escolha de skill nos níveis ímpares a partir do 5, drop de item, loja entre
@@ -10,8 +10,8 @@ andares, evento aleatório e multiplicador de Essência. Uma calibração anteri
 mediu um herói sem passiva nenhuma e com o equipamento do andar 1 — os números
 dela não valem para o jogo que existe.
 
-Valores medidos no estado atual (250 runs por classe, política competente,
-equipamento típico) — `reports/validation_20260905.json`:
+Valores medidos com 250 runs por classe, política competente, equipamento
+típico:
 
     classe    andar médio  mediano  chega ao 20  bot que só ataca
     Guerreiro     10.4        7        34,0%         andar médio 0.9

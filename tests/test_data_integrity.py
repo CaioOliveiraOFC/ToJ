@@ -1,4 +1,4 @@
-"""Integridade do texto dos dados de conteúdo.
+"""Integridade dos dados de conteúdo.
 
 Seis skills chegaram ao repositório com o nome duplamente codificado — os bytes
 UTF-8 de "Lançar Adaga" lidos como latin-1 e regravados, virando
@@ -197,3 +197,50 @@ class TestDescricaoDizOQueACartaFaz:
         assert not mortas, (
             f"`chance` != 100 em skills que não são de status, onde o motor a ignora: {mortas}"
         )
+
+
+class TestDadosVemDoJSON:
+    """Regra 5: dados em JSON, sem hardcoded.
+
+    A fronteira: fórmula é código, valor é dado. Um multiplicador de arquétipo,
+    o nome de um monstro ou o custo de uma skill são valores — mudam sem que a
+    regra mude, e por isso vivem no JSON.
+    """
+
+    def test_arquetipos_vem_do_json(self):
+        from src.content.factories.archetypes import all_archetypes
+
+        dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))
+        assert set(all_archetypes()) == set(dados["archetypes"]), (
+            "Os arquétipos carregados divergem do JSON — há papel definido em Python."
+        )
+
+    def test_todo_arquetipo_declara_orcamento_e_papel_no_json(self):
+        dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))
+        for role, payload in dados["archetypes"].items():
+            assert set(payload["budget"]) == {"hp", "attack", "defense", "agility"}, role
+            assert payload["threat"] and payload["counterplay"], (
+                f"{role} não declara ameaça e counterplay no JSON."
+            )
+
+    def test_geracao_de_andar_vem_do_json(self):
+        dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))
+        geracao = dados["generation"]
+        for chave in (
+            "base_count",
+            "min_monsters",
+            "scaling_per_3_levels",
+            "advanced_role_min_floor",
+            "advanced_roles",
+            "elite_spawn_chance",
+            "level_variation",
+        ):
+            assert chave in geracao, f"generation.{chave} ausente do JSON."
+
+    @pytest.mark.parametrize(
+        "arquivo", ["items.json", "skills.json", "passives.json", "monsters.json"]
+    )
+    def test_json_de_conteudo_e_valido_e_versionado(self, arquivo):
+        dados = json.loads((RAIZ / "src" / "data" / arquivo).read_text(encoding="utf-8"))
+        assert dados.get("version"), f"{arquivo} sem campo version."
+        assert dados.get("description"), f"{arquivo} sem descrição."

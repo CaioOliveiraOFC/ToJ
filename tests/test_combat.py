@@ -116,7 +116,7 @@ def predict_attack_rolls(seed, hit_chance, crit_chance):
 
 
 class TestHyperbolicDefenseMitigation:
-    """DEFENSE_MODIFIER = k/(k+defense) — COMBAT_DESIGN.md §5."""
+    """DEFENSE_MODIFIER = k/(k+defense)."""
 
     @pytest.mark.parametrize(
         "defense,expected_mod",
@@ -146,7 +146,7 @@ class TestHyperbolicDefenseMitigation:
 
 
 class TestXmultCap:
-    """XMULT Cap 5.0 — COMBAT_DESIGN.md §3.3."""
+    """XMULT Cap 5.0."""
 
     def test_produtorio_abaixo_do_teto_passa_intacto(self):
         assert cmb._apply_xmult_cap(1.8) == 1.8

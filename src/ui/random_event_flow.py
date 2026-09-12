@@ -1,4 +1,4 @@
-"""Fluxos de eventos aleatórios (TASK-005) — UI bloqueante chamada via EventBus."""
+"""Fluxos de eventos aleatórios — UI bloqueante chamada via EventBus."""
 
 from __future__ import annotations
 

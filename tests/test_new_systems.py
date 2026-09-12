@@ -1,4 +1,4 @@
-"""Testes para os 3 novos sistemas de TASK-006 — cooldown, damage_reduction, stun_chance."""
+"""Testes para os 3 novos sistemas de — cooldown, damage_reduction, stun_chance."""
 
 import random
 import sys

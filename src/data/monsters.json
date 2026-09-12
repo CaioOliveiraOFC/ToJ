@@ -5,7 +5,6 @@
     "base_count": 3,
     "scaling_per_3_levels": 3,
     "min_monsters": 2,
-    "boss_spawn_chance": 0.1,
     "advanced_role_min_floor": 4,
     "advanced_roles": [
       "controller",

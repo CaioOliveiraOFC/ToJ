@@ -1,5 +1,9 @@
 # GAME DESIGN — Tales of the Journey
 
+> O estado **atual** do design. O que ainda está em redesign não é
+> descrito aqui como se existisse — hoje isso vale para o sistema de
+> equipamento, que está em nova fase de desenho.
+
 > A bússola criativa. O resto é código, suor e tokens.
 
 > **Como ler este documento.** Toda afirmação carrega um estado verificado contra
@@ -329,89 +333,6 @@ Python 3.10, 3.11 e 3.12.
 
 ---
 
-## Decisões pendentes
-
-As perguntas abertas, com o que se sabe de cada uma. Nenhuma tem resposta ainda.
-
-### D1 — A faixa da Essência — **DECIDIDO: fica em 0.6x–2.2x**
-
-O documento pedia 0.5x–3.0x e chamava a sorte de pilar ("Caos"). A medição mostrou
-que ela explicava 38,7% da profundidade final; a faixa foi estreitada para 0.6x–2.2x
-e o peso da sorte caiu para ~12,8%.
-
-A pergunta era se 38,7% era problema ou era o jogo — "xadrez com a morte" quer que a
-habilidade decida, "Caos" quer que o sorteio decida, e os dois estão escritos aqui.
-
-**Decisão: a faixa estreitada fica.** O pilar "Caos" continua valendo, mas se expressa
-no que ainda é sorteado — composição do encontro, carta oferecida, drop, evento — e
-não numa moeda que decide a run inteira antes do jogador agir. A especificação
-original de 0.5x–3.0x está superada por esta decisão.
-
-### D2 — O que consome ouro?
-
-O único ralo especificado (reset de atributos por 100 de ouro) depende de um sistema
-de atributos que não existe. Sem ele, o ouro entra na run e não sai.
-
-Três respostas possíveis, e cada uma é um jogo diferente:
-- **Tensão dentro da run** — o preço acompanha a renda, o catálogo não acaba, e a
-  escolha é poção agora contra arma depois.
-- **Recompensa de risco** — o ouro só vira permanente na extração, e aí o troféu
-  precisa guardá-lo (o que colide com "sem meta-progressão").
-- **Nada** — assume-se, remove-se o ouro, e a loja vira troca por item dropado.
-
-### D3 — Pontos de atributo distribuíveis fazem sentido hoje?
-
-Foram especificados quando os stats subiam por valores fixos por classe. Hoje os
-atributos são derivados do nível por uma razão única, e a identidade da classe vem
-dos pesos de `CLASS_WEIGHTS`. Um sistema de distribuição livre **compete** com essa
-identidade — ou a reforça, se os pontos forem limitados aos atributos que a classe já
-usa.
-
-Vale notar que ele não é só um sistema de progressão: é o ralo de ouro do D2.
-
-### D4 — A Arena ainda é o destino?
-
-É a resposta escrita para "por que o jogador recomeça". Se continua valendo, ela é o
-maior bloco de trabalho restante e tudo sobre extração deve ser projetado para
-alimentá-la. Se não, o jogo precisa de outra resposta para a mesma pergunta — e hoje
-não tem nenhuma.
-
-### D5 — Quanto tempo dura uma run?
-
-A run mediana morre no andar 6. **Ninguém sabe quantos minutos isso é, porque ninguém
-jogou.** Quinze minutos e três horas são jogos diferentes: mudam o custo de morrer, o
-tamanho da build e quanto conteúdo é preciso.
-
-Nenhuma simulação responde isso.
-
-### D6 — Limite de 4 skills equipadas: ainda vale?
-
-Foi especificado junto com "aprende automaticamente". Como hoje o jogador **escolhe**
-a skill, um teto de 4 transforma cada escolha em uma troca — o que é mais interessante
-e mais próximo do TFT que o documento cita como referência. Mas é uma mecânica nova,
-não um conserto.
-
-### D7 — Conteúdo procedural infinito?
-
-Levantado depois deste documento: gerar itens, skills e passivas em vez de listá-los
-em JSON, para dar sensação de infinidade numa masmorra infinita.
-
-O que se sabe: gerador desenha de um vocabulário finito, então "item infinito" é
-"afixos finitos × combinatória" — o trabalho de design muda de lugar, não some. E há
-evidência contrária vinda do próprio jogo: as 29 passivas produzem 22 cartas de
-identidade, enquanto os 159 itens produzem 0,28 upgrade por visita à loja no andar 13.
-Quantidade não é o eixo.
-
-Gerador é bom em **adjetivo** (números num slot — item) e ruim em **verbo** (ação nova
-no combate — skill).
-
-### D8 — O nome do arquivo
-
-`GAME_DESING.md` tem um erro de digitação e é referenciado pelo `README.md` e pelo
-`GAME_GUIDE.md`. Renomear é barato; só precisa ser decidido.
-
----
-
 ## Métricas de Sucesso
 
 Uma feature está pronta quando:
@@ -422,3 +343,298 @@ Uma feature está pronta quando:
    balanceamento foram escritos sem que este arquivo fosse lido, e uma constante de
    design foi alterada contra a intenção escrita aqui. Documento desatualizado não é
    documentação — é uma armadilha.
+
+---
+
+## Combate — a matemática
+
+### Filosofia Central
+
+O sistema de combate do ToJ é um **pipeline determinístico de redução de contexto**.
+Nenhum sistema gera dano diretamente — todos injetam operadores matemáticos num contexto
+de combate imutável que é colapsado em sequência.
+
+Inspirado na arquitetura do Balatro: matemática simples, profundidade emergente via interações.
+
+---
+
+### Fórmula Universal de Dano
+
+$$DAMAGE_{final} = \Big[\big(BASE\_POWER + \sum FLAT\big) \times \prod MULT \times \prod XMULT_{capped}\Big] \times DEFENSE\_MODIFIER$$
+
+Uma única fórmula para todas as classes, skills e situações.
+A identidade vem dos **pesos e modificadores**, não de equações separadas.
+
+---
+
+### Geração do Poder Base
+
+$$BASE\_POWER = (W_{class} \cdot A) + weapon_{power}$$
+
+Onde:
+- `A` = vetor de atributos `[ST, MG, AG]`
+- `W_class` = vetor de pesos da classe
+- `weapon_power` = poder bruto da arma equipada
+
+### Matriz de Pesos por Classe
+
+| Classe  | w_ST | w_MG | w_AG |
+|---------|------|------|------|
+| Warrior | 1.6  | 0.4  | 0.0  |
+| Mage    | 0.3  | 1.9  | 0.0  |
+| Rogue   | 0.8  | 0.4  | 1.7  |
+
+> **Nota:** Warrior e Mage não usam AG no poder base.
+> AG para essas classes alimenta apenas Speed (ordem de turno) e hit_chance.
+
+---
+
+### Pipeline de Modificadores
+
+Os sistemas do jogo não geram dano — injetam operadores no pipeline.
+
+### 3.1 Modificadores Aditivos (FLAT e MULT)
+
+Bônus lineares. Acumulam-se de forma previsível.
+
+$$\prod MULT = 1 + \sum \Delta mult$$
+
+**Fontes:** skills comuns, buffs de buff, equipamentos passivos, atributos secundários.
+
+### 3.2 Modificadores Multiplicativos (XMULT)
+
+Multiplicadores puros. Reservados para gatilhos de alto impacto.
+
+$$\prod XMULT_{raw} = \prod_{i=1}^{n} xmult_i$$
+
+**Fontes:** cartas de dungeon, passivas de alto risco, condições críticas de estado.
+
+### 3.3 Teto Obrigatório de XMULT
+
+Para evitar explosão numérica por empilhamento de multiplicadores:
+
+$$\prod XMULT_{capped} = \min\!\Big(\prod XMULT_{raw},\ 5.0\Big)$$
+
+> Exemplo sem teto: Full House (3.0) × Execute (2.0) × Glass Soul (1.8) × Crit (1.5) = **16.2×**
+> Com teto de 5.0: resultado máximo é **5.0×** — previsível e balanceável.
+
+---
+
+### Resolução de Crítico
+
+O crítico injeta no produtório de XMULT **antes** do teto ser aplicado.
+
+```
+Se rand(0, 100) <= crit_chance:
+    XMULT_raw *= crit_damage_multiplier
+```
+
+**Limites obrigatórios:**
+
+| Parâmetro          | Valor  |
+|--------------------|--------|
+| crit_chance máximo | 75%    |
+| crit_damage padrão | 1.5×   |
+
+---
+
+### Curva de Mitigação de Defesa
+
+Curva hiperbólica de rendimento decrescente. O dano **nunca** chega a zero.
+
+$$DEFENSE\_MODIFIER = \frac{k}{k + defense_{target}}$$
+
+Onde `k = 100` (constante de calibração).
+
+| defense | Mitigação | Dano recebido |
+|---------|-----------|---------------|
+| 0       | 0%        | 100%          |
+| 30      | 23%       | 77%           |
+| 100     | 50%       | 50%           |
+| 200     | 67%       | 33%           |
+| 300     | 75%       | 25%           |
+| 500     | 83%       | 17%           |
+| 1000    | 91%       | 9%            |
+
+---
+
+### Injeção por Sistema
+
+### Skills
+| Skill     | Injeção                                          |
+|-----------|--------------------------------------------------|
+| Fireball  | `ΔMULT += 0.35`, `Resource_cost += 20 MP`        |
+| Execute   | `Se HP_target < 30%: XMULT *= 2.0`              |
+
+### Equipamentos
+| Item          | Injeção                                              |
+|---------------|------------------------------------------------------|
+| Sword         | `FLAT += 25`                                         |
+| Ancient Staff | `ΔMULT += 0.20`                                      |
+| Cursed Dagger | `crit_chance += 15`, trigger: `hp_drain = 5/turno`   |
+
+### Cartas de Dungeon
+| Carta        | Injeção                                                       |
+|--------------|---------------------------------------------------------------|
+| 7 of Blades  | `ΔMULT += 0.25`                                               |
+| Full House   | `XMULT *= 3.0`, `healing_modifier *= 0.5`                     |
+| Ace of Death | `damage_incoming *= 1.5`, `crit_chance += 20`                 |
+
+#### Apenas exemplo, cartas não foi introduzida ainda.
+
+### Passivas
+| Passiva      | Injeção                                                       |
+|--------------|---------------------------------------------------------------|
+| Battle Focus | `ΔMULT += 0.05 × stack_combo`                                 |
+| Glass Soul   | `XMULT *= 1.8`, `DEFENSE_MODIFIER *= 0.7`                     |
+
+---
+
+### Economia de Recursos (Condição de Contorno)
+
+A jogada só é executada se o custo for viável:
+
+$$Cost_{vector} = \begin{bmatrix} \Delta HP \\ \Delta MP \\ \Delta Essence \\ \Delta Corruption \end{bmatrix}$$
+
+Se qualquer componente do vetor exceder o recurso disponível, a ação é bloqueada pelo sistema — independente do DAMAGE_final calculado.
+
+---
+
+### Constantes de Calibração
+
+| Constante           | Valor | Descrição                            |
+|---------------------|-------|--------------------------------------|
+| `DEFENSE_K`         | 100   | Curva de mitigação                   |
+| `XMULT_CAP`         | 5.0   | Teto de multiplicadores puros        |
+| `CRIT_CHANCE_CAP`   | 75    | % máximo de chance crítica           |
+| `CRIT_DAMAGE_BASE`  | 1.5   | Multiplicador padrão de crítico      |
+
+> Estas constantes residem em `src/shared/constants.py` e são os únicos valores
+> a serem ajustados durante o balanceamento. Nunca hardcode esses valores inline.
+
+---
+
+## Apêndice — como adicionar passivas
+
+### Contexto
+
+Este guia serve para gerar dezenas/centenas de novas passivas para o catálogo `src/data/passives.json` do jogo TOJ (Tales of the Journey).
+
+---
+
+### Estrutura do Arquivo
+
+O arquivo `src/data/passives.json` tem esta estrutura:
+
+```json
+{
+  "description": "...",
+  "version": "1.0",
+  "rarity_weights": { "Common": 60, "Rare": 28, "Epic": 10, "Legendary": 2 },
+  "passives": [
+    { ... cada passiva é um objeto ... }
+  ]
+}
+```
+
+Cada passiva dentro do array `"passives"` deve ter **exatamente** estes 7 campos:
+
+| Campo | Tipo | Descrição | Exemplo |
+|---|---|---|---|
+| `id` | string | Identificador único, snake_case, sem acentos | `"coracao_ferro"` |
+| `name` | string | Nome exibido, pode ter acentos | `"Coração de Ferro"` |
+| `category` | string | Uma das 3 categorias: `Stats`, `Recursos`, `Combate` | `"Stats"` |
+| `rarity` | string | Uma das 4: `Common`, `Rare`, `Epic`, `Legendary` | `"Common"` |
+| `description` | string | Texto curto exibido na carta | `"+15 HP máximo"` |
+| `effect_type` | string | Identificador do efeito (ver tabela abaixo) | `"max_hp"` |
+| `effect_value` | number | Valor numérico (inteiro ou float) | `15` |
+
+---
+
+### Effect Types Válidos
+
+### Stats (alteram atributos base do jogador)
+| effect_type | O que faz | Valores típicos por raridade |
+|---|---|---|
+| `max_hp` | Aumenta HP máximo | Common: 10-30, Rare: 30-60, Epic: 60-120, Legendary: 120-250 |
+| `max_mp` | Aumenta MP máximo | Common: 8-20, Rare: 20-40, Epic: 40-80, Legendary: 80-150 |
+| `strength` | Aumenta força base | Common: 2-5, Rare: 6-12, Epic: 12-20, Legendary: 20-40 |
+| `defense` | Aumenta defesa base | Common: 2-5, Rare: 5-10, Epic: 10-20, Legendary: 20-35 |
+| `agility` | Aumenta agilidade base (cap: 95) | Common: 1-3, Rare: 3-6, Epic: 6-12, Legendary: 12-20 |
+
+### Recursos (afetam economia e ganhos)
+| effect_type | O que faz | Valores típicos por raridade |
+|---|---|---|
+| `essence_bonus` | Bônus % no multiplicador de essência | Common: 5-15, Rare: 15-25, Epic: 25-45, Legendary: 45-70 |
+| `gold_drop_bonus` | Bônus % em ouro dropado | Common: 5-15, Rare: 15-30, Epic: 30-50, Legendary: 40-60 |
+| `potion_heal_bonus` | Bônus % na cura de poções | Common: 5-12, Rare: 12-20, Epic: 20-35, Legendary: 30-50 |
+
+### Combate (afetam mecânicas de luta)
+| effect_type | O que faz | Valores típicos por raridade |
+|---|---|---|
+| `crit_chance` | Chance % de ataque crítico | Common: 3-8, Rare: 8-15, Epic: 15-25, Legendary: 25-40 |
+| `dodge_chance` | Chance % de esquiva | Common: 3-6, Rare: 6-12, Epic: 10-18, Legendary: 15-25 |
+| `damage_reduction` | % de redução de dano recebido | Common: 2-5, Rare: 5-10, Epic: 10-18, Legendary: 15-25 |
+| `stun_chance` | Chance % de atordoar | Common: 3-6, Rare: 6-10, Epic: 10-15, Legendary: 12-20 |
+| `death_ignore` | Quantas mortes ignorar (inteiro, não %) | Epic: 1, Legendary: 1-2 |
+
+---
+
+### Regras Críticas
+
+1. **IDs devem ser únicos** — nunca repetir um `id` existente no arquivo
+2. **IDs sem acentos** — usar `coracao` em vez de `coração`, `lamina` em vez de `lâmina`
+3. **IDs em snake_case** — `nome_da_passiva`, sem camelCase ou kebab-case
+4. **Nomes com acentos são ok** — `"Coração de Ferro"` está correto no campo `name`
+5. **`effect_value` deve ser número** — `15`, não `"15"`
+6. **Categorias fixas** — exatamente `"Stats"`, `"Recursos"` ou `"Combate"`
+7. **Raridades fixas** — exatamente `"Common"`, `"Rare"`, `"Epic"` ou `"Legendary"`
+8. **Escalabilidade por raridade** — valores de Legendary devem ser significativamente maiores que Common
+9. **Descriptions concisas** — máximo ~40 caracteres, formato: `"+X Y"` ou `"descrição curta"`
+10. **JSON válido** — aspas duplas em tudo, vírgulas entre objetos, sem trailing comma no último elemento
+
+---
+
+### Template para Gerar em Massa
+
+```json
+{
+  "id": "nome_unico_snake_case",
+  "name": "Nome da Passiva",
+  "category": "Stats",
+  "rarity": "Common",
+  "description": "+15 HP máximo",
+  "effect_type": "max_hp",
+  "effect_value": 15
+}
+```
+
+---
+
+### Onde os Dados São Usados
+
+| Arquivo | Uso |
+|---|---|
+| `src/content/passives.py` | Carrega o JSON, cria `PassiveCard` dataclasses, gera escolhas ponderadas |
+| `src/entities/heroes.py` | Aplica stats (`max_hp`, `max_mp`, `strength`, `defense`, `agility`) ao escolher passiva |
+| `src/mechanics/combat.py` | Usa `crit_chance` e `dodge_chance` em cálculos de combate |
+| `src/storage/save_manager.py` | Salva/carrega apenas os IDs das passivas |
+
+---
+
+### Notas sobre Integração
+
+- **Stats** (`max_hp`, `max_mp`, `strength`, `defense`, `agility`) são aplicados **imediatamente** ao escolher a passiva, sem chamar `rest()`.
+- **Combate** (`crit_chance`, `dodge_chance`) é lido pelo `combat.py` via `player.get_passive_bonus()`.
+- **Recursos** (`essence_bonus`, `gold_drop_bonus`, `potion_heal_bonus`) e **Combate avançado** (`damage_reduction`, `stun_chance`, `death_ignore`) ainda não têm integração ativa no motor — ficarão para tarefas futuras.
+- Novos `effect_type` podem ser adicionados, mas requerem código em `_apply_passive_stats()` (heroes.py) e/ou `combat.py`.
+
+---
+
+### Checklist Pós-Criação
+
+- [ ] Todos os IDs são únicos (sem duplicatas)
+- [ ] JSON válido (validar com `python3 -c "import json; json.load(open('src/data/passives.json'))"`)
+- [ ] Nenhuma passiva tem `effect_value` como string
+- [ ] Distribuição por raridade está balanceada
+- [ ] Ruff check passa: `python3 -m ruff check src/content/passives.py`
