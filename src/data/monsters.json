@@ -77,12 +77,20 @@
           "id": "mob_golpe_pesado",
           "name": "Golpe Pesado",
           "effect_type": "damage",
-          "effect_value": 40,
+          "effect_value": 0,
           "mana_cost": 15,
           "cooldown": 3,
           "duration": 2,
           "chance": 100,
-          "target": "enemy"
+          "target": "enemy",
+          "scaling": [
+            {
+              "stat": "st",
+              "weight": 1.0
+            }
+          ],
+          "power": 0.933,
+          "accuracy_modifier": -5
         },
         {
           "id": "mob_furia",
@@ -147,13 +155,25 @@
           "id": "mob_impacto",
           "name": "Impacto de Escudo",
           "effect_type": "damage",
-          "effect_value": 45,
+          "effect_value": 0,
           "mana_cost": 20,
           "cooldown": 4,
           "duration": 3,
           "chance": 100,
           "target": "enemy",
-          "description": "Golpe pesado com o escudo, lento e caro."
+          "description": "Golpe pesado com o escudo, lento e caro.",
+          "scaling": [
+            {
+              "stat": "st",
+              "weight": 0.6
+            },
+            {
+              "stat": "df",
+              "weight": 0.4
+            }
+          ],
+          "power": 1.332,
+          "accuracy_modifier": -10
         }
       ]
     },
@@ -181,24 +201,40 @@
           "id": "mob_rajada",
           "name": "Rajada Arcana",
           "effect_type": "damage",
-          "effect_value": 70,
+          "effect_value": 0,
           "mana_cost": 25,
           "cooldown": 2,
           "duration": 2,
           "chance": 100,
-          "target": "enemy"
+          "target": "enemy",
+          "scaling": [
+            {
+              "stat": "mg",
+              "weight": 1.0
+            }
+          ],
+          "power": 1.133,
+          "accuracy_modifier": 0
         },
         {
           "id": "mob_detonacao",
           "name": "Detonação Arcana",
           "effect_type": "damage",
-          "effect_value": 130,
+          "effect_value": 0,
           "mana_cost": 40,
           "cooldown": 5,
           "duration": 3,
           "chance": 100,
           "target": "enemy",
-          "description": "Descarga total. Cara, lenta, e decide o combate."
+          "description": "Descarga total. Cara, lenta, e decide o combate.",
+          "scaling": [
+            {
+              "stat": "mg",
+              "weight": 1.0
+            }
+          ],
+          "power": 1.533,
+          "accuracy_modifier": -10
         }
       ]
     },
@@ -226,12 +262,24 @@
           "id": "mob_corte_rapido",
           "name": "Corte Rápido",
           "effect_type": "damage",
-          "effect_value": 30,
+          "effect_value": 0,
           "mana_cost": 12,
           "cooldown": 2,
           "duration": 2,
           "chance": 100,
-          "target": "enemy"
+          "target": "enemy",
+          "scaling": [
+            {
+              "stat": "ag",
+              "weight": 0.6
+            },
+            {
+              "stat": "st",
+              "weight": 0.4
+            }
+          ],
+          "power": 1.733,
+          "accuracy_modifier": 10
         },
         {
           "id": "mob_evasao_mob",
@@ -396,12 +444,24 @@
           "id": "mob_investida_brutal",
           "name": "Investida Brutal",
           "effect_type": "damage",
-          "effect_value": 55,
+          "effect_value": 0,
           "mana_cost": 25,
           "cooldown": 3,
           "duration": 2,
           "chance": 100,
-          "target": "enemy"
+          "target": "enemy",
+          "scaling": [
+            {
+              "stat": "st",
+              "weight": 0.7
+            },
+            {
+              "stat": "ag",
+              "weight": 0.3
+            }
+          ],
+          "power": 1.44,
+          "accuracy_modifier": -5
         },
         {
           "id": "mob_rugido",
@@ -453,12 +513,24 @@
           "id": "boss_devastar",
           "name": "Devastar",
           "effect_type": "damage",
-          "effect_value": 80,
+          "effect_value": 0,
           "mana_cost": 30,
           "cooldown": 3,
           "duration": 2,
           "chance": 100,
-          "target": "enemy"
+          "target": "enemy",
+          "scaling": [
+            {
+              "stat": "st",
+              "weight": 0.8
+            },
+            {
+              "stat": "df",
+              "weight": 0.2
+            }
+          ],
+          "power": 1.449,
+          "accuracy_modifier": -5
         },
         {
           "id": "boss_esmagar",

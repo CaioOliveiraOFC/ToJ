@@ -28,6 +28,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from src.content.factories.archetypes import all_archetypes, spawn_by_role  # noqa: E402
 from src.content.items import Item, get_all_items  # noqa: E402
 from src.content.skill_validator import (  # noqa: E402
     offensive_budget,
@@ -37,6 +38,7 @@ from src.content.skills_loader import (  # noqa: E402
     Requirement,
     ScalingTerm,
     SecondaryEffect,
+    SkillCard,
     get_skill_by_id,
     load_skills,
 )
@@ -489,6 +491,117 @@ def test_o_teto_de_deck_e_um_so():
     assert pick_policies.MAX_EQUIPPED_SKILLS == MAX_ACTIVE_SKILLS
     fonte = inspect.getsource(pick_policies)
     assert "MAX_EQUIPPED_SKILLS = MAX_ACTIVE_SKILLS" in fonte
+
+
+# --- 10. monstro fala a mesma língua ---------------------------------------
+
+
+CARTAS_DE_MONSTRO = [
+    (papel, carta)
+    for papel, arquetipo in sorted(all_archetypes().items())
+    for carta in arquetipo.skills
+]
+MONSTRO_DE_DANO = [(p, c) for p, c in CARTAS_DE_MONSTRO if c.effect_type == "damage"]
+assert MONSTRO_DE_DANO, "nenhuma carta de dano de monstro: esta seção não estaria medindo nada."
+
+
+class TestMonstroUsaAMesmaGramatica:
+    """Não existe `MonsterSkill`. Existe `SkillCard`, e o monstro usa a mesma.
+
+    O que muda entre herói e monstro é a ORIGEM da carta e os atributos de quem
+    a lança. A linguagem e o resolvedor são um só — é o que impede o dano do
+    monstro de virar um segundo sistema que ninguém compara com o do jogador.
+    """
+
+    @pytest.mark.parametrize("papel,carta", CARTAS_DE_MONSTRO, ids=lambda x: getattr(x, "id", x))
+    def test_a_carta_de_monstro_e_a_carta_do_heroi(self, papel, carta):
+        assert isinstance(carta, SkillCard)
+
+    @pytest.mark.parametrize("papel,carta", MONSTRO_DE_DANO, ids=lambda x: getattr(x, "id", x))
+    def test_escala_valida_e_custo_declarado(self, papel, carta):
+        assert carta.scaling, f"{carta.id} não diz de qual atributo o golpe nasce"
+        assert len(carta.scaling) <= MAX_SCALING_STATS
+        assert sum(t.weight for t in carta.scaling) == pytest.approx(1.0, abs=0.001)
+        assert all(t.stat in SKILL_SCALING_STATS for t in carta.scaling)
+        assert carta.power > 0
+        assert carta.mana_cost > 0 or carta.mana_cost_percent > 0
+        assert carta.cooldown > 0
+        lo, hi = SKILL_ACCURACY_RANGE
+        assert lo <= carta.accuracy_modifier <= hi
+
+    @pytest.mark.parametrize("papel,carta", MONSTRO_DE_DANO, ids=lambda x: getattr(x, "id", x))
+    def test_o_dano_sai_dos_atributos_do_proprio_monstro(self, papel, carta):
+        """Dobrar a Força do monstro dobra o golpe — como no herói."""
+        m = spawn_by_role(papel, 12)
+        antes = cmb.skill_damage_base(m, carta)
+        assert antes == pytest.approx(
+            sum(m.get_stat(t.stat) * t.weight for t in carta.scaling) * carta.power, rel=0.02
+        )
+        # Sobe os atributos DESTA carta — não um genérico: `mob_rajada` escala
+        # com Magia, e empurrar Força nela não provaria nada.
+        for termo in carta.scaling:
+            setattr(m, f"base_{termo.stat}", int(getattr(m, f"base_{termo.stat}") * 2))
+        depois = cmb.skill_damage_base(m, carta)
+        assert depois > antes, "o atributo do monstro não chega ao BASE da carta dele"
+
+    @pytest.mark.parametrize("papel,carta", CARTAS_DE_MONSTRO, ids=lambda x: getattr(x, "id", x))
+    def test_status_e_secundario_vem_do_catalogo_global(self, papel, carta):
+        """Poison é Poison. Nenhuma carta redefine um efeito, de nenhum lado."""
+        if carta.effect_type == "status":
+            assert core.definition(str(carta.effect_value)) is not None, (
+                f"{carta.id} inventa o status {carta.effect_value!r}"
+            )
+        if carta.secondary is not None:
+            assert core.definition(carta.secondary.effect) is not None
+
+    def test_o_monstro_passa_pelo_mesmo_funil_de_dano(self):
+        """Mesma função, mesmo acerto, mesmo crítico, mesma defesa, mesma mitigação.
+
+        A prova é por REPRODUÇÃO: o dano que o monstro causa é reconstruído aqui
+        com o BASE da carta dele e o mesmo pipeline público que o herói usa. Se
+        `combat.py` ganhasse um caminho separado para monstro, os dois números
+        deixariam de bater.
+        """
+        m = spawn_by_role("glass_cannon", 12)
+        alvo = heroi("Warrior", 12)
+        alvo._hp = 10**7
+        carta_mob = next(c for c in m.skills if c.effect_type == "damage")
+
+        base = cmb.skill_damage_base(m, carta_mob, alvo)
+        baldes = cmb.damage_modifiers(m, alvo, is_critical=False)
+        esperado = cmb._calculate_damage(
+            base,
+            baldes.flat,
+            baldes.mult,
+            baldes.xmult,
+            alvo.get_df(),
+            baldes.mitigation,
+        )
+
+        antes = alvo.get_hp()
+        resultado = cmb.apply_skill(m, alvo, carta_mob, rng=_Rng(1, 100))
+        assert not resultado.strike.was_evaded
+        assert antes - alvo.get_hp() == esperado
+
+    def test_a_mira_da_carta_do_monstro_tambem_vale(self):
+        """`accuracy_modifier` não é enfeite de herói: é a mesma conta dos dois."""
+        m = spawn_by_role("skirmisher", 12)
+        alvo = heroi("Warrior", 12)
+        rapido = next(c for c in m.skills if c.id == "mob_corte_rapido")
+        assert rapido.accuracy_modifier != 0
+        neutro = cmb.hit_chance(m, alvo)
+        com_carta = cmb.hit_chance(m, alvo, rapido.accuracy_modifier)
+        assert com_carta == max(
+            HIT_CHANCE_FLOOR, min(HIT_CHANCE_CEIL, neutro + rapido.accuracy_modifier)
+        )
+
+    def test_combat_nao_tem_caminho_separado_para_monstro(self):
+        """Nenhum `if monster:` dentro do resolvedor. A origem difere, a regra não."""
+        import inspect
+
+        fonte = inspect.getsource(cmb)
+        for proibido in ("is_boss", "Monster", "isinstance(caster", "isinstance(attacker"):
+            assert proibido not in fonte, f"`combat.py` distingue monstro por {proibido!r}"
 
 
 # --- utilitário ------------------------------------------------------------

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from src.content.skills_loader import SkillCard
+from src.content.skills_loader import MONSTER_SKILL_CLASS, SkillCard, card_from_json
 from src.data.loader import load_monsters_data
 from src.entities.monsters import Monster
 from src.shared.constants import (
@@ -59,30 +59,33 @@ class Archetype:
     names: tuple[str, ...]
 
 
-def _skill_from_json(data: dict) -> SkillCard:
-    """Monta uma skill de monstro reaproveitando o mesmo `SkillCard` do herói.
+# O que o JSON de monstro não precisa repetir em toda carta. São os campos que
+# a carta do herói traz do catálogo dele e que, para um monstro, têm sempre o
+# mesmo valor: não há nível de aquisição, não há assinatura de classe.
+PADROES_DE_MONSTRO = {
+    "skill_class": MONSTER_SKILL_CLASS,
+    "level_required": 1,
+    "is_initial": False,
+    "rarity": "Common",
+    "target": "enemy",
+    "chance": 100,
+}
 
-    Reusar a carta do herói significa que `combat.apply_skill` trata os dois lados
-    com o mesmo código — o monstro não ganha uma segunda implementação de dano
-    que possa divergir da do jogador.
+
+def _skill_from_json(data: dict) -> SkillCard:
+    """Monta a carta do monstro com o MESMO construtor da carta do herói.
+
+    Antes esta função montava o `SkillCard` campo a campo, e por isso ela parou
+    no tempo: a gramática V2 (`scaling`, `power`, `accuracy_modifier`,
+    `secondary`, `requires`) entrou no jogo pelo `card_from_json` e nunca chegou
+    aqui. O monstro continuava carregando cartas sem escala — e caía no atalho
+    de conteúdo legado do motor, que usa o poder de ataque genérico.
+
+    Um construtor só resolve isso na origem: campo novo na gramática passa a
+    valer para os dois lados no mesmo dia, sem ninguém precisar lembrar deste
+    arquivo. O que o monstro tem de próprio são os PADRÕES, não a linguagem.
     """
-    return SkillCard(
-        id=data["id"],
-        name=data["name"],
-        skill_class="Monster",
-        level_required=1,
-        mana_cost=int(data.get("mana_cost", 0)),
-        effect_type=data["effect_type"],
-        effect_value=data["effect_value"],
-        effect_stat=data.get("effect_stat", ""),
-        description=data.get("description", ""),
-        target=data.get("target", "enemy"),
-        duration=int(data.get("duration", 0)),
-        chance=int(data.get("chance", 100)),
-        rarity=data.get("rarity", "Common"),
-        is_initial=False,
-        cooldown=int(data.get("cooldown", 0)),
-    )
+    return card_from_json({**PADROES_DE_MONSTRO, **data})
 
 
 def _archetype_from_json(role: str, data: dict) -> Archetype:

@@ -395,3 +395,90 @@ class TestCatalogoDeSkills:
         assert "offensive budget" in " ".join(veredito.erros)
         with pytest.raises(ValueError):
             assert_catalogo_valido([absurda])
+
+    def test_toda_carta_de_monstro_passa_no_mesmo_validador(self):
+        """Monstro obedece às MESMAS leis, medido contra o arquétipo dele.
+
+        A régua muda porque tem de mudar — o Tanque tem Defesa alta e Agilidade
+        baixa, e medi-lo contra o Guerreiro diria que a carta dele é fraca por
+        um detalhe de planilha. A LEI é a mesma: escala válida, no máximo dois
+        atributos somando 1.0, MP e recarga, acerto na faixa, efeito do catálogo
+        global, orçamento não absurdo.
+        """
+        from src.content.skill_validator import validate_monster_catalog
+
+        vereditos = validate_monster_catalog()
+        assert vereditos, "nenhuma carta de monstro validada: o teste não estaria medindo nada"
+        reprovadas = [str(v) for v in vereditos if not v.ok]
+        assert not reprovadas, "\n".join(reprovadas)
+
+    def test_o_validador_reprova_carta_de_monstro_invalida(self):
+        """Prova de carga do lado do monstro."""
+        import dataclasses
+
+        from src.content.factories.archetypes import get_archetype
+        from src.content.skill_validator import monster_reference, validate
+        from src.content.skills_loader import ScalingTerm
+
+        ref = monster_reference("boss")
+        carta = next(s for s in get_archetype("boss").skills if s.effect_type == "damage")
+        for rotulo, quebrada in (
+            (
+                "três atributos",
+                dataclasses.replace(
+                    carta,
+                    scaling=(
+                        ScalingTerm("st", 0.4),
+                        ScalingTerm("mg", 0.3),
+                        ScalingTerm("df", 0.3),
+                    ),
+                ),
+            ),
+            ("pesos errados", dataclasses.replace(carta, scaling=(ScalingTerm("st", 0.5),))),
+            ("sem recarga", dataclasses.replace(carta, cooldown=0)),
+            ("sem mana", dataclasses.replace(carta, mana_cost=0, mana_cost_percent=0)),
+            ("dano absurdo", dataclasses.replace(carta, power=carta.power * 30)),
+        ):
+            assert not validate(quebrada, reference=ref).ok, f"{rotulo} passou no validador"
+
+
+class TestNenhumaSkillOficialUsaOAtalhoLegado:
+    """O fallback existe para save antigo e mod — não para o conteúdo do jogo.
+
+    `skill_damage_base` aceita uma carta sem `scaling`/`power` e cai no poder de
+    ataque genérico. Isso é rede de segurança para um save de outra versão, e
+    tem de continuar existindo. Mas se uma carta OFICIAL cair ali, ela deixou de
+    ter identidade: duas cartas diferentes passam a bater igual, e ninguém
+    percebe, porque o motor não reclama — só devolve um número plausível.
+    """
+
+    def _oficiais_de_dano(self):
+        from src.content.factories.archetypes import all_archetypes
+        from src.content.skills_loader import load_skills
+
+        cartas = [("hero", s) for s in load_skills()]
+        for role, arquetipo in sorted(all_archetypes().items()):
+            cartas += [(role, s) for s in arquetipo.skills]
+        return [(origem, s) for origem, s in cartas if s.effect_type == "damage"]
+
+    def test_toda_carta_oficial_de_dano_tem_gramatica_v2(self):
+        faltando = [
+            f"{origem}/{s.id}"
+            for origem, s in self._oficiais_de_dano()
+            if not s.scaling or not s.power
+        ]
+        assert not faltando, (
+            "cartas oficiais de dano sem `scaling`/`power` caem no atalho de "
+            f"conteúdo legado e batem todas igual: {faltando}"
+        )
+
+    def test_o_atalho_continua_existindo_para_conteudo_de_fora(self):
+        """Prova de carga: a rede de segurança não pode ter sido removida junto."""
+        from types import SimpleNamespace
+
+        from src.entities.heroes import Warrior
+        from src.mechanics.combat import skill_damage_base
+
+        heroi = Warrior("Teste")
+        antiga = SimpleNamespace(name="De um save velho", effect_type="damage", effect_value=140)
+        assert skill_damage_base(heroi, antiga) == heroi.get_avg_damage()

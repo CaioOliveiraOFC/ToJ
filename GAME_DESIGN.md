@@ -172,17 +172,79 @@ para a Arena, quando ela existir.
 
 ## Habilidades (Ativas em Combate)
 
-**`[bug]`** *"Cada classe começa com 4 habilidades iniciais."* Um personagem recém-criado
-tem **zero**. As 4 iniciais são adquiridas uma por nível, do 1 ao 4. Este bug já estava
-no roadmap deste documento e continua aberto.
+> **Skills V2.** A regra que organiza tudo abaixo: **a skill define COMO o personagem
+> transforma os atributos dele numa ação. O poder vem do personagem, não de um número
+> que a carta carrega.** Não existe um segundo sistema de dano ao lado do combate.
 
-**`[divergiu]`** O documento dizia *"ao atingir certos níveis, aprende novas habilidades
-automaticamente conforme a tabela da classe"*. Hoje, ao subir para um nível ímpar a
-partir do 5, o jogador **escolhe 1 entre 3 cartas de skill** — o mesmo formato das
-passivas.
+### Aquisição
 
-**`[não existe]`** *"O personagem sempre carrega exatamente 4 habilidades equipadas."*
-Não há limite. As skills acumulam sem teto.
+**`[implementado]`** No **nível 1** o personagem recebe **uma** habilidade: a assinatura
+da classe, fixa e declarada no JSON (Golpe Poderoso, Bola de Fogo, Ataque Furtivo).
+Eram quatro, entregues uma por nível até a quarta — o jogador chegava ao nível 4 com o
+deck cheio sem ter escolhido nada, e a primeira decisão do jogo acontecia depois de ele
+já estar montado.
+
+**`[implementado]`** A partir daí, **a cada 3 níveis** (3, 6, 9, 12, …) o jogo oferece
+**3 cartas e o jogador escolhe 1** — mesmo formato das passivas. Subir de nível não
+entrega mais nada de graça.
+
+**`[implementado]`** O deck tem **teto de 4 habilidades ativas**. Ao aprender a quinta,
+o jogo mostra a carta nova ao lado das 4 atuais e o jogador **escolhe qual esquecer ou
+recusa a nova**. O motor nunca decide por ele.
+
+**`[implementado]`** Regras da oferta:
+- carta que já está **ativa nunca aparece** — oferecê-la gastaria um dos três espaços;
+- **inéditas têm prioridade**: o jogo lembra o que já mostrou nesta run;
+- **repetição só depois** de esgotarem as inéditas elegíveis;
+- o pool é **classe + Neutral**. Skill exclusiva continua exclusiva: um Guerreiro nunca
+  vê uma carta de Mago.
+
+**`[pendente — conteúdo]`** O pool **Neutral existe no código e está vazio no JSON**:
+nenhuma carta declara `skill_class: "Neutral"` ainda. O caminho funciona; falta conteúdo.
+
+**`[pendente — conteúdo]`** Na primeira oferta (nível 3) existem exatamente **3
+candidatas** por classe, então o menu mostra tudo o que existe — o que ainda não é
+escolher. A partir do nível 6 há mais candidatas que vagas.
+
+### O que uma carta declara
+
+**`[implementado]`** `scaling`: de quais atributos o golpe nasce, **no máximo 2**, com
+os **pesos somando 1.0**. `power`: o peso da ação — golpe leve, médio, pesado. Juntos
+constroem o BASE, e é só isso que a carta produz:
+
+```
+BASE = Σ(atributo_resolvido × peso) × (1 + arma%) × power × (1 + bônus%)
+```
+
+Os atributos entram já resolvidos: nível, equipamento, gemas, `+N` e efeitos ativos
+chegam sozinhos. Daí em diante quem resolve é **o pipeline global de dano de sempre** —
+acerto, crítico, encantamento, defesa e mitigação. A carta não tem funil próprio.
+
+**`[implementado]`** `accuracy_modifier`: quanto a ação ajuda ou atrapalha a mira. Entra
+na **mesma conta de acerto** que evasão, medo e o efeito **Precisão** — não existe uma
+segunda rolagem. O ataque básico passa 0 e é a régua contra a qual as skills se comparam.
+
+**`[implementado]`** `secondary`: **no máximo um** efeito extra, e sempre do **catálogo
+global de efeitos**. A carta escolhe chance, duração e intensidade; o que `poison`
+significa é do catálogo. Nenhuma carta redefine um efeito.
+
+**`[implementado]`** `requires`: requisito de equipamento (tipo de peça, número de mãos,
+duas armas). Ele **bloqueia o USO, nunca a aquisição** — o jogador pega a carta de escudo
+e vai atrás de um escudo. A carta fica no deck, visível, com o que falta escrito na tela.
+É o que permite pivotar uma build em vez de só reagir ao que caiu.
+
+**`[implementado]`** **Herói e monstro usam a MESMA `SkillCard` e a mesma gramática.**
+Não existe `MonsterSkill` nem um segundo resolvedor: o que muda é a origem da carta e os
+atributos de quem a lança.
+
+**`[implementado]`** Todo conteúdo de skill — dos dois lados — passa por um **validador
+estático** antes de entrar no jogo: escala válida, no máximo 2 atributos somando 1.0, MP
+e recarga obrigatórios, acerto dentro da faixa, efeito do catálogo global, orçamento não
+absurdo. O orçamento é medido contra um personagem de referência (a classe, para o herói;
+o arquétipo, para o monstro), porque a Agilidade 92 do Ladino e a Força 191 do Guerreiro
+não são o mesmo número.
+
+### Custo
 
 **`[implementado]`** Skills consomem MP e têm recarga por skill, definida em
 `skills.json`. Os cooldowns batem com a especificação:
@@ -195,9 +257,17 @@ Não há limite. As skills acumulam sem teto.
 | Legendary | 4-5 | 4-5 ✓ |
 
 **`[implementado]`** A tabela de preços das skills foi reescrita por curva: o dano
-cresce com o nível exigido e a mana com o dano, com prêmio para recarga longa. Antes
-havia **13 pares dominados** — skills que custavam mais mana e mais recarga para
-entregar menos dano que a skill de nível 1 da classe. Hoje são zero.
+cresce com o nível exigido e a mana com o dano. Antes havia **13 pares dominados** —
+skills que custavam mais mana e mais recarga para entregar menos dano que a skill de
+nível 1 da classe. Hoje são zero.
+
+**`[bug conhecido — balanceamento]`** *"com prêmio para recarga longa"* não é verdade.
+Medido em dano por ponto percentual de mana, as skills de recarga longa rendem **~21**
+contra **~29** das de recarga curta: trocar frequência por pico custa mais caro por
+ponto de dano, e não menos. A regra parecia cumprida porque a medição antiga dividia um
+percentual de bônus por uma mana absoluta — duas unidades diferentes. Medido na mesma
+unidade sobre os dados anteriores à V2, a razão **já estava invertida**. Está registrado
+como falha esperada no teste e é backlog de balanceamento, não de código.
 
 ---
 
@@ -369,14 +439,27 @@ A identidade vem dos **pesos e modificadores**, não de equações separadas.
 
 ### Geração do Poder Base
 
-$$BASE\_POWER = (W_{class} \cdot A) + weapon_{power}$$
+$$BASE\_POWER = (W \cdot A) \times (1 + weapon\%)$$
 
 Onde:
-- `A` = vetor de atributos `[ST, MG, AG]`
-- `W_class` = vetor de pesos da classe
-- `weapon_power` = poder bruto da arma equipada
+- `A` = vetor de atributos **já resolvidos** (nível, equipamento, gemas, `+N`, efeitos)
+- `W` = vetor de pesos **da ação**
+- `weapon%` = percentual de dano das armas empunhadas
 
-### Matriz de Pesos por Classe
+**De onde vêm os pesos.** É aqui que o ataque básico e uma skill se diferenciam, e é a
+única diferença entre eles:
+
+| Ação | Pesos | Peso da ação |
+|---|---|---|
+| Ataque básico | fixos, da **classe** (tabela abaixo) | 1 (é a régua) |
+| Skill (V2) | os que a **carta** declara em `scaling`, até 2, somando 1.0 | `power` |
+
+O ataque básico é, literalmente, a skill de pesos fixos: mesma função, mesma conta,
+mesma arma. Uma skill de Ladino pode nascer de `0.6 AG + 0.4 ST` e uma de Tanque de
+`0.6 ST + 0.4 DF` — a carta escolhe **de onde** o golpe vem, nunca **quanto** ele vale.
+Vale igual para monstro: os arquétipos usam a mesma gramática.
+
+### Matriz de Pesos por Classe (ataque básico)
 
 | Classe  | w_ST | w_MG | w_AG |
 |---------|------|------|------|
@@ -384,8 +467,9 @@ Onde:
 | Mage    | 0.3  | 1.9  | 0.0  |
 | Rogue   | 0.8  | 0.4  | 1.7  |
 
-> **Nota:** Warrior e Mage não usam AG no poder base.
-> AG para essas classes alimenta apenas Speed (ordem de turno) e hit_chance.
+> **Nota:** Warrior e Mage não usam AG no **ataque básico**.
+> AG para essas classes alimenta Speed (ordem de turno) e hit_chance — e pode alimentar
+> uma skill, se a carta declarar `ag` no `scaling` dela.
 
 ---
 
@@ -461,10 +545,17 @@ Onde `k = 100` (constante de calibração).
 ### Injeção por Sistema
 
 ### Skills
-| Skill     | Injeção                                          |
-|-----------|--------------------------------------------------|
-| Fireball  | `ΔMULT += 0.35`, `Resource_cost += 20 MP`        |
-| Execute   | `Se HP_target < 30%: XMULT *= 2.0`              |
+Skill **não injeta** no pipeline: ela constrói o BASE e para. Era o desenho antigo, e
+manter os dois caminhos abertos daria à mesma carta dois jeitos de ficar mais forte —
+um deles fora do alcance do validador.
+
+| Skill            | O que ela declara                                             |
+|------------------|---------------------------------------------------------------|
+| Bola de Fogo     | `scaling: mg 1.0`, `power: 3.49`, custo em % da mana máxima    |
+| Assassinato      | `scaling: ag 0.6 + st 0.4`, `power: 5.59`, `bonus_condition`   |
+
+A condição situacional (`bonus_condition` + `bonus_percent`) multiplica o BASE **antes**
+do funil, e não depois — ela é parte da construção do golpe, não um XMULT escondido.
 
 ### Equipamentos
 | Item          | Injeção                                              |

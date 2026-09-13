@@ -108,9 +108,18 @@ MIN_DAMAGE_SKILLS = 2
 def _skill_value(skill) -> float:
     """Valor bruto de uma skill, para comparar candidatas do mesmo tipo.
 
-    Só é comparável dentro de um tipo: em dano é percentual de dano, em buff é
+    Só é comparável dentro de um tipo: em dano é o orçamento ofensivo, em buff é
     ponto de atributo, em cura é percentual de HP. `pick_skill` respeita isso.
+
+    Dano vem de `offensive_budget`, e não de `effect_value`: depois da V2 esse
+    campo é zero em toda carta de dano, e o desempate entre duas cartas de dano
+    virava empate — o bot levava a primeira da oferta e o relatório de scout
+    culparia o conteúdo por uma escolha que o medidor nunca fez.
     """
+    if getattr(skill, "effect_type", "") == "damage":
+        from src.content.skill_validator import offensive_budget
+
+        return float(offensive_budget(skill))
     try:
         return float(skill.effect_value)
     except (TypeError, ValueError):

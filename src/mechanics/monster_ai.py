@@ -65,10 +65,24 @@ def _hp_ratio(entity) -> float:
     return entity.get_hp() / max(1, int(getattr(entity, "base_hp", 1)))
 
 
-def _valor(skill) -> int:
-    """Valor numérico de `effect_value`, ou 0 quando o efeito é um nome."""
+def _valor(skill, caster=None) -> float:
+    """Quanto a jogada vale para QUEM vai lançá-la.
+
+    Para uma skill de dano, o valor é o BASE que ela produz nas mãos deste
+    monstro — a conta do motor, não uma segunda estimativa. Era
+    `effect_value`, e depois da V2 esse campo é zero em toda carta de dano:
+    `_maior` virava `max` de chave constante e devolvia o primeiro da lista.
+    O chefe com o herói a um golpe da morte escolhia `Rajada Arcana` em vez de
+    `Detonação Arcana` — a "execução" existia na forma e não na prática, que é
+    o mesmo defeito que os status já tiveram aqui.
+
+    Cura e buff continuam em `effect_value`: neles o campo é um percentual vivo,
+    e não um número morto.
+    """
+    if skill.effect_type == "damage" and caster is not None:
+        return float(combat_mech.skill_damage_base(caster, skill))
     bruto = str(getattr(skill, "effect_value", 0))
-    return int(bruto) if bruto.lstrip("-").isdigit() else 0
+    return float(bruto) if bruto.lstrip("-").isdigit() else 0.0
 
 
 def _valor_de_status(skill) -> float:
@@ -95,13 +109,17 @@ def _valor_de_status(skill) -> float:
     return control_weight(str(getattr(skill, "effect_value", ""))) * duracao * chance
 
 
-def _maior(skills: list):
-    """A skill de maior valor da lista. `None` para lista vazia."""
+def _maior(skills: list, caster=None):
+    """A skill de maior valor da lista. `None` para lista vazia.
+
+    `caster` é quem vai lançar: sem ele não há como saber quanto uma carta de
+    dano vale, porque depois da V2 o dano nasce dos atributos de quem lança.
+    """
     if not skills:
         return None
     if all(s.effect_type == "status" for s in skills):
         return max(skills, key=_valor_de_status)
-    return max(skills, key=_valor)
+    return max(skills, key=lambda s: _valor(s, caster))
 
 
 def _ja_esta_no_ar(monster, skill, target=None) -> bool:
@@ -163,37 +181,55 @@ def _pick_skill(monster, hero, usable: list, rng: random.Random) -> tuple[object
     #    fechar a conta. É o momento em que o jogador precisa ter guardado a
     #    fuga, a cura ou o atordoamento — e é a razão de o combate ter turnos.
     if alvo < MONSTER_EXECUTE_HP_RATIO and damages:
-        return _maior(damages), True
+        return _maior(damages, monster), True
 
     # 2. Sobrevivência. Um suporte que morre com a cura na mão não cumpriu função.
     if heals and proprio < MONSTER_HEAL_HP_RATIO:
-        return _maior(heals), True
+        return _maior(heals, monster), True
 
     # 3. Desespero. Quem tem defesa se fecha para durar mais um turno; quem não
     #    tem gasta o maior dano que tiver, porque guardar recurso para um turno
     #    que não vai existir é o mesmo que não ter recurso.
     if proprio < MONSTER_DESPERATE_HP_RATIO:
-        escolha = _maior(defensivas) if role in DEFENSIVE_ROLES else None
-        escolha = escolha or _maior(damages) or _maior(defensivas) or _maior(statuses)
+        escolha = _maior(defensivas, monster) if role in DEFENSIVE_ROLES else None
+        escolha = (
+            escolha
+            or _maior(damages, monster)
+            or _maior(defensivas, monster)
+            or _maior(statuses, monster)
+        )
         if escolha is not None:
             return escolha, True
 
     # 4. Abertura. O buff vale pelos turnos que ainda existem à frente.
     if turnos < MONSTER_OPENER_TURNS and role in OPENER_ROLES and defensivas:
-        return _maior(defensivas), True
+        return _maior(defensivas, monster), True
 
     # 5. Rotina do papel. Aqui a moeda ainda vale: é a variação que impede o
     #    encontro de virar um roteiro decorado.
     if role == "controller":
-        return (_maior(statuses) or _maior(damages) or _maior(defensivas)), False
+        return (
+            _maior(statuses, monster) or _maior(damages, monster) or _maior(defensivas, monster)
+        ), False
     if role == "support":
-        return (_maior(heals) or _maior(defensivas) or _maior(statuses) or _maior(damages)), False
+        return (
+            _maior(heals, monster)
+            or _maior(defensivas, monster)
+            or _maior(statuses, monster)
+            or _maior(damages, monster)
+        ), False
     if role == "tank":
-        return (_maior(defensivas) or _maior(damages) or _maior(statuses)), False
+        return (
+            _maior(defensivas, monster) or _maior(damages, monster) or _maior(statuses, monster)
+        ), False
     if role in ("glass_cannon", "boss", "elite", "bruiser", "skirmisher"):
-        return (_maior(damages) or _maior(statuses) or _maior(defensivas)), False
+        return (
+            _maior(damages, monster) or _maior(statuses, monster) or _maior(defensivas, monster)
+        ), False
 
-    return (_maior(damages) or _maior(statuses) or _maior(defensivas)), False
+    return (
+        _maior(damages, monster) or _maior(statuses, monster) or _maior(defensivas, monster)
+    ), False
 
 
 def decide_monster_action(monster, hero, *, rng: random.Random | None = None, publish=None) -> None:

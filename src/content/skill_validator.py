@@ -21,12 +21,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from src.content.skills_loader import MONSTER_SKILL_CLASS
 from src.shared import effect_core as core
 from src.shared.constants import (
     MAX_ACTIVE_SKILLS,
     MAX_OFFENSIVE_BUDGET,
     MAX_OFFENSIVE_BUDGET_NEUTRAL,
     MAX_SCALING_STATS,
+    MONSTER_REFERENCE_LEVEL,
     RARITY_MULTIPLIERS,
     SKILL_ACCURACY_RANGE,
     SKILL_REFERENCE_NEUTRAL,
@@ -35,7 +37,7 @@ from src.shared.constants import (
 )
 
 NEUTRAL = "Neutral"
-CLASSES_VALIDAS = frozenset(SKILL_REFERENCE_STATS) | {NEUTRAL}
+CLASSES_VALIDAS = frozenset(SKILL_REFERENCE_STATS) | {NEUTRAL, MONSTER_SKILL_CLASS}
 TIPOS_VALIDOS = frozenset({"damage", "buff", "heal", "status", "damage_reduction"})
 ALVOS_VALIDOS = frozenset({"self", "enemy"})
 
@@ -81,6 +83,30 @@ class Veredito:
         return f"FAIL  {self.skill_id}\n" + "\n".join(f"      - {e}" for e in self.erros)
 
 
+def monster_reference(role: str) -> dict:
+    """O vetor de referência de um arquétipo, tirado do próprio monstro.
+
+    Medir uma carta de Tanque contra o Guerreiro seria mentir duas vezes: o
+    Tanque tem Defesa 101 onde o Guerreiro tem 144, e Agilidade 17 onde o
+    Ladino tem 92. A carta pareceria fraca ou absurda por um detalhe da
+    planilha, e não pelo que ela faz.
+
+    O número é DERIVADO — nasce de `spawn_by_role` no nível de referência — em
+    vez de copiado para uma tabela. Uma cópia congelada seria uma segunda fonte
+    de verdade sobre os atributos do monstro, e ela envelheceria em silêncio no
+    primeiro ajuste de orçamento de arquétipo.
+
+    O import é local porque `archetypes` importa este módulo pela via do
+    carregador de skills; resolver no uso evita o ciclo sem esconder nada.
+    """
+    from src.content.factories.archetypes import spawn_by_role
+
+    m = spawn_by_role(role, MONSTER_REFERENCE_LEVEL)
+    ref = {stat: int(m.get_stat(stat)) for stat in SKILL_SCALING_STATS}
+    ref["avg"] = int(m.get_avg_damage())
+    return ref
+
+
 def _referencia(skill_class: str) -> dict:
     return (
         SKILL_REFERENCE_NEUTRAL
@@ -89,7 +115,7 @@ def _referencia(skill_class: str) -> dict:
     )
 
 
-def offensive_budget(skill, com_bonus: bool = True) -> int:
+def offensive_budget(skill, com_bonus: bool = True, reference: dict | None = None) -> int:
     """Dano da carta em % do ataque básico da referência da classe dela.
 
     Zero para skill que não causa dano — o custo dela é medido pelos efeitos.
@@ -105,11 +131,15 @@ def offensive_budget(skill, com_bonus: bool = True) -> int:
     condição situacional não ajuda. As duas pontas juntas são o que separa uma
     carta dominada (pior nas duas) de uma aposta diferente (pior no piso, melhor
     no teto).
+
+    `reference` troca a régua sem trocar a LEI. É por aqui que uma carta de
+    monstro é medida contra o arquétipo dela em vez de contra uma classe de
+    herói — mesma conta, personagem de referência diferente.
     """
     escala = getattr(skill, "scaling", ())
     if skill.effect_type != "damage" or not escala:
         return 0
-    ref = _referencia(skill.skill_class)
+    ref = reference or _referencia(skill.skill_class)
     base = sum(ref.get(t.stat, 0) * t.weight for t in escala) * float(skill.power)
     if com_bonus and getattr(skill, "bonus_percent", 0):
         # A condição não é garantida, mas o teto tem de contar o melhor caso:
@@ -149,15 +179,31 @@ def _efeitos_da_carta(skill):
         yield sec.effect, int(sec.chance), int(sec.duration)
 
 
-def budget_credit(skill) -> int:
+def _custo_percentual(skill, ref: dict) -> float:
+    """Quanto a carta cobra em % da mana máxima de quem a lança.
+
+    A carta do herói declara isso; a do monstro traz só o custo absoluto. Como
+    o crédito de orçamento é sobre o que se PAGA, e o que se paga é a fração da
+    barra, o absoluto é convertido contra a mana da referência. Sem isso toda
+    carta de monstro entraria com crédito de mana zero e pareceria mais cara do
+    que é — o validador puniria o monstro por um detalhe de formato.
+    """
+    declarado = float(getattr(skill, "mana_cost_percent", 0) or 0)
+    if declarado:
+        return declarado
+    return float(getattr(skill, "mana_cost", 0) or 0) / max(1, ref.get("mp", 1)) * 100
+
+
+def budget_credit(skill, reference: dict | None = None) -> int:
     """Créditos por custo assumido, com TETO.
 
     Cooldown enorme e requisito de equipamento devolvem orçamento, mas nunca o
     suficiente para justificar uma carta absurda: `CREDITO_MAX` é o que impede
     "cooldown 99" de virar licença para tudo.
     """
+    ref = reference or _referencia(skill.skill_class)
     credito = max(0, int(skill.cooldown) - 1) * CREDITO_POR_TURNO_DE_RECARGA
-    credito += int(float(getattr(skill, "mana_cost_percent", 0)) * CREDITO_POR_PONTO_DE_MANA)
+    credito += int(_custo_percentual(skill, ref) * CREDITO_POR_PONTO_DE_MANA)
     if getattr(skill, "requires", None) is not None:
         credito += CREDITO_POR_REQUISITO
     if getattr(skill, "accuracy_modifier", 0) < 0:
@@ -165,8 +211,19 @@ def budget_credit(skill) -> int:
     return min(CREDITO_MAX, credito)
 
 
-def validate(skill) -> Veredito:
-    """Valida uma carta contra todas as leis. Devolve o veredito com motivos."""
+def validate(skill, reference: dict | None = None) -> Veredito:
+    """Valida uma carta contra todas as leis. Devolve o veredito com motivos.
+
+    UMA entrada de validação para o jogo inteiro. Herói e monstro obedecem às
+    MESMAS leis estruturais — escala válida, no máximo dois atributos somando
+    1.0, MP e recarga obrigatórios, acerto dentro da faixa, efeito do catálogo
+    global, orçamento não absurdo.
+
+    `reference` é a única coisa que muda entre eles, e muda porque tem de mudar:
+    obrigar uma carta de Tanque a ser medida contra o Guerreiro não é tratá-los
+    igual, é fingir que têm os mesmos atributos. A lei é a mesma; a régua é a do
+    personagem que vai usar a carta.
+    """
     v = Veredito(skill_id=str(getattr(skill, "id", "?")))
     erro = v.erros.append
 
@@ -243,21 +300,44 @@ def validate(skill) -> Veredito:
             erro("requisito contraditório: duas armas E uma peça de duas mãos")
 
     # Orçamento
-    v.orcamento = offensive_budget(skill) + effect_budget(skill) - budget_credit(skill)
+    ref = reference or _referencia(skill.skill_class)
+    v.orcamento = (
+        offensive_budget(skill, reference=ref)
+        + effect_budget(skill)
+        - budget_credit(skill, reference=ref)
+    )
     v.teto = MAX_OFFENSIVE_BUDGET_NEUTRAL if skill.skill_class == NEUTRAL else MAX_OFFENSIVE_BUDGET
     if v.orcamento > v.teto:
         erro(f"offensive budget {v.orcamento} > permitted {v.teto}")
     return v
 
 
-def validate_all(skills) -> list[Veredito]:
+def validate_all(skills, reference: dict | None = None) -> list[Veredito]:
     """Valida um catálogo inteiro. Devolve só os vereditos, sem levantar."""
-    return [validate(s) for s in skills]
+    return [validate(s, reference=reference) for s in skills]
 
 
-def assert_catalogo_valido(skills) -> None:
+def validate_monster_catalog() -> list[Veredito]:
+    """Valida as cartas de TODOS os arquétipos, cada uma contra o papel dela.
+
+    A carta de monstro não diz a que arquétipo pertence — quem sabe disso é o
+    arquétipo, que a carrega. Por isso a varredura começa neles, e não na lista
+    de cartas.
+    """
+    from src.content.factories.archetypes import all_archetypes
+
+    vereditos = []
+    for role, arquetipo in sorted(all_archetypes().items()):
+        if not arquetipo.skills:
+            continue
+        ref = monster_reference(role)
+        vereditos += [validate(s, reference=ref) for s in arquetipo.skills]
+    return vereditos
+
+
+def assert_catalogo_valido(skills, reference: dict | None = None) -> None:
     """Levanta com o relatório completo se alguma carta for inválida."""
-    reprovadas = [v for v in validate_all(skills) if not v.ok]
+    reprovadas = [v for v in validate_all(skills, reference=reference) if not v.ok]
     if reprovadas:
         raise ValueError(
             f"{len(reprovadas)} skill(s) reprovadas pelo validador:\n"
@@ -271,7 +351,9 @@ __all__ = [
     "assert_catalogo_valido",
     "budget_credit",
     "effect_budget",
+    "monster_reference",
     "offensive_budget",
     "validate",
     "validate_all",
+    "validate_monster_catalog",
 ]

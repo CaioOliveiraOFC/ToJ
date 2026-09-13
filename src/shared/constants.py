@@ -256,6 +256,16 @@ SKILL_REFERENCE_NEUTRAL = {
 MAX_OFFENSIVE_BUDGET = 400
 MAX_OFFENSIVE_BUDGET_NEUTRAL = 250
 
+# Nível em que o monstro de referência é medido pelo validador. O mesmo 12 do
+# herói, e pelo mesmo motivo: o meio da curva, onde os atributos já se
+# diferenciaram e nenhum arredondamento de nível 1 distorce a proporção.
+#
+# Não existe uma tabela de referência de monstro ao lado de
+# `SKILL_REFERENCE_STATS`: os atributos dele são DERIVADOS de `spawn_by_role`
+# neste nível. Congelar uma cópia aqui criaria uma segunda verdade sobre o
+# orçamento de arquétipo, e ela envelheceria em silêncio.
+MONSTER_REFERENCE_LEVEL = 12
+
 CLASS_WEIGHTS = {
     "Warrior": {"st": 1.6, "mg": 0.4, "ag": 0.0},
     "Mage": {"st": 0.3, "mg": 1.9, "ag": 0.0},

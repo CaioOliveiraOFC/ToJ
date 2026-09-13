@@ -18,6 +18,12 @@ from src.shared.registries import set_initial_skill_provider
 # Classe das cartas que qualquer um pode receber.
 NEUTRAL = "Neutral"
 
+# Classe das cartas de monstro. Não é um pool de oferta — nenhum herói recebe
+# uma carta destas —, é a etiqueta que diz contra qual referência o validador
+# mede o orçamento delas. A GRAMÁTICA é a mesma; só a régua muda, porque um
+# tanque e um ladino não têm os mesmos atributos.
+MONSTER_SKILL_CLASS = "Monster"
+
 
 @dataclass(frozen=True)
 class ScalingTerm:
