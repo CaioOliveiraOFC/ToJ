@@ -173,7 +173,7 @@ def _calculate_damage(
     return max(1, dano)
 
 
-def hit_chance(attacker, defender) -> int:
+def hit_chance(attacker, defender, accuracy_modifier: int = 0) -> int:
     """Chance de acerto, a partir da diferença *relativa* de agilidade.
 
     A fórmula antiga era `85 + AG_atacante - AG_defensor`, sem piso. Como a
@@ -192,11 +192,13 @@ def hit_chance(attacker, defender) -> int:
 
     chance = BASE_HIT_CHANCE + swing
     chance -= fx.combat_modifier(defender, "evasion")
-    # Medo é do ATACANTE e mexe na confiabilidade do golpe, não na Agilidade
-    # dele nem no tamanho do dano. Entra no cálculo de acerto que já existe —
-    # uma segunda rolagem paralela é como `Esmagar` acabou atordoando por dois
-    # caminhos independentes.
-    chance -= core.accuracy_penalty(attacker)
+    # Saldo de acerto do ATACANTE: precisão soma, medo subtrai, os dois na mesma
+    # conta. Nenhum mexe na Agilidade dele nem no tamanho do dano — uma segunda
+    # rolagem paralela é como `Esmagar` acabou atordoando por dois caminhos.
+    chance += core.accuracy_shift(attacker)
+    # E o modificador da AÇÃO: um golpe pesado erra mais, uma estocada precisa
+    # erra menos. Mesma conta, mesmo clamp, nenhuma rolagem nova.
+    chance += int(accuracy_modifier)
     chance -= core.concealment_penalty(defender)
 
     return int(max(HIT_CHANCE_FLOOR, min(HIT_CHANCE_CEIL, chance)))
@@ -273,23 +275,43 @@ def _fracao_de_vida(entidade) -> float:
 
 
 def skill_damage_base(caster, skill, target=None) -> int:
-    """BASE_POWER total de uma skill de dano, antes de defesa e crítico.
+    """BASE da ação: o único número que a skill produz.
 
-    `effect_value` é um **percentual sobre o poder base**, não uma soma fixa.
-    Como soma fixa, a skill anti-escalava: o poder base cresce a cada nível e o
-    valor da skill não, então no nível 20 o Apocalipse entregava apenas +30%
-    sobre um ataque básico que é gratuito e sem recarga. Como percentual, a
-    skill mantém o mesmo peso relativo do nível 1 ao 20.
+        BASE = Σ(atributo_resolvido × peso) × (1 + arma%) × power × (1 + bônus%)
+
+    Daqui em diante quem resolve é o motor — crítico, encantamento, defesa e
+    mitigação passam pelo funil de sempre. A carta constrói o BASE e para.
+
+    Os atributos entram JÁ RESOLVIDOS, pela mão da própria entidade
+    (`weighted_power`), então nível, equipamento, gemas, `+N` e efeitos ativos
+    chegam sozinhos: não existe cópia paralela de atributo, e o combate continua
+    sem saber o que é um item. A arma entra pelo mesmo percentual do ataque
+    básico — ela é parte do poder do personagem, e uma skill que a ignorasse
+    tornaria a arma irrelevante para metade do jogo.
+
+    `power` é o peso da AÇÃO — golpe leve, médio, pesado. Ele atua AQUI, na
+    construção do BASE, e nunca vira um multiplicador escondido depois do funil.
 
     Vive aqui, e não na política do simulador, porque o bot precisa estimar o
-    dano com a mesma fórmula que o motor aplica. Duas cópias da fórmula divergem
-    na primeira mudança de balanceamento.
+    dano com a mesma fórmula que o motor aplica. Duas cópias divergem na
+    primeira mudança de balanceamento.
     """
-    base_power = caster.get_avg_damage()
-    bonus_percent = int(skill.effect_value)
+    escala = getattr(skill, "scaling", ())
+    if not escala or not getattr(skill, "power", 0):
+        # Carta sem gramática V2 — não deveria existir depois da migração, e o
+        # validador reprova. O fallback existe para o motor não explodir com um
+        # save ou um mod antigo: usa o poder de ataque como estava.
+        return max(1, int(caster.get_avg_damage()))
+
+    # `weighted_power` é da ENTIDADE: ela resolve os atributos e aplica o que
+    # empunha. O combate manda os pesos da carta e recebe um número. Foi assim
+    # que a arma entrou na conta sem o combate abrir o equipamento de ninguém.
+    total = caster.weighted_power(tuple((t.stat, t.weight) for t in escala))
+    total *= float(skill.power)
+
     if bonus_condition_met(caster, skill, target):
-        bonus_percent += int(getattr(skill, "bonus_percent", 0) or 0)
-    return max(1, int(base_power * (1 + bonus_percent / 100)))
+        total *= 1 + int(getattr(skill, "bonus_percent", 0) or 0) / 100
+    return max(1, int(total))
 
 
 def resolve_physical_attack(
@@ -300,14 +322,23 @@ def resolve_physical_attack(
     *,
     rng: random.Random | None = None,
     publish: PublishFn = None,
+    accuracy_modifier: int = 0,
 ) -> CombatResult:
     """
     Resolve um golpe físico: acerto, crítico, pipeline de dano e aplica `take_damage`.
     `base_damage` é o BASE_POWER (vindo de get_avg_damage() com pesos de classe).
+
+    `accuracy_modifier` é o que ESTA ação faz com a mira: um golpe amplo erra
+    mais, uma estocada erra menos. Entra na mesma conta de `hit_chance`, ao lado
+    de precisão, medo e evasão — não existe uma segunda rolagem de acerto. O
+    ataque básico não declara nada e passa 0, que é a definição de "mira
+    neutra": ele é a régua contra a qual as skills se comparam.
     """
     r = _rng(rng)
 
-    if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > hit_chance(attacker, defender):
+    if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > hit_chance(
+        attacker, defender, accuracy_modifier
+    ):
         miss = CombatResult(
             attacker_id=attacker.get_nick_name(),
             defender_id=defender.get_nick_name(),
@@ -501,6 +532,32 @@ ONHIT_PROCS = {
 }
 
 
+def _aplicar_secundario(target, skill, r: random.Random, publish: PublishFn) -> bool:
+    """Aplica o efeito SECUNDÁRIO da skill, quando existe.
+
+    No máximo um, e sempre pelo núcleo: a carta escolhe chance, duração e
+    intensidade; o catálogo global diz o que o efeito é. Era um campo
+    `stun_chance` — atordoamento tinha caminho próprio e nenhum outro efeito
+    podia ser secundário, então `Corte Tóxico` precisaria de código novo.
+    """
+    sec = getattr(skill, "secondary", None)
+    if sec is None:
+        return False
+    definicao = core.definition(sec.effect)
+    if definicao is None:
+        return False
+    return try_apply_status(
+        target,
+        sec.effect,
+        sec.chance,
+        sec.duration or definicao.default_duration,
+        r,
+        publish,
+        applied_kind=f"{sec.effect}_applied",
+        source_id=_fonte_da_skill(skill),
+    )
+
+
 def _aplicar_procs_on_hit(attacker, defender, r: random.Random, publish: PublishFn) -> None:
     """Rola os efeitos que o atacante aplica ao acertar.
 
@@ -607,6 +664,23 @@ def apply_skill(
     """Aplica efeitos de habilidade no estado (sem prints)."""
     r = _rng(rng)
 
+    # Requisito de equipamento. Bloqueia o USO, nunca a posse: a carta continua
+    # no deck, visível, e volta a funcionar assim que a mão certa estiver
+    # ocupada. Recusar aqui, e não na aquisição, é o que deixa o jogador pegar a
+    # carta de escudo e ir atrás do escudo — pivotar a build em vez de só reagir
+    # ao que caiu. Sem MP gasto e sem recarga: uma tentativa impossível não pode
+    # custar o turno.
+    verificador = getattr(caster, "can_use_skill", None)
+    if callable(verificador) and not verificador(skill):
+        out = SkillApplyResult(kind="damage", mp_spent=0, strike=None)
+        _emit(
+            publish,
+            T.COMBAT_SKILL_CAST,
+            type_="skill_cast",
+            payload={"caster": caster, "skill": skill, "requirement_unmet": True},
+        )
+        return out
+
     # Cooldown: verifica se skill está em recarga
     skill_id = getattr(skill, "id", None)
     skill_cooldown = int(getattr(skill, "cooldown", 0) or 0)
@@ -645,18 +719,18 @@ def apply_skill(
     if skill.effect_type == "damage":
         total_base = skill_damage_base(caster, skill, target)
         strike = resolve_physical_attack(
-            caster, target, total_base, str(skill.name), rng=r, publish=None
+            caster,
+            target,
+            total_base,
+            str(skill.name),
+            rng=r,
+            publish=None,
+            accuracy_modifier=int(getattr(skill, "accuracy_modifier", 0) or 0),
         )
         # Stun que a skill carrega. Só rola se o golpe conectou: um ataque
         # esquivado não atordoa.
         if strike and not strike.was_evaded:
-            _try_apply_stun(
-                target,
-                int(getattr(skill, "stun_chance", 0) or 0),
-                r,
-                publish,
-                _fonte_da_skill(skill),
-            )
+            _aplicar_secundario(target, skill, r, publish)
         out = SkillApplyResult(kind="damage", mp_spent=custo, strike=strike)
         _emit(
             publish,
@@ -692,17 +766,9 @@ def apply_skill(
             publish,
             source_id=_fonte_da_skill(skill),
         ):
-            # O atordoamento da skill também vale aqui. Este ramo não o rolava:
-            # o bloco existia só na versão de dano, então `Golpe Baixo` aplicava
-            # `weakened` em 100% das vezes e nunca os seus 15% de atordoamento.
-            # Só rola quando o status pegou — uma skill que falhou não atordoa.
-            _try_apply_stun(
-                target,
-                int(getattr(skill, "stun_chance", 0) or 0),
-                r,
-                publish,
-                _fonte_da_skill(skill),
-            )
+            # O secundário também vale aqui, e só quando o principal pegou:
+            # uma skill que falhou não aplica o brinde.
+            _aplicar_secundario(target, skill, r, publish)
             out = SkillApplyResult(
                 kind="status",
                 mp_spent=custo,

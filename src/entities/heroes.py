@@ -7,7 +7,6 @@ from src.shared import effect_core as core
 from src.shared.constants import (
     CLASS_WEIGHTS,
     DAMAGE_FORMULA_DIVISOR,
-    INITIAL_SKILL_LEVELS,
     LEVEL_UP_RESTORE_PERCENT,
     MAGE_BASE_AG,
     MAGE_BASE_DF,
@@ -16,6 +15,7 @@ from src.shared.constants import (
     MAGE_BASE_MP,
     MAGE_BASE_ST,
     MAGIC_SHIELD_ABSORB_PERCENT,
+    MAX_ACTIVE_SKILLS,
     POTION_BUFF_DURATION,
     ROGUE_BASE_AG,
     ROGUE_BASE_DF,
@@ -23,6 +23,7 @@ from src.shared.constants import (
     ROGUE_BASE_MG,
     ROGUE_BASE_MP,
     ROGUE_BASE_ST,
+    SKILL_OFFER_LEVEL_INTERVAL,
     WARRIOR_BASE_AG,
     WARRIOR_BASE_DF,
     WARRIOR_BASE_HP,
@@ -144,6 +145,11 @@ class Player(Entity):
         self.equipment = {posicao: None for posicao in self.EQUIPMENT_POSITIONS}
         self.skills: dict[int, SkillCard] = {}
         self.initial_skills_learned: int = 0
+        # Cartas que esta RUN já mostrou — aprendidas, recusadas ou esquecidas.
+        # Serve para a oferta preferir o inédito: ver a mesma carta três vezes
+        # antes de conhecer metade do catálogo é o que faz a escolha parecer
+        # sorteio. Vive no herói porque é estado de run, e é salvo com ele.
+        self.seen_skill_ids: set[str] = set()
         self.active_effects: dict[str, object] = {}
         self.active_buffs: dict[str, dict[str, object]] = {}
         self.passives: list[PassiveCard] = []
@@ -839,20 +845,28 @@ class Player(Entity):
         """Nome da classe. Cada subclasse concreta redefine."""
         return "Player"
 
+    def weighted_power(self, weights) -> float:
+        """Como o da entidade, amplificado pelo que o herói empunha.
+
+        A arma entra AQUI, num só lugar, e vale igual para o ataque básico e
+        para qualquer skill: as duas são ações do mesmo personagem com a mesma
+        arma na mão. Também é o que mantém `mechanics/combat.py` sem uma leitura
+        de equipamento — ele pede o poder, não o inventário.
+        """
+        return super().weighted_power(weights) * (1 + self.weapon_percent() / 100)
+
     def get_avg_damage(self) -> int:
         """BASE_POWER = (W_classe · [ST, MG, AG]) + poder da arma.
 
         Os pesos ficam em CLASS_WEIGHTS e são a identidade ofensiva da classe.
         A arma soma sobre esse total; o valor é lido do equipamento e não do
         campo `avg_damage`, para não contar o bônus duas vezes.
+
+        O ataque básico é a skill de pesos fixos: mesma conta, mesmos pesos da
+        classe. Por isso passa por `weighted_power` como todo o resto.
         """
         weights = CLASS_WEIGHTS[self.get_classname()]
-        base_power = (
-            self.get_st() * weights["st"]
-            + self.get_mg() * weights["mg"]
-            + self.get_ag() * weights["ag"]
-        )
-        return max(1, int(base_power * (1 + self.weapon_percent() / 100)))
+        return max(1, int(self.weighted_power(tuple((k, weights[k]) for k in ("st", "mg", "ag")))))
 
     def add_xp_points(self, amount: int) -> None:
         """Adiciona pontos de experiência.
@@ -887,28 +901,72 @@ class Player(Entity):
                 messages.append(f"Você precisa de {self.need_to_next()} XP para o próximo nível.")
         return messages
 
+    MAX_ACTIVE_SKILLS = MAX_ACTIVE_SKILLS
+
     def learn_new_skills(self, show: bool = True) -> list[str]:
-        """Aprende as skills iniciais da classe, uma por nível.
+        """Garante a skill inicial da classe. Uma só, no nível 1.
 
-        Args:
-            show: Se True, inclui mensagens de novas habilidades.
-
-        Returns:
-            Lista de mensagens sobre habilidades aprendidas.
+        Era uma por nível até o quarto: o jogador chegava ao nível 4 com o deck
+        cheio sem ter escolhido nada. Agora o nível 1 entrega a ASSINATURA da
+        classe — fixa, declarada no JSON — e todo o resto do deck vem de escolha.
         """
         messages: list[str] = []
-        if 1 <= self.level <= INITIAL_SKILL_LEVELS and self.initial_skills_learned < self.level:
-            initial_skills = get_initial_skills_for(self.get_classname())
-            while self.initial_skills_learned < self.level and self.initial_skills_learned < len(
-                initial_skills
-            ):
-                skill = initial_skills[self.initial_skills_learned]
-                new_key = self.initial_skills_learned + 1
-                self.skills[new_key] = skill
-                self.initial_skills_learned += 1
-                if show:
-                    messages.append(f"Nova habilidade aprendida: {skill.name}!")
+        iniciais = get_initial_skills_for(self.get_classname())
+        if not iniciais or self.initial_skills_learned:
+            return messages
+        skill = iniciais[0]
+        self.skills[1] = skill
+        self.initial_skills_learned = 1
+        self.seen_skill_ids.add(skill.id)
+        if show:
+            messages.append(f"Nova habilidade aprendida: {skill.name}!")
         return messages
+
+    def active_skill_ids(self) -> list[str]:
+        """Os ids das skills ativas, na ordem dos slots."""
+        return [s.id for _, s in sorted(self.skills.items())]
+
+    def has_free_skill_slot(self) -> bool:
+        return len(self.skills) < self.MAX_ACTIVE_SKILLS
+
+    def is_skill_offer_level(self) -> bool:
+        """Se este nível oferece uma escolha de skill. O 1 não oferece: é fixo."""
+        return self.level > 1 and self.level % SKILL_OFFER_LEVEL_INTERVAL == 0
+
+    def learn_skill(self, skill) -> str:
+        """Aprende no primeiro slot livre. Sem slot, não faz nada.
+
+        Trocar exige `add_skill_with_replacement`, porque a decisão de qual
+        carta sai é do jogador — o motor não escolhe por ele.
+        """
+        self.seen_skill_ids.add(skill.id)
+        if not self.has_free_skill_slot():
+            return f"Deck cheio: escolha qual carta {skill.name} substitui."
+        chave = next(k for k in range(1, self.MAX_ACTIVE_SKILLS + 1) if k not in self.skills)
+        self.skills[chave] = skill
+        return f"Nova habilidade aprendida: {skill.name}!"
+
+    def can_use_skill(self, skill) -> bool:
+        """Se o equipamento atual satisfaz o requisito da carta.
+
+        Requisito bloqueia o USO, nunca a aquisição: o jogador pode aprender uma
+        carta de escudo e sair atrás de um escudo. É o que permite pivotar uma
+        build em vez de só reagir ao que caiu.
+        """
+        req = getattr(skill, "requires", None)
+        if req is None:
+            return True
+        maos = [self.equipment.get(p) for p in self.HAND_POSITIONS]
+        empunhadas = [p for p in maos if p is not None]
+        if req.two_weapons and len(empunhadas) < 2:
+            return False
+        if req.hands and not any(self.hands_required(p) == req.hands for p in empunhadas):
+            return False
+        if req.hand_type and not any(
+            getattr(p, "hand_type", None) == req.hand_type for p in empunhadas
+        ):
+            return False
+        return True
 
     def add_skill_with_replacement(self, new_skill: "SkillCard", replace_key: int) -> str:
         """Adiciona nova skill substituindo uma existente na chave especificada.

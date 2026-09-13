@@ -50,8 +50,11 @@ STACK_REFRESH = "refresh"
 # alvo certo simplesmente não joga não tem counterplay, tem espectador.
 MIN_ATTRIBUTE_RATIO = 0.10
 
-# Quantos pontos percentuais de acerto o medo tira de uma ação OFENSIVA.
+# Quantos pontos percentuais de acerto o medo tira de uma ação OFENSIVA, e
+# quantos a precisão devolve. Os dois vivem na MESMA família e na mesma soma:
+# `Precision +20` com `Fear -10` resolve `+10`, e não "o último a chegar vence".
 FEAR_ACCURACY_PENALTY = 20
+PRECISION_ACCURACY_BONUS = 20
 
 # Quanto acerto se perde ao atacar um alvo escondido. Espelho do medo, do outro
 # lado da troca: um atrapalha quem ataca, o outro protege quem é atacado.
@@ -185,6 +188,18 @@ _registrar(
         default_duration=3,
         breaks_on_damage=True,
     ),
+    # precisão: o lado positivo do medo, e o par dele. Não é `never_miss` — o
+    # teto global de acerto continua valendo, por maior que seja o acúmulo.
+    EffectDefinition(
+        effect_id="precision",
+        family=FAMILY_ACCURACY,
+        label="Preciso",
+        positive=True,
+        stack_rule=STACK_BY_SOURCE,
+        default_duration=3,
+        default_intensity=float(PRECISION_ACCURACY_BONUS),
+        resistible=False,
+    ),
     # medo: não mexe em Agilidade, mexe na confiabilidade da ação ofensiva
     EffectDefinition(
         effect_id="fear",
@@ -225,6 +240,7 @@ _registrar(
 # "o último ganha". Compensação é o que dá counterplay aos dois lados.
 OPPOSING_PAIRS: dict[str, str] = {}
 for _a, _b in (
+    ("precision", "fear"),
     ("empowered", "weakened"),
     ("arcane_surge", "hexed"),
     ("quickened", "slowed"),
@@ -482,14 +498,21 @@ def concealment_penalty(entity) -> int:
     return int(sum(i.total_intensity for i in instances(entity, FAMILY_CONCEALMENT)))
 
 
-def accuracy_penalty(entity) -> int:
-    """Pontos de acerto perdidos por medo e afins, numa ação OFENSIVA.
+def accuracy_shift(entity) -> int:
+    """Saldo de acerto que a entidade leva para uma ação OFENSIVA, com sinal.
 
-    Medo não reduz Agilidade — reduz a confiabilidade do golpe. Entra no cálculo
-    de acerto que já existe, e não numa segunda rolagem paralela: duas rolagens
-    para a mesma pergunta é como `Esmagar` acabou atordoando por dois caminhos.
+    Positivo de `precision`, negativo de `fear`, somados no MESMO lugar. Nenhum
+    dos dois mexe em Agilidade e nenhum cria rolagem nova: os dois entram na
+    conta de acerto que já existe. Duas rolagens para a mesma pergunta é como
+    `Esmagar` acabou atordoando por dois caminhos independentes.
     """
-    return int(sum(i.total_intensity for i in instances(entity, FAMILY_ACCURACY)))
+    total = 0.0
+    for instancia in instances(entity, FAMILY_ACCURACY):
+        definicao = instancia.definition
+        if definicao is None:
+            continue
+        total += instancia.total_intensity if definicao.positive else -instancia.total_intensity
+    return int(total)
 
 
 def dot_damage(entity, effect_id: str, max_hp: int) -> int:

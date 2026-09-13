@@ -155,11 +155,28 @@ CENARIOS = {
 }
 
 # Gravados contra o motor pré-centralização.
+#
+# Os dois cenários de SKILL foram regravados na V2, e os seis restantes NÃO
+# mudaram — o que é a leitura importante deste bloco: o funil de dano ficou onde
+# estava, e só o BASE de uma skill passou a ser construído de outro jeito.
+#
+#   skill_de_dano       300 -> 302  (+0,7%)  resíduo da calibração de `power`
+#   skill_com_condicao  476 -> 596  (+25%)   mudança de FORMA da fórmula
+#
+# O +25% não é ruído. Na V1 o bônus situacional entrava no MESMO percentual do
+# dano da carta (`1 + (effect_value + bonus)/100`), então um bônus de +65 sobre
+# uma carta de 106 valia +31% relativos. A V2 o multiplica por fora
+# (`... × power × (1 + bonus/100)`), como manda a fórmula desta rodada, e ele
+# passa a valer os +65 cheios. Medido no catálogo inteiro: sem a condição, o
+# desvio entre V1 e V2 fica em -5,3%..+1,7%; com a condição satisfeita, vai de
+# +2,2% a +42,1%, e cresce com `bonus_percent` — as capstones são as mais
+# afetadas. É movimento de balanceamento REAL, registrado aqui e reportado, não
+# corrigido nesta rodada: mexer nos `bonus_percent` do JSON seria rebalancear.
 GOLDEN = {
     "basico_sem_crit": 160,
     "basico_com_crit": 240,
-    "skill_de_dano": 300,
-    "skill_com_condicao": 476,
+    "skill_de_dano": 302,
+    "skill_com_condicao": 596,
     "atacante_com_fear": 160,
     "defensor_com_reducao": 112,
     "dois_redutores": 112,

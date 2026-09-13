@@ -46,6 +46,8 @@ from src.shared.constants import (
     MAP_WIDTH_INCREMENT_PER_5_LEVELS,
     MAX_WALL_PERCENT_CAP,
     MIN_WALL_PERCENT,
+    SKILL_OFFER_LEVEL_INTERVAL,
+    SKILL_OFFER_SIZE,
     WALL_PERCENT_PER_LEVEL,
 )
 from src.shared.economy import interest_cap
@@ -194,6 +196,12 @@ def _pick_skill_action(player, monsters, primary) -> "battle.Action | None":
             continue
 
         skill = player.skills[int(skill_choice)]
+        # A carta continua listada e continua sendo dele: o que falta é a mão
+        # certa. Esconder a carta faria o jogador esquecer que tem um objetivo.
+        if not player.can_use_skill(skill):
+            screens.render_skill_requirement_message(skill.name, skill.requires.describe())
+            sleep(0.5)
+            continue
         remaining = player.skill_cooldowns.get(getattr(skill, "id", ""), 0)
         if remaining > 0:
             screens.render_skill_on_cooldown_message(skill.name, remaining)
@@ -321,12 +329,21 @@ def run_fight(
                 choices = generate_passive_choices(count=3)
                 publish(topics.UI_OPEN_PASSIVES, {"player": player, "choices": choices})
 
-                # Escolha de skill (apenas níveis ímpares >= 5)
-                if lvl >= 5 and lvl % 2 == 1:
-                    player_skill_ids = [s.id for s in player.skills.values()]
+                # Escolha de skill. A cadência é do herói (`is_skill_offer_level`),
+                # e não um `lvl % 2` escrito aqui: o simulador chamava a mesma
+                # regra por conta própria e as duas podiam divergir sem ninguém
+                # notar. O nível 1 não oferece — ele entrega a carta da classe.
+                if lvl > 1 and lvl % SKILL_OFFER_LEVEL_INTERVAL == 0:
                     skill_choices = generate_skill_choices(
-                        player.get_classname(), lvl, player_skill_ids, count=3
+                        player.get_classname(),
+                        lvl,
+                        player.active_skill_ids(),
+                        count=SKILL_OFFER_SIZE,
+                        seen_ids=player.seen_skill_ids,
                     )
+                    # Ver a carta já conta como conhecê-la, mesmo que ele recuse:
+                    # sem isto a oferta seguinte devolveria as mesmas três.
+                    player.seen_skill_ids.update(c.id for c in skill_choices)
                     publish(topics.UI_OPEN_SKILLS, {"player": player, "choices": skill_choices})
     finally:
         cleanup_combat()

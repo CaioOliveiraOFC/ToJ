@@ -112,8 +112,15 @@ def _on_open_skills(ev: GameEvent) -> None:
     choices = ev.payload.get("choices")
     if player and choices:
         chosen_skill = run_skill_selection_flow(player, choices)
-        if chosen_skill:
-            run_skill_selection_with_replacement(player, chosen_skill)
+        if not chosen_skill:
+            return
+        # Com vaga no deck, aprender é aprender: a tela de substituição pedia ao
+        # jogador que sacrificasse uma carta mesmo com dois slots vazios, e a
+        # única saída era o 0 — que descartava a carta escolhida.
+        if player.has_free_skill_slot():
+            screens.render_skill_acquired(player.learn_skill(chosen_skill))
+            return
+        run_skill_selection_with_replacement(player, chosen_skill)
 
 
 def register_ui_handlers(sink: EventSink) -> Callable[[], None]:

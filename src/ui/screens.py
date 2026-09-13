@@ -129,6 +129,16 @@ def render_skill_select_panel(player: "Player") -> None:
                 f"{player.skill_mana_cost(skill)} MP",
                 f"[red]{cooldown_remaining} turnos[/red]",
             )
+        elif not player.can_use_skill(skill):
+            # A carta continua listada: o requisito é um objetivo de build, e
+            # esconder a carta faria o jogador esquecer que ele existe. Dizer o
+            # que falta aqui evita que ele descubra escolhendo e sendo recusado.
+            skill_table.add_row(
+                str(key) + ".",
+                f"[dim]{skill.name}[/dim]",
+                f"{player.skill_mana_cost(skill)} MP",
+                f"[yellow]exige {skill.requires.describe()}[/yellow]",
+            )
         else:
             skill_table.add_row(
                 str(key) + ".", skill.name, f"{player.skill_mana_cost(skill)} MP", ""
@@ -148,6 +158,24 @@ def render_skill_on_cooldown_message(skill_name: str, remaining: int) -> None:
         Panel(
             Text(
                 f"{skill_name} está em recarga por {remaining} turno(s)!",
+                justify="center",
+                style="yellow",
+            ),
+            border_style="yellow",
+        )
+    )
+
+
+def render_skill_requirement_message(skill_name: str, requisito: str) -> None:
+    """A carta está no deck, mas a mão não tem o que ela pede.
+
+    Dizer o que falta, em vez de só recusar: o requisito é um objetivo de build,
+    e um "não pode usar" sem motivo o transformaria num bug aparente.
+    """
+    renderer.console.print(
+        Panel(
+            Text(
+                f"{skill_name} exige {requisito}.",
                 justify="center",
                 style="yellow",
             ),
@@ -1005,6 +1033,19 @@ def render_passive_acquired(message: str) -> None:
     sleep(1.5)
 
 
+def _dano_previsto(card, player) -> str:
+    """O que esta carta faria na mão deste herói, agora.
+
+    Sem herói (uma tela de catálogo, um teste) não há resposta honesta: o dano
+    da V2 não existe fora de um personagem. Devolve "?" em vez de inventar.
+    """
+    if player is None:
+        return "?"
+    from src.content.skills_loader import damage_preview
+
+    return str(damage_preview(card, player))
+
+
 def render_skill_selection(choices: list, player: "Player" | None = None) -> None:
     """Renderiza as 3 cartas de skills para escolha."""
     rarity_colors = {
@@ -1035,7 +1076,12 @@ def render_skill_selection(choices: list, player: "Player" | None = None) -> Non
 
         # Mostra o valor do efeito de forma legível
         if effect_type == "damage":
-            effect_text = f"Dano: {effect_value}"
+            # O dano REAL desta carta para ESTE herói. Depois da V2 a carta não
+            # carrega número de dano — `effect_value` é sempre zero —, e a tela
+            # anunciava "Dano: 0" em todas as cartas de dano do jogo. O número
+            # útil é o que o motor vai calcular, e ele já depende dos atributos,
+            # do equipamento e das gemas de quem está escolhendo.
+            effect_text = f"Dano: {_dano_previsto(card, player)}"
         elif effect_type == "heal":
             effect_text = f"Cura: {effect_value}"
         elif effect_type == "buff":
@@ -1061,6 +1107,25 @@ def render_skill_selection(choices: list, player: "Player" | None = None) -> Non
     )
 
 
+def _resumo_de_poder(skill, player) -> str:
+    """Uma linha comparável entre as cinco cartas da tela de substituição.
+
+    Trocar uma carta por outra é a decisão mais cara do deck e ela era tomada
+    às cegas: a tela mostrava só nome, custo e descrição. Dano contra dano é o
+    mínimo para a escolha ser uma escolha.
+    """
+    tipo = getattr(skill, "effect_type", "")
+    if tipo == "damage":
+        return f"Dano: {_dano_previsto(skill, player)}"
+    if tipo == "heal":
+        return f"Cura: {getattr(skill, 'effect_value', 0)}% do HP máximo"
+    if tipo == "status":
+        return f"Status: {getattr(skill, 'effect_value', '')}"
+    if tipo == "buff":
+        return f"Buff: +{getattr(skill, 'effect_value', 0)}"
+    return str(getattr(skill, "effect_value", ""))
+
+
 def render_skill_replacement_choice(player: "Player", new_skill: object) -> None:
     """Renderiza a nova skill e pede para escolher qual das 4 atuais substituir."""
     rarity_colors = {
@@ -1080,7 +1145,8 @@ def render_skill_replacement_choice(player: "Player", new_skill: object) -> None
                 f"[bold]Nova Habilidade:[/bold]\n"
                 f"[bold {color_new}]{new_skill.name}[/bold {color_new}]\n"
                 f"[dim]Custo: {player.skill_mana_cost(new_skill)} MP "
-                f"| {new_skill.description}[/dim]"
+                f"| {_resumo_de_poder(new_skill, player)}[/dim]\n"
+                f"[dim]{new_skill.description}[/dim]"
             ),
             title="[bold green]Nova Skill[/bold green]",
             border_style="green",
@@ -1108,7 +1174,9 @@ def render_skill_replacement_choice(player: "Player", new_skill: object) -> None
             Panel(
                 Text.from_markup(
                     f"[bold {color}]{key}. {skill.name}[/bold {color}]\n"
-                    f"[dim]Custo: {player.skill_mana_cost(skill)} MP | {skill.description}[/dim]"
+                    f"[dim]Custo: {player.skill_mana_cost(skill)} MP "
+                    f"| {_resumo_de_poder(skill, player)}[/dim]\n"
+                    f"[dim]{skill.description}[/dim]"
                 ),
                 border_style=color,
             )

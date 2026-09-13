@@ -15,7 +15,7 @@
       "level_required": 1,
       "mana_cost": 15,
       "effect_type": "damage",
-      "effect_value": 54,
+      "effect_value": 0,
       "description": "54% de dano; +8% contra alvo intacto.",
       "target": "enemy",
       "duration": 0,
@@ -23,11 +23,18 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 1,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 4.5,
       "bonus_condition": "target_healthy",
-      "bonus_percent": 8
+      "bonus_percent": 8,
+      "accuracy_modifier": 0,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 2.8
     },
     {
       "id": "investida",
@@ -36,19 +43,35 @@
       "level_required": 1,
       "mana_cost": 20,
       "effect_type": "damage",
-      "effect_value": 55,
+      "effect_value": 0,
       "description": "55% de dano; +22% contra alvo intacto.",
       "target": "enemy",
       "duration": 0,
       "chance": 100,
       "rarity": "Common",
-      "is_initial": true,
+      "is_initial": false,
       "cooldown": 1,
-      "stun_chance": 15,
       "effect_stat": "",
       "mana_cost_percent": 5.06,
       "bonus_condition": "target_healthy",
-      "bonus_percent": 22
+      "bonus_percent": 22,
+      "accuracy_modifier": 0,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 0.7
+        },
+        {
+          "stat": "ag",
+          "weight": 0.3
+        }
+      ],
+      "power": 3.73,
+      "secondary": {
+        "effect": "stun",
+        "chance": 15,
+        "duration": 1
+      }
     },
     {
       "id": "escudo_protetor",
@@ -63,11 +86,11 @@
       "duration": 3,
       "chance": 100,
       "rarity": "Common",
-      "is_initial": true,
+      "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "df",
-      "mana_cost_percent": 9.33
+      "mana_cost_percent": 9.33,
+      "accuracy_modifier": 0
     },
     {
       "id": "grito_guerra",
@@ -82,11 +105,11 @@
       "duration": 3,
       "chance": 100,
       "rarity": "Common",
-      "is_initial": true,
+      "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "st",
-      "mana_cost_percent": 8.53
+      "mana_cost_percent": 8.53,
+      "accuracy_modifier": 0
     },
     {
       "id": "golpe_devastador",
@@ -95,7 +118,7 @@
       "level_required": 10,
       "mana_cost": 40,
       "effect_type": "damage",
-      "effect_value": 103,
+      "effect_value": 0,
       "description": "103% de dano; +60% contra você ferido.",
       "target": "enemy",
       "duration": 0,
@@ -103,11 +126,22 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 10.28,
       "bonus_condition": "caster_wounded",
-      "bonus_percent": 60
+      "bonus_percent": 60,
+      "accuracy_modifier": -15,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 0.8
+        },
+        {
+          "stat": "df",
+          "weight": 0.2
+        }
+      ],
+      "power": 3.92
     },
     {
       "id": "bola_fogo",
@@ -116,7 +150,7 @@
       "level_required": 1,
       "mana_cost": 25,
       "effect_type": "damage",
-      "effect_value": 68,
+      "effect_value": 0,
       "description": "68% de dano; +45% contra alvo sob efeito.",
       "target": "enemy",
       "duration": 0,
@@ -124,11 +158,18 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 1,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 5.61,
       "bonus_condition": "target_afflicted",
-      "bonus_percent": 45
+      "bonus_percent": 45,
+      "accuracy_modifier": 0,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.49
     },
     {
       "id": "missil_magico",
@@ -137,19 +178,26 @@
       "level_required": 1,
       "mana_cost": 20,
       "effect_type": "damage",
-      "effect_value": 54,
+      "effect_value": 0,
       "description": "54% de dano; +15% contra alvo intacto.",
       "target": "enemy",
       "duration": 0,
       "chance": 100,
       "rarity": "Common",
-      "is_initial": true,
+      "is_initial": false,
       "cooldown": 1,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 4.78,
       "bonus_condition": "target_healthy",
-      "bonus_percent": 15
+      "bonus_percent": 15,
+      "accuracy_modifier": 10,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.19
     },
     {
       "id": "drenar_vida",
@@ -164,11 +212,11 @@
       "duration": 0,
       "chance": 100,
       "rarity": "Common",
-      "is_initial": true,
+      "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 5.31
+      "mana_cost_percent": 5.31,
+      "accuracy_modifier": 0
     },
     {
       "id": "escudo_magico",
@@ -183,11 +231,11 @@
       "duration": 3,
       "chance": 100,
       "rarity": "Common",
-      "is_initial": true,
+      "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "df",
-      "mana_cost_percent": 8.53
+      "mana_cost_percent": 8.53,
+      "accuracy_modifier": 0
     },
     {
       "id": "raio_congelante",
@@ -204,9 +252,9 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 7.82
+      "mana_cost_percent": 7.82,
+      "accuracy_modifier": 0
     },
     {
       "id": "cura_menor",
@@ -223,9 +271,9 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 9.94
+      "mana_cost_percent": 9.94,
+      "accuracy_modifier": 0
     },
     {
       "id": "ataque_furtivo",
@@ -234,7 +282,7 @@
       "level_required": 1,
       "mana_cost": 22,
       "effect_type": "damage",
-      "effect_value": 54,
+      "effect_value": 0,
       "description": "54% de dano; +37% contra alvo intacto.",
       "target": "enemy",
       "duration": 0,
@@ -242,11 +290,22 @@
       "rarity": "Common",
       "is_initial": true,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 6.62,
       "bonus_condition": "target_healthy",
-      "bonus_percent": 37
+      "bonus_percent": 37,
+      "accuracy_modifier": 5,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 0.6
+        },
+        {
+          "stat": "st",
+          "weight": 0.4
+        }
+      ],
+      "power": 4.18
     },
     {
       "id": "golpe_baixo",
@@ -261,11 +320,16 @@
       "duration": 2,
       "chance": 100,
       "rarity": "Common",
-      "is_initial": true,
+      "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 15,
       "effect_stat": "",
-      "mana_cost_percent": 5.31
+      "mana_cost_percent": 5.31,
+      "accuracy_modifier": 0,
+      "secondary": {
+        "effect": "stun",
+        "chance": 15,
+        "duration": 1
+      }
     },
     {
       "id": "evasao",
@@ -280,11 +344,11 @@
       "duration": 3,
       "chance": 100,
       "rarity": "Common",
-      "is_initial": true,
+      "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "evasion",
-      "mana_cost_percent": 5.31
+      "mana_cost_percent": 5.31,
+      "accuracy_modifier": 0
     },
     {
       "id": "sombra_rapida",
@@ -299,11 +363,11 @@
       "duration": 2,
       "chance": 100,
       "rarity": "Common",
-      "is_initial": true,
+      "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "ag",
-      "mana_cost_percent": 7.72
+      "mana_cost_percent": 7.72,
+      "accuracy_modifier": 0
     },
     {
       "id": "lancar_adaga",
@@ -320,9 +384,9 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 12.92
+      "mana_cost_percent": 12.92,
+      "accuracy_modifier": 0
     },
     {
       "id": "cortina_fumaca",
@@ -339,9 +403,9 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "ag",
-      "mana_cost_percent": 11.68
+      "mana_cost_percent": 11.68,
+      "accuracy_modifier": 0
     },
     {
       "id": "cutelada",
@@ -350,7 +414,7 @@
       "level_required": 5,
       "mana_cost": 35,
       "effect_type": "damage",
-      "effect_value": 78,
+      "effect_value": 0,
       "description": "78% de dano; +45% contra alvo sob efeito.",
       "target": "enemy",
       "duration": 0,
@@ -358,11 +422,18 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 7.28,
       "bonus_condition": "target_afflicted",
-      "bonus_percent": 45
+      "bonus_percent": 45,
+      "accuracy_modifier": 0,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.23
     },
     {
       "id": "provocacao",
@@ -379,9 +450,9 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 6.12
+      "mana_cost_percent": 6.12,
+      "accuracy_modifier": 0
     },
     {
       "id": "fortalecimento",
@@ -398,9 +469,9 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "st",
-      "mana_cost_percent": 11.68
+      "mana_cost_percent": 11.68,
+      "accuracy_modifier": 0
     },
     {
       "id": "golpe_duplo",
@@ -409,7 +480,7 @@
       "level_required": 9,
       "mana_cost": 35,
       "effect_type": "damage",
-      "effect_value": 96,
+      "effect_value": 0,
       "description": "96% de dano; +55% contra alvo sob efeito.",
       "target": "enemy",
       "duration": 0,
@@ -417,11 +488,18 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 9.9,
       "bonus_condition": "target_afflicted",
-      "bonus_percent": 55
+      "bonus_percent": 55,
+      "accuracy_modifier": -5,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.56
     },
     {
       "id": "resistencia_heroica",
@@ -438,9 +516,9 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "damage_reduction",
-      "mana_cost_percent": 7.97
+      "mana_cost_percent": 7.97,
+      "accuracy_modifier": 0
     },
     {
       "id": "furia",
@@ -457,9 +535,9 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "st",
-      "mana_cost_percent": 16.32
+      "mana_cost_percent": 16.32,
+      "accuracy_modifier": 0
     },
     {
       "id": "esmagar",
@@ -468,7 +546,7 @@
       "level_required": 15,
       "mana_cost": 40,
       "effect_type": "damage",
-      "effect_value": 119,
+      "effect_value": 0,
       "description": "119% de dano; +70% contra alvo ferido.",
       "target": "enemy",
       "duration": 0,
@@ -476,11 +554,27 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 4,
-      "stun_chance": 30,
       "effect_stat": "",
       "mana_cost_percent": 13.77,
       "bonus_condition": "target_wounded",
-      "bonus_percent": 70
+      "bonus_percent": 70,
+      "accuracy_modifier": -10,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 0.8
+        },
+        {
+          "stat": "df",
+          "weight": 0.2
+        }
+      ],
+      "power": 4.23,
+      "secondary": {
+        "effect": "stun",
+        "chance": 30,
+        "duration": 1
+      }
     },
     {
       "id": "imortal",
@@ -497,9 +591,9 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 5,
-      "stun_chance": 0,
       "effect_stat": "damage_reduction",
-      "mana_cost_percent": 19.47
+      "mana_cost_percent": 19.47,
+      "accuracy_modifier": 0
     },
     {
       "id": "relampago",
@@ -508,7 +602,7 @@
       "level_required": 5,
       "mana_cost": 35,
       "effect_type": "damage",
-      "effect_value": 85,
+      "effect_value": 0,
       "description": "85% de dano; +50% contra alvo ferido.",
       "target": "enemy",
       "duration": 0,
@@ -516,11 +610,18 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 7.93,
       "bonus_condition": "target_wounded",
-      "bonus_percent": 50
+      "bonus_percent": 50,
+      "accuracy_modifier": 0,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.84
     },
     {
       "id": "barreira_arcana",
@@ -537,9 +638,9 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "df",
-      "mana_cost_percent": 9.33
+      "mana_cost_percent": 9.33,
+      "accuracy_modifier": 0
     },
     {
       "id": "explosao_arcana",
@@ -548,7 +649,7 @@
       "level_required": 7,
       "mana_cost": 40,
       "effect_type": "damage",
-      "effect_value": 106,
+      "effect_value": 0,
       "description": "106% de dano; +55% contra alvo sob efeito.",
       "target": "enemy",
       "duration": 0,
@@ -556,11 +657,22 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 10.65,
       "bonus_condition": "target_afflicted",
-      "bonus_percent": 55
+      "bonus_percent": 55,
+      "accuracy_modifier": 0,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 0.75
+        },
+        {
+          "stat": "mp",
+          "weight": 0.25
+        }
+      ],
+      "power": 2.88
     },
     {
       "id": "dreno_mana",
@@ -577,9 +689,9 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 6.12
+      "mana_cost_percent": 6.12,
+      "accuracy_modifier": 0
     },
     {
       "id": "sono_profundo",
@@ -596,9 +708,9 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 13.43
+      "mana_cost_percent": 13.43,
+      "accuracy_modifier": 0
     },
     {
       "id": "tempestade",
@@ -607,7 +719,7 @@
       "level_required": 13,
       "mana_cost": 45,
       "effect_type": "damage",
-      "effect_value": 124,
+      "effect_value": 0,
       "description": "124% de dano; +60% contra alvo sob efeito.",
       "target": "enemy",
       "duration": 0,
@@ -615,11 +727,22 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 12.16,
       "bonus_condition": "target_afflicted",
-      "bonus_percent": 60
+      "bonus_percent": 60,
+      "accuracy_modifier": -10,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 0.75
+        },
+        {
+          "stat": "mp",
+          "weight": 0.25
+        }
+      ],
+      "power": 3.14
     },
     {
       "id": "ressurgir",
@@ -636,9 +759,9 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 5,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 20.64
+      "mana_cost_percent": 20.64,
+      "accuracy_modifier": 0
     },
     {
       "id": "apocalipse",
@@ -647,7 +770,7 @@
       "level_required": 20,
       "mana_cost": 55,
       "effect_type": "damage",
-      "effect_value": 179,
+      "effect_value": 0,
       "description": "179% de dano; +80% contra você ferido.",
       "target": "enemy",
       "duration": 0,
@@ -655,11 +778,22 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 5,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 20.64,
       "bonus_condition": "caster_wounded",
-      "bonus_percent": 80
+      "bonus_percent": 80,
+      "accuracy_modifier": -15,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 0.8
+        },
+        {
+          "stat": "st",
+          "weight": 0.2
+        }
+      ],
+      "power": 6.31
     },
     {
       "id": "golpe_sombras",
@@ -668,7 +802,7 @@
       "level_required": 5,
       "mana_cost": 35,
       "effect_type": "damage",
-      "effect_value": 88,
+      "effect_value": 0,
       "description": "88% de dano; +45% contra alvo sob efeito.",
       "target": "enemy",
       "duration": 0,
@@ -676,11 +810,22 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 7.93,
       "bonus_condition": "target_afflicted",
-      "bonus_percent": 45
+      "bonus_percent": 45,
+      "accuracy_modifier": 0,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 0.6
+        },
+        {
+          "stat": "st",
+          "weight": 0.4
+        }
+      ],
+      "power": 5.1
     },
     {
       "id": "envenenar",
@@ -697,9 +842,9 @@
       "rarity": "Common",
       "is_initial": false,
       "cooldown": 2,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 14.16
+      "mana_cost_percent": 14.16,
+      "accuracy_modifier": 0
     },
     {
       "id": "passo_felino",
@@ -716,9 +861,9 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "ag",
-      "mana_cost_percent": 12.61
+      "mana_cost_percent": 12.61,
+      "accuracy_modifier": 0
     },
     {
       "id": "assassinato",
@@ -727,7 +872,7 @@
       "level_required": 9,
       "mana_cost": 40,
       "effect_type": "damage",
-      "effect_value": 106,
+      "effect_value": 0,
       "description": "106% de dano; +65% contra alvo ferido.",
       "target": "enemy",
       "duration": 0,
@@ -735,11 +880,22 @@
       "rarity": "Rare",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 11.03,
       "bonus_condition": "target_wounded",
-      "bonus_percent": 65
+      "bonus_percent": 65,
+      "accuracy_modifier": 0,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 0.6
+        },
+        {
+          "stat": "st",
+          "weight": 0.4
+        }
+      ],
+      "power": 5.59
     },
     {
       "id": "evasao_perfeita",
@@ -756,9 +912,9 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "evasion",
-      "mana_cost_percent": 8.9
+      "mana_cost_percent": 8.9,
+      "accuracy_modifier": 0
     },
     {
       "id": "danca_laminas",
@@ -767,7 +923,7 @@
       "level_required": 13,
       "mana_cost": 45,
       "effect_type": "damage",
-      "effect_value": 126,
+      "effect_value": 0,
       "description": "126% de dano; +55% contra alvo sob efeito.",
       "target": "enemy",
       "duration": 0,
@@ -775,11 +931,22 @@
       "rarity": "Epic",
       "is_initial": false,
       "cooldown": 3,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 12.16,
       "bonus_condition": "target_afflicted",
-      "bonus_percent": 55
+      "bonus_percent": 55,
+      "accuracy_modifier": 0,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 0.7
+        },
+        {
+          "stat": "st",
+          "weight": 0.3
+        }
+      ],
+      "power": 6.57
     },
     {
       "id": "fantasma",
@@ -796,9 +963,9 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 4,
-      "stun_chance": 0,
       "effect_stat": "",
-      "mana_cost_percent": 6.93
+      "mana_cost_percent": 6.93,
+      "accuracy_modifier": 0
     },
     {
       "id": "morte_subita",
@@ -807,7 +974,7 @@
       "level_required": 20,
       "mana_cost": 55,
       "effect_type": "damage",
-      "effect_value": 168,
+      "effect_value": 0,
       "description": "168% de dano; +90% contra alvo ferido.",
       "target": "enemy",
       "duration": 0,
@@ -815,11 +982,22 @@
       "rarity": "Legendary",
       "is_initial": false,
       "cooldown": 5,
-      "stun_chance": 0,
       "effect_stat": "",
       "mana_cost_percent": 20.64,
       "bonus_condition": "target_wounded",
-      "bonus_percent": 90
+      "bonus_percent": 90,
+      "accuracy_modifier": -10,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 0.7
+        },
+        {
+          "stat": "st",
+          "weight": 0.3
+        }
+      ],
+      "power": 7.79
     }
   ]
 }

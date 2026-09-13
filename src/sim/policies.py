@@ -102,6 +102,14 @@ def _effective_hp(entity) -> float:
 
 
 def _usable_skills(hero, kinds: tuple[str, ...]) -> list:
+    """As cartas que o herói pode lançar AGORA.
+
+    `can_use_skill` entra na mesma lista que MP e recarga porque um requisito de
+    equipamento não atendido é a mesma coisa das outras duas: a carta está no
+    deck e não é jogável neste turno. Sem ele, o bot escolheria a melhor carta
+    do deck, o motor recusaria o lançamento, e a run perderia o turno medindo
+    uma decisão que o jogador nunca tomaria.
+    """
     cooldowns = getattr(hero, "skill_cooldowns", {})
     return [
         s
@@ -109,6 +117,7 @@ def _usable_skills(hero, kinds: tuple[str, ...]) -> list:
         if s.effect_type in kinds
         and hero.get_mp() >= hero.skill_mana_cost(s)
         and cooldowns.get(s.id, 0) <= 0
+        and hero.can_use_skill(s)
     ]
 
 

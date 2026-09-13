@@ -20,6 +20,7 @@ from __future__ import annotations
 import random
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -27,8 +28,8 @@ RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
 
 from src.content.factories.archetypes import all_archetypes, spawn_by_role  # noqa: E402
-from src.data.loader import load_json  # noqa: E402
-from src.entities.heroes import Warrior  # noqa: E402
+from src.content.skills_loader import load_skills  # noqa: E402
+from src.entities.heroes import Mage, Rogue, Warrior  # noqa: E402
 from src.mechanics import combat as combat_mech  # noqa: E402
 from src.mechanics.monster_ai import _pick_skill, decide_monster_action  # noqa: E402
 from src.shared.constants import BASIC_ATTACK_POWER_MULT  # noqa: E402
@@ -42,6 +43,9 @@ from src.shared.constants import BASIC_ATTACK_POWER_MULT  # noqa: E402
 # O piso fica em 1,7 para deixar folga de arredondamento sem voltar a aceitar
 # uma skill que não paga o próprio custo.
 MIN_SKILL_TO_BASIC_RATIO = 1.7
+
+# As três classes, para medir cada carta com quem de fato a usa.
+CLASSES = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 
 
 def _ferir(entidade, fracao: float) -> None:
@@ -66,23 +70,46 @@ class TestPesoDoAtaqueBasico:
         )
 
     @pytest.mark.parametrize(
-        "skill",
-        [s for s in load_json("skills.json")["skills"] if s["effect_type"] == "damage"],
-        ids=lambda s: s["id"],
+        "carta",
+        [s for s in load_skills() if s.effect_type == "damage"],
+        ids=lambda c: c.id,
     )
-    def test_toda_skill_de_dano_vale_mais_que_bater(self, skill):
-        """A regra que faz o recurso ser uma decisão, e não um imposto."""
+    def test_toda_skill_de_dano_vale_mais_que_bater(self, carta):
+        """A regra que faz o recurso ser uma decisão, e não um imposto.
+
+        A carta REAL, e não um boneco com `effect_value`. O boneco parou de
+        medir o que este teste protege quando a skill passou a nascer dos
+        atributos: sem `scaling` nem `power` ele caía no atalho de conteúdo não
+        migrado, todas as 17 cartas mediam 1,11 — o inverso do multiplicador do
+        ataque básico — e o teste virava uma checagem de constante.
+
+        A carta é medida contra um herói DA CLASSE DELA, no nível em que ela
+        aparece: `bola_fogo` escala com Magia e um Guerreiro a mediria fraca por
+        um motivo que não é da carta. Neutral vale para os três, e o pior dos
+        três é o que conta.
+        """
+        classes = [carta.skill_class] if carta.skill_class in CLASSES else sorted(CLASSES)
+        for nome in classes:
+            heroi = CLASSES[nome](f"Teste{nome}")
+            heroi.set_level(max(1, carta.level_required))
+            razao = combat_mech.skill_damage_base(heroi, carta) / combat_mech.basic_attack_power(
+                heroi
+            )
+            assert razao >= MIN_SKILL_TO_BASIC_RATIO, (
+                f"{carta.name} vale {razao:.2f} ataque básico para o {nome}: "
+                "gastar mana e recarga é pior que não gastar nada"
+            )
+
+    def test_a_medicao_da_razao_usa_a_carta_e_nao_um_boneco(self):
+        """Prova de carga: uma carta sem gramática V2 seria reprovada.
+
+        É o defeito que o teste acima tinha. Ele fica registrado aqui para que
+        voltar a medir um boneco seja uma falha, e não um verde silencioso.
+        """
         heroi = Warrior("Teste")
-        basico = combat_mech.basic_attack_power(heroi)
-
-        class _Carta:
-            effect_value = skill["effect_value"]
-
-        razao = combat_mech.skill_damage_base(heroi, _Carta()) / basico
-        assert razao >= MIN_SKILL_TO_BASIC_RATIO, (
-            f"{skill['name']} vale {razao:.2f} ataque básico: "
-            "gastar mana e recarga é pior que não gastar nada"
-        )
+        boneco = SimpleNamespace(effect_value=140, name="Boneco")
+        razao = combat_mech.skill_damage_base(heroi, boneco) / combat_mech.basic_attack_power(heroi)
+        assert razao < MIN_SKILL_TO_BASIC_RATIO
 
     def test_a_estimativa_do_bot_bate_com_o_motor(self):
         """Fórmula duplicada diverge no primeiro rebalanceamento."""

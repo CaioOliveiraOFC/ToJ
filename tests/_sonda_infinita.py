@@ -257,13 +257,16 @@ def valida_efeitos(f: Falhas, e, ponto, quem):
     for efeito in ("bleed", "poison"):
         dano = core.dot_damage(e, efeito, e.base_hp)
         f.checar(finito(dano) and dano >= 0, f"dot/{efeito}", ponto, quem, ">=0", dano)
+    # O deslocamento de acerto é SINALIZADO desde que existe Precisão: medo puxa
+    # para baixo, precisão puxa para cima, e a sonda checa o valor com o sinal.
+    # Só `fear` está no ar aqui, então o esperado é a penalidade negativa.
     f.checar(
-        core.accuracy_penalty(e) == core.FEAR_ACCURACY_PENALTY,
+        core.accuracy_shift(e) == -core.FEAR_ACCURACY_PENALTY,
         "effects/fear",
         ponto,
         quem,
-        core.FEAR_ACCURACY_PENALTY,
-        core.accuracy_penalty(e),
+        -core.FEAR_ACCURACY_PENALTY,
+        core.accuracy_shift(e),
     )
     rel = core.tick_effects(e)
     f.checar(rel["skip_turn"] is True, "effects/control", ponto, quem, True, rel["skip_turn"])

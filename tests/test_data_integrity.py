@@ -357,3 +357,41 @@ class TestEfeitoDeEquipamentoEConhecido:
                     declarados.add(item["effect_type"])
         orfaos = sorted(set(self.KNOWN_BACKLOG) - declarados)
         assert not orfaos, f"backlog sem nenhum item que o declare: {orfaos}"
+
+
+class TestCatalogoDeSkills:
+    """O portão que separa o JSON do jogo.
+
+    O catálogo vai ser escrito por IA, e IA devaneia. O validador roda ANTES de
+    a carta chegar ao motor — estaticamente, sem simular combate — e é aqui que
+    ele é acionado sobre o catálogo real: sem esta chamada ele seria um módulo
+    correto que ninguém executa, que é a definição de placebo neste projeto.
+    """
+
+    def test_toda_carta_do_catalogo_passa_no_validador(self):
+        from src.content.skill_validator import assert_catalogo_valido
+        from src.content.skills_loader import load_skills
+
+        assert_catalogo_valido(load_skills())
+
+    def test_o_validador_reprova_de_verdade(self):
+        """Prova de carga: sem ela, um validador quebrado aprovaria tudo em silêncio."""
+        import dataclasses
+
+        import pytest
+
+        from src.content.skill_validator import assert_catalogo_valido, validate
+        from src.content.skills_loader import ScalingTerm, get_skill_by_id
+
+        carta = get_skill_by_id("golpe_poderoso")
+        absurda = dataclasses.replace(
+            carta,
+            id="absurda",
+            power=carta.power * 20,
+            scaling=(ScalingTerm("st", 1.0),),
+        )
+        veredito = validate(absurda)
+        assert not veredito.ok
+        assert "offensive budget" in " ".join(veredito.erros)
+        with pytest.raises(ValueError):
+            assert_catalogo_valido([absurda])

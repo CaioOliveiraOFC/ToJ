@@ -197,6 +197,65 @@ CRIT_CHANCE_CAP = 75  # % máximo de chance crítica
 CRIT_DAMAGE_BASE = 1.5  # Multiplicador padrão de crítico
 
 # Matriz de pesos por classe (Fórmula Universal de Dano)
+# =====================================================================
+# SKILLS V2
+# =====================================================================
+
+# Quantas skills ativas o personagem carrega. Quatro, como um time de Pokémon:
+# o limite é o que transforma "aprendi mais uma" em "abri mão de qual?".
+MAX_ACTIVE_SKILLS = 4
+
+# De quantos em quantos níveis o jogo oferece uma escolha de skill. O nível 1
+# não entra: ele é a assinatura fixa da classe, não um sorteio.
+SKILL_OFFER_LEVEL_INTERVAL = 3
+
+# Quantas cartas por oferta.
+SKILL_OFFER_SIZE = 3
+
+# Atributos que uma skill pode usar como escala, e o teto de quantos.
+SKILL_SCALING_STATS = ("st", "mg", "ag", "df", "hp", "mp")
+MAX_SCALING_STATS = 2
+
+# Faixa segura do modificador de acerto da própria ação. Fora dela, uma carta
+# sozinha decidiria o acerto do jogo inteiro — e o clamp global viraria fachada.
+SKILL_ACCURACY_RANGE = (-30, 20)
+
+# Personagem de REFERÊNCIA do validador: atributos resolvidos de cada classe no
+# nível 12 com o loadout `expected`, medidos uma vez.
+#
+# Existe porque o orçamento precisa ser comparável entre classes, e `power`
+# sozinho não é: a Agilidade do Ladino vale 92 onde a Força do Guerreiro vale
+# 191, então a mesma "pancada pesada" exige `power` quase o dobro nele. Sem uma
+# referência comum, o validador puniria o Ladino por um detalhe da planilha.
+#
+# São dados de calibração, não de gameplay: nada no combate lê isto.
+SKILL_REFERENCE_STATS: dict[str, dict[str, int]] = {
+    "Warrior": {"st": 191, "mg": 116, "ag": 38, "df": 144, "hp": 1586, "mp": 318, "avg": 411},
+    "Mage": {"st": 107, "mg": 202, "ag": 34, "df": 117, "hp": 1342, "mp": 674, "avg": 482},
+    "Rogue": {"st": 170, "mg": 111, "ag": 92, "df": 111, "hp": 1342, "mp": 451, "avg": 394},
+}
+# Skill Neutral é avaliada contra a MÉDIA das classes: ela não pertence a
+# nenhuma, e medi-la contra a mais fraca seria dar-lhe teto de graça.
+SKILL_REFERENCE_NEUTRAL = {
+    stat: sum(r[stat] for r in SKILL_REFERENCE_STATS.values()) // len(SKILL_REFERENCE_STATS)
+    for stat in ("st", "mg", "ag", "df", "hp", "mp", "avg")
+}
+
+# Teto de orçamento, medido em % do ataque básico da referência da classe.
+#
+# DERIVADO do catálogo, não escolhido: as cartas existentes vão de -60 (utilidade
+# pura) a 373, e as duas mais caras são as capstones Legendary — Morte Súbita e
+# Apocalipse. 400 acomoda o que o jogo já tem com ~7% de folga e ainda recusa o
+# absurdo, que é o serviço que um guardrail presta. Um teto que reprovasse as
+# capstones existentes seria balancear pelo validador, e isto não é balanceamento.
+#
+# Neutral tem teto menor de propósito, e o número também sai do catálogo: 250
+# fica abaixo das seis cartas de classe mais caras, então uma ferramenta
+# universal nunca é a melhor opção ofensiva de ninguém — que é o que a impede de
+# virar uma quarta classe.
+MAX_OFFENSIVE_BUDGET = 400
+MAX_OFFENSIVE_BUDGET_NEUTRAL = 250
+
 CLASS_WEIGHTS = {
     "Warrior": {"st": 1.6, "mg": 0.4, "ag": 0.0},
     "Mage": {"st": 0.3, "mg": 1.9, "ag": 0.0},
@@ -443,8 +502,6 @@ INVISIBLE_HIT_PENALTY = 45  # pontos percentuais de acerto perdidos contra alvo 
 
 # Duração, em turnos, dos buffs vindos de consumíveis.
 POTION_BUFF_DURATION = 3
-# Níveis em que o herói aprende as skills iniciais da classe, uma por nível.
-INITIAL_SKILL_LEVELS = 4
 
 # --- Descanso entre andares ---
 # Concluir um andar devolve parte dos recursos. Não tudo: a cura completa a cada

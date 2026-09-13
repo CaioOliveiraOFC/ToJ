@@ -28,12 +28,16 @@ from src.shared.constants import (  # noqa: E402
 class StubEntity:
     """Entidade mínima: só o que combat.py toca."""
 
-    def __init__(self, name="A", ag=10, df=20, hp=999, mp=100, classname="Guerreiro"):
+    def __init__(
+        self, name="A", ag=10, df=20, hp=999, mp=100, classname="Guerreiro", st=100, mg=50
+    ):
         self._name = name
         self._ag = ag
         self._df = df
         self._hp = hp
         self._mp = mp
+        self._st = st
+        self._mg = mg
         self._alive = True
         self._classname = classname
         self.level = 1
@@ -76,6 +80,19 @@ class StubEntity:
 
     def get_avg_damage(self):
         return 40
+
+    def get_stat(self, stat):
+        return getattr(self, f"_{stat}", 0)
+
+    def weighted_power(self, weights):
+        """A mesma conta de `Entity.weighted_power`, sem equipamento.
+
+        O boneco precisa responder por aqui porque é a entidade — e não o
+        combate — que resolve atributo. Um boneco que não respondesse empurraria
+        toda skill para o atalho de conteúdo não migrado, e os testes de V2
+        mediriam o atalho.
+        """
+        return sum(float(self.get_stat(nome)) * float(peso) for nome, peso in weights)
 
     def get_passive_bonus(self, effect_type):
         return self.passive_bonus.get(effect_type, 0)
@@ -303,8 +320,8 @@ class TestApplySkill:
         caster.level = 10
         return caster, StubEntity("Target", df=0, hp=500)
 
-    def _skill(self, effect_type, value=30, chance=50, duration=3, mana=20):
-        return SimpleNamespace(
+    def _skill(self, effect_type, value=30, chance=50, duration=3, mana=20, **extra):
+        campos = dict(
             name="Bola de Fogo",
             mana_cost=mana,
             effect_type=effect_type,
@@ -312,25 +329,56 @@ class TestApplySkill:
             chance=chance,
             duration=duration,
         )
+        campos.update(extra)
+        return SimpleNamespace(**campos)
 
-    def test_skill_de_dano_e_percentual_do_poder_base(self):
+    def _carta_v2(self, scaling=(("st", 1.0),), power=2.0, **extra):
+        """Carta na gramática V2: de onde o golpe nasce, e o peso da ação."""
+        return self._skill(
+            "damage",
+            scaling=tuple(SimpleNamespace(stat=s, weight=w) for s, w in scaling),
+            power=power,
+            **extra,
+        )
+
+    def test_o_dano_da_skill_sai_dos_atributos_do_lancador(self):
+        """O contrato V2: a carta diz DE ONDE, o personagem diz QUANTO.
+
+        `st=100`, peso 1.0, `power=2.0` → BASE 200. Nenhum número de dano vem da
+        carta: mudar `effect_value` não mexe em nada aqui, e é essa a diferença
+        entre uma skill e um segundo sistema de dano.
+        """
         caster, target = self._caster_target()
-        # effect_value 30 = +30% sobre o poder base 40 -> 52.
-        skill = self._skill("damage")
-        assert cmb.skill_damage_base(caster, skill) == 52
+        skill = self._carta_v2()
+        assert cmb.skill_damage_base(caster, skill) == 200
         res = cmb.apply_skill(caster, target, skill, rng=random.Random(7))
         assert res.kind == "damage"
         assert res.mp_spent == 20
         assert caster.get_mp() == 80
 
-    def test_skill_de_dano_mantem_peso_relativo_entre_niveis(self):
-        # Como percentual, a skill vale o mesmo no nível 1 e no nível 20. Como
-        # soma fixa, ela anti-escalava e virava ruído no fim do jogo.
-        baixo, _ = self._caster_target()
-        alto, _ = self._caster_target()
-        alto.level = 20
-        skill = self._skill("damage")
-        assert cmb.skill_damage_base(baixo, skill) == cmb.skill_damage_base(alto, skill)
+    def test_a_carta_reparte_o_golpe_entre_dois_atributos(self):
+        """`0.6 ag + 0.4 mg` é a identidade da carta, e os pesos somam 1."""
+        caster, _ = self._caster_target()  # ag=10, mg=50
+        skill = self._carta_v2(scaling=(("ag", 0.6), ("mg", 0.4)), power=1.0)
+        assert cmb.skill_damage_base(caster, skill) == int(10 * 0.6 + 50 * 0.4)
+
+    def test_a_mesma_carta_rende_mais_num_personagem_mais_forte(self):
+        """O poder vem do personagem: dobrar o atributo dobra o BASE.
+
+        Antes o teste exigia que a carta rendesse o MESMO nos dois — o que ela
+        de fato faz quando cai no atalho de conteúdo não migrado, e por isso
+        passava sem medir nada de V2.
+        """
+        fraco, _ = self._caster_target()
+        forte, _ = self._caster_target()
+        forte._st = fraco._st * 2
+        skill = self._carta_v2()
+        assert cmb.skill_damage_base(forte, skill) == 2 * cmb.skill_damage_base(fraco, skill)
+
+    def test_carta_sem_gramatica_v2_cai_no_poder_de_ataque(self):
+        """Save ou mod antigo não derruba o motor: vale o ataque do personagem."""
+        caster, _ = self._caster_target()
+        assert cmb.skill_damage_base(caster, self._skill("damage")) == caster.get_avg_damage()
 
     def test_skill_de_cura(self):
         caster, target = self._caster_target()

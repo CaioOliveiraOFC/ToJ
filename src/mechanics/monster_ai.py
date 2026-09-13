@@ -123,12 +123,18 @@ def _usable_skills(monster, target=None) -> list:
     que ainda mudem alguma coisa."""
     skills = getattr(monster, "skills", None) or []
     cooldowns = getattr(monster, "skill_cooldowns", {})
+    # Monstro não tem equipamento e portanto satisfaz qualquer requisito; o
+    # `getattr` existe para o dia em que ele tiver, e não para acomodar a
+    # ausência do método. Uma gramática só para herói e monstro significa que o
+    # filtro precisa perguntar a mesma coisa aos dois.
+    pode_usar = getattr(monster, "can_use_skill", None)
     return [
         s
         for s in skills
         if monster.get_mp() >= monster.skill_mana_cost(s)
         and cooldowns.get(s.id, 0) <= 0
         and not _ja_esta_no_ar(monster, s, target)
+        and (not callable(pode_usar) or pode_usar(s))
     ]
 
 

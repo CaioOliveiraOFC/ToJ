@@ -24,6 +24,8 @@ import collections
 import random
 from dataclasses import dataclass
 
+from src.shared.constants import MAX_ACTIVE_SKILLS
+
 # Ordem de preferência de passivas por intenção de build. A mesma carta pode ser
 # a primeira de uma lista e a última de outra — é isso que revela identidade.
 PASSIVE_PRIORITIES: dict[str, tuple[str, ...]] = {
@@ -94,8 +96,10 @@ STATUS_SKILL_VALUE = 25.0
 STATUS_VALUE_NORMALISER = 4.0
 
 # Quantas skills o herói carrega ao mesmo tempo. Era um 4 literal dentro da
-# política de escolha, onde ninguém procuraria pelo teto de deck do jogo.
-MAX_EQUIPPED_SKILLS = 4
+# política de escolha, onde ninguém procuraria pelo teto de deck do jogo — e
+# depois virou um segundo 4, ao lado do teto oficial do jogo. Um teto só: se o
+# deck crescer, o bot cresce junto sem ninguém precisar lembrar deste arquivo.
+MAX_EQUIPPED_SKILLS = MAX_ACTIVE_SKILLS
 # Quantas dessas precisam causar dano. Um herói sem skill de dano depende do
 # ataque básico para matar tudo, o que não é uma build: é um bot quebrado.
 MIN_DAMAGE_SKILLS = 2
@@ -128,6 +132,19 @@ def _status_value(skill) -> float:
     duracao = max(1, int(getattr(skill, "duration", 1) or 1))
     chance = _numeric(getattr(skill, "chance", 100)) / 100 or 1.0
     return STATUS_SKILL_VALUE * peso * duracao * chance / STATUS_VALUE_NORMALISER
+
+
+def _primeiro_slot_livre(hero) -> int:
+    """O menor slot vago do deck.
+
+    Era `max(slots) + 1`, que devolve 5 num deck com buraco — `{1, 2, 3, 5}` tem
+    quatro vagas ocupadas e uma livre, e o bot escrevia no slot 6. O herói usa a
+    mesma regra em `learn_skill`; as duas camadas preenchem o deck igual.
+    """
+    return next(
+        (k for k in range(1, MAX_EQUIPPED_SKILLS + 1) if k not in hero.skills),
+        MAX_EQUIPPED_SKILLS,
+    )
 
 
 @dataclass(frozen=True)
@@ -185,7 +202,7 @@ class PickPolicy:
             # deixaria de ser referência para o valor da escolha deliberada.
             nova = rng.choice(choices)
             if len(hero.skills) < MAX_EQUIPPED_SKILLS:
-                return nova, max(hero.skills, default=0) + 1
+                return nova, _primeiro_slot_livre(hero)
             return nova, rng.choice(sorted(hero.skills))
 
         ordem = SKILL_PRIORITIES[self.name]
@@ -228,7 +245,7 @@ class PickPolicy:
         nova = min(candidatas, key=chave)
 
         if len(hero.skills) < MAX_EQUIPPED_SKILLS:
-            return nova, max(hero.skills, default=0) + 1
+            return nova, _primeiro_slot_livre(hero)
 
         # A carta a sacrificar nunca pode ser a última fonte de dano do deck.
         descartaveis = [

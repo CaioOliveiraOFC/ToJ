@@ -22,11 +22,14 @@ from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.content.skills_loader import generate_skill_choices
 from src.mechanics.math_operations import generate_essence_multiplier
+from src.shared.constants import SKILL_OFFER_LEVEL_INTERVAL, SKILL_OFFER_SIZE
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, PickPolicy, get_pick_policy
 from src.sim.toggles import Toggles
 
-# O jogo oferece escolha de skill nos níveis ímpares a partir deste.
-SKILL_CHOICE_MIN_LEVEL = 5
+# A cadência da oferta é a do jogo: `SKILL_OFFER_LEVEL_INTERVAL`, importado, e
+# não um "níveis ímpares a partir de 5" reescrito aqui. As duas camadas
+# divergiam — o jogo oferecia em 5, 7, 9 e o simulador media outra progressão de
+# deck que a do jogador.
 # Quantos consumíveis de cura o bot tenta manter em mãos ao sair da loja.
 TARGET_HEALING_POTIONS = 3
 # Fração do ouro que o bot aceita gastar em equipamento; o resto fica para poção.
@@ -65,8 +68,8 @@ def on_level_up(
 ) -> None:
     """Aplica as escolhas que o jogo oferece a cada nível ganho.
 
-    Espelha `engine/loop.py`: uma passiva por nível, e uma skill nos níveis
-    ímpares a partir de `SKILL_CHOICE_MIN_LEVEL`.
+    Espelha `engine/loop.py`: uma passiva por nível, e uma oferta de skill a
+    cada `SKILL_OFFER_LEVEL_INTERVAL` níveis.
     """
     cfg = toggles or Toggles()
 
@@ -86,10 +89,16 @@ def on_level_up(
 
     nivel = hero.get_level()
     for lvl in range(nivel - levels_gained + 1, nivel + 1):
-        if lvl >= SKILL_CHOICE_MIN_LEVEL and lvl % 2 == 1:
-            conhecidas = [s.id for s in hero.skills.values()]
-            ofertas = generate_skill_choices(hero.get_classname(), lvl, conhecidas, count=3)
+        if lvl > 1 and lvl % SKILL_OFFER_LEVEL_INTERVAL == 0:
+            ofertas = generate_skill_choices(
+                hero.get_classname(),
+                lvl,
+                hero.active_skill_ids(),
+                count=SKILL_OFFER_SIZE,
+                seen_ids=hero.seen_skill_ids,
+            )
             ofertas = [o for o in ofertas if o.id not in cfg.banned_skills]
+            hero.seen_skill_ids.update(o.id for o in ofertas)
             nova, slot = pick_skill(hero, ofertas, rng, picker)
             if telemetry is not None:
                 telemetry.record_offer("skill", ofertas, nova)

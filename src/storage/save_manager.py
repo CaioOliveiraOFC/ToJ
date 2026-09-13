@@ -9,7 +9,7 @@ from src.content.enchantments import enchantment_from_dict, enchantment_to_dict
 from src.content.gems import gem_from_dict, gem_to_dict
 from src.content.passives import get_passive_by_id
 from src.content.skills_loader import get_skill_by_id
-from src.shared.constants import MAX_SOCKETS
+from src.shared.constants import MAX_ACTIVE_SKILLS, MAX_SOCKETS
 
 # Save antigo guardava uma posição por categoria ("Weapon", "Ring"); o personagem
 # agora tem duas de cada. A peça salva entra na primeira, e `Weapon2`, `Ring2` e
@@ -138,6 +138,38 @@ def _desserializar(registro, item_registry):
     return item
 
 
+def _restaurar_skills(player, skills_data: dict) -> None:
+    """Recoloca as skills salvas no deck, respeitando o teto de 4 slots.
+
+    O sistema anterior entregava uma carta por nível até o quarto e não tinha
+    teto: existem saves com mais de `MAX_ACTIVE_SKILLS` cartas ativas. Descartar
+    o excedente em silêncio apagaria progresso sem o jogador saber.
+
+    A migração é determinística e documentada: as cartas são ordenadas pela
+    chave de slot que o save já usava (1, 2, 3, …), as primeiras
+    `MAX_ACTIVE_SKILLS` entram no deck reindexadas em 1..4, e as demais **não
+    somem** — entram em `seen_skill_ids`, ou seja, o jogo lembra que o
+    personagem já as conheceu e a oferta prioriza o que ele ainda não viu. O
+    critério é a ordem de slot, e não a ordem do dicionário JSON, para que o
+    mesmo arquivo carregue sempre o mesmo deck.
+    """
+    player.skills.clear()
+    pares = []
+    for chave, skill_id in skills_data.items():
+        try:
+            ordem = int(chave)
+        except (TypeError, ValueError):
+            continue
+        skill = get_skill_by_id(skill_id)
+        if skill:
+            pares.append((ordem, skill))
+    pares.sort(key=lambda par: par[0])
+    for indice, (_, skill) in enumerate(pares, start=1):
+        player.seen_skill_ids.add(skill.id)
+        if indice <= MAX_ACTIVE_SKILLS:
+            player.skills[indice] = skill
+
+
 def save_game(
     player: "Player", dungeon_level: int, map_state: dict | None = None, slot: int = 1
 ) -> SaveResult:
@@ -169,6 +201,14 @@ def save_game(
         "passives": passive_ids,
         "skills": skills_data,
         "initial_skills_learned": player.initial_skills_learned,
+        # Estado de aquisição. `seen_skill_ids` é o que faz a oferta priorizar o
+        # inédito: sem salvá-lo, carregar o jogo devolveria cartas já recusadas
+        # como se fossem novidade. `skill_cooldowns` é o que impede que salvar e
+        # carregar zere a recarga da capstone que acabou de ser lançada.
+        "seen_skill_ids": sorted(getattr(player, "seen_skill_ids", ())),
+        "skill_cooldowns": {
+            str(k): int(v) for k, v in getattr(player, "skill_cooldowns", {}).items()
+        },
         "active_buffs": player.active_buffs,
         "active_effects": player.active_effects,
         "dungeon_level": dungeon_level,
@@ -206,21 +246,10 @@ def load_game(
 
         player = player_class(player_name)
 
-        # Carrega skills do novo formato (por id)
-        skills_loaded = True
         skills_data = save_data.get("skills", {})
+        player.seen_skill_ids.update(save_data.get("seen_skill_ids", ()))
         if skills_data:
-            for key_str, skill_id in skills_data.items():
-                skill = get_skill_by_id(skill_id)
-                if skill:
-                    player.skills[int(key_str)] = skill
-                else:
-                    skills_loaded = False
-        else:
-            skills_loaded = False
-
-        if not skills_loaded:
-            pass  # Aviso: Save incompatível - skills não puderam ser carregadas.
+            _restaurar_skills(player, skills_data)
 
         player.initial_skills_learned = save_data.get("initial_skills_learned", len(player.skills))
 
@@ -228,13 +257,13 @@ def load_game(
         saved_level = save_data["level"]
         player.set_level(saved_level)
 
-        # Restaurar skills salvas (set_level limpa as skills)
+        # `set_level` limpa o deck e reaprende a inicial: restaurar depois dele é
+        # o que faz o save mandar sobre o que o motor supõe.
         if skills_data:
-            player.skills.clear()
-            for key_str, skill_id in skills_data.items():
-                skill = get_skill_by_id(skill_id)
-                if skill:
-                    player.skills[int(key_str)] = skill
+            _restaurar_skills(player, skills_data)
+
+        recargas = save_data.get("skill_cooldowns") or {}
+        player.skill_cooldowns = {str(k): int(v) for k, v in recargas.items() if int(v) > 0}
 
         player.xp_points = save_data["xp"]
         player.coins = save_data["coins"]

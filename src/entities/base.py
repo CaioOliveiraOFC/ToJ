@@ -31,6 +31,24 @@ class Entity:
         """
         return float((getattr(self, "resistances", None) or {}).get(status, 0) or 0)
 
+    def weighted_power(self, weights) -> float:
+        """Σ(atributo × peso): o BASE de uma ação, antes de entrar no funil.
+
+        A AÇÃO traz os pesos — a classe, no ataque básico; a carta, na skill. A
+        ENTIDADE traz os números. É a divisão que impede a skill de virar um
+        segundo sistema de dano: a carta escolhe de quais atributos o golpe
+        nasce, e nunca quanto ele vale.
+
+        Fica aqui, e não em `mechanics/combat.py`, porque resolver atributo é da
+        camada de entidade. O combate resolve o GOLPE; quanto vale o atributo
+        que entra nele é resposta de quem é dono do atributo — inclusive do que
+        o personagem empunha, que o combate não pode enxergar.
+
+        `weights` é uma sequência de pares `(atributo, peso)`. Dado puro: a
+        entidade não conhece `SkillCard` nem `ScalingTerm`.
+        """
+        return sum(float(self.get_stat(stat)) * float(peso) for stat, peso in weights)
+
     def reduce_hp(self, quantty: int) -> None:
         """Reduz HP da entidade pela quantidade especificada.
 
