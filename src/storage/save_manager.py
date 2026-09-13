@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 from src.content.gems import gem_from_dict, gem_to_dict
 from src.content.passives import get_passive_by_id
 from src.content.skills_loader import get_skill_by_id
+from src.shared.constants import MAX_SOCKETS
 
 # Save antigo guardava uma posição por categoria ("Weapon", "Ring"); o personagem
 # agora tem duas de cada. A peça salva entra na primeira, e `Weapon2`, `Ring2` e
@@ -81,6 +82,12 @@ def _serializar(item) -> dict | None:
     rank = int(getattr(item, "enhancement_level", 0) or 0)
     if rank:
         registro["enhancement_level"] = rank
+    sockets = int(getattr(item, "socket_count", 0) or 0)
+    if sockets:
+        # O número foi SORTEADO quando o exemplar nasceu. Sem gravá-lo, carregar
+        # o jogo devolveria a peça com os sockets da definição do catálogo — que
+        # são zero — e a espada de três encaixes viraria uma espada comum.
+        registro["socket_count"] = sockets
     gemas = list(getattr(item, "gems", ()) or ())
     if any(g is not None for g in gemas):
         registro["gems"] = [gem_to_dict(g) for g in gemas]
@@ -101,9 +108,15 @@ def _desserializar(registro, item_registry):
     definicao = item_registry.get(nome)
     if definicao is None:
         return None
+    # `instance()`, nunca `spawn()`: carregar restaura o exemplar que existia, e
+    # sortear aqui rerrolaria os encaixes a cada load.
     item = definicao.instance()
     if isinstance(registro, dict):
         item.enhancement_level = max(0, int(registro.get("enhancement_level", 0) or 0))
+        sockets = registro.get("socket_count")
+        if sockets is not None:
+            item.socket_count = max(0, min(MAX_SOCKETS, int(sockets)))
+            item.gems = [None] * item.socket_count
         gemas = registro.get("gems")
         if gemas is not None:
             # A contagem de sockets vem da definição; o save só diz o que está

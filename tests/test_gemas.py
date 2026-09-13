@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.content.gems import GEM_TYPES, Gem, create_gem, random_gem  # noqa: E402
 from src.content.items import Item  # noqa: E402
 from src.entities.heroes import Mage, Rogue, Warrior  # noqa: E402
+from src.shared.constants import MAX_SOCKETS, SOCKET_WEIGHTS_BY_RARITY  # noqa: E402
 from src.shared.formulas import enhancement_multiplier, gem_percent  # noqa: E402
 
 
@@ -259,3 +260,104 @@ class TestSave:
         carregado, _, _ = save_isolado.load_game(registro, self.FABRICAS, slot=1)
         assert carregado.equipment["Weapon1"].gems == []
         assert carregado.gems == []
+
+
+class TestGeracaoDeSockets:
+    """Quantos encaixes um exemplar recebe ao nascer, por raridade.
+
+    Sorteio do EXEMPLAR: duas Espadas Rare podem nascer com 1 e com 3, e é isso
+    que faz um drop valer mais que outro drop da mesma peça.
+    """
+
+    AMOSTRA = 20000
+
+    def _peca(self, raridade: str) -> Item:
+        return _item("Peça", rarity=raridade, damage_bonus=5)
+
+    def _distribuicao(self, raridade: str) -> dict[int, float]:
+        r = random.Random(20260913)
+        peca = self._peca(raridade)
+        contagem: dict[int, int] = {}
+        for _ in range(self.AMOSTRA):
+            n = peca.spawn(r).socket_count
+            contagem[n] = contagem.get(n, 0) + 1
+        return {n: c / self.AMOSTRA for n, c in contagem.items()}
+
+    def test_dois_exemplares_iguais_podem_nascer_diferentes(self):
+        r = random.Random(3)
+        peca = self._peca("Legendary")
+        contagens = {peca.spawn(r).socket_count for _ in range(50)}
+        assert len(contagens) > 1, "todos os exemplares nasceram iguais"
+
+    @pytest.mark.parametrize("raridade", ["Common", "Rare", "Epic", "Legendary"])
+    def test_nunca_passa_de_tres(self, raridade):
+        r = random.Random(11)
+        peca = self._peca(raridade)
+        assert all(0 <= peca.spawn(r).socket_count <= MAX_SOCKETS for _ in range(2000))
+
+    def test_common_nasce_sem_socket(self):
+        assert self._distribuicao("Common") == {0: 1.0}
+
+    @pytest.mark.parametrize("raridade", ["Rare", "Epic", "Legendary"])
+    def test_segue_a_distribuicao_configurada(self, raridade):
+        esperado = SOCKET_WEIGHTS_BY_RARITY[raridade]
+        medido = self._distribuicao(raridade)
+        for n, peso in enumerate(esperado):
+            assert medido.get(n, 0.0) == pytest.approx(peso / 100, abs=0.02), f"{raridade}/{n}"
+
+    def test_raridade_maior_tem_mais_chance_de_tres(self):
+        rare, epic, lenda = (
+            self._distribuicao(r).get(3, 0.0) for r in ("Rare", "Epic", "Legendary")
+        )
+        assert rare < epic < lenda
+
+    def test_a_tabela_e_coerente(self):
+        """Se alguém rebalancear, que não introduza uma linha que não soma 100."""
+        for raridade, pesos in SOCKET_WEIGHTS_BY_RARITY.items():
+            assert sum(pesos) == 100, raridade
+            assert len(pesos) == MAX_SOCKETS + 1, raridade
+
+    def test_carregar_nao_rerrola(self, tmp_path, monkeypatch):
+        from src.storage import save_manager
+
+        monkeypatch.setattr(save_manager, "SAVE_DIR", str(tmp_path), raising=False)
+        monkeypatch.setattr(
+            save_manager, "get_slot_file", lambda s: str(tmp_path / f"slot_{s}.json")
+        )
+        definicao = _item("Espada de Ferro", rarity="Legendary", damage_bonus=6)
+        registro = TestSave._Registro({"Espada de Ferro": definicao})
+
+        peca = definicao.instance()
+        peca.socket_count = 3
+        peca.gems = [None, None, None]
+        peca.socket(create_gem("Rubi", 8), 0)
+        peca.socket(create_gem("Ônix", 5), 1)
+        h = Warrior("Guardião")
+        h.equip(peca)
+        save_manager.save_game(h, 3, None, slot=1)
+
+        # Carregar duas vezes: se sorteasse, os dois resultados divergiriam.
+        for _ in range(2):
+            carregado, _, _ = save_manager.load_game(registro, TestSave.FABRICAS, slot=1)
+            arma = carregado.equipment["Weapon1"]
+            assert arma.socket_count == 3
+            assert [g.display_name if g else None for g in arma.gems] == [
+                "Rubi Nv. 8",
+                "Ônix Nv. 5",
+                None,
+            ]
+
+    def test_tres_sockets_preenchidos_funcionam(self):
+        h = Warrior("Prova")
+        h.level = 8
+        peca = _item("Espada", rarity="Legendary", damage_bonus=10)
+        peca.socket_count = 3
+        peca.gems = [None, None, None]
+        h.equip(peca)
+        for gema in (create_gem("Rubi", 5), create_gem("Ônix", 10), create_gem("Topázio", 7)):
+            h.gems.append(gema)
+            h.socket_gem(peca, gema)
+        assert peca.free_socket() is None
+        assert h.equipment_percent("st") == pytest.approx(gem_percent(5))
+        assert h.equipment_percent("hp") == pytest.approx(gem_percent(10))
+        assert h.equipment_percent("df") == pytest.approx(gem_percent(7))

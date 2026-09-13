@@ -78,7 +78,7 @@ class Shop:
                 continue
 
             price = self.get_price(item, dungeon_level)
-            available_items.append({"item": item.instance(), "price": price})
+            available_items.append({"item": item.spawn(), "price": price})
 
         # Define quantos itens mostrar conforme o andar
         if dungeon_level <= 3:

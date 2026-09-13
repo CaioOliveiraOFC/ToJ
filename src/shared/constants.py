@@ -45,6 +45,26 @@ MINI_BOSS_BASE_XP_REWARD = 120
 # primeiro degrau é o melhor negócio é uma escada quebrada.
 ENHANCEMENT_RATE = 0.15
 
+# Quantos sockets um EXEMPLAR recebe ao nascer, por raridade. Cada tupla é a
+# distribuição de 0, 1, 2 e 3 sockets, em pontos percentuais somando 100.
+#
+# É sorteio do exemplar, e não propriedade do item-base: duas Espadas Rare podem
+# nascer com 1 e com 3 encaixes, e é isso que faz um drop valer mais que outro
+# drop da mesma peça. Sem isso, "melhor item" seria só uma questão de raridade.
+#
+# A filosofia importa mais que os números, e é ela que deve sobreviver a um
+# rebalanceamento: em Rare, 3 sockets é excepcional; em Epic, 2 é o caso comum e
+# 3 já aparece; em Legendary, 3 é o esperado.
+SOCKET_WEIGHTS_BY_RARITY: dict[str, tuple[int, int, int, int]] = {
+    "Common": (100, 0, 0, 0),
+    "Rare": (0, 70, 25, 5),
+    "Epic": (0, 30, 50, 20),
+    "Legendary": (0, 10, 30, 60),
+}
+
+# Teto de encaixes. Um quarto socket é decisão de conteúdo, não de código.
+MAX_SOCKETS = 3
+
 # Quanto o nível de uma gema vale, em pontos percentuais do atributo.
 #
 # Entra num logaritmo, e NÃO na mesma raiz que `+N` usa: os dois sistemas são

@@ -1,7 +1,8 @@
 import copy
+import random
 
 from src.data.loader import load_json
-from src.shared.constants import RARITY_MULTIPLIERS
+from src.shared.constants import MAX_SOCKETS, RARITY_MULTIPLIERS, SOCKET_WEIGHTS_BY_RARITY
 from src.shared.formulas import enhancement_multiplier
 
 
@@ -90,7 +91,7 @@ class Item:
         # encaixes é conteúdo, não arquitetura nova, e um campo único fecharia
         # essa porta. Pertence ao EXEMPLAR, como o rank — duas Espadas de Ferro
         # podem ter pedras diferentes.
-        self.socket_count: int = max(0, int(socket_count or 0))
+        self.socket_count: int = max(0, min(MAX_SOCKETS, int(socket_count or 0)))
         self.gems: list = [None] * self.socket_count
 
         if effect_type and effect_value:
@@ -200,6 +201,20 @@ class Item:
         """
         return sum(g.percent for g in self.gems if g is not None and g.stat == stat)
 
+    def spawn(self, rng=None) -> "Item":
+        """Um exemplar NOVO, com os sockets sorteados pela raridade.
+
+        Separado de `instance()` de propósito: `instance()` copia e ponto, e é
+        o que save/load usa. Se o sorteio morasse lá, carregar o jogo rerrolaria
+        os encaixes da sua espada toda vez — o exemplar deixaria de ter história.
+
+        Chamado onde uma peça NASCE: drop, oferta da loja, recompensa, bootstrap.
+        """
+        novo = self.instance()
+        novo.socket_count = roll_socket_count(novo.rarity, rng)
+        novo.gems = [None] * novo.socket_count
+        return novo
+
     def instance(self) -> "Item":
         """Um exemplar novo desta definição.
 
@@ -245,6 +260,20 @@ class Item:
             "life_steal",
             "mana_regen",
         )
+
+
+def roll_socket_count(rarity: str, rng=None) -> int:
+    """Quantos sockets um exemplar desta raridade recebe ao nascer.
+
+    Lê `SOCKET_WEIGHTS_BY_RARITY`. Raridade desconhecida nasce sem encaixe: um
+    default generoso faria conteúdo novo ganhar sockets por engano, e ninguém
+    perceberia até a economia já estar torta.
+    """
+    pesos = SOCKET_WEIGHTS_BY_RARITY.get(str(rarity))
+    if not pesos:
+        return 0
+    r = rng if rng is not None else random
+    return int(r.choices(range(len(pesos)), weights=pesos, k=1)[0])
 
 
 def create_item_from_json(item_data: dict) -> Item:

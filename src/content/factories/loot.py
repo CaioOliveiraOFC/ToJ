@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import random
 from typing import Any
 
@@ -86,8 +85,10 @@ def get_loot() -> Item | None:
         for item in _LOOT_TABLE
     ]
     if not any(peso_por_item):
-        return copy.copy(random.choice(_LOOT_TABLE))
-    return copy.copy(random.choices(_LOOT_TABLE, weights=peso_por_item, k=1)[0])
+        return random.choice(_LOOT_TABLE).spawn()
+    # `.spawn()` e não `copy.copy`: o drop é um exemplar novo, e é aqui que os
+    # sockets dele são sorteados pela raridade.
+    return random.choices(_LOOT_TABLE, weights=peso_por_item, k=1)[0].spawn()
 
 
 def reload_loot_table() -> None:

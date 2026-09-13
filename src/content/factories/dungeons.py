@@ -131,7 +131,7 @@ def apply_fountain_heal(player) -> int:
         all_items = get_all_items()
         potion = all_items.get("Poção de Cura Pequena") or all_items.get("Potion")
         if potion and len(player.inventory) < 20:
-            player.add_item_to_inventory(potion.instance())
+            player.add_item_to_inventory(potion.spawn())
     except Exception:
         pass
 
