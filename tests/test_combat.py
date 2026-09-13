@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pytest  # noqa: E402
 
 from src.mechanics import combat as cmb  # noqa: E402
+from src.shared import effect_core as core  # noqa: E402
 from src.shared.constants import (  # noqa: E402
     BASE_HIT_CHANCE,
     CRIT_CHANCE_CAP,
@@ -18,7 +19,6 @@ from src.shared.constants import (  # noqa: E402
     DEFENSE_K,
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
-    POISON_DAMAGE_PER_TICK,
     XMULT_CAP,
 )
 
@@ -342,11 +342,16 @@ class TestApplySkill:
     def test_status_sucesso_aplica_efeito_no_alvo(self):
         caster, target = self._caster_target()
         roll = random.Random(0).randrange(1, 101)
-        res = cmb.apply_skill(caster, target, self._skill("status"), rng=random.Random(0))
+        skill = self._skill("status")
+        # Um status do CATÁLOGO. O valor sintético anterior ("30") passava porque
+        # o motor escrevia qualquer nome no estado; hoje o núcleo recusa nome que
+        # não existe, e um status inventado não aplica mais nada em silêncio.
+        skill.effect_value = "poison"
+        res = cmb.apply_skill(caster, target, skill, rng=random.Random(0))
         sucesso = roll <= 50
         assert res.status_success is sucesso
         if sucesso:
-            assert target.active_effects["30"] == {"duration": 3}
+            assert target.active_effects["poison"]["duration"] == 3
         else:
             assert target.active_effects == {}
 
@@ -376,19 +381,24 @@ class TestApplySkill:
 
 class TestProcessTurnStartEffects:
     def test_poison_tick_dano_por_ag_e_duracao(self):
+        """Veneno agora é PERCENTUAL do HP máximo, e vem do catálogo.
+
+        Era `5 + agilidade//5`: um valor plano que anti-escalava, e que ficava
+        MAIOR quanto mais ágil o alvo — quem esquivava melhor apodrecia mais
+        rápido. O catálogo diz 1,5% do HP máximo por stack.
+        """
         e = StubEntity(ag=20, hp=100)
-        e.active_effects["poison"] = {"duration": 2}
+        core.apply_effect(e, "poison", duration=2)
         cmb.process_turn_start_effects(e)
-        # POISON_DAMAGE_PER_TICK + ag//5 = 5 + 4 = 9
-        assert e.get_hp() == 91
+        assert e.get_hp() == 99  # 1,5% de 100, truncado
         assert e.active_effects["poison"]["duration"] == 1
 
     def test_poison_expira_e_remove(self):
         e = StubEntity(ag=0, hp=100)
-        e.active_effects["poison"] = {"duration": 1}
+        core.apply_effect(e, "poison", duration=1)
         cmb.process_turn_start_effects(e)
         assert "poison" not in e.active_effects
-        assert e.get_hp() == 100 - POISON_DAMAGE_PER_TICK
+        assert e.get_hp() == 99
 
     def test_frozen_pula_turno(self):
         e = StubEntity()
@@ -406,8 +416,9 @@ class TestProcessTurnStartEffects:
 
     def test_entidade_morta_por_tick_marca_isalive_false(self):
         e = StubEntity(hp=3)
-        e.active_effects["poison"] = {"duration": 2}
-        cmb.process_turn_start_effects(e)
+        core.apply_effect(e, "bleed", duration=5)
+        for _ in range(5):
+            cmb.process_turn_start_effects(e)
         assert e.get_isalive() is False
 
 

@@ -303,9 +303,9 @@ class TestDeathIgnore:
 class TestAtivacaoControlada:
     """O canal não pode acordar família que não foi aprovada nesta rodada."""
 
-    # Backlog consciente: on-hit precisa de resolução de proc, e os dois últimos
-    # não têm mecânica nenhuma. Ver KNOWN_BACKLOG em test_data_integrity.
-    NAO_ATIVADOS = ["stun", "bleed", "poison", "fear", "true_damage", "armageddon"]
+    # O que sobrou depois do núcleo global de efeitos: os dois sem mecânica
+    # nenhuma. A família on-hit saiu daqui — ela agora resolve pelo catálogo.
+    NAO_ATIVADOS = ["true_damage", "armageddon"]
 
     @pytest.mark.parametrize("efeito", NAO_ATIVADOS)
     def test_continua_placebo(self, efeito):
@@ -314,15 +314,15 @@ class TestAtivacaoControlada:
         assert h.get_equipment_bonus(efeito) == 0.0
         assert fx.combat_modifier(h, efeito) == 0.0
 
-    def test_efeito_on_hit_nao_aplica_status_no_alvo(self):
-        """O caso completo: uma arma de `stun` não atordoa ninguém ainda."""
+    @pytest.mark.parametrize("efeito", ["stun", "bleed", "poison", "fear"])
+    def test_efeito_on_hit_agora_aplica_pelo_nucleo(self, efeito):
+        """A arma declara a CHANCE; o catálogo global decide o resto."""
         h, m = _heroi(), spawn_by_role("bruiser", 8)
-        h.equip(_item("stun", 100, "Weapon"))
-        for _ in range(20):
-            cmb.resolve_physical_attack(
-                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 100)
-            )
-        assert "stun" not in m.active_effects
+        h.equip(_item(efeito, 100, "Weapon"))
+        cmb.resolve_physical_attack(
+            h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 100)
+        )
+        assert efeito in m.active_effects, efeito
 
     def test_a_lista_de_permissao_e_exatamente_esta(self):
         """Se alguém acrescentar uma família, que seja de propósito e visível."""

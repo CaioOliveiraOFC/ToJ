@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from src.entities.base import Entity
+from src.shared import effect_core as core
 from src.shared.constants import (
     DAMAGE_FORMULA_DIVISOR,
     MONSTER_BASE_AG,
@@ -98,7 +99,14 @@ class Monster(Entity):
         nada. Um arquétipo cujo comportamento não altera o combate não é um
         arquétipo — é uma animação.
         """
-        return int(getattr(self, f"base_{stat}")) + sum_buffs(self, stat)
+        base = int(getattr(self, f"base_{stat}"))
+        com_buff = base + sum_buffs(self, stat)
+        if stat in ("hp", "mp"):
+            return max(1, int(com_buff * (1 + core.resource_percent(self, stat) / 100)))
+        # O mesmo piso do herói: o núcleo não pergunta quem é a entidade.
+        return core.apply_attribute_floor(
+            base, com_buff * (1 + core.attribute_percent(self, stat) / 100)
+        )
 
     def get_avg_damage(self) -> int:
         """BASE_POWER do monstro, derivado dos atributos COM buffs.

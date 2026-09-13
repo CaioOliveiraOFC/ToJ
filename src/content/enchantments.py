@@ -34,12 +34,13 @@ ENCHANT_EFFECTS: dict[str, str] = {
     "life_steal": "+% de roubo de vida",
     "evasion": "+ pontos de evasão",
     "mana_regen": "+ MP por turno",
-    # Atordoamento é a ÚNICA família on-hit desta V1, e entra porque não custa
-    # nada: `resolve_physical_attack` já rola `combat_modifier(atacante,
-    # "stun_chance")` para a passiva. Sangramento, veneno e medo ficam de fora
-    # porque exigiriam três rolagens novas dentro do golpe — mudança relevante,
-    # e a família on-hit inteira é a próxima rodada.
+    # A família on-hit. Todas resolvem pelo NÚCLEO de efeitos, pela mesma
+    # rolagem que a passiva e a skill usam: o encantamento declara a chance, e o
+    # catálogo global decide o que sangramento significa.
     "stun_chance": "+% de chance de atordoar",
+    "bleed_chance": "+% de chance de sangramento",
+    "poison_chance": "+% de chance de envenenar",
+    "fear_chance": "+% de chance de amedrontar",
 }
 
 

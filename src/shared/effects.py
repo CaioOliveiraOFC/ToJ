@@ -19,6 +19,8 @@ sem dependência de camada nenhuma.
 
 from __future__ import annotations
 
+from src.shared import effect_core as core
+
 # Atributos base que um buff pode somar. Lidos por `get_stat`.
 ATTRIBUTE_STATS = ("st", "ag", "mg", "df", "hp", "mp")
 
@@ -44,17 +46,12 @@ COMBAT_MODIFIERS = (
 # si mesmo), `invisible` (benéfico) e os rótulos de poção `true_damage` e
 # `death_ignore` — ninguém resiste ao próprio consumível.
 
-# Status que fazem a entidade perder o turno.
-TURN_SKIPPING_STATUSES = ("frozen", "stun", "sleep")
-
-# Status que sofrem dano ou perda de recurso a cada turno.
-DAMAGE_OVER_TIME = ("poison", "bleed")
-
-# Status que reduzem o dano causado pela entidade afetada, em percentual.
-OUTGOING_DAMAGE_PENALTY = {"weakened": 30, "fear": 20}
-
-# Status que drenam MP por turno.
-RESOURCE_DRAIN = ("mana_burn",)
+# As famílias agora vêm do CATÁLOGO, e não de listas paralelas: um status novo
+# entra em `effect_core.CATALOG` e todo mundo enxerga, sem ninguém precisar
+# lembrar de acrescentá-lo aqui também.
+TURN_SKIPPING_STATUSES = core.effects_of_family(core.FAMILY_CONTROL)
+DAMAGE_OVER_TIME = core.effects_of_family(core.FAMILY_DOT)
+RESOURCE_DRAIN = core.effects_of_family(core.FAMILY_DRAIN)
 
 
 # Quanto vale um turno de controle, por família de status. Serve para comparar
@@ -83,10 +80,8 @@ BONUS_CONDITIONS = (
 
 
 def negative_statuses() -> tuple[str, ...]:
-    """Os status resistíveis, na grafia que o motor usa."""
-    return (
-        TURN_SKIPPING_STATUSES + DAMAGE_OVER_TIME + tuple(OUTGOING_DAMAGE_PENALTY) + RESOURCE_DRAIN
-    )
+    """Os status resistíveis, na grafia que o motor usa. Vêm do catálogo."""
+    return core.negative_effects()
 
 
 def status_resistance(entity, status: str) -> float:
@@ -106,13 +101,8 @@ def status_resistance(entity, status: str) -> float:
 
 
 def effective_status_chance(base_chance: float, resistance: float) -> float:
-    """`base × (1 - resistência/100)`, com as duas pontas presas em 0..100.
-
-    100% de resistência resulta em 0%, sem piso: se o jogador pagou o preço da
-    imunidade, a imunidade é real. Um "mínimo de 5%" transformaria o item mais
-    caro do jogo em quase-imunidade, que é outra coisa.
-    """
-    return _clamp_percent(_clamp_percent(base_chance) * (1 - _clamp_percent(resistance) / 100))
+    """`base × (1 - resistência/100)`. Delegada ao núcleo — a regra é uma só."""
+    return core.effective_chance(base_chance, resistance)
 
 
 def _clamp_percent(valor) -> float:
@@ -128,9 +118,8 @@ def control_weight(effect: str) -> float:
     return 1.0
 
 
-# `sleep` acorda ao levar dano — dormir para sempre seria atordoamento eterno,
-# não sono, e removeria o counterplay de simplesmente bater no alvo.
-BREAKS_ON_DAMAGE = ("sleep",)
+# Quais efeitos quebram ao levar dano. Declarado no catálogo, por efeito.
+BREAKS_ON_DAMAGE = tuple(d.effect_id for d in core.CATALOG.values() if d.breaks_on_damage)
 
 # Nomes de buff legados usados por poções e skills antigas, mapeados para o
 # atributo que eles sempre pretenderam modificar. Existe para que saves e
@@ -208,14 +197,15 @@ def combat_modifier(entity, kind: str) -> float:
 
 
 def outgoing_damage_multiplier(entity) -> float:
-    """Multiplicador de dano causado, considerando status debilitantes."""
-    effects = getattr(entity, "active_effects", {})
-    penalty = 0
-    for name, data in effects.items():
-        if name in OUTGOING_DAMAGE_PENALTY:
-            value = data.get("value") if isinstance(data, dict) else None
-            penalty += int(value if value is not None else OUTGOING_DAMAGE_PENALTY[name])
-    return max(0.1, 1 - min(90, penalty) / 100)
+    """Multiplicador de dano causado pela entidade.
+
+    Vazio hoje, e de propósito. `weakened` virou efeito de ATRIBUTO (reduz Força,
+    e o dano cai por consequência) e `fear` virou efeito de ACERTO (o golpe
+    falha mais, e não bate mais fraco). Nenhum dos dois multiplica o dano por
+    fora — mas o ponto continua aqui, porque é o lugar certo caso um efeito
+    genuinamente multiplicativo apareça, e tirá-lo obrigaria a reabrir o funil.
+    """
+    return 1.0
 
 
 def incoming_damage_multiplier(entity) -> float:
@@ -230,9 +220,5 @@ def incoming_damage_multiplier(entity) -> float:
 
 
 def wake_on_damage(entity) -> list[str]:
-    """Remove os status que quebram ao levar dano. Devolve o que foi removido."""
-    effects = getattr(entity, "active_effects", {})
-    removed = [name for name in BREAKS_ON_DAMAGE if name in effects]
-    for name in removed:
-        del effects[name]
-    return removed
+    """Remove os status que quebram ao levar dano. Delegada ao núcleo."""
+    return core.break_on_damage(entity)

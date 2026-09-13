@@ -18,6 +18,15 @@ Isto expõe uma fragilidade destes cenários: eles usam `make_hero(..., "expecte
 então congelam o catálogo junto com a matemática, e toda mudança de loadout os
 derruba sem que o pipeline tenha mudado. Uma fixture de equipamento explícita
 resolveria — fica registrado, não é desta rodada.
+
+Regravados de novo quando o medo mudou de família. `fear` deixou de multiplicar
+o dano e passou a tirar pontos de ACERTO: ele não faz o golpe bater mais fraco,
+faz o golpe errar mais. Como a rolagem roteirizada destes cenários sempre
+acerta, `atacante_com_fear` virou igual a `basico_sem_crit` (128 -> 160) e
+`dois_redutores` igual a `defensor_com_reducao` (89 -> 112).
+
+Os dois cenários ficam, mas hoje não exercitam nada que os outros já não
+exercitem — o medo é testado onde ele agora vive, em `test_efeitos_nucleo.py`.
 """
 
 from __future__ import annotations
@@ -143,9 +152,9 @@ GOLDEN = {
     "basico_com_crit": 240,
     "skill_de_dano": 300,
     "skill_com_condicao": 476,
-    "atacante_com_fear": 128,
+    "atacante_com_fear": 160,
     "defensor_com_reducao": 112,
-    "dois_redutores": 89,
+    "dois_redutores": 112,
     "monstro_contra_mago_com_egide": 87,
 }
 

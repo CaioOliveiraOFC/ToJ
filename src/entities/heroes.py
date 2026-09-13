@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from src.entities.base import Entity
+from src.shared import effect_core as core
 from src.shared.constants import (
     CLASS_WEIGHTS,
     DAMAGE_FORMULA_DIVISOR,
@@ -297,6 +298,17 @@ class Player(Entity):
     # motor, e só faltava o equipamento chegar até ela. Ficam de fora os efeitos
     # on-hit (`stun`, `bleed`, `poison`, `fear`), que precisam de resolução de proc
     # que ainda não existe, e os que não têm mecânica nenhuma.
+    # Os quatro `effect_type` on-hit do catálogo. O valor declarado no item é a
+    # CHANCE de aplicar, e vira o modificador que o golpe consulta: um item que
+    # diz `bleed: 5` dá 5% de chance de sangramento. A mecânica em si é do
+    # núcleo — o item não redefine o que sangramento é, só quer aplicá-lo.
+    EQUIP_ONHIT_EFFECTS: dict[str, str] = {
+        "stun": "stun_chance",
+        "bleed": "bleed_chance",
+        "poison": "poison_chance",
+        "fear": "fear_chance",
+    }
+
     EQUIP_COMBAT_EFFECTS = frozenset(
         {
             "evasion",  # hit_chance()
@@ -325,7 +337,10 @@ class Player(Entity):
         for item in self.equipment.values():
             if item is None:
                 continue
-            if permitido and getattr(item, "effect_type", None) == kind:
+            efeito_do_item = getattr(item, "effect_type", None)
+            if permitido and efeito_do_item == kind:
+                total += float(getattr(item, "effect_value", 0) or 0)
+            elif self.EQUIP_ONHIT_EFFECTS.get(efeito_do_item) == kind:
                 total += float(getattr(item, "effect_value", 0) or 0)
             # Encantamento tem allowlist PRÓPRIA, aplicada dentro de
             # `enchantment_bonus`. São duas fontes na mesma peça, e nem sempre
@@ -402,9 +417,24 @@ class Player(Entity):
         )
 
     def _scaled(self, key: str) -> int:
-        """Valor do atributo no nível atual: base do nível 1 vezes a razão comum."""
+        """Valor do atributo no nível atual, com equipamento e efeitos ativos.
+
+        Ordem: nível → passiva plana → equipamento e gemas (percentual) →
+        efeitos do núcleo (percentual) → piso.
+
+        O piso é do núcleo e vale para os quatro atributos de combate: nenhum
+        acúmulo de debuff derruba Força, Magia, Agilidade ou Defesa abaixo de
+        10% da base. Recurso (hp/mp) não tem piso de atributo — quem cuida do
+        teto temporário deles é `resource_percent`, e zerar vida por debuff é
+        outra conversa.
+        """
         grown = geometric(self._growth.get(key, 0), self.level) + self._bonus.get(key, 0)
-        return int(grown * (1 + self.equipment_percent(key) / 100))
+        com_equipamento = grown * (1 + self.equipment_percent(key) / 100)
+        if key in ("hp", "mp"):
+            resolvido = com_equipamento * (1 + core.resource_percent(self, key) / 100)
+            return max(1, int(resolvido))
+        resolvido = com_equipamento * (1 + core.attribute_percent(self, key) / 100)
+        return core.apply_attribute_floor(int(com_equipamento), resolvido)
 
     def _add_bonus(self, key: str, value: int) -> None:
         self._bonus[key] = self._bonus.get(key, 0) + int(value)

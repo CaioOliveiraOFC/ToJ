@@ -8,11 +8,11 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from src.shared import combat_topics as T
+from src.shared import effect_core as core
 from src.shared import effects as fx
 from src.shared.constants import (
     BASE_HIT_CHANCE,
     BASIC_ATTACK_POWER_MULT,
-    BLEED_DAMAGE_PERCENT,
     CRIT_CHANCE_CAP,
     CRIT_CHANCE_DEFAULT,
     CRIT_CHANCE_HIGH,
@@ -24,14 +24,10 @@ from src.shared.constants import (
     HIT_AGILITY_SWING,
     HIT_CHANCE_CEIL,
     HIT_CHANCE_FLOOR,
-    INVISIBLE_HIT_PENALTY,
     MAGIC_SHIELD_DAMAGE_PER_MP,
-    MANA_BURN_PER_TICK,
     MP_REGEN_PERCENT_PER_TURN,
     PERCENTAGE_RANGE_MAX,
     PERCENTAGE_RANGE_MIN,
-    POISON_AGILITY_DIVISOR,
-    POISON_DAMAGE_PER_TICK,
     SKILL_BONUS_HEALTHY_RATIO,
     SKILL_BONUS_WOUNDED_RATIO,
     STUN_DURATION,
@@ -196,8 +192,12 @@ def hit_chance(attacker, defender) -> int:
 
     chance = BASE_HIT_CHANCE + swing
     chance -= fx.combat_modifier(defender, "evasion")
-    if "invisible" in getattr(defender, "active_effects", {}):
-        chance -= INVISIBLE_HIT_PENALTY
+    # Medo é do ATACANTE e mexe na confiabilidade do golpe, não na Agilidade
+    # dele nem no tamanho do dano. Entra no cálculo de acerto que já existe —
+    # uma segunda rolagem paralela é como `Esmagar` acabou atordoando por dois
+    # caminhos independentes.
+    chance -= core.accuracy_penalty(attacker)
+    chance -= core.concealment_penalty(defender)
 
     return int(max(HIT_CHANCE_FLOOR, min(HIT_CHANCE_CEIL, chance)))
 
@@ -361,8 +361,7 @@ def resolve_physical_attack(
     # independentes — o JSON declarava 30% e o jogo entregava 46% —, e a passiva
     # de atordoamento do herói era silenciosamente descartada em todo golpe de
     # Esmagar, que é justamente onde ela deveria valer mais.
-    stun_chance = int(fx.combat_modifier(attacker, "stun_chance"))
-    _try_apply_stun(defender, stun_chance, r, publish)
+    _aplicar_procs_on_hit(attacker, defender, r, publish)
 
     defender.take_damage(damage)
     fx.wake_on_damage(defender)
@@ -411,6 +410,7 @@ def try_apply_status(
     publish: PublishFn = None,
     *,
     applied_kind: str | None = None,
+    source_id: str = "",
 ) -> bool:
     """Tenta aplicar um status negativo. Devolve se pegou.
 
@@ -429,7 +429,6 @@ def try_apply_status(
     """
     if not hasattr(target, "active_effects"):
         return False
-
     chance = fx.effective_status_chance(base_chance, fx.status_resistance(target, status))
     if chance <= 0:
         if base_chance > 0:
@@ -440,11 +439,12 @@ def try_apply_status(
                 payload={"entity": target, "kind": "status_resisted", "status": status},
             )
         return False
-
     if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > chance:
         return False
-
-    target.active_effects[status] = {"duration": int(duration)}
+    # Passou a rolagem. O NÚCLEO decide o resto: se empilha, se renova, qual o
+    # teto de stacks, quanto dura. O combate não conhece nenhuma dessas regras.
+    if core.apply_effect(target, status, source_id=source_id, duration=duration) is None:
+        return False
     if applied_kind:
         _emit(
             publish,
@@ -468,6 +468,44 @@ def _try_apply_stun(target, chance: int, r: random.Random, publish: PublishFn) -
     return try_apply_status(
         target, "stun", int(chance), STUN_DURATION, r, publish, applied_kind="stun_applied"
     )
+
+
+# Efeito que o atacante pode aplicar ao acertar, e o modificador que carrega a
+# chance. Uma tabela, e não quatro blocos de `if`: a quinta família entra aqui
+# como uma linha, e a mecânica de cada uma já é do núcleo.
+ONHIT_PROCS = {
+    "stun": "stun_chance",
+    "bleed": "bleed_chance",
+    "poison": "poison_chance",
+    "fear": "fear_chance",
+}
+
+
+def _aplicar_procs_on_hit(attacker, defender, r: random.Random, publish: PublishFn) -> None:
+    """Rola os efeitos que o atacante aplica ao acertar.
+
+    A chance vem de `combat_modifier`, então equipamento, encantamento, passiva
+    e buff chegam pelo mesmo caminho — e o alvo resiste pela mesma regra, porque
+    quem aplica é `try_apply_status`, que é a única porta de entrada de status.
+
+    O combate não sabe quanto dura um sangramento nem quantos stacks ele aceita.
+    Isso é do catálogo.
+    """
+    for effect_id, modificador in ONHIT_PROCS.items():
+        chance = int(fx.combat_modifier(attacker, modificador))
+        if chance <= 0:
+            continue
+        definicao = core.definition(effect_id)
+        try_apply_status(
+            defender,
+            effect_id,
+            chance,
+            definicao.default_duration if definicao else 1,
+            r,
+            publish,
+            applied_kind=f"{effect_id}_applied",
+            source_id=getattr(attacker, "nick_name", "atacante"),
+        )
 
 
 def _absorve_com_egide(defender, damage: int, publish: PublishFn) -> int:
@@ -740,49 +778,41 @@ def process_turn_start_effects(
         if entity.get_mp() > max_mp:
             entity._mp = max_mp
 
+    # O NÚCLEO passa o turno: aplica DoT e dreno, decrementa e expira. Ele não
+    # publica evento nem conhece a tela — devolve o que aconteceu, e a voz é
+    # dada aqui.
+    relatorio = core.tick_effects(entity)
+    skipped_turn = relatorio["skip_turn"]
+
+    for effect_id, dano in relatorio["dot"].items():
+        _emit(
+            publish,
+            T.COMBAT_TURN_EFFECT,
+            type_="turn_effect",
+            payload={"entity": entity, "kind": f"{effect_id}_tick", "damage": dano},
+        )
+    for effect_id, quanto in relatorio["drain"].items():
+        _emit(
+            publish,
+            T.COMBAT_TURN_EFFECT,
+            type_="turn_effect",
+            payload={"entity": entity, "kind": f"{effect_id}_tick", "amount": quanto},
+        )
+    for instancia in core.instances(entity, core.FAMILY_CONTROL):
+        _emit(
+            publish,
+            T.COMBAT_TURN_EFFECT,
+            type_="turn_effect",
+            payload={"entity": entity, "kind": instancia.effect},
+        )
+
+    # `damage_reduction` ainda é escrito como dicionário simples pela skill de
+    # monstro, e não é efeito de catálogo: não tem família, não empilha, não
+    # resiste. Fica com o ciclo antigo até ser migrado, e o núcleo não o toca.
     effects_to_remove: list[str] = []
-    buffs_to_remove: list[str] = []
-
     for effect, data in list(getattr(entity, "active_effects", {}).items()):
-        if effect == "poison":
-            poison_damage = POISON_DAMAGE_PER_TICK + (entity.get_ag() // POISON_AGILITY_DIVISOR)
-            entity.take_damage(poison_damage)
-            _emit(
-                publish,
-                T.COMBAT_TURN_EFFECT,
-                type_="turn_effect",
-                payload={"entity": entity, "kind": "poison_tick", "damage": poison_damage},
-            )
-        elif effect == "bleed":
-            max_hp = int(getattr(entity, "base_hp", entity.get_hp()))
-            bleed_damage = max(1, int(max_hp * BLEED_DAMAGE_PERCENT / 100))
-            entity.take_damage(bleed_damage)
-            _emit(
-                publish,
-                T.COMBAT_TURN_EFFECT,
-                type_="turn_effect",
-                payload={"entity": entity, "kind": "bleed_tick", "damage": bleed_damage},
-            )
-        elif effect == "mana_burn":
-            entity.reduce_mp(MANA_BURN_PER_TICK)
-            if entity.get_mp() < 0:
-                entity._mp = 0
-            _emit(
-                publish,
-                T.COMBAT_TURN_EFFECT,
-                type_="turn_effect",
-                payload={"entity": entity, "kind": "mana_burn_tick", "amount": MANA_BURN_PER_TICK},
-            )
-
-        if effect in fx.TURN_SKIPPING_STATUSES:
-            _emit(
-                publish,
-                T.COMBAT_TURN_EFFECT,
-                type_="turn_effect",
-                payload={"entity": entity, "kind": effect},
-            )
-            skipped_turn = True
-
+        if isinstance(data, core.EffectInstance) or not isinstance(data, dict):
+            continue
         if effect == "damage_reduction":
             _emit(
                 publish,
@@ -794,24 +824,27 @@ def process_turn_start_effects(
                     "value": data.get("value", 0),
                 },
             )
-
         data["duration"] -= 1
         if data["duration"] <= 0:
             effects_to_remove.append(effect)
 
-    for buff, data in list(getattr(entity, "active_buffs", {}).items()):
-        data["duration"] -= 1
-        if data["duration"] <= 0:
-            buffs_to_remove.append(buff)
-
     for effect in effects_to_remove:
         del entity.active_effects[effect]
+        relatorio["expired"].append(effect)
+
+    for effect in relatorio["expired"]:
         _emit(
             publish,
             T.COMBAT_TURN_EFFECT,
             type_="turn_effect",
             payload={"entity": entity, "kind": "effect_expired", "name": effect},
         )
+
+    buffs_to_remove: list[str] = []
+    for buff, data in list(getattr(entity, "active_buffs", {}).items()):
+        data["duration"] -= 1
+        if data["duration"] <= 0:
+            buffs_to_remove.append(buff)
 
     for buff in buffs_to_remove:
         del entity.active_buffs[buff]

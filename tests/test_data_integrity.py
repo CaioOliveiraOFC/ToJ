@@ -304,15 +304,16 @@ class TestEfeitoDeEquipamentoEConhecido:
             "life_steal",
             "mana_regen",
             "death_ignore",
+            # on-hit: o valor é a CHANCE, e a mecânica é do catálogo global.
+            "stun",
+            "bleed",
+            "poison",
+            "fear",
         }
     )
 
     # Backlog consciente. Cada entrada tem um motivo, não é uma amnistia geral.
     KNOWN_BACKLOG = {
-        "stun": "on-hit: precisa de resolução de proc, que ainda não existe",
-        "bleed": "on-hit: idem",
-        "poison": "on-hit: idem",
-        "fear": "on-hit: idem",
         "true_damage": "sem mecânica: 'ignora defesa' ainda não é um conceito do motor",
         "armageddon": "sem mecânica: o nome não corresponde a nada",
     }
@@ -338,7 +339,9 @@ class TestEfeitoDeEquipamentoEConhecido:
         from src.entities.heroes import Player
 
         atributos = {nome for fontes in Player.EQUIP_STAT_SOURCES.values() for nome in fontes}
-        assert self.SUPPORTED == atributos | set(Player.EQUIP_COMBAT_EFFECTS)
+        assert self.SUPPORTED == (
+            atributos | set(Player.EQUIP_COMBAT_EFFECTS) | set(Player.EQUIP_ONHIT_EFFECTS)
+        )
 
     def test_backlog_e_supported_nao_se_sobrepoem(self):
         """Um efeito ligado não pode continuar listado como pendente."""

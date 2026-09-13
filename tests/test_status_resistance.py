@@ -18,6 +18,7 @@ from src.content.factories.archetypes import spawn_by_role  # noqa: E402
 from src.content.items import Item  # noqa: E402
 from src.content.skills_loader import load_skills  # noqa: E402
 from src.mechanics import combat as cmb  # noqa: E402
+from src.shared import effect_core as core
 from src.shared import effects as fx  # noqa: E402
 from src.sim.harness import make_hero  # noqa: E402
 from tests.test_damage_pipeline import ACERTA_SEM_CRIT, RngRoteirizado  # noqa: E402
@@ -150,18 +151,34 @@ class TestOsCaminhosDeAplicacao:
 
 
 def test_o_vocabulario_e_o_do_motor():
-    """A lista de resistíveis é montada das famílias, não escrita à mão."""
+    """A lista de resistíveis vem do CATÁLOGO, não de uma lista escrita à mão.
+
+    Cresceu com o núcleo global: os oito efeitos de atributo e os dois de
+    recurso negativos entraram, e são resistíveis pela mesma regra — nada no
+    catálogo é resistível por exceção.
+    """
     canonicos = set(fx.negative_statuses())
     assert canonicos == {
+        # controle
         "frozen",
         "stun",
         "sleep",
+        # dano e dreno por turno
         "poison",
         "bleed",
-        "weakened",
-        "fear",
         "mana_burn",
+        # acerto
+        "fear",
+        # atributo
+        "weakened",
+        "hexed",
+        "slowed",
+        "vulnerable",
+        # recurso
+        "frailty",
+        "clouded",
     }
+    assert not any(core.CATALOG[e].positive for e in canonicos), "efeito positivo não é resistível"
     assert "invisible" not in canonicos, "estado benéfico não é resistível"
     assert "damage_reduction" not in canonicos, "buff que o lançador põe em si mesmo"
 

@@ -22,6 +22,7 @@ from src.content.passives import load_passives  # noqa: E402
 from src.content.skills_loader import load_skills  # noqa: E402
 from src.entities.heroes import POTION_BUFFS, POTION_STATUSES  # noqa: E402
 from src.mechanics import combat as cmb  # noqa: E402
+from src.shared import effect_core as core
 from src.shared import effects as fx  # noqa: E402
 from src.sim.encounters import build_encounter  # noqa: E402
 from src.sim.harness import ALL_CLASSES, make_hero, simulate, simulate_run  # noqa: E402
@@ -118,13 +119,11 @@ class TestCoberturaDeEfeitos:
     Perfeita — não fazia nada.
     """
 
-    STATUS_CONHECIDOS = (
-        set(fx.TURN_SKIPPING_STATUSES)
-        | set(fx.OUTGOING_DAMAGE_PENALTY)
-        | set(fx.DAMAGE_OVER_TIME)
-        | set(fx.RESOURCE_DRAIN)
-        | {"damage_reduction", "invisible"}
-    )
+    # Vem do CATÁLOGO global de efeitos, não de listas paralelas. Os dois nomes
+    # extras não são efeitos de catálogo: `damage_reduction` é escrito como
+    # dicionário simples pela skill de monstro, e `invisible` é um estado antigo
+    # sem família — os dois ainda esperam migração.
+    STATUS_CONHECIDOS = set(core.CATALOG) | {"damage_reduction", "invisible"}
     STATS_CONHECIDOS = set(fx.ATTRIBUTE_STATS) | set(fx.COMBAT_MODIFIERS)
 
     def test_toda_skill_de_buff_declara_o_atributo_que_modifica(self):
