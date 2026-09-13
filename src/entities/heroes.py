@@ -320,14 +320,19 @@ class Player(Entity):
         peça devolve o valor de antes, sem resíduo. Mesma escolha de
         `equipment_percent` e `get_status_resistance`, pelo mesmo motivo.
         """
-        if kind not in self.EQUIP_COMBAT_EFFECTS:
-            return 0.0
+        permitido = kind in self.EQUIP_COMBAT_EFFECTS
         total = 0.0
         for item in self.equipment.values():
             if item is None:
                 continue
-            if getattr(item, "effect_type", None) == kind:
+            if permitido and getattr(item, "effect_type", None) == kind:
                 total += float(getattr(item, "effect_value", 0) or 0)
+            # Encantamento tem allowlist PRÓPRIA, aplicada dentro de
+            # `enchantment_bonus`. São duas fontes na mesma peça, e nem sempre
+            # com o mesmo vocabulário: `damage_percent` só existe encantado.
+            encantado = getattr(item, "enchantment_bonus", None)
+            if callable(encantado):
+                total += float(encantado(kind))
         return total
 
     def equipment_percent(self, key: str) -> float:

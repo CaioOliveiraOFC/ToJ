@@ -151,6 +151,22 @@ def _linhas_de_socket(item) -> str:
     return linhas
 
 
+def _linhas_de_encantamento(item) -> str:
+    """Os encantamentos da peça. Vazio quando não há nenhum.
+
+    Diferente dos sockets, que mostram os vazios: socket vazio é uma vaga que o
+    jogador pode preencher, e precisa ser visível. Encantamento ausente não é
+    vaga — nada no jogo ainda enche uma.
+    """
+    encantos = [e for e in getattr(item, "enchantments", ()) or () if e is not None]
+    if not encantos:
+        return ""
+    linhas = "\n[bold]Encantamentos:[/bold]\n"
+    for i, encanto in enumerate(encantos, start=1):
+        linhas += f"  [{i}] [cyan]{escape_markup(encanto.display_name)}[/cyan]\n"
+    return linhas
+
+
 def _find_equipped_slot_by_item(player, item) -> str | None:
     """Encontra o slot onde o item está equipado."""
     for slot, equipped_item in player.equipment.items():
@@ -693,6 +709,7 @@ def navigate_inventory(
                 content += "[dim]Sem bônus de combate - item utilitário[/dim]\n"
 
         content += _linhas_de_socket(item)
+        content += _linhas_de_encantamento(item)
 
         # Raridade e classes
         if rarity in ("Epic", "Legendary"):

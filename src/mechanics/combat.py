@@ -119,7 +119,17 @@ def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifier
     if is_critical:
         xmult.append(CRIT_DAMAGE_BASE + fx.combat_modifier(attacker, "crit_damage") / 100)
 
+    # `+MULT`: percentuais ADITIVOS entre si. O bucket existe desde a
+    # centralização da linguagem de poder e nunca tinha dono — este é o
+    # primeiro. Pergunta pela MECÂNICA (`damage_percent`), como todo o resto:
+    # o funil não sabe que encantamento existe, nem precisa saber.
+    mult: list[float] = []
+    percentual = fx.combat_modifier(attacker, "damage_percent")
+    if percentual:
+        mult.append(percentual / 100)
+
     return DamageModifiers(
+        mult=mult,
         xmult=xmult,
         # Status do atacante que reduzem o dano que ele causa (weakened, fear) e
         # do defensor que reduzem o que ele recebe (redução ativa e passiva).

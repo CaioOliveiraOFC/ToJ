@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from src.content.enchantments import enchantment_from_dict, enchantment_to_dict
 from src.content.gems import gem_from_dict, gem_to_dict
 from src.content.passives import get_passive_by_id
 from src.content.skills_loader import get_skill_by_id
@@ -91,6 +92,9 @@ def _serializar(item) -> dict | None:
     gemas = list(getattr(item, "gems", ()) or ())
     if any(g is not None for g in gemas):
         registro["gems"] = [gem_to_dict(g) for g in gemas]
+    encantos = [e for e in getattr(item, "enchantments", ()) or () if e is not None]
+    if encantos:
+        registro["enchantments"] = [enchantment_to_dict(e) for e in encantos]
     return registro
 
 
@@ -117,6 +121,9 @@ def _desserializar(registro, item_registry):
         if sockets is not None:
             item.socket_count = max(0, min(MAX_SOCKETS, int(sockets)))
             item.gems = [None] * item.socket_count
+        item.enchantments = [
+            e for e in (enchantment_from_dict(d) for d in registro.get("enchantments", [])) if e
+        ]
         gemas = registro.get("gems")
         if gemas is not None:
             # A contagem de sockets vem da definição; o save só diz o que está

@@ -1,6 +1,7 @@
 import copy
 import random
 
+from src.content.enchantments import ENCHANT_EFFECTS, MAX_ENCHANTMENTS
 from src.data.loader import load_json
 from src.shared.constants import MAX_SOCKETS, RARITY_MULTIPLIERS, SOCKET_WEIGHTS_BY_RARITY
 from src.shared.formulas import enhancement_multiplier
@@ -41,6 +42,7 @@ class Item:
         hand_type: str | None = None,
         enhancement_level: int = 0,
         socket_count: int = 0,
+        enchantments: list | None = None,
     ) -> None:
         self.id: str = item_id
         self.name: str = name
@@ -93,6 +95,10 @@ class Item:
         # podem ter pedras diferentes.
         self.socket_count: int = max(0, min(MAX_SOCKETS, int(socket_count or 0)))
         self.gems: list = [None] * self.socket_count
+
+        # Encantamentos do exemplar. Lista, como os sockets, e pelo mesmo motivo:
+        # a peça pode ter vários, e um campo único fecharia a porta.
+        self.enchantments: list = list(enchantments or [])[:MAX_ENCHANTMENTS]
 
         if effect_type and effect_value:
             multiplier = RARITY_MULTIPLIERS.get(rarity, 1.0)
@@ -192,6 +198,45 @@ class Item:
                 return i
         return None
 
+    def enchant(self, enchantment, index: int | None = None):
+        """Acrescenta ou substitui um encantamento. Devolve o que saiu, ou `None`.
+
+        Sem `index`, ocupa o primeiro lugar livre até o teto; cheio, substitui o
+        primeiro. Simétrico a `socket`, e de propósito: são duas listas do mesmo
+        exemplar e não há razão para terem gramáticas diferentes.
+        """
+        if index is None:
+            if len(self.enchantments) < MAX_ENCHANTMENTS:
+                self.enchantments.append(enchantment)
+                return None
+            index = 0
+        if not 0 <= index < MAX_ENCHANTMENTS:
+            raise IndexError(f"Encantamento vai de 0 a {MAX_ENCHANTMENTS - 1}, não {index}")
+        if index >= len(self.enchantments):
+            self.enchantments.append(enchantment)
+            return None
+        anterior = self.enchantments[index]
+        self.enchantments[index] = enchantment
+        return anterior
+
+    def disenchant(self, index: int):
+        """Retira o encantamento da posição. Devolve ele, ou `None` se não havia."""
+        if not 0 <= index < len(self.enchantments):
+            return None
+        return self.enchantments.pop(index)
+
+    def enchantment_bonus(self, kind: str) -> float:
+        """Quanto os encantamentos desta peça acrescentam a um modificador.
+
+        Canal PRÓPRIO, ao lado do `effect_type` da peça e das gemas. Os três
+        somam no mesmo lugar porque representam a mesma coisa por caminhos
+        diferentes — mas continuam três campos distintos, e "de onde veio este
+        ponto de poder?" segue tendo resposta.
+        """
+        if kind not in ENCHANT_EFFECTS:
+            return 0.0
+        return sum(float(e.value) for e in self.enchantments if e is not None and e.effect == kind)
+
     def gem_percent(self, stat: str) -> float:
         """Quanto as pedras desta peça acrescentam a um atributo, em %.
 
@@ -211,7 +256,13 @@ class Item:
         Chamado onde uma peça NASCE: drop, oferta da loja, recompensa, bootstrap.
         """
         novo = self.instance()
-        novo.socket_count = roll_socket_count(novo.rarity, rng)
+        # Só peça equipável recebe encaixe. Poção não tem onde cravar uma gema, e
+        # o catálogo tem consumíveis Rare e Epic — sem esta guarda, um Elixir
+        # Épico nasceria com dois sockets que nada no jogo saberia usar.
+        if novo.consumable or not novo.slot:
+            novo.socket_count = 0
+        else:
+            novo.socket_count = roll_socket_count(novo.rarity, rng)
         novo.gems = [None] * novo.socket_count
         return novo
 
@@ -228,6 +279,7 @@ class Item:
         # definição dividiriam os sockets — encaixar um Rubi numa espada o
         # encaixaria em todas.
         novo.gems = list(self.gems)
+        novo.enchantments = list(self.enchantments)
         novo.status_resistances = dict(self.status_resistances)
         novo.classes = list(self.classes) if self.classes is not None else None
         return novo
@@ -299,6 +351,7 @@ def create_item_from_json(item_data: dict) -> Item:
         hands_required=item_data.get("hands_required", 1),
         enhancement_level=item_data.get("enhancement_level", 0),
         socket_count=item_data.get("socket_count", 0),
+        enchantments=item_data.get("enchantments"),
         hand_type=item_data.get("hand_type"),
     )
 
