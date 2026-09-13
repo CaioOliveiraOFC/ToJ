@@ -26,8 +26,10 @@ class Monster(Entity):
         base_df: Defesa base do monstro (constante de classe).
     """
 
-    base_hp: int = MONSTER_BASE_HP
-    base_mp: int = MONSTER_BASE_MP
+    # Defaults de classe. `hp`/`mp` guardam a base CRUA porque `base_hp` e
+    # `base_mp` são propriedades — o teto delas é derivado dos efeitos ativos.
+    _base_hp: int = MONSTER_BASE_HP
+    _base_mp: int = MONSTER_BASE_MP
     base_st: int = MONSTER_BASE_ST
     base_ag: int = MONSTER_BASE_AG
     base_mg: int = MONSTER_BASE_MG
@@ -61,10 +63,10 @@ class Monster(Entity):
         self.level: int = max(1, mob_level)
         self.isalive: bool = True
 
-        self._hp: int = int(hp if hp is not None else self.base_hp)
-        self.base_hp: int = int(hp if hp is not None else self.base_hp)
-        self._mp: int = int(mp if mp is not None else self.base_mp)
-        self.base_mp: int = int(mp if mp is not None else self.base_mp)
+        self._base_hp: int = int(hp if hp is not None else self._base_hp)
+        self._hp: int = self._base_hp
+        self._base_mp: int = int(mp if mp is not None else self._base_mp)
+        self._mp: int = self._base_mp
 
         self._st: int = int(st if st is not None else self.base_st)
         self.base_st: int = int(st if st is not None else self.base_st)
@@ -90,6 +92,27 @@ class Monster(Entity):
         # abertura, quando um buff de duração rende todos os turnos à frente.
         self.turns_taken: int = 0
 
+    # O teto de HP/MP é DERIVADO, como no herói. Era atributo cru, e por isso
+    # Vitalidade e Fragilidade mudavam `get_stat("hp")` mas não `base_hp` — que
+    # é o teto que `heal()`, a regeneração de mana e o tick de efeitos leem. Na
+    # prática, o efeito de recurso funcionava no herói e não funcionava no
+    # monstro: assimetria do resolvedor, não decisão de design.
+    @property
+    def base_hp(self) -> int:
+        return max(1, int(self._base_hp * (1 + core.resource_percent(self, "hp") / 100)))
+
+    @base_hp.setter
+    def base_hp(self, valor: int) -> None:
+        self._base_hp = int(valor)
+
+    @property
+    def base_mp(self) -> int:
+        return max(0, int(self._base_mp * (1 + core.resource_percent(self, "mp") / 100)))
+
+    @base_mp.setter
+    def base_mp(self, valor: int) -> None:
+        self._base_mp = int(valor)
+
     def get_stat(self, stat: str) -> int:
         """Valor de um atributo somando os buffs ativos que o modificam.
 
@@ -102,7 +125,9 @@ class Monster(Entity):
         base = int(getattr(self, f"base_{stat}"))
         com_buff = base + sum_buffs(self, stat)
         if stat in ("hp", "mp"):
-            return max(1, int(com_buff * (1 + core.resource_percent(self, stat) / 100)))
+            # `base_hp`/`base_mp` já são propriedades que aplicam o efeito de
+            # recurso; aplicar de novo aqui contaria o mesmo bônus duas vezes.
+            return max(1, com_buff)
         # O mesmo piso do herói: o núcleo não pergunta quem é a entidade.
         return core.apply_attribute_floor(
             base, com_buff * (1 + core.attribute_percent(self, stat) / 100)

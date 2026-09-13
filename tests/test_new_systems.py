@@ -166,7 +166,11 @@ class TestDamageReduction:
     def test_dano_reduzido_com_efeito_ativo(self):
         attacker = StubEntity(df=0)
         defender = StubEntity(df=0, hp=100)
-        defender.active_effects["damage_reduction"] = {"value": 50, "duration": 3}
+        defender.active_buffs["Redução de Dano"] = {
+            "stat": "damage_reduction",
+            "value": 50,
+            "duration": 3,
+        }
         # Sem redução, dano base 100 com DEF 0 = 100
         # Com 50% redução, dano = 50
         res = cmb.resolve_physical_attack(attacker, defender, base_damage=100, rng=random.Random(3))
@@ -176,7 +180,11 @@ class TestDamageReduction:
 
     def test_damage_reduction_expira_apos_duracao(self):
         entity = StubEntity()
-        entity.active_effects["damage_reduction"] = {"value": 30, "duration": 1}
+        entity.active_buffs["Redução de Dano"] = {
+            "stat": "damage_reduction",
+            "value": 30,
+            "duration": 1,
+        }
         cmb.process_turn_start_effects(entity)
         assert "damage_reduction" not in entity.active_effects
 
@@ -185,15 +193,23 @@ class TestDamageReduction:
         target = StubEntity()
         skill = make_skill(effect_type="damage_reduction", effect_value=30, duration=3, mana=10)
         # Usamos duration da skill
-        cmb.apply_skill(caster, target, skill, rng=random.Random(0))
-        assert "damage_reduction" in target.active_effects
-        assert target.active_effects["damage_reduction"]["value"] == 30
-        assert target.active_effects["damage_reduction"]["duration"] == 3
+        res = cmb.apply_skill(caster, target, skill, rng=random.Random(0))
+        # Mora onde o buff do herói sempre morou, com a FONTE na chave: não há
+        # mais um formato exclusivo de monstro.
+        alvo = caster if getattr(skill, "target", "self") == "self" else target
+        registro = alvo.active_buffs[res.buff_name]
+        assert registro["stat"] == "damage_reduction"
+        assert (registro["value"], registro["duration"]) == (30, 3)
+        assert "damage_reduction" not in alvo.active_effects
 
     def test_dano_minimo_1_mesmo_com_reducao(self):
         attacker = StubEntity()
         defender = StubEntity(hp=10)
-        defender.active_effects["damage_reduction"] = {"value": 99, "duration": 2}
+        defender.active_buffs["Redução de Dano"] = {
+            "stat": "damage_reduction",
+            "value": 99,
+            "duration": 2,
+        }
         res = cmb.resolve_physical_attack(attacker, defender, base_damage=1, rng=random.Random(3))
         assert res.damage >= 1
 

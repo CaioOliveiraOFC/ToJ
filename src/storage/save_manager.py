@@ -273,6 +273,17 @@ def load_game(
 
         player.active_buffs = save_data.get("active_buffs", {})
         player.active_effects = save_data.get("active_effects", {})
+        # Save anterior à paridade guardava a redução de dano do monstro como
+        # dicionário solto em `active_effects`. Ela agora é buff, como a do
+        # herói sempre foi; sem esta migração ela ficaria no estado sem nunca
+        # ser lida nem expirar.
+        legado = player.active_effects.pop("damage_reduction", None)
+        if isinstance(legado, dict):
+            player.active_buffs["Redução de Dano"] = {
+                "stat": "damage_reduction",
+                "value": int(legado.get("value", 0)),
+                "duration": int(legado.get("duration", 1)),
+            }
 
         passive_ids = save_data.get("passives", [])
         if passive_ids:

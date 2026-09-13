@@ -119,14 +119,22 @@ def atacante_com_fear() -> int:
 
 def defensor_com_reducao() -> int:
     h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
-    m.active_effects["damage_reduction"] = {"value": 30, "duration": 3}
+    m.active_buffs["Redução de Dano"] = {
+        "stat": "damage_reduction",
+        "value": 30,
+        "duration": 3,
+    }
     return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
 
 
 def dois_redutores() -> int:
     h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
     h.active_effects["fear"] = {"duration": 3}
-    m.active_effects["damage_reduction"] = {"value": 30, "duration": 3}
+    m.active_buffs["Redução de Dano"] = {
+        "stat": "damage_reduction",
+        "value": 30,
+        "duration": 3,
+    }
     return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
 
 

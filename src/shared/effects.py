@@ -209,14 +209,13 @@ def outgoing_damage_multiplier(entity) -> float:
 
 
 def incoming_damage_multiplier(entity) -> float:
-    """Multiplicador de dano recebido, considerando redução ativa e passiva."""
-    reduction = 0.0
-    effects = getattr(entity, "active_effects", {})
-    data = effects.get("damage_reduction")
-    if isinstance(data, dict):
-        reduction += float(data.get("value", 0))
-    reduction += combat_modifier(entity, "damage_reduction")
-    return max(0.1, 1 - min(80.0, reduction) / 100)
+    """Multiplicador de dano recebido: buff, passiva, equipamento e encantamento.
+
+    Uma leitura só. Havia uma segunda, para o dicionário solto que a skill de
+    monstro escrevia — a última mecânica com representação exclusiva de monstro,
+    e a exceção morreu junto com ela.
+    """
+    return max(0.1, 1 - min(80.0, combat_modifier(entity, "damage_reduction")) / 100)
 
 
 def wake_on_damage(entity) -> list[str]:

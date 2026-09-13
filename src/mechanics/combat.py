@@ -455,7 +455,20 @@ def try_apply_status(
     return True
 
 
-def _try_apply_stun(target, chance: int, r: random.Random, publish: PublishFn) -> bool:
+def _fonte_da_skill(skill) -> str:
+    """A identidade de uma skill como FONTE de efeito.
+
+    A carta, não quem a lança: a regra é que a mesma skill reaplicada renove a
+    contribuição dela em vez de empilhar. Duas cartas diferentes que aplicam
+    `weakened` são duas fontes e somam; a mesma carta lançada quatro vezes
+    continua valendo uma.
+    """
+    return str(getattr(skill, "id", None) or getattr(skill, "name", "") or "skill")
+
+
+def _try_apply_stun(
+    target, chance: int, r: random.Random, publish: PublishFn, source_id: str = "skill"
+) -> bool:
     """Rola atordoamento pelo resolvedor central. Devolve se atordoou.
 
     Existe para que os três caminhos que atordoam — passiva do atacante, skill de
@@ -466,7 +479,14 @@ def _try_apply_stun(target, chance: int, r: random.Random, publish: PublishFn) -
     if not chance:
         return False
     return try_apply_status(
-        target, "stun", int(chance), STUN_DURATION, r, publish, applied_kind="stun_applied"
+        target,
+        "stun",
+        int(chance),
+        STUN_DURATION,
+        r,
+        publish,
+        applied_kind="stun_applied",
+        source_id=source_id,
     )
 
 
@@ -630,7 +650,13 @@ def apply_skill(
         # Stun que a skill carrega. Só rola se o golpe conectou: um ataque
         # esquivado não atordoa.
         if strike and not strike.was_evaded:
-            _try_apply_stun(target, int(getattr(skill, "stun_chance", 0) or 0), r, publish)
+            _try_apply_stun(
+                target,
+                int(getattr(skill, "stun_chance", 0) or 0),
+                r,
+                publish,
+                _fonte_da_skill(skill),
+            )
         out = SkillApplyResult(kind="damage", mp_spent=custo, strike=strike)
         _emit(
             publish,
@@ -664,12 +690,19 @@ def apply_skill(
             int(skill.duration),
             r,
             publish,
+            source_id=_fonte_da_skill(skill),
         ):
             # O atordoamento da skill também vale aqui. Este ramo não o rolava:
             # o bloco existia só na versão de dano, então `Golpe Baixo` aplicava
             # `weakened` em 100% das vezes e nunca os seus 15% de atordoamento.
             # Só rola quando o status pegou — uma skill que falhou não atordoa.
-            _try_apply_stun(target, int(getattr(skill, "stun_chance", 0) or 0), r, publish)
+            _try_apply_stun(
+                target,
+                int(getattr(skill, "stun_chance", 0) or 0),
+                r,
+                publish,
+                _fonte_da_skill(skill),
+            )
             out = SkillApplyResult(
                 kind="status",
                 mp_spent=custo,
@@ -715,19 +748,31 @@ def apply_skill(
         return out
 
     if skill.effect_type == "damage_reduction":
+        # O MESMO caminho do buff do herói. Antes esta era a única mecânica com
+        # representação exclusiva de monstro: um dicionário solto em
+        # `active_effects`, fora do ciclo de buff, lido por uma exceção em
+        # `incoming_damage_multiplier` e por outra na IA. Três lugares sabiam de
+        # um formato que só o monstro usava.
+        #
+        # `damage_reduction` não é status: não se resiste a ele, não empilha por
+        # stack, e quem o lança põe em si mesmo. É modificador de combate, e o
+        # canal de modificador de combate é `active_buffs`, com a fonte na chave.
         value = (
             int(skill.effect_value)
             if isinstance(skill.effect_value, int)
             else DAMAGE_REDUCTION_DEFAULT_PERCENT
         )
         duration = int(skill.duration) if skill.duration else DAMAGE_REDUCTION_DURATION
-        # Aplica no alvo indicado pelo skill (self -> caster, enemy -> target)
         recipient = caster if getattr(skill, "target", "self") == "self" else target
-        recipient.active_effects["damage_reduction"] = {"value": value, "duration": duration}
+        recipient.active_buffs[str(skill.name)] = {
+            "stat": "damage_reduction",
+            "value": value,
+            "duration": duration,
+        }
         out = SkillApplyResult(
             kind="buff",
             mp_spent=custo,
-            buff_name="damage_reduction",
+            buff_name=str(skill.name),
         )
         _emit(
             publish,
@@ -805,32 +850,6 @@ def process_turn_start_effects(
             type_="turn_effect",
             payload={"entity": entity, "kind": instancia.effect},
         )
-
-    # `damage_reduction` ainda é escrito como dicionário simples pela skill de
-    # monstro, e não é efeito de catálogo: não tem família, não empilha, não
-    # resiste. Fica com o ciclo antigo até ser migrado, e o núcleo não o toca.
-    effects_to_remove: list[str] = []
-    for effect, data in list(getattr(entity, "active_effects", {}).items()):
-        if isinstance(data, core.EffectInstance) or not isinstance(data, dict):
-            continue
-        if effect == "damage_reduction":
-            _emit(
-                publish,
-                T.COMBAT_TURN_EFFECT,
-                type_="turn_effect",
-                payload={
-                    "entity": entity,
-                    "kind": "damage_reduction_active",
-                    "value": data.get("value", 0),
-                },
-            )
-        data["duration"] -= 1
-        if data["duration"] <= 0:
-            effects_to_remove.append(effect)
-
-    for effect in effects_to_remove:
-        del entity.active_effects[effect]
-        relatorio["expired"].append(effect)
 
     for effect in relatorio["expired"]:
         _emit(

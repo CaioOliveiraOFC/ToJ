@@ -106,9 +106,8 @@ def _maior(skills: list):
 
 def _ja_esta_no_ar(monster, skill, target=None) -> bool:
     """Evita relançar o que já está ativo — gastar turno em nada é o defeito."""
-    if skill.effect_type == "damage_reduction":
-        return "damage_reduction" in getattr(monster, "active_effects", {})
-    if skill.effect_type == "buff":
+    if skill.effect_type in ("damage_reduction", "buff"):
+        # As duas moram no mesmo lugar agora, com a fonte na chave.
         return str(skill.name) in getattr(monster, "active_buffs", {})
     if skill.effect_type == "status" and target is not None:
         # O status vive no ALVO, não em quem lança — por isso o alvo precisa

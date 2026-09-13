@@ -186,7 +186,14 @@ class TestJogadasDecisivas:
 class TestTurnoDesperdicado:
     def test_nao_relanca_reducao_de_dano_ja_ativa(self):
         monstro = spawn_by_role("tank", 8)
-        monstro.active_effects["damage_reduction"] = {"value": 35, "duration": 3}
+        # A chave é o NOME DA SKILL, igual ao buff — é assim que a IA sabe que
+        # a carta dela já está no ar.
+        carapaca = next(s for s in monstro.skills if s.id == "mob_carapaca")
+        monstro.active_buffs[carapaca.name] = {
+            "stat": "damage_reduction",
+            "value": 35,
+            "duration": 3,
+        }
         from src.mechanics.monster_ai import _usable_skills
 
         ids = {s.id for s in _usable_skills(monstro)}
