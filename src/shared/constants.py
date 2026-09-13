@@ -45,6 +45,16 @@ MINI_BOSS_BASE_XP_REWARD = 120
 # primeiro degrau é o melhor negócio é uma escada quebrada.
 ENHANCEMENT_RATE = 0.15
 
+# Quanto o nível de uma gema vale, em pontos percentuais do atributo.
+#
+# Entra num logaritmo, e NÃO na mesma raiz que `+N` usa: os dois sistemas são
+# independentes, e a forma de cada um segue de como o jogador o obtém. Rank de
+# item se compra um degrau por vez, então precisa de passos parecidos — daí a
+# raiz. Nível de gema se ENCONTRA: a gema inteira é substituída por outra
+# melhor, e nunca se paga do Nv.7 para o Nv.8. Aí o salto grande no começo é
+# virtude: achar o primeiro Rubi tem que ser um acontecimento.
+GEM_RATE = 6.0
+
 RARITY_MULTIPLIERS = {
     "Common": 1.0,
     "Rare": 1.15,

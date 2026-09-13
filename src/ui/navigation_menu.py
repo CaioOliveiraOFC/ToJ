@@ -132,6 +132,25 @@ def equipar_escolhendo_posicao(player, item) -> str:
     return player.equip(item, posicao)
 
 
+def _linhas_de_socket(item) -> str:
+    """As pedras da peça, uma por linha. Vazio quando o item não tem socket."""
+    total = int(getattr(item, "socket_count", 0) or 0)
+    if total <= 0:
+        return ""
+    linhas = "\n[bold]Sockets:[/bold]\n"
+    gemas = list(getattr(item, "gems", ()) or ())
+    for i in range(total):
+        gema = gemas[i] if i < len(gemas) else None
+        if gema is None:
+            linhas += f"  [{i + 1}] [dim]Vazio[/dim]\n"
+        else:
+            linhas += (
+                f"  [{i + 1}] [magenta]{escape_markup(gema.display_name)}[/magenta] "
+                f"[dim](+{gema.percent:.1f}% {gema.stat})[/dim]\n"
+            )
+    return linhas
+
+
 def _find_equipped_slot_by_item(player, item) -> str | None:
     """Encontra o slot onde o item está equipado."""
     for slot, equipped_item in player.equipment.items():
@@ -672,6 +691,8 @@ def navigate_inventory(
                 content += f"[bold]Efeito:[/bold] [green]{effect_type} +{effect_value}[/green]\n"
             if not damage and not defense and not (effect_type and effect_value):
                 content += "[dim]Sem bônus de combate - item utilitário[/dim]\n"
+
+        content += _linhas_de_socket(item)
 
         # Raridade e classes
         if rarity in ("Epic", "Legendary"):

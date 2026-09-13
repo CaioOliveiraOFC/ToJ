@@ -15,6 +15,7 @@ import math
 
 from src.shared.constants import (
     ENHANCEMENT_RATE,
+    GEM_RATE,
     GROWTH_RATE,
     XP_BASE_COST,
     XP_LEVEL_SOFTENER,
@@ -79,3 +80,18 @@ def enhancement_multiplier(level: int) -> float:
     ficou com nove multiplicadores soltos antes da centralização.
     """
     return 1.0 + ENHANCEMENT_RATE * math.sqrt(max(0, int(level)))
+
+
+def gem_percent(level: int) -> float:
+    """Quanto uma gema de nível `level` acrescenta ao atributo dela, em %.
+
+    `GEM_RATE * ln(1 + N)`. Percentual e não pontos fixos: `+50 de Força` seria
+    metade do herói no nível 1 e ruído no nível 40, então a gema morreria junto
+    com a escala — que é o defeito que o equipamento já teve uma vez.
+
+    Função separada de `enhancement_multiplier` de propósito, e não por
+    duplicação: são dois sistemas, e nada garante que a curva de um sirva ao
+    outro. Compartilhar a função seria acoplar duas progressões que o desenho
+    quer independentes.
+    """
+    return GEM_RATE * math.log(1 + max(0, int(level)))

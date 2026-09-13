@@ -150,6 +150,11 @@ class Player(Entity):
         # Resistência a status negativo, por nome canônico. Vazio: nenhum herói
         # nasce resistente. Ver `Entity.get_status_resistance`.
         self.resistances: dict[str, int] = {}
+        # Bolsa de gemas soltas. Lista própria e não `inventory`: gema não é
+        # equipamento nem consumível, e todo consumidor de `inventory` teria de
+        # aprender a ignorá-la — a loja, o descarte do bot, a tela de itens do
+        # combate. Separar é a solução menor.
+        self.gems: list = []
 
     # As posições físicas do personagem, na ordem em que a UI as mostra.
     #
@@ -326,12 +331,22 @@ class Player(Entity):
         return total
 
     def equipment_percent(self, key: str) -> float:
-        """Soma, em percentual, o que o equipamento acrescenta a um atributo."""
+        """Soma, em percentual, o que o equipamento acrescenta a um atributo.
+
+        Duas contribuições, somadas e nunca misturadas: o que a PEÇA declara
+        (já com o `+N` dela resolvido) e o que as GEMAS encaixadas nela trazem.
+        A gema entra aqui, e não num canal próprio, porque é exatamente isto que
+        ela é — percentual de atributo. Assim ela funciona nas onze posições sem
+        uma linha de código por slot.
+        """
         total = 0.0
         sources = self.EQUIP_STAT_SOURCES.get(key, ())
         for item in self.equipment.values():
             if item is None:
                 continue
+            obter_gemas = getattr(item, "gem_percent", None)
+            if callable(obter_gemas):
+                total += float(obter_gemas(key))
             if key == "df":
                 total += float(getattr(item, "defense_bonus", 0))
             # `elif`: os dois ramos não eram exclusivos, então um item com
@@ -436,6 +451,29 @@ class Player(Entity):
     @base_df.setter
     def base_df(self, value: int) -> None:
         self._add_bonus("df", int(value) - self.base_df)
+
+    def socket_gem(self, item, gem, index: int | None = None) -> bool:
+        """Encaixa uma gema da bolsa numa peça. A pedra trocada volta para a bolsa.
+
+        Mora no `Player` porque é aqui que a posse existe: o item sabe encaixar,
+        mas não sabe de onde a pedra veio nem para onde a antiga vai. É a mesma
+        divisão de `equip`, e é o que garante que nenhuma gema se perca no meio.
+        """
+        if int(getattr(item, "socket_count", 0) or 0) <= 0:
+            return False
+        anterior = item.socket(gem, index)
+        if gem in self.gems:
+            self.gems.remove(gem)
+        if anterior is not None:
+            self.gems.append(anterior)
+        return True
+
+    def unsocket_gem(self, item, index: int):
+        """Retira a gema do socket e devolve à bolsa. Retorna a pedra, ou `None`."""
+        gem = item.unsocket(index)
+        if gem is not None:
+            self.gems.append(gem)
+        return gem
 
     def add_item_to_inventory(self, item: object) -> str | None:
         """Adiciona item ao inventário.

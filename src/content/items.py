@@ -39,6 +39,7 @@ class Item:
         hands_required: int = 1,
         hand_type: str | None = None,
         enhancement_level: int = 0,
+        socket_count: int = 0,
     ) -> None:
         self.id: str = item_id
         self.name: str = name
@@ -84,6 +85,13 @@ class Item:
         # Espadas de Ferro podem estar +3 e +17 ao mesmo tempo. Sem teto — a
         # masmorra é infinita, e um cap aqui seria o fim da progressão do item.
         self.enhancement_level: int = max(0, int(enhancement_level or 0))
+
+        # Sockets. Uma LISTA, e não um `self.gem`: um item com dois ou três
+        # encaixes é conteúdo, não arquitetura nova, e um campo único fecharia
+        # essa porta. Pertence ao EXEMPLAR, como o rank — duas Espadas de Ferro
+        # podem ter pedras diferentes.
+        self.socket_count: int = max(0, int(socket_count or 0))
+        self.gems: list = [None] * self.socket_count
 
         if effect_type and effect_value:
             multiplier = RARITY_MULTIPLIERS.get(rarity, 1.0)
@@ -150,6 +158,48 @@ class Item:
         self.enhancement_level = max(0, self.enhancement_level + int(amount))
         return self.enhancement_level
 
+    def socket(self, gem, index: int | None = None):
+        """Encaixa `gem`. Devolve a pedra que saiu, ou `None` se o socket estava vazio.
+
+        Sem `index`, usa o primeiro socket livre; sem nenhum livre, substitui o
+        primeiro. Quem chama decide o que fazer com a devolvida — devolver ao
+        inventário é responsabilidade do `Player`, não do item.
+        """
+        if self.socket_count <= 0:
+            raise ValueError(f"{self.name} não tem socket.")
+        if index is None:
+            index = self.free_socket()
+            if index is None:
+                index = 0
+        if not 0 <= index < self.socket_count:
+            raise IndexError(f"{self.name} tem {self.socket_count} socket(s), não o índice {index}")
+        anterior = self.gems[index]
+        self.gems[index] = gem
+        return anterior
+
+    def unsocket(self, index: int):
+        """Retira a pedra do socket. Devolve ela, ou `None` se estava vazio."""
+        if not 0 <= index < self.socket_count:
+            raise IndexError(f"{self.name} tem {self.socket_count} socket(s), não o índice {index}")
+        gem, self.gems[index] = self.gems[index], None
+        return gem
+
+    def free_socket(self) -> int | None:
+        """Índice do primeiro socket vazio, ou `None` se estão todos ocupados."""
+        for i, gem in enumerate(self.gems):
+            if gem is None:
+                return i
+        return None
+
+    def gem_percent(self, stat: str) -> float:
+        """Quanto as pedras desta peça acrescentam a um atributo, em %.
+
+        Separado de `damage_bonus` e companhia de propósito: `+N` multiplica a
+        base da peça, a gema soma um percentual do atributo do personagem. Somar
+        as duas no mesmo campo apagaria a diferença que o desenho quer manter.
+        """
+        return sum(g.percent for g in self.gems if g is not None and g.stat == stat)
+
     def instance(self) -> "Item":
         """Um exemplar novo desta definição.
 
@@ -159,6 +209,10 @@ class Item:
         mundo — loja, drop, save, loadout — e não em quem só lê o catálogo.
         """
         novo = copy.copy(self)
+        # Lista própria: `copy.copy` é raso, e sem isto dois exemplares da mesma
+        # definição dividiriam os sockets — encaixar um Rubi numa espada o
+        # encaixaria em todas.
+        novo.gems = list(self.gems)
         novo.status_resistances = dict(self.status_resistances)
         novo.classes = list(self.classes) if self.classes is not None else None
         return novo
@@ -215,6 +269,7 @@ def create_item_from_json(item_data: dict) -> Item:
         status_resistances=item_data.get("status_resistances"),
         hands_required=item_data.get("hands_required", 1),
         enhancement_level=item_data.get("enhancement_level", 0),
+        socket_count=item_data.get("socket_count", 0),
         hand_type=item_data.get("hand_type"),
     )
 

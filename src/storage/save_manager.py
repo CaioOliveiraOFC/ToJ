@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from src.content.gems import gem_from_dict, gem_to_dict
 from src.content.passives import get_passive_by_id
 from src.content.skills_loader import get_skill_by_id
 
@@ -80,6 +81,9 @@ def _serializar(item) -> dict | None:
     rank = int(getattr(item, "enhancement_level", 0) or 0)
     if rank:
         registro["enhancement_level"] = rank
+    gemas = list(getattr(item, "gems", ()) or ())
+    if any(g is not None for g in gemas):
+        registro["gems"] = [gem_to_dict(g) for g in gemas]
     return registro
 
 
@@ -100,6 +104,17 @@ def _desserializar(registro, item_registry):
     item = definicao.instance()
     if isinstance(registro, dict):
         item.enhancement_level = max(0, int(registro.get("enhancement_level", 0) or 0))
+        gemas = registro.get("gems")
+        if gemas is not None:
+            # A contagem de sockets vem da definição; o save só diz o que está
+            # encaixado. Se o catálogo mudar o item para menos sockets, a pedra
+            # a mais some do encaixe — mas o excedente volta para a bolsa, em
+            # `load_game`, em vez de evaporar.
+            for i, dados in enumerate(gemas[: item.socket_count]):
+                item.gems[i] = gem_from_dict(dados)
+            item.gems_excedentes = [
+                g for g in (gem_from_dict(d) for d in gemas[item.socket_count :]) if g
+            ]
     return item
 
 
@@ -128,6 +143,7 @@ def save_game(
         # daquele andar de novo, e salvar/carregar em laço imprimiria moeda.
         "ledger": dict(getattr(player, "ledger", {})),
         "last_interest_floor": int(getattr(player, "last_interest_floor", 0)),
+        "gems": [gem_to_dict(g) for g in getattr(player, "gems", ())],
         "inventory": inventory_names,
         "equipment": equipment_names,
         "passives": passive_ids,
@@ -208,6 +224,8 @@ def load_game(
         player.last_interest_floor = int(save_data.get("last_interest_floor", 0))
 
         # Reconstrói o inventário (pula itens que não existem mais no registro)
+        player.gems = [g for g in (gem_from_dict(d) for d in save_data.get("gems", [])) if g]
+
         player.inventory = []
         for registro in save_data["inventory"]:
             item = _desserializar(registro, item_registry)
@@ -231,6 +249,7 @@ def load_game(
                     and item_to_equip not in player.inventory
                 ):
                     player.inventory.append(item_to_equip)
+                player.gems.extend(getattr(item_to_equip, "gems_excedentes", ()))
 
         player.active_buffs = save_data.get("active_buffs", {})
         player.active_effects = save_data.get("active_effects", {})
