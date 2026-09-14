@@ -38,8 +38,8 @@
         "agility": 0.95
       },
       "skill_use_chance": 0,
-      "threat": "Acúmulo. Nunca mata sozinho, drena recurso em grupo.",
-      "counterplay": "Matar rápido e gastar pouco.",
+      "threat": "Atrito. Mata devagar e cobra recurso que valia para a luta seguinte.",
+      "counterplay": "Matar rápido e gastar pouco: o andar tem outros.",
       "names": [
         "Goblin",
         "Rato Gigante",
@@ -789,8 +789,8 @@
         "agility": 1.0
       },
       "skill_use_chance": 60,
-      "threat": "Multiplica os outros. Sozinho é inofensivo.",
-      "counterplay": "Prioridade de alvo: matar antes do resto.",
+      "threat": "Sustain. Cura-se, se prepara e enfraquece quem está na frente dele.",
+      "counterplay": "Pressa: passar do dano de cura dele antes que a preparação feche a luta.",
       "names": [
         "Cultista Sombrio",
         "Xamã Goblin",

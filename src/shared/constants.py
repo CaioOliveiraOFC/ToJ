@@ -486,16 +486,6 @@ MONSTER_OPENER_TURNS = 1
 # Papel usado quando nada mais é indicado (carregamento de save antigo, por exemplo).
 DEFAULT_MONSTER_ROLE = "bruiser"
 
-# --- Composição de encontros por profundidade ---
-# Andares rasos mantêm inimigos isolados, para ensinar; grupos aparecem a partir
-# de ENCOUNTER_GROUP_MIN_FLOOR e ficam maiores conforme a profundidade. Elites e
-# chefes nunca entram em grupo: eles já são o encontro.
-ENCOUNTER_GROUP_MIN_FLOOR = 4
-ENCOUNTER_LARGE_GROUP_MIN_FLOOR = 10
-ENCOUNTER_MAX_SIZE_SHALLOW = 1
-ENCOUNTER_MAX_SIZE_MID = 2
-ENCOUNTER_MAX_SIZE_DEEP = 3
-
 # --- Acerto relativo ---
 # A chance de acerto usa a diferença *relativa* de agilidade, não a absoluta.
 # Com a diferença absoluta, uma agilidade que cresce sem teto zera a chance de o

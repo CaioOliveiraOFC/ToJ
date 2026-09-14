@@ -236,8 +236,8 @@ def decide_monster_action(monster, hero, *, rng: random.Random | None = None, pu
     """Executa o turno do monstro contra o herói.
 
     O monstro sem skills cai no ataque básico — que é o comportamento histórico e
-    continua sendo o certo para um trash mob: o arquétipo dele é acúmulo, e a
-    ameaça é o número, não a jogada.
+    continua sendo o certo para um trash mob: o duelo contra ele é a luta simples,
+    e a ameaça é o atrito que ele cobra, não a jogada que ele faz.
     """
     r = rng if rng is not None else random
     try:

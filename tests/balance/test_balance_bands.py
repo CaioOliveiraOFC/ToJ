@@ -113,7 +113,7 @@ class TestEncontros:
                 assert resultado.turns_mean >= T.MIN_TTK_ANY_ENCOUNTER
 
     @pytest.mark.parametrize(
-        "encontro", ["elite_solo", "boss_solo", "tank_plus_glass", "trash_trio", "skirmisher_pair"]
+        "encontro", ["elite_solo", "boss_solo", "tank_solo", "controller_solo", "skirmisher_solo"]
     )
     def test_marco_de_andar_cobra_um_preco(self, encontro):
         # Um encontro isolado começado com a vida cheia não deve matar — a
@@ -131,7 +131,7 @@ class TestEncontros:
             f"{encontro} custa no máximo {max(custos):.0%} da vida. Conteúdo decorativo."
         )
 
-    @pytest.mark.parametrize("encontro", ["elite_solo", "boss_solo", "tank_plus_glass"])
+    @pytest.mark.parametrize("encontro", ["elite_solo", "boss_solo", "tank_solo"])
     def test_encontro_nao_e_intransponivel_para_todas_as_classes(self, encontro):
         taxas = [
             simulate(c, encontro, 12, T.FAST_ITERATIONS, "smart", loadout="expected").win_rate

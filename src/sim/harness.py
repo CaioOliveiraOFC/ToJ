@@ -451,9 +451,18 @@ def _apply_random_event(
 def _default_floor_plan(floor: int) -> list[str]:
     """Composição de um andar, por faixa de profundidade.
 
-    A faixa importa mais que a contagem: os primeiros andares ensinam com
-    encontros isolados, e a partir do andar 6 as composições passam a exigir
-    escolha de alvo, que é a decisão tática mais básica que o jogo tem.
+    A faixa importa mais que a contagem: os primeiros andares ensinam com os
+    arquétipos simples, e a profundidade vai trazendo os TIPOS DE DUELO mais
+    exigentes — o tank, que é a luta longa; o controller, que é a luta contra
+    status. Toda luta é 1x1.
+
+    Cada posição do plano é uma TUPLA de duelos, e não um duelo só, porque o
+    andar não perdeu monstros nesta rodada — ele perdeu os encontros compostos.
+    Onde havia `trash_pair` há dois duelos contra trash, onde havia
+    `tank_plus_glass` há um duelo de tank e um de glass cannon. A quantidade de
+    inimigos do andar é a mesma; o que mudou é que eles nunca lutam juntos. Sem
+    isso a renda do andar cairia, e a âncora econômica mediria uma masmorra que
+    o jogo não tem.
 
     Elite e chefe seguem as regras do jogo, lidas do JSON, e não uma tabela
     própria. A tabela anterior punha um elite em todo andar múltiplo de 3,
@@ -467,29 +476,34 @@ def _default_floor_plan(floor: int) -> list[str]:
     if floor <= 2:
         return ["trash_solo", "trash_solo", "bruiser_solo"]
     if floor <= 5:
-        plan = ["trash_solo", "trash_pair", "bruiser_solo", "skirmisher_solo"]
+        plan = [
+            ("trash_solo",),
+            ("trash_solo", "trash_solo"),
+            ("bruiser_solo",),
+            ("skirmisher_solo",),
+        ]
     elif floor <= 10:
         plan = [
-            "trash_pair",
-            "bruiser_solo",
-            "glass_solo",
-            "skirmisher_solo",
-            "tank_solo",
-            "controller_solo",
+            ("trash_solo", "trash_solo"),
+            ("bruiser_solo",),
+            ("glass_solo",),
+            ("skirmisher_solo",),
+            ("tank_solo",),
+            ("controller_solo",),
         ]
     else:
         plan = [
-            "trash_trio",
-            "bruiser_solo",
-            "tank_plus_glass",
-            "controller_plus_bruiser",
-            "skirmisher_pair",
-            "support_plus_bruiser",
-            "glass_solo",
+            ("trash_solo", "trash_solo", "trash_solo"),
+            ("bruiser_solo",),
+            ("tank_solo", "glass_solo"),
+            ("controller_solo", "bruiser_solo"),
+            ("skirmisher_solo", "skirmisher_solo"),
+            ("support_solo", "bruiser_solo"),
+            ("glass_solo",),
         ]
 
     count = min(len(plan), 3 + floor // 4)
-    fights = [plan[(floor + i) % len(plan)] for i in range(count)]
+    fights = [nome for i in range(count) for nome in plan[(floor + i) % len(plan)]]
 
     regras = generation_rules()
     # Mini-chefe a cada N andares, como `engine/loop.py` faz.

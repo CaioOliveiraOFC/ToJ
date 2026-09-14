@@ -36,11 +36,6 @@ from src.shared.constants import (
     BASE_MAP_HEIGHT,
     BASE_MAP_WIDTH,
     BOSS_FLOOR_INTERVAL,
-    ENCOUNTER_GROUP_MIN_FLOOR,
-    ENCOUNTER_LARGE_GROUP_MIN_FLOOR,
-    ENCOUNTER_MAX_SIZE_DEEP,
-    ENCOUNTER_MAX_SIZE_MID,
-    ENCOUNTER_MAX_SIZE_SHALLOW,
     FLOOR_CLEAR_RESTORE_PERCENT,
     MAP_HEIGHT_INCREMENT_PER_5_LEVELS,
     MAP_WIDTH_INCREMENT_PER_5_LEVELS,
@@ -119,26 +114,6 @@ def _get_game_publish() -> callable:
     return publish
 
 
-def _choose_target(player: "Player", monsters: list) -> "Monster | None":
-    """Seleção de alvo quando o encontro tem mais de um monstro.
-
-    Escolher alvo é a decisão tática mais básica que existe, e ela não existia:
-    o combate era sempre um contra um. Com um monstro só, não há pergunta a
-    fazer — a função devolve o único alvo direto.
-    """
-    living = battle.alive(monsters)
-    if len(living) <= 1:
-        return living[0] if living else None
-
-    screens.render_target_select_panel(living)
-    keys = [str(i) for i in range(1, len(living) + 1)] + ["0"]
-    choice = safe_get_key(keys)
-    if choice == "0" or not choice or not choice.isdigit():
-        return living[0]
-    index = int(choice) - 1
-    return living[index] if 0 <= index < len(living) else living[0]
-
-
 def _human_decision(player: "Player", monsters: list, turn: int = 0) -> battle.Action:
     """Lê a ação do jogador para o turno dele.
 
@@ -148,21 +123,21 @@ def _human_decision(player: "Player", monsters: list, turn: int = 0) -> battle.A
     while True:
         living = battle.alive(monsters)
         primary = living[0] if living else None
-        screens.render_battle_frame(player, primary, living)
+        screens.render_battle_frame(player, primary)
         screens.render_battle_action_panel()
 
         choice = safe_get_key(valid_keys=["1", "2", "3", "4"])
 
         if choice == "1":
-            target = _choose_target(player, monsters)
-            return battle.Action(kind="attack", target=target)
+            # Um inimigo, um alvo: não há o que perguntar.
+            return battle.Action(kind="attack", target=primary)
 
         if choice == "2":
             if not player.skills:
                 screens.render_battle_no_skills_message()
                 sleep(0.5)
                 continue
-            action = _pick_skill_action(player, monsters, primary)
+            action = _pick_skill_action(player, primary)
             if action is not None:
                 return action
 
@@ -172,7 +147,7 @@ def _human_decision(player: "Player", monsters: list, turn: int = 0) -> battle.A
                 screens.render_battle_no_potions_message()
                 sleep(0.5)
                 continue
-            action = _pick_potion_action(player, potions, primary, living)
+            action = _pick_potion_action(player, potions, primary)
             if action is not None:
                 return action
 
@@ -180,10 +155,10 @@ def _human_decision(player: "Player", monsters: list, turn: int = 0) -> battle.A
             return battle.Action(kind="flee")
 
 
-def _pick_skill_action(player, monsters, primary) -> "battle.Action | None":
+def _pick_skill_action(player, primary) -> "battle.Action | None":
     """Menu de skills. Devolve None se o jogador voltar sem escolher."""
     while True:
-        screens.render_battle_frame(player, primary, battle.alive(monsters))
+        screens.render_battle_frame(player, primary)
         screens.render_skill_select_panel(player)
 
         skill_keys = [str(k) for k in player.skills.keys()] + ["0"]
@@ -212,16 +187,17 @@ def _pick_skill_action(player, monsters, primary) -> "battle.Action | None":
             sleep(0.5)
             continue
 
-        # Skill que age sobre o próprio herói não pede alvo.
+        # Skill que age sobre o próprio herói não pede alvo; ofensiva também
+        # não, porque só existe um inimigo.
         if skill.effect_type in ("heal", "buff") or getattr(skill, "target", "enemy") == "self":
             return battle.Action(kind="skill", skill=skill, target=player)
-        return battle.Action(kind="skill", skill=skill, target=_choose_target(player, monsters))
+        return battle.Action(kind="skill", skill=skill, target=primary)
 
 
-def _pick_potion_action(player, potions, primary, living) -> "battle.Action | None":
+def _pick_potion_action(player, potions, primary) -> "battle.Action | None":
     """Menu de consumíveis. Devolve None se o jogador voltar sem escolher."""
     while True:
-        screens.render_battle_frame(player, primary, living)
+        screens.render_battle_frame(player, primary)
         screens.render_potion_select_panel(potions)
 
         potion_keys = [str(i) for i in range(1, len(potions) + 1)] + ["0"]
@@ -238,7 +214,7 @@ def _pick_potion_action(player, potions, primary, living) -> "battle.Action | No
 def _on_turn_start(actor, player, monsters) -> None:
     """Redesenha a tela e anuncia de quem é o turno."""
     living = battle.alive(monsters)
-    screens.render_battle_frame(player, living[0] if living else None, living)
+    screens.render_battle_frame(player, living[0] if living else None)
     screens.render_turn_banner(actor)
 
 
@@ -273,9 +249,9 @@ def run_fight(
 ) -> None:
     """Loop principal de batalha: mecânica publica eventos; UI reage via inscrições no bus.
 
-    Aceita um monstro ou uma lista deles. A assinatura de um monstro só é mantida
-    porque o mapa entrega um encontro por vez, e porque o combate era 1 contra 1
-    até aqui — escolher alvo passa a existir quando o encontro tem mais de um.
+    Um herói contra UM monstro, sempre. Aceita a lista de um elemento porque o
+    mapa e os saves ainda falam nessa forma; `battle.run_battle` recusa qualquer
+    lista maior.
     """
     rng = rng or random.Random()
     bus = EventBus()
@@ -371,8 +347,8 @@ def process_post_battle(
     Esta função pertence à camada de engine - ela pode importar de
     mechanics/ e content/, e pode mutar estado de entidades.
 
-    Recompensa por monstro do encontro: um encontro com três inimigos deve pagar
-    mais que um com um, senão a composição vira punição pura.
+    A batalha é 1x1, então a recompensa é a do monstro derrotado. A lista de um
+    elemento continua aceita porque o mapa e os saves ainda falam nessa forma.
 
     Retorna tupla com:
     - xp_gained: quantidade de XP ganha
@@ -382,17 +358,14 @@ def process_post_battle(
     - coins_gained: quantidade de moedas ganhas
     - levels_gained: quantidade de níveis ganhos
     """
-    monsters = list(monster) if isinstance(monster, list) else [monster]
+    mob = battle.sole_monster(list(monster) if isinstance(monster, list) else [monster])
 
-    xp_base_reward = 0
-    coins_base_reward = 0
-    for mob in monsters:
-        if getattr(mob, "is_boss", False):
-            xp_base_reward += calculate_mini_boss_xp_reward(mob.level)
-            coins_base_reward += calculate_mini_boss_coin_reward(mob.level)
-        else:
-            xp_base_reward += calculate_monster_xp_reward(mob.level)
-            coins_base_reward += calculate_monster_coin_reward(mob.level)
+    if getattr(mob, "is_boss", False):
+        xp_base_reward = calculate_mini_boss_xp_reward(mob.level)
+        coins_base_reward = calculate_mini_boss_coin_reward(mob.level)
+    else:
+        xp_base_reward = calculate_monster_xp_reward(mob.level)
+        coins_base_reward = calculate_monster_coin_reward(mob.level)
 
     player_won = player.get_isalive()
     dropped_item = None
@@ -470,45 +443,16 @@ def _setup_dungeon_map(
         game_map.generate_map(percent_of_walls=wall_percent)
         game_map.place_player()
         game_map.place_exit()
-        monsters_to_place = generate_monsters_for_level(dungeon_level, player.level)
+        # Um monstro por casa. O andar pode ter dez inimigos; encontrar outro
+        # monstro significa OUTRA batalha, e não um inimigo a mais na mesma.
+        for monstro in generate_monsters_for_level(dungeon_level, player.level):
+            game_map.place_enemy(monstro)
 
-        # Os monstros do andar são distribuídos em encontros, não um por casa:
-        # um encontro composto exige escolha de alvo, que é a decisão tática mais
-        # básica do jogo e que não existia enquanto o combate era 1 contra 1.
-        for group in _build_encounters(monsters_to_place, dungeon_level):
-            game_map.place_enemy(group)
-
-        # Mini-chefe a cada N andares, sempre sozinho: ele já é o encontro.
+        # Mini-chefe a cada N andares, na casa dele, como todo mundo.
         if dungeon_level % BOSS_FLOOR_INTERVAL == 0:
-            game_map.place_enemy([create_boss_for_level(dungeon_level)])
+            game_map.place_enemy(create_boss_for_level(dungeon_level))
 
     return game_map
-
-
-def _build_encounters(monsters: list, dungeon_level: int) -> list[list]:
-    """Agrupa os monstros do andar em encontros.
-
-    Andares rasos mantêm inimigos isolados, para ensinar; a partir do andar 4 os
-    grupos aparecem, e ficam maiores conforme a profundidade. Elites e chefes
-    nunca entram em grupo — eles já são o encontro.
-    """
-    solos = [m for m in monsters if getattr(m, "is_boss", False)]
-    rest = [m for m in monsters if not getattr(m, "is_boss", False)]
-
-    if dungeon_level < ENCOUNTER_GROUP_MIN_FLOOR:
-        max_size = ENCOUNTER_MAX_SIZE_SHALLOW
-    elif dungeon_level < ENCOUNTER_LARGE_GROUP_MIN_FLOOR:
-        max_size = ENCOUNTER_MAX_SIZE_MID
-    else:
-        max_size = ENCOUNTER_MAX_SIZE_DEEP
-
-    groups: list[list] = [[m] for m in solos]
-    index = 0
-    while index < len(rest):
-        size = random.randint(1, max_size)
-        groups.append(rest[index : index + size])
-        index += size
-    return groups
 
 
 def _render_dungeon_screen(
@@ -548,7 +492,8 @@ def _handle_player_movement(
     """
     collided_object = game_map.move_player(move)
 
-    if isinstance(collided_object, list) or isinstance(collided_object, Monster):
+    # A casa devolve UM monstro. A lista some daqui junto com o encontro composto.
+    if isinstance(collided_object, Monster):
         fight(player, collided_object, essence_multiplier=essence_multiplier)
         if not player.get_isalive():
             _get_game_publish()(topics.UI_GAME_OVER, {"player_name": player.get_nick_name()})

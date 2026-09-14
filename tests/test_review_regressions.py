@@ -183,13 +183,12 @@ class TestNivelDoEncontroSorteia:
     """A run simulada fixava todo monstro no andar; o jogo sorteia +0/+1/+2."""
 
     def test_sem_sorteador_o_nivel_e_o_andar(self):
-        monstros = build_encounter("trash_trio", 6)
-        assert [m.level for m in monstros] == [6, 6, 6]
+        monstros = build_encounter("trash_solo", 6)
+        assert [m.level for m in monstros] == [6]
 
-    def test_com_sorteador_cada_monstro_sorteia(self):
-        contador = iter([7, 8, 9])
-        monstros = build_encounter("trash_trio", 6, lambda: next(contador))
-        assert [m.level for m in monstros] == [7, 8, 9]
+    def test_com_sorteador_o_monstro_sorteia(self):
+        monstros = build_encounter("trash_solo", 6, lambda: 9)
+        assert [m.level for m in monstros] == [9]
 
     def test_o_chefe_ignora_o_sorteio(self):
         monstros = build_encounter("boss_solo", 5, lambda: 99)

@@ -1,7 +1,7 @@
 """Testes de fumaça do engine.
 
 Existem por causa de um bug concreto: um import esquecido em `engine/loop.py`
-deixou `_build_encounters` com um `NameError`, e nenhum dos 197 testes pegou —
+deixou a montagem de andar com um `NameError`, e nenhum dos 197 testes pegou —
 porque nenhum deles executava o loop do jogo. O erro só apareceu ao rodar o
 AutoTester à mão.
 
@@ -52,32 +52,38 @@ class TestGeracaoDeAndar:
     """Os caminhos do engine que só o jogo real percorria."""
 
     @pytest.mark.parametrize("andar", [1, 3, 4, 5, 9, 10, 15, 20])
-    def test_monta_encontros_do_andar(self, andar):
+    def test_cada_monstro_do_andar_ganha_a_propria_casa(self, andar):
+        """O andar tem vários inimigos; cada um é uma batalha própria."""
         monstros = generate_monsters_for_level(andar, andar)
-        grupos = loop._build_encounters(monstros, andar)
+        game_map = MapOfGame(height=20, width=40)
+        game_map.generate_map(percent_of_walls=0.05)
+        game_map.place_player()
+        game_map.place_exit()
+        for monstro in monstros:
+            game_map.place_enemy(monstro)
 
-        assert grupos, f"Andar {andar} não gerou encontro nenhum."
-        assert sum(len(g) for g in grupos) == len(monstros), (
-            "Agrupar não pode perder nem duplicar monstro."
+        assert len(game_map.enemies_pos) == len(monstros), (
+            "Nenhum monstro pode ser perdido nem dividir casa com outro."
         )
-        for grupo in grupos:
-            marcos = [m for m in grupo if getattr(m, "is_boss", False)]
-            if marcos:
-                assert len(grupo) == 1, "Elite e chefe entram sozinhos no encontro."
+        for ocupante in game_map.enemies_pos.values():
+            assert not isinstance(ocupante, list), "Uma casa guarda UM monstro."
 
-    def test_grupos_crescem_com_a_profundidade(self):
-        raso = max(len(g) for g in loop._build_encounters(generate_monsters_for_level(1, 1), 1))
-        fundo = max(len(g) for g in loop._build_encounters(generate_monsters_for_level(20, 20), 20))
-        assert raso == 1, "Os primeiros andares ensinam com inimigos isolados."
-        assert fundo > raso
-
-    def test_mapa_guarda_encontro_e_devolve_na_colisao(self):
+    def test_a_casa_recusa_um_grupo(self):
+        """A porta por onde o encontro composto voltaria."""
         game_map = MapOfGame(height=12, width=25)
         game_map.generate_map(percent_of_walls=0.05)
         game_map.place_player()
         game_map.place_exit()
-        grupo = [spawn_by_role("trash", 3), spawn_by_role("bruiser", 3)]
-        game_map.place_enemy(grupo)
+        with pytest.raises(ValueError):
+            game_map.place_enemy([spawn_by_role("trash", 3), spawn_by_role("bruiser", 3)])
+
+    def test_mapa_guarda_o_monstro_e_devolve_na_colisao(self):
+        game_map = MapOfGame(height=12, width=25)
+        game_map.generate_map(percent_of_walls=0.05)
+        game_map.place_player()
+        game_map.place_exit()
+        monstro = spawn_by_role("trash", 3)
+        game_map.place_enemy(monstro)
 
         estado = game_map.get_map_state()
         recarregado = MapOfGame(height=12, width=25)
@@ -85,28 +91,55 @@ class TestGeracaoDeAndar:
 
         assert len(recarregado.enemies_pos) == 1
         [carregado] = recarregado.enemies_pos.values()
-        assert len(carregado) == len(grupo)
-        assert [m.role for m in carregado] == [m.role for m in grupo], (
-            "O papel do monstro precisa sobreviver ao save."
-        )
+        assert carregado.role == monstro.role, "O papel do monstro precisa sobreviver ao save."
+
+    def test_save_da_fase_de_grupos_migra_para_casas_separadas(self):
+        """Save antigo com `[A, B, C]` numa casa: ninguém é apagado."""
+        game_map = MapOfGame(height=14, width=28)
+        game_map.generate_map(percent_of_walls=0.05)
+        game_map.place_player()
+        game_map.place_exit()
+        game_map.place_enemy(spawn_by_role("trash", 3))
+        estado = game_map.get_map_state()
+
+        casa = next(iter(estado["enemies_pos"]))
+        estado["enemies_pos"][casa] = [
+            {"nick_name": "A", "level": 3, "role": "trash"},
+            {"nick_name": "B", "level": 3, "role": "bruiser"},
+            {"nick_name": "C", "level": 3, "role": "tank"},
+        ]
+
+        migrado = MapOfGame(height=14, width=28)
+        migrado.load_map_state(estado)
+
+        assert len(migrado.enemies_pos) == 3, "Nenhum monstro do save pode sumir."
+        assert {m.nick_name for m in migrado.enemies_pos.values()} == {"A", "B", "C"}
+        y, x = map(int, casa.split(","))
+        assert migrado.enemies_pos[(y, x)].nick_name == "A", "O primeiro fica onde estava."
+
+        # Determinística: o mesmo save recarregado põe todo mundo nas mesmas casas.
+        outro = MapOfGame(height=14, width=28)
+        outro.load_map_state(estado)
+        assert sorted(outro.enemies_pos) == sorted(migrado.enemies_pos)
+
+    def test_save_novo_nao_grava_array_de_encontro(self):
+        game_map = MapOfGame(height=12, width=25)
+        game_map.generate_map(percent_of_walls=0.05)
+        game_map.place_player()
+        game_map.place_exit()
+        game_map.place_enemy(spawn_by_role("trash", 3))
+        for entrada in game_map.get_map_state()["enemies_pos"].values():
+            assert isinstance(entrada, dict), "Uma casa, um monstro, no disco também."
 
 
 class TestPosCombate:
-    """Recompensa por encontro, não por monstro."""
+    """Recompensa do monstro derrotado. A batalha é 1x1."""
 
-    def test_encontro_maior_paga_mais(self):
-        def xp_de(quantidade):
-            heroi = Warrior("Teste")
-            heroi.set_level(5)
-            monstros = [spawn_by_role("trash", 5) for _ in range(quantidade)]
-            xp, venceu, _, _, moedas, _ = loop.process_post_battle(heroi, monstros)
-            assert venceu
-            return xp, moedas
-
-        xp_um, moedas_um = xp_de(1)
-        xp_tres, moedas_tres = xp_de(3)
-        assert xp_tres > xp_um
-        assert moedas_tres > moedas_um
+    def test_recompensa_recusa_mais_de_um_monstro(self):
+        heroi = Warrior("Teste")
+        heroi.set_level(5)
+        with pytest.raises(ValueError):
+            loop.process_post_battle(heroi, [spawn_by_role("trash", 5) for _ in range(3)])
 
     def test_chefe_paga_mais_que_monstro_comum(self):
         heroi = Warrior("Teste")

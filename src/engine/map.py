@@ -13,6 +13,28 @@ if TYPE_CHECKING:
     pass
 
 
+def _um_monstro(enemy_obj: object):
+    """Desembrulha o que o chamador passou e garante UM monstro.
+
+    A lista existia para carregar o encontro composto. Ela ainda é aceita por
+    compatibilidade, com exatamente um elemento dentro — e é aqui que uma lista
+    maior morre, em vez de virar uma casa com grupo dentro.
+    """
+    if isinstance(enemy_obj, list):
+        if len(enemy_obj) != 1:
+            raise ValueError(
+                f"Uma casa guarda UM monstro: recebi {len(enemy_obj)}. "
+                "Cada inimigo do andar ocupa a própria casa."
+            )
+        return enemy_obj[0]
+    return enemy_obj
+
+
+def _monstro_de(dado: dict):
+    """Reconstrói um monstro a partir do que o save guardou."""
+    return create_monster(dado["nick_name"], dado["level"], dado.get("role", "bruiser"))
+
+
 class MapOfGame:
     """
     Esta classe gere a criação, exibição e interação com o mapa do jogo,
@@ -86,15 +108,17 @@ class MapOfGame:
             self.exit_pos = {"y": exit_y, "x": exit_x}
 
     def place_enemy(self, enemy_obj: object) -> None:
-        """Coloca um inimigo, ou um grupo deles, em um local aleatório.
+        """Coloca UM inimigo numa casa livre do mapa.
 
-        Uma posição guarda um encontro inteiro, não um monstro: é isso que
-        permite composições — um tank protegendo um glass cannon, por exemplo —
-        em vez do combate um contra um que existia antes.
+        Uma casa, um monstro, uma batalha. O andar pode ter dez inimigos — eles
+        ocupam dez casas, e encontrar o segundo significa outra batalha, não um
+        inimigo a mais na primeira.
+
+        Aceita uma lista de um elemento porque o chamador antigo entregava o
+        encontro inteiro; mais de um é erro, e não uma casa com grupo dentro.
         """
         y, x = self._get_random_empty_spot()
-        group = list(enemy_obj) if isinstance(enemy_obj, list) else [enemy_obj]
-        self.enemies_pos[(y, x)] = group
+        self.enemies_pos[(y, x)] = _um_monstro(enemy_obj)
 
     def draw_map(self) -> list[str]:
         """Gera representação pura do mapa como lista de strings para renderização pela UI.
@@ -111,11 +135,8 @@ class MapOfGame:
                 if y == self.player_pos["y"] and x == self.player_pos["x"]:
                     char = "@"
                 elif (y, x) in self.enemies_pos:
-                    group = self.enemies_pos[(y, x)]
-                    if any(getattr(mob, "is_boss", False) for mob in group):
-                        char = "B"
-                    else:
-                        char = "&"
+                    mob = self.enemies_pos[(y, x)]
+                    char = "B" if getattr(mob, "is_boss", False) else "&"
                 elif tile == "X":
                     char = "X"
                 elif tile == "D":
@@ -170,16 +191,15 @@ class MapOfGame:
     def get_map_state(self) -> dict:
         """Retorna um dicionário com o estado atual do mapa para salvamento."""
         # Serializar enemies_pos para salvar. (y, x) -> {nick_name, level}
+        # Um objeto por casa, nunca um array: o array era a representação do
+        # encontro em grupo, e gravá-lo de novo reabriria a porta.
         enemies_serializable = {
-            f"{y},{x}": [
-                {
-                    "nick_name": mob.nick_name,
-                    "level": mob.level,
-                    "role": getattr(mob, "role", "bruiser"),
-                }
-                for mob in group
-            ]
-            for (y, x), group in self.enemies_pos.items()
+            f"{y},{x}": {
+                "nick_name": mob.nick_name,
+                "level": mob.level,
+                "role": getattr(mob, "role", "bruiser"),
+            }
+            for (y, x), mob in self.enemies_pos.items()
         }
 
         return {
@@ -200,12 +220,37 @@ class MapOfGame:
         self.exit_pos = map_state["exit_pos"]
 
         self.enemies_pos = {}
+        # Saves da fase de grupos guardam um ARRAY por casa. O primeiro monstro
+        # fica onde estava e os demais ganham casa própria — ninguém é apagado,
+        # porque perder inimigo de um save salvo é perder progresso do jogador.
+        excedentes: list[dict] = []
         for pos_str, entry in map_state["enemies_pos"].items():
             y, x = map(int, pos_str.split(","))
-            # Saves anteriores guardavam um único monstro por posição; hoje
-            # guardam o encontro. Aceitar os dois formatos evita invalidar saves.
-            group_data = entry if isinstance(entry, list) else [entry]
-            self.enemies_pos[(y, x)] = [
-                create_monster(mob["nick_name"], mob["level"], mob.get("role", "bruiser"))
-                for mob in group_data
-            ]
+            grupo = entry if isinstance(entry, list) else [entry]
+            if not grupo:
+                continue
+            self.enemies_pos[(y, x)] = _monstro_de(grupo[0])
+            excedentes.extend(grupo[1:])
+
+        for dado in excedentes:
+            destino = self._nearest_free_spot()
+            if destino is None:
+                break
+            self.enemies_pos[destino] = _monstro_de(dado)
+
+    def _nearest_free_spot(self) -> tuple[int, int] | None:
+        """A primeira casa de chão livre, numa varredura estável.
+
+        Determinística de propósito: carregar o mesmo save duas vezes tem de
+        colocar os monstros nas mesmas casas, ou o save deixa de ser o save.
+        """
+        jogador = (self.player_pos["y"], self.player_pos["x"])
+        saida = (self.exit_pos["y"], self.exit_pos["x"]) if self.exit_pos else None
+        for y, linha in enumerate(self.grid):
+            for x, tile in enumerate(linha):
+                if tile != ".":
+                    continue
+                if (y, x) in self.enemies_pos or (y, x) == jogador or (y, x) == saida:
+                    continue
+                return (y, x)
+        return None

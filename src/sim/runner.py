@@ -2,7 +2,7 @@
 
 Uso:
     python -m src.sim.runner simulate --class Warrior --level 10 \\
-        --encounter elite_plus_2_trash --iterations 10000 --policy smart
+        --encounter elite_solo --iterations 10000 --policy smart
     python -m src.sim.runner baseline --out reports/baseline.json
     python -m src.sim.runner matrix --iterations 2000 --format table
     python -m src.sim.runner run --classes all --iterations 500

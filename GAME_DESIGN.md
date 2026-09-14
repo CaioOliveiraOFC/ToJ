@@ -78,11 +78,23 @@ Fonte (cura 50% do HP máximo).
 **`[implementado]`** Boss a cada 5 andares. Elite a partir do andar 4, com 12% de
 chance.
 
-**`[divergiu]`** O documento dizia *"inimigos são encontros isolados (estilo Pokémon)"*.
-Hoje há **grupos**: encontros de mais de um monstro a partir do andar 4, e grupos
-grandes a partir do andar 10. Foi uma mudança deliberada do rebalanceamento — um
-tank protegendo um glass cannon é um problema diferente de qualquer um dos dois
-sozinho.
+**`[implementado]`** **Toda batalha é 1x1: um herói contra um monstro.** O andar
+pode ter dez inimigos; cada um ocupa a própria casa, e encontrar o segundo
+significa OUTRA batalha, não um inimigo a mais na primeira. Elite e chefe também
+são duelos — eles são o duelo mais profundo, não um encontro maior.
+
+Os arquétipos descrevem **tipos de duelo**, e não funções de uma party de
+monstros: *trash* é a luta simples, *bruiser* a troca de dano, *tank* a luta
+longa, *glass cannon* a corrida para matar antes de morrer, *skirmisher* a luta
+de acerto e esquiva, *controller* a luta contra status, *support* o especialista
+em sustain e preparação — ele se cura, se fortalece e enfraquece o jogador, sem
+depender de ninguém —, *elite* o duelo complexo e *boss* o de maior profundidade.
+
+**`[corrigido]`** Houve uma fase com **encontros em grupo** (dois a três monstros
+na mesma casa, a partir do andar 4). Foi aprovada por engano e não faz parte da
+visão do jogo: saiu do mapa, do motor, da UI e do simulador. `run_battle` recusa
+mais de um monstro, e uma casa do mapa recusa um grupo — o erro volta como
+exceção, e não como uma batalha 1x3 que ninguém percebe.
 
 **`[implementado]`** Entre andares: loja, depois a decisão de **Extrair** ou **Continuar**.
 

@@ -1,10 +1,14 @@
 """Catálogo de encontros nomeados.
 
-Um encontro é uma composição, não um monstro. Um monstro isolado pode estar
-equilibrado e a combinação estar quebrada — um tank que protege um glass cannon é
-um problema diferente de qualquer um dos dois sozinho. Por isso a unidade de
-medida do balanceamento é o encontro, e ele precisa de nome estável para
-comparar resultados entre iterações.
+Um encontro é UM DUELO: um herói contra um monstro. Houve uma fase em que o
+catálogo tinha composições — `tank_plus_glass`, `trash_trio` —, e ela foi um
+erro de direção: o jogo é 1x1 e o simulador precisa medir o jogo que existe, não
+um que nunca existiu.
+
+O arquétipo continua sendo a unidade de medida, porque é ele que decide o TIPO
+de duelo: o tank é a luta longa, o glass cannon é a corrida para matar antes de
+morrer, o controller é a luta contra status. Cada um precisa de nome estável
+para comparar resultados entre iterações.
 """
 
 from __future__ import annotations
@@ -49,13 +53,6 @@ def _solo(role: str) -> EncounterFactory:
     return factory
 
 
-def _group(*roles: str) -> EncounterFactory:
-    def factory(level: int, level_fn: LevelFn | None = None) -> list:
-        return [spawn_by_role(role, _nivel(level, role, level_fn)) for role in roles]
-
-    return factory
-
-
 ENCOUNTERS: dict[str, EncounterFactory] = {
     # Legado — o que existia antes. Mantido para a baseline continuar comparável.
     "legacy_monster": _legacy_monster,
@@ -70,36 +67,18 @@ ENCOUNTERS: dict[str, EncounterFactory] = {
     "support_solo": _solo("support"),
     "elite_solo": _solo("elite"),
     "boss_solo": _solo("boss"),
-    # Composições: onde a combinação vale mais que a soma das partes.
-    "trash_pair": _group("trash", "trash"),
-    "trash_trio": _group("trash", "trash", "trash"),
-    "tank_plus_glass": _group("tank", "glass_cannon"),
-    "controller_plus_bruiser": _group("controller", "bruiser"),
-    "skirmisher_pair": _group("skirmisher", "skirmisher"),
-    "support_plus_bruiser": _group("support", "bruiser"),
-    "elite_plus_2_trash": _group("elite", "trash", "trash"),
 }
 
 # Conjuntos usados pelos testes e pelo runner.
 SOLO_ENCOUNTERS = [
     name for name in ENCOUNTERS if name.endswith("_solo") and not name.startswith("legacy")
 ]
-GROUP_ENCOUNTERS = [
-    "trash_pair",
-    "trash_trio",
-    "tank_plus_glass",
-    "controller_plus_bruiser",
-    "skirmisher_pair",
-    "support_plus_bruiser",
-    "elite_plus_2_trash",
-]
-MATRIX_ENCOUNTERS = SOLO_ENCOUNTERS + GROUP_ENCOUNTERS
+# A matriz mede duelos, porque o jogo só tem duelos.
+MATRIX_ENCOUNTERS = SOLO_ENCOUNTERS
 # Encontros que representam o andar comum. Boss e elite ficam de fora: eles são
 # marcos, e misturá-los na média esconde o que o andar comum está fazendo.
 ROUTINE_ENCOUNTERS = [
     "trash_solo",
-    "trash_pair",
-    "trash_trio",
     "bruiser_solo",
     "tank_solo",
     "glass_solo",

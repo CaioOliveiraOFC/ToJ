@@ -83,9 +83,29 @@ def build_turn_order(hero, monsters: list) -> list:
 
 
 def pick_default_target(monsters: list):
-    """Alvo padrão quando a decisão não indica um: o primeiro monstro vivo."""
+    """O alvo do herói. Há um só, e por isso não existe escolha a fazer."""
     living = alive(monsters)
     return living[0] if living else None
+
+
+def sole_monster(monsters: list):
+    """O único monstro do encontro. Levanta se a lista não tiver exatamente um.
+
+    Toda batalha do jogo é UM herói contra UM monstro. O andar pode ter dez
+    inimigos; cada um deles ocupa a própria casa e é a própria batalha.
+
+    A lista continua na assinatura por compatibilidade — trocá-la por `Monster`
+    tocaria o motor, a UI, o simulador e os saves de uma vez. O que a lista NÃO
+    pode voltar a significar é encontro composto, e é isso que esta função
+    garante: um erro alto e cedo, e não uma segunda batalha 1x3 que ninguém
+    percebe porque o teto de turnos a esconde.
+    """
+    if len(monsters) != 1:
+        raise ValueError(
+            f"Batalha é 1x1: recebi {len(monsters)} monstros. "
+            "O andar pode ter vários inimigos, mas cada um é uma batalha própria."
+        )
+    return monsters[0]
 
 
 def run_battle(
@@ -102,7 +122,7 @@ def run_battle(
 
     Args:
         hero: O jogador.
-        monsters: Lista de monstros do encontro (pode ter um só).
+        monsters: O monstro da batalha, em lista de UM. Mais de um é erro.
         hero_decision: Callback que devolve a `Action` do herói no turno dele.
         rng: Gerador dedicado. Passe um `random.Random(seed)` para reprodutibilidade.
         publish: Callback de eventos para a UI. `None` deixa o motor mudo e rápido.
@@ -112,6 +132,7 @@ def run_battle(
     Returns:
         `BattleOutcome` com o resultado e as métricas do combate.
     """
+    sole_monster(monsters)
     r = rng if rng is not None else random.Random()
     out = BattleOutcome(hp_max=int(getattr(hero, "base_hp", hero.get_hp())))
 

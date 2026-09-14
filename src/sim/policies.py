@@ -19,8 +19,6 @@ from src.shared.effects import TURN_SKIPPING_STATUSES
 FLEE_HP_RATIO = 0.12
 # Abaixo deste percentual o bot esperto gasta poção ou skill de cura.
 HEAL_HP_RATIO = 0.35
-# Papéis que matam rápido e por isso morrem primeiro.
-PRIORITY_ROLES = ("glass_cannon", "support", "controller")
 # Abaixo desta fração de mana, o bot bebe poção de mana se tiver uma.
 MANA_POTION_RATIO = 0.25
 # Efeitos de consumível que valem um turno no começo de um combate longo.
@@ -93,12 +91,6 @@ def _numero(valor) -> float:
 
 def _hp_ratio(entity) -> float:
     return entity.get_hp() / max(1, int(getattr(entity, "base_hp", 1)))
-
-
-def _effective_hp(entity) -> float:
-    """HP dividido pela mitigação: quanto dano bruto o alvo ainda absorve."""
-    mitigation = 100 / (100 + max(0, entity.get_df()))
-    return entity.get_hp() / max(0.01, mitigation)
 
 
 def _usable_skills(hero, kinds: tuple[str, ...]) -> list:
@@ -233,10 +225,10 @@ def smart_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None 
     if ratio < FLEE_HP_RATIO and not heal_skills and not potions:
         return Action(kind="flee")
 
-    # 3. Escolher alvo: papéis perigosos primeiro, depois o mais frágil.
-    target = _choose_target(living)
+    # 3. O alvo. Há um só — a batalha é 1x1, e escolher alvo era regra de grupo.
+    target = living[0]
     basic = _estimate_basic_damage(hero, target)
-    turnos_estimados = _estimated_turns(living, basic)
+    turnos_estimados = _estimated_turns(target, basic)
     combate_longo = turnos_estimados >= LONG_FIGHT_TURNS
 
     # 4. Preparar o combate longo. Um buff de defesa no primeiro turno de uma
@@ -293,7 +285,7 @@ def smart_policy(hero, monsters: list, turn: int = 0, rng: random.Random | None 
 
 
 def _golpe_letal(hero, living: list):
-    """O alvo que morre neste turno, e com o quê. `None` se nenhum morre.
+    """Se o inimigo morre neste turno, e com o quê. `None` se não morre.
 
     Devolve `(alvo, skill)`, com `skill=None` quando o ataque básico já basta —
     ele é gratuito, então nunca vale gastar mana para matar quem o básico mata.
@@ -323,17 +315,9 @@ def _elixir_stat(item) -> str:
     return entry[0] if entry else ""
 
 
-def _estimated_turns(living: list, damage_per_turn: int) -> int:
-    """Quantos turnos o encontro inteiro deve durar no ritmo atual."""
-    total_hp = sum(m.get_hp() for m in living)
-    return max(1, total_hp // max(1, damage_per_turn))
-
-
-def _choose_target(living: list):
-    """Papel perigoso primeiro; entre iguais, o que morre mais rápido."""
-    priority = [m for m in living if getattr(m, "role", "") in PRIORITY_ROLES]
-    pool = priority or living
-    return min(pool, key=_effective_hp)
+def _estimated_turns(target, damage_per_turn: int) -> int:
+    """Quantos turnos o duelo deve durar no ritmo atual."""
+    return max(1, target.get_hp() // max(1, damage_per_turn))
 
 
 def _estimate_basic_damage(hero, target) -> int:
