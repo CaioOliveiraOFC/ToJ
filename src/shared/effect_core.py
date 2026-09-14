@@ -575,15 +575,20 @@ def adopt_legacy(entity) -> list[str]:
     return adotadas
 
 
-def tick_effects(entity) -> dict:
+def tick_effects(entity, *, drain_scale=None) -> dict:
     """Passa um turno: aplica dano/dreno, decrementa e expira.
 
     Devolve o que aconteceu, para quem chama dar voz na tela. O núcleo não
     publica evento nem imprime nada — ele não conhece UI.
+
+    `drain_scale` é como as LEIS DE INTERAÇÃO chegam aqui sem o núcleo importá-las:
+    quem chama passa uma função `(entidade, efeito) -> (fator, leis)`, e o núcleo
+    só pergunta. Assim a lei continua declarada em `shared/interactions.py`, num
+    lugar só, e este módulo continua sem depender de nada.
     """
     adopt_legacy(entity)
     ativo = _store(entity)
-    relatorio: dict = {"dot": {}, "drain": {}, "expired": [], "skip_turn": False}
+    relatorio: dict = {"dot": {}, "drain": {}, "expired": [], "skip_turn": False, "laws": []}
     max_hp = int(getattr(entity, "base_hp", getattr(entity, "get_hp", lambda: 1)()))
 
     for effect_id in effects_of_family(FAMILY_DOT):
@@ -593,8 +598,10 @@ def tick_effects(entity) -> dict:
             relatorio["dot"][effect_id] = dano
 
     for instancia in instances(entity, FAMILY_DRAIN):
-        quanto = int(instancia.total_intensity)
+        fator, leis = drain_scale(entity, instancia.effect) if drain_scale else (1.0, ())
+        quanto = int(instancia.total_intensity * fator)
         if quanto > 0:
+            relatorio["laws"].extend(leis)
             entity.reduce_mp(quanto)
             if entity.get_mp() < 0:
                 entity._mp = 0

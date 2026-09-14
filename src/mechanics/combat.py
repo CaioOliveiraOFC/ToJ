@@ -10,6 +10,7 @@ from typing import Any, Literal
 from src.shared import combat_topics as T
 from src.shared import effect_core as core
 from src.shared import effects as fx
+from src.shared import interactions as ix
 from src.shared.constants import (
     BASE_HIT_CHANCE,
     BASIC_ATTACK_POWER_MULT,
@@ -120,6 +121,14 @@ def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifier
     xmult: list[float] = []
     if is_critical:
         xmult.append(CRIT_DAMAGE_BASE + fx.combat_modifier(attacker, "crit_damage") / 100)
+
+    # As leis globais que este golpe destrava — Quebra Gélida, Emboscada. Elas
+    # entram como FATOR do bucket ×MULT, ao lado do crítico e sob o mesmo teto.
+    # Nenhuma multiplica o dano depois do funil, e o combate não sabe qual carta
+    # colocou o gelo: a lei é do jogo.
+    xmult.extend(
+        ix.strike_xmult(ix.strike_interactions(attacker, defender, is_critical=is_critical))
+    )
 
     # `+MULT`: percentuais ADITIVOS entre si. O bucket existe desde a
     # centralização da linguagem de poder e nunca tinha dono — este é o
@@ -359,6 +368,10 @@ def resolve_physical_attack(
             did_defender_die=False,
             notes=("miss",),
         )
+        # Atacou, revelou a posição — mesmo tendo errado. Sem isto o atacante
+        # guardaria a invisibilidade até acertar, e a Emboscada deixaria de ser
+        # uma escolha de momento para virar um bônus garantido.
+        ix.reveal_on_attempt(attacker)
         _emit(
             publish,
             T.COMBAT_PHYSICAL_STRIKE,
@@ -379,6 +392,7 @@ def resolve_physical_attack(
 
     is_critical = r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= crit_chance
 
+    disparadas = ix.strike_interactions(attacker, defender, is_critical=is_critical)
     mods = damage_modifiers(attacker, defender, is_critical=is_critical)
     damage = _calculate_damage(
         base_power=float(base_damage),
@@ -407,6 +421,16 @@ def resolve_physical_attack(
 
     defender.take_damage(damage)
     fx.wake_on_damage(defender)
+
+    # As leis cobram o preço DEPOIS do dano, nesta ordem: o golpe já valeu mais,
+    # e agora o gelo sai e a posição é revelada. Quebra Gélida é uma troca —
+    # dano por controle — e ela não seria troca nenhuma se o gelo saísse antes.
+    _anunciar_interacoes(
+        attacker,
+        defender,
+        ix.consume_strike(attacker, defender, disparadas),
+        publish,
+    )
 
     # Roubo de vida: devolve ao atacante um percentual do dano causado.
     life_steal = fx.combat_modifier(attacker, "life_steal")
@@ -441,6 +465,27 @@ def resolve_physical_attack(
         payload={"attacker": attacker, "defender": defender, "strike": strike},
     )
     return strike
+
+
+def _anunciar_interacoes(attacker, defender, disparadas, publish: PublishFn) -> None:
+    """Dá voz às leis que dispararam. Herói ou monstro, a mesma mensagem.
+
+    O jogador precisa poder DESCOBRIR as leis olhando o combate: uma interação
+    que acontece calada é indistinguível de um número que ninguém explicou.
+    """
+    for interacao in disparadas:
+        _emit(
+            publish,
+            T.COMBAT_TURN_EFFECT,
+            type_="turn_effect",
+            payload={
+                "entity": defender,
+                "kind": "interaction",
+                "interaction": interacao,
+                "label": ix.label(interacao),
+                "actor": attacker,
+            },
+        )
 
 
 def try_apply_status(
@@ -483,8 +528,13 @@ def try_apply_status(
         return False
     if r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) > chance:
         return False
-    # Passou a rolagem. O NÚCLEO decide o resto: se empilha, se renova, qual o
-    # teto de stacks, quanto dura. O combate não conhece nenhuma dessas regras.
+    # Passou a rolagem SOZINHO: nenhuma lei global mexe na chance de aplicar, ou
+    # o status teria um segundo sistema por fora do núcleo. O que as leis mudam
+    # é a peça que está entrando — a duração, aqui; o stack, logo abaixo.
+    duration, por_duracao = ix.duration_before_apply(target, status, duration)
+
+    # O NÚCLEO decide o resto: se empilha, se renova, qual o teto de stacks. O
+    # combate não conhece nenhuma dessas regras.
     if core.apply_effect(target, status, source_id=source_id, duration=duration) is None:
         return False
     if applied_kind:
@@ -494,6 +544,7 @@ def try_apply_status(
             type_="turn_effect",
             payload={"entity": target, "kind": applied_kind},
         )
+    _anunciar_interacoes(target, target, por_duracao + ix.after_apply(target, status), publish)
     return True
 
 
@@ -903,8 +954,9 @@ def process_turn_start_effects(
     # O NÚCLEO passa o turno: aplica DoT e dreno, decrementa e expira. Ele não
     # publica evento nem conhece a tela — devolve o que aconteceu, e a voz é
     # dada aqui.
-    relatorio = core.tick_effects(entity)
+    relatorio = core.tick_effects(entity, drain_scale=ix.drain_scale)
     skipped_turn = relatorio["skip_turn"]
+    _anunciar_interacoes(entity, entity, relatorio.get("laws", ()), publish)
 
     for effect_id, dano in relatorio["dot"].items():
         _emit(

@@ -239,6 +239,14 @@ def render_flee_failed_message() -> None:
     console.print(Panel(Text("A fuga falhou!", justify="center", style="red"), border_style="red"))
 
 
+def render_interaction_message(entity, label: str) -> None:
+    """Anuncia uma lei que disparou. Alto, curto e com o alvo nomeado."""
+    console.print(
+        f"[bold yellow]{label}![/bold yellow] [dim white]({entity.get_nick_name()})[/dim white]",
+        justify="center",
+    )
+
+
 def render_turn_effect_message(entity, event: tuple[str, ...]) -> None:
     kind = event[0]
     if kind == "poison_tick":

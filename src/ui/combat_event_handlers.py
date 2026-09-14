@@ -62,6 +62,11 @@ def _on_turn_effect(ev: GameEvent) -> None:
         renderer.render_turn_effect_message(entity, (kind,))
     elif kind == "stun_applied":
         renderer.render_turn_effect_message(entity, ("stun_applied",))
+    elif kind == "interaction":
+        # As leis do jogo precisam ser VISÍVEIS: é observando o combate que o
+        # jogador descobre que gelo e crítico se combinam. Vale igual quando
+        # quem ativa é o monstro — a lei não é dele nem do herói.
+        renderer.render_interaction_message(entity, str(p["label"]))
     elif kind == "status_resisted":
         renderer.render_turn_effect_message(entity, ("status_resisted", str(p["status"])))
     elif kind == "mana_burn_tick":

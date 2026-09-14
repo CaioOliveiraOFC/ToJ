@@ -38,6 +38,7 @@ from __future__ import annotations
 import random
 
 from src.mechanics import combat as combat_mech
+from src.shared import interactions as ix
 from src.shared.constants import (
     DEFAULT_MONSTER_ROLE,
     MONSTER_DESPERATE_HP_RATIO,
@@ -109,17 +110,32 @@ def _valor_de_status(skill) -> float:
     return control_weight(str(getattr(skill, "effect_value", ""))) * duracao * chance
 
 
-def _maior(skills: list, caster=None):
+def _maior(skills: list, caster=None, alvo=None):
     """A skill de maior valor da lista. `None` para lista vazia.
 
     `caster` é quem vai lançar: sem ele não há como saber quanto uma carta de
     dano vale, porque depois da V2 o dano nasce dos atributos de quem lança.
+
+    `alvo` entra para que uma carta que destrava uma LEI do jogo — veneno num
+    alvo frágil, sangramento num alvo vulnerável, golpe num alvo congelado —
+    valha mais que a mesma carta contra um alvo limpo. O peso é MULTIPLICATIVO
+    (`opportunity_weight`) porque dano e controle vivem em escalas diferentes e
+    um bônus fixo desequilibraria uma das duas; sem oportunidade ele é 1.0 e a
+    ordem do arquétipo não muda em nada.
+
+    A IA não ganha conhecimento mágico com isso: `opportunities` só responde
+    quando o estado está REALMENTE no alvo e a carta REALMENTE põe a outra peça.
+    Não existe "o controlador gosta de veneno porque a Toxicidade existe".
     """
     if not skills:
         return None
+
+    def peso(s):
+        return ix.opportunity_weight(caster, alvo, s) if caster is not None else 1.0
+
     if all(s.effect_type == "status" for s in skills):
-        return max(skills, key=_valor_de_status)
-    return max(skills, key=lambda s: _valor(s, caster))
+        return max(skills, key=lambda s: _valor_de_status(s) * peso(s))
+    return max(skills, key=lambda s: _valor(s, caster) * peso(s))
 
 
 def _ja_esta_no_ar(monster, skill, target=None) -> bool:
@@ -207,28 +223,43 @@ def _pick_skill(monster, hero, usable: list, rng: random.Random) -> tuple[object
 
     # 5. Rotina do papel. Aqui a moeda ainda vale: é a variação que impede o
     #    encontro de virar um roteiro decorado.
+    #
+    #    É SÓ AQUI que a oportunidade de interação pesa, e por isso o alvo só é
+    #    passado deste ponto em diante. Execução, sobrevivência, desespero e
+    #    abertura continuam acima de qualquer combo: um monstro que persegue uma
+    #    Ferida Séptica com o herói a um golpe da morte está jogando pior, não
+    #    melhor. A lei entra como desempate DENTRO da rotina do arquétipo, e
+    #    nunca no lugar dela.
     if role == "controller":
         return (
-            _maior(statuses, monster) or _maior(damages, monster) or _maior(defensivas, monster)
+            _maior(statuses, monster, hero)
+            or _maior(damages, monster, hero)
+            or _maior(defensivas, monster)
         ), False
     if role == "support":
         return (
             _maior(heals, monster)
             or _maior(defensivas, monster)
-            or _maior(statuses, monster)
-            or _maior(damages, monster)
+            or _maior(statuses, monster, hero)
+            or _maior(damages, monster, hero)
         ), False
     if role == "tank":
         return (
-            _maior(defensivas, monster) or _maior(damages, monster) or _maior(statuses, monster)
+            _maior(defensivas, monster)
+            or _maior(damages, monster, hero)
+            or _maior(statuses, monster, hero)
         ), False
     if role in ("glass_cannon", "boss", "elite", "bruiser", "skirmisher"):
         return (
-            _maior(damages, monster) or _maior(statuses, monster) or _maior(defensivas, monster)
+            _maior(damages, monster, hero)
+            or _maior(statuses, monster, hero)
+            or _maior(defensivas, monster)
         ), False
 
     return (
-        _maior(damages, monster) or _maior(statuses, monster) or _maior(defensivas, monster)
+        _maior(damages, monster, hero)
+        or _maior(statuses, monster, hero)
+        or _maior(defensivas, monster)
     ), False
 
 

@@ -404,6 +404,73 @@ terceiro turno e 36% do dano dele saía do ataque gratuito.
 
 ---
 
+## Efeitos / Interações
+
+**`[implementado]`** Um efeito é uma **peça**. Uma interação é uma **lei sobre
+duas peças** — e a lei pertence ao jogo, nunca à carta.
+
+A diferença é a regra inteira. "A skill X quebra o gelo" seria uma regra da skill
+X: cada carta nova precisaria reimplementá-la, o monstro nunca a teria, e o
+jogador decoraria trinta casos especiais em vez de aprender uma lei. O que existe
+é *alvo congelado + golpe crítico = Quebra Gélida*. Quem congelou, com o quê, e
+quem está batendo, não entra na pergunta.
+
+Disso decorre o resto:
+
+- **A fonte não importa.** Skill, passiva, item, encantamento ou monstro colocam a
+  mesma peça e destravam a mesma lei.
+- **O ator não importa.** Herói e monstro leem as mesmas leis. Não existe uma
+  versão de Quebra Gélida para cada lado.
+- **Nada multiplica dano fora do funil.** As duas leis que mexem em dano entram no
+  bucket `×MULT`, ao lado do crítico e sob o mesmo teto. As outras seis mexem em
+  stack, duração, estado ou MP.
+- **As leis são visíveis.** Quando uma dispara, o combate anuncia — é observando
+  que o jogador descobre que gelo e crítico se combinam.
+
+### As 16 leis
+
+Oito já eram resolvidas pelo núcleo de efeitos e foram apenas **reconhecidas**,
+não reimplementadas — sete pares opostos que se compensam numa soma só, e o sono
+que quebra ao levar dano:
+
+| Lei | Gatilho |
+|---|---|
+| Força e Fraqueza | Fortalecido ↔ Enfraquecido (Força) |
+| Surto e Maldição | Surto Arcano ↔ Amaldiçoado (Magia) |
+| Pressa e Peso | Acelerado ↔ Lentificado (Agilidade) |
+| Guarda e Brecha | Fortificado ↔ Vulnerável (Defesa) |
+| Vigor e Fragilidade | Vitalidade ↔ Fragilidade (teto de HP) |
+| Foco e Névoa | Concentrado ↔ Mente Turva (teto de MP) |
+| Mira e Medo | Preciso ↔ Amedrontado (a mesma chance de acerto) |
+| Sono e Dor | Adormecido levando dano acorda |
+
+As oito novas:
+
+| Lei | Gatilho | Efeito |
+|---|---|---|
+| **Quebra Gélida** | Congelado + golpe crítico que acerta | ×1,25 no `×MULT`, e o gelo sai depois do golpe |
+| **Emboscada** | Atacante Invisível + ação ofensiva | ×1,20 no `×MULT`; a invisibilidade sai na tentativa, acertando ou errando |
+| **Ferida Aberta** | Sangramento entrando em alvo Vulnerável | um stack a mais, respeitando o teto |
+| **Toxicidade** | Veneno entrando em alvo Frágil | um turno a mais de duração |
+| **Pânico** | Medo entrando em alvo que já sangra | um turno a mais de Medo |
+| **Hemorragia Fria** | Quebra Gélida em alvo que já sangra | um stack a mais de Sangramento |
+| **Ferida Séptica** | Sangramento e Veneno coexistindo | reaplicar um renova a duração do outro |
+| **Colapso Mental** | Queima de Mana em alvo de Mente Turva | o dreno de MP vale ×1,5 (não é dano) |
+
+Quebra Gélida e Emboscada são **trocas**, e não bônus: o golpe vale mais e o
+controle acaba; o golpe vale mais e a posição foi revelada. Nenhuma lei mexe na
+chance de um status pegar — o efeito passa pela resistência do alvo sozinho, ou
+existiria um segundo sistema de status por fora do núcleo.
+
+**`[implementado]`** Os monstros percebem as oportunidades. A percepção é sóbria e
+sem conhecimento mágico: uma carta só vale mais se o estado estiver **realmente**
+no alvo e a carta **realmente** puser a outra peça. E a lei entra como desempate
+*dentro* da rotina do arquétipo — execução, sobrevivência, desespero e abertura
+continuam acima de qualquer combo. Um monstro que persegue uma Ferida Séptica com
+o herói a um golpe da morte está jogando pior, não melhor.
+
+---
+
 ## Itens, Loja e Economia
 
 **`[implementado]`** 159 itens, uso livre de consumíveis no turno de combate.
