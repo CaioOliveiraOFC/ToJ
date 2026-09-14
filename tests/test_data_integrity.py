@@ -101,18 +101,40 @@ class TestCondicoesDeBonusExistemNoMotor:
         ]
         assert not quebradas, f"condição sem bônus, ou bônus sem condição: {quebradas}"
 
-    def test_toda_skill_de_dano_tem_uma_situacao(self):
-        """Sem condição, uma skill de dano é um ataque básico caro.
+    def test_toda_skill_de_dano_tem_alguma_identidade(self):
+        """Uma skill de dano sem NENHUM traço próprio é um ataque básico caro.
 
         A escolha entre elas vira aritmética fixa — sempre a de maior valor — e
         o deck deixa de precisar ser lido.
+
+        A regra exigia especificamente uma CONDIÇÃO SITUACIONAL de todas elas, e
+        isso é forte demais: uma carta também se distingue pelo efeito que
+        aplica, pela mira que tem, pelo equipamento que pede ou por onde o golpe
+        nasce. Exigir sempre a mesma forma de identidade empurra o catálogo para
+        uma forma só, que é o oposto do que esta regra protege.
+
+        O que continua proibido é a carta sem nenhuma delas.
         """
-        sem = [
-            s["id"]
-            for s in _skills()
-            if s["effect_type"] == "damage" and not s.get("bonus_condition")
-        ]
-        assert not sem, f"skills de dano sem condição situacional: {sem}"
+        sem = []
+        for s in _skills():
+            if s["effect_type"] != "damage":
+                continue
+            tracos = [
+                nome
+                for nome, tem in (
+                    ("condição", bool(s.get("bonus_condition")) and bool(s.get("bonus_percent"))),
+                    ("efeito secundário", bool(s.get("secondary"))),
+                    ("mira", bool(s.get("accuracy_modifier"))),
+                    ("requisito", bool(s.get("requires"))),
+                )
+                if tem
+            ]
+            if not tracos:
+                sem.append(s["id"])
+        assert not sem, (
+            "skills de dano sem condição, efeito, mira nem requisito — "
+            f"são ataques básicos mais caros: {sem}"
+        )
 
 
 def _skills() -> list[dict]:
@@ -140,6 +162,13 @@ class TestDescricaoDizOQueACartaFaz:
     PROMESSAS = {
         "insta-kill": "não existe execução instantânea no motor",
         "ignora morte": "`death_ignore` é passiva, não efeito de skill",
+        # Achados na auditoria semântica do catálogo de 150 cartas.
+        "nunca erra": "não existe acerto garantido: `accuracy_modifier` soma na "
+        "mesma conta e continua preso ao teto global de acerto",
+        "sempre acerta": "idem — o teto de acerto vale para toda carta",
+        "reflete": "não existe reflexão de dano no motor",
+        "devolve o feitiço": "não existe reflexão de magia no motor",
+        "não sobra mão": "a carta não impede o ataque do turno seguinte",
     }
 
     def test_nenhuma_descricao_promete_mecanica_inexistente(self):
@@ -538,3 +567,63 @@ class TestRequisitoDeSkillTemPecaQueOCumpra:
                 if req.hand_type not in por_classe.get(classe, set()):
                     impossiveis.append(f"{skill.id} exige {req.hand_type} e {classe} não equipa")
         assert not impossiveis, "; ".join(impossiveis)
+
+
+class TestCatalogoNaoTemCartaRepetida:
+    """Duas cartas que oferecem a MESMA decisão são uma carta com dois nomes.
+
+    A assinatura de uma carta é o que ela decide: de quem é, o que faz, de qual
+    atributo nasce, o que aplica, o que exige e quando rende mais. Número não
+    entra — "a mesma carta com o valor maior" é justamente o caso que esta regra
+    recusa. O catálogo já teve três buffs de Agilidade do Ladino que só diferiam
+    em 30, 45 e 50, e nove grupos assim no total; todos foram redesenhados.
+
+    Sem este teste, o próximo lote de conteúdo os traz de volta sem ninguém ver.
+    """
+
+    def test_nenhuma_carta_de_heroi_repete_outra(self):
+        from src.content.skill_validator import find_clones
+        from src.content.skills_loader import load_skills
+
+        repetidas = find_clones(load_skills())
+        assert not repetidas, f"cartas que oferecem a mesma decisão: {repetidas}"
+
+    def test_nenhuma_carta_de_monstro_repete_outra_do_mesmo_arquetipo(self):
+        from src.content.factories.archetypes import all_archetypes
+        from src.content.skill_validator import find_clones
+
+        cartas = [
+            (papel, carta)
+            for papel, arquetipo in sorted(all_archetypes().items())
+            for carta in arquetipo.skills
+        ]
+        repetidas = find_clones(cartas)
+        assert not repetidas, f"cartas que oferecem a mesma decisão: {repetidas}"
+
+    def test_a_deteccao_enxerga_uma_copia(self):
+        """Prova de carga: um auditor cego aprovaria o catálogo inteiro."""
+        import dataclasses
+
+        from src.content.skill_validator import find_clones
+        from src.content.skills_loader import get_skill_by_id
+
+        original = get_skill_by_id("grito_guerra")
+        copia = dataclasses.replace(original, id="copia", name="Cópia", effect_value=999)
+        assert find_clones([original, copia]) == [["grito_guerra", "copia"]]
+
+
+class TestMitigacaoDizQuantoReduz:
+    """A carta de mitigação é escolhida pelo número, e o número tem de estar lá.
+
+    Nove cartas diziam apenas o que a personagem fazia ("amarra o escudo no
+    braço") e nunca quanto isso valia. Entre duas delas, a escolha era às cegas.
+    """
+
+    def test_toda_carta_de_reducao_cita_o_proprio_valor(self):
+        erradas = [
+            f"{s['id']} (reduz {s['effect_value']}%): {s['description']!r}"
+            for s in _skills()
+            if s["effect_type"] == "damage_reduction"
+            and str(s["effect_value"]) not in s.get("description", "")
+        ]
+        assert not erradas, "mitigação que não diz quanto reduz: " + "; ".join(erradas)

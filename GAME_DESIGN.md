@@ -234,14 +234,31 @@ mesma carta com dois nomes, e o pipeline de autoria as recusa — não adianta
 mudar o número, o custo ou 5% de chance. Foram 16 quase-duplicatas rejeitadas e
 reescritas durante a geração deste catálogo.
 
-**`[bug conhecido — conteúdo]`** Doze pares que **já estavam** no jogo antes
-deste catálogo são clones por esse mesmo critério: três buffs de Agilidade do
-Ladino que só diferem em 30/45/50, `cutelada` e `golpe_duplo`, `escudo_magico` e
-`barreira_arcana`, `explosao_arcana` e `tempestade`, entre outros. Não foram
-apagados — consolidá-los é uma rodada de conteúdo própria, com o cuidado de não
-quebrar save antigo.
+**`[implementado]`** **Zero clones no catálogo**, herói e monstro, verificado por
+teste. Os nove grupos herdados — três buffs de Agilidade do Ladino que só
+diferiam em 30/45/50, três curas do Mago, `cutelada`/`golpe_duplo`,
+`escudo_magico`/`barreira_arcana`, `explosao_arcana`/`tempestade` e outros —
+foram **redesenhados no lugar, com o ID preservado**: nenhum save quebrou e
+nenhuma carta sumiu. `Fortalecimento` virou o atordoamento do Guerreiro,
+`Cortina de Fumaça` passou a embaralhar a mana do inimigo, `Cura Menor` virou um
+empréstimo de vida máxima, e assim por diante.
 
-**`[implementado]`** **Requisito de equipamento como pivô.** 28% das cartas
+**`[implementado]`** **A descrição diz a verdade.** Uma auditoria semântica das
+150 cartas encontrou promessas que o motor não cumpre — "nunca erra o lugar"
+(não existe acerto garantido), "devolve o feitiço" (não existe reflexão), "não
+sobra mão para revidar" (a carta não impede o turno seguinte) —, além de 45
+buffs que mostravam um número sem dizer do que ele era e nove cartas de
+mitigação que não diziam quanto reduziam. Todas reescritas, e cada termo
+proibido entrou na lista que o teste de integridade verifica.
+
+**`[implementado]`** **Identidade de carta de dano não é só a condição
+situacional.** A regra exigia `bonus_condition` de toda skill de dano, o que
+empurrava o catálogo para uma forma só. Uma carta também se distingue pelo
+efeito que aplica, pela mira, pelo equipamento que pede ou por onde o golpe
+nasce. O que continua proibido é a carta sem NENHUMA delas — essa é literalmente
+um ataque básico mais caro.
+
+**`[implementado]`** **Requisito de equipamento como pivô.** 31% das cartas
 pedem uma peça: espada, adaga, machado, maça, cajado, arco, ou as duas mãos
 ocupadas. A carta aparece na oferta mesmo sem o equipamento, de propósito — é o
 convite a mudar o rumo da run. Para que isso não fosse promessa vazia, as 42

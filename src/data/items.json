@@ -1256,8 +1256,7 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "consumable": false,
-      "hand_type": "mace"
+      "consumable": false
     },
     {
       "id": "bastão_cru",
@@ -1619,8 +1618,7 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "consumable": false,
-      "hand_type": "staff"
+      "consumable": false
     },
     {
       "id": "escudo_ferro",

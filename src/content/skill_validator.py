@@ -312,6 +312,66 @@ def validate(skill, reference: dict | None = None) -> Veredito:
     return v
 
 
+# --- similaridade conceitual ------------------------------------------------
+#
+# 204 cartas não podem ser 40 ideias e 164 renomes. O que define uma carta é o
+# que ela DECIDE: de quem é, o que faz, de qual atributo nasce, o que aplica, o
+# que exige e quando rende mais. Duas cartas com essa mesma assinatura oferecem
+# a mesma decisão ao jogador — são a mesma carta com dois nomes, e a segunda
+# gasta um dos três espaços do menu com nada.
+#
+# Número NÃO entra na assinatura. "A mesma carta com o valor maior" é
+# exatamente o caso que esta regra existe para recusar: o catálogo já teve três
+# buffs de Agilidade do Ladino que só diferiam em 30, 45 e 50.
+
+
+def skill_signature(skill, role: str = "") -> tuple:
+    """A identidade conceitual de uma carta.
+
+    `role` existe porque toda carta de monstro carrega `skill_class="Monster"`:
+    sem ele, o Torpor do Controlador e o Esmagar do Chefe pareceriam a mesma
+    carta, quando a diferença entre os arquétipos é justamente o que o jogador
+    precisa aprender a ler.
+    """
+    escala = tuple(sorted((t.stat, round(t.weight, 2)) for t in skill.scaling))
+    req = skill.requires
+    chave_req = ()
+    if req is not None:
+        chave_req = tuple(
+            sorted(
+                (k, v)
+                for k, v in (
+                    ("hand_type", req.hand_type),
+                    ("hands", req.hands),
+                    ("two_weapons", req.two_weapons),
+                )
+                if v
+            )
+        )
+    return (
+        role or skill.skill_class,
+        skill.effect_type,
+        escala,
+        # Só o `effect_value` que é um NOME conta: em `status` ele é o efeito
+        # aplicado, e `poison` e `frozen` são decisões diferentes. Em buff, cura
+        # e mitigação ele é um número, e número não distingue carta.
+        str(skill.effect_value) if skill.effect_type == "status" else "",
+        skill.effect_stat,
+        skill.secondary.effect if skill.secondary else "",
+        skill.bonus_condition,
+        chave_req,
+    )
+
+
+def find_clones(cartas) -> list[list[str]]:
+    """Grupos de cartas que oferecem a mesma decisão. Aceita `(papel, carta)`."""
+    grupos: dict[tuple, list[str]] = {}
+    for entrada in cartas:
+        papel, carta = entrada if isinstance(entrada, tuple) else ("", entrada)
+        grupos.setdefault(skill_signature(carta, papel), []).append(carta.id)
+    return [ids for ids in grupos.values() if len(ids) > 1]
+
+
 def validate_all(skills, reference: dict | None = None) -> list[Veredito]:
     """Valida um catálogo inteiro. Devolve só os vereditos, sem levantar."""
     return [validate(s, reference=reference) for s in skills]
@@ -351,8 +411,10 @@ __all__ = [
     "assert_catalogo_valido",
     "budget_credit",
     "effect_budget",
+    "find_clones",
     "monster_reference",
     "offensive_budget",
+    "skill_signature",
     "validate",
     "validate_all",
     "validate_monster_catalog",

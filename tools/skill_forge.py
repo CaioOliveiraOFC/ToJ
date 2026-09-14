@@ -40,6 +40,7 @@ from src.content.skill_validator import (  # noqa: E402
     _referencia,
     monster_reference,
     offensive_budget,
+    skill_signature,
     validate,
 )
 from src.content.skills_loader import card_from_json  # noqa: E402
@@ -189,13 +190,40 @@ RAMOS_QUE_LEEM_SECUNDARIO = ("damage", "status")
 RAMOS_QUE_LEEM_ACERTO = ("damage",)
 
 
+# O que pode dar identidade a uma carta de dano. A condição situacional é UMA
+# das formas, e por um tempo ela foi exigida de todas — o que é forte demais:
+# uma carta pode se distinguir pelo efeito que aplica, pela mira, pelo
+# equipamento que pede, pela escala de onde nasce, ou pelo preço. Exigir a
+# condição de todas empurrava o catálogo para uma forma só.
+#
+# O que continua proibido é a carta de dano SEM NENHUMA delas: essa é
+# literalmente um ataque básico mais caro, e a escolha entre ela e as outras
+# vira aritmética fixa.
+def _identidade_da_carta(c: Carta) -> list[str]:
+    marcas = []
+    if c.cond and c.bonus:
+        marcas.append("condição situacional")
+    if c.sec:
+        marcas.append("efeito secundário")
+    if c.acc:
+        marcas.append("mira própria")
+    if c.req:
+        marcas.append("requisito de equipamento")
+    return marcas
+
+
 def problemas_de_autoria(c: Carta) -> list[str]:
     erros = []
     if c.tipo == "damage":
         if not c.esc or not c.bud:
             erros.append("carta de dano sem escala ou sem orçamento")
-        if not c.cond or not c.bonus:
-            erros.append("carta de dano sem condição situacional (vira ataque básico caro)")
+        if not _identidade_da_carta(c):
+            erros.append(
+                "carta de dano sem nenhuma identidade (condição, efeito, mira ou "
+                "requisito): é um ataque básico mais caro"
+            )
+        if bool(c.cond) != bool(c.bonus):
+            erros.append("condição sem bônus, ou bônus sem condição")
     else:
         if c.esc or c.bud:
             erros.append(f"`scaling` em carta de {c.tipo}: o motor só o usa em dano")
@@ -218,34 +246,22 @@ def problemas_de_autoria(c: Carta) -> list[str]:
 
 
 def assinatura(c: Carta) -> tuple:
-    """O que a carta DECIDE. Nome, custo e 5% de chance não entram.
+    """A assinatura da carta, pela MESMA regra que o jogo aplica.
 
-    Duas cartas com a mesma assinatura oferecem a mesma decisão ao jogador: o
-    mesmo recurso, aplicado do mesmo jeito, na mesma situação. São a mesma carta.
+    A lei mora em `content/skill_validator.skill_signature`: ela vale para o
+    catálogo publicado e é verificada por teste. Aqui só se traduz a intenção de
+    autoria para uma carta de verdade antes de perguntar.
     """
-    escala = tuple(sorted((t["stat"], round(t["weight"], 2)) for t in c.escala()))
-    return (
-        c.papel or c.cls,
-        c.tipo,
-        escala,
-        _efeito_nomeado(c.tipo, c.ev),
-        c.stat,
-        c.sec[0] if c.sec else "",
-        c.cond,
-        tuple(sorted((c.req or {}).items())),
-    )
+    return skill_signature(card_from_json(_json_completo(c)), c.papel)
 
 
-def _efeito_nomeado(tipo: str, ev) -> str:
-    """Só o `effect_value` que é um NOME entra na assinatura.
+def _json_completo(c: Carta) -> dict:
+    dados = c.json()
+    if c.papel:
+        from src.content.factories.archetypes import PADROES_DE_MONSTRO
 
-    Em `status` ele é o efeito aplicado — `poison` e `frozen` são decisões
-    diferentes. Em buff, cura e redução ele é um número, e "a mesma carta com o
-    número maior" é exatamente a definição de clone que este projeto recusa:
-    o catálogo do Ladino tem três buffs de Agilidade que só diferem em 30, 45 e
-    50, e eles precisam aparecer aqui.
-    """
-    return str(ev) if tipo == "status" else ""
+        return {**PADROES_DE_MONSTRO, **dados}
+    return dados
 
 
 @dataclass
@@ -305,38 +321,8 @@ def auditar(cartas: list[Carta], existentes: list | None = None) -> Relatorio:
 
 
 def _assinatura_de_carregada(s, papel: str = "") -> tuple:
-    """A mesma assinatura, para uma `SkillCard` já carregada do JSON.
-
-    `papel` existe porque toda carta de monstro carrega `skill_class="Monster"`:
-    sem ele, o Torpor do Controlador e o Esmagar do Chefe pareceriam a mesma
-    carta. São arquétipos diferentes, e é justamente a diferença entre eles que
-    o jogador precisa aprender a ler.
-    """
-    escala = tuple(sorted((t.stat, round(t.weight, 2)) for t in s.scaling))
-    req = s.requires
-    chave_req = ()
-    if req is not None:
-        chave_req = tuple(
-            sorted(
-                (k, v)
-                for k, v in (
-                    ("hand_type", req.hand_type),
-                    ("hands", req.hands),
-                    ("two_weapons", req.two_weapons),
-                )
-                if v
-            )
-        )
-    return (
-        papel or s.skill_class,
-        s.effect_type,
-        escala,
-        _efeito_nomeado(s.effect_type, s.effect_value),
-        s.effect_stat,
-        s.secondary.effect if s.secondary else "",
-        s.bonus_condition,
-        chave_req,
-    )
+    """Apelido de `skill_signature`, para os pontos que já liam este nome."""
+    return skill_signature(s, papel)
 
 
 def imprimir(rel: Relatorio, titulo: str) -> bool:
@@ -442,6 +428,12 @@ def calibrar(c: Carta, piso: float = 1.80) -> int:
     O piso existe para que gastar mana e recarga seja melhor que não gastar
     nada. Uma carta de classe é medida contra a classe dela; uma Neutral contra
     as três, e vale a pior — é para essa classe que ela seria uma armadilha.
+
+    **1,80 é margem de autoria, não lei do jogo.** O contrato está em
+    `MIN_SKILL_TO_BASIC_RATIO` (1,7) e continua onde sempre esteve; escrever um
+    pouco acima dele evita que um arredondamento derrube a carta. Subir o
+    contrato junto tornaria o ataque básico irrelevante, e ele precisa continuar
+    sendo uma jogada de verdade — é o que dá sentido a economizar mana.
     """
     if c.tipo != "damage":
         return c.bud
