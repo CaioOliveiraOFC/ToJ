@@ -560,15 +560,15 @@
         {
           "id": "mob_evasao_mob",
           "name": "Esquiva Felina",
-          "effect_type": "buff",
-          "effect_value": 25,
-          "effect_stat": "evasion",
+          "effect_type": "status",
+          "effect_value": "invisible",
+          "effect_stat": "",
           "mana_cost": 15,
           "cooldown": 5,
           "duration": 3,
           "chance": 100,
           "target": "self",
-          "description": "Fica mais difícil de acertar por alguns turnos."
+          "description": "Sai do campo de visão e só reaparece no golpe — que chega de onde ninguém olhava."
         },
         {
           "id": "mob_ferida",
@@ -631,7 +631,12 @@
               "weight": 1.0
             }
           ],
-          "power": 4.957
+          "power": 4.957,
+          "secondary": {
+            "effect": "poison",
+            "chance": 45,
+            "duration": 5
+          }
         },
         {
           "id": "mob_rasteira",
@@ -689,7 +694,12 @@
           "cooldown": 3,
           "duration": 2,
           "chance": 75,
-          "target": "enemy"
+          "target": "enemy",
+          "secondary": {
+            "effect": "clouded",
+            "chance": 60,
+            "duration": 3
+          }
         },
         {
           "id": "mob_medo",
@@ -715,7 +725,12 @@
           "chance": 60,
           "cooldown": 4,
           "effect_stat": "",
-          "accuracy_modifier": 0
+          "accuracy_modifier": 0,
+          "secondary": {
+            "effect": "bleed",
+            "chance": 45,
+            "duration": 2
+          }
         },
         {
           "id": "mob_letargia",
@@ -866,18 +881,18 @@
           "name": "Praga Lenta",
           "mana_cost": 22,
           "effect_type": "status",
-          "effect_value": "poison",
-          "description": "Não é para matar. É para o outro chegar cansado no fim.",
+          "effect_value": "frailty",
+          "description": "Primeiro tira o que segurava de pé. O veneno vem depois, e encontra menos resistência.",
           "target": "enemy",
-          "duration": 5,
-          "chance": 70,
+          "duration": 3,
+          "chance": 55,
           "cooldown": 4,
           "effect_stat": "",
           "accuracy_modifier": 0,
           "secondary": {
-            "effect": "frailty",
-            "chance": 55,
-            "duration": 3
+            "effect": "poison",
+            "chance": 70,
+            "duration": 5
           }
         },
         {

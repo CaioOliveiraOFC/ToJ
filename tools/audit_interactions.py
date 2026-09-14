@@ -258,6 +258,80 @@ def relatorio_smoke() -> None:
     ):
         caso(nome, fn)
 
+    print("\n=== SMOKE — MONSTRO, sequência dirigida com as cartas dele ===")
+
+    def _mob(role):
+        mob = spawn_by_role(role, 20)
+        mob._mp = 10**6
+        return mob
+
+    def _vitima():
+        h = make_hero("Warrior", 20, "naked")
+        h.base_hp = h._hp = 10**6
+        h.base_mp = h._mp = 500
+        return h
+
+    def _lancar_mob(mob, alvo, sid):
+        """Lança a carta REAL do monstro. `self` vai no monstro, como no jogo."""
+        carta = next(s for s in mob.skills if s.id == sid)
+        destino = mob if getattr(carta, "target", "enemy") == "self" else alvo
+        combat.apply_skill(mob, destino, carta, rng=_Certeiro(0), publish=publicar)
+
+    def emboscada_skirmisher():
+        mob, h = _mob("skirmisher"), _vitima()
+        _lancar_mob(mob, h, "mob_evasao_mob")  # some de vista
+        combat.resolve_physical_attack(mob, h, 300, "", rng=_Certeiro(0), publish=publicar)
+
+    def gelo_controller():
+        mob, h = _mob("controller"), _vitima()
+        _lancar_mob(mob, h, "mob_teia_de_gelo")  # frozen + secundário bleed
+        combat.resolve_physical_attack(mob, h, 300, "", rng=_Certeiro(0), publish=publicar)
+
+    def panico_controller():
+        mob, h = _mob("controller"), _vitima()
+        _lancar_mob(mob, h, "mob_teia_de_gelo")  # o bleed vem daqui
+        _lancar_mob(mob, h, "mob_medo")  # Presságio num alvo que sangra
+
+    def colapso_controller():
+        mob, h = _mob("controller"), _vitima()
+        _lancar_mob(mob, h, "mob_queima_mana")  # mana_burn + secundário clouded
+        combat.process_turn_start_effects(h, rng=random.Random(0), publish=publicar)
+
+    def toxicidade_support():
+        mob, h = _mob("support"), _vitima()
+        _lancar_mob(mob, h, "mob_praga_lenta")  # frailty primeiro, veneno depois
+
+    def septica_skirmisher():
+        """O bote vem DEPOIS, como no duelo: `mob_bote` tem 3 de recarga.
+
+        Os turnos no meio não são enfeite. Ferida Séptica renova a duração do
+        outro efeito, e renovar só significa alguma coisa se ela já tiver
+        caído — um sangramento recém-aplicado não tem o que renovar.
+        """
+        mob, h = _mob("skirmisher"), _vitima()
+        _lancar_mob(mob, h, "mob_ferida")  # bleed, duração 3
+        for _ in range(2):
+            combat.process_turn_start_effects(h, rng=random.Random(0), publish=None)
+        _lancar_mob(mob, h, "mob_bote")  # dano + secundário poison
+
+    def ferida_aberta_elite():
+        mob, h = _mob("elite"), _vitima()
+        _lancar_mob(mob, h, "mob_golpe_de_arauto")  # vulnerable
+        _lancar_mob(mob, h, "mob_lamina_negra")  # bleed num alvo vulnerável
+
+    for nome, fn in (
+        ("skirmisher: Esquiva Felina → ataque", emboscada_skirmisher),
+        ("controller: Teia de Gelo → crítico", gelo_controller),
+        ("controller: Teia de Gelo → Presságio", panico_controller),
+        ("controller: Queima de Mana → tick", colapso_controller),
+        ("support: Praga Lenta", toxicidade_support),
+        ("skirmisher: Ferida Aberta → Bote", septica_skirmisher),
+        ("elite: Golpe de Arauto → Lâmina Negra", ferida_aberta_elite),
+    ):
+        vistos.clear()
+        fn()
+        print(f"{nome:42} {sorted(set(vistos)) or 'NÃO DISPAROU'}")
+
     print("\n=== SMOKE — MONSTRO, jogando sozinho os próprios turnos ===")
     for role in ROLES:
         achou: list[str] = []

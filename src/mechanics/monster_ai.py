@@ -143,12 +143,18 @@ def _ja_esta_no_ar(monster, skill, target=None) -> bool:
     if skill.effect_type in ("damage_reduction", "buff"):
         # As duas moram no mesmo lugar agora, com a fonte na chave.
         return str(skill.name) in getattr(monster, "active_buffs", {})
-    if skill.effect_type == "status" and target is not None:
-        # O status vive no ALVO, não em quem lança — por isso o alvo precisa
-        # chegar até aqui. Sem isto o monstro reaplicava `Torpor` num herói já
-        # atordoado, pagando MP por uma duração renovada que não muda nada. A
-        # chave é `effect_value`, a mesma que o motor grava em `combat.py`.
-        return str(skill.effect_value) in (getattr(target, "active_effects", {}) or {})
+    if skill.effect_type == "status":
+        # O status vive em QUEM O RECEBE. Quase sempre é o alvo — por isso ele
+        # precisa chegar até aqui; sem isto o monstro reaplicava `Torpor` num
+        # herói já atordoado, pagando MP por uma duração renovada que não muda
+        # nada. Mas uma carta de status pode declarar `target: self`, e aí quem
+        # recebe é o próprio monstro: perguntar ao herói faria o Ladino do
+        # arquétipo reaplicar invisibilidade em cima de invisibilidade, que é o
+        # mesmo turno jogado fora com outro nome.
+        recebe = monster if getattr(skill, "target", "enemy") == "self" else target
+        if recebe is None:
+            return False
+        return str(skill.effect_value) in (getattr(recebe, "active_effects", {}) or {})
     return False
 
 

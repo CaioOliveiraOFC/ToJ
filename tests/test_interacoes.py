@@ -391,3 +391,79 @@ def _baldes(mods) -> dict:
         "xmult_mods": mods.xmult,
         "mitigation": mods.mitigation,
     }
+
+
+class TestCoberturaDeMonstro:
+    """Toda lei nova precisa de um caminho real para o monstro no 1x1.
+
+    No duelo não existe aliado para preparar a jogada: o mesmo monstro tem de
+    colocar as DUAS peças com as próprias cartas, ao longo dos próprios turnos.
+    Estes testes provam o patch de conteúdo que fechou isso, e não o motor —
+    o motor já estava certo, faltavam as peças.
+    """
+
+    @staticmethod
+    def _mob(role, nivel=20):
+        mob = spawn_by_role(role, nivel)
+        mob._mp = 10**6
+        return mob
+
+    @staticmethod
+    def _carta(mob, sid):
+        return next(s for s in mob.skills if s.id == sid)
+
+    def _lancar(self, mob, alvo, sid):
+        carta = self._carta(mob, sid)
+        destino = mob if getattr(carta, "target", "enemy") == "self" else alvo
+        combat.apply_skill(mob, destino, carta, rng=_Sempre(0), publish=None)
+
+    def test_status_de_alvo_self_cai_no_proprio_monstro(self):
+        """`Esquiva Felina` virou status: quem recebe é o lançador, não o herói."""
+        mob, heroi = self._mob("skirmisher"), _heroi()
+        self._lancar(mob, heroi, "mob_evasao_mob")
+        assert core.has_effect(mob, "invisible")
+        assert not core.has_effect(heroi, "invisible")
+
+    def test_a_ia_nao_reaplica_invisibilidade_ja_ativa(self):
+        """Perguntar ao herói faria o monstro pagar MP por um turno em branco."""
+        from src.mechanics import monster_ai
+
+        mob, heroi = self._mob("skirmisher"), _heroi()
+        assert any(s.id == "mob_evasao_mob" for s in monster_ai._usable_skills(mob, heroi))
+
+        core.apply_effect(mob, "invisible")
+        assert not any(s.id == "mob_evasao_mob" for s in monster_ai._usable_skills(mob, heroi))
+
+    def test_praga_lenta_dispara_toxicidade_na_ordem_nova(self):
+        """Fragilidade primeiro, veneno depois: a lei precisa da peça já posta."""
+        mob, heroi = self._mob("support"), _heroi()
+        vistos: list[str] = []
+
+        def publicar(_topico, evento):
+            if evento.payload.get("kind") == "interaction":
+                vistos.append(evento.payload["label"])
+
+        carta = self._carta(mob, "mob_praga_lenta")
+        assert carta.effect_value == "frailty"
+        assert carta.secondary.effect == "poison"
+        combat.apply_skill(mob, heroi, carta, rng=_Sempre(0), publish=publicar)
+        assert "TOXICIDADE" in vistos
+
+    def test_toda_lei_nova_tem_pelo_menos_um_arquetipo(self):
+        """A auditoria, reduzida à pergunta que importa: sobrou alguma sem dono?"""
+        from tools.audit_interactions import PECAS, ROLES, fontes_do_monstro
+
+        fontes = fontes_do_monstro()
+        sem_dono = [
+            lei
+            for lei, pecas in PECAS.items()
+            if not any(all(fontes[p].get(r) for p in pecas) for r in ROLES)
+        ]
+        assert not sem_dono, f"Leis sem nenhum monstro capaz de montá-las: {sem_dono}"
+
+
+class _Sempre(random.Random):
+    """Toda rolagem passa. A chance é a do jogo; aqui ela é fixada."""
+
+    def randrange(self, *args, **kwargs):
+        return 1
