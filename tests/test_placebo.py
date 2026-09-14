@@ -425,3 +425,134 @@ class TestMecanicasQueAsPassivasNovasUsam:
         alvo.resistances = {"poison": 100}
         combat.resolve_physical_attack(heroi, alvo, 500, "", rng=random.Random(1), publish=None)
         assert "poison" not in alvo.active_effects
+
+
+class TestPrecisionEStatusResistance:
+    """As duas vias abertas no segundo lote de passivas.
+
+    Nenhuma das duas é mecânica nova: `precision` já existia como efeito
+    temporário do núcleo e `status_resistance` já existia como resistência
+    específica. O lote só deu ACESSO PERMANENTE a regras que o motor já tinha —
+    e o teste é justamente esse: a passiva chega pelo caminho que já existia,
+    sem segunda rolagem, sem segundo teto e sem tocar em dano.
+    """
+
+    @staticmethod
+    def _com(efeito, valor, classe="Warrior", nivel=20):
+        from src.content.passives import PassiveCard
+
+        heroi = make_hero(classe, nivel, "naked")
+        heroi.add_passive(PassiveCard("prova", "Prova", "Combate", "Common", "", efeito, valor))
+        return heroi
+
+    # ---------------- precision ----------------
+
+    def test_precision_soma_pontos_na_mesma_chance_de_acerto(self):
+        """Medido longe do teto: um Guerreiro nível 20 contra lixo já bate em 89,
+        e a prova viraria a do clamp. O `accuracy_modifier` desloca os DOIS lados
+        na mesma conta, que é justamente o ponto — precisão e mira da ação são a
+        mesma soma."""
+        alvo = _alvo_imortal()
+        sem = make_hero("Warrior", 20, "naked")
+        com = self._com("precision", 10)
+        assert combat.hit_chance(com, alvo, -30) == combat.hit_chance(sem, alvo, -30) + 10
+
+    def test_precision_entra_antes_do_teto_e_nao_garante_acerto(self):
+        """O teto global continua sendo o teto: não existe acerto garantido."""
+        from src.shared.constants import HIT_CHANCE_CEIL
+
+        alvo = _alvo_imortal()
+        assert combat.hit_chance(self._com("precision", 500), alvo) == HIT_CHANCE_CEIL
+
+    def test_precision_respeita_o_piso_quando_o_alvo_e_evasivo(self):
+        """Somar precisão a quem está no piso levanta a conta, não a quebra."""
+        from src.shared.constants import HIT_CHANCE_FLOOR
+
+        alvo = _alvo_imortal()
+        no_piso = combat.hit_chance(make_hero("Warrior", 20, "naked"), alvo, accuracy_modifier=-500)
+        assert no_piso == HIT_CHANCE_FLOOR
+        com = combat.hit_chance(self._com("precision", 5), alvo, accuracy_modifier=-500)
+        assert com == HIT_CHANCE_FLOOR
+
+    def test_precision_nao_aumenta_dano(self):
+        """Mira é mira: nenhum balde do funil muda por causa dela."""
+        alvo = _alvo_imortal()
+        sem = combat.damage_modifiers(make_hero("Warrior", 20, "naked"), alvo, is_critical=False)
+        com = combat.damage_modifiers(self._com("precision", 40), alvo, is_critical=False)
+        assert (com.flat, com.mult, com.xmult, com.mitigation) == (
+            sem.flat,
+            sem.mult,
+            sem.xmult,
+            sem.mitigation,
+        )
+
+    def test_precision_permanente_e_temporaria_somam_no_mesmo_lugar(self):
+        """A passiva não substitui o efeito do núcleo — os dois entram juntos."""
+        alvo = _alvo_imortal()
+        heroi = self._com("precision", 10)
+        antes = combat.hit_chance(heroi, alvo, -30)
+        core.apply_effect(heroi, "precision", duration=3, intensity=7)
+        assert combat.hit_chance(heroi, alvo, -30) == antes + 7
+
+    # ---------------- status_resistance ----------------
+
+    @staticmethod
+    def _taxa_de_status(alvo_factory, status="poison", n: int = 2000) -> float:
+        pegou = 0
+        for i in range(n):
+            alvo = alvo_factory()
+            pegou += combat.try_apply_status(alvo, status, 100, 3, random.Random(i), None)
+        return pegou / n
+
+    def test_resistencia_global_reduz_a_chance_de_o_status_pegar(self):
+        assert self._taxa_de_status(lambda: make_hero("Warrior", 20, "naked")) == 1.0
+        taxa = self._taxa_de_status(lambda: self._com("status_resistance", 50))
+        assert 0.44 < taxa < 0.56
+
+    def test_resistencia_global_soma_com_a_especifica(self):
+        """Vinte de passiva com trinta de específica dão cinquenta contra aquele
+        status — uma conta só, resolvida por `get_status_resistance`."""
+
+        def alvo():
+            heroi = self._com("status_resistance", 20)
+            heroi.resistances = {"poison": 30}
+            return heroi
+
+        assert alvo().get_status_resistance("poison") == 50
+        # E não empresta nada para os outros status.
+        assert alvo().get_status_resistance("bleed") == 20
+        assert 0.44 < self._taxa_de_status(alvo) < 0.56
+
+    def test_a_soma_respeita_o_teto_de_cem(self):
+        def alvo():
+            heroi = self._com("status_resistance", 50)
+            heroi.resistances = {"poison": 60}
+            return heroi
+
+        assert alvo().get_status_resistance("poison") == 100
+        assert self._taxa_de_status(alvo) == 0.0
+
+    def test_resistencia_a_status_nao_reduz_dano(self):
+        """Status e dano são sistemas vizinhos: o golpe chega inteiro."""
+        atacante = _alvo_imortal()
+        sem = make_hero("Warrior", 20, "naked")
+        com = self._com("status_resistance", 100)
+        assert com.get_hp() == sem.get_hp()
+        for alvo in (sem, com):
+            combat.resolve_physical_attack(
+                atacante, alvo, 400, "", rng=random.Random(7), publish=None
+            )
+        assert sem.get_hp() == com.get_hp()
+
+
+class TestCatalogoDePassivas:
+    """O catálogo congelado: 60 cartas, e nenhuma delas enfeite."""
+
+    def test_o_catalogo_carrega_sessenta_passivas(self):
+        assert len(load_passives()) == 60
+
+    def test_a_distribuicao_por_raridade_e_a_declarada(self):
+        contagem: dict[str, int] = {}
+        for p in load_passives():
+            contagem[p.rarity] = contagem.get(p.rarity, 0) + 1
+        assert contagem == {"Common": 19, "Rare": 19, "Epic": 15, "Legendary": 7}

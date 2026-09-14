@@ -29,6 +29,11 @@ ATTRIBUTE_STATS = ("st", "ag", "mg", "df", "hp", "mp")
 # `damage_reduction` reduz o dano recebido, em percentual.
 # `life_steal` devolve ao atacante um percentual do dano causado.
 # `mana_regen` restaura MP no início de cada turno.
+# `precision` soma pontos à chance de o ATACANTE acertar — a mesma conta que a
+# agilidade relativa, o medo e a mira da ação alimentam. Não é um segundo
+# sorteio e não toca no tamanho do golpe.
+# `status_resistance` é resistência GLOBAL à aplicação de status: soma com a
+# resistência específica do alvo e muda só a chance de o estado pegar.
 COMBAT_MODIFIERS = (
     "crit_chance",
     "crit_damage",
@@ -37,6 +42,8 @@ COMBAT_MODIFIERS = (
     "life_steal",
     "mana_regen",
     "stun_chance",
+    "precision",
+    "status_resistance",
 )
 
 # Os status negativos que um alvo pode resistir. É a união das famílias abaixo,

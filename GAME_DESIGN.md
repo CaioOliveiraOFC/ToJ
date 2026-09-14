@@ -141,15 +141,15 @@ exibidas como cartas.
 
 ## Passivas Permanentes (O Coração da Build)
 
-**`[implementado]`** 45 passivas, permanentes para a run.
+**`[implementado]`** 60 passivas, permanentes para a run. **Catálogo congelado.**
 
 **`[implementado]`** Taxonomia, conforme o campo `category` em `passives.json`:
 
 | Categoria | Quantas | Exemplo |
 |---|---:|---|
-| **Stats** | 17 | +200 de HP máximo, +8 de Magia |
-| **Recursos** | 9 | +20% de ouro dropado, +60% de Essência |
-| **Combate** | 19 | 10% de chance de atordoar, sobreviver a um golpe letal |
+| **Stats** | 18 | +200 de HP máximo, +16 de Magia |
+| **Recursos** | 12 | +20% de ouro dropado, +60% de Essência |
+| **Combate** | 30 | 10% de chance de atordoar, sobreviver a um golpe letal |
 
 **`[implementado]`** Toda passiva do catálogo tem consumidor real: o `effect_type`
 de cada carta ou é um atributo que entra no boneco (`Player.PASSIVE_FLAT_STATS`),
@@ -157,6 +157,15 @@ ou é um modificador lido pelo funil de dano (`fx.combat_modifier`), ou é uma
 chance de status ao acertar (`ONHIT_PROCS`), ou é um bônus de recompensa. Uma
 auditoria carta a carta confirmou o efeito por comportamento medido — nenhuma
 passiva é placebo, e nenhuma delas multiplica dano fora do funil.
+
+**`[implementado]`** Duas vias permanentes a mais, e nenhuma delas é mecânica
+nova: **Precisão** (`precision`) soma pontos à mesma conta de acerto que a
+agilidade relativa, o medo e a mira da ação alimentam — sob o mesmo piso e teto,
+sem segunda rolagem e sem tocar em dano; e **resistência global a status**
+(`status_resistance`) soma com a resistência específica do alvo antes do teto de
+100, mudando só a chance de o estado pegar. A Precisão temporária do núcleo de
+efeitos e as resistências de equipamento continuam valendo e se acumulam com as
+passivas.
 
 **`[implementado]`** Quatro raridades: Comum, Raro, Épico, Lendário.
 

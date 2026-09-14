@@ -202,6 +202,11 @@ def hit_chance(attacker, defender, accuracy_modifier: int = 0) -> int:
     # conta. Nenhum mexe na Agilidade dele nem no tamanho do dano — uma segunda
     # rolagem paralela é como `Esmagar` acabou atordoando por dois caminhos.
     chance += core.accuracy_shift(attacker)
+    # E a precisão PERMANENTE: passiva, buff declarado e equipamento, pelo mesmo
+    # funil dos outros modificadores. O combate não sabe de onde veio; sabe que
+    # é saldo de acerto, e por isso entra ao lado do temporário e sob o mesmo
+    # clamp, em vez de virar um bônus que ignora o teto.
+    chance += fx.combat_modifier(attacker, "precision")
     # E o modificador da AÇÃO: um golpe pesado erra mais, uma estocada precisa
     # erra menos. Mesma conta, mesmo clamp, nenhuma rolagem nova.
     chance += int(accuracy_modifier)

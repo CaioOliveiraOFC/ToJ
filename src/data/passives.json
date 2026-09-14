@@ -412,6 +412,141 @@
       "description": "+30% de dano causado",
       "effect_type": "damage_percent",
       "effect_value": 30
+    },
+    {
+      "id": "olho_de_cacador",
+      "name": "Olho de Caçador",
+      "category": "Combate",
+      "rarity": "Common",
+      "description": "+5 pontos de Precisão",
+      "effect_type": "precision",
+      "effect_value": 5
+    },
+    {
+      "id": "pele_de_sal",
+      "name": "Pele de Sal",
+      "category": "Combate",
+      "rarity": "Common",
+      "description": "+8% de resistência à aplicação de status negativos",
+      "effect_type": "status_resistance",
+      "effect_value": 8
+    },
+    {
+      "id": "odio_baixo",
+      "name": "Ódio Baixo",
+      "category": "Combate",
+      "rarity": "Common",
+      "description": "+4% de dano causado",
+      "effect_type": "damage_percent",
+      "effect_value": 4
+    },
+    {
+      "id": "boca_de_sangue",
+      "name": "Boca de Sangue",
+      "category": "Combate",
+      "rarity": "Common",
+      "description": "Recupera 4% do dano causado como vida",
+      "effect_type": "life_steal",
+      "effect_value": 4
+    },
+    {
+      "id": "postura_fechada",
+      "name": "Postura Fechada",
+      "category": "Combate",
+      "rarity": "Common",
+      "description": "-3% de dano recebido",
+      "effect_type": "damage_reduction",
+      "effect_value": 3
+    },
+    {
+      "id": "ritmo_profano",
+      "name": "Ritmo Profano",
+      "category": "Recursos",
+      "rarity": "Rare",
+      "description": "+8 MP no início de cada turno",
+      "effect_type": "mana_regen",
+      "effect_value": 8
+    },
+    {
+      "id": "agulha_no_osso",
+      "name": "Agulha no Osso",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "14% de chance de causar Sangramento ao acertar",
+      "effect_type": "bleed_chance",
+      "effect_value": 14
+    },
+    {
+      "id": "voz_no_escuro",
+      "name": "Voz no Escuro",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "10% de chance de causar Medo ao acertar",
+      "effect_type": "fear_chance",
+      "effect_value": 10
+    },
+    {
+      "id": "cabeca_dura",
+      "name": "Cabeça Dura",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "8% de chance de Atordoar ao acertar",
+      "effect_type": "stun_chance",
+      "effect_value": 8
+    },
+    {
+      "id": "instinto_frio",
+      "name": "Instinto Frio",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "+10 pontos de Precisão",
+      "effect_type": "precision",
+      "effect_value": 10
+    },
+    {
+      "id": "sangue_toxico",
+      "name": "Sangue Tóxico",
+      "category": "Combate",
+      "rarity": "Epic",
+      "description": "25% de chance de Envenenar ao acertar",
+      "effect_type": "poison_chance",
+      "effect_value": 25
+    },
+    {
+      "id": "alquimia_do_desespero",
+      "name": "Alquimia do Desespero",
+      "category": "Recursos",
+      "rarity": "Epic",
+      "description": "Poções de vida curam +40%",
+      "effect_type": "potion_heal_bonus",
+      "effect_value": 40
+    },
+    {
+      "id": "divida_de_ouro",
+      "name": "Dívida de Ouro",
+      "category": "Recursos",
+      "rarity": "Epic",
+      "description": "+35% de ouro obtido",
+      "effect_type": "gold_drop_bonus",
+      "effect_value": 35
+    },
+    {
+      "id": "oraculo_partido",
+      "name": "Oráculo Partido",
+      "category": "Stats",
+      "rarity": "Epic",
+      "description": "+16 Magia",
+      "effect_type": "magic",
+      "effect_value": 16
+    },
+    {
+      "id": "corpo_inviolavel",
+      "name": "Corpo Inviolável",
+      "category": "Combate",
+      "rarity": "Legendary",
+      "description": "+50% de resistência à aplicação de todos os status negativos",
+      "effect_type": "status_resistance",
+      "effect_value": 50
     }
   ]
 }

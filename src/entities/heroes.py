@@ -31,7 +31,7 @@ from src.shared.constants import (
     WARRIOR_BASE_MP,
     WARRIOR_BASE_ST,
 )
-from src.shared.effects import buff_value, sum_buffs
+from src.shared.effects import buff_value, combat_modifier, sum_buffs
 from src.shared.formulas import geometric, xp_for_level
 from src.shared.registries import get_initial_skills_for
 
@@ -396,12 +396,20 @@ class Player(Entity):
 
         O combate continua perguntando só `get_status_resistance` e não sabe que
         equipamento existe.
+
+        A resistência GLOBAL entra aqui também: `status_resistance` não nomeia um
+        status, vale contra todos, e por isso soma antes do teto em vez de virar
+        uma exceção dentro do resolvedor de status. Vinte de passiva com trinta
+        de anel contra veneno dão cinquenta contra veneno — uma conta só, e o
+        `effective_chance` do núcleo continua sendo o único lugar onde
+        resistência vira chance.
         """
         total = super().get_status_resistance(status)
         for item in self.equipment.values():
             if item is None:
                 continue
             total += float((getattr(item, "status_resistances", None) or {}).get(status, 0) or 0)
+        total += combat_modifier(self, "status_resistance")
         return max(0.0, min(100.0, total))
 
     def weapon_percent(self) -> float:
