@@ -298,8 +298,15 @@ def relatorio_smoke() -> None:
         combat.process_turn_start_effects(h, rng=random.Random(0), publish=publicar)
 
     def toxicidade_support():
+        """Duas cartas, e não uma: o secundário só rola se o principal entrar.
+
+        Pôr a fragilidade como principal da Praga Lenta faria o veneno herdar a
+        chance do secundário — 70% viraria 38,5% — e isso é balanceamento
+        acidental. A preparação é da Maldição, num turno anterior.
+        """
         mob, h = _mob("support"), _vitima()
-        _lancar_mob(mob, h, "mob_praga_lenta")  # frailty primeiro, veneno depois
+        _lancar_mob(mob, h, "mob_maldicao")  # weakened + secundário frailty
+        _lancar_mob(mob, h, "mob_praga_lenta")  # veneno num alvo já frágil
 
     def septica_skirmisher():
         """O bote vem DEPOIS, como no duelo: `mob_bote` tem 3 de recarga.
@@ -324,7 +331,7 @@ def relatorio_smoke() -> None:
         ("controller: Teia de Gelo → crítico", gelo_controller),
         ("controller: Teia de Gelo → Presságio", panico_controller),
         ("controller: Queima de Mana → tick", colapso_controller),
-        ("support: Praga Lenta", toxicidade_support),
+        ("support: Maldição → Praga Lenta", toxicidade_support),
         ("skirmisher: Ferida Aberta → Bote", septica_skirmisher),
         ("elite: Golpe de Arauto → Lâmina Negra", ferida_aberta_elite),
     ):

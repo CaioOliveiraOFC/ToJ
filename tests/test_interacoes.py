@@ -434,8 +434,14 @@ class TestCoberturaDeMonstro:
         core.apply_effect(mob, "invisible")
         assert not any(s.id == "mob_evasao_mob" for s in monster_ai._usable_skills(mob, heroi))
 
-    def test_praga_lenta_dispara_toxicidade_na_ordem_nova(self):
-        """Fragilidade primeiro, veneno depois: a lei precisa da peça já posta."""
+    def test_o_support_prepara_a_toxicidade_em_duas_cartas(self):
+        """A fragilidade vem da Maldição; o veneno, da Praga Lenta, depois.
+
+        Em UMA carta não dá, e a tentativa custou caro: o secundário só é rolado
+        quando o principal entra, então promover a fragilidade a principal fazia
+        o veneno herdar a chance do secundário — 70% viravam 38,5%. A carta teria
+        mudado de força, não de sequência, e isso é balanceamento acidental.
+        """
         mob, heroi = self._mob("support"), _heroi()
         vistos: list[str] = []
 
@@ -443,10 +449,13 @@ class TestCoberturaDeMonstro:
             if evento.payload.get("kind") == "interaction":
                 vistos.append(evento.payload["label"])
 
-        carta = self._carta(mob, "mob_praga_lenta")
-        assert carta.effect_value == "frailty"
-        assert carta.secondary.effect == "poison"
-        combat.apply_skill(mob, heroi, carta, rng=_Sempre(0), publish=publicar)
+        praga = self._carta(mob, "mob_praga_lenta")
+        assert (praga.effect_value, praga.chance) == ("poison", 70), "A Praga não pode mudar."
+        assert (praga.secondary.effect, praga.secondary.chance) == ("frailty", 55)
+
+        self._lancar(mob, heroi, "mob_maldicao")  # weakened + secundário frailty
+        assert core.has_effect(heroi, "frailty")
+        combat.apply_skill(mob, heroi, praga, rng=_Sempre(0), publish=publicar)
         assert "TOXICIDADE" in vistos
 
     def test_toda_lei_nova_tem_pelo_menos_um_arquetipo(self):

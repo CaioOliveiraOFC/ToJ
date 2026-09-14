@@ -846,7 +846,12 @@
           "duration": 3,
           "chance": 80,
           "target": "enemy",
-          "description": "Enfraquece o alvo e derruba o dano dele."
+          "description": "Enfraquece o alvo e derruba o dano dele.",
+          "secondary": {
+            "effect": "frailty",
+            "chance": 55,
+            "duration": 3
+          }
         },
         {
           "id": "mob_canto_de_ossos",
@@ -881,18 +886,18 @@
           "name": "Praga Lenta",
           "mana_cost": 22,
           "effect_type": "status",
-          "effect_value": "frailty",
-          "description": "Primeiro tira o que segurava de pé. O veneno vem depois, e encontra menos resistência.",
+          "effect_value": "poison",
+          "description": "Não é para matar. É para o outro chegar cansado no fim.",
           "target": "enemy",
-          "duration": 3,
-          "chance": 55,
+          "duration": 5,
+          "chance": 70,
           "cooldown": 4,
           "effect_stat": "",
           "accuracy_modifier": 0,
           "secondary": {
-            "effect": "poison",
-            "chance": 70,
-            "duration": 5
+            "effect": "frailty",
+            "chance": 55,
+            "duration": 3
           }
         },
         {
