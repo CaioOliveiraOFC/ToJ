@@ -784,29 +784,48 @@ class Player(Entity):
         self._apply_passive_stats(passive)
         return f"Passiva adquirida: {passive.name}!"
 
-    def _apply_passive_stats(self, passive: PassiveCard) -> None:
-        effect_type = passive.effect_type
-        value = int(passive.effect_value)
+    # Passivas que somam um valor PLANO num atributo ou recurso. Declarado como
+    # dado, e não como cadeia de `if`, porque quem audita a cobertura precisa
+    # poder PERGUNTAR quais famílias o motor consome. A lista paralela que
+    # existia no teste de invariantes já tinha ficado para trás — ela não sabia
+    # de `damage_percent` nem dos procs de acerto, e reportava como morto o que
+    # o funil lê todo turno.
+    #
+    # `magic` entrou aqui e fechou a lacuna: havia passiva plana de Força,
+    # Defesa, Agilidade, HP e MP, e nenhuma de Magia — a classe que escala em MG
+    # não tinha carta de atributo. A semântica é a das outras: sobe `base_mg`, a
+    # MG resolvida muda, e toda skill que escala em Magia recebe o BASE novo
+    # sozinha. `combat.py` não fica sabendo que a Magia veio de uma passiva.
+    PASSIVE_FLAT_STATS = {
+        "max_hp": "hp",
+        "max_mp": "mp",
+        "strength": "st",
+        "magic": "mg",
+        "defense": "df",
+        "agility": "ag",
+    }
 
-        if effect_type == "max_hp":
-            old_base_hp = self.base_hp
-            self.base_hp += value
-            hp_ratio = self._hp / old_base_hp if old_base_hp > 0 else 1
-            self._hp = min(int(self.base_hp * hp_ratio), self.base_hp)
-        elif effect_type == "max_mp":
-            old_base_mp = self.base_mp
-            self.base_mp += value
-            mp_ratio = self._mp / old_base_mp if old_base_mp > 0 else 1
-            self._mp = min(int(self.base_mp * mp_ratio), self.base_mp)
-        elif effect_type == "strength":
-            self.base_st += value
+    def _apply_passive_stats(self, passive: PassiveCard) -> None:
+        chave = self.PASSIVE_FLAT_STATS.get(passive.effect_type)
+        if chave is None:
+            # Modificador de combate ou de recompensa: não muda o boneco, é lido
+            # pelo consumidor dele via `get_passive_bonus`.
+            return
+        valor = int(passive.effect_value)
+        antes = getattr(self, f"base_{chave}")
+        setattr(self, f"base_{chave}", antes + valor)
+        if chave in ("hp", "mp"):
+            # O teto sobe; o valor ATUAL sobe na mesma fração, para a passiva não
+            # virar cura nem deixar o herói com a barra pela metade de graça.
+            atual = self._hp if chave == "hp" else self._mp
+            fracao = atual / antes if antes > 0 else 1
+            novo_teto = getattr(self, f"base_{chave}")
+            if chave == "hp":
+                self._hp = min(int(novo_teto * fracao), novo_teto)
+            else:
+                self._mp = min(int(novo_teto * fracao), novo_teto)
+        elif chave in ("st", "mg"):
             self.avg_damage = (self.base_st + self.base_mg) // DAMAGE_FORMULA_DIVISOR
-        elif effect_type == "defense":
-            self.base_df += value
-        elif effect_type == "agility":
-            # Sem teto: com a chance de acerto relativa, agilidade alta é
-            # vantagem limitada pela fórmula, não imunidade.
-            self.base_ag += value
 
     def add_passive_load(self, passive: PassiveCard) -> None:
         self.passives.append(passive)

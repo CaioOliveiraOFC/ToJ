@@ -141,15 +141,22 @@ exibidas como cartas.
 
 ## Passivas Permanentes (O Coração da Build)
 
-**`[implementado]`** 29 passivas, permanentes para a run.
+**`[implementado]`** 45 passivas, permanentes para a run.
 
 **`[implementado]`** Taxonomia, conforme o campo `category` em `passives.json`:
 
 | Categoria | Quantas | Exemplo |
 |---|---:|---|
-| **Stats** | 13 | +200 de HP máximo |
-| **Recursos** | 7 | +20% de ouro dropado, +60% de Essência |
-| **Combate** | 9 | 10% de chance de atordoar, sobreviver a um golpe letal |
+| **Stats** | 17 | +200 de HP máximo, +8 de Magia |
+| **Recursos** | 9 | +20% de ouro dropado, +60% de Essência |
+| **Combate** | 19 | 10% de chance de atordoar, sobreviver a um golpe letal |
+
+**`[implementado]`** Toda passiva do catálogo tem consumidor real: o `effect_type`
+de cada carta ou é um atributo que entra no boneco (`Player.PASSIVE_FLAT_STATS`),
+ou é um modificador lido pelo funil de dano (`fx.combat_modifier`), ou é uma
+chance de status ao acertar (`ONHIT_PROCS`), ou é um bônus de recompensa. Uma
+auditoria carta a carta confirmou o efeito por comportamento medido — nenhuma
+passiva é placebo, e nenhuma delas multiplica dano fora do funil.
 
 **`[implementado]`** Quatro raridades: Comum, Raro, Épico, Lendário.
 
@@ -163,7 +170,8 @@ por raridade**: 60 / 28 / 10 / 2. Uma Lendária vale 2 contra 60 de uma Comum.
 intenções de build (survival, offense, economy, aleatória): **zero cartas com escolha
 automática** e **uma única carta fraca de verdade** (`Reflexos Rápidos`). Vinte e duas
 são cartas de identidade — alta numa intenção, baixa noutra. É exatamente o que um
-sistema de cartas deve produzir.
+sistema de cartas deve produzir. *(Medição feita sobre as 29 primeiras cartas; as 16
+acrescentadas depois seguem as mesmas famílias de efeito e ainda não foram medidas.)*
 
 **`[implementado]`** Se o personagem for extraído vivo, as passivas vão com ele —
 para a Arena, quando ela existir.
@@ -767,18 +775,18 @@ Cada passiva dentro do array `"passives"` deve ter **exatamente** estes 7 campos
 | Arquivo | Uso |
 |---|---|
 | `src/content/passives.py` | Carrega o JSON, cria `PassiveCard` dataclasses, gera escolhas ponderadas |
-| `src/entities/heroes.py` | Aplica stats (`max_hp`, `max_mp`, `strength`, `defense`, `agility`) ao escolher passiva |
-| `src/mechanics/combat.py` | Usa `crit_chance` e `dodge_chance` em cálculos de combate |
+| `src/entities/heroes.py` | Aplica stats (`PASSIVE_FLAT_STATS`: `max_hp`, `max_mp`, `strength`, `magic`, `defense`, `agility`) ao escolher passiva |
+| `src/mechanics/combat.py` | Lê os modificadores de combate pelo funil `fx.combat_modifier`, sem saber que a fonte é passiva |
 | `src/storage/save_manager.py` | Salva/carrega apenas os IDs das passivas |
 
 ---
 
 ### Notas sobre Integração
 
-- **Stats** (`max_hp`, `max_mp`, `strength`, `defense`, `agility`) são aplicados **imediatamente** ao escolher a passiva, sem chamar `rest()`.
-- **Combate** (`crit_chance`, `dodge_chance`) é lido pelo `combat.py` via `player.get_passive_bonus()`.
-- **Recursos** (`essence_bonus`, `gold_drop_bonus`, `potion_heal_bonus`) e **Combate avançado** (`damage_reduction`, `stun_chance`, `death_ignore`) ainda não têm integração ativa no motor — ficarão para tarefas futuras.
-- Novos `effect_type` podem ser adicionados, mas requerem código em `_apply_passive_stats()` (heroes.py) e/ou `combat.py`.
+- **Stats** (os de `Player.PASSIVE_FLAT_STATS`) são aplicados **imediatamente** ao escolher a passiva, sem chamar `rest()`.
+- **Combate** entra pelo funil: `fx.combat_modifier(entidade, nome)` soma buff + passiva + equipamento, e o `combat.py` só conhece o nome do modificador. Não existe multiplicação de dano paralela por a fonte ser uma passiva.
+- **Recursos** (`essence_bonus`, `gold_drop_bonus`, `potion_heal_bonus`) e `death_ignore` são lidos por quem os paga (pós-batalha, loja, poção, golpe letal).
+- Um novo `effect_type` só vale se algum consumidor já o leia; o teste `test_toda_passiva_e_consumida_por_alguma_regra` deriva a lista de consumidores do próprio código e reprova passiva sem efeito.
 
 ---
 

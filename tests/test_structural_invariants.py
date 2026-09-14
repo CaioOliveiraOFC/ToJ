@@ -142,18 +142,31 @@ class TestCoberturaDeEfeitos:
         ]
         assert not mortos, f"Status sem tratamento no motor: {mortos}"
 
+    # Famílias cujo consumidor não é o combate: elas mudam recompensa, cura de
+    # poção ou sobrevivência, e cada uma tem o próprio ponto de leitura.
+    RECOMPENSAS = frozenset(
+        {"essence_bonus", "gold_drop_bonus", "potion_heal_bonus", "death_ignore"}
+    )
+
     def test_toda_passiva_e_consumida_por_alguma_regra(self):
-        consumidas = self.STATS_CONHECIDOS | {
-            "max_hp",
-            "max_mp",
-            "strength",
-            "defense",
-            "agility",
-            "essence_bonus",
-            "gold_drop_bonus",
-            "potion_heal_bonus",
-            "death_ignore",
-        }
+        """A lista de consumidores é DERIVADA do código que consome.
+
+        Ela era escrita à mão, e tinha ficado para trás: não sabia de
+        `damage_percent` (que o funil lê em `+MULT`) nem dos procs de acerto
+        (`bleed_chance`, `poison_chance`, `fear_chance`), então reportava como
+        morto o que o motor usa todo turno. Uma lista paralela que envelhece
+        sozinha é o mesmo defeito que este arquivo existe para impedir.
+        """
+        from src.entities.heroes import Player
+        from src.mechanics.combat import MULT_MODIFIER, ONHIT_PROCS
+
+        consumidas = (
+            set(Player.PASSIVE_FLAT_STATS)  # atributos e recursos do boneco
+            | set(fx.COMBAT_MODIFIERS)  # modificadores que o funil consulta
+            | set(ONHIT_PROCS.values())  # chances de aplicar status ao acertar
+            | {MULT_MODIFIER}  # o bucket +MULT
+            | self.RECOMPENSAS
+        )
         mortas = [p.id for p in load_passives() if p.effect_type not in consumidas]
         assert not mortas, f"Passivas sem efeito: {mortas}"
 

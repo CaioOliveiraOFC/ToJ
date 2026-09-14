@@ -97,6 +97,12 @@ class DamageModifiers:
     mitigation: list[float] = field(default_factory=list)
 
 
+# O modificador que alimenta o bucket `+MULT` do funil. Nomeado porque a
+# auditoria de cobertura precisa saber que ele é consumido — encantamento e
+# passiva entram por aqui, e o funil não pergunta de onde veio.
+MULT_MODIFIER = "damage_percent"
+
+
 def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifiers:
     """Reúne tudo o que modifica ESTE golpe, dos dois lados.
 
@@ -120,7 +126,7 @@ def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifier
     # primeiro. Pergunta pela MECÂNICA (`damage_percent`), como todo o resto:
     # o funil não sabe que encantamento existe, nem precisa saber.
     mult: list[float] = []
-    percentual = fx.combat_modifier(attacker, "damage_percent")
+    percentual = fx.combat_modifier(attacker, MULT_MODIFIER)
     if percentual:
         mult.append(percentual / 100)
 

@@ -268,6 +268,150 @@
       "description": "+200 HP máximo",
       "effect_type": "max_hp",
       "effect_value": 200
+    },
+    {
+      "id": "sangue_de_vidente",
+      "name": "Sangue de Vidente",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+3 Magia",
+      "effect_type": "magic",
+      "effect_value": 3
+    },
+    {
+      "id": "respiracao_contada",
+      "name": "Respiração Contada",
+      "category": "Recursos",
+      "rarity": "Common",
+      "description": "+4 MP no início de cada turno",
+      "effect_type": "mana_regen",
+      "effect_value": 4
+    },
+    {
+      "id": "fio_serrilhado",
+      "name": "Fio Serrilhado",
+      "category": "Combate",
+      "rarity": "Common",
+      "description": "8% de chance de causar sangramento ao acertar",
+      "effect_type": "bleed_chance",
+      "effect_value": 8
+    },
+    {
+      "id": "pulso_certeiro",
+      "name": "Pulso Certeiro",
+      "category": "Combate",
+      "rarity": "Common",
+      "description": "Soma 15 ao multiplicador de crítico, que parte de 150%",
+      "effect_type": "crit_damage",
+      "effect_value": 15
+    },
+    {
+      "id": "passo_de_corca",
+      "name": "Passo de Corça",
+      "category": "Stats",
+      "rarity": "Common",
+      "description": "+4 Agilidade",
+      "effect_type": "agility",
+      "effect_value": 4
+    },
+    {
+      "id": "odio_antigo",
+      "name": "Ódio Antigo",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "+8% de dano causado",
+      "effect_type": "damage_percent",
+      "effect_value": 8
+    },
+    {
+      "id": "sede_silenciosa",
+      "name": "Sede Silenciosa",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "Recupera 8% do dano causado como vida",
+      "effect_type": "life_steal",
+      "effect_value": 8
+    },
+    {
+      "id": "unha_suja",
+      "name": "Unha Suja",
+      "category": "Combate",
+      "rarity": "Rare",
+      "description": "12% de chance de envenenar ao acertar",
+      "effect_type": "poison_chance",
+      "effect_value": 12
+    },
+    {
+      "id": "casco_calejado",
+      "name": "Casco Calejado",
+      "category": "Stats",
+      "rarity": "Rare",
+      "description": "+8 Defesa",
+      "effect_type": "defense",
+      "effect_value": 8
+    },
+    {
+      "id": "poco_fundo",
+      "name": "Poço Fundo",
+      "category": "Recursos",
+      "rarity": "Rare",
+      "description": "+40 MP máximo",
+      "effect_type": "max_mp",
+      "effect_value": 40
+    },
+    {
+      "id": "heranca_do_abismo",
+      "name": "Herança do Abismo",
+      "category": "Stats",
+      "rarity": "Rare",
+      "description": "+8 Magia",
+      "effect_type": "magic",
+      "effect_value": 8
+    },
+    {
+      "id": "lamina_do_juizo",
+      "name": "Lâmina do Juízo",
+      "category": "Combate",
+      "rarity": "Epic",
+      "description": "Soma 45 ao multiplicador de crítico, que parte de 150%",
+      "effect_type": "crit_damage",
+      "effect_value": 45
+    },
+    {
+      "id": "presenca_errada",
+      "name": "Presença Errada",
+      "category": "Combate",
+      "rarity": "Epic",
+      "description": "18% de chance de causar medo ao acertar",
+      "effect_type": "fear_chance",
+      "effect_value": 18
+    },
+    {
+      "id": "voracidade",
+      "name": "Voracidade",
+      "category": "Combate",
+      "rarity": "Epic",
+      "description": "Recupera 18% do dano causado como vida",
+      "effect_type": "life_steal",
+      "effect_value": 18
+    },
+    {
+      "id": "vulto",
+      "name": "Vulto",
+      "category": "Combate",
+      "rarity": "Epic",
+      "description": "+15% de chance de esquiva",
+      "effect_type": "evasion",
+      "effect_value": 15
+    },
+    {
+      "id": "estrela_quebrada",
+      "name": "Estrela Quebrada",
+      "category": "Combate",
+      "rarity": "Legendary",
+      "description": "+30% de dano causado",
+      "effect_type": "damage_percent",
+      "effect_value": 30
     }
   ]
 }
