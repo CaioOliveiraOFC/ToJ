@@ -551,7 +551,7 @@
       "target": "enemy",
       "duration": 0,
       "chance": 100,
-      "rarity": "Legendary",
+      "rarity": "Epic",
       "is_initial": false,
       "cooldown": 4,
       "effect_stat": "",
@@ -588,7 +588,7 @@
       "target": "self",
       "duration": 1,
       "chance": 100,
-      "rarity": "Legendary",
+      "rarity": "Epic",
       "is_initial": false,
       "cooldown": 5,
       "effect_stat": "damage_reduction",
@@ -756,7 +756,7 @@
       "target": "self",
       "duration": 0,
       "chance": 100,
-      "rarity": "Legendary",
+      "rarity": "Epic",
       "is_initial": false,
       "cooldown": 5,
       "effect_stat": "",
@@ -960,7 +960,7 @@
       "target": "self",
       "duration": 2,
       "chance": 100,
-      "rarity": "Legendary",
+      "rarity": "Epic",
       "is_initial": false,
       "cooldown": 4,
       "effect_stat": "",
@@ -998,6 +998,2860 @@
         }
       ],
       "power": 7.79
+    },
+    {
+      "id": "quebra_guarda",
+      "name": "Quebra-Guarda",
+      "level_required": 3,
+      "mana_cost": 18,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Um golpe que busca a brecha entre a arma e o corpo, e abre o alvo para o próximo +12% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 6.03,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 12,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.554,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 45,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "sword"
+      }
+    },
+    {
+      "id": "pisada_de_ferro",
+      "name": "Pisada de Ferro",
+      "level_required": 6,
+      "mana_cost": 17,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Todo o peso da armadura descendo sobre quem não tem como sair do caminho +25% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 5.84,
+      "accuracy_modifier": -5,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 25,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.099,
+      "secondary": {
+        "effect": "slowed",
+        "chance": 50,
+        "duration": 3
+      }
+    },
+    {
+      "id": "berro_de_ferro",
+      "name": "Berro de Ferro",
+      "level_required": 3,
+      "mana_cost": 15,
+      "effect_type": "status",
+      "effect_value": "hexed",
+      "description": "Um berro que estilhaça a concentração de quem estava recitando algo.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 70,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 5.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "secondary": {
+        "effect": "fear",
+        "chance": 45,
+        "duration": 2
+      }
+    },
+    {
+      "id": "postura_de_muro",
+      "name": "Postura de Muro",
+      "level_required": 3,
+      "mana_cost": 19,
+      "effect_type": "buff",
+      "effect_value": 30,
+      "description": "Planta os pés, a espada na diagonal, e fecha a linha inteira (30%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "df",
+      "mana_cost_percent": 6.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "sword"
+      }
+    },
+    {
+      "id": "couraca_improvisada",
+      "name": "Couraça Improvisada",
+      "level_required": 3,
+      "mana_cost": 18,
+      "effect_type": "damage_reduction",
+      "effect_value": 20,
+      "description": "Amarra o que sobrou do escudo no braço e aguenta o próximo golpe.",
+      "target": "self",
+      "duration": 2,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false
+    },
+    {
+      "id": "soco_de_placa",
+      "name": "Soco de Placa",
+      "level_required": 3,
+      "mana_cost": 15,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Sem arma, sem espaço, sem elegância: a manopla resolve +20% quando você está ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 1,
+      "effect_stat": "",
+      "mana_cost_percent": 5.25,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 20,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 2.959,
+      "secondary": {
+        "effect": "weakened",
+        "chance": 35,
+        "duration": 2
+      }
+    },
+    {
+      "id": "marca_do_acougueiro",
+      "name": "Marca do Açougueiro",
+      "level_required": 6,
+      "mana_cost": 15,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Um corte que não fecha sozinho +22% contra alvo ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 5.33,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 22,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 2.946,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 55,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "axe"
+      }
+    },
+    {
+      "id": "investida_de_ariete",
+      "name": "Investida de Aríete",
+      "level_required": 6,
+      "mana_cost": 16,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Ombro na linha do peito, à velocidade que a armadura permitir +15% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 5.45,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 15,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.181,
+      "secondary": {
+        "effect": "stun",
+        "chance": 20,
+        "duration": 1
+      },
+      "requires": {
+        "hand_type": "sword"
+      }
+    },
+    {
+      "id": "olho_de_ferreiro",
+      "name": "Olho de Ferreiro",
+      "level_required": 6,
+      "mana_cost": 18,
+      "effect_type": "buff",
+      "effect_value": 14,
+      "description": "Aprende onde a placa do inimigo é mais fina (14%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "crit_chance",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false
+    },
+    {
+      "id": "fio_no_rebite",
+      "name": "Fio no Rebite",
+      "level_required": 9,
+      "mana_cost": 21,
+      "effect_type": "buff",
+      "effect_value": 25,
+      "description": "Assenta a lâmina para que o golpe certo valha por dois (25%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "crit_damage",
+      "mana_cost_percent": 7.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "sword"
+      }
+    },
+    {
+      "id": "sangue_nos_olhos",
+      "name": "Sangue nos Olhos",
+      "level_required": 6,
+      "mana_cost": 18,
+      "effect_type": "status",
+      "effect_value": "vulnerable",
+      "description": "Um talho na testa: o inimigo passa a se defender com um olho só.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 70,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 45,
+        "duration": 2
+      }
+    },
+    {
+      "id": "tomar_folego",
+      "name": "Tomar Fôlego",
+      "level_required": 9,
+      "mana_cost": 24,
+      "effect_type": "heal",
+      "effect_value": 12,
+      "description": "Recua um passo, respira, e volta. Recupera 12% da vida máxima.",
+      "target": "self",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 8.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false
+    },
+    {
+      "id": "peso_do_machado",
+      "name": "Peso do Machado",
+      "level_required": 9,
+      "mana_cost": 18,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Não é técnica, é gravidade: o machado cai onde a força mandou +20% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 6.23,
+      "accuracy_modifier": -10,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 20,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.407,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 55,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "axe"
+      }
+    },
+    {
+      "id": "baluarte",
+      "name": "Baluarte",
+      "level_required": 6,
+      "mana_cost": 27,
+      "effect_type": "damage_reduction",
+      "effect_value": 32,
+      "description": "Planta a maça no chão e faz do próprio corpo o portão.",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 9.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "mace"
+      }
+    },
+    {
+      "id": "ferro_contra_ferro",
+      "name": "Ferro Contra Ferro",
+      "level_required": 9,
+      "mana_cost": 21,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Aparar e devolver no mesmo movimento: a guarda vira o golpe +30% quando você está ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 7.2,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 30,
+      "scaling": [
+        {
+          "stat": "df",
+          "weight": 0.6
+        },
+        {
+          "stat": "st",
+          "weight": 0.4
+        }
+      ],
+      "power": 4.175,
+      "secondary": {
+        "effect": "weakened",
+        "chance": 60,
+        "duration": 3
+      }
+    },
+    {
+      "id": "rasgo_de_gancho",
+      "name": "Rasgo de Gancho",
+      "level_required": 9,
+      "mana_cost": 21,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Puxa o inimigo pela armadura e abre o que estiver embaixo +25% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 7.01,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 25,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.615,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 65,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "axe"
+      }
+    },
+    {
+      "id": "tremor_de_bigorna",
+      "name": "Tremor de Bigorna",
+      "level_required": 9,
+      "mana_cost": 20,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "A maça encontra o chão e o chão devolve o recado +28% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 6.81,
+      "accuracy_modifier": -10,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 28,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 0.8
+        },
+        {
+          "stat": "df",
+          "weight": 0.2
+        }
+      ],
+      "power": 3.625,
+      "secondary": {
+        "effect": "stun",
+        "chance": 25,
+        "duration": 1
+      },
+      "requires": {
+        "hand_type": "mace"
+      }
+    },
+    {
+      "id": "veterania",
+      "name": "Veterania",
+      "level_required": 9,
+      "mana_cost": 28,
+      "effect_type": "buff",
+      "effect_value": 35,
+      "description": "Vinte anos de campanha ensinam onde o golpe vai antes de ele sair (35%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "evasion",
+      "mana_cost_percent": 9.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "sword"
+      }
+    },
+    {
+      "id": "sede_de_batalha",
+      "name": "Sede de Batalha",
+      "level_required": 12,
+      "mana_cost": 30,
+      "effect_type": "buff",
+      "effect_value": 18,
+      "description": "Cada corte aberto no outro fecha um seu (18%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "life_steal",
+      "mana_cost_percent": 10.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "axe"
+      }
+    },
+    {
+      "id": "quebra_ossos",
+      "name": "Quebra-Ossos",
+      "level_required": 12,
+      "mana_cost": 25,
+      "effect_type": "status",
+      "effect_value": "slowed",
+      "description": "Um golpe seco no joelho. O inimigo continua vivo, e mais devagar.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 75,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 8.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 40,
+        "duration": 2
+      }
+    },
+    {
+      "id": "mao_dupla",
+      "name": "Mão Dupla",
+      "level_required": 12,
+      "mana_cost": 24,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Duas armas, dois tempos, nenhuma pausa entre eles +25% contra alvo ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 8.15,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 25,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.959,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 55,
+        "duration": 3
+      },
+      "requires": {
+        "two_weapons": true
+      }
+    },
+    {
+      "id": "respiracao_de_forja",
+      "name": "Respiração de Forja",
+      "level_required": 12,
+      "mana_cost": 33,
+      "effect_type": "buff",
+      "effect_value": 30,
+      "description": "Controla o fôlego como quem controla o fole: o corpo aguenta mais (30%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 5,
+      "effect_stat": "hp",
+      "mana_cost_percent": 11.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false
+    },
+    {
+      "id": "juramento_da_muralha",
+      "name": "Juramento da Muralha",
+      "level_required": 12,
+      "mana_cost": 39,
+      "effect_type": "damage_reduction",
+      "effect_value": 45,
+      "description": "Jura não ceder o terreno, e ocupa as duas mãos cumprindo a promessa.",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "",
+      "mana_cost_percent": 13.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "requires": {
+        "two_weapons": true
+      }
+    },
+    {
+      "id": "colheita_de_ferro",
+      "name": "Colheita de Ferro",
+      "level_required": 15,
+      "mana_cost": 31,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Uma volta completa com a lâmina na altura da cintura +35% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 10.54,
+      "accuracy_modifier": -5,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 35,
+      "scaling": [
+        {
+          "stat": "st",
+          "weight": 1.0
+        }
+      ],
+      "power": 4.463,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 70,
+        "duration": 3
+      },
+      "requires": {
+        "two_weapons": true
+      }
+    },
+    {
+      "id": "carga_do_condenado",
+      "name": "Carga do Condenado",
+      "level_required": 15,
+      "mana_cost": 34,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Quem já perdeu o combate não tem mais o que economizar +45% quando você está ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 11.41,
+      "accuracy_modifier": -10,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 45,
+      "scaling": [
+        {
+          "stat": "hp",
+          "weight": 1.0
+        }
+      ],
+      "power": 0.518,
+      "secondary": {
+        "effect": "fear",
+        "chance": 60,
+        "duration": 3
+      }
+    },
+    {
+      "id": "silencio_do_veterano",
+      "name": "Silêncio do Veterano",
+      "level_required": 15,
+      "mana_cost": 34,
+      "effect_type": "status",
+      "effect_value": "fear",
+      "description": "Nenhuma palavra, nenhuma ameaça: só a certeza de que o próximo passo é ruim.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 75,
+      "rarity": "Epic",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 11.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 55,
+        "duration": 3
+      }
+    },
+    {
+      "id": "fortaleza_viva",
+      "name": "Fortaleza Viva",
+      "level_required": 18,
+      "mana_cost": 54,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "O que ele passou a vida aguentando volta de uma vez. Cada placa de armadura vira massa, e a massa vira o golpe +60% quando você está ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Legendary",
+      "cooldown": 5,
+      "effect_stat": "",
+      "mana_cost_percent": 18.24,
+      "accuracy_modifier": -15,
+      "skill_class": "Warrior",
+      "is_initial": false,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 60,
+      "scaling": [
+        {
+          "stat": "df",
+          "weight": 0.6
+        },
+        {
+          "stat": "st",
+          "weight": 0.4
+        }
+      ],
+      "power": 6.627,
+      "secondary": {
+        "effect": "stun",
+        "chance": 40,
+        "duration": 1
+      }
+    },
+    {
+      "id": "lasca_de_gelo",
+      "name": "Lasca de Gelo",
+      "level_required": 3,
+      "mana_cost": 18,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Um estilhaço rápido que também rouba o passo de quem foi atingido +12% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 6.25,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 12,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 4.687,
+      "secondary": {
+        "effect": "slowed",
+        "chance": 45,
+        "duration": 3
+      }
+    },
+    {
+      "id": "fagulha_teimosa",
+      "name": "Fagulha Teimosa",
+      "level_required": 3,
+      "mana_cost": 14,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Barata e precisa: estala na altura dos olhos e o inimigo perde a mira +18% contra alvo ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 1,
+      "effect_stat": "",
+      "mana_cost_percent": 4.95,
+      "accuracy_modifier": 10,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 18,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.337,
+      "secondary": {
+        "effect": "fear",
+        "chance": 35,
+        "duration": 2
+      }
+    },
+    {
+      "id": "marca_ardente",
+      "name": "Marca Ardente",
+      "level_required": 6,
+      "mana_cost": 15,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Uma runa queimada na pele que continua queimando depois +20% contra alvo ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 5.01,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 20,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.36,
+      "secondary": {
+        "effect": "poison",
+        "chance": 55,
+        "duration": 4
+      }
+    },
+    {
+      "id": "pulso_de_forca",
+      "name": "Pulso de Força",
+      "level_required": 6,
+      "mana_cost": 15,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Magia sem elegância: empurra tudo o que estiver na frente do cajado +22% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 5.09,
+      "accuracy_modifier": -5,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 22,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.423,
+      "secondary": {
+        "effect": "slowed",
+        "chance": 50,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "staff"
+      }
+    },
+    {
+      "id": "foco_do_estudante",
+      "name": "Foco do Estudante",
+      "level_required": 3,
+      "mana_cost": 19,
+      "effect_type": "buff",
+      "effect_value": 30,
+      "description": "Fecha os olhos e organiza o que sabe (30%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "mg",
+      "mana_cost_percent": 6.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false
+    },
+    {
+      "id": "veias_de_eter",
+      "name": "Veias de Éter",
+      "level_required": 3,
+      "mana_cost": 15,
+      "effect_type": "buff",
+      "effect_value": 12,
+      "description": "O éter volta a circular sozinho (12%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "mana_regen",
+      "mana_cost_percent": 5.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false
+    },
+    {
+      "id": "reserva_profunda",
+      "name": "Reserva Profunda",
+      "level_required": 6,
+      "mana_cost": 16,
+      "effect_type": "buff",
+      "effect_value": 30,
+      "description": "Abre uma segunda gaveta de mana que ele guardava para depois (30%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 4,
+      "effect_stat": "mp",
+      "mana_cost_percent": 5.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false
+    },
+    {
+      "id": "palavra_de_torpor",
+      "name": "Palavra de Torpor",
+      "level_required": 6,
+      "mana_cost": 16,
+      "effect_type": "status",
+      "effect_value": "slowed",
+      "description": "Uma sílaba só, dita devagar, e o corpo do outro esquece a pressa.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 75,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 5.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "secondary": {
+        "effect": "clouded",
+        "chance": 50,
+        "duration": 3
+      }
+    },
+    {
+      "id": "dissonancia",
+      "name": "Dissonância",
+      "level_required": 6,
+      "mana_cost": 18,
+      "effect_type": "status",
+      "effect_value": "hexed",
+      "description": "Desafina a magia alheia até ela não valer o gesto.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 75,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "secondary": {
+        "effect": "clouded",
+        "chance": 55,
+        "duration": 3
+      }
+    },
+    {
+      "id": "pele_de_quartzo",
+      "name": "Pele de Quartzo",
+      "level_required": 3,
+      "mana_cost": 19,
+      "effect_type": "damage_reduction",
+      "effect_value": 22,
+      "description": "A pele endurece em placas translúcidas por um instante.",
+      "target": "self",
+      "duration": 2,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false
+    },
+    {
+      "id": "passo_borrado",
+      "name": "Passo Borrado",
+      "level_required": 9,
+      "mana_cost": 22,
+      "effect_type": "buff",
+      "effect_value": 28,
+      "description": "O contorno do corpo atrasa meio segundo em relação a ele (28%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 4,
+      "effect_stat": "evasion",
+      "mana_cost_percent": 7.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false
+    },
+    {
+      "id": "mao_firme",
+      "name": "Mão Firme",
+      "level_required": 9,
+      "mana_cost": 21,
+      "effect_type": "buff",
+      "effect_value": 16,
+      "description": "Cada gesto do encantamento sai no lugar exato (16%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "crit_chance",
+      "mana_cost_percent": 7.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "staff"
+      }
+    },
+    {
+      "id": "lancar_pedra",
+      "name": "Lançar Pedra",
+      "level_required": 9,
+      "mana_cost": 15,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Quando a mana acaba, sobra o que estiver no chão — e um empurrão arcano +25% quando você está ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 1,
+      "effect_stat": "",
+      "mana_cost_percent": 5.1,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 25,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.36,
+      "secondary": {
+        "effect": "stun",
+        "chance": 18,
+        "duration": 1
+      },
+      "requires": {
+        "hand_type": "staff"
+      }
+    },
+    {
+      "id": "lente_de_obsidiana",
+      "name": "Lente de Obsidiana",
+      "level_required": 9,
+      "mana_cost": 19,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Concentra o feitiço num ponto do tamanho de uma moeda +25% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.65,
+      "accuracy_modifier": 15,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 25,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 4.295,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 55,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "staff"
+      }
+    },
+    {
+      "id": "maldicao_de_cinzas",
+      "name": "Maldição de Cinzas",
+      "level_required": 9,
+      "mana_cost": 16,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "O feitiço não mata: ele começa a desfazer o alvo, e tem paciência +30% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 5.51,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 30,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 3.763,
+      "secondary": {
+        "effect": "poison",
+        "chance": 70,
+        "duration": 5
+      }
+    },
+    {
+      "id": "troca_de_sangue",
+      "name": "Troca de Sangue",
+      "level_required": 12,
+      "mana_cost": 23,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Paga o feitiço com o que corre nas veias em vez do que corre no cajado +35% quando você está ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 7.85,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 35,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 0.7
+        },
+        {
+          "stat": "hp",
+          "weight": 0.3
+        }
+      ],
+      "power": 1.575,
+      "secondary": {
+        "effect": "frailty",
+        "chance": 55,
+        "duration": 3
+      }
+    },
+    {
+      "id": "grilhoes_de_gelo",
+      "name": "Grilhões de Gelo",
+      "level_required": 12,
+      "mana_cost": 30,
+      "effect_type": "status",
+      "effect_value": "frozen",
+      "description": "O chão sobe pelas pernas do alvo e endurece.",
+      "target": "enemy",
+      "duration": 2,
+      "chance": 65,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 10.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 60,
+        "duration": 3
+      }
+    },
+    {
+      "id": "sanguessuga_arcana",
+      "name": "Sanguessuga Arcana",
+      "level_required": 12,
+      "mana_cost": 31,
+      "effect_type": "buff",
+      "effect_value": 20,
+      "description": "Cada feitiço que conecta devolve um pouco do que custou (20%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "life_steal",
+      "mana_cost_percent": 10.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false
+    },
+    {
+      "id": "clarividencia",
+      "name": "Clarividência",
+      "level_required": 12,
+      "mana_cost": 27,
+      "effect_type": "buff",
+      "effect_value": 22,
+      "description": "Vê o golpe do inimigo um instante antes de ele decidir dá-lo (22%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "ag",
+      "mana_cost_percent": 9.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "staff"
+      }
+    },
+    {
+      "id": "egide_de_runas",
+      "name": "Égide de Runas",
+      "level_required": 9,
+      "mana_cost": 33,
+      "effect_type": "damage_reduction",
+      "effect_value": 35,
+      "description": "Seis runas giram devagar em volta do cajado e absorvem o que chega.",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 11.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "staff"
+      }
+    },
+    {
+      "id": "palavra_de_pavor",
+      "name": "Palavra de Pavor",
+      "level_required": 9,
+      "mana_cost": 24,
+      "effect_type": "status",
+      "effect_value": "fear",
+      "description": "Diz o nome verdadeiro da coisa em voz alta e ela hesita.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 75,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 8.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "secondary": {
+        "effect": "frailty",
+        "chance": 55,
+        "duration": 3
+      }
+    },
+    {
+      "id": "prisma_de_devastacao",
+      "name": "Prisma de Devastação",
+      "level_required": 12,
+      "mana_cost": 33,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Um prisma se abre no ar e devolve o feitiço multiplicado por sete faces +45% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 11.22,
+      "accuracy_modifier": -10,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 45,
+      "scaling": [
+        {
+          "stat": "mg",
+          "weight": 1.0
+        }
+      ],
+      "power": 5.101,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 70,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "staff"
+      }
+    },
+    {
+      "id": "dividendo_de_mana",
+      "name": "Dividendo de Mana",
+      "level_required": 18,
+      "mana_cost": 40,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Converte a reserva inteira em uma única cobrança, e o troco é o estrago +40% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 13.63,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 40,
+      "scaling": [
+        {
+          "stat": "mp",
+          "weight": 1.0
+        }
+      ],
+      "power": 1.788,
+      "secondary": {
+        "effect": "mana_burn",
+        "chance": 60,
+        "duration": 2
+      }
+    },
+    {
+      "id": "hora_parada",
+      "name": "Hora Parada",
+      "level_required": 15,
+      "mana_cost": 42,
+      "effect_type": "status",
+      "effect_value": "sleep",
+      "description": "O alvo continua no mesmo segundo enquanto o resto do mundo anda.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 65,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "",
+      "mana_cost_percent": 14.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "secondary": {
+        "effect": "hexed",
+        "chance": 70,
+        "duration": 3
+      }
+    },
+    {
+      "id": "pacto_do_vazio",
+      "name": "Pacto do Vazio",
+      "level_required": 15,
+      "mana_cost": 45,
+      "effect_type": "buff",
+      "effect_value": 70,
+      "description": "Entrega parte do que é, e o que volta não sai pela metade (70%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "crit_damage",
+      "mana_cost_percent": 15.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false
+    },
+    {
+      "id": "cerco_de_espelhos",
+      "name": "Cerco de Espelhos",
+      "level_required": 12,
+      "mana_cost": 39,
+      "effect_type": "status",
+      "effect_value": "fear",
+      "description": "Doze reflexos dele em volta do inimigo, e um só é real.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 85,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "",
+      "mana_cost_percent": 13.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Mage",
+      "is_initial": false,
+      "secondary": {
+        "effect": "slowed",
+        "chance": 70,
+        "duration": 3
+      }
+    },
+    {
+      "id": "corte_de_tendao",
+      "name": "Corte de Tendão",
+      "level_required": 3,
+      "mana_cost": 21,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Não busca o coração. Busca o que segura o inimigo de pé +12% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 7.02,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 12,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 7.456,
+      "secondary": {
+        "effect": "slowed",
+        "chance": 55,
+        "duration": 3
+      }
+    },
+    {
+      "id": "picada_certeira",
+      "name": "Picada Certeira",
+      "level_required": 3,
+      "mana_cost": 17,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Uma estocada curta que nunca erra o lugar +15% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 1,
+      "effect_stat": "",
+      "mana_cost_percent": 5.88,
+      "accuracy_modifier": 15,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 15,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 5.921,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 40,
+        "duration": 2
+      },
+      "requires": {
+        "hand_type": "dagger"
+      }
+    },
+    {
+      "id": "flecha_pela_fresta",
+      "name": "Flecha pela Fresta",
+      "level_required": 6,
+      "mana_cost": 19,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Espera o inimigo abrir a guarda e paga a espera à distância +25% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 6.5,
+      "accuracy_modifier": 10,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 25,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 5.996,
+      "secondary": {
+        "effect": "slowed",
+        "chance": 50,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "bow"
+      }
+    },
+    {
+      "id": "dose_da_viuva",
+      "name": "Dose da Viúva",
+      "level_required": 6,
+      "mana_cost": 18,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "A lâmina passa raspando; o que ela deixou é que resolve +20% contra alvo ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 6.14,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 20,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 5.924,
+      "secondary": {
+        "effect": "poison",
+        "chance": 60,
+        "duration": 5
+      },
+      "requires": {
+        "hand_type": "dagger"
+      }
+    },
+    {
+      "id": "faro_de_rua",
+      "name": "Faro de Rua",
+      "level_required": 3,
+      "mana_cost": 15,
+      "effect_type": "buff",
+      "effect_value": 12,
+      "description": "Sabe em que beco descansar e em que hora sair dele (12%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "mana_regen",
+      "mana_cost_percent": 5.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false
+    },
+    {
+      "id": "respiracao_de_ladrao",
+      "name": "Respiração de Ladrão",
+      "level_required": 3,
+      "mana_cost": 18,
+      "effect_type": "buff",
+      "effect_value": 15,
+      "description": "Conta os batimentos até a mão parar de tremer (15%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "crit_chance",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false
+    },
+    {
+      "id": "capa_rasgada",
+      "name": "Capa Rasgada",
+      "level_required": 3,
+      "mana_cost": 18,
+      "effect_type": "damage_reduction",
+      "effect_value": 20,
+      "description": "Enrola a capa no braço e aceita perder o tecido em vez do osso.",
+      "target": "self",
+      "duration": 2,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false
+    },
+    {
+      "id": "pó_nos_olhos",
+      "name": "Pó nos Olhos",
+      "level_required": 6,
+      "mana_cost": 18,
+      "effect_type": "status",
+      "effect_value": "fear",
+      "description": "Punhado de cinza, mão rápida, e o inimigo passa a chutar o escuro.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 75,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "secondary": {
+        "effect": "slowed",
+        "chance": 45,
+        "duration": 2
+      }
+    },
+    {
+      "id": "joelho_torto",
+      "name": "Joelho Torto",
+      "level_required": 6,
+      "mana_cost": 19,
+      "effect_type": "status",
+      "effect_value": "slowed",
+      "description": "Um pontapé na articulação. Nada elegante, muito eficaz.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 80,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 35,
+        "duration": 2
+      }
+    },
+    {
+      "id": "leitura_de_guarda",
+      "name": "Leitura de Guarda",
+      "level_required": 9,
+      "mana_cost": 22,
+      "effect_type": "buff",
+      "effect_value": 30,
+      "description": "Assiste três trocas de golpe sem revidar, e depois não erra mais (30%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "crit_damage",
+      "mana_cost_percent": 7.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "dagger"
+      }
+    },
+    {
+      "id": "bolso_furado",
+      "name": "Bolso Furado",
+      "level_required": 9,
+      "mana_cost": 18,
+      "effect_type": "status",
+      "effect_value": "mana_burn",
+      "description": "Corta a bolsa de componentes antes de cortar o dono.",
+      "target": "enemy",
+      "duration": 2,
+      "chance": 75,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "secondary": {
+        "effect": "clouded",
+        "chance": 60,
+        "duration": 3
+      }
+    },
+    {
+      "id": "duas_maos_um_tempo",
+      "name": "Duas Mãos, Um Tempo",
+      "level_required": 9,
+      "mana_cost": 20,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Os dois braços saem juntos e chegam em momentos diferentes +18% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 6.77,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 18,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 6.714,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 50,
+        "duration": 3
+      },
+      "requires": {
+        "two_weapons": true
+      }
+    },
+    {
+      "id": "ferida_paga",
+      "name": "Ferida Paga",
+      "level_required": 9,
+      "mana_cost": 21,
+      "effect_type": "heal",
+      "effect_value": 10,
+      "description": "Costura o corte com o que sobrou do kit. Recupera 10% da vida máxima.",
+      "target": "self",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 7.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false
+    },
+    {
+      "id": "lamina_no_escuro",
+      "name": "Lâmina no Escuro",
+      "level_required": 9,
+      "mana_cost": 23,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "O inimigo nunca vê de onde veio, e nem devia +35% contra alvo ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 7.9,
+      "accuracy_modifier": 15,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_wounded",
+      "bonus_percent": 35,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 7.296,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 60,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "dagger"
+      }
+    },
+    {
+      "id": "marcar_a_presa",
+      "name": "Marcar a Presa",
+      "level_required": 9,
+      "mana_cost": 22,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Escolhe onde vai doer e passa o resto do combate voltando ali +28% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 7.53,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 28,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 7.193,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 65,
+        "duration": 3
+      }
+    },
+    {
+      "id": "chuva_de_ferrões",
+      "name": "Chuva de Ferrões",
+      "level_required": 12,
+      "mana_cost": 22,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Seis agulhas ao mesmo tempo, e nenhuma delas era a importante +30% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 7.65,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 30,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 7.247,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 70,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "bow"
+      }
+    },
+    {
+      "id": "bolso_do_alfaiate",
+      "name": "Bolso do Alfaiate",
+      "level_required": 12,
+      "mana_cost": 19,
+      "effect_type": "buff",
+      "effect_value": 40,
+      "description": "Sempre há mais um bolso, e nele sempre há mais um truque (40%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 5,
+      "effect_stat": "mp",
+      "mana_cost_percent": 6.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false
+    },
+    {
+      "id": "sangria_lenta",
+      "name": "Sangria Lenta",
+      "level_required": 12,
+      "mana_cost": 30,
+      "effect_type": "buff",
+      "effect_value": 22,
+      "description": "Cada corte que ele abre, ele fecha um seu (22%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "life_steal",
+      "mana_cost_percent": 10.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "dagger"
+      }
+    },
+    {
+      "id": "olho_do_falcão",
+      "name": "Olho do Falcão",
+      "level_required": 9,
+      "mana_cost": 28,
+      "effect_type": "buff",
+      "effect_value": 40,
+      "description": "Enxerga a costura da armadura a trinta passos (40%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "crit_damage",
+      "mana_cost_percent": 9.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "bow"
+      }
+    },
+    {
+      "id": "nó_corredio",
+      "name": "Nó Corredio",
+      "level_required": 12,
+      "mana_cost": 31,
+      "effect_type": "status",
+      "effect_value": "stun",
+      "description": "Um laço no tornozelo e o combate passa a ser onde ele quiser.",
+      "target": "enemy",
+      "duration": 1,
+      "chance": 55,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 10.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "secondary": {
+        "effect": "slowed",
+        "chance": 65,
+        "duration": 3
+      }
+    },
+    {
+      "id": "couro_endurecido",
+      "name": "Couro Endurecido",
+      "level_required": 9,
+      "mana_cost": 27,
+      "effect_type": "buff",
+      "effect_value": 40,
+      "description": "Placas costuradas por dentro do casaco, onde ninguém procura (40%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "df",
+      "mana_cost_percent": 9.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false
+    },
+    {
+      "id": "hora_do_lobo",
+      "name": "Hora do Lobo",
+      "level_required": 12,
+      "mana_cost": 36,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "A hora entre a última ronda e o primeiro galo. Ninguém está pronto +40% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 12.29,
+      "accuracy_modifier": 15,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 40,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 9.177,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 65,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "dagger"
+      }
+    },
+    {
+      "id": "cobranca_de_juros",
+      "name": "Cobrança de Juros",
+      "level_required": 18,
+      "mana_cost": 41,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Cada veneno, cada corte e cada osso torto entram na conta de uma vez +45% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 13.86,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 45,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 1.0
+        }
+      ],
+      "power": 9.599,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 80,
+        "duration": 3
+      }
+    },
+    {
+      "id": "testamento_do_ladrao",
+      "name": "Testamento do Ladrão",
+      "level_required": 15,
+      "mana_cost": 37,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Com uma mão na ferida e a outra na adaga, ele não guarda mais nada +50% quando você está ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 12.35,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 50,
+      "scaling": [
+        {
+          "stat": "ag",
+          "weight": 0.6
+        },
+        {
+          "stat": "hp",
+          "weight": 0.4
+        }
+      ],
+      "power": 1.336,
+      "secondary": {
+        "effect": "poison",
+        "chance": 70,
+        "duration": 4
+      },
+      "requires": {
+        "two_weapons": true
+      }
+    },
+    {
+      "id": "silencio_de_seda",
+      "name": "Silêncio de Seda",
+      "level_required": 15,
+      "mana_cost": 39,
+      "effect_type": "status",
+      "effect_value": "sleep",
+      "description": "Fecha a boca do conjurador com um pano e uma promessa.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 60,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "",
+      "mana_cost_percent": 13.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "secondary": {
+        "effect": "mana_burn",
+        "chance": 70,
+        "duration": 2
+      }
+    },
+    {
+      "id": "mao_leve",
+      "name": "Mão Leve",
+      "level_required": 12,
+      "mana_cost": 39,
+      "effect_type": "buff",
+      "effect_value": 35,
+      "description": "As duas lâminas passam a encontrar sozinhas o lugar entre as costelas (35%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "crit_chance",
+      "mana_cost_percent": 13.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Rogue",
+      "is_initial": false,
+      "requires": {
+        "two_weapons": true
+      }
+    },
+    {
+      "id": "n_guarda_alta",
+      "name": "Guarda Alta",
+      "level_required": 3,
+      "mana_cost": 16,
+      "effect_type": "buff",
+      "effect_value": 25,
+      "description": "A primeira coisa que se aprende em qualquer escola de armas (25%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "df",
+      "mana_cost_percent": 5.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_respirar_fundo",
+      "name": "Respirar Fundo",
+      "level_required": 3,
+      "mana_cost": 21,
+      "effect_type": "heal",
+      "effect_value": 10,
+      "description": "Um instante para si mesmo no meio do barulho. Recupera 10% da vida máxima.",
+      "target": "self",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 7.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_mira_calma",
+      "name": "Mira Calma",
+      "level_required": 3,
+      "mana_cost": 29,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Sem pressa, sem floreio, no lugar onde vai doer +15% contra alvo intacto.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 2,
+      "effect_stat": "",
+      "mana_cost_percent": 9.91,
+      "accuracy_modifier": 15,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "bonus_condition": "target_healthy",
+      "bonus_percent": 15,
+      "scaling": [
+        {
+          "stat": "df",
+          "weight": 1.0
+        }
+      ],
+      "power": 6.558,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 40,
+        "duration": 2
+      }
+    },
+    {
+      "id": "n_passo_lateral",
+      "name": "Passo Lateral",
+      "level_required": 3,
+      "mana_cost": 18,
+      "effect_type": "buff",
+      "effect_value": 22,
+      "description": "Sai da linha do golpe em vez de aparar (22%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "evasion",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_pausa_util",
+      "name": "Pausa Útil",
+      "level_required": 3,
+      "mana_cost": 13,
+      "effect_type": "buff",
+      "effect_value": 14,
+      "description": "Para de gastar por um momento e deixa o corpo repor (14%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "mana_regen",
+      "mana_cost_percent": 4.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_grito_curto",
+      "name": "Grito Curto",
+      "level_required": 3,
+      "mana_cost": 16,
+      "effect_type": "status",
+      "effect_value": "fear",
+      "description": "Não intimida ninguém por muito tempo. Só o suficiente.",
+      "target": "enemy",
+      "duration": 2,
+      "chance": 70,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 5.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "secondary": {
+        "effect": "weakened",
+        "chance": 40,
+        "duration": 2
+      }
+    },
+    {
+      "id": "n_areia_no_chao",
+      "name": "Areia no Chão",
+      "level_required": 6,
+      "mana_cost": 18,
+      "effect_type": "status",
+      "effect_value": "slowed",
+      "description": "Espalha o que estiver solto no piso e o inimigo passa a medir cada passo.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 75,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 45,
+        "duration": 3
+      }
+    },
+    {
+      "id": "n_couro_batido",
+      "name": "Couro Batido",
+      "level_required": 6,
+      "mana_cost": 18,
+      "effect_type": "damage_reduction",
+      "effect_value": 20,
+      "description": "Equipamento remendado no acampamento, e ainda assim equipamento.",
+      "target": "self",
+      "duration": 2,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_estocada_seca",
+      "name": "Estocada Seca",
+      "level_required": 6,
+      "mana_cost": 18,
+      "effect_type": "status",
+      "effect_value": "bleed",
+      "description": "Um movimento só, do ombro ao punho. O que ele abre não fecha sozinho.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 70,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "sword"
+      }
+    },
+    {
+      "id": "n_travar_o_pulso",
+      "name": "Travar o Pulso",
+      "level_required": 6,
+      "mana_cost": 18,
+      "effect_type": "status",
+      "effect_value": "weakened",
+      "description": "Prende a mão que segura a arma o bastante para o turno se perder.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 75,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "secondary": {
+        "effect": "slowed",
+        "chance": 45,
+        "duration": 3
+      }
+    },
+    {
+      "id": "n_folego_de_marcha",
+      "name": "Fôlego de Marcha",
+      "level_required": 6,
+      "mana_cost": 21,
+      "effect_type": "buff",
+      "effect_value": 25,
+      "description": "O corpo de quem andou muito aguenta mais um pouco (25%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 4,
+      "effect_stat": "hp",
+      "mana_cost_percent": 7.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_olho_treinado",
+      "name": "Olho Treinado",
+      "level_required": 9,
+      "mana_cost": 19,
+      "effect_type": "buff",
+      "effect_value": 12,
+      "description": "Sabe onde a armadura de cada povo é mais fina (12%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "crit_chance",
+      "mana_cost_percent": 6.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "bow"
+      }
+    },
+    {
+      "id": "n_pancada_na_nuca",
+      "name": "Pancada na Nuca",
+      "level_required": 9,
+      "mana_cost": 18,
+      "effect_type": "status",
+      "effect_value": "hexed",
+      "description": "Não derruba ninguém. Só faz o outro perder o fio do que estava fazendo.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 75,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_curativo_de_campo",
+      "name": "Curativo de Campo",
+      "level_required": 9,
+      "mana_cost": 22,
+      "effect_type": "buff",
+      "effect_value": 15,
+      "description": "Enfaixa o que dá para enfaixar e segue (15%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Common",
+      "cooldown": 4,
+      "effect_stat": "life_steal",
+      "mana_cost_percent": 7.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_encarar",
+      "name": "Encarar",
+      "level_required": 9,
+      "mana_cost": 19,
+      "effect_type": "status",
+      "effect_value": "vulnerable",
+      "description": "Olha nos olhos e não pisca. Alguma coisa no outro cede.",
+      "target": "enemy",
+      "duration": 3,
+      "chance": 70,
+      "rarity": "Common",
+      "cooldown": 3,
+      "effect_stat": "",
+      "mana_cost_percent": 6.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "secondary": {
+        "effect": "fear",
+        "chance": 40,
+        "duration": 2
+      }
+    },
+    {
+      "id": "n_disciplina_de_forja",
+      "name": "Disciplina de Forja",
+      "level_required": 9,
+      "mana_cost": 27,
+      "effect_type": "buff",
+      "effect_value": 40,
+      "description": "Nem toda escola de armas ensina a bater. Algumas ensinam a durar (40%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "df",
+      "mana_cost_percent": 9.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "requires": {
+        "two_weapons": true
+      }
+    },
+    {
+      "id": "n_guarda_cruzada",
+      "name": "Guarda Cruzada",
+      "level_required": 9,
+      "mana_cost": 28,
+      "effect_type": "damage_reduction",
+      "effect_value": 32,
+      "description": "As duas armas em X na frente do peito. Não sobra mão para revidar.",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 9.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "requires": {
+        "two_weapons": true
+      }
+    },
+    {
+      "id": "n_ritmo_de_duelo",
+      "name": "Ritmo de Duelo",
+      "level_required": 9,
+      "mana_cost": 27,
+      "effect_type": "buff",
+      "effect_value": 35,
+      "description": "Encontra o compasso do adversário e passa a chegar meio tempo antes (35%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "ag",
+      "mana_cost_percent": 9.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_leitura_de_terreno",
+      "name": "Leitura de Terreno",
+      "level_required": 12,
+      "mana_cost": 28,
+      "effect_type": "buff",
+      "effect_value": 38,
+      "description": "Escolhe onde pisar antes de precisar pisar (38%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "evasion",
+      "mana_cost_percent": 9.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "dagger"
+      }
+    },
+    {
+      "id": "n_marca_do_cacador",
+      "name": "Marca do Caçador",
+      "level_required": 12,
+      "mana_cost": 36,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Deixa um sinal no alvo que a mão encontra sozinha depois +25% contra alvo sob efeito.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 12.14,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "bonus_condition": "target_afflicted",
+      "bonus_percent": 25,
+      "scaling": [
+        {
+          "stat": "df",
+          "weight": 0.5
+        },
+        {
+          "stat": "ag",
+          "weight": 0.5
+        }
+      ],
+      "power": 10.296,
+      "secondary": {
+        "effect": "bleed",
+        "chance": 60,
+        "duration": 3
+      },
+      "requires": {
+        "hand_type": "bow"
+      }
+    },
+    {
+      "id": "n_voto_de_silencio",
+      "name": "Voto de Silêncio",
+      "level_required": 12,
+      "mana_cost": 27,
+      "effect_type": "status",
+      "effect_value": "mana_burn",
+      "description": "Nenhuma palavra sai da boca do outro, e o que ele ia conjurar fica lá dentro.",
+      "target": "enemy",
+      "duration": 2,
+      "chance": 80,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 9.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "secondary": {
+        "effect": "hexed",
+        "chance": 60,
+        "duration": 3
+      }
+    },
+    {
+      "id": "n_amuleto_rachado",
+      "name": "Amuleto Rachado",
+      "level_required": 12,
+      "mana_cost": 18,
+      "effect_type": "buff",
+      "effect_value": 35,
+      "description": "Quebrou defendendo alguém. Ainda tem uma última carga (35%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 5,
+      "effect_stat": "mp",
+      "mana_cost_percent": 6.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_gancho_e_corda",
+      "name": "Gancho e Corda",
+      "level_required": 12,
+      "mana_cost": 30,
+      "effect_type": "status",
+      "effect_value": "stun",
+      "description": "Não é uma arma. É um jeito de decidir onde o inimigo vai estar.",
+      "target": "enemy",
+      "duration": 1,
+      "chance": 50,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "",
+      "mana_cost_percent": 10.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 60,
+        "duration": 3
+      }
+    },
+    {
+      "id": "n_lamina_assentada",
+      "name": "Lâmina Assentada",
+      "level_required": 9,
+      "mana_cost": 27,
+      "effect_type": "buff",
+      "effect_value": 35,
+      "description": "Passa a pedra na lâmina até o fio decidir sozinho onde entra (35%).",
+      "target": "self",
+      "duration": 3,
+      "chance": 100,
+      "rarity": "Rare",
+      "cooldown": 4,
+      "effect_stat": "crit_damage",
+      "mana_cost_percent": 9.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "sword"
+      }
+    },
+    {
+      "id": "n_postura_impecavel",
+      "name": "Postura Impecável",
+      "level_required": 12,
+      "mana_cost": 37,
+      "effect_type": "buff",
+      "effect_value": 55,
+      "description": "Vinte anos de repetição até a técnica pesar mais que o músculo (55%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "st",
+      "mana_cost_percent": 12.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false
+    },
+    {
+      "id": "n_mao_que_nao_treme",
+      "name": "A Mão que Não Treme",
+      "level_required": 15,
+      "mana_cost": 37,
+      "effect_type": "buff",
+      "effect_value": 60,
+      "description": "Não é coragem. É ter feito isto vezes demais para a mão ainda perguntar (60%).",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "crit_damage",
+      "mana_cost_percent": 12.5,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "mace"
+      }
+    },
+    {
+      "id": "n_ultima_carta",
+      "name": "Última Carta",
+      "level_required": 15,
+      "mana_cost": 32,
+      "effect_type": "damage",
+      "effect_value": 0,
+      "description": "Guardada para o momento em que o resto já falhou +50% quando você está ferido.",
+      "target": "enemy",
+      "duration": 0,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "",
+      "mana_cost_percent": 10.86,
+      "accuracy_modifier": -10,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "bonus_condition": "caster_wounded",
+      "bonus_percent": 50,
+      "scaling": [
+        {
+          "stat": "hp",
+          "weight": 1.0
+        }
+      ],
+      "power": 0.48,
+      "secondary": {
+        "effect": "fear",
+        "chance": 55,
+        "duration": 3
+      }
+    },
+    {
+      "id": "n_pacto_de_ferro",
+      "name": "Pacto de Ferro",
+      "level_required": 15,
+      "mana_cost": 39,
+      "effect_type": "damage_reduction",
+      "effect_value": 45,
+      "description": "Um acordo antigo entre o corpo e o metal: nenhum dos dois cede primeiro.",
+      "target": "self",
+      "duration": 4,
+      "chance": 100,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "",
+      "mana_cost_percent": 13.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "requires": {
+        "hand_type": "mace"
+      }
+    },
+    {
+      "id": "n_hora_do_arauto",
+      "name": "Hora do Arauto",
+      "level_required": 12,
+      "mana_cost": 36,
+      "effect_type": "status",
+      "effect_value": "fear",
+      "description": "Anuncia o que vai acontecer, e o inimigo acredita antes de ver.",
+      "target": "enemy",
+      "duration": 4,
+      "chance": 85,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "",
+      "mana_cost_percent": 12.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "secondary": {
+        "effect": "vulnerable",
+        "chance": 70,
+        "duration": 3
+      }
+    },
+    {
+      "id": "n_paciencia_do_coveiro",
+      "name": "Paciência do Coveiro",
+      "level_required": 15,
+      "mana_cost": 36,
+      "effect_type": "status",
+      "effect_value": "poison",
+      "description": "Ele não tem pressa. O trabalho dele sempre acaba chegando.",
+      "target": "enemy",
+      "duration": 5,
+      "chance": 85,
+      "rarity": "Epic",
+      "cooldown": 5,
+      "effect_stat": "",
+      "mana_cost_percent": 12.0,
+      "accuracy_modifier": 0,
+      "skill_class": "Neutral",
+      "is_initial": false,
+      "secondary": {
+        "effect": "frailty",
+        "chance": 70,
+        "duration": 4
+      }
     }
   ]
 }

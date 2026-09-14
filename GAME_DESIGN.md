@@ -199,12 +199,55 @@ recusa a nova**. O motor nunca decide por ele.
 - o pool é **classe + Neutral**. Skill exclusiva continua exclusiva: um Guerreiro nunca
   vê uma carta de Mago.
 
-**`[pendente — conteúdo]`** O pool **Neutral existe no código e está vazio no JSON**:
-nenhuma carta declara `skill_class: "Neutral"` ainda. O caminho funciona; falta conteúdo.
+### O catálogo
 
-**`[pendente — conteúdo]`** Na primeira oferta (nível 3) existem exatamente **3
-candidatas** por classe, então o menu mostra tudo o que existe — o que ainda não é
-escolher. A partir do nível 6 há mais candidatas que vagas.
+**`[implementado]`** **150 cartas de herói**, distribuídas assim:
+
+| Classe | Common | Rare | Epic | Legendary | Total |
+|---|---|---|---|---|---|
+| Warrior | 19 | 12 | 8 | 1 | **40** |
+| Mage | 19 | 12 | 8 | 1 | **40** |
+| Rogue | 19 | 12 | 8 | 1 | **40** |
+| Neutral | 15 | 9 | 6 | 0 | **30** |
+| **Total** | **72** | **45** | **30** | **3** | **150** |
+
+E **54 cartas de monstro**, distribuídas por arquétipo: Trash 3, Bruiser 6,
+Tank 6, Glass Cannon 6, Skirmisher 6, Controller 7, Support 7, Elite 6, Boss 7.
+
+**`[implementado]`** **Legendary é jackpot, e é raro de verdade**: três no jogo
+inteiro, uma por classe, nenhuma Neutral. Elas não seguem a filosofia de "é
+diferente, não necessariamente melhor" — trabalham perto do topo do orçamento
+permitido (420–433% do ataque básico de referência) e existem para o jogador
+pensar "eu dei muita sorte". O que elas não podem é inventar mecânica: passam
+pelo mesmo validador e pelo mesmo pipeline de dano de todas as outras.
+
+O catálogo tinha SEIS Legendary. Quatro desceram para Epic, e o critério foi o
+que cada carta entrega, não a aritmética da tabela: `imortal` e `ressurgir` são
+sustento (um turno mais seguro não é um jackpot), `fantasma` é utilidade de
+orçamento negativo, e `esmagar` era boa mas muito abaixo das capstones das
+outras duas classes. Nenhuma foi apagada.
+
+**`[implementado]`** **Variedade é regra, não gosto.** Uma carta é definida pelo
+que ela DECIDE: classe, tipo, de quais atributos nasce, o que aplica, o que
+exige e em que situação rende mais. Duas cartas com essa mesma assinatura são a
+mesma carta com dois nomes, e o pipeline de autoria as recusa — não adianta
+mudar o número, o custo ou 5% de chance. Foram 16 quase-duplicatas rejeitadas e
+reescritas durante a geração deste catálogo.
+
+**`[bug conhecido — conteúdo]`** Doze pares que **já estavam** no jogo antes
+deste catálogo são clones por esse mesmo critério: três buffs de Agilidade do
+Ladino que só diferem em 30/45/50, `cutelada` e `golpe_duplo`, `escudo_magico` e
+`barreira_arcana`, `explosao_arcana` e `tempestade`, entre outros. Não foram
+apagados — consolidá-los é uma rodada de conteúdo própria, com o cuidado de não
+quebrar save antigo.
+
+**`[implementado]`** **Requisito de equipamento como pivô.** 28% das cartas
+pedem uma peça: espada, adaga, machado, maça, cajado, arco, ou as duas mãos
+ocupadas. A carta aparece na oferta mesmo sem o equipamento, de propósito — é o
+convite a mudar o rumo da run. Para que isso não fosse promessa vazia, as 42
+armas do jogo passaram a declarar de que tipo são; nenhuma estatística delas
+mudou. Um teste garante que todo requisito é cumprível por alguma peça que a
+classe da carta consegue empunhar.
 
 ### O que uma carta declara
 

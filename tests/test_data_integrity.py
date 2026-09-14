@@ -482,3 +482,59 @@ class TestNenhumaSkillOficialUsaOAtalhoLegado:
         heroi = Warrior("Teste")
         antiga = SimpleNamespace(name="De um save velho", effect_type="damage", effect_value=140)
         assert skill_damage_base(heroi, antiga) == heroi.get_avg_damage()
+
+
+class TestRequisitoDeSkillTemPecaQueOCumpra:
+    """Um requisito que nenhum item satisfaz é uma carta morta no deck.
+
+    O requisito bloqueia o USO. Se nenhuma peça do jogo declara o `hand_type`
+    pedido, a carta nunca fica jogável — ela ocupa um dos quatro slots para
+    sempre, e a tela ainda diz ao jogador para ir atrás de uma arma que não
+    existe. É o defeito de placebo na sua forma mais cruel: não é que o efeito
+    não aconteça, é que o jogador passa a run inteira tentando fazê-lo acontecer.
+
+    Foi um problema real: nenhum item declarava `hand_type` até este catálogo,
+    e as 42 armas precisaram ser etiquetadas para que os requisitos existissem.
+    """
+
+    def _tipos_de_mao_no_jogo(self) -> set[str]:
+        dados = json.loads((RAIZ / "src" / "data" / "items.json").read_text(encoding="utf-8"))
+        return {
+            i["hand_type"] for i in dados["items"] if i.get("hand_type") and not i.get("consumable")
+        }
+
+    def test_todo_hand_type_exigido_existe_em_alguma_arma(self):
+        from src.content.skills_loader import load_skills
+
+        disponiveis = self._tipos_de_mao_no_jogo()
+        assert disponiveis, "nenhuma arma declara hand_type: todo requisito seria carta morta"
+        orfas = [
+            f"{s.id} exige {s.requires.hand_type!r}"
+            for s in load_skills()
+            if s.requires and s.requires.hand_type and s.requires.hand_type not in disponiveis
+        ]
+        assert not orfas, "requisitos que nenhuma peça do jogo cumpre: " + "; ".join(orfas)
+
+    def test_cada_classe_alcanca_os_tipos_que_as_cartas_dela_exigem(self):
+        """Exigir do Mago uma arma que o Mago não pode equipar é o mesmo defeito."""
+        from src.content.skills_loader import NEUTRAL, load_skills
+
+        dados = json.loads((RAIZ / "src" / "data" / "items.json").read_text(encoding="utf-8"))
+        por_classe: dict[str, set[str]] = {"Warrior": set(), "Mage": set(), "Rogue": set()}
+        for item in dados["items"]:
+            tipo = item.get("hand_type")
+            if not tipo or item.get("consumable"):
+                continue
+            for classe in item.get("classes") or list(por_classe):
+                por_classe.setdefault(classe, set()).add(tipo)
+
+        impossiveis = []
+        for skill in load_skills():
+            req = skill.requires
+            if not req or not req.hand_type:
+                continue
+            alvos = list(por_classe) if skill.skill_class == NEUTRAL else [skill.skill_class]
+            for classe in alvos:
+                if req.hand_type not in por_classe.get(classe, set()):
+                    impossiveis.append(f"{skill.id} exige {req.hand_type} e {classe} não equipa")
+        assert not impossiveis, "; ".join(impossiveis)

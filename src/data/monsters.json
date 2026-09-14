@@ -50,7 +50,64 @@
         "Verme da Terra",
         "Corvo Sanguinário"
       ],
-      "skills": []
+      "skills": [
+        {
+          "id": "mob_mordida_suja",
+          "name": "Mordida Suja",
+          "mana_cost": 8,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "Dentes que não foram feitos para isso, e ainda assim funcionam +15% contra alvo ferido.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 2,
+          "effect_stat": "",
+          "accuracy_modifier": 0,
+          "bonus_condition": "target_wounded",
+          "bonus_percent": 15,
+          "scaling": [
+            {
+              "stat": "st",
+              "weight": 1.0
+            }
+          ],
+          "power": 0.667,
+          "secondary": {
+            "effect": "bleed",
+            "chance": 30,
+            "duration": 2
+          }
+        },
+        {
+          "id": "mob_guincho",
+          "name": "Guincho",
+          "mana_cost": 10,
+          "effect_type": "status",
+          "effect_value": "slowed",
+          "description": "Um som agudo e curto que atrapalha mais do que assusta.",
+          "target": "enemy",
+          "duration": 2,
+          "chance": 55,
+          "cooldown": 3,
+          "effect_stat": "",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_encolher",
+          "name": "Encolher",
+          "mana_cost": 12,
+          "effect_type": "damage_reduction",
+          "effect_value": 18,
+          "description": "Se enrola no chão e espera o golpe passar por cima.",
+          "target": "self",
+          "duration": 2,
+          "chance": 100,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": 0
+        }
+      ]
     },
     "bruiser": {
       "label": "Bruiser",
@@ -104,6 +161,76 @@
           "chance": 100,
           "target": "self",
           "description": "Aumenta a própria força e transforma os turnos seguintes em pressão."
+        },
+        {
+          "id": "mob_cabecada",
+          "name": "Cabeçada",
+          "mana_cost": 18,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "Testa contra nariz. Ganha quem tiver o crânio mais grosso +20% contra alvo intacto.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 3,
+          "effect_stat": "",
+          "accuracy_modifier": -10,
+          "bonus_condition": "target_healthy",
+          "bonus_percent": 20,
+          "scaling": [
+            {
+              "stat": "st",
+              "weight": 1.0
+            }
+          ],
+          "power": 0.833,
+          "secondary": {
+            "effect": "stun",
+            "chance": 25,
+            "duration": 1
+          }
+        },
+        {
+          "id": "mob_urro_de_caca",
+          "name": "Urro de Caça",
+          "mana_cost": 15,
+          "effect_type": "status",
+          "effect_value": "weakened",
+          "description": "Anuncia que escolheu um alvo, e o alvo sente o braço pesar.",
+          "target": "enemy",
+          "duration": 3,
+          "chance": 70,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_couro_de_batalha",
+          "name": "Couro de Batalha",
+          "mana_cost": 20,
+          "effect_type": "damage_reduction",
+          "effect_value": 25,
+          "description": "Cicatriz sobre cicatriz até virar armadura.",
+          "target": "self",
+          "duration": 3,
+          "chance": 100,
+          "cooldown": 5,
+          "effect_stat": "",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_sangue_quente",
+          "name": "Sangue Quente",
+          "mana_cost": 18,
+          "effect_type": "buff",
+          "effect_value": 20,
+          "description": "Quanto mais tempo o combate dura, mais fundo ele acerta (20%).",
+          "target": "self",
+          "duration": 4,
+          "chance": 100,
+          "cooldown": 5,
+          "effect_stat": "crit_chance",
+          "accuracy_modifier": 0
         }
       ]
     },
@@ -174,6 +301,71 @@
           ],
           "power": 1.332,
           "accuracy_modifier": -10
+        },
+        {
+          "id": "mob_agarrao",
+          "name": "Agarrão",
+          "mana_cost": 20,
+          "effect_type": "status",
+          "effect_value": "slowed",
+          "description": "Fecha a mão no braço do herói e o combate passa a ser no ritmo dele.",
+          "target": "enemy",
+          "duration": 3,
+          "chance": 80,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": 0,
+          "secondary": {
+            "effect": "vulnerable",
+            "chance": 60,
+            "duration": 3
+          }
+        },
+        {
+          "id": "mob_raizes_fundas",
+          "name": "Raízes Fundas",
+          "mana_cost": 22,
+          "effect_type": "buff",
+          "effect_value": 35,
+          "description": "Se ancora no chão e passa a aguentar o que antes o derrubava (35%).",
+          "target": "self",
+          "duration": 4,
+          "chance": 100,
+          "cooldown": 5,
+          "effect_stat": "hp",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_pisao",
+          "name": "Pisão",
+          "mana_cost": 22,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "Levanta a pata e deixa a massa fazer o trabalho +30% contra alvo ferido.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": -15,
+          "bonus_condition": "target_wounded",
+          "bonus_percent": 30,
+          "scaling": [
+            {
+              "stat": "df",
+              "weight": 0.6
+            },
+            {
+              "stat": "st",
+              "weight": 0.4
+            }
+          ],
+          "power": 1.219,
+          "secondary": {
+            "effect": "stun",
+            "chance": 20,
+            "duration": 1
+          }
         }
       ]
     },
@@ -235,6 +427,85 @@
           ],
           "power": 1.533,
           "accuracy_modifier": -10
+        },
+        {
+          "id": "mob_lanca_de_ozonio",
+          "name": "Lança de Ozônio",
+          "mana_cost": 28,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "O ar racha antes do golpe chegar, e o cheiro fica +25% contra alvo intacto.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 3,
+          "effect_stat": "",
+          "accuracy_modifier": 0,
+          "bonus_condition": "target_healthy",
+          "bonus_percent": 25,
+          "scaling": [
+            {
+              "stat": "mg",
+              "weight": 1.0
+            }
+          ],
+          "power": 1.04,
+          "secondary": {
+            "effect": "fear",
+            "chance": 40,
+            "duration": 2
+          }
+        },
+        {
+          "id": "mob_sobrecarga",
+          "name": "Sobrecarga",
+          "mana_cost": 30,
+          "effect_type": "buff",
+          "effect_value": 45,
+          "description": "Abre todas as comportas de uma vez e lida com as consequências depois (45%).",
+          "target": "self",
+          "duration": 3,
+          "chance": 100,
+          "cooldown": 5,
+          "effect_stat": "mg",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_praga_ardente",
+          "name": "Praga Ardente",
+          "mana_cost": 24,
+          "effect_type": "status",
+          "effect_value": "poison",
+          "description": "Uma chama que não precisa de combustível e não tem pressa.",
+          "target": "enemy",
+          "duration": 5,
+          "chance": 75,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_fenda_de_eter",
+          "name": "Fenda de Éter",
+          "mana_cost": 35,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "Abre um talho no ar e cobra a conta da própria reserva +35% contra alvo sob efeito.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": -10,
+          "bonus_condition": "target_afflicted",
+          "bonus_percent": 35,
+          "scaling": [
+            {
+              "stat": "mp",
+              "weight": 1.0
+            }
+          ],
+          "power": 4.641
         }
       ]
     },
@@ -305,6 +576,71 @@
           "chance": 75,
           "target": "enemy",
           "description": "Corte que sangra: dano por turno enquanto durar."
+        },
+        {
+          "id": "mob_finta",
+          "name": "Finta",
+          "mana_cost": 14,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "Mostra um lado, entra pelo outro +20% contra alvo intacto.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 2,
+          "effect_stat": "",
+          "accuracy_modifier": 15,
+          "bonus_condition": "target_healthy",
+          "bonus_percent": 20,
+          "scaling": [
+            {
+              "stat": "ag",
+              "weight": 1.0
+            }
+          ],
+          "power": 4.699,
+          "secondary": {
+            "effect": "slowed",
+            "chance": 45,
+            "duration": 2
+          }
+        },
+        {
+          "id": "mob_bote",
+          "name": "Bote",
+          "mana_cost": 18,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "Fica parado tempo demais e depois atravessa a distância inteira num salto +30% contra alvo ferido.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 3,
+          "effect_stat": "",
+          "accuracy_modifier": 0,
+          "bonus_condition": "target_wounded",
+          "bonus_percent": 30,
+          "scaling": [
+            {
+              "stat": "ag",
+              "weight": 1.0
+            }
+          ],
+          "power": 4.957
+        },
+        {
+          "id": "mob_rasteira",
+          "name": "Rasteira",
+          "mana_cost": 20,
+          "effect_type": "status",
+          "effect_value": "stun",
+          "description": "Tira o chão de quem estava confiante nele.",
+          "target": "enemy",
+          "duration": 1,
+          "chance": 45,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": 0
         }
       ]
     },
@@ -361,6 +697,81 @@
           "chance": 70,
           "target": "enemy",
           "description": "Enche o alvo de pavor e reduz o dano que ele causa."
+        },
+        {
+          "id": "mob_teia_de_gelo",
+          "name": "Teia de Gelo",
+          "mana_cost": 26,
+          "effect_type": "status",
+          "effect_value": "frozen",
+          "description": "O chão vira vidro e as pernas param de responder.",
+          "target": "enemy",
+          "duration": 2,
+          "chance": 60,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_letargia",
+          "name": "Letargia",
+          "mana_cost": 28,
+          "effect_type": "status",
+          "effect_value": "sleep",
+          "description": "Uma nota grave e longa que faz as pálpebras pesarem.",
+          "target": "enemy",
+          "duration": 3,
+          "chance": 55,
+          "cooldown": 5,
+          "effect_stat": "",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_ferrugem_da_alma",
+          "name": "Ferrugem da Alma",
+          "mana_cost": 22,
+          "effect_type": "status",
+          "effect_value": "vulnerable",
+          "description": "Corrói a guarda antes de corroer o corpo.",
+          "target": "enemy",
+          "duration": 3,
+          "chance": 75,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": 0,
+          "secondary": {
+            "effect": "weakened",
+            "chance": 60,
+            "duration": 3
+          }
+        },
+        {
+          "id": "mob_agulhada_mental",
+          "name": "Agulhada Mental",
+          "mana_cost": 20,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "Pouco estrago, e exatamente em quem não podia perder a concentração +35% contra alvo sob efeito.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 3,
+          "effect_stat": "",
+          "accuracy_modifier": 10,
+          "bonus_condition": "target_afflicted",
+          "bonus_percent": 35,
+          "scaling": [
+            {
+              "stat": "mg",
+              "weight": 1.0
+            }
+          ],
+          "power": 0.64,
+          "secondary": {
+            "effect": "mana_burn",
+            "chance": 50,
+            "duration": 2
+          }
         }
       ]
     },
@@ -416,6 +827,67 @@
           "chance": 80,
           "target": "enemy",
           "description": "Enfraquece o alvo e derruba o dano dele."
+        },
+        {
+          "id": "mob_canto_de_ossos",
+          "name": "Canto de Ossos",
+          "mana_cost": 22,
+          "effect_type": "buff",
+          "effect_value": 35,
+          "description": "Uma reza rouca que endurece o braço de quem ainda está de pé (35%).",
+          "target": "self",
+          "duration": 4,
+          "chance": 100,
+          "cooldown": 5,
+          "effect_stat": "st",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_veu_protetor",
+          "name": "Véu Protetor",
+          "mana_cost": 24,
+          "effect_type": "damage_reduction",
+          "effect_value": 30,
+          "description": "Um tecido fino de nada que segura muita coisa.",
+          "target": "self",
+          "duration": 3,
+          "chance": 100,
+          "cooldown": 5,
+          "effect_stat": "",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_praga_lenta",
+          "name": "Praga Lenta",
+          "mana_cost": 22,
+          "effect_type": "status",
+          "effect_value": "poison",
+          "description": "Não é para matar. É para o outro chegar cansado no fim.",
+          "target": "enemy",
+          "duration": 5,
+          "chance": 70,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": 0,
+          "secondary": {
+            "effect": "frailty",
+            "chance": 55,
+            "duration": 3
+          }
+        },
+        {
+          "id": "mob_folego_emprestado",
+          "name": "Fôlego Emprestado",
+          "mana_cost": 25,
+          "effect_type": "buff",
+          "effect_value": 30,
+          "description": "Tira de si e dá a quem ainda vai lutar (30%).",
+          "target": "self",
+          "duration": 4,
+          "chance": 100,
+          "cooldown": 5,
+          "effect_stat": "hp",
+          "accuracy_modifier": 0
         }
       ]
     },
@@ -485,6 +957,80 @@
           "chance": 100,
           "target": "self",
           "description": "Reduz o dano recebido por alguns turnos."
+        },
+        {
+          "id": "mob_golpe_de_arauto",
+          "name": "Golpe de Arauto",
+          "mana_cost": 26,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "Um golpe treinado, com o peso do escudo atrás dele +25% contra alvo intacto.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 3,
+          "effect_stat": "",
+          "accuracy_modifier": -5,
+          "bonus_condition": "target_healthy",
+          "bonus_percent": 25,
+          "scaling": [
+            {
+              "stat": "st",
+              "weight": 0.7
+            },
+            {
+              "stat": "df",
+              "weight": 0.3
+            }
+          ],
+          "power": 1.328,
+          "secondary": {
+            "effect": "vulnerable",
+            "chance": 55,
+            "duration": 3
+          }
+        },
+        {
+          "id": "mob_grito_de_comando",
+          "name": "Grito de Comando",
+          "mana_cost": 24,
+          "effect_type": "buff",
+          "effect_value": 25,
+          "description": "Não é raiva: é ordem. E o corpo obedece a ordens melhor do que a raiva (25%).",
+          "target": "self",
+          "duration": 4,
+          "chance": 100,
+          "cooldown": 5,
+          "effect_stat": "crit_chance",
+          "accuracy_modifier": 0
+        },
+        {
+          "id": "mob_lamina_negra",
+          "name": "Lâmina Negra",
+          "mana_cost": 24,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "A lâmina foi tratada com alguma coisa, e a ferida não fecha +30% contra alvo ferido.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 3,
+          "effect_stat": "",
+          "accuracy_modifier": 0,
+          "bonus_condition": "target_wounded",
+          "bonus_percent": 30,
+          "scaling": [
+            {
+              "stat": "st",
+              "weight": 1.0
+            }
+          ],
+          "power": 0.896,
+          "secondary": {
+            "effect": "bleed",
+            "chance": 70,
+            "duration": 3
+          }
         }
       ]
     },
@@ -566,6 +1112,66 @@
           "chance": 100,
           "target": "self",
           "description": "A fera enfurece e passa a bater muito mais forte."
+        },
+        {
+          "id": "boss_juizo",
+          "name": "Juízo",
+          "mana_cost": 32,
+          "effect_type": "damage",
+          "effect_value": 0,
+          "description": "Quando a fera entende que pode perder, ela para de se conter +45% quando você está ferido.",
+          "target": "enemy",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 4,
+          "effect_stat": "",
+          "accuracy_modifier": -10,
+          "bonus_condition": "caster_wounded",
+          "bonus_percent": 45,
+          "scaling": [
+            {
+              "stat": "st",
+              "weight": 0.6
+            },
+            {
+              "stat": "hp",
+              "weight": 0.4
+            }
+          ],
+          "power": 0.459
+        },
+        {
+          "id": "boss_sentenca",
+          "name": "Sentença",
+          "mana_cost": 30,
+          "effect_type": "status",
+          "effect_value": "fear",
+          "description": "Diz alguma coisa numa língua morta, e o herói entende assim mesmo.",
+          "target": "enemy",
+          "duration": 4,
+          "chance": 85,
+          "cooldown": 5,
+          "effect_stat": "",
+          "accuracy_modifier": 0,
+          "secondary": {
+            "effect": "vulnerable",
+            "chance": 70,
+            "duration": 3
+          }
+        },
+        {
+          "id": "boss_carne_antiga",
+          "name": "Carne Antiga",
+          "mana_cost": 35,
+          "effect_type": "heal",
+          "effect_value": 20,
+          "description": "O corpo se lembra de como era antes do ferimento. Recupera 20% da vida máxima.",
+          "target": "self",
+          "duration": 0,
+          "chance": 100,
+          "cooldown": 6,
+          "effect_stat": "",
+          "accuracy_modifier": 0
         }
       ]
     }

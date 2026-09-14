@@ -27,7 +27,11 @@ import pytest
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
 
-from src.content.factories.archetypes import all_archetypes, spawn_by_role  # noqa: E402
+from src.content.factories.archetypes import (  # noqa: E402
+    all_archetypes,
+    get_archetype,
+    spawn_by_role,
+)
 from src.content.skills_loader import load_skills  # noqa: E402
 from src.entities.heroes import Mage, Rogue, Warrior  # noqa: E402
 from src.mechanics import combat as combat_mech  # noqa: E402
@@ -234,13 +238,29 @@ class TestTurnoDesperdicado:
         ids = {s.id for s in _usable_skills(monstro)}
         assert "mob_furia" not in ids
 
-    def test_o_trash_continua_so_batendo(self):
-        """O arquétipo dele é acúmulo. Dar skill ao trash apagaria o contraste."""
-        monstro = spawn_by_role("trash", 5)
-        assert monstro.skills == []
-        mp_antes = monstro.get_mp()
-        decide_monster_action(monstro, Warrior("Teste"), rng=random.Random(1), publish=None)
-        assert monstro.get_mp() == mp_antes
+    def test_o_kit_do_trash_continua_simples(self):
+        """O trash ganhou repertório, e o contraste que ele protege é outro.
+
+        Ele tinha zero skills, e o teste anterior travava isso. O contraste que
+        importa nunca foi "não tem nada": é que o bicho de andar raso não rouba
+        o turno do jogador. Perder a vez para um monstro descartável é a pior
+        sensação que um combate pode dar, porque não há decisão a tomar contra
+        ela — só esperar. Controle é do Controlador, e é para isso que ele existe.
+        """
+        from src.shared.effects import TURN_SKIPPING_STATUSES
+
+        arquetipo = get_archetype("trash")
+        assert arquetipo.skills, "o trash perdeu o kit inteiro"
+        assert len(arquetipo.skills) <= 4, "o trash deixou de ser simples"
+        for carta in arquetipo.skills:
+            aplica = {str(carta.effect_value)}
+            if carta.secondary:
+                aplica.add(carta.secondary.effect)
+            roubados = aplica & set(TURN_SKIPPING_STATUSES)
+            assert not roubados, (
+                f"{carta.id} deixa o trash roubar o turno do jogador ({roubados}); "
+                "isso é papel do Controlador"
+            )
 
 
 class TestCatalogoDeArquetipos:
@@ -314,8 +334,12 @@ class TestMonstroEscolheControlePorValor:
         from src.mechanics.monster_ai import _maior, _valor_de_status
 
         monstro = self._controller()
-        skills = list(monstro.skills)
-        escolhida = _maior(skills)
+        # Só as cartas de status: é este o ramo de `_maior` que a regra protege,
+        # e o Controlador passou a ter também uma carta de dano. Misturar os dois
+        # tipos mediria outro caminho do código.
+        skills = [s for s in monstro.skills if s.effect_type == "status"]
+        assert len(skills) > 1, "o Controlador precisa de mais de um status para haver escolha"
+        escolhida = _maior(skills, monstro)
         melhor = max(skills, key=_valor_de_status)
         assert escolhida is melhor
         assert escolhida is not skills[0] or _valor_de_status(skills[0]) == _valor_de_status(melhor)

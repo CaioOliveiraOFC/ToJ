@@ -26,6 +26,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from src.content.items import Item  # noqa: E402
 from src.content.passives import load_passives  # noqa: E402
 from src.content.skills_loader import load_skills  # noqa: E402
 from src.mechanics import combat  # noqa: E402
@@ -161,6 +162,32 @@ class TestPassivaMudaOBoneco:
         assert not morreu(PASSIVAS["Imortalidade Momentânea"])
 
 
+def _satisfazer_requisito(heroi, skill) -> None:
+    """Põe nas mãos do herói o que a carta exige, se ela exigir algo.
+
+    Sem isto o teste mede a coisa errada: com as mãos vazias o motor RECUSA a
+    carta de requisito — corretamente —, nada muda de estado, e uma carta que
+    funciona perfeitamente é reprovada como placebo. O requisito bloqueia o uso;
+    quem verifica se a carta faz alguma coisa precisa primeiro cumpri-lo.
+    """
+    req = getattr(skill, "requires", None)
+    if req is None:
+        return
+    tipo = req.hand_type or "sword"
+    peca = Item(
+        item_id=f"prova_{tipo}",
+        name=f"Arma de Prova ({tipo})",
+        description="",
+        slot="Weapon",
+        damage_bonus=1,
+        price=1,
+        hand_type=tipo,
+    )
+    heroi.equip(peca, "Weapon1")
+    if req.two_weapons:
+        heroi.equip(peca.instance(), "Weapon2")
+
+
 class TestSkillMudaOEstado:
     """Toda skill precisa mudar o alvo ou o lançador."""
 
@@ -171,6 +198,7 @@ class TestSkillMudaOEstado:
             classe = "Warrior"
         for i in range(60):
             heroi = make_hero(classe, 20, "naked")
+            _satisfazer_requisito(heroi, skill)
             heroi._mp = 10**6
             heroi.skill_cooldowns = {}
             heroi._hp = max(1, heroi.base_hp // 2)  # cura e buff precisam de espaço

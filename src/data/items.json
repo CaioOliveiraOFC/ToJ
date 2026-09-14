@@ -26,7 +26,8 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "adaga_curta",
@@ -45,7 +46,8 @@
       "droppable": true,
       "price": 40,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "dagger"
     },
     {
       "id": "cajado_aprendiz",
@@ -64,7 +66,8 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "clava_madeira",
@@ -81,7 +84,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "mace"
     },
     {
       "id": "machado_enferrujado",
@@ -100,7 +104,8 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 2,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "axe"
     },
     {
       "id": "arco_curto",
@@ -119,7 +124,8 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 2,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "bow"
     },
     {
       "id": "lança_madeira",
@@ -519,7 +525,8 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 5,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "adaga_assassino",
@@ -538,7 +545,8 @@
       "droppable": true,
       "price": 110,
       "shop_min_floor": 5,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "dagger"
     },
     {
       "id": "cajado_arcano",
@@ -557,7 +565,8 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 5,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "machado_batalha",
@@ -576,7 +585,8 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 6,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "axe"
     },
     {
       "id": "arco_longbow",
@@ -595,7 +605,8 @@
       "droppable": true,
       "price": 120,
       "shop_min_floor": 5,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "bow"
     },
     {
       "id": "tridente_guerreiro",
@@ -634,7 +645,8 @@
       "droppable": true,
       "price": 115,
       "shop_min_floor": 5,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "garras_ferro",
@@ -1014,7 +1026,8 @@
       "price": 500,
       "shop_min_floor": 10,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "cajado_eterno",
@@ -1034,7 +1047,8 @@
       "price": 550,
       "shop_min_floor": 10,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "adaga_mortal",
@@ -1054,7 +1068,8 @@
       "price": 520,
       "shop_min_floor": 10,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "dagger"
     },
     {
       "id": "arco_élfico",
@@ -1074,7 +1089,8 @@
       "price": 480,
       "shop_min_floor": 10,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "bow"
     },
     {
       "id": "machado_terrível",
@@ -1094,7 +1110,8 @@
       "price": 600,
       "shop_min_floor": 12,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "axe"
     },
     {
       "id": "luvas_titanio",
@@ -1202,7 +1219,8 @@
       "price": 2000,
       "shop_min_floor": 20,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "cajado_galaxia",
@@ -1220,7 +1238,8 @@
       "price": 2500,
       "shop_min_floor": 20,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "pá_batalha",
@@ -1237,7 +1256,8 @@
       "droppable": true,
       "price": 45,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "mace"
     },
     {
       "id": "bastão_cru",
@@ -1254,7 +1274,8 @@
       "droppable": true,
       "price": 25,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "faca_caça",
@@ -1271,7 +1292,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "dagger"
     },
     {
       "id": "escudo_madeira",
@@ -1543,7 +1565,8 @@
       "droppable": true,
       "price": 20,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "porrete",
@@ -1560,7 +1583,8 @@
       "droppable": true,
       "price": 35,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "mace"
     },
     {
       "id": "adaga_madeira",
@@ -1577,7 +1601,8 @@
       "droppable": true,
       "price": 15,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "dagger"
     },
     {
       "id": "gravetos",
@@ -1594,7 +1619,8 @@
       "droppable": true,
       "price": 30,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "escudo_ferro",
@@ -1849,7 +1875,8 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 6,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "machado_guerra",
@@ -1866,7 +1893,8 @@
       "droppable": true,
       "price": 150,
       "shop_min_floor": 7,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "axe"
     },
     {
       "id": "arco_composto",
@@ -1883,7 +1911,8 @@
       "droppable": true,
       "price": 130,
       "shop_min_floor": 6,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "bow"
     },
     {
       "id": "cajado_cristal",
@@ -1900,7 +1929,8 @@
       "droppable": true,
       "price": 160,
       "shop_min_floor": 7,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "luvas_aco",
@@ -2172,7 +2202,8 @@
       "droppable": true,
       "price": 55,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "clava_pesada",
@@ -2191,7 +2222,8 @@
       "droppable": true,
       "price": 50,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "mace"
     },
     {
       "id": "adaga_sangrenta",
@@ -2210,7 +2242,8 @@
       "droppable": true,
       "price": 60,
       "shop_min_floor": 1,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "dagger"
     },
     {
       "id": "cota_leve",
@@ -2284,7 +2317,8 @@
       "droppable": true,
       "price": 150,
       "shop_min_floor": 5,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "cajado_equilibrio",
@@ -2303,7 +2337,8 @@
       "droppable": true,
       "price": 140,
       "shop_min_floor": 5,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "arco_precisao",
@@ -2322,7 +2357,8 @@
       "droppable": true,
       "price": 135,
       "shop_min_floor": 5,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "bow"
     },
     {
       "id": "armadura_espinhos",
@@ -2399,7 +2435,8 @@
       "price": 600,
       "shop_min_floor": 10,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "cajado_vazio",
@@ -2419,7 +2456,8 @@
       "price": 650,
       "shop_min_floor": 10,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "arco_silencio",
@@ -2439,7 +2477,8 @@
       "price": 580,
       "shop_min_floor": 10,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "bow"
     },
     {
       "id": "armadura_fenrir",
@@ -2519,7 +2558,8 @@
       "price": 2200,
       "shop_min_floor": 15,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "sword"
     },
     {
       "id": "cajado_oblivion",
@@ -2539,7 +2579,8 @@
       "price": 2600,
       "shop_min_floor": 15,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "staff"
     },
     {
       "id": "adaga_vazio",
@@ -2559,7 +2600,8 @@
       "price": 2400,
       "shop_min_floor": 15,
       "shop_max_floor": null,
-      "consumable": false
+      "consumable": false,
+      "hand_type": "dagger"
     },
     {
       "id": "armadura_tita",

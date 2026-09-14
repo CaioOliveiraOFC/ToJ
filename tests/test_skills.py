@@ -171,46 +171,48 @@ def test_com_o_deck_cheio_a_carta_so_entra_por_substituicao(classe, cls):
 
 
 @pytest.mark.parametrize("classe", sorted(CLASSES))
-def test_o_menu_do_nivel_3_ainda_nao_oferece_escolha_de_verdade(classe):
-    """Lacuna de CONTEÚDO, registrada em número para não passar despercebida.
+def test_toda_oferta_tem_mais_candidatas_que_vagas(classe):
+    """Escolher entre tudo o que existe não é escolher.
 
-    Na primeira oferta (nível 3) existem exatamente três candidatas nas três
-    classes: o menu mostra todas as cartas que existem, o que não é escolher.
-    Só a partir do nível 6 há mais candidatas que vagas.
-
-    `generate_skill_choices` devolve o que existe — o código está certo. O
-    número fica fixado aqui para que subir o catálogo apareça como uma falha
-    deste teste, e não como um silêncio.
+    Este teste substitui o que registrava a lacuna oposta: enquanto o catálogo
+    tinha 41 cartas, o menu do nível 3 mostrava as três únicas candidatas que
+    existiam, e a "escolha" era uma formalidade. Com 150, cada oferta tem folga
+    de verdade.
     """
-
-    def quantas(nivel):
-        pool = get_offer_pool(classe)
-        return len([s for s in pool if not s.is_initial and s.level_required <= nivel])
-
-    candidatas = {nivel: quantas(nivel) for nivel in (3, 6, 9)}
-    assert candidatas == {3: 3, 6: 5, 9: 7}, (
-        f"{classe}: o catálogo mudou ({candidatas}). Se aumentou, o menu do "
-        "nível 3 finalmente oferece escolha — atualize este número."
-    )
+    for nivel in (3, 6, 9, 12, 15, 18):
+        candidatas = [
+            s for s in get_offer_pool(classe) if not s.is_initial and s.level_required <= nivel
+        ]
+        assert len(candidatas) > SKILL_OFFER_SIZE, (
+            f"{classe} no nível {nivel}: {len(candidatas)} candidatas para "
+            f"{SKILL_OFFER_SIZE} vagas — o menu mostra tudo o que existe"
+        )
 
 
-def test_o_pool_neutral_esta_vazio_hoje():
-    """A gramática Neutral existe e o conteúdo dela ainda não.
+@pytest.mark.parametrize("classe", sorted(CLASSES))
+def test_as_tres_classes_recebem_o_pool_neutral(classe):
+    """Neutral é ferramenta universal, e agora existe de verdade."""
+    pool = get_offer_pool(classe)
+    neutras = [s for s in pool if s.skill_class == NEUTRAL]
+    assert neutras, f"{classe} não enxerga nenhuma carta Neutral"
+    assert {s.skill_class for s in pool} == {classe, NEUTRAL}
 
-    `get_offer_pool` já junta as cartas da classe com as Neutral, e o validador
-    já as segura num teto ofensivo menor. Só que nenhuma carta declara
-    `skill_class: "Neutral"`, então o caminho inteiro é, hoje, um caminho que
-    não passa por lugar nenhum.
 
-    Este teste existe para que isso seja um fato registrado, e não um recurso
-    que todo mundo acha que funciona. Quando a primeira Neutral entrar no JSON,
-    ele falha e pede para ser trocado por um teste do comportamento real.
+def test_neutral_nao_e_uma_quarta_classe_ofensiva():
+    """A ferramenta universal nunca pode ser a melhor opção de dano de ninguém.
+
+    Se fosse, as três classes convergiriam para o mesmo deck de dano e a
+    identidade de classe deixaria de significar alguma coisa. O teto menor no
+    validador existe para isso; este teste confere o resultado no conteúdo.
     """
-    neutras = [s for s in load_skills() if s.skill_class == NEUTRAL]
-    assert not neutras, (
-        f"{len(neutras)} carta(s) Neutral entraram no catálogo. O pool deixou de "
-        "ser vazio: troque este teste por um que verifique que as três classes a recebem."
-    )
+    dano = [s for s in load_skills() if s.effect_type == "damage"]
+    melhor_neutral = max(offensive_budget(s) for s in dano if s.skill_class == NEUTRAL)
+    for classe in sorted(CLASSES):
+        melhor_da_classe = max(offensive_budget(s) for s in dano if s.skill_class == classe)
+        assert melhor_da_classe > melhor_neutral, (
+            f"a melhor carta de dano Neutral ({melhor_neutral}%) alcança a melhor "
+            f"de {classe} ({melhor_da_classe}%): Neutral virou uma quarta classe"
+        )
 
 
 # --- Regras de design da tabela de preços --------------------------------
@@ -292,45 +294,65 @@ def test_nenhuma_skill_de_dano_e_dominada(classe):
 
 
 @pytest.mark.parametrize("classe", CLASSES_COM_DANO)
-def test_a_skill_aprendida_bate_a_inicial(classe):
-    """Subir de nível tem de entregar mais poder que o kit de partida.
+def test_o_teto_de_dano_cresce_com_o_nivel(classe):
+    """Subir de nível tem de ABRIR poder que antes não estava disponível.
 
-    Sem esta regra, o kit inicial é o kit final: era o caso das doze skills
-    aprendidas do jogo, todas com dano abaixo da melhor skill de nível 1 da
-    própria classe.
+    A regra era par a par: toda carta de nível maior precisava bater toda carta
+    de nível menor. Isso funcionava num catálogo com uma carta por degrau e é
+    impossível com quatorze — obrigaria as quatorze a entregarem exatamente o
+    mesmo, que é o oposto de variedade. E não era isso que a regra protegia: o
+    defeito original eram doze cartas aprendidas TODAS abaixo do kit de nível 1,
+    ou seja, um degrau inteiro que não abria nada.
+
+    A forma correta é por DEGRAU: o melhor que a classe alcança em cada nível de
+    oferta cresce. Dentro do degrau pode haver carta barata e carta cara — essa
+    é a escolha —, mas o teto sobe, e é o teto que representa a promessa de
+    subir de nível.
     """
-    da_classe = [s for s in SKILLS_DE_DANO if s.skill_class == classe]
-    iniciais = [s for s in da_classe if int(s.level_required) <= 1]
-    aprendidas = [s for s in da_classe if int(s.level_required) > 1]
-    if not iniciais or not aprendidas:
-        pytest.skip(f"{classe} não tem os dois grupos")
-
-    teto = max(offensive_budget(s) for s in iniciais)
-    for s in aprendidas:
-        assert offensive_budget(s) > teto, (
-            f"{s.id} é aprendida no nível {s.level_required} e entrega "
-            f"{offensive_budget(s)}%, abaixo dos {teto}% que a classe já tem no nível 1"
+    if classe == NEUTRAL:
+        pytest.skip(
+            "Neutral é ferramenta universal, não uma linha de progressão ofensiva: "
+            "exigir que o teto de dano dela cresça a cada degrau é pedir que ela "
+            "vire a quarta classe que o teto menor do validador existe para impedir."
         )
+    da_classe = [s for s in SKILLS_DE_DANO if s.skill_class == classe]
+    # Medido nos níveis em que o jogo OFERECE carta. Os níveis 5, 7, 10 e 13 são
+    # herança do sistema antigo (ímpares a partir do 5) e o jogador nunca vê uma
+    # oferta neles — cobrar progressão ali mediria um degrau que não existe.
+    degraus = [n for n in range(SKILL_OFFER_LEVEL_INTERVAL, 21, SKILL_OFFER_LEVEL_INTERVAL)]
+    teto_anterior, nivel_anterior = -1, None
+    for nivel in degraus:
+        disponiveis = [s for s in da_classe if int(s.level_required) <= nivel]
+        if not disponiveis:
+            continue
+        teto = max(offensive_budget(s) for s in disponiveis)
+        if nivel_anterior is not None:
+            assert teto > teto_anterior, (
+                f"{classe}: o nível {nivel} não abre nada acima do nível "
+                f"{nivel_anterior} (teto continua em {teto}%)"
+            )
+        teto_anterior, nivel_anterior = teto, nivel
 
 
 @pytest.mark.parametrize("classe", CLASSES_COM_DANO)
-def test_o_dano_cresce_com_o_nivel_exigido(classe):
-    """Duas skills da mesma classe: a de nível maior entrega mais.
+def test_nenhum_degrau_fica_abaixo_do_kit_inicial(classe):
+    """Nenhum nível de oferta pode entregar menos do que o jogador já tinha.
 
-    É a promessa que o menu de escolha faz ao jogador. Quebrá-la transforma a
-    escolha num teste de memória sobre quais cartas são armadilha.
+    É a metade da regra antiga que continua valendo carta a carta seria cruel, e
+    por degrau é exatamente o que ela sempre quis dizer: chegar ao nível 9 e ver
+    três cartas piores que a assinatura de nível 1 é o kit inicial virando o kit
+    final.
     """
-    da_classe = sorted(
-        (s for s in SKILLS_DE_DANO if s.skill_class == classe),
-        key=lambda s: int(s.level_required),
-    )
-    for anterior, seguinte in zip(da_classe, da_classe[1:]):
-        if int(anterior.level_required) == int(seguinte.level_required):
-            continue
-        assert offensive_budget(seguinte) > offensive_budget(anterior), (
-            f"{seguinte.id} (nv {seguinte.level_required}) entrega "
-            f"{offensive_budget(seguinte)}%, não mais que {anterior.id} "
-            f"(nv {anterior.level_required}, {offensive_budget(anterior)}%)"
+    da_classe = [s for s in SKILLS_DE_DANO if s.skill_class == classe]
+    iniciais = [s for s in da_classe if int(s.level_required) <= 1]
+    if not iniciais:
+        pytest.skip(f"{classe} não tem carta de dano no nível 1")
+    piso = max(offensive_budget(s) for s in iniciais)
+    for nivel in sorted({int(s.level_required) for s in da_classe if int(s.level_required) > 1}):
+        melhor = max(offensive_budget(s) for s in da_classe if int(s.level_required) <= nivel)
+        assert melhor > piso, (
+            f"{classe}: no nível {nivel} o melhor dano disponível é {melhor}%, "
+            f"não mais que os {piso}% que a classe já tinha no nível 1"
         )
 
 
