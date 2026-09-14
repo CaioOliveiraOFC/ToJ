@@ -38,6 +38,7 @@ sys.path.insert(0, str(RAIZ))
 
 from src.content.skill_validator import (  # noqa: E402
     _referencia,
+    damage_identity,
     monster_reference,
     offensive_budget,
     skill_signature,
@@ -200,16 +201,14 @@ RAMOS_QUE_LEEM_ACERTO = ("damage",)
 # literalmente um ataque básico mais caro, e a escolha entre ela e as outras
 # vira aritmética fixa.
 def _identidade_da_carta(c: Carta) -> list[str]:
-    marcas = []
-    if c.cond and c.bonus:
-        marcas.append("condição situacional")
-    if c.sec:
-        marcas.append("efeito secundário")
-    if c.acc:
-        marcas.append("mira própria")
-    if c.req:
-        marcas.append("requisito de equipamento")
-    return marcas
+    """Consulta a LEI (`skill_validator.damage_identity`), não uma cópia dela.
+
+    A ferramenta de autoria e o teste de integridade precisam concordar sobre o
+    que torna uma carta de dano distinta. Duas implementações divergem na
+    primeira mudança, e a divergência aparece como "passou na autoria e o teste
+    reprovou" — que foi exatamente o que aconteceu com a escala distintiva.
+    """
+    return damage_identity(card_from_json(_json_completo(c)))
 
 
 def problemas_de_autoria(c: Carta) -> list[str]:
@@ -219,8 +218,8 @@ def problemas_de_autoria(c: Carta) -> list[str]:
             erros.append("carta de dano sem escala ou sem orçamento")
         if not _identidade_da_carta(c):
             erros.append(
-                "carta de dano sem nenhuma identidade (condição, efeito, mira ou "
-                "requisito): é um ataque básico mais caro"
+                "carta de dano sem nenhuma identidade (condição, efeito, mira, "
+                "requisito ou escala distintiva): é um ataque básico mais caro"
             )
         if bool(c.cond) != bool(c.bonus):
             erros.append("condição sem bônus, ou bônus sem condição")

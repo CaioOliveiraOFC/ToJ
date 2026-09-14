@@ -15,6 +15,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -114,26 +115,17 @@ class TestCondicoesDeBonusExistemNoMotor:
         uma forma só, que é o oposto do que esta regra protege.
 
         O que continua proibido é a carta sem nenhuma delas.
+
+        A definição mora em `skill_validator.damage_identity` — uma só, que a
+        ferramenta de autoria também consulta.
         """
-        sem = []
-        for s in _skills():
-            if s["effect_type"] != "damage":
-                continue
-            tracos = [
-                nome
-                for nome, tem in (
-                    ("condição", bool(s.get("bonus_condition")) and bool(s.get("bonus_percent"))),
-                    ("efeito secundário", bool(s.get("secondary"))),
-                    ("mira", bool(s.get("accuracy_modifier"))),
-                    ("requisito", bool(s.get("requires"))),
-                )
-                if tem
-            ]
-            if not tracos:
-                sem.append(s["id"])
+        from src.content.skill_validator import damage_identity
+        from src.content.skills_loader import load_skills
+
+        sem = [c.id for c in load_skills() if c.effect_type == "damage" and not damage_identity(c)]
         assert not sem, (
-            "skills de dano sem condição, efeito, mira nem requisito — "
-            f"são ataques básicos mais caros: {sem}"
+            "skills de dano sem condição, efeito, mira, requisito nem escala "
+            f"distintiva — são ataques básicos mais caros: {sem}"
         )
 
 
@@ -627,3 +619,87 @@ class TestMitigacaoDizQuantoReduz:
             and str(s["effect_value"]) not in s.get("description", "")
         ]
         assert not erradas, "mitigação que não diz quanto reduz: " + "; ".join(erradas)
+
+
+class TestEscalaDistintivaContaComoIdentidade:
+    """De onde o golpe NASCE pode ser a ideia inteira da carta.
+
+    Um Guerreiro que transforma Defesa em dano não parece com nenhuma outra
+    carta da classe e monta outra build — isso é identidade, mesmo sem condição,
+    efeito, mira ou requisito.
+
+    O que a regra não pode virar é "tem `scaling`, logo tem identidade": TODA
+    skill V2 tem escala, e aceitar qualquer uma destruiria a proteção inteira.
+    Preço também não conta — duas cartas de 100% Força que só diferem em mana e
+    recarga continuam sendo uma ideia só.
+    """
+
+    @staticmethod
+    def _carta(classe, escala):
+        from src.content.skills_loader import ScalingTerm
+
+        return SimpleNamespace(
+            id="prova",
+            skill_class=classe,
+            effect_type="damage",
+            scaling=tuple(ScalingTerm(s, p) for s, p in escala),
+            power=1.0,
+            bonus_condition="",
+            bonus_percent=0,
+            secondary=None,
+            accuracy_modifier=0,
+            requires=None,
+        )
+
+    @pytest.mark.parametrize(
+        "classe,escala,distintiva,porque",
+        [
+            ("Warrior", [("st", 1.0)], False, "Força é o caminho óbvio do Guerreiro"),
+            ("Warrior", [("df", 1.0)], True, "Defesa virando dano é uma ideia"),
+            ("Warrior", [("st", 0.7), ("df", 0.3)], True, "híbrido é sempre uma escolha"),
+            ("Mage", [("mg", 1.0)], False, "Magia é o caminho óbvio do Mago"),
+            ("Mage", [("mp", 1.0)], True, "a reserva virando dano é uma ideia"),
+            ("Rogue", [("ag", 1.0)], False, "Agilidade é o caminho óbvio do Ladino"),
+            ("Rogue", [("ag", 0.7), ("hp", 0.3)], True, "híbrido é sempre uma escolha"),
+            ("Neutral", [("df", 1.0)], True, "o pool universal não tem atributo natural"),
+            ("Monster", [("st", 1.0)], False, "o ataque básico do monstro é (st+mg)/2"),
+            ("Monster", [("mg", 1.0)], False, "idem — os dois alimentam o ataque básico"),
+            ("Monster", [("df", 1.0)], True, "Defesa não alimenta o ataque básico do monstro"),
+        ],
+    )
+    def test_o_que_conta_como_escala_distintiva(self, classe, escala, distintiva, porque):
+        from src.content.skill_validator import scaling_is_distinctive
+
+        carta = self._carta(classe, escala)
+        assert scaling_is_distinctive(carta) is distintiva, porque
+
+    def test_escala_distintiva_sozinha_ja_da_identidade(self):
+        """`Golpe da Muralha`: 100% Defesa, e mais nada. É uma carta válida."""
+        from src.content.skill_validator import damage_identity
+
+        muralha = self._carta("Warrior", [("df", 1.0)])
+        assert damage_identity(muralha) == ["escala distintiva"]
+
+    def test_escala_trivial_sozinha_nao_da_identidade(self):
+        """100% Força sem mais nada continua sendo um ataque básico mais caro."""
+        from src.content.skill_validator import damage_identity
+
+        assert damage_identity(self._carta("Warrior", [("st", 1.0)])) == []
+
+    def test_preco_nao_e_identidade(self):
+        """Mana e recarga diferentes não fazem de duas cartas duas ideias."""
+        import dataclasses
+
+        from src.content.skill_validator import damage_identity, skill_signature
+        from src.content.skills_loader import get_skill_by_id
+
+        base = get_skill_by_id("cutelada")
+        cara = dataclasses.replace(
+            base,
+            id="cara",
+            mana_cost_percent=base.mana_cost_percent * 2,
+            cooldown=base.cooldown + 2,
+            power=base.power * 1.5,
+        )
+        assert damage_identity(cara) == damage_identity(base)
+        assert skill_signature(cara) == skill_signature(base)

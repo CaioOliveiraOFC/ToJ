@@ -24,6 +24,7 @@ from dataclasses import dataclass, field
 from src.content.skills_loader import MONSTER_SKILL_CLASS
 from src.shared import effect_core as core
 from src.shared.constants import (
+    CLASS_WEIGHTS,
     MAX_ACTIVE_SKILLS,
     MAX_OFFENSIVE_BUDGET,
     MAX_OFFENSIVE_BUDGET_NEUTRAL,
@@ -312,6 +313,79 @@ def validate(skill, reference: dict | None = None) -> Veredito:
     return v
 
 
+# --- identidade de uma carta de dano ----------------------------------------
+#
+# Uma carta de dano sem NENHUM traço próprio é um ataque básico mais caro: a
+# escolha entre ela e as outras vira aritmética fixa, e o deck deixa de precisar
+# ser lido. A regra existe para impedir isso.
+#
+# Por um tempo ela exigiu especificamente uma CONDIÇÃO SITUACIONAL, e depois
+# passou a aceitar condição, efeito secundário, mira ou requisito — mas seguia
+# ignorando de onde o golpe NASCE. Um Guerreiro que transforma Defesa em dano é
+# uma ideia inteira, mesmo sem mais nada: a carta não parece com nenhuma outra
+# da classe e monta uma build diferente.
+#
+# O que NÃO pode contar é o trivial. Toda skill V2 tem `scaling`, então aceitar
+# qualquer escala destruiria a proteção — e preço também não serve: duas cartas
+# de 100% Força que só diferem em mana e recarga continuam sendo uma ideia só.
+
+
+def primary_stat(skill_class: str) -> frozenset[str]:
+    """O atributo de onde o dano daquela classe nasce por padrão.
+
+    Não é uma tabela nova: sai de `CLASS_WEIGHTS`, que já define a identidade
+    ofensiva de cada classe e é o que o ataque básico usa. Se um dia o Guerreiro
+    deixar de ser uma classe de Força, esta regra acompanha sozinha.
+
+    - Monster devolve `{st, mg}` porque o ataque básico do monstro é
+      literalmente `(st + mg) / 2`: escalar em qualquer um dos dois é escalar no
+      ataque básico dele.
+    - Neutral devolve vazio: o pool universal não tem atributo natural, e é por
+      isso que `df` ou `hp` ali já são uma escolha de design, não o caminho óbvio.
+    """
+    if skill_class == MONSTER_SKILL_CLASS:
+        return frozenset({"st", "mg"})
+    pesos = CLASS_WEIGHTS.get(skill_class)
+    if not pesos:
+        return frozenset()
+    maior = max(pesos.values())
+    return frozenset(nome for nome, peso in pesos.items() if peso == maior)
+
+
+def scaling_is_distinctive(skill) -> bool:
+    """A escala desta carta é uma ideia, ou o caminho óbvio da classe?
+
+    É ideia quando:
+      - mistura dois atributos (o híbrido é sempre uma escolha), ou
+      - nasce de um atributo que NÃO é o primário da classe.
+
+    `Guerreiro 100% Força` é o caminho óbvio e não conta sozinho.
+    `Guerreiro 100% Defesa` e `Guerreiro 70% Força + 30% Defesa` contam.
+    """
+    escala = getattr(skill, "scaling", ())
+    if not escala:
+        return False
+    if len(escala) > 1:
+        return True
+    return escala[0].stat not in primary_stat(skill.skill_class)
+
+
+def damage_identity(skill) -> list[str]:
+    """Os traços que fazem esta carta de dano ser ela mesma. Vazio = genérica."""
+    marcas = []
+    if getattr(skill, "bonus_condition", "") and getattr(skill, "bonus_percent", 0):
+        marcas.append("condição situacional")
+    if getattr(skill, "secondary", None):
+        marcas.append("efeito secundário")
+    if getattr(skill, "accuracy_modifier", 0):
+        marcas.append("mira própria")
+    if getattr(skill, "requires", None):
+        marcas.append("requisito de equipamento")
+    if scaling_is_distinctive(skill):
+        marcas.append("escala distintiva")
+    return marcas
+
+
 # --- similaridade conceitual ------------------------------------------------
 #
 # 204 cartas não podem ser 40 ideias e 164 renomes. O que define uma carta é o
@@ -410,10 +484,13 @@ __all__ = [
     "Veredito",
     "assert_catalogo_valido",
     "budget_credit",
+    "damage_identity",
     "effect_budget",
     "find_clones",
     "monster_reference",
     "offensive_budget",
+    "primary_stat",
+    "scaling_is_distinctive",
     "skill_signature",
     "validate",
     "validate_all",
