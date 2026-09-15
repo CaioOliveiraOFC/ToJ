@@ -63,6 +63,31 @@ menu inicial (`toj_menu`), que rodam antes do laço de jogo existir.
 `sim/runner.py` pode usar `print()`: é CLI de desenvolvimento, e importar `ui/`
 de dentro de `sim/` quebraria a regra maior de a simulação ser headless.
 
+## Responsabilidade por módulo
+
+Os módulos onde a responsabilidade não é óbvia pelo nome da camada:
+
+| módulo | responsabilidade |
+|---|---|
+| `shared/formulas.py` | a matemática fundamental: crescimento, dano, acerto, mitigação |
+| `shared/economy.py` | **aritmética** econômica pura. Recebe a renda como número; nunca a calcula, porque isso exigiria conhecer o catálogo |
+| `shared/effects.py` | `fx.combat_modifier(entidade, nome)` — o **funil único** que soma buff + passiva + equipamento. Nada multiplica dano fora dele |
+| `shared/effect_core.py` | o catálogo global de efeitos: famílias, empilhamento, duração |
+| `shared/interactions.py` | as 16 **leis** sobre pares de efeitos. Sem estado, sem ator, sem fonte |
+| `content/economy.py` | a **ponte**: conhece o catálogo e o gerador, e é o único lugar que calcula `expected_floor_income`, `reroll_cost`, `exit_fee`, custos do Ferreiro e teto de juros |
+| `content/factories/monsters.py` | **fonte única da população do andar** (`routine_monster_count`, `floor_role_plan`). Mapa e simulador leem daqui — é o que garante que os dois meçam o mesmo andar |
+| `content/factories/features.py` | sorteio dos serviços do andar com pity (`roll_features`). Muta os contadores de seca do jogador, que pertencem à run |
+| `content/floor_exit.py` | a saída: cobra a taxa (`use_exit`), mantém o `unpaid_exit_streak` e converte o roll em Essência efetiva (`effective_essence`). Não existe dívida |
+| `content/forge.py` | o Ferreiro: cobra e delega. `+N`, gemas e encantamentos continuam implementados em `content/items.py` |
+| `engine/map.py` | a grade do andar: casas de monstro, evento, serviço e saída, e a serialização delas no save |
+| `engine/map_analysis.py` | medição da geometria do andar (Dijkstra por `(combates, passos)`). Ferramenta de auditoria, não regra de jogo |
+| `sim/` | simulação headless. Roda o mesmo `mechanics/battle.py`, lê as mesmas fontes de população e de serviços, e nunca importa `engine/` nem `ui/` |
+
+**Fonte única é regra, não estilo.** Renda do andar, população do andar, custo de
+reroll, preços do Ferreiro e penalidade de Essência vivem cada um em exatamente
+uma função. Copiar a fórmula para o simulador ou para a UI é o defeito que já
+produziu um simulador medindo um andar que o jogo não gera.
+
 ## Onde está a verdade
 
 | assunto | fonte |

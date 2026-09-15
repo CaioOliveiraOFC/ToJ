@@ -1,8 +1,10 @@
 # GAME DESIGN — Tales of the Journey
 
 > O estado **atual** do design. O que ainda está em redesign não é
-> descrito aqui como se existisse — hoje isso vale para o sistema de
-> equipamento, que está em nova fase de desenho.
+> descrito aqui como se existisse. **Nenhum sistema está em redesign hoje** —
+> o equipamento, que era a exceção, fechou: 11 posições, arma de duas mãos
+> ocupando as duas, e um canal declarado de `evasion` e `damage_reduction`
+> para o funil de dano.
 
 > A bússola criativa. O resto é código, suor e tokens.
 
@@ -15,6 +17,7 @@
 > | **`[divergiu]`** | Existe, mas diferente do que este documento pedia. A diferença está escrita |
 > | **`[não existe]`** | Especificado aqui e nunca construído |
 > | **`[bug]`** | Deveria funcionar assim, não funciona |
+> | **`[corrigido]`** | Era um `[bug]` ou uma divergência, e foi resolvido. Fica registrado porque o defeito explica a regra atual |
 >
 > Antes desta revisão, o documento descrevia coisas que nunca foram construídas
 > sem dizer isso — e três relatórios de balanceamento foram escritos sem que
@@ -105,10 +108,23 @@ visão do jogo: saiu do mapa, do motor, da UI e do simulador. `run_battle` recus
 mais de um monstro, e uma casa do mapa recusa um grupo — o erro volta como
 exceção, e não como uma batalha 1x3 que ninguém percebe.
 
-**`[implementado]`** **O andar é o lugar das decisões.** Loja (`$`), Ferreiro
-(`F`), Evento (`?`) e Extração (`E`) são CASAS do mapa, encontradas explorando —
-nenhuma acontece sozinha no fim do andar. As quatro são independentes: um andar
-pode ter todas, uma só ou nenhuma.
+**`[implementado]`** **O andar é o lugar das decisões.** Loja, Ferreiro, Evento e
+Extração são CASAS do mapa, encontradas explorando — **nenhuma acontece sozinha
+no fim do andar**. As quatro são independentes: um andar pode ter todas, uma só
+ou nenhuma.
+
+A legenda completa do andar:
+
+| Símbolo | O que é |
+|:---:|---|
+| `@` | o jogador |
+| `&` | monstro |
+| `B` | chefe |
+| `$` | Loja |
+| `F` | Ferreiro |
+| `?` | Evento |
+| `E` | Extração |
+| `X` | saída |
 
 | Serviço | Chance base | Pity por andar sem aparecer |
 |---|---:|---:|
@@ -119,11 +135,34 @@ pode ter todas, uma só ou nenhuma.
 O pity existe para o jogador não ficar refém da moeda: uma seca longa de Loja não
 pode ser o que encerra a run. Os contadores de seca pertencem à RUN e são salvos.
 
-**`[implementado]`** **A saída cobra 30% da renda esperada do andar.** Quem pode,
-paga e sobe. Quem **não** pode sobe do mesmo jeito: não existe dívida, bloqueio
-nem softlock. O preço é a **Essência** do andar seguinte — cada saída não paga
-consecutiva desconta 0,2x do multiplicador, com **piso absoluto de 0,5x**. Pagar
-uma saída inteira zera a punição na hora.
+**Loja e Ferreiro são de uso único:** a casa é consumida ao abrir, e sair e voltar
+não rerrola estoque nem devolve o contador de reroll. **A Extração é a exceção
+deliberada** — recusá-la **deixa a casa no mapa**, porque "volto aqui se piorar" é
+exatamente o valor dela.
+
+**`[implementado]`** **A saída cobra 30% da renda esperada do andar.**
+
+```
+exit_fee = expected_floor_income(andar) × 0,30
+```
+
+**Se o jogador paga:** sobe, e a punição de Essência **zera na hora**
+(`unpaid_exit_streak = 0`).
+
+**Se não paga:** sobe **do mesmo jeito**. Não é cobrado nada — pagamento parcial
+seria dívida disfarçada, e o jogador ficaria sem ouro E com a punição. Não existe
+dívida, não existe bloqueio, não existe softlock; só o contador sobe
+(`unpaid_exit_streak += 1`).
+
+O preço é a **Essência** do andar seguinte:
+
+```
+effective_essence = max(0,5 , rolled_essence − unpaid_exit_streak × 0,2)
+```
+
+O piso de `0,5x` é **absoluto** e vale só aqui. O sorteio natural nunca desce de
+`0,6x` — ver **Essência (XP)**. A diferença é de propósito: o andar penalizado
+pode ser pior que o pior andar sorteado.
 
 É isso que dá preço a atravessar o andar sem lutar, sem nenhuma regra proibindo
 evitar combate: contornar todo mundo continua possível, e continua cobrando a
@@ -142,7 +181,12 @@ O multiplicador é re-gerado a cada andar e exibido ao jogador.
 emocional descrita no mapa da jornada (*"Andar 2 — Multiplicador 0.6x. A fartura
 acabou."*).
 
-Hoje a faixa é **0.6x a 2.2x**, com desvio menor. A mudança foi feita durante o
+Hoje a faixa é **0.6x a 2.2x**, com desvio menor. **`0.6x` é o piso do roll
+NATURAL.** Existe um segundo piso, mais baixo, que só se aplica à Essência
+depois da punição por saída não paga: **`0.5x`**. Os dois **não** coincidem, e
+isso é intencional — um andar penalizado pode ser pior que o pior sorteio
+natural, senão fugir da conta sairia de graça para quem já tirou um roll ruim.
+Ver **Exploração**. A mudança foi feita durante o
 rebalanceamento porque a medição mostrou que a Essência dos primeiros andares
 explicava **38,7% da variância** da profundidade final — e o objetivo era derrubar
 isso para ~12,8%.
@@ -154,8 +198,9 @@ isso para ~12,8%.
 **`[implementado]`** Passivas influenciam o ganho de Essência: 4 cartas com
 `essence_bonus` (+10% a +60%).
 
-**`[não existe]`** A Essência multiplica o XP e **não** multiplica o ouro. O documento
-não diz qual dos dois é o certo.
+**`[implementado]`** A Essência multiplica **só o XP**. O ouro do abate não passa
+pelo multiplicador. Se é isso mesmo que o design quer, ainda não foi decidido —
+ver **Decisões pendentes, D6**.
 
 ### Subida de Nível
 
@@ -222,8 +267,11 @@ por raridade**: 60 / 28 / 10 / 2. Uma Lendária vale 2 contra 60 de uma Comum.
 intenções de build (survival, offense, economy, aleatória): **zero cartas com escolha
 automática** e **uma única carta fraca de verdade** (`Reflexos Rápidos`). Vinte e duas
 são cartas de identidade — alta numa intenção, baixa noutra. É exatamente o que um
-sistema de cartas deve produzir. *(Medição feita sobre as 29 primeiras cartas; as 16
-acrescentadas depois seguem as mesmas famílias de efeito e ainda não foram medidas.)*
+sistema de cartas deve produzir. *(Medição feita sobre as 29 primeiras
+cartas, quando o catálogo tinha 13 famílias de efeito. O catálogo hoje tem **60
+cartas e 23 famílias**, e as políticas de escolha do simulador ainda ordenam
+apenas as 13 originais — ver **Decisões pendentes, D3**. As cartas das 10 famílias
+novas não foram medidas.)*
 
 **`[implementado]`** Se o personagem for extraído vivo, as passivas vão com ele —
 para a Arena, quando ela existir.
@@ -261,7 +309,8 @@ recusa a nova**. O motor nunca decide por ele.
 
 ### O catálogo
 
-**`[implementado]`** **150 cartas de herói**, distribuídas assim:
+**`[implementado]`** **150 cartas de herói. Catálogo congelado.** Distribuídas
+assim:
 
 | Classe | Common | Rare | Epic | Legendary | Total |
 |---|---|---|---|---|---|
@@ -460,7 +509,8 @@ Disso decorre o resto:
 
 ### As 16 leis
 
-Oito já eram resolvidas pelo núcleo de efeitos e foram apenas **reconhecidas**,
+**Sistema congelado.** Oito já eram resolvidas pelo núcleo de efeitos e foram
+apenas **reconhecidas**,
 não reimplementadas — sete pares opostos que se compensam numa soma só, e o sono
 que quebra ao levar dano:
 
@@ -509,9 +559,26 @@ o herói a um golpe da morte está jogando pior, não melhor.
 **`[implementado]`** Poções curam **percentual** do máximo (25% / 40% / 60%), não
 valor fixo. Armas somam percentual sobre o poder base.
 
-**`[bug]`** **A loja não vende nenhum equipamento a partir do andar 16.** 121 dos 135
-itens vendáveis têm `shop_max_floor = 15`; os 14 que sobrevivem são todos consumíveis.
-Numa masmorra infinita, isso significa que o comércio acaba e o jogo continua.
+**`[corrigido]`** **A loja vendia equipamento só até o andar 15.** 121 itens
+carregavam `shop_max_floor = 15` — 100% dos equipamentos vendáveis e 0% dos
+consumíveis, o que não é decisão por item: é o default de quando a masmorra
+acabava no andar 20. Numa masmorra infinita, o comércio acabava e o jogo
+continuava. Os 121 valores saíram do JSON.
+
+**`[implementado]`** Hoje **todo filtro da loja é DESBLOQUEIO, nunca curva por
+profundidade**: um andar mais fundo libera coisa e nunca muda a proporção entre
+raridades — a loja do andar 80 é a mesma do andar 16. As regras vigentes:
+
+- `shop_min_floor` do item, quando declarado;
+- **Épico só a partir do andar 10**;
+- **Lendário nunca é vendido** em loja;
+- item com `classes` declarado só aparece para a classe certa;
+- o tamanho da vitrine cresce por faixa de andar, de 8-10 itens (andar 1-3) a
+  22-25 (andar 15+).
+
+O campo `shop_max_floor` continua sendo lido, para o caso de alguém querer um
+item genuinamente limitado no tempo. Hoje **nenhum item o declara**, e quem
+voltar a declará-lo precisa dizer por quê.
 
 **`[corrigido]`** A **renda esperada do andar** deixou de ser uma reta ajustada
 à mão e passa a sair da população real do andar — a mesma fonte que povoa o mapa
@@ -522,18 +589,44 @@ cima no acumulado até o 20 e 24% para BAIXO no andar 50, onde o platê mentia e
 jogo continuava crescendo. Como consequência, a curva de renda ganhou a cadência
 do chefe: o andar de chefe paga um pico e o seguinte recua.
 
-**`[bug]`** **O preço cresce linearmente e a renda cresce geometricamente.**
-Preço: `base × (1 + andar × 0,05)` — dobra em 20 andares. Renda: razão 1,12 — cresce
-8,6× nos mesmos 20 andares. No andar 1 a renda de um andar compra meio item; no
-andar 20 compra 8,6.
+**`[corrigido]`** **O preço crescia linearmente e a renda cresce geometricamente.**
+O preço era `base × (1 + andar × 0,05)` — dobrava em 20 andares — contra uma renda
+de razão 1,12, que cresce 8,6× no mesmo trecho. Hoje o `price` do JSON deixou de
+ser valor absoluto e passou a ser o valor **relativo dentro da raridade**: a
+escala de "quanto custa um Comum" sai da renda esperada do andar
+(`item_price(raridade, preço_relativo, referência, renda, consumível)`), e
+consumível tem tabela própria. Preço e renda passaram a crescer juntos.
 
-**`[bug]`** **O loot é uniforme.** `random.choice` sobre os 159 itens: a raridade não
-pesa em nada. Uma Lendária é tão provável quanto um Comum — 1,51% por abate, o que
-dá 88% de sair pelo menos uma numa run de 20 andares.
+**`[corrigido]`** **O loot era uniforme.** Era `random.choice` sobre os 159 itens:
+a raridade não pesava em nada, e como o catálogo tem 71 Comuns contra 8 Lendárias,
+a raridade efetiva do drop era só a contagem de itens de cada tipo no JSON — um
+Lendário novo mudava a economia sem ninguém decidir isso.
 
-**`[bug]`** As 8 Lendárias não são vendidas na loja, mas o campo `price` delas
-continua valendo para **venda**: uma Lendária dropada no andar 1 vende por 1.050 a
-1.470 de ouro — mais que a renda acumulada dos seis primeiros andares.
+**`[implementado]`** Hoje o sorteio é **ponderado por raridade**, pelos pesos que já
+estavam declarados em `items.json` e nunca eram lidos:
+
+| Raridade | Peso | Itens no catálogo |
+|---|---:|---:|
+| Comum | 60 | 71 |
+| Raro | 28 | 59 |
+| Épico | 10 | 21 |
+| Lendário | 2 | 8 |
+
+O peso da raridade é **dividido pela contagem de itens daquela raridade**, senão a
+raridade com mais itens levaria a fatia dela multiplicada pelo número de cartas —
+que é o defeito do sorteio uniforme, disfarçado de ponderado.
+
+Os pesos são **fixos de propósito**: a masmorra é infinita e como a raridade deve
+se comportar em profundidade alta ainda não foi decidido, então **não existe
+escala por andar** no loot. O andar 30 sorteia igual ao andar 1.
+
+**`[corrigido]`** As 8 Lendárias continuam fora da loja, mas o `price` delas valia
+para **venda**: uma Lendária dropada no andar 1 vendia por 1.050 a 1.470 de ouro —
+mais que a renda acumulada dos seis primeiros andares. Como o preço agora sai da
+renda do andar e a venda devolve de 20% a 25% **do preço naquele andar**, a mesma
+Lendária vende hoje por ~81 de ouro no andar 1, contra uma renda esperada de 90
+para o andar inteiro. A fração que a venda devolve é **derivada do id do item**, e
+não sorteada: a tela e o mercador precisam mostrar o mesmo número.
 
 **`[implementado]`** **Reroll pago** — o primeiro ralo de ouro do jogo. Loja,
 oferta de Skill e oferta de Passiva podem ser trocadas por ouro, pela **mesma
@@ -546,10 +639,13 @@ até já ter investido demais para parar. Quem segura não é uma regra, é o pr
 — e o que ele queima é o capital que compraria equipamento, consumível ou
 recuperação. Reroll é **controle de RNG comprado com risco econômico**.
 
-**`[implementado]`** **Ferreiro** — serviço regular entre andares, depois da loja
-e antes dos juros. Não é evento aleatório: a decisão "comprar, rerollar,
-recuperar, aprimorar, engastar, encantar ou guardar para os juros" só existe se
-reaparecer todo andar, disputando a mesma carteira. Três serviços:
+**`[implementado]`** **Ferreiro** — **casa do mapa (`F`), não serviço garantido
+entre andares.** Ele nasceu como serviço fixo do fim do andar; hoje aparece a
+**30%**, com **pity de +15% por andar sem aparecer**, e é preciso andar até ele.
+A decisão "comprar, rerollar, recuperar, aprimorar, engastar, encantar ou guardar
+para os juros" continua disputando a mesma carteira — o que mudou é que a
+oportunidade não é garantida, e o jogador que a encontra escolhe entre gastar
+agora ou apostar que ela reaparece. Três serviços:
 
 - **Aprimorar (`+N`)** — determinístico, sem chance de falha e sem teto. Custa
   35% do preço da peça, crescendo 50% por rank. Cobra sobre o valor do exemplar,
@@ -583,8 +679,35 @@ outra amostra e não altera a distribuição do catálogo.
 
 ## Personagens (Gladiadores)
 
-**`[implementado]`** 10 slots. Um personagem é definido por nome, classe, nível,
-inventário, equipamento, passivas e skills.
+**`[implementado]`** Um personagem é definido por nome, classe, nível, inventário,
+equipamento, passivas e skills.
+
+**`[implementado]`** **11 posições de equipamento**, nesta ordem:
+
+| # | Posição | # | Posição |
+|---:|---|---:|---|
+| 1 | Helmet | 7 | Hands |
+| 2 | Amulet | 8 | Shoes |
+| 3 | Weapon1 | 9 | Ring1 |
+| 4 | Weapon2 | 10 | Ring2 |
+| 5 | Body | 11 | Accessory |
+| 6 | Legs | | |
+
+**POSIÇÃO não é CATEGORIA.** O item declara a categoria em que se encaixa
+(`Weapon`, `Ring`); o personagem tem as posições onde ela cabe
+(`Weapon1`/`Weapon2`, `Ring1`/`Ring2`). Duas posições da mesma categoria são
+**equivalentes**: não há anel esquerdo e direito, só a primeira livre.
+
+`Weapon1` e `Weapon2` são as duas **mãos**. Toda classe tem as duas — `Weapon2`
+não é "a segunda arma do dual wield", é a segunda mão, onde cabe escudo, orbe,
+foco ou uma segunda lâmina. O Mago não tem menos mãos que o Guerreiro; restrição
+pertence ao ITEM (`classes`, proficiência, requisito), não à classe.
+
+**Uma arma de duas mãos ocupa as duas posições de mão.**
+
+Saves antigos, gravados quando existia uma posição `Weapon` e uma `Ring`, são
+mapeados na leitura para `Weapon1` e `Ring1`; `Weapon2`, `Ring2` e `Accessory`
+nascem vazios. Nenhum arquivo precisou ser migrado.
 
 **`[implementado]`** **Morte na Forge Run:** o save é deletado e um troféu é gravado
 com nome, classe, nível, andar alcançado e causa.
@@ -610,14 +733,24 @@ então refazia e cujas recompensas recebia de novo.
 `mechanics/battle.py` do jogo real, sem UI, e mede balanceamento por telemetria e
 por **ablação** — desliga um sistema e mede quantos andares a run perde.
 
-Duas limitações que importam para qualquer decisão de design tirada dela:
-- **Não modela o mapa.** A simulação roda todos os encontros do andar; não sabe pular
-  luta. Não consegue medir nada sobre "o jogador escolhe brigar ou contornar".
-- **Não modela extração.** A run vai do andar 1 ao 20 ou até morrer. O `max_floor = 20`
+O que ela **passou a** modelar: a população do andar sai da MESMA função que povoa
+o mapa do jogo (`floor_role_plan`), e os serviços do andar são sorteados com as
+MESMAS chances e o mesmo pity (`roll_features`), em vez de serem garantidos. A
+taxa de saída e a punição de Essência também rodam.
+
+Limitações que importam para qualquer decisão de design tirada dela:
+- **Não modela a GEOMETRIA do mapa.** A simulação roda todos os encontros do andar;
+  não sabe pular luta. Não consegue medir nada sobre "o jogador escolhe brigar ou
+  contornar" — e, como consequência, o bot sempre tem ouro e paga 100% das saídas,
+  então a punição de Essência **nunca dispara** numa run simulada padrão. Medir o
+  custo de contornar exige uma política que evite combate; hoje ela não existe.
+- **Não modela a DECISÃO de extrair.** A casa de Extração é sorteada e contada, mas
+  o bot nunca extrai: a run vai do andar 1 ao 20 ou até morrer. O `max_floor = 20`
   é a janela de medição, **não um teto do jogo**.
 
-**`[implementado]`** CI com 404 testes e 128 invariantes de balanceamento, rodando em
-Python 3.10, 3.11 e 3.12.
+**`[implementado]`** CI em Python 3.10, 3.11 e 3.12, com três jobs bloqueantes:
+suíte rápida (**2.393 testes**), lint (`ruff check` + `ruff format --check`) e
+**111 invariantes de balanceamento**.
 
 ---
 
@@ -634,7 +767,10 @@ Python 3.10, 3.11 e 3.12.
 - Um JRPG com história linear.
 - **Um roguelite com meta-progressão que salva itens/XP.** O personagem *é* o meta:
   ele sobrevive se for extraído, e some se morrer.
-- Um jogo com mapa tático ou escolha de rota visual (estilo Slay the Spire).
+- Um jogo com mapa de nós e escolha de rota numa tela à parte (estilo Slay the
+  Spire). O andar **é** uma grade, e andar por ela **é** decisão — contornar ou
+  lutar, passar na Loja ou ir direto para a saída —, mas a decisão acontece
+  caminhando, e não escolhendo um galho num diagrama antes de entrar.
 - Um jogo onde inimigos se adaptam a ataques repetidos.
 - Um jogo com crafting complexo (por enquanto).
 - Um jogo com multiplayer na Masmorra.
@@ -967,3 +1103,79 @@ Cada passiva dentro do array `"passives"` deve ter **exatamente** estes 7 campos
 - [ ] Nenhuma passiva tem `effect_value` como string
 - [ ] Distribuição por raridade está balanceada
 - [ ] Ruff check passa: `python3 -m ruff check src/content/passives.py`
+
+---
+
+## Decisões pendentes
+
+As perguntas abertas do design. Nenhuma delas é um sistema futuro descrito como
+se existisse — são escolhas que o jogo hoje resolve de um jeito e que ainda não
+foram ratificadas.
+
+### D1 — Faixa da Essência: `0.5x–3.0x` ou `0.6x–2.2x`
+
+**Resolvida: a faixa estreitada foi ratificada.** O documento original pedia
+`0.5x` a `3.0x`, "puro RNG". A medição mostrou que a Essência dos primeiros
+andares explicava 38,7% da variância da profundidade final: o sorteio do andar 2
+decidia a run mais do que qualquer escolha do jogador, o que é o oposto de
+"xadrez com a morte". A faixa vigente é `0.6x` a `2.2x`.
+
+O pilar "Caos" continua servido — por escolha de carta, loot e composição do
+andar —, e não por um multiplicador que sequestra a run inteira.
+
+### D2 — O ouro precisa de mais ralos?
+
+**Parcialmente resolvida.** O documento nomeava um único ralo (respec por 100 de
+ouro) que nunca foi construído, e o ouro não tinha destino. Desde então
+entraram: **reroll pago** (Loja, Skill e Passiva, 15% da renda dobrando por
+tentativa), **Ferreiro** (aprimorar, engastar, retirar, encantar, reencantar),
+**recuperação paga** e a **taxa de saída** (30% da renda do andar).
+
+Aberto: se isso é ralo suficiente, e em que ordem o jogador deveria querer
+gastar. **Só a medição do novo loop responde.** Os números atuais são
+calibração V1 — existem para a fase de balanceamento ter o que medir, e **não
+são uma afirmação de que estão balanceados**.
+
+### D3 — As políticas do simulador não ordenam o catálogo inteiro de passivas
+
+O catálogo cresceu de 29 para **60 cartas** e de 13 para **23 famílias de
+efeito**. As três políticas deliberadas do simulador (`survival`, `offense`,
+`economy`) ordenam **as 13 famílias originais**. As 10 novas — `precision`,
+`status_resistance`, `poison_chance`, `bleed_chance`, `fear_chance`,
+`crit_damage`, `damage_percent`, `life_steal`, `mana_regen`, `magic` — caem no
+desempate por valor, então o ranking delas é ruído.
+
+Isso **não** é um defeito do jogo: é do instrumento. Mas invalida qualquer
+conclusão do tipo "esta passiva é fraca" sobre uma carta dessas famílias. Precisa
+ser resolvido **antes** do balanceamento global, não depois.
+
+### D4 — O chefe é contornável
+
+`move_player` não verifica se o chefe está morto antes de devolver
+`level_complete`. Em 719 de 720 andares de marco medidos, dá para caminhar até o
+`X` e subir sem lutar com o `B`. A geometria do andar hoje permite contornar
+~100% dos monstros em qualquer profundidade.
+
+Não foi corrigido em silêncio de propósito: "combate é opcional" é design
+declarado, e se o chefe é a exceção, isso é uma decisão a tomar, não um bug a
+consertar sozinho.
+
+### D5 — A Arena
+
+Metade do laço do jogo está especificada e não construída — ver **Os Dois
+Pilares**. Sem ela, extrair um personagem vivo não leva a lugar nenhum. É a maior
+lacuna aberta do design, e nada nas rodadas estruturais a endereçou.
+
+### D6 — A Essência deveria multiplicar o ouro também?
+
+Hoje ela multiplica **só o XP**. O ouro do abate entra pelo valor cheio, sem
+passar pelo multiplicador do andar.
+
+Nunca foi uma decisão: o documento original não dizia qual dos dois era o certo,
+e o código escolheu um. As consequências são reais e opostas — multiplicar os
+dois faria o andar sortudo decidir progressão **e** economia de uma vez, o que é
+exatamente a variância que **D1** foi estreitada para conter; manter como está
+significa que o multiplicador exibido na tela não descreve metade do que o jogador
+leva do andar.
+
+Fica aberta para depois da medição do novo loop.
