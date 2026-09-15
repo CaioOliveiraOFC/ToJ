@@ -16,6 +16,7 @@ from src.content.factories.monsters import (
     create_boss_for_level,
     generate_monsters_for_level,
 )
+from src.content.forge import award_gem
 from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.content.skills_loader import generate_skill_choices
@@ -73,7 +74,7 @@ if TYPE_CHECKING:
 # dinheiro que o jogador já ia gastar, e "guardar capital" deixaria de competir
 # com "gastar agora". Um pagamento por andar concluído, travado no herói
 # (`last_interest_floor`) para sobreviver a save/load.
-FIM_DE_ANDAR = ("evento", "descanso", "loja", "juros", "extracao")
+FIM_DE_ANDAR = ("evento", "descanso", "loja", "ferreiro", "juros", "extracao")
 
 
 def _economia_da_run(player) -> dict:
@@ -285,7 +286,7 @@ def run_fight(
             return
 
         xp_gained, player_won, dropped_item, level_up_msgs, coins_gained, levels_gained = (
-            process_post_battle(player, monsters, essence_multiplier)
+            process_post_battle(player, monsters, essence_multiplier, dungeon_level)
         )
         _render_battle_results(
             player,
@@ -358,6 +359,7 @@ def process_post_battle(
     player: "Player",
     monster: "Monster | list",
     essence_multiplier: float = 1.0,
+    dungeon_level: int = 1,
 ) -> tuple[int, bool, object | None, list[str], int, int]:
     """
     Processa a lógica de pós-combate (XP, loot, moedas, level up).
@@ -410,6 +412,9 @@ def process_post_battle(
         if dropped_item:
             player.add_item_to_inventory(dropped_item)
             player.ledger["items_dropped"] = player.ledger.get("items_dropped", 0) + 1
+        # Rolagem SEPARADA da do item: a gema não ocupa o lugar dele, e a mesma
+        # vitória pode largar os dois.
+        award_gem(player, dungeon_level)
 
     level_up_messages: list[str] = []
     levels_gained = 0
@@ -639,6 +644,15 @@ def start_game(
                 _get_game_publish()(
                     topics.UI_OPEN_SHOP,
                     {"player": player, "shop": shop, "dungeon_level": dungeon_level},
+                )
+                # Ferreiro DEPOIS da loja: o jogador precisa ter visto o que o
+                # mercador oferece antes de decidir investir na peça que já tem.
+                # Serviço regular entre andares, e não evento aleatório — a
+                # decisão "aprimorar ou comprar" só existe se ela reaparecer todo
+                # andar, concorrendo pelo mesmo ouro da poção e dos juros.
+                _get_game_publish()(
+                    topics.UI_OPEN_FORGE,
+                    {"player": player, "dungeon_level": dungeon_level},
                 )
                 # Juros por último, sobre o que sobrou da loja. Pagá-los antes
                 # seria render sobre dinheiro que o jogador já ia gastar: o

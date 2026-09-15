@@ -49,13 +49,30 @@ class MapOfGame:
         self.exit_pos = {"y": 0, "x": 0}
         self.enemies_pos = {}
 
-    def _get_random_empty_spot(self) -> tuple[int, int]:
-        """Encontra e retorna uma posição vazia aleatória ('.') no mapa."""
-        while True:
+    def _get_random_empty_spot(self, avoid_enemies: bool = False) -> tuple[int, int]:
+        """Uma posição de chão livre, sorteada.
+
+        `avoid_enemies` existe porque monstro NÃO é marcado no grid — ele vive em
+        `enemies_pos`. Sem a checagem, dois monstros do mesmo andar podiam cair
+        na mesma casa e o dicionário engolia um deles em silêncio: o andar
+        entregava sete inimigos onde o gerador tinha produzido oito. Cai
+        exatamente sobre o invariante da rodada passada, o de que o andar tem os
+        monstros que o gerador criou.
+        """
+        for _ in range(self.height * self.width * 4):
             y = random.randint(MAP_BORDER_OFFSET, self.height - 2)
             x = random.randint(MAP_BORDER_OFFSET, self.width - 2)
-            if self.grid[y][x] == ".":
-                return y, x
+            if self.grid[y][x] != ".":
+                continue
+            if avoid_enemies and (y, x) in self.enemies_pos:
+                continue
+            return y, x
+        # Mapa apertado demais para o sorteio: varre e pega a primeira livre, em
+        # vez de rodar para sempre.
+        livre = self._nearest_free_spot()
+        if livre is None:
+            raise RuntimeError("O mapa não tem casa livre para colocar mais nada.")
+        return livre
 
     def generate_map(self, percent_of_walls: float = DEFAULT_WALL_PERCENTAGE) -> None:
         """Gera o mapa usando Random Walk garantindo conectividade."""
@@ -117,7 +134,7 @@ class MapOfGame:
         Aceita uma lista de um elemento porque o chamador antigo entregava o
         encontro inteiro; mais de um é erro, e não uma casa com grupo dentro.
         """
-        y, x = self._get_random_empty_spot()
+        y, x = self._get_random_empty_spot(avoid_enemies=True)
         self.enemies_pos[(y, x)] = _um_monstro(enemy_obj)
 
     def draw_map(self) -> list[str]:

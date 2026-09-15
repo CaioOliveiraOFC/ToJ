@@ -164,6 +164,44 @@ def reroll_cost(dungeon_level: int, rerolls_done: int) -> int:
     return formulas.reroll_price(expected_floor_income(dungeon_level), rerolls_done)
 
 
+# --- Ferreiro ---------------------------------------------------------------
+#
+# Todo preço do Ferreiro sai daqui. Nem a UI nem o simulador têm fórmula: os
+# dois chamam estas funções, e é o que garante que o número que o jogador lê na
+# tela seja o número que o bot paga na simulação.
+
+
+def enhancement_cost(item: "Item", dungeon_level: int) -> int:
+    """Custo de levar esta peça de `+N` para `+N+1`, neste andar."""
+    return formulas.enhancement_price(
+        price_of(item, dungeon_level), int(getattr(item, "enhancement_level", 0) or 0)
+    )
+
+
+def socket_cost(dungeon_level: int) -> int:
+    """Custo de engastar uma gema."""
+    return formulas.socket_price(expected_floor_income(dungeon_level))
+
+
+def unsocket_cost(dungeon_level: int) -> int:
+    """Custo de retirar uma gema. A pedra volta inteira para a bolsa."""
+    return formulas.unsocket_price(expected_floor_income(dungeon_level))
+
+
+def enchant_cost(dungeon_level: int, enchant_count: int) -> int:
+    """Custo de ACRESCENTAR a próxima camada de encantamento."""
+    return formulas.enchant_price(expected_floor_income(dungeon_level), enchant_count)
+
+
+def reenchant_cost(dungeon_level: int, index: int) -> int:
+    """Custo de TROCAR a camada `index`. É o preço daquela posição.
+
+    A terceira camada custa o preço de uma terceira camada, tenha ela sido
+    comprada primeiro ou por último: o que se paga é o lugar na peça.
+    """
+    return formulas.enchant_price(expected_floor_income(dungeon_level), index)
+
+
 def interest_cap(dungeon_level: int) -> int:
     """Teto de juros do andar — o número que a tela mostra.
 

@@ -343,6 +343,10 @@ def simulate_run(
                 break
             hero.recover(FLOOR_CLEAR_RESTORE_PERCENT)
             progression.visit_shop(hero, shop, floor, rng, cfg, telemetry)
+            # Ferreiro DEPOIS da loja e ANTES dos juros, como no jogo: comprar a
+            # peça melhor vem antes de investir na que já se tem, e o que sobrar
+            # ainda rende.
+            progression.visit_forge(hero, floor, cfg, telemetry)
             juros = pay_interest(hero, floor)
             if telemetry is not None:
                 if juros > 0:
@@ -521,7 +525,7 @@ def _award(
         telemetry.xp_base += xp
         telemetry.xp_after_essence += xp_final
         telemetry.gold_from_combat += coins_final
-    progression.collect_loot(hero, rng, toggles, telemetry)
+    progression.collect_loot(hero, rng, toggles, telemetry, dungeon_level=floor)
 
     # Contar pela mudança de nível, não pelo retorno de `level_up`: com
     # `show=False` ele devolve lista vazia mesmo quando o nível sobe, e um laço

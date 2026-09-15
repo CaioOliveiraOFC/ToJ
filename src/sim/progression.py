@@ -16,13 +16,22 @@ from __future__ import annotations
 
 import random
 
-from src.content.economy import buy_recovery, reroll_cost
+from src.content import forge
+from src.content.economy import (
+    buy_recovery,
+    enchant_cost,
+    enhancement_cost,
+    reroll_cost,
+    socket_cost,
+)
+from src.content.enchantments import MAX_ENCHANTMENTS
 from src.content.factories.loot import get_loot
+from src.content.forge import award_gem
 from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.content.skills_loader import generate_skill_choices
 from src.mechanics.math_operations import generate_essence_multiplier
-from src.shared.constants import SKILL_OFFER_LEVEL_INTERVAL, SKILL_OFFER_SIZE
+from src.shared.constants import CLASS_WEIGHTS, SKILL_OFFER_LEVEL_INTERVAL, SKILL_OFFER_SIZE
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, PickPolicy, get_pick_policy
 from src.sim.toggles import Toggles
 
@@ -149,7 +158,13 @@ def on_level_up(
                 hero.skills[slot] = nova
 
 
-def collect_loot(hero, rng: random.Random, toggles: Toggles | None = None, telemetry=None) -> None:
+def collect_loot(
+    hero,
+    rng: random.Random,
+    toggles: Toggles | None = None,
+    telemetry=None,
+    dungeon_level: int = 1,
+) -> None:
     """Recolhe o drop do combate e equipa se for melhor que o item atual.
 
     O jogo dropa item a cada vitória. Ignorar isso na simulação corta a principal
@@ -157,6 +172,12 @@ def collect_loot(hero, rng: random.Random, toggles: Toggles | None = None, telem
     """
     if toggles is not None and not toggles.loot:
         return
+
+    # Gema: a MESMA rolagem do jogo, pela mesma função. Nada de "uma gema
+    # esperada por andar" — o que se quer medir é a chance que o jogador vive.
+    if award_gem(hero, dungeon_level, rng) is not None and telemetry is not None:
+        telemetry.gems_found += 1
+
     item = get_loot()
     if item is None:
         return
@@ -346,6 +367,100 @@ def _rerollar_estoque(hero, visita, telemetry=None) -> None:
         if telemetry is not None:
             telemetry.gold_spent_on_shop_reroll += custo
             telemetry.rerolls += 1
+
+
+# --- Ferreiro ---------------------------------------------------------------
+#
+# Limites DO BOT, e não do jogo. O Ferreiro real não tem teto nenhum: o jogador
+# pode aprimorar a mesma peça a noite inteira se tiver ouro. O bot é contido
+# porque a pergunta desta fase é "o ciclo está vivo e aparece na telemetria?", e
+# um bot que torrasse tudo em +N mediria a própria ganância.
+BOT_MAX_ENHANCEMENTS_PER_VISIT = 1
+BOT_MAX_ENCHANTS_PER_VISIT = 1
+BOT_FORGE_BUDGET_RATIO = 0.30
+
+
+def _ganho_por_ouro(item, dungeon_level: int) -> float:
+    """Quanto poder um ouro compra ao aprimorar ESTA peça.
+
+    O `+N` multiplica a base da peça, então o ganho marginal é proporcional ao
+    que ela já rende; o custo cresce com o rank. Dividir um pelo outro é o que
+    faz o bot preferir a peça onde o ouro rende mais, em vez de sempre a mais
+    cara ou sempre a primeira da lista.
+    """
+    custo = enhancement_cost(item, dungeon_level)
+    if custo <= 0:
+        return 0.0
+    return _peso_do_item(item) / custo
+
+
+def _gema_preferida(hero, gemas: list):
+    """A pedra que mais serve a esta classe, pelos pesos que a classe já tem.
+
+    Sem tabela nova: `CLASS_WEIGHTS` já diz de quais atributos o dano da classe
+    nasce, e é isso que torna um Rubi bom para o Guerreiro e uma Safira boa para
+    o Mago. O jogo real aceita qualquer gema em qualquer socket — a preferência
+    é só do bot.
+    """
+    pesos = dict(CLASS_WEIGHTS.get(hero.get_classname(), {}))
+    return max(gemas, key=lambda g: pesos.get(g.stat, 0.0) * g.percent)
+
+
+def visit_forge(hero, dungeon_level: int, toggles: Toggles | None = None, telemetry=None) -> None:
+    """O Ferreiro do bot: engasta o que achou, aprimora e encanta uma peça.
+
+    DEPOIS da loja, de propósito: comprar a peça melhor vem antes de investir na
+    que já se tem, e as duas saem da mesma carteira. O orçamento é uma fração do
+    ouro que sobrou, então o Ferreiro nunca come o dinheiro da poção.
+    """
+    if toggles is not None and not getattr(toggles, "forge", True):
+        return
+
+    orcamento = int(hero.coins * BOT_FORGE_BUDGET_RATIO)
+
+    # 1. Engastar: socket vazio é poder parado, e a gema já foi paga com sorte.
+    for item in forge.socketable(hero):
+        for slot, ocupante in enumerate(item.gems):
+            if ocupante is not None or not hero.gems:
+                continue
+            custo = socket_cost(dungeon_level)
+            if custo > orcamento:
+                break
+            gema = _gema_preferida(hero, hero.gems)
+            if forge.socket(hero, item, gema, slot, dungeon_level):
+                orcamento -= custo
+                if telemetry is not None:
+                    telemetry.gold_spent_on_socket += custo
+                    telemetry.gems_socketed += 1
+
+    # 2. Aprimorar a peça onde o ouro rende mais.
+    for _ in range(BOT_MAX_ENHANCEMENTS_PER_VISIT):
+        pecas = forge.enhanceable(hero)
+        if not pecas:
+            break
+        melhor = max(pecas, key=lambda i: _ganho_por_ouro(i, dungeon_level))
+        custo = enhancement_cost(melhor, dungeon_level)
+        if custo > orcamento or forge.enhance(hero, melhor, dungeon_level) is None:
+            break
+        orcamento -= custo
+        if telemetry is not None:
+            telemetry.gold_spent_on_enhancement += custo
+            telemetry.items_enhanced += 1
+
+    # 3. Encantar uma peça que ainda tem camada livre. O bot não reencanta nesta
+    #    V1: trocar é aposta, e apostar sem dado medido não ensina nada.
+    for _ in range(BOT_MAX_ENCHANTS_PER_VISIT):
+        candidatas = [i for i in forge.enhanceable(hero) if len(i.enchantments) < MAX_ENCHANTMENTS]
+        if not candidatas:
+            break
+        alvo = min(candidatas, key=lambda i: len(i.enchantments))
+        custo = enchant_cost(dungeon_level, len(alvo.enchantments))
+        if custo > orcamento or forge.enchant(hero, alvo, dungeon_level) is None:
+            break
+        orcamento -= custo
+        if telemetry is not None:
+            telemetry.gold_spent_on_enchant += custo
+            telemetry.enchantments_added += 1
 
 
 def _vender_dominados(hero, shop: Shop, dungeon_level: int) -> None:

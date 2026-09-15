@@ -22,6 +22,7 @@ class Toggles:
     skill_choice: bool = True
     loot: bool = True
     shop: bool = True
+    forge: bool = True
     events: bool = True
     essence: bool = True
     # Cartas removidas do sorteio. Usado para medir uma skill ou passiva

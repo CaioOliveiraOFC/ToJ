@@ -421,7 +421,7 @@ class TestOrdemDeFimDeAndar:
     def test_a_ordem_esta_declarada(self):
         from src.engine.loop import FIM_DE_ANDAR
 
-        assert FIM_DE_ANDAR == ("evento", "descanso", "loja", "juros", "extracao")
+        assert FIM_DE_ANDAR == ("evento", "descanso", "loja", "ferreiro", "juros", "extracao")
 
     def test_o_jogo_e_o_simulador_seguem_a_mesma_ordem(self):
         """Medido no código, não na intenção.
@@ -448,9 +448,13 @@ class TestOrdemDeFimDeAndar:
                 "evento": "roll_random_event()",
                 "descanso": "player.recover(",
                 "loja": "UI_OPEN_SHOP",
+                # Ferreiro depois da loja: investir na peça que já se tem vem
+                # depois de ver a peça que dá para comprar, e as duas saem da
+                # mesma carteira.
+                "ferreiro": "UI_OPEN_FORGE",
                 "juros": "pay_interest(",
             },
-        ) == ["evento", "descanso", "loja", "juros"]
+        ) == ["evento", "descanso", "loja", "ferreiro", "juros"]
 
         assert sequencia(
             sim,
@@ -458,9 +462,10 @@ class TestOrdemDeFimDeAndar:
                 "evento": "_apply_random_event(",
                 "descanso": "hero.recover(",
                 "loja": "visit_shop(",
+                "ferreiro": "visit_forge(",
                 "juros": "pay_interest(",
             },
-        ) == ["evento", "descanso", "loja", "juros"]
+        ) == ["evento", "descanso", "loja", "ferreiro", "juros"]
 
     def test_loja_e_simulador_usam_as_mesmas_formulas(self):
         """Nenhuma das duas pode ter fórmula própria de preço ou de venda."""

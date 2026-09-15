@@ -515,6 +515,30 @@ até já ter investido demais para parar. Quem segura não é uma regra, é o pr
 — e o que ele queima é o capital que compraria equipamento, consumível ou
 recuperação. Reroll é **controle de RNG comprado com risco econômico**.
 
+**`[implementado]`** **Ferreiro** — serviço regular entre andares, depois da loja
+e antes dos juros. Não é evento aleatório: a decisão "comprar, rerollar,
+recuperar, aprimorar, engastar, encantar ou guardar para os juros" só existe se
+reaparecer todo andar, disputando a mesma carteira. Três serviços:
+
+- **Aprimorar (`+N`)** — determinístico, sem chance de falha e sem teto. Custa
+  35% do preço da peça, crescendo 50% por rank. Cobra sobre o valor do exemplar,
+  e não sobre a renda do andar: aprimorar uma Épica não pode custar o mesmo que
+  aprimorar uma Comum.
+- **Gemas** — encontradas, nunca compradas. Toda vitória tem uma rolagem de 5%
+  **independente** do loot de item: o monstro pode largar os dois. O nível segue
+  `1 + andar // 5`, bem mais lento que o andar. Engastar custa 10% da renda do
+  andar; retirar custa 5%, e a pedra volta inteira para a bolsa — não quebra e
+  não perde nível. Socket ocupado **não** aceita engaste: para trocar, retira-se
+  primeiro e pagam-se as duas pontas.
+- **Encantar** — o jogador paga e recebe um efeito aleatório da allowlist. A
+  primeira camada custa 50% da renda do andar e dobra por camada, até o teto
+  mecânico de 5. **Reencantar** troca uma camada pelo preço daquela posição, e é
+  aposta pura: sai do mesmo sorteio, não garante efeito diferente nem valor
+  maior, e o antigo não volta.
+
+Nenhum dos três tem teto econômico. O soft cap é a conta — e o mesmo ouro pagaria
+equipamento, poção, recuperação ou um reroll.
+
 O contador é por CONTEXTO, não global: uma visita à loja, uma oferta de Skill e
 uma oferta de Passiva são três contextos independentes, e cada um volta a 15%
 quando a oferta acaba. Sair da loja encerra a visita; o Mercador Errante é uma

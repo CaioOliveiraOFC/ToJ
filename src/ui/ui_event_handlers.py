@@ -10,6 +10,7 @@ from src.shared.types import GameEvent
 from src.ui import screens
 from src.ui.character_status_flow import run_character_status_flow
 from src.ui.extraction_flow import run_extraction_prompt
+from src.ui.forge_flow import run_forge_flow
 from src.ui.inventory_flow import run_inventory_flow_v2
 from src.ui.passive_flow import run_passive_selection_flow
 from src.ui.random_event_flow import run_random_event
@@ -63,6 +64,12 @@ def _on_open_passives(ev: GameEvent) -> None:
     choices = ev.payload.get("choices")
     if player and choices:
         run_passive_selection_flow(player, choices, ev.payload.get("dungeon_level", 1))
+
+
+def _on_open_forge(ev: GameEvent) -> None:
+    player = ev.payload.get("player")
+    if player is not None:
+        run_forge_flow(player, ev.payload.get("dungeon_level", 1))
 
 
 def _on_extraction_prompt(ev: GameEvent) -> None:
@@ -132,6 +139,7 @@ def register_ui_handlers(sink: EventSink) -> Callable[[], None]:
     unsubs = [
         sink.subscribe(topics.UI_OPEN_INVENTORY, _on_open_inventory),
         sink.subscribe(topics.UI_OPEN_SHOP, _on_open_shop),
+        sink.subscribe(topics.UI_OPEN_FORGE, _on_open_forge),
         sink.subscribe(topics.UI_OPEN_PASSIVES, _on_open_passives),
         sink.subscribe(topics.UI_OPEN_SKILLS, _on_open_skills),
         sink.subscribe(topics.UI_EXTRACTION_PROMPT, _on_extraction_prompt),

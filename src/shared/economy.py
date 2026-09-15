@@ -22,6 +22,10 @@ from __future__ import annotations
 
 from src.shared.constants import (
     CONSUMABLE_PRICE_INCOME_RATIO,
+    ENCHANT_COST_GROWTH,
+    ENCHANT_FIRST_INCOME_RATIO,
+    ENHANCEMENT_COST_GROWTH,
+    ENHANCEMENT_COST_ITEM_RATIO,
     GEAR_PRICE_INCOME_RATIO,
     INTEREST_CAP_INCOME_RATIO,
     INTEREST_RATE_PERCENT,
@@ -32,6 +36,8 @@ from src.shared.constants import (
     REROLL_FIRST_INCOME_RATIO,
     SELL_PRICE_MAX_FACTOR,
     SELL_PRICE_MIN_FACTOR,
+    SOCKET_COST_INCOME_RATIO,
+    UNSOCKET_COST_INCOME_RATIO,
 )
 from src.shared.formulas import geometric
 
@@ -70,6 +76,39 @@ def reroll_price(income: int, rerolls_done: int) -> int:
     """
     tentativas = max(0, int(rerolls_done))
     return max(1, int(income * REROLL_FIRST_INCOME_RATIO * REROLL_COST_GROWTH**tentativas))
+
+
+def enhancement_price(item_price: int, current_level: int) -> int:
+    """Custo de subir uma peça de `+N` para `+N+1`.
+
+    Proporção do PREÇO DA PEÇA, e não da renda do andar: o que se compra é uma
+    fração do valor daquele exemplar, então aprimorar o que já é caro é caro.
+    Cresce 50% por rank, sem teto — o `+N` não tem hard cap, e quem o segura é
+    a conta, não uma regra.
+    """
+    escala = ENHANCEMENT_COST_GROWTH ** max(0, int(current_level))
+    return max(1, int(item_price * ENHANCEMENT_COST_ITEM_RATIO * escala))
+
+
+def socket_price(income: int) -> int:
+    """Custo de engastar uma gema."""
+    return max(1, int(income * SOCKET_COST_INCOME_RATIO))
+
+
+def unsocket_price(income: int) -> int:
+    """Custo de retirar uma gema. Metade de engastar, e a pedra volta inteira."""
+    return max(1, int(income * UNSOCKET_COST_INCOME_RATIO))
+
+
+def enchant_price(income: int, layer: int) -> int:
+    """Custo da camada `layer` de encantamento (0 para a primeira).
+
+    Dobra por camada. Vale tanto para acrescentar quanto para REENCANTAR: quem
+    troca a terceira camada paga o preço da terceira, porque o que se compra é o
+    lugar na peça, não a ordem em que se comprou.
+    """
+    escala = ENCHANT_COST_GROWTH ** max(0, int(layer))
+    return max(1, int(income * ENCHANT_FIRST_INCOME_RATIO * escala))
 
 
 def interest_for(gold: int, income: int) -> int:

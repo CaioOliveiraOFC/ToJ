@@ -96,11 +96,27 @@ class BandTotals:
     gold_spent_on_skill_reroll: int = 0
     gold_spent_on_passive_reroll: int = 0
     rerolls: int = 0
+    gold_spent_on_enhancement: int = 0
+    gold_spent_on_socket: int = 0
+    gold_spent_on_unsocket: int = 0
+    gold_spent_on_enchant: int = 0
+    gold_spent_on_reenchant: int = 0
     purchases: int = 0
     items_sold: int = 0
     interest_payments: int = 0
     # Soma dos saldos ao fim de cada andar da faixa; a média sai na serialização.
     carrying_balance_sum: int = 0
+
+    @property
+    def gold_spent_on_forge(self) -> int:
+        """Todo ouro que virou equipamento melhor: +N, gema e encantamento."""
+        return (
+            self.gold_spent_on_enhancement
+            + self.gold_spent_on_socket
+            + self.gold_spent_on_unsocket
+            + self.gold_spent_on_enchant
+            + self.gold_spent_on_reenchant
+        )
 
     @property
     def gold_spent_on_rerolls(self) -> int:
@@ -117,6 +133,7 @@ class BandTotals:
             + self.gold_spent_on_consumables
             + self.gold_spent_on_recovery
             + self.gold_spent_on_rerolls
+            + self.gold_spent_on_forge
         )
 
     @property
@@ -150,6 +167,7 @@ class BandTotals:
             "gold_spent_on_skill_reroll": self.gold_spent_on_skill_reroll,
             "gold_spent_on_passive_reroll": self.gold_spent_on_passive_reroll,
             "rerolls": self.rerolls,
+            "gold_spent_on_forge": self.gold_spent_on_forge,
             "purchases": self.purchases,
             "items_sold": self.items_sold,
             "interest_payments": self.interest_payments,
@@ -177,6 +195,14 @@ class RunTelemetry:
     passive_picked: dict[str, int] = field(default_factory=lambda: defaultdict(int))
 
     # --- Equipamento e economia ---
+    # Ferreiro: o que o ouro virou em equipamento. Contagem, não ouro — o ouro
+    # já está separado por destino logo acima.
+    gems_found: int = 0
+    gems_socketed: int = 0
+    gems_unsocketed: int = 0
+    items_enhanced: int = 0
+    enchantments_added: int = 0
+    enchantments_rerolled: int = 0
     items_from_loot: int = 0
     items_equipped_from_loot: int = 0
     items_bought: int = 0
@@ -189,6 +215,11 @@ class RunTelemetry:
     gold_spent_on_skill_reroll: int = 0
     gold_spent_on_passive_reroll: int = 0
     rerolls: int = 0
+    gold_spent_on_enhancement: int = 0
+    gold_spent_on_socket: int = 0
+    gold_spent_on_unsocket: int = 0
+    gold_spent_on_enchant: int = 0
+    gold_spent_on_reenchant: int = 0
     gold_from_sales: int = 0
     gold_from_interest: int = 0
     gold_unspent: int = 0
@@ -241,6 +272,17 @@ class RunTelemetry:
         return self.items_bought + self.recovery_purchases
 
     @property
+    def gold_spent_on_forge(self) -> int:
+        """Todo ouro que virou equipamento melhor: +N, gema e encantamento."""
+        return (
+            self.gold_spent_on_enhancement
+            + self.gold_spent_on_socket
+            + self.gold_spent_on_unsocket
+            + self.gold_spent_on_enchant
+            + self.gold_spent_on_reenchant
+        )
+
+    @property
     def gold_spent_on_rerolls(self) -> int:
         return (
             self.gold_spent_on_shop_reroll
@@ -256,6 +298,7 @@ class RunTelemetry:
             + self.gold_spent_on_consumables
             + self.gold_spent_on_recovery
             + self.gold_spent_on_rerolls
+            + self.gold_spent_on_forge
         )
 
     @property
@@ -371,6 +414,12 @@ class RunTelemetry:
                 "picked": dict(self.passive_picked),
             },
             "equipment": {
+                "gems_found": self.gems_found,
+                "gems_socketed": self.gems_socketed,
+                "gems_unsocketed": self.gems_unsocketed,
+                "items_enhanced": self.items_enhanced,
+                "enchantments_added": self.enchantments_added,
+                "enchantments_rerolled": self.enchantments_rerolled,
                 "items_from_loot": self.items_from_loot,
                 "items_equipped_from_loot": self.items_equipped_from_loot,
                 "items_bought": self.items_bought,
@@ -395,6 +444,12 @@ class RunTelemetry:
                 "gold_spent_on_skill_reroll": self.gold_spent_on_skill_reroll,
                 "gold_spent_on_passive_reroll": self.gold_spent_on_passive_reroll,
                 "rerolls": self.rerolls,
+                "gold_spent_on_forge": self.gold_spent_on_forge,
+                "gold_spent_on_enhancement": self.gold_spent_on_enhancement,
+                "gold_spent_on_socket": self.gold_spent_on_socket,
+                "gold_spent_on_unsocket": self.gold_spent_on_unsocket,
+                "gold_spent_on_enchant": self.gold_spent_on_enchant,
+                "gold_spent_on_reenchant": self.gold_spent_on_reenchant,
                 "gold_spent_on_consumables": self.gold_spent_on_consumables,
                 "gold_spent_on_recovery": self.gold_spent_on_recovery,
                 "gold_from_sales": self.gold_from_sales,

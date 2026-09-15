@@ -15,6 +15,7 @@ SYSTEM_SAVE_ERROR = "system.save_error"
 # Eventos de UI (engine → ui via EventBus)
 UI_OPEN_INVENTORY = "ui.open_inventory"
 UI_OPEN_SHOP = "ui.open_shop"
+UI_OPEN_FORGE = "ui.open_forge"
 UI_OPEN_PASSIVES = "ui.open_passives"
 UI_OPEN_SKILLS = "ui.open_skills"
 UI_EXTRACTION_PROMPT = "ui.extraction_prompt"

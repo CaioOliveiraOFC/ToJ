@@ -13,6 +13,7 @@ ponto de poder veio.
 
 from __future__ import annotations
 
+from src.shared.constants import GEM_DROP_CHANCE, GEM_LEVEL_FLOORS_PER_RANK
 from src.shared.formulas import gem_percent
 
 # Cada tipo de gema alimenta UM atributo, pela mesma chave que
@@ -88,12 +89,30 @@ def gem_to_dict(gem: Gem | None) -> dict | None:
     return {"gem_type": gem.gem_type, "level": gem.level}
 
 
-def random_gem(dungeon_level: int, rng) -> Gem:
-    """Uma gema plausível para o andar. Provisório e deliberadamente simples.
+def gem_max_level(dungeon_level: int) -> int:
+    """Teto de nível da gema encontrada neste andar: `1 + andar // 5`.
 
-    A distribuição real — chance de drop, peso por tipo, teto por profundidade —
-    é decisão de conteúdo e não desta rodada. Isto existe para que drop de gema
-    seja testável hoje sem redesenhar a tabela de loot.
+    Bem mais lento que o andar, e de propósito. Com o teto em `andar`, o andar 20
+    já entregaria uma pedra Nv.20 — poder demais entrando no jogo antes de
+    alguém ter medido o sistema. Continua sem teto absoluto, então acompanha a
+    masmorra infinita: andar 50 dá Nv.10–11.
     """
-    tipo = rng.choice(list(GEM_TYPES))
-    return Gem(tipo, max(1, rng.randint(1, max(1, int(dungeon_level)))))
+    return 1 + max(1, int(dungeon_level)) // GEM_LEVEL_FLOORS_PER_RANK
+
+
+def random_gem(dungeon_level: int, rng) -> Gem:
+    """Uma gema do patamar deste andar. Tipo sorteado entre os seis."""
+    teto = gem_max_level(dungeon_level)
+    return Gem(rng.choice(sorted(GEM_TYPES)), rng.randint(max(1, teto - 1), teto))
+
+
+def roll_gem_drop(dungeon_level: int, rng) -> Gem | None:
+    """A rolagem de gema de UMA vitória. `None` quase sempre.
+
+    INDEPENDENTE do loot de item: o monstro pode largar os dois na mesma morte, e
+    a gema nunca ocupa o lugar do item. São duas perguntas diferentes feitas ao
+    mesmo cadáver.
+    """
+    if rng.random() >= GEM_DROP_CHANCE:
+        return None
+    return random_gem(dungeon_level, rng)

@@ -44,6 +44,25 @@ ENCHANT_EFFECTS: dict[str, str] = {
 }
 
 
+# Faixa de valor de cada efeito, ao encantar. CALIBRAÇÃO INICIAL: existe para o
+# sistema poder ser medido, e não porque estes números estejam equilibrados. Um
+# lugar só, porque o dia em que esta tabela estiver em dois arquivos é o dia em
+# que o Ferreiro e o teste discordarem sobre o que é um encantamento forte.
+ENCHANT_VALUE_RANGES: dict[str, tuple[int, int]] = {
+    "damage_percent": (5, 10),
+    "crit_chance": (3, 7),
+    "crit_damage": (8, 15),
+    "damage_reduction": (3, 7),
+    "life_steal": (3, 7),
+    "evasion": (5, 10),
+    "mana_regen": (2, 5),
+    "stun_chance": (3, 6),
+    "bleed_chance": (5, 10),
+    "poison_chance": (5, 10),
+    "fear_chance": (5, 10),
+}
+
+
 class Enchantment:
     """Um encantamento no exemplar. Efeito e valor, e mais nada.
 
@@ -94,3 +113,16 @@ def enchantment_to_dict(ench: Enchantment | None) -> dict | None:
     if ench is None:
         return None
     return {"effect": ench.effect, "value": ench.value}
+
+
+def roll_enchantment(rng) -> Enchantment:
+    """Sorteia um encantamento: um efeito da allowlist, com valor da faixa dele.
+
+    Porta ÚNICA do sorteio. Encantar e reencantar chamam esta mesma função, e é
+    por isso que reencantar não garante nada — nem efeito diferente, nem valor
+    maior. É o gamble do Ferreiro, e ele precisa ser o mesmo sorteio nas duas
+    portas, ou "trocar" seria melhor que "comprar" por acidente de código.
+    """
+    efeito = rng.choice(sorted(ENCHANT_VALUE_RANGES))
+    minimo, maximo = ENCHANT_VALUE_RANGES[efeito]
+    return create_enchantment(efeito, rng.randint(minimo, maximo))

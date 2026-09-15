@@ -122,6 +122,36 @@ RARITY_MULTIPLIERS = {
 REROLL_FIRST_INCOME_RATIO = 0.15
 REROLL_COST_GROWTH = 2.0
 
+# --- Ferreiro ---
+# Três serviços, três curvas, e todas ancoradas na renda do andar ou no preço da
+# peça. Nenhuma tem teto: o soft cap é o próprio custo.
+#
+# `+N` cobra sobre o PREÇO DO ITEM, e não sobre a renda do andar, porque
+# aprimorar uma Espada Épica não pode custar o mesmo que aprimorar uma Adaga
+# Comum — o que se está comprando é uma fração do valor daquela peça.
+ENHANCEMENT_COST_ITEM_RATIO = 0.35
+ENHANCEMENT_COST_GROWTH = 1.50
+
+# Gema entra e sai por uma fração da renda do andar. Retirar custa metade de
+# engastar, e a pedra nunca quebra: a troca é uma decisão de build, não uma
+# aposta. Quem aposta é o encantamento.
+SOCKET_COST_INCOME_RATIO = 0.10
+UNSOCKET_COST_INCOME_RATIO = 0.05
+
+# Encantar é caro desde o primeiro e dobra por camada: 50%, 100%, 200%, 400%,
+# 800% da renda do andar. Reencantar paga o custo da POSIÇÃO, e é gamble puro —
+# não garante efeito diferente nem valor maior.
+ENCHANT_FIRST_INCOME_RATIO = 0.50
+ENCHANT_COST_GROWTH = 2.0
+
+# Chance de uma gema cair numa vitória. Rolagem INDEPENDENTE do loot de item: o
+# monstro pode dropar os dois na mesma morte, e a gema não ocupa o lugar do item.
+GEM_DROP_CHANCE = 0.05
+# Teto de nível da gema encontrada, por profundidade: `1 + andar // 5`. Bem mais
+# lento que o andar, e de propósito — com `1..andar` o andar 20 já entregaria uma
+# pedra Nv.20 e o sistema entraria no jogo com poder que ninguém mediu.
+GEM_LEVEL_FLOORS_PER_RANK = 5
+
 # --- Juros ---
 # Pagos ao concluir o andar, sobre o ouro que sobrou depois da loja. O cap é uma
 # fração da renda do andar: rendimento nunca compete com jogar o andar, e como o

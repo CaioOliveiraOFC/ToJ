@@ -1539,3 +1539,159 @@ def render_character_status(player) -> None:
     renderer.console.print(
         Panel(Text("[Q] Voltar", justify="center", style="dim"), border_style="dim")
     )
+
+
+# --- Ferreiro ---------------------------------------------------------------
+# Texto direto, sem enfeite: o que importa é o jogador ver o preço antes de
+# apertar, e ver que ele subiu depois.
+
+
+def render_forge_main(coins: int, gem_count: int) -> None:
+    renderer.console.clear()
+    renderer.console.print(
+        Panel(
+            Text("FERREIRO", justify="center", style="bold yellow"),
+            border_style="yellow",
+            subtitle=(
+                f"Ouro: [bold yellow]{coins}[/bold yellow]  |  "
+                f"Gemas na bolsa: [bold cyan]{gem_count}[/bold cyan]"
+            ),
+        )
+    )
+    for chave, rotulo in (("1", "Aprimorar"), ("2", "Gemas"), ("3", "Encantar"), ("0", "Voltar")):
+        renderer.console.print(f"  [bold blue]{chave}[/bold blue]  [cyan]{rotulo}[/cyan]")
+    renderer.console.print("")
+
+
+def _linha_preco(indice: int, texto: str, preco: int, coins: int) -> str:
+    cor = "yellow" if coins >= preco else "red"
+    return f"  [bold blue]{indice}[/bold blue]  {texto} — [bold {cor}]{preco}[/bold {cor}] ouro"
+
+
+def render_forge_enhance_menu(items: list, costs: list[int], coins: int) -> None:
+    renderer.console.clear()
+    renderer.console.print(Panel(Text("Aprimorar", justify="center", style="bold yellow")))
+    for i, (item, custo) in enumerate(zip(items, costs, strict=False), 1):
+        proximo = int(getattr(item, "enhancement_level", 0) or 0) + 1
+        renderer.console.print(_linha_preco(i, f"{item.display_name} → +{proximo}", custo, coins))
+    renderer.console.print("  [bold blue]0[/bold blue]  Voltar\n")
+
+
+def render_forge_gem_items(items: list, bag: list) -> None:
+    renderer.console.clear()
+    renderer.console.print(Panel(Text("Gemas", justify="center", style="bold yellow")))
+    for i, item in enumerate(items, 1):
+        cravadas = sum(1 for g in item.gems if g is not None)
+        renderer.console.print(
+            f"  [bold blue]{i}[/bold blue]  {item.display_name} "
+            f"[dim]({cravadas}/{item.socket_count} sockets)[/dim]"
+        )
+    renderer.console.print(f"\n  [dim]Bolsa: {len(bag)} gema(s)[/dim]")
+    renderer.console.print("  [bold blue]0[/bold blue]  Voltar\n")
+
+
+def render_forge_sockets(
+    item, bag: list, socket_price: int, unsocket_price: int, coins: int
+) -> None:
+    renderer.console.clear()
+    renderer.console.print(Panel(Text(item.display_name, justify="center", style="bold yellow")))
+    for i, gem in enumerate(item.gems, 1):
+        if gem is None:
+            renderer.console.print(
+                _linha_preco(i, "[dim]Vazio[/dim] — engastar", socket_price, coins)
+            )
+        else:
+            renderer.console.print(
+                _linha_preco(i, f"{gem.display_name} — retirar", unsocket_price, coins)
+            )
+    renderer.console.print(
+        f"\n  [dim]Bolsa: {', '.join(g.display_name for g in bag) or 'vazia'}[/dim]"
+    )
+    renderer.console.print("  [bold blue]0[/bold blue]  Voltar\n")
+
+
+def render_forge_gem_bag(bag: list) -> None:
+    renderer.console.clear()
+    renderer.console.print(Panel(Text("Qual gema?", justify="center", style="bold yellow")))
+    for i, gem in enumerate(bag, 1):
+        renderer.console.print(
+            f"  [bold blue]{i}[/bold blue]  {gem.display_name} "
+            f"[dim](+{gem.percent:.0f}% {gem.stat})[/dim]"
+        )
+    renderer.console.print("  [bold blue]0[/bold blue]  Voltar\n")
+
+
+def render_forge_enchant_items(items: list, dungeon_level: int) -> None:
+    renderer.console.clear()
+    renderer.console.print(Panel(Text("Encantar", justify="center", style="bold yellow")))
+    for i, item in enumerate(items, 1):
+        renderer.console.print(
+            f"  [bold blue]{i}[/bold blue]  {item.display_name} "
+            f"[dim]({len(item.enchantments)} encantamento(s))[/dim]"
+        )
+    renderer.console.print("  [bold blue]0[/bold blue]  Voltar\n")
+
+
+def render_forge_enchant_layers(item, add_price, swap_prices: list[int], coins: int) -> None:
+    renderer.console.clear()
+    renderer.console.print(Panel(Text(item.display_name, justify="center", style="bold yellow")))
+    for i, encanto in enumerate(item.enchantments, 1):
+        renderer.console.print(
+            _linha_preco(i, f"{encanto.display_name} — reencantar", swap_prices[i - 1], coins)
+        )
+    if add_price is not None:
+        cor = "yellow" if coins >= add_price else "red"
+        renderer.console.print(
+            f"  [bold blue]A[/bold blue]  Adicionar encantamento — "
+            f"[bold {cor}]{add_price}[/bold {cor}] ouro"
+        )
+    else:
+        renderer.console.print("  [dim]Peça no limite de encantamentos.[/dim]")
+    renderer.console.print("  [bold blue]0[/bold blue]  Voltar\n")
+
+
+def render_forge_enhanced(name: str, paid: int) -> None:
+    renderer.console.print(
+        f"[bold green]{name}[/bold green] — pago [bold yellow]{paid}[/bold yellow] de ouro.",
+        justify="center",
+    )
+    sleep(0.8)
+
+
+def render_forge_socketed(gem: str, item: str, paid: int) -> None:
+    renderer.console.print(
+        f"[bold cyan]{gem}[/bold cyan] cravada em [bold green]{item}[/bold green] "
+        f"por [bold yellow]{paid}[/bold yellow].",
+        justify="center",
+    )
+    sleep(0.8)
+
+
+def render_forge_unsocketed(gem: str, paid: int) -> None:
+    renderer.console.print(
+        f"[bold cyan]{gem}[/bold cyan] voltou para a bolsa por [bold yellow]{paid}[/bold yellow].",
+        justify="center",
+    )
+    sleep(0.8)
+
+
+def render_forge_enchanted(label: str, paid: int) -> None:
+    renderer.console.print(
+        f"[bold magenta]{label}[/bold magenta] — pago [bold yellow]{paid}[/bold yellow].",
+        justify="center",
+    )
+    sleep(0.8)
+
+
+def render_forge_denied(cost: int, coins: int) -> None:
+    renderer.console.print(
+        f"[dim white]Custa[/dim white] [bold yellow]{cost}[/bold yellow] "
+        f"[dim white]e você tem[/dim white] [bold yellow]{coins}[/bold yellow].",
+        justify="center",
+    )
+    sleep(0.8)
+
+
+def render_forge_empty(message: str) -> None:
+    renderer.console.print(f"[dim white]{message}[/dim white]", justify="center")
+    sleep(0.8)
