@@ -15,9 +15,14 @@ from types import SimpleNamespace
 from src.content.passives import PassiveCard, load_passives
 from src.sim.harness import simulate_run
 from src.sim.pick_policies import (
+    DESCONHECIDA,
+    FORA_DA_INTENCAO,
+    NEUTRA,
     PASSIVE_PRIORITIES,
     PASSIVE_SEM_PREFERENCIA,
     POLICIES,
+    PREFERIDA,
+    intent_fit,
 )
 from src.sim.toggles import Toggles
 
@@ -151,3 +156,93 @@ class TestAblacaoIsolaOSistema:
         for nome in booleanos:
             rotulo = Toggles().without(**{nome: False}).label()
             assert nome in rotulo, f"desligar {nome} não aparece em label(): {rotulo!r}"
+
+
+class TestNeutraNaoEOffIntent:
+    """Sem preferência definida não é o mesmo que contra a intenção.
+
+    Enquanto os dois estados eram um só, a ausência de classificação virava
+    veredito: o bot pagava reroll para fugir de uma oferta neutra e o scout
+    contava essa recusa como prova de carta fraca. A carta era fraca porque
+    ninguém tinha classificado a família dela — circular.
+    """
+
+    def _carta(self, effect_type: str, rarity: str = "Common") -> PassiveCard:
+        return PassiveCard(
+            id=f"teste_{effect_type}",
+            name=f"Carta de {effect_type}",
+            category="Combate",
+            rarity=rarity,
+            description="",
+            effect_type=effect_type,
+            effect_value=10,
+        )
+
+    def test_familia_classificada_fora_da_intencao_continua_off_intent(self):
+        # A regra, provada sobre uma política construída aqui. Com o catálogo de
+        # hoje as três políticas ordenam o MESMO conjunto de 13 famílias, em
+        # ordens diferentes, então FORA_DA_INTENCAO está vazio na prática e não
+        # existe oferta real que dispare a recusa. Testar a regra com dado
+        # sintético é o que mantém a garantia viva para o dia em que uma política
+        # deixar de ordenar algo que outra ordena.
+        ordenada_por_alguem = sorted(PASSIVE_PRIORITIES["survival"])[0]
+        politica = POLICIES["survival"]
+
+        assert intent_fit("survival", ordenada_por_alguem) == PREFERIDA
+
+        magra = dataclasses.replace(
+            politica,
+            name="magra",
+        )
+        PASSIVE_PRIORITIES["magra"] = tuple(
+            f for f in PASSIVE_PRIORITIES["survival"] if f != ordenada_por_alguem
+        )
+        try:
+            assert intent_fit("magra", ordenada_por_alguem) == FORA_DA_INTENCAO
+            oferta = [self._carta(ordenada_por_alguem)]
+            assert magra.passive_off_intent(oferta) is True
+        finally:
+            del PASSIVE_PRIORITIES["magra"]
+
+    def test_familia_neutra_nao_e_off_intent(self):
+        neutra = sorted(PASSIVE_SEM_PREFERENCIA)[0]
+        oferta = [self._carta(neutra) for _ in range(3)]
+        for nome, politica in POLICIES.items():
+            if not politica.deliberate:
+                continue
+            assert intent_fit(nome, neutra) == NEUTRA
+            assert politica.passive_off_intent(oferta) is False, (
+                f"{nome} tratou uma oferta sem classificação como oferta ruim: "
+                "a ausência de decisão virou veredito."
+            )
+
+    def test_nenhuma_familia_do_catalogo_fica_em_estado_implicito(self):
+        # DESCONHECIDA é erro de dados, não um quarto comportamento: uma família
+        # entrou no catálogo sem ninguém decidir nada sobre ela.
+        for familia in _familias_do_catalogo():
+            for nome, politica in POLICIES.items():
+                if not politica.deliberate:
+                    continue
+                estado = intent_fit(nome, familia)
+                assert estado != DESCONHECIDA, (
+                    f"{familia} não está classificada nem declarada neutra para {nome}."
+                )
+                assert estado in (PREFERIDA, NEUTRA, FORA_DA_INTENCAO)
+
+    def test_o_scout_nao_chama_carta_neutra_de_fraca(self):
+        # O caminho completo: taxa de escolha baixa numa família neutra não pode
+        # sair do relatório com o veredito de carta morta.
+        from src.content.passives import load_passives
+        from src.sim.scout import _analyse_cards
+
+        neutras = [p for p in load_passives() if p.effect_type in PASSIVE_SEM_PREFERENCIA]
+        assert neutras, "o tier neutro ficou vazio; este teste perdeu o objeto"
+        alvo = neutras[0]
+        taxas = {nome: {alvo.id: 0.0} for nome in ("survival", "offense", "economy")}
+
+        achados = _analyse_cards(taxas, "passivas")
+        assuntos = {a.subject for a in achados}
+        assert "recusadas por toda intenção" not in assuntos, (
+            f"{alvo.name} tem a família sem classificação e mesmo assim foi declarada fraca."
+        )
+        assert "sem classificação de intenção" in assuntos

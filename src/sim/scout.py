@@ -282,6 +282,15 @@ def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str
     certa disfarçada de escolha; levada por uma só é identidade de build, que é
     exatamente o que se quer e não deve ser mexido.
 
+    E um quarto balde, que não é diagnóstico nenhum: a carta cuja FAMÍLIA não
+    está na ordem de nenhuma política. Ela não compete pelos três padrões acima
+    porque nunca esteve na corrida — `pick_passive` percorre as famílias
+    preferidas primeiro, então uma carta neutra só é levada quando a oferta
+    inteira é neutra. A taxa baixa dela mede a lacuna do medidor. Enquanto as
+    duas coisas ficavam no mesmo balde, o relatório dizia "carta fraca" sobre
+    uma carta que ninguém tinha classificado, e o balanceamento herdaria esse
+    veredito como se fosse medição.
+
     Só entra na classificação a carta que **toda** política deliberada ofereceu
     o bastante para render uma taxa. Antes, a carta ausente da tabela de uma
     política era lida como taxa zero — descartada por falta de amostra e
@@ -293,11 +302,23 @@ def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str
     """
     from src.content.passives import load_passives
     from src.content.skills_loader import load_skills
+    from src.sim.pick_policies import PASSIVE_SEM_PREFERENCIA
 
     catalogo = (
         {p.id: p.name for p in load_passives()}
         if sistema == "passivas"
         else {s.id: s.name for s in load_skills()}
+    )
+    # Cartas cuja família nenhuma política classificou. A taxa de escolha delas é
+    # baixa por CONSTRUÇÃO: o laço de `pick_passive` sempre encontra antes uma
+    # família preferida, então a carta neutra só é levada quando a oferta inteira
+    # é neutra. Chamar isso de "carta fraca" seria ler o silêncio do instrumento
+    # como veredito sobre o conteúdo — e foi exatamente esse circuito fechado que
+    # esta separação existe para cortar.
+    neutras = (
+        {p.id for p in load_passives() if p.effect_type in PASSIVE_SEM_PREFERENCIA}
+        if sistema == "passivas"
+        else set()
     )
     deliberadas = [n for n in DELIBERATE_POLICIES if n in taxas_por_politica]
     if not deliberadas:
@@ -305,6 +326,7 @@ def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str
 
     todas_cartas = {cid for nome in deliberadas for cid in taxas_por_politica[nome]}
     fracas, universais, identidade, sem_amostra = [], [], [], []
+    sem_classificacao: list[str] = []
 
     for cid in sorted(todas_cartas):
         nome = catalogo.get(cid, cid)
@@ -313,6 +335,12 @@ def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str
             sem_amostra.append(nome)
             continue
         taxas = [taxas_por_politica[n][cid] for n in deliberadas]
+        if cid in neutras:
+            # Sai da classificação por mérito e entra num balde próprio. Nem
+            # fraca, nem identidade, nem universal: não medida.
+            if max(taxas) <= LOW_PICK_RATE:
+                sem_classificacao.append(nome)
+            continue
         if max(taxas) <= LOW_PICK_RATE:
             fracas.append(nome)
         elif min(taxas) >= UNIVERSAL_PICK_RATE:
@@ -321,6 +349,19 @@ def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str
             identidade.append(nome)
 
     achados: list[Finding] = []
+    if sem_classificacao:
+        achados.append(
+            Finding(
+                sistema,
+                "sem classificação de intenção",
+                "NAO MEDIDA",
+                f"{len(sem_classificacao)} cartas: "
+                + ", ".join(sem_classificacao[:8])
+                + " — a família delas não está na ordem de nenhuma política, "
+                "então a taxa baixa é do medidor e não diz nada sobre a carta",
+                len(sem_classificacao),
+            )
+        )
     if fracas:
         achados.append(
             Finding(

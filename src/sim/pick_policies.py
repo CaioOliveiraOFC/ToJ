@@ -111,6 +111,49 @@ PASSIVE_SEM_PREFERENCIA: frozenset[str] = frozenset(
     }
 )
 
+# Como uma família se relaciona com a intenção de uma política. Quatro estados,
+# e nenhum deles é "não está no dicionário".
+#
+# A distinção existe porque NEUTRA e FORA_DA_INTENCAO levam a conclusões opostas
+# sobre a mesma carta. Enquanto as duas eram a mesma coisa, uma oferta só de
+# cartas sem classificação era lida como oferta ruim: o bot pagava reroll para
+# fugir dela e o scout contava a recusa como evidência de carta fraca. Isso é
+# circular — a carta é fraca porque ninguém classificou a família dela.
+PREFERIDA = "preferida"
+NEUTRA = "neutra"
+FORA_DA_INTENCAO = "fora_da_intencao"
+DESCONHECIDA = "desconhecida"
+
+# Toda família que aparece na ordem de alguma política. Hoje as três ordenam o
+# MESMO conjunto de 13, em ordens diferentes — então FORA_DA_INTENCAO está vazio
+# na prática, e `passive_off_intent` nunca dispara. Isso é um resultado, não um
+# descuido: com o catálogo atual não existe oferta de passiva que contrarie uma
+# intenção, e o bot não tem por que pagar reroll de passiva. A estrutura fica
+# pronta para o dia em que uma política deixar de ordenar uma família que outra
+# ordena.
+FAMILIAS_CLASSIFICADAS: frozenset[str] = frozenset(
+    familia for ordem in PASSIVE_PRIORITIES.values() for familia in ordem
+)
+
+
+def intent_fit(policy_name: str, effect_type: str) -> str:
+    """Em que estado esta família está para esta intenção.
+
+    DESCONHECIDA é erro de dados, não um quarto comportamento: significa que uma
+    família entrou no catálogo sem ninguém decidir nada sobre ela. Não levanta
+    exceção para não derrubar uma run por causa de um JSON, e é tratada como
+    neutra na decisão — o estado que não conclui nada. Quem a proíbe é o teste
+    estrutural.
+    """
+    if effect_type in PASSIVE_PRIORITIES.get(policy_name, ()):
+        return PREFERIDA
+    if effect_type in PASSIVE_SEM_PREFERENCIA:
+        return NEUTRA
+    if effect_type in FAMILIAS_CLASSIFICADAS:
+        return FORA_DA_INTENCAO
+    return DESCONHECIDA
+
+
 # Desempate DENTRO do tier indiferente. Raridade é o único comparador entre
 # famílias que o próprio jogo declara: uma Lendária é, por design, uma carta
 # maior que uma Comum, seja qual for o efeito. Não é uma opinião deste arquivo
@@ -240,14 +283,20 @@ class PickPolicy:
         """
         if not self.deliberate or not choices:
             return False
-        # Carta do tier indiferente NÃO serve à intenção: por declaração, e não
-        # por omissão do dicionário. O efeito colateral é real e precisa estar
-        # escrito — enquanto essas 10 famílias não tiverem intenção atribuída, o
-        # scout vai contá-las como "recusadas por toda intenção", que é o
-        # veredito dele para carta fraca. Isso é artefato do instrumento, e não
-        # pode ser lido como fraqueza de conteúdo no balanceamento global.
-        prioridades = PASSIVE_PRIORITIES[self.name]
-        return not any(c.effect_type in prioridades for c in choices)
+        # "Sem preferência definida" NÃO é "contra a intenção". Uma carta neutra
+        # é uma carta sobre a qual ninguém decidiu nada, e recusar a oferta por
+        # causa dela transformaria a ausência de classificação em veredito de
+        # carta fraca.
+        #
+        # A oferta só é fraca quando NENHUMA carta é preferida E NENHUMA é
+        # neutra — ou seja, quando todas pertencem a famílias que alguma
+        # política ordena e esta não. Com o catálogo atual isso não acontece, e
+        # é por isso que o bot não paga reroll de passiva: não porque a regra
+        # sumiu, mas porque não existe oferta que a satisfaça.
+        estados = {intent_fit(self.name, c.effect_type) for c in choices}
+        if PREFERIDA in estados or NEUTRA in estados or DESCONHECIDA in estados:
+            return False
+        return True
 
     def pick_skill(self, hero, choices: list, rng: random.Random):
         """Escolhe uma skill nova e o slot que ela substitui.
