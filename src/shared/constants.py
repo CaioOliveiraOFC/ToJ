@@ -122,6 +122,36 @@ RARITY_MULTIPLIERS = {
 REROLL_FIRST_INCOME_RATIO = 0.15
 REROLL_COST_GROWTH = 2.0
 
+# --- Saída do andar e penalidade de Essência ---
+# Sair custa. É o que dá preço a atravessar o andar sem lutar: contornar todo
+# mundo continua possível, e continua pagando a taxa com capital que o combate
+# não repôs.
+EXIT_FEE_INCOME_RATIO = 0.30
+
+# Quem não consegue pagar sobe do mesmo jeito. Não há dívida, não há bloqueio e
+# não há softlock: a run continua, e vai ficando menos eficiente. Cada saída
+# NÃO PAGA consecutiva tira isto do multiplicador de Essência do andar seguinte.
+ESSENCE_UNPAID_EXIT_PENALTY = 0.20
+# E o piso é absoluto: por maior que seja a sequência, a Essência efetiva nunca
+# cai abaixo disto. É o que impede a punição de virar espiral sem volta — quem
+# está em 0,5x continua ganhando o suficiente para voltar a lutar e pagar.
+ESSENCE_PENALTY_FLOOR = 0.5
+
+# --- Features do mapa ---
+# Loja, Ferreiro e Extração deixaram de ser garantidos e viraram casas do mapa.
+# Cada um tem chance própria e um "pity" que sobe a cada andar sem aparecer, até
+# forçar o encontro. O pity existe para o jogador não ficar refém da moeda: uma
+# seca longa de Loja não pode ser o que encerra a run.
+SHOP_SPAWN_CHANCE = 0.35
+SHOP_PITY_INCREMENT = 0.15
+FORGE_SPAWN_CHANCE = 0.30
+FORGE_PITY_INCREMENT = 0.15
+# Extração é a saída de emergência da run, e não existe nos primeiros andares:
+# antes disso não há o que preservar.
+EXTRACTION_MIN_FLOOR = 3
+EXTRACTION_SPAWN_CHANCE = 0.15
+EXTRACTION_PITY_INCREMENT = 0.10
+
 # --- Ferreiro ---
 # Três serviços, três curvas, e todas ancoradas na renda do andar ou no preço da
 # peça. Nenhuma tem teto: o soft cap é o próprio custo.

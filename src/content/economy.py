@@ -171,6 +171,17 @@ def reroll_cost(dungeon_level: int, rerolls_done: int) -> int:
 # tela seja o número que o bot paga na simulação.
 
 
+def exit_fee(dungeon_level: int) -> int:
+    """A taxa da saída do andar.
+
+    Proporção da renda do andar, como todo o resto. É o preço de terminar o
+    andar — quem contornou todos os monstros chega aqui sem ter reposto o que
+    vai gastar, e é assim que evitar combate custa sem nenhuma regra proibindo
+    evitar combate.
+    """
+    return formulas.exit_price(expected_floor_income(dungeon_level))
+
+
 def enhancement_cost(item: "Item", dungeon_level: int) -> int:
     """Custo de levar esta peça de `+N` para `+N+1`, neste andar."""
     return formulas.enhancement_price(

@@ -421,7 +421,7 @@ class TestOrdemDeFimDeAndar:
     def test_a_ordem_esta_declarada(self):
         from src.engine.loop import FIM_DE_ANDAR
 
-        assert FIM_DE_ANDAR == ("descanso", "loja", "ferreiro", "juros", "extracao")
+        assert FIM_DE_ANDAR == ("saida", "descanso", "juros")
 
     def test_o_jogo_e_o_simulador_seguem_a_mesma_ordem(self):
         """Medido no código, não na intenção.
@@ -442,30 +442,25 @@ class TestOrdemDeFimDeAndar:
         jogo = inspect.getsource(loop.start_game)
         sim = inspect.getsource(harness.simulate_run)
 
-        # O evento saiu daqui: virou casa do mapa, e o jogador só o encontra se
-        # andar até ele. Chegar na saída não dispara mais nada.
+        # Loja, Ferreiro, Evento e Extração saíram daqui: viraram casas do
+        # mapa. O que resta no fim do andar é a saída, o descanso e os juros.
         assert sequencia(
             jogo,
             {
+                "saida": "use_exit(",
                 "descanso": "player.recover(",
-                "loja": "UI_OPEN_SHOP",
-                # Ferreiro depois da loja: investir na peça que já se tem vem
-                # depois de ver a peça que dá para comprar, e as duas saem da
-                # mesma carteira.
-                "ferreiro": "UI_OPEN_FORGE",
                 "juros": "pay_interest(",
             },
-        ) == ["descanso", "loja", "ferreiro", "juros"]
+        ) == ["saida", "descanso", "juros"]
 
         assert sequencia(
             sim,
             {
+                "saida": "use_exit(",
                 "descanso": "hero.recover(",
-                "loja": "visit_shop(",
-                "ferreiro": "visit_forge(",
                 "juros": "pay_interest(",
             },
-        ) == ["descanso", "loja", "ferreiro", "juros"]
+        ) == ["saida", "descanso", "juros"]
 
     def test_loja_e_simulador_usam_as_mesmas_formulas(self):
         """Nenhuma das duas pode ter fórmula própria de preço ou de venda."""

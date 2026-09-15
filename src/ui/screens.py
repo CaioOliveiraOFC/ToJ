@@ -1695,3 +1695,33 @@ def render_forge_denied(cost: int, coins: int) -> None:
 def render_forge_empty(message: str) -> None:
     renderer.console.print(f"[dim white]{message}[/dim white]", justify="center")
     sleep(0.8)
+
+
+def render_exit_paid(fee: int) -> None:
+    renderer.console.print(
+        f"[dim white]Taxa de saída:[/dim white] [bold yellow]{fee}[/bold yellow] de ouro.",
+        justify="center",
+    )
+    sleep(0.6)
+
+
+def render_exit_unpaid(fee: int, coins: int, streak: int, penalty: float) -> None:
+    """Subiu sem pagar. Não há dívida — há Essência a menos no próximo andar."""
+    renderer.console.print(
+        f"[bold red]Saída não paga[/bold red]: custa [bold yellow]{fee}[/bold yellow] "
+        f"e você tem [bold yellow]{coins}[/bold yellow]. "
+        f"[dim white]{streak}ª seguida — Essência -{penalty:.1f}x no próximo andar.[/dim white]",
+        justify="center",
+    )
+    sleep(1.2)
+
+
+def render_essence_penalty(rolled: float, penalty: float, effective: float) -> None:
+    """As três linhas que o jogador precisa ver: roll, desconto e resultado."""
+    renderer.console.print(
+        f"[dim white]Essência:[/dim white] [bold]{rolled:.1f}x[/bold] "
+        f"[dim white]— penalidade de saída[/dim white] [bold red]-{penalty:.1f}x[/bold red] "
+        f"[dim white]= efetiva[/dim white] [bold cyan]{effective:.1f}x[/bold cyan]",
+        justify="center",
+    )
+    sleep(0.8)

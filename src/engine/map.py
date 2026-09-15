@@ -13,6 +13,17 @@ if TYPE_CHECKING:
     pass
 
 
+# O caractere de cada serviço no mapa. Texto puro: a rodada é de mecânica.
+FEATURE_CHARS = {"shop": "$", "forge": "F", "extraction": "E"}
+
+
+class FeatureTile(NamedTuple):
+    """O jogador pisou num serviço do andar."""
+
+    feature: str
+    position: tuple[int, int]
+
+
 class EventTile(NamedTuple):
     """O jogador pisou numa casa de evento. Carrega o tipo sorteado.
 
@@ -65,6 +76,12 @@ class MapOfGame:
         # depois de gastar o evento não o traz de volta.
         self.event_pos: tuple[int, int] | None = None
         self.event_type: str | None = None
+        # Serviços do andar: Loja, Ferreiro, Extração. Casa -> tipo. Cada um
+        # aparece no máximo uma vez, nenhum divide célula com ninguém, e usar a
+        # Loja ou o Ferreiro CONSOME a casa — entrar e sair não rerrola estoque
+        # nem devolve o desconto do reroll. A Extração é a exceção: recusá-la
+        # não a gasta, porque "volto aqui se piorar" é justamente o valor dela.
+        self.features: dict[tuple[int, int], str] = {}
 
     def _get_random_empty_spot(self, avoid_enemies: bool = False) -> tuple[int, int]:
         """Uma posição de chão livre, sorteada.
@@ -163,16 +180,44 @@ class MapOfGame:
         """
         if not event_type:
             return None
-        jogador = (self.player_pos["y"], self.player_pos["x"])
-        saida = (self.exit_pos["y"], self.exit_pos["x"])
+        ocupadas = self._casas_ocupadas()
         for _ in range(self.height * self.width * 4):
             y, x = self._get_random_empty_spot(avoid_enemies=True)
-            if (y, x) in (jogador, saida):
+            if (y, x) in ocupadas:
                 continue
             self.event_pos = (y, x)
             self.event_type = str(event_type)
             return self.event_pos
         return None
+
+    def place_feature(self, feature: str) -> tuple[int, int] | None:
+        """Põe um serviço numa casa livre. Devolve a posição, ou `None`."""
+        if not feature:
+            return None
+        ocupadas = self._casas_ocupadas()
+        for _ in range(self.height * self.width * 4):
+            y, x = self._get_random_empty_spot(avoid_enemies=True)
+            if (y, x) in ocupadas:
+                continue
+            self.features[(y, x)] = str(feature)
+            return (y, x)
+        return None
+
+    def _casas_ocupadas(self) -> set[tuple[int, int]]:
+        """Tudo que já tem dono: jogador, saída, monstros, evento e serviços."""
+        ocupadas = {
+            (self.player_pos["y"], self.player_pos["x"]),
+            (self.exit_pos["y"], self.exit_pos["x"]),
+            *self.enemies_pos,
+            *self.features,
+        }
+        if self.event_pos is not None:
+            ocupadas.add(self.event_pos)
+        return ocupadas
+
+    def take_feature(self, position: tuple[int, int]) -> str | None:
+        """Consome o serviço daquela casa e devolve o tipo."""
+        return self.features.pop(position, None)
 
     def take_event(self) -> str | None:
         """Consome o evento da casa e devolve o tipo. Uso único.
@@ -204,6 +249,8 @@ class MapOfGame:
                     char = "B" if getattr(mob, "is_boss", False) else "&"
                 elif self.event_pos == (y, x):
                     char = "?"
+                elif (y, x) in self.features:
+                    char = FEATURE_CHARS.get(self.features[(y, x)], "?")
                 elif tile == "X":
                     char = "X"
                 elif tile == "D":
@@ -248,6 +295,13 @@ class MapOfGame:
             self.player_pos = {"y": ny, "x": nx}
             return EventTile(self.take_event())
 
+        # Serviço: a casa NÃO é consumida aqui. Quem decide gastá-la é o fluxo
+        # que abre a Loja ou o Ferreiro — a Extração recusada continua no mapa,
+        # e essa diferença é a regra, não um detalhe de implementação.
+        if (ny, nx) in self.features:
+            self.player_pos = {"y": ny, "x": nx}
+            return FeatureTile(self.features[(ny, nx)], (ny, nx))
+
         # Verifica colisão com inimigo
         if (ny, nx) in self.enemies_pos:
             enemy_collided = self.enemies_pos.pop((ny, nx))
@@ -281,6 +335,7 @@ class MapOfGame:
             "player_pos": self.player_pos,
             "exit_pos": self.exit_pos,
             "enemies_pos": enemies_serializable,
+            "features": [{"y": y, "x": x, "type": tipo} for (y, x), tipo in self.features.items()],
             "event": (
                 {"y": self.event_pos[0], "x": self.event_pos[1], "type": self.event_type}
                 if self.event_pos is not None
@@ -299,6 +354,11 @@ class MapOfGame:
         # Evento não visitado volta onde estava; consumido não volta, porque o
         # save nem chegou a gravá-lo. Save antigo, sem a chave, é andar sem
         # evento — que é exatamente o que ele era.
+        self.features = {}
+        for f in map_state.get("features") or []:
+            if isinstance(f, dict) and f.get("type"):
+                self.features[(int(f["y"]), int(f["x"]))] = str(f["type"])
+
         evento = map_state.get("event")
         if isinstance(evento, dict) and evento.get("type"):
             self.event_pos = (int(evento["y"]), int(evento["x"]))

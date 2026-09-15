@@ -105,7 +105,29 @@ visão do jogo: saiu do mapa, do motor, da UI e do simulador. `run_battle` recus
 mais de um monstro, e uma casa do mapa recusa um grupo — o erro volta como
 exceção, e não como uma batalha 1x3 que ninguém percebe.
 
-**`[implementado]`** Entre andares: loja, depois a decisão de **Extrair** ou **Continuar**.
+**`[implementado]`** **O andar é o lugar das decisões.** Loja (`$`), Ferreiro
+(`F`), Evento (`?`) e Extração (`E`) são CASAS do mapa, encontradas explorando —
+nenhuma acontece sozinha no fim do andar. As quatro são independentes: um andar
+pode ter todas, uma só ou nenhuma.
+
+| Serviço | Chance base | Pity por andar sem aparecer |
+|---|---:|---:|
+| Loja | 35% | +15% |
+| Ferreiro | 30% | +15% |
+| Extração (a partir do andar 3) | 15% | +10% |
+
+O pity existe para o jogador não ficar refém da moeda: uma seca longa de Loja não
+pode ser o que encerra a run. Os contadores de seca pertencem à RUN e são salvos.
+
+**`[implementado]`** **A saída cobra 30% da renda esperada do andar.** Quem pode,
+paga e sobe. Quem **não** pode sobe do mesmo jeito: não existe dívida, bloqueio
+nem softlock. O preço é a **Essência** do andar seguinte — cada saída não paga
+consecutiva desconta 0,2x do multiplicador, com **piso absoluto de 0,5x**. Pagar
+uma saída inteira zera a punição na hora.
+
+É isso que dá preço a atravessar o andar sem lutar, sem nenhuma regra proibindo
+evitar combate: contornar todo mundo continua possível, e continua cobrando a
+conta de quem não repôs o capital.
 
 ---
 

@@ -11,17 +11,19 @@ from typing import TYPE_CHECKING
 
 from src.content.economy import interest_cap, pay_interest
 from src.content.factories.dungeons import roll_random_event
+from src.content.factories.features import roll_features
 from src.content.factories.loot import get_loot
 from src.content.factories.monsters import (
     create_boss_for_level,
     generate_monsters_for_level,
 )
+from src.content.floor_exit import current_penalty, effective_essence, use_exit
 from src.content.forge import award_gem
 from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.content.skills_loader import generate_skill_choices
 from src.engine.events import EventBus
-from src.engine.map import EventTile, MapOfGame
+from src.engine.map import EventTile, FeatureTile, MapOfGame
 from src.entities.monsters import Monster
 from src.mechanics import battle
 from src.mechanics.math_operations import (
@@ -74,7 +76,7 @@ if TYPE_CHECKING:
 # dinheiro que o jogador já ia gastar, e "guardar capital" deixaria de competir
 # com "gastar agora". Um pagamento por andar concluído, travado no herói
 # (`last_interest_floor`) para sobreviver a save/load.
-FIM_DE_ANDAR = ("descanso", "loja", "ferreiro", "juros", "extracao")
+FIM_DE_ANDAR = ("saida", "descanso", "juros")
 
 
 def _economia_da_run(player) -> dict:
@@ -480,6 +482,12 @@ def _setup_dungeon_map(
         # chegar na saída.
         game_map.place_event(roll_random_event())
 
+        # Serviços: Loja, Ferreiro e Extração deixaram de ser garantidos. Cada um
+        # tem chance própria e pity, e o pity mora no jogador porque é memória da
+        # RUN, não do mapa.
+        for feature in roll_features(player, dungeon_level):
+            game_map.place_feature(feature)
+
     return game_map
 
 
@@ -502,6 +510,59 @@ def _render_dungeon_screen(
     map_lines = game_map.draw_map()
     screens.render_map(map_lines)
     screens.render_dungeon_controls()
+
+
+def _handle_feature(
+    player: "Player",
+    game_map: MapOfGame,
+    dungeon_level: int,
+    tile: FeatureTile,
+    slot: int,
+) -> str | None:
+    """Abre o serviço em que o jogador pisou.
+
+    Loja e Ferreiro são de uso único: a casa é consumida ao abrir, e sair e
+    voltar não rerrola estoque nem devolve o contador de reroll. A Extração é
+    diferente de propósito — recusá-la a deixa no mapa, porque "volto aqui se
+    piorar" é o valor dela.
+    """
+    if tile.feature == "shop":
+        game_map.take_feature(tile.position)
+        _get_game_publish()(
+            topics.UI_OPEN_SHOP,
+            {"player": player, "shop": Shop(), "dungeon_level": dungeon_level},
+        )
+        return None
+
+    if tile.feature == "forge":
+        game_map.take_feature(tile.position)
+        _get_game_publish()(
+            topics.UI_OPEN_FORGE, {"player": player, "dungeon_level": dungeon_level}
+        )
+        return None
+
+    if tile.feature == "extraction":
+        decision: dict[str, str | None] = {"choice": None}
+        _get_game_publish()(
+            topics.UI_EXTRACTION_PROMPT,
+            {
+                "player": player,
+                "dungeon_level": dungeon_level,
+                "essence_multiplier": estimate_next_essence_multiplier(dungeon_level),
+                "is_estimate": True,
+                "result": decision,
+                "slot": slot,
+            },
+        )
+        if decision.get("choice") == "extract":
+            # A Extração ignora dívida e crédito esgotado. É a saída de
+            # emergência real da run: quem está em 3/3 e sem ouro ainda pode
+            # preservar o personagem, e é isso que impede a trava de virar morte
+            # certa.
+            save_game(player, dungeon_level + 1, None, slot=slot)
+            screens.render_extraction_success(dungeon_level)
+            return "extracted"
+    return None
 
 
 def _handle_player_movement(
@@ -546,6 +607,10 @@ def _handle_player_movement(
                 delete_save(slot)
                 return "player_died"
         return None
+
+    # Serviço do andar. Loja e Ferreiro gastam a casa; Extração recusada não.
+    if isinstance(collided_object, FeatureTile):
+        return _handle_feature(player, game_map, dungeon_level, collided_object, slot)
 
     # A casa devolve UM monstro. A lista some daqui junto com o encontro composto.
     if isinstance(collided_object, Monster):
@@ -620,15 +685,25 @@ def start_game(
 ) -> None:
     """Loop principal do jogo: exploração de masmorras e combate."""
     dungeon_level = start_level
-    shop = Shop()
     essence_multiplier = 1.0  # Valor padrão ao carregar save
+    essence_rolled = 1.0
 
     while True:
         game_map = _setup_dungeon_map(dungeon_level, initial_map_state, start_level, player)
 
-        # Gerar novo multiplicador apenas ao criar novo andar (não ao carregar)
+        # Gerar novo multiplicador apenas ao criar novo andar (não ao carregar).
+        #
+        # O SORTEADO e o EFETIVO são coisas diferentes: o andar rola o dele
+        # normalmente, e a penalidade das saídas não pagas é descontada em
+        # `effective_essence`. Quem consome Essência recebe sempre o efetivo, e
+        # ninguém multiplica `-0,2 × streak` por conta própria.
         if not (initial_map_state and dungeon_level == start_level):
-            essence_multiplier = generate_essence_multiplier(dungeon_level)
+            essence_rolled = generate_essence_multiplier(dungeon_level)
+        essence_multiplier = effective_essence(player, essence_rolled)
+        if current_penalty(player) > 0:
+            screens.render_essence_penalty(
+                essence_rolled, current_penalty(player), essence_multiplier
+            )
 
         while True:
             _render_dungeon_screen(player, dungeon_level, game_map, essence_multiplier)
@@ -639,66 +714,32 @@ def start_game(
                 return
             elif result == "level_complete":
                 # ORDEM DE FIM DE ANDAR (ver `FIM_DE_ANDAR` no topo do módulo):
-                # descanso gratuito → loja → ferreiro → juros → extração/avanço.
+                # saída → descanso gratuito → juros → próximo andar.
                 #
-                # O evento NÃO está mais aqui. Ele era um sorteio que acontecia
-                # sozinho ao pisar na saída — o jogador não escolhia nada, só
-                # recebia. Agora é uma casa do mapa: quem quiser o Altar anda
-                # até ele, e quem preferir a saída passa direto.
+                # Loja, Ferreiro, Evento e Extração NÃO estão mais aqui. Os
+                # quatro eram garantidos e aconteciam sozinhos: o jogador
+                # recebia, não escolhia. Hoje são casas do mapa, e encontrá-los
+                # é o que a exploração decide.
+                #
+                # A saída SEMPRE abre. Quem não paga sobe do mesmo jeito e leva
+                # a conta para a Essência do andar seguinte: não há dívida,
+                # bloqueio nem softlock.
+                tentativa = use_exit(player, dungeon_level)
+                if tentativa.was_paid:
+                    screens.render_exit_paid(tentativa.fee)
+                else:
+                    screens.render_exit_unpaid(
+                        tentativa.fee, player.coins, tentativa.streak, current_penalty(player)
+                    )
+
                 # Descanso parcial, não cura completa: o andar é a unidade de
-                # risco, e chegar ferido ao próximo é o que dá peso à extração.
-                # Vem DEPOIS do evento para que o estado de vida com que o
-                # jogador entra na loja seja o definitivo — é sobre ele que a
-                # decisão de comprar recuperação é tomada.
+                # risco, e chegar ferido ao próximo é o que dá peso à Extração.
                 player.recover(FLOOR_CLEAR_RESTORE_PERCENT)
-                # Loja sempre disponível ao concluir o andar — inclusive para quem vai extrair,
-                # para não perder a recompensa do andar (corrige bug reportado).
-                _get_game_publish()(
-                    topics.UI_OPEN_SHOP,
-                    {"player": player, "shop": shop, "dungeon_level": dungeon_level},
-                )
-                # Ferreiro DEPOIS da loja: o jogador precisa ter visto o que o
-                # mercador oferece antes de decidir investir na peça que já tem.
-                # Serviço regular entre andares, e não evento aleatório — a
-                # decisão "aprimorar ou comprar" só existe se ela reaparecer todo
-                # andar, concorrendo pelo mesmo ouro da poção e dos juros.
-                _get_game_publish()(
-                    topics.UI_OPEN_FORGE,
-                    {"player": player, "dungeon_level": dungeon_level},
-                )
-                # Juros por último, sobre o que sobrou da loja. Pagá-los antes
-                # seria render sobre dinheiro que o jogador já ia gastar: o
-                # rendimento viraria automático e "guardar capital" deixaria de
-                # ser uma decisão concorrente de "gastar agora".
+
                 juros = pay_interest(player, dungeon_level)
                 if juros > 0:
                     screens.render_interest_paid(juros, player.coins, interest_cap(dungeon_level))
-                # --- Decisão de extração ---
-                # Sem meta-progressão nova: "preservar" = salvar o personagem
-                # no slot atual via save_game (xp/level/passivas/coins/inventário
-                # já com o resultado da loja) e encerrar a run. Continuar mantém
-                # o fluxo histórico.
-                next_estimate = estimate_next_essence_multiplier(dungeon_level)
-                decision: dict[str, str | None] = {"choice": None}
-                _get_game_publish()(
-                    topics.UI_EXTRACTION_PROMPT,
-                    {
-                        "player": player,
-                        "dungeon_level": dungeon_level,
-                        "essence_multiplier": next_estimate,
-                        "is_estimate": True,
-                        "result": decision,
-                        "slot": slot,
-                    },
-                )
-                if decision.get("choice") == "extract":
-                    # `dungeon_level + 1`: a extração acontece com o andar atual
-                    # JÁ concluído. Salvar o andar corrente fazia o jogador
-                    # refazê-lo ao voltar e receber as recompensas de novo —
-                    # um moedor infinito de XP e ouro sem risco nenhum.
-                    save_game(player, dungeon_level + 1, None, slot=slot)
-                    screens.render_extraction_success(dungeon_level)
-                    return
+
                 dungeon_level += 1
                 initial_map_state = None
                 break

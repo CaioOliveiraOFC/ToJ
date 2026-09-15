@@ -26,6 +26,9 @@ from src.shared.constants import (
     ENCHANT_FIRST_INCOME_RATIO,
     ENHANCEMENT_COST_GROWTH,
     ENHANCEMENT_COST_ITEM_RATIO,
+    ESSENCE_PENALTY_FLOOR,
+    ESSENCE_UNPAID_EXIT_PENALTY,
+    EXIT_FEE_INCOME_RATIO,
     GEAR_PRICE_INCOME_RATIO,
     INTEREST_CAP_INCOME_RATIO,
     INTEREST_RATE_PERCENT,
@@ -76,6 +79,29 @@ def reroll_price(income: int, rerolls_done: int) -> int:
     """
     tentativas = max(0, int(rerolls_done))
     return max(1, int(income * REROLL_FIRST_INCOME_RATIO * REROLL_COST_GROWTH**tentativas))
+
+
+def exit_price(income: int) -> int:
+    """Quanto custa usar a saída do andar."""
+    return max(1, int(income * EXIT_FEE_INCOME_RATIO))
+
+
+def essence_penalty(unpaid_exits: int) -> float:
+    """Quanto uma sequência de saídas não pagas tira do multiplicador."""
+    return max(0, int(unpaid_exits)) * ESSENCE_UNPAID_EXIT_PENALTY
+
+
+def essence_after_penalty(rolled: float, unpaid_exits: int) -> float:
+    """O multiplicador efetivo do andar: o sorteado, menos a penalidade.
+
+        efetivo = max(PISO, sorteado - 0,2 × saídas_não_pagas)
+
+    O piso é ABSOLUTO e vale inclusive quando o próprio sorteio já veio baixo:
+    um roll de 0,5x com três saídas em aberto continua 0,5x. É o que impede a
+    punição de virar espiral — quem está no piso ainda ganha o bastante para
+    voltar a lutar, pagar uma saída e zerar tudo.
+    """
+    return max(ESSENCE_PENALTY_FLOOR, float(rolled) - essence_penalty(unpaid_exits))
 
 
 def enhancement_price(item_price: int, current_level: int) -> int:

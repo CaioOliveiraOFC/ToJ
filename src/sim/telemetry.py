@@ -240,6 +240,10 @@ class RunTelemetry:
 
     # --- Essência ---
     essence_rolls: list[float] = field(default_factory=list)
+    # O SORTEADO e o EFETIVO, lado a lado: a distância entre os dois é o preço
+    # que as saídas não pagas cobraram da run.
+    essence_effective: list[float] = field(default_factory=list)
+    essence_floor_hits: int = 0
     xp_base: int = 0
     xp_after_essence: int = 0
 
@@ -247,6 +251,16 @@ class RunTelemetry:
     # O MAPA gerou vs o BOT visitou. Duas contagens porque são duas decisões, e
     # confundi-las é o defeito que esta rodada corrige: o evento acontecia
     # sozinho e "visitar" não existia.
+    # Saída e dívida: o novo custo de terminar o andar.
+    exit_fee_paid: int = 0
+    exits_paid: int = 0
+    exits_unpaid: int = 0
+    exit_streak_counts: dict[int, int] = field(default_factory=lambda: defaultdict(int))
+    # Serviços do mapa: o que o andar OFERECEU vs o que o bot usou.
+    features_spawned: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+    features_visited: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+    extraction_offers: int = 0
+    floors_since_extraction: list[int] = field(default_factory=list)
     events_spawned: int = 0
     events_visited: int = 0
     events_skipped: int = 0
@@ -482,8 +496,37 @@ class RunTelemetry:
             "essence": {
                 "rolls": len(self.essence_rolls),
                 "sum": sum(self.essence_rolls),
+                "effective_sum": sum(self.essence_effective),
+                "floor_hits": self.essence_floor_hits,
                 "xp_base": self.xp_base,
                 "xp_after": self.xp_after_essence,
+            },
+            "exit": {
+                "fee_paid": self.exit_fee_paid,
+                "paid": self.exits_paid,
+                "unpaid": self.exits_unpaid,
+                "streaks": dict(self.exit_streak_counts),
+            },
+            "features": {
+                "spawned": dict(self.features_spawned),
+                "visited": dict(self.features_visited),
+                "max_extraction_drought": (
+                    max(self.floors_since_extraction) if self.floors_since_extraction else 0
+                ),
+                "mean_extraction_gap": (
+                    sum(self.floors_since_extraction) / len(self.floors_since_extraction)
+                    if self.floors_since_extraction
+                    else 0.0
+                ),
+                "extraction_offers": self.extraction_offers,
+                "extraction_gap_mean": (
+                    round(sum(self.floors_since_extraction) / len(self.floors_since_extraction), 2)
+                    if self.floors_since_extraction
+                    else 0.0
+                ),
+                "extraction_gap_max": (
+                    max(self.floors_since_extraction) if self.floors_since_extraction else 0
+                ),
             },
             "events": {
                 "spawned": self.events_spawned,

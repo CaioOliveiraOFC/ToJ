@@ -195,6 +195,13 @@ def save_game(
         # daquele andar de novo, e salvar/carregar em laço imprimiria moeda.
         "ledger": dict(getattr(player, "ledger", {})),
         "last_interest_floor": int(getattr(player, "last_interest_floor", 0)),
+        # Dívida da saída e pity dos serviços: estado da RUN. Sem eles no save,
+        # carregar zeraria o crédito já gasto e a seca já acumulada — dois
+        # sistemas que existem justamente para ter memória entre andares.
+        "unpaid_exit_streak": int(getattr(player, "unpaid_exit_streak", 0)),
+        "shop_miss_streak": int(getattr(player, "shop_miss_streak", 0)),
+        "forge_miss_streak": int(getattr(player, "forge_miss_streak", 0)),
+        "extraction_miss_streak": int(getattr(player, "extraction_miss_streak", 0)),
         "gems": [gem_to_dict(g) for g in getattr(player, "gems", ())],
         "inventory": inventory_names,
         "equipment": equipment_names,
@@ -271,6 +278,13 @@ def load_game(
         # os campos, e um KeyError aqui torna o save velho ilegível.
         player.ledger.update(save_data.get("ledger") or {})
         player.last_interest_floor = int(save_data.get("last_interest_floor", 0))
+        for campo in (
+            "unpaid_exit_streak",
+            "shop_miss_streak",
+            "forge_miss_streak",
+            "extraction_miss_streak",
+        ):
+            setattr(player, campo, int(save_data.get(campo, 0) or 0))
 
         # Reconstrói o inventário (pula itens que não existem mais no registro)
         player.gems = [g for g in (gem_from_dict(d) for d in save_data.get("gems", [])) if g]

@@ -34,7 +34,9 @@ def _mapa(altura=14, largura=28) -> MapOfGame:
 class TestEventoSaiuDoFimDeAndar:
     def test_a_ordem_de_fim_de_andar_nao_tem_mais_evento(self):
         assert "evento" not in loop.FIM_DE_ANDAR
-        assert loop.FIM_DE_ANDAR == ("descanso", "loja", "ferreiro", "juros", "extracao")
+        # Loja, Ferreiro e Extração saíram junto: os quatro viraram casas do
+        # mapa, e o fim do andar ficou com a saída, o descanso e os juros.
+        assert loop.FIM_DE_ANDAR == ("saida", "descanso", "juros")
 
     def test_chegar_na_saida_nao_dispara_evento(self):
         """Medido no código: o ramo de `level_complete` não sorteia mais nada."""

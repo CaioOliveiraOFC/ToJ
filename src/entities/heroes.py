@@ -135,6 +135,19 @@ class Player(Entity):
             "items_sold": 0,
             "items_equipped": 0,
         }
+        # Dívida da saída. O jogador que não consegue pagar a taxa do andar sobe
+        # devendo, e toda renda futura quita isso antes de chegar ao bolso.
+        #
+        # Quantas saídas CONSECUTIVAS o jogador não conseguiu pagar. Não é
+        # dívida: nada é cobrado depois. É o que reduz a Essência do próximo
+        # andar, e zera assim que ele pagar uma saída inteira.
+        self.unpaid_exit_streak: int = 0
+        # Quantos andares seguidos cada serviço deixou de aparecer. Estado da
+        # RUN, e não do mapa: o mapa do andar 7 não sabe que a Loja falhou no 4,
+        # no 5 e no 6 — quem carrega essa memória é o jogador.
+        self.shop_miss_streak: int = 0
+        self.forge_miss_streak: int = 0
+        self.extraction_miss_streak: int = 0
         # Último andar cujos juros já foram pagos. Mora no herói, e não no laço
         # de jogo, porque é salvo com ele: sem isso, carregar um save no meio do
         # andar pagaria os juros daquele andar de novo.
@@ -587,11 +600,12 @@ class Player(Entity):
         """
         if amount <= 0:
             return
-        self.coins += amount
         self.ledger["gold_earned"] += amount
         self.ledger[f"gold_from_{source}"] = self.ledger.get(f"gold_from_{source}", 0) + amount
         if source == "interest":
             self.ledger["interest_payments"] += 1
+
+        self.coins += amount
         self.ledger["max_gold_held"] = max(self.ledger["max_gold_held"], self.coins)
 
     def restore_mp(self, amount: int) -> int:

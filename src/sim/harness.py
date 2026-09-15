@@ -15,20 +15,27 @@ import statistics
 from dataclasses import asdict, dataclass, field
 
 from src.content.economy import pay_interest
+from src.content.factories import features
 from src.content.factories.dungeons import (
     altar_hp_cost,
     apply_altar_blessing,
     apply_fountain_heal,
     roll_random_event,
 )
+from src.content.factories.features import roll_features
 from src.content.factories.monsters import (
     calculate_scaled_monster_level,
     floor_role_plan,
 )
+from src.content.floor_exit import effective_essence, use_exit
 from src.content.shop import Shop
 from src.entities.heroes import Mage, Rogue, Warrior
 from src.mechanics.battle import run_battle
-from src.shared.constants import BOSS_FLOOR_INTERVAL, FLOOR_CLEAR_RESTORE_PERCENT
+from src.shared.constants import (
+    BOSS_FLOOR_INTERVAL,
+    ESSENCE_PENALTY_FLOOR,
+    FLOOR_CLEAR_RESTORE_PERCENT,
+)
 from src.sim import progression
 from src.sim.encounters import build_encounter, solo_for_role
 from src.sim.loadouts import apply_loadout
@@ -276,13 +283,21 @@ def simulate_run(
             telemetry.start_run()
         reached = 0
         cedo: list[float] = []
+        ultima_extracao = 0
 
         for floor in range(1, max_floor + 1):
-            essence = progression.floor_essence_multiplier(floor) if cfg.essence else 1.0
+            # SORTEADO vs EFETIVO. O andar rola o multiplicador normalmente; a
+            # penalidade das saídas não pagas é descontada pela MESMA função que
+            # o jogo usa, e o que chega em `_award` é o efetivo.
+            rolled = progression.floor_essence_multiplier(floor) if cfg.essence else 1.0
+            essence = effective_essence(hero, rolled) if cfg.essence else rolled
             if floor <= EARLY_FLOORS:
                 cedo.append(essence)
             if telemetry is not None:
-                telemetry.essence_rolls.append(essence)
+                telemetry.essence_rolls.append(rolled)
+                telemetry.essence_effective.append(essence)
+                if essence <= ESSENCE_PENALTY_FLOOR:
+                    telemetry.essence_floor_hits += 1
             fights = (
                 encounters_per_floor(floor) if encounters_per_floor else _default_floor_plan(floor)
             )
@@ -337,16 +352,51 @@ def simulate_run(
             # DEPOIS da loja, então o bot comprava olhando uma vida que não era
             # a que ele levaria para o andar seguinte — e com recuperação paga
             # na loja essa inversão passaria a mudar quanto ele gasta.
+            # Serviços do andar: as MESMAS chances e o mesmo pity do jogo. O
+            # mapa (aqui, o sorteio) diz o que existe; a política do bot diz se
+            # ele usa. Antes os três eram garantidos e ninguém escolhia nada.
+            servicos = roll_features(hero, floor, rng) if cfg.shop else []
             if cfg.events:
                 _apply_random_event(hero, shop, floor, rng, cfg, telemetry)
             if not hero.get_isalive() or hero.get_hp() <= 0:
                 break
+            if telemetry is not None:
+                for nome in servicos:
+                    telemetry.features_spawned[nome] += 1
+
+            if features.SHOP in servicos:
+                progression.visit_shop(hero, shop, floor, rng, cfg, telemetry)
+                if telemetry is not None:
+                    telemetry.features_visited[features.SHOP] += 1
+            # Ferreiro DEPOIS da loja, como no jogo: comprar a peça melhor vem
+            # antes de investir na que já se tem.
+            if features.FORGE in servicos:
+                progression.visit_forge(hero, floor, cfg, telemetry)
+                if telemetry is not None:
+                    telemetry.features_visited[features.FORGE] += 1
+
+            if features.EXTRACTION in servicos and telemetry is not None:
+                telemetry.extraction_offers += 1
+                telemetry.floors_since_extraction.append(floor - ultima_extracao)
+                ultima_extracao = floor
+
+            # A SAÍDA cobra. Quem contornou tudo chega aqui sem ter reposto o
+            # que vai gastar — e é assim que evitar combate custa, sem nenhuma
+            # regra proibindo evitar combate.
+            #
+            # E ela SEMPRE abre: quem não paga sobe do mesmo jeito e leva a conta
+            # para a Essência do andar seguinte. Não há dívida, bloqueio nem
+            # softlock — a run continua, ficando menos eficiente.
+            saida = use_exit(hero, floor)
+            if telemetry is not None:
+                telemetry.exit_fee_paid += saida.paid
+                telemetry.exit_streak_counts[saida.streak] += 1
+                if saida.was_paid:
+                    telemetry.exits_paid += 1
+                else:
+                    telemetry.exits_unpaid += 1
+
             hero.recover(FLOOR_CLEAR_RESTORE_PERCENT)
-            progression.visit_shop(hero, shop, floor, rng, cfg, telemetry)
-            # Ferreiro DEPOIS da loja e ANTES dos juros, como no jogo: comprar a
-            # peça melhor vem antes de investir na que já se tem, e o que sobrar
-            # ainda rende.
-            progression.visit_forge(hero, floor, cfg, telemetry)
             juros = pay_interest(hero, floor)
             if telemetry is not None:
                 if juros > 0:
