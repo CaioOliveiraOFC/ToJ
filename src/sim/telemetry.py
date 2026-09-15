@@ -244,6 +244,12 @@ class RunTelemetry:
     xp_after_essence: int = 0
 
     # --- Eventos aleatórios ---
+    # O MAPA gerou vs o BOT visitou. Duas contagens porque são duas decisões, e
+    # confundi-las é o defeito que esta rodada corrige: o evento acontecia
+    # sozinho e "visitar" não existia.
+    events_spawned: int = 0
+    events_visited: int = 0
+    events_skipped: int = 0
     event_counts: dict[str, int] = field(default_factory=lambda: defaultdict(int))
     fountain_healed: int = 0
     altar_hp_paid: int = 0
@@ -480,6 +486,9 @@ class RunTelemetry:
                 "xp_after": self.xp_after_essence,
             },
             "events": {
+                "spawned": self.events_spawned,
+                "visited": self.events_visited,
+                "skipped": self.events_skipped,
                 "counts": dict(self.event_counts),
                 "declined": dict(self.event_declined),
                 "fountain_healed": self.fountain_healed,

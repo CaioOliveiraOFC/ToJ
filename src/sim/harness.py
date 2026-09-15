@@ -417,20 +417,51 @@ def _power_without_equipment(hero) -> float:
         hero.equipment.update(equipado)
 
 
+def _bot_visita_evento(hero, event: str) -> bool:
+    """O bot decide se vale ANDAR até a casa do evento.
+
+    Duas coisas diferentes, e é por isso que estão separadas: o MAPA gera o
+    evento (25%, como sempre), e o BOT decide visitá-lo. Antes eram a mesma
+    coisa — o evento acontecia sozinho no fim do andar, e "o jogador escolhe" não
+    existia nem como conceito.
+
+    A decisão é simples de propósito. O custo real de visitar é geométrico
+    (passos e lutas de desvio) e o simulador ainda não tem mapa; inventar uma
+    política elaborada agora seria calibrar em cima de uma distância que ninguém
+    mediu. Isto é o suficiente para o ciclo rodar e aparecer na telemetria.
+    """
+    if event == "fountain":
+        return hero.get_hp() < int(getattr(hero, "base_hp", 1))
+    if event == "merchant":
+        return int(getattr(hero, "coins", 0)) > 0
+    if event == "altar":
+        return hero.get_hp() > altar_hp_cost(hero) * 2
+    return False
+
+
 def _apply_random_event(
     hero, shop, floor: int, rng: random.Random, toggles=None, telemetry=None
 ) -> None:
-    """Evento aleatório de andar, com a mesma chance do jogo.
+    """Evento do andar: o mapa sorteia, o bot decide se vai até lá.
 
     O Altar cobra vida por um buff e pode matar; a Fonte cura; o Mercador é uma
-    loja extra. O bot aceita a Fonte sempre e o Altar só com vida sobrando, que é
-    a decisão que um jogador competente toma.
+    loja extra.
     """
     event = roll_random_event(rng)
     if event is None:
         return
     if telemetry is not None:
+        telemetry.events_spawned += 1
         telemetry.event_counts[event] += 1
+
+    if not _bot_visita_evento(hero, event):
+        if telemetry is not None:
+            telemetry.events_skipped += 1
+            telemetry.event_declined[event] += 1
+        return
+
+    if telemetry is not None:
+        telemetry.events_visited += 1
 
     if event == "fountain":
         curado = apply_fountain_heal(hero)
@@ -438,17 +469,14 @@ def _apply_random_event(
             telemetry.fountain_healed += int(curado)
     elif event == "altar":
         custo = altar_hp_cost(hero)
-        if hero.get_hp() > custo * 2:
-            hero.take_damage(custo)
-            apply_altar_blessing(hero)
+        hero.take_damage(custo)
+        apply_altar_blessing(hero)
+        if telemetry is not None:
+            telemetry.altar_hp_paid += int(custo)
+        if hero.get_hp() <= 0:
+            hero.set_isalive(False)
             if telemetry is not None:
-                telemetry.altar_hp_paid += int(custo)
-            if hero.get_hp() <= 0:
-                hero.set_isalive(False)
-                if telemetry is not None:
-                    telemetry.altar_deaths += 1
-        elif telemetry is not None:
-            telemetry.event_declined["altar"] += 1
+                telemetry.altar_deaths += 1
     elif event == "merchant":
         # Uma segunda passagem pela loja. Antes, o Mercador aparecia em um terço
         # dos eventos e a simulação não fazia nada com ele.

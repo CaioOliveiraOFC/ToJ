@@ -21,7 +21,7 @@ from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
 from src.content.skills_loader import generate_skill_choices
 from src.engine.events import EventBus
-from src.engine.map import MapOfGame
+from src.engine.map import EventTile, MapOfGame
 from src.entities.monsters import Monster
 from src.mechanics import battle
 from src.mechanics.math_operations import (
@@ -74,7 +74,7 @@ if TYPE_CHECKING:
 # dinheiro que o jogador já ia gastar, e "guardar capital" deixaria de competir
 # com "gastar agora". Um pagamento por andar concluído, travado no herói
 # (`last_interest_floor`) para sobreviver a save/load.
-FIM_DE_ANDAR = ("evento", "descanso", "loja", "ferreiro", "juros", "extracao")
+FIM_DE_ANDAR = ("descanso", "loja", "ferreiro", "juros", "extracao")
 
 
 def _economia_da_run(player) -> dict:
@@ -475,6 +475,11 @@ def _setup_dungeon_map(
         if dungeon_level % BOSS_FLOOR_INTERVAL == 0:
             game_map.place_enemy(create_boss_for_level(dungeon_level))
 
+        # Evento: a mesma chance de 25% de sempre, agora decidindo se o ANDAR
+        # tem uma casa de evento — e não se o jogador recebe um de brinde ao
+        # chegar na saída.
+        game_map.place_event(roll_random_event())
+
     return game_map
 
 
@@ -514,6 +519,33 @@ def _handle_player_movement(
     None se nada aconteceu.
     """
     collided_object = game_map.move_player(move)
+
+    # Casa de evento: o jogador andou até ela porque quis. A casa já foi
+    # consumida pelo mapa — recusar o Altar ou sair do Mercador sem comprar
+    # gasta a visita do mesmo jeito.
+    if isinstance(collided_object, EventTile):
+        if collided_object.event_type:
+            _get_game_publish()(
+                topics.UI_RANDOM_EVENT,
+                {
+                    "player": player,
+                    "dungeon_level": dungeon_level,
+                    "event_type": collided_object.event_type,
+                },
+            )
+            if not player.get_isalive():
+                _get_game_publish()(topics.UI_GAME_OVER, {"player_name": player.get_nick_name()})
+                add_trophy(
+                    player.get_nick_name(),
+                    player.get_classname(),
+                    player.get_level(),
+                    dungeon_level,
+                    "Altar sombrio",
+                    economy=_economia_da_run(player),
+                )
+                delete_save(slot)
+                return "player_died"
+        return None
 
     # A casa devolve UM monstro. A lista some daqui junto com o encontro composto.
     if isinstance(collided_object, Monster):
@@ -607,32 +639,12 @@ def start_game(
                 return
             elif result == "level_complete":
                 # ORDEM DE FIM DE ANDAR (ver `FIM_DE_ANDAR` no topo do módulo):
-                # evento → descanso gratuito → loja → juros → extração/avanço.
-                # --- Evento aleatório — 25% antes da extração ---
-                event_type = roll_random_event()
-                if event_type:
-                    _get_game_publish()(
-                        topics.UI_RANDOM_EVENT,
-                        {
-                            "player": player,
-                            "dungeon_level": dungeon_level,
-                            "event_type": event_type,
-                        },
-                    )
-                    if not player.get_isalive():
-                        _get_game_publish()(
-                            topics.UI_GAME_OVER, {"player_name": player.get_nick_name()}
-                        )
-                        add_trophy(
-                            player.get_nick_name(),
-                            player.get_classname(),
-                            player.get_level(),
-                            dungeon_level,
-                            "Altar sombrio",
-                            economy=_economia_da_run(player),
-                        )
-                        delete_save(slot)
-                        return
+                # descanso gratuito → loja → ferreiro → juros → extração/avanço.
+                #
+                # O evento NÃO está mais aqui. Ele era um sorteio que acontecia
+                # sozinho ao pisar na saída — o jogador não escolhia nada, só
+                # recebia. Agora é uma casa do mapa: quem quiser o Altar anda
+                # até ele, e quem preferir a saída passa direto.
                 # Descanso parcial, não cura completa: o andar é a unidade de
                 # risco, e chegar ferido ao próximo é o que dá peso à extração.
                 # Vem DEPOIS do evento para que o estado de vida com que o

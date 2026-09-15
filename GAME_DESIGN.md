@@ -71,9 +71,18 @@ de vitória: `dungeon_level += 1` para sempre. A única forma de uma run termina
 a saída ocupa outra — **combate é opcional**, dá para contornar um inimigo e ir para
 a saída.
 
-**`[implementado]`** Evento aleatório a 25% ao entrar no andar: Mercador Errante
-(1-3 itens com 10% de desconto), Altar (sacrifica 30% do HP máximo por um buff) ou
-Fonte (cura 50% do HP máximo).
+**`[implementado]`** Evento aleatório a 25% por andar: Mercador Errante (1-3 itens
+com 10% de desconto), Altar (sacrifica 30% do HP máximo por um buff) ou Fonte
+(cura 50% do HP máximo). **O evento é uma CASA do mapa, marcada com `?`**, e é
+OPCIONAL: ele só acontece se o jogador andar até lá. Chegar à saída não dispara
+nada.
+
+Uso único — recusar o Altar, ignorar a Fonte ou sair do Mercador sem comprar
+gastam a visita do mesmo jeito. A casa é estado do MAPA, então salvar no meio do
+andar preserva o evento não visitado, e o já consumido não volta.
+
+**`[corrigido]`** O evento acontecia sozinho ao pisar na saída, no fim do andar:
+o jogador não escolhia, recebia. Era decisão nenhuma.
 
 **`[implementado]`** Boss a cada 5 andares. Elite a partir do andar 4, com 12% de
 chance.

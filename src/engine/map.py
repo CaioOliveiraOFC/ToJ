@@ -4,13 +4,24 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NamedTuple
 
 from src.content.factories.monsters import create_monster
 from src.shared.constants import DEFAULT_WALL_PERCENTAGE, MAP_BORDER_OFFSET
 
 if TYPE_CHECKING:
     pass
+
+
+class EventTile(NamedTuple):
+    """O jogador pisou numa casa de evento. Carrega o tipo sorteado.
+
+    Um tipo próprio, e não uma string: `move_player` já devolve `"level_complete"`
+    e um `Monster`, e um terceiro retorno em string acabaria comparado por
+    engano com o primeiro.
+    """
+
+    event_type: str | None
 
 
 def _um_monstro(enemy_obj: object):
@@ -48,6 +59,12 @@ class MapOfGame:
         self.player_pos = {"y": 0, "x": 0}
         self.exit_pos = {"y": 0, "x": 0}
         self.enemies_pos = {}
+        # O evento é uma CASA do mapa, e não um sorteio de fim de andar. Guardar
+        # aqui, e não no jogador, é o que faz "já visitei este altar" ser estado
+        # do andar: salvar no meio do andar preserva a casa, e voltar a ele
+        # depois de gastar o evento não o traz de volta.
+        self.event_pos: tuple[int, int] | None = None
+        self.event_type: str | None = None
 
     def _get_random_empty_spot(self, avoid_enemies: bool = False) -> tuple[int, int]:
         """Uma posição de chão livre, sorteada.
@@ -137,6 +154,37 @@ class MapOfGame:
         y, x = self._get_random_empty_spot(avoid_enemies=True)
         self.enemies_pos[(y, x)] = _um_monstro(enemy_obj)
 
+    def place_event(self, event_type: str) -> tuple[int, int] | None:
+        """Põe o evento numa casa livre. Devolve a posição, ou `None`.
+
+        Um por andar, e ele não divide casa com ninguém: nem jogador, nem saída,
+        nem monstro, nem outro evento. Sem casa livre, o andar simplesmente não
+        tem evento — melhor que sobrescrever um inimigo em silêncio.
+        """
+        if not event_type:
+            return None
+        jogador = (self.player_pos["y"], self.player_pos["x"])
+        saida = (self.exit_pos["y"], self.exit_pos["x"])
+        for _ in range(self.height * self.width * 4):
+            y, x = self._get_random_empty_spot(avoid_enemies=True)
+            if (y, x) in (jogador, saida):
+                continue
+            self.event_pos = (y, x)
+            self.event_type = str(event_type)
+            return self.event_pos
+        return None
+
+    def take_event(self) -> str | None:
+        """Consome o evento da casa e devolve o tipo. Uso único.
+
+        Chamado quando o jogador PISA nela, e não quando ele termina a conversa:
+        recusar o Altar, ignorar a Fonte ou sair do Mercador sem comprar também
+        gastam a casa. A escolha foi feita, e entrar e sair da mesma casa não
+        pode virar farm.
+        """
+        tipo, self.event_type, self.event_pos = self.event_type, None, None
+        return tipo
+
     def draw_map(self) -> list[str]:
         """Gera representação pura do mapa como lista de strings para renderização pela UI.
 
@@ -154,6 +202,8 @@ class MapOfGame:
                 elif (y, x) in self.enemies_pos:
                     mob = self.enemies_pos[(y, x)]
                     char = "B" if getattr(mob, "is_boss", False) else "&"
+                elif self.event_pos == (y, x):
+                    char = "?"
                 elif tile == "X":
                     char = "X"
                 elif tile == "D":
@@ -193,6 +243,11 @@ class MapOfGame:
         if ny == self.exit_pos["y"] and nx == self.exit_pos["x"]:
             return "level_complete"
 
+        # Casa de evento: opcional, e só acontece se o jogador andar até ela.
+        if self.event_pos == (ny, nx):
+            self.player_pos = {"y": ny, "x": nx}
+            return EventTile(self.take_event())
+
         # Verifica colisão com inimigo
         if (ny, nx) in self.enemies_pos:
             enemy_collided = self.enemies_pos.pop((ny, nx))
@@ -226,6 +281,11 @@ class MapOfGame:
             "player_pos": self.player_pos,
             "exit_pos": self.exit_pos,
             "enemies_pos": enemies_serializable,
+            "event": (
+                {"y": self.event_pos[0], "x": self.event_pos[1], "type": self.event_type}
+                if self.event_pos is not None
+                else None
+            ),
         }
 
     def load_map_state(self, map_state: dict) -> None:
@@ -235,6 +295,16 @@ class MapOfGame:
         self.grid = map_state["grid"]
         self.player_pos = map_state["player_pos"]
         self.exit_pos = map_state["exit_pos"]
+
+        # Evento não visitado volta onde estava; consumido não volta, porque o
+        # save nem chegou a gravá-lo. Save antigo, sem a chave, é andar sem
+        # evento — que é exatamente o que ele era.
+        evento = map_state.get("event")
+        if isinstance(evento, dict) and evento.get("type"):
+            self.event_pos = (int(evento["y"]), int(evento["x"]))
+            self.event_type = str(evento["type"])
+        else:
+            self.event_pos, self.event_type = None, None
 
         self.enemies_pos = {}
         # Saves da fase de grupos guardam um ARRAY por casa. O primeiro monstro
