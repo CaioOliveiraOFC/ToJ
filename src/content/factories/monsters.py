@@ -73,20 +73,21 @@ def generation_rules() -> dict[str, Any]:
     return dict(_get_monsters_data()["generation"])
 
 
-def _pick_role(dungeon_level: int) -> str:
+def _pick_role(dungeon_level: int, rng=None) -> str:
     """Sorteia um papel para o andar, respeitando a profundidade mínima.
 
     Papéis de controle e suporte exigem que o jogador reordene alvos, então só
     entram a partir do andar configurado em `generation.advanced_role_min_floor`.
     Antes disso o andar é de aprendizado.
     """
+    r = rng if rng is not None else random
     generation = _get_monsters_data()["generation"]
     weights = dict(routine_role_weights())
     if dungeon_level < int(generation["advanced_role_min_floor"]):
         for role in generation["advanced_roles"]:
             weights.pop(role, None)
     roles = list(weights)
-    return random.choices(roles, weights=[weights[r] for r in roles], k=1)[0]
+    return r.choices(roles, weights=[weights[r_] for r_ in roles], k=1)[0]
 
 
 def _name_for(role: str, level: int) -> str:
@@ -108,12 +109,57 @@ def create_monster(nick_name: str, level: int, role: str = DEFAULT_ROLE) -> Mons
     return spawn_by_role(role, lvl, name=nick_name)
 
 
-def generate_monsters_for_level(dungeon_level: int, player_level: int = 1) -> list[Monster]:
-    """Gera a população de um andar.
+def routine_monster_count(dungeon_level: int) -> int:
+    """Quantos monstros COMUNS o andar coloca. Sem elite e sem chefe.
 
     A quantidade vem do JSON. A correção relevante: `scaling_per_3_levels` valia
     1, então a conta era `2 + andar`, e o andar 20 spawnava 22 monstros. O nome
     da chave prometia uma divisão por 3 que não acontecia.
+
+    Existe como função separada porque a conta era feita em três lugares: aqui,
+    no plano de andar do simulador e no modelo de XP. Três cópias da mesma regra
+    é três chances de o simulador medir uma masmorra que o jogo não tem — e foi
+    exatamente o que aconteceu: o plano do simulador levava 14 monstros ao andar
+    20 contra os 10 do jogo.
+    """
+    generation = _get_monsters_data()["generation"]
+    scaling_step = max(1, int(generation.get("scaling_per_3_levels", 3)))
+    return max(
+        int(generation.get("min_monsters", 1)),
+        int(generation.get("base_count", 3)) + dungeon_level // scaling_step,
+    )
+
+
+def floor_role_plan(dungeon_level: int, rng=None) -> list[str]:
+    """Os PAPÉIS que o andar coloca no mapa: os comuns mais o elite eventual.
+
+    A ESTRUTURA do andar — quantos monstros e de quais arquétipos — sem criar
+    monstro nenhum. É o que o jogo e o simulador precisam ter em comum: o
+    simulador quer saber quantas lutas o andar tem, e não quais exemplares.
+
+    O chefe não entra: quem o coloca é quem monta o andar, a cada
+    `BOSS_FLOOR_INTERVAL`, e ele não é população gerada.
+
+    `rng` existe para a comparação entre jogo e simulador ser reprodutível com
+    uma semente conhecida. O padrão é o `random` global, que é o que o jogo
+    sempre usou — passar nada mantém as mesmas probabilidades e a mesma fonte.
+    """
+    r = rng if rng is not None else random
+    generation = _get_monsters_data()["generation"]
+
+    roles = [_pick_role(dungeon_level, r) for _ in range(routine_monster_count(dungeon_level))]
+
+    # Elite: o marco do andar. Testa se a build funciona, sem ser um chefe.
+    if dungeon_level >= int(generation["advanced_role_min_floor"]) and r.random() < float(
+        generation["elite_spawn_chance"]
+    ):
+        roles.append("elite")
+
+    return roles
+
+
+def generate_monsters_for_level(dungeon_level: int, player_level: int = 1) -> list[Monster]:
+    """Gera a população de um andar, a partir do plano de papéis.
 
     Args:
         dungeon_level: Nível atual da masmorra.
@@ -122,27 +168,10 @@ def generate_monsters_for_level(dungeon_level: int, player_level: int = 1) -> li
     Returns:
         Lista de monstros do andar, com papéis variados.
     """
-    generation = _get_monsters_data()["generation"]
-
-    scaling_step = max(1, int(generation.get("scaling_per_3_levels", 3)))
-    count = max(
-        int(generation.get("min_monsters", 1)),
-        int(generation.get("base_count", 3)) + dungeon_level // scaling_step,
-    )
-
     monsters: list[Monster] = []
-    for _ in range(count):
+    for role in floor_role_plan(dungeon_level):
         level = calculate_scaled_monster_level(dungeon_level, player_level)
-        role = _pick_role(dungeon_level)
         monsters.append(create_monster(_name_for(role, level), level, role))
-
-    # Elite: o marco do andar. Testa se a build funciona, sem ser um chefe.
-    if dungeon_level >= int(generation["advanced_role_min_floor"]) and random.random() < float(
-        generation["elite_spawn_chance"]
-    ):
-        level = calculate_scaled_monster_level(dungeon_level, player_level)
-        monsters.append(create_monster(_name_for("elite", level), level, "elite"))
-
     return monsters
 
 

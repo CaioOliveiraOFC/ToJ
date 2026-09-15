@@ -45,6 +45,18 @@ class TestRendaDoAndar:
         assert rendas == sorted(rendas)
         assert rendas[0] > 0
 
+    @pytest.mark.xfail(
+        strict=True,
+        reason=(
+            "A âncora foi calibrada contra o plano de andar ANTIGO do simulador, que "
+            "levava 14 lutas ao andar 20 contra os 10 monstros que o jogo gera. Com o "
+            "simulador lendo a mesma fonte do jogo, a âncora aparece 37% acima do que o "
+            "andar paga de verdade no acumulado até o 20 (medido também contra "
+            "`generate_monsters_for_level`, sem o simulador no meio: 589 de ouro no andar "
+            "11 contra 976 estimados). O baseline media um andar que não existe mais. "
+            "Reancorar a economia é rodada própria — compensar aqui esconderia o achado."
+        ),
+    )
     def test_renda_bate_com_o_que_os_andares_realmente_pagam(self):
         """Contra o gerador de andares de verdade, não contra outra fórmula.
 

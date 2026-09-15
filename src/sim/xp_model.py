@@ -32,7 +32,11 @@ import random
 import statistics
 from functools import lru_cache
 
-from src.content.factories.monsters import calculate_scaled_monster_level, generation_rules
+from src.content.factories.monsters import (
+    calculate_scaled_monster_level,
+    generation_rules,
+    routine_monster_count,
+)
 from src.mechanics.math_operations import (
     calculate_mini_boss_xp_reward,
     calculate_monster_xp_reward,
@@ -104,14 +108,14 @@ def _amostra_por_balde(floor: int, hero_level: int) -> tuple[float, float]:
 def expected_monsters(floor: int) -> float:
     """Monstros que o andar coloca no mapa, contando elite e chefe esperados.
 
-    Espelha `generate_monsters_for_level` + a colocação do chefe em
-    `engine/loop.py`, lendo os mesmos números do JSON.
+    A contagem de comuns vem de `routine_monster_count`, a MESMA que o jogo usa
+    para povoar o andar — aqui era uma terceira cópia da fórmula, ao lado da do
+    jogo e da do plano de andar do simulador. Elite e chefe entram como VALOR
+    ESPERADO, e não como sorteio, porque esta função responde "quanto o andar
+    rende em média" e não "o que este andar tem".
     """
     regras = generation_rules()
-    passo = max(1, int(regras.get("scaling_per_3_levels", 3)))
-    comuns = max(
-        int(regras.get("min_monsters", 1)), int(regras.get("base_count", 3)) + floor // passo
-    )
+    comuns = routine_monster_count(floor)
     elite = (
         float(regras["elite_spawn_chance"])
         if floor >= int(regras["advanced_role_min_floor"])

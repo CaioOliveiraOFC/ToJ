@@ -69,6 +69,33 @@ ENCOUNTERS: dict[str, EncounterFactory] = {
     "boss_solo": _solo("boss"),
 }
 
+# Papel do jogo -> cenário de duelo que o representa. O vocabulário do
+# simulador não é o do jogo: o arquétipo `glass_cannon` vira `glass_solo`, e é
+# esta tabela que traduz — e não uma regra de nome que quebra no primeiro papel
+# cujo cenário não se chama `{papel}_solo`.
+SOLO_BY_ROLE = {
+    "trash": "trash_solo",
+    "bruiser": "bruiser_solo",
+    "tank": "tank_solo",
+    "glass_cannon": "glass_solo",
+    "skirmisher": "skirmisher_solo",
+    "controller": "controller_solo",
+    "support": "support_solo",
+    "elite": "elite_solo",
+    "boss": "boss_solo",
+}
+
+
+def solo_for_role(role: str) -> str:
+    """O duelo que representa este papel. Levanta se o papel não tiver cenário."""
+    try:
+        return SOLO_BY_ROLE[role]
+    except KeyError:
+        raise ValueError(
+            f"Papel sem cenário de duelo: {role!r}. Conhecidos: {', '.join(sorted(SOLO_BY_ROLE))}."
+        ) from None
+
+
 # Conjuntos usados pelos testes e pelo runner.
 SOLO_ENCOUNTERS = [
     name for name in ENCOUNTERS if name.endswith("_solo") and not name.startswith("legacy")

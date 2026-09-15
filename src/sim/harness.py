@@ -21,13 +21,16 @@ from src.content.factories.dungeons import (
     apply_fountain_heal,
     roll_random_event,
 )
-from src.content.factories.monsters import calculate_scaled_monster_level, generation_rules
+from src.content.factories.monsters import (
+    calculate_scaled_monster_level,
+    floor_role_plan,
+)
 from src.content.shop import Shop
 from src.entities.heroes import Mage, Rogue, Warrior
 from src.mechanics.battle import run_battle
 from src.shared.constants import BOSS_FLOOR_INTERVAL, FLOOR_CLEAR_RESTORE_PERCENT
 from src.sim import progression
-from src.sim.encounters import build_encounter
+from src.sim.encounters import build_encounter, solo_for_role
 from src.sim.loadouts import apply_loadout
 from src.sim.metrics import wilson_interval
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, get_pick_policy
@@ -448,71 +451,30 @@ def _apply_random_event(
         progression.visit_shop(hero, shop, floor, rng, toggles, telemetry)
 
 
-def _default_floor_plan(floor: int) -> list[str]:
-    """Composição de um andar, por faixa de profundidade.
+def _default_floor_plan(floor: int, rng=None) -> list[str]:
+    """As lutas de um andar, na MESMA fonte de verdade da Forge Run.
 
-    A faixa importa mais que a contagem: os primeiros andares ensinam com os
-    arquétipos simples, e a profundidade vai trazendo os TIPOS DE DUELO mais
-    exigentes — o tank, que é a luta longa; o controller, que é a luta contra
-    status. Toda luta é 1x1.
+    Quem decide quantos monstros o andar tem e de quais arquétipos é
+    `content.factories.monsters.floor_role_plan` — a função que o jogo real usa
+    para povoar o mapa. Aqui só se traduz papel para cenário de duelo.
 
-    Cada posição do plano é uma TUPLA de duelos, e não um duelo só, porque o
-    andar não perdeu monstros nesta rodada — ele perdeu os encontros compostos.
-    Onde havia `trash_pair` há dois duelos contra trash, onde havia
-    `tank_plus_glass` há um duelo de tank e um de glass cannon. A quantidade de
-    inimigos do andar é a mesma; o que mudou é que eles nunca lutam juntos. Sem
-    isso a renda do andar cairia, e a âncora econômica mediria uma masmorra que
-    o jogo não tem.
+    Havia uma tabela própria aqui, escrita à mão por faixa de profundidade. Ela
+    era uma SEGUNDA regra tentando representar a mesma coisa, e divergiu: no
+    andar 20 levava 14 lutas contra os 10 monstros que o jogo gera, 39% a mais.
+    Toda medição de dificuldade e de renda feita em cima disso mediu uma
+    masmorra que não existe.
 
-    Elite e chefe seguem as regras do jogo, lidas do JSON, e não uma tabela
-    própria. A tabela anterior punha um elite em todo andar múltiplo de 3,
-    começando no 3. O jogo nunca gera elite antes de
-    `generation.advanced_role_min_floor` (andar 4) e, a partir dali, só com
-    `generation.elite_spawn_chance` (12%). O elite do andar 3 era invenção do
-    simulador, e era ele que encerrava a run: 36 das 48 mortes do Guerreiro no
-    andar 3, 66 das 117 do Mago e 44 das 53 do Ladino. A "parede do andar 3" que
-    o scout reportava media o medidor.
+    O chefe entra aqui, e não no plano de papéis, porque no jogo quem o coloca é
+    quem monta o andar (`engine/loop.py`), a cada `BOSS_FLOOR_INTERVAL` — ele
+    não é população gerada.
+
+    O simulador continua enfrentando TODOS os monstros do andar: o mapa e a
+    escolha de contornar inimigos são outra rodada. O que se corrige aqui é só a
+    quantidade.
     """
-    if floor <= 2:
-        return ["trash_solo", "trash_solo", "bruiser_solo"]
-    if floor <= 5:
-        plan = [
-            ("trash_solo",),
-            ("trash_solo", "trash_solo"),
-            ("bruiser_solo",),
-            ("skirmisher_solo",),
-        ]
-    elif floor <= 10:
-        plan = [
-            ("trash_solo", "trash_solo"),
-            ("bruiser_solo",),
-            ("glass_solo",),
-            ("skirmisher_solo",),
-            ("tank_solo",),
-            ("controller_solo",),
-        ]
-    else:
-        plan = [
-            ("trash_solo", "trash_solo", "trash_solo"),
-            ("bruiser_solo",),
-            ("tank_solo", "glass_solo"),
-            ("controller_solo", "bruiser_solo"),
-            ("skirmisher_solo", "skirmisher_solo"),
-            ("support_solo", "bruiser_solo"),
-            ("glass_solo",),
-        ]
-
-    count = min(len(plan), 3 + floor // 4)
-    fights = [nome for i in range(count) for nome in plan[(floor + i) % len(plan)]]
-
-    regras = generation_rules()
-    # Mini-chefe a cada N andares, como `engine/loop.py` faz.
+    fights = [solo_for_role(role) for role in floor_role_plan(floor, rng)]
     if floor % BOSS_FLOOR_INTERVAL == 0:
         fights.append("boss_solo")
-    elif floor >= int(regras["advanced_role_min_floor"]) and random.random() < float(
-        regras["elite_spawn_chance"]
-    ):
-        fights.append("elite_solo")
     return fights
 
 
