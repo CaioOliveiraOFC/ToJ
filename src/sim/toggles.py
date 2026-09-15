@@ -21,8 +21,13 @@ class Toggles:
     passives: bool = True
     skill_choice: bool = True
     loot: bool = True
+    # Loja, Ferreiro e Extração são TRÊS sistemas, e cada um desliga só a si
+    # mesmo. Antes o sorteio inteiro de serviços era gateado por `shop`: pedir
+    # uma run sem loja também tirava o Ferreiro e a Extração do andar, e a
+    # ablação atribuía a `shop` o efeito somado dos três.
     shop: bool = True
     forge: bool = True
+    extraction: bool = True
     events: bool = True
     essence: bool = True
     # Cartas removidas do sorteio. Usado para medir uma skill ou passiva
@@ -38,7 +43,16 @@ class Toggles:
         """Nome curto do que foi desligado, para aparecer no relatório."""
         desligados = [
             nome
-            for nome in ("passives", "skill_choice", "loot", "shop", "events", "essence")
+            for nome in (
+                "passives",
+                "skill_choice",
+                "loot",
+                "shop",
+                "forge",
+                "extraction",
+                "events",
+                "essence",
+            )
             if not getattr(self, nome)
         ]
         if self.banned_skills:

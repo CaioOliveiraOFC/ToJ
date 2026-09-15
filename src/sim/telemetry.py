@@ -251,7 +251,10 @@ class RunTelemetry:
     # O MAPA gerou vs o BOT visitou. Duas contagens porque são duas decisões, e
     # confundi-las é o defeito que esta rodada corrige: o evento acontecia
     # sozinho e "visitar" não existia.
-    # Saída e dívida: o novo custo de terminar o andar.
+    # Saída: o novo custo de terminar o andar. Quem paga sobe e zera o streak;
+    # quem não paga sobe do mesmo jeito, não deve nada, e leva 0,2x a menos de
+    # Essência por saída não paga consecutiva. Não há dívida a registrar — o que
+    # se mede aqui é quanto foi pago e quantas vezes o streak avançou.
     exit_fee_paid: int = 0
     exits_paid: int = 0
     exits_unpaid: int = 0

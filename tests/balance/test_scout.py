@@ -261,11 +261,21 @@ class TestPoliticasDeEscolha:
     """
 
     def test_toda_politica_deliberada_cobre_todo_efeito_de_passiva(self):
+        # "Cobrir" passou a incluir a indiferença DECLARADA. O que este teste
+        # proíbe é a família que nenhuma política ordena E que ninguém declarou
+        # indiferente: essa cai no desempate do fim do `pick_passive` sem que
+        # ninguém tenha escolhido isso, e o ranking dela vira ruído.
+        #
+        # A versão anterior exigia preferência explícita para as 23 famílias.
+        # Atribuir intenção a 10 delas é decisão de balanceamento, e o tier
+        # indiferente é a forma de registrar que a decisão ainda não foi tomada
+        # sem deixar o comportamento acontecer por acidente.
         from src.content.passives import load_passives
+        from src.sim.pick_policies import PASSIVE_SEM_PREFERENCIA
 
         efeitos = {p.effect_type for p in load_passives()}
         for nome, ordem in PASSIVE_PRIORITIES.items():
-            faltando = efeitos - set(ordem)
+            faltando = efeitos - set(ordem) - PASSIVE_SEM_PREFERENCIA
             assert not faltando, (
                 f"a política {nome} não sabe ordenar {faltando}: essas passivas "
                 "cairiam no desempate por valor e o ranking viraria ruído."

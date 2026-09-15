@@ -355,7 +355,24 @@ def simulate_run(
             # Serviços do andar: as MESMAS chances e o mesmo pity do jogo. O
             # mapa (aqui, o sorteio) diz o que existe; a política do bot diz se
             # ele usa. Antes os três eram garantidos e ninguém escolhia nada.
-            servicos = roll_features(hero, floor, rng) if cfg.shop else []
+            #
+            # O sorteio acontece SEMPRE, inclusive com um serviço desligado, e a
+            # ablação filtra o resultado. Pular o sorteio congelaria o pity dos
+            # OUTROS dois: `roll_features` avança os três contadores de seca numa
+            # chamada só, então uma run sem loja passaria a ver o Ferreiro e a
+            # Extração com a distribuição errada — e a ablação mediria a loja
+            # somada a uma mudança de frequência que ninguém pediu.
+            servicos = roll_features(hero, floor, rng)
+            desligados = {
+                nome
+                for nome, ligado in (
+                    (features.SHOP, cfg.shop),
+                    (features.FORGE, cfg.forge),
+                    (features.EXTRACTION, cfg.extraction),
+                )
+                if not ligado
+            }
+            servicos = [s for s in servicos if s not in desligados]
             if cfg.events:
                 _apply_random_event(hero, shop, floor, rng, cfg, telemetry)
             if not hero.get_isalive() or hero.get_hp() <= 0:
@@ -583,7 +600,13 @@ def _award(
         calculate_monster_xp_reward,
     )
 
-    essence_passive = 1 + hero.get_passive_bonus("essence_bonus") / 100
+    # A ablação de Essência precisa desligar a ESSÊNCIA, e não só o sorteio do
+    # andar. O multiplicador do andar já vinha neutralizado em 1.0, mas as
+    # passivas de `essence_bonus` continuavam multiplicando o XP aqui: uma run
+    # "sem essência" entregava 6% de XP a mais que a base, e a ablação media o
+    # sorteio do andar enquanto dizia medir o sistema.
+    liga_essencia = toggles is None or toggles.essence
+    essence_passive = 1 + hero.get_passive_bonus("essence_bonus") / 100 if liga_essencia else 1.0
     gold_passive = 1 + hero.get_passive_bonus("gold_drop_bonus") / 100
 
     xp = coins = 0
