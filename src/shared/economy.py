@@ -22,56 +22,57 @@ from __future__ import annotations
 
 from src.shared.constants import (
     CONSUMABLE_PRICE_INCOME_RATIO,
-    FLOOR_INCOME_BASE_UNITS,
-    FLOOR_INCOME_MAX_UNITS,
-    FLOOR_INCOME_UNITS_PER_FLOOR,
     GEAR_PRICE_INCOME_RATIO,
     INTEREST_CAP_INCOME_RATIO,
     INTEREST_RATE_PERCENT,
     MONSTER_BASE_COIN_REWARD,
     RECOVERY_MP_STEP_INCOME_RATIO,
     RECOVERY_STEP_PERCENT,
+    REROLL_COST_GROWTH,
+    REROLL_FIRST_INCOME_RATIO,
     SELL_PRICE_MAX_FACTOR,
     SELL_PRICE_MIN_FACTOR,
 )
 from src.shared.formulas import geometric
 
 
-def floor_income_units(floor: int) -> float:
-    """Quantos monstros-padrão do andar cabem na renda esperada dele.
-
-    O andar não paga um monstro: paga o plano de andar inteiro, que cresce de
-    três encontros nos primeiros andares até estabilizar. Medido no gerador real
-    de andares, a razão entre a renda do andar e o valor de um monstro do nível
-    dele é 3,1 no andar 1, 9,2 no 10, 13,4 no 15 e **platô em ~14** do 16 em
-    diante — o plano de andar para de crescer ali.
-
-    O platô é o que impede a renda de fugir da curva de tudo o mais: acima dele,
-    o dinheiro do andar volta a crescer no mesmo ×1,12 de atributo, dano e XP.
-
-    A reta é um envelope de poder de compra, não uma tabela de pagamento. Do
-    andar 10 em diante ela erra menos de 10%; entre o 5 e o 9 erra até 67% para
-    cima, porque ali o plano de andar sobe e desce (o chefe do 5, depois dois
-    andares magros) e nenhuma curva suave acompanha isso. O que importa para
-    preço é o acumulado — quanto ouro o jogador tem em mãos ao chegar —, e esse
-    fica dentro de 20% em todo andar. `tests/test_economy.py` cobra as duas
-    coisas separadamente, contra o gerador de andares de verdade.
-    """
-    unidades = FLOOR_INCOME_BASE_UNITS + (max(1, floor) - 1) * FLOOR_INCOME_UNITS_PER_FLOOR
-    return min(FLOOR_INCOME_MAX_UNITS, unidades)
-
-
-def expected_floor_income(floor: int) -> int:
+def floor_income(floor: int, units: float) -> int:
     """Ouro que um andar concluído paga, em média.
 
-    Derivada de `MONSTER_BASE_COIN_REWARD` e da curva geométrica do jogo, não de
-    uma tabela à parte: se a recompensa por monstro mudar, os preços, o cap de
-    juros e o custo de recuperação seguem junto, sem recalibração manual.
+    `units` é quantos monstros-padrão daquele andar a população dele vale. Quem
+    sabe esse número é quem conhece o gerador de andares, e este módulo não
+    conhece — ele faz a aritmética e nada mais.
+
+    Era uma RETA ajustada à mão aqui dentro, com platô em 14 unidades a partir do
+    andar 16. A reta tinha sido calibrada contra um plano de andar do simulador
+    que levava 14 lutas ao andar 20 contra os 10 monstros que o jogo gera. Com a
+    população real, a reta errava 38% para cima no acumulado até o andar 20 e 24%
+    para BAIXO no andar 50, onde o platô mentia e o jogo continuava crescendo.
+
+    Quem calcula as unidades é `content/economy.py`, a partir de
+    `content/factories/monsters.py` — a mesma fonte que povoa o andar de verdade.
     """
-    return int(geometric(MONSTER_BASE_COIN_REWARD, max(1, floor)) * floor_income_units(floor))
+    return int(geometric(MONSTER_BASE_COIN_REWARD, max(1, floor)) * units)
 
 
-def interest_for(gold: int, floor: int) -> int:
+def reroll_price(income: int, rerolls_done: int) -> int:
+    """Quanto custa comprar outra amostra, depois de `rerolls_done` tentativas.
+
+        renda × 0,15 × 2 ** tentativas_feitas
+
+    Uma curva só para os três consumidores — loja, skill e passiva. Três
+    fórmulas seriam três economias, e a primeira a divergir tornaria "rerollar"
+    uma palavra sem preço fixo.
+
+    Cresce dobrando porque a decisão interessante não é a primeira tentativa, é
+    a quarta: 15%, 30%, 60%, 120%, 240% da renda do andar. Quem insiste queima o
+    capital que compraria equipamento — e essa é a troca, não um castigo.
+    """
+    tentativas = max(0, int(rerolls_done))
+    return max(1, int(income * REROLL_FIRST_INCOME_RATIO * REROLL_COST_GROWTH**tentativas))
+
+
+def interest_for(gold: int, income: int) -> int:
     """Juros pagos ao concluir um andar, sobre o ouro carregado.
 
     Existe para criar uma decisão, não para criar dinheiro: o cap é uma fração da
@@ -83,17 +84,16 @@ def interest_for(gold: int, floor: int) -> int:
     if gold <= 0:
         return 0
     bruto = gold * INTEREST_RATE_PERCENT / 100
-    teto = expected_floor_income(floor) * INTEREST_CAP_INCOME_RATIO
-    return int(min(bruto, teto))
+    return int(min(bruto, interest_cap(income)))
 
 
-def interest_cap(floor: int) -> int:
+def interest_cap(income: int) -> int:
     """Teto de juros do andar — o que a tela mostra ao jogador."""
-    return int(expected_floor_income(floor) * INTEREST_CAP_INCOME_RATIO)
+    return int(income * INTEREST_CAP_INCOME_RATIO)
 
 
 def item_price(
-    rarity: str, relative_price: float, rarity_reference: float, floor: int, consumable: bool
+    rarity: str, relative_price: float, rarity_reference: float, income: int, consumable: bool
 ) -> int:
     """Preço de um item no andar, em proporção à renda esperada dele.
 
@@ -109,7 +109,7 @@ def item_price(
     tabela = CONSUMABLE_PRICE_INCOME_RATIO if consumable else GEAR_PRICE_INCOME_RATIO
     proporcao = tabela.get(rarity, tabela["Common"])
     peso = (relative_price / rarity_reference) if rarity_reference > 0 else 1.0
-    return max(1, int(expected_floor_income(floor) * proporcao * peso))
+    return max(1, int(income * proporcao * peso))
 
 
 def sell_factor(item_id: str) -> float:
@@ -135,7 +135,9 @@ def sell_value(price_at_floor: int, item_id: str) -> int:
     return max(1, int(price_at_floor * sell_factor(item_id)))
 
 
-def recovery_price(floor: int, percent: float, ratio: float = RECOVERY_MP_STEP_INCOME_RATIO) -> int:
+def recovery_price(
+    income: int, percent: float, ratio: float = RECOVERY_MP_STEP_INCOME_RATIO
+) -> int:
     """Custo de restaurar `percent` do máximo de um recurso, no andar dado.
 
     Linear no que é de fato restaurado, e cobrado só sobre isso: quem está a 90%
@@ -146,4 +148,4 @@ def recovery_price(floor: int, percent: float, ratio: float = RECOVERY_MP_STEP_I
     if percent <= 0:
         return 0
     passos = percent / RECOVERY_STEP_PERCENT
-    return max(1, int(expected_floor_income(floor) * ratio * passos))
+    return max(1, int(income * ratio * passos))

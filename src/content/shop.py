@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-from src.content.economy import price_of, sell_value_of
+from src.content.economy import price_of, reroll_cost, sell_value_of
 from src.content.items import Item, get_all_items
 
 if TYPE_CHECKING:
@@ -96,6 +96,15 @@ class Shop:
         random.shuffle(available_items)
         return available_items[:max_items]
 
+    def visit(self, dungeon_level: int, player_class: str) -> "ShopVisit":
+        """Abre uma visita: o estoque é sorteado uma vez e passa a ser o desta ida.
+
+        Antes disso o estoque nascia a cada entrada na tela de compra, então sair
+        e voltar já era um reroll — de graça, infinito e invisível. Um reroll
+        pago ao lado de um reroll gratuito não seria uma decisão econômica.
+        """
+        return ShopVisit(self, dungeon_level, player_class)
+
     def get_sell_price(self, item: Item, dungeon_level: int) -> int:
         """Quanto a loja paga pelo item. A tela e a transação chamam esta."""
         return sell_value_of(item, dungeon_level)
@@ -116,3 +125,47 @@ class Shop:
             player.ledger["items_sold"] = player.ledger.get("items_sold", 0) + 1
             return True
         return False
+
+
+class ShopVisit:
+    """O estoque de UMA visita à loja, e as tentativas pagas de trocá-lo.
+
+    O contador de rerolls mora aqui, e é por isso que ele zera sozinho: quando a
+    visita acaba, o contador acaba com ela. Voltar à loja no andar seguinte, ou
+    encontrar o Mercador Errante, é uma visita nova e um preço de novo no
+    começo da curva — sem nenhuma regra escrita para "resetar", que é o tipo de
+    regra que alguém esquece de chamar.
+    """
+
+    def __init__(self, shop: Shop, dungeon_level: int, player_class: str):
+        self.shop = shop
+        self.dungeon_level = int(dungeon_level)
+        self.player_class = str(player_class)
+        self.rerolls_done = 0
+        self.stock: list[dict] = shop.get_available_items(self.dungeon_level, self.player_class)
+
+    @property
+    def next_reroll_cost(self) -> int:
+        """O que o PRÓXIMO reroll custa. É o número que a tela mostra."""
+        return reroll_cost(self.dungeon_level, self.rerolls_done)
+
+    def can_reroll(self, player: "Player") -> bool:
+        return int(getattr(player, "coins", 0)) >= self.next_reroll_cost
+
+    def reroll(self, player: "Player") -> bool:
+        """Cobra e troca o estoque inteiro. Devolve se aconteceu.
+
+        Sem ouro, nada acontece: nem cobrança, nem estoque novo, nem contador. É
+        o mesmo estado de antes, e não uma tentativa consumida.
+        """
+        custo = self.next_reroll_cost
+        if not player.spend_coins(custo, source="shop_reroll"):
+            return False
+        self.stock = self.shop.get_available_items(self.dungeon_level, self.player_class)
+        self.rerolls_done += 1
+        return True
+
+    def take(self, index: int) -> None:
+        """Tira da vitrine o que acabou de ser comprado."""
+        if 0 <= index < len(self.stock):
+            self.stock.pop(index)

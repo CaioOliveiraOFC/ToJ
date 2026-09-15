@@ -20,9 +20,15 @@ from __future__ import annotations
 import statistics
 from typing import TYPE_CHECKING
 
+from src.content.factories.monsters import generation_rules, routine_monster_count
 from src.content.items import get_all_items
+from src.mechanics.math_operations import (
+    calculate_mini_boss_coin_reward,
+    calculate_monster_coin_reward,
+)
 from src.shared import economy as formulas
 from src.shared.constants import (
+    BOSS_FLOOR_INTERVAL,
     RECOVERY_HP_STEP_INCOME_RATIO,
     RECOVERY_MP_STEP_INCOME_RATIO,
     RECOVERY_STEP_PERCENT,
@@ -65,7 +71,11 @@ def price_of(item: "Item", dungeon_level: int) -> int:
     consumivel = bool(getattr(item, "consumable", False))
     referencia = _referencias().get((raridade, consumivel), float(getattr(item, "price", 50)))
     return formulas.item_price(
-        raridade, float(getattr(item, "price", 50)), referencia, dungeon_level, consumivel
+        raridade,
+        float(getattr(item, "price", 50)),
+        referencia,
+        expected_floor_income(dungeon_level),
+        consumivel,
     )
 
 
@@ -80,9 +90,45 @@ def sell_value_of(item: "Item", dungeon_level: int) -> int:
     )
 
 
+def floor_income_units(dungeon_level: int) -> float:
+    """Quantos monstros-padrão do andar a população dele vale.
+
+    Lê a MESMA fonte que povoa o andar de verdade — `routine_monster_count` e as
+    regras de geração do JSON — em vez da reta ajustada à mão que existia aqui.
+    Aquela reta tinha sido calibrada contra um plano de andar do simulador que
+    levava 14 lutas ao andar 20 contra os 10 monstros que o jogo gera.
+
+    O chefe entra convertido em unidades de monstro comum, e não como "mais um":
+    ele paga bem mais que um monstro do andar, e contá-lo como 1 subestimaria
+    justamente os andares de marco.
+
+    O que esta conta NÃO modela é o sorteio de nível por monstro (+0/+1/+2, peso
+    70/25/5), que rende cerca de 5% a mais. É uma subestimação conhecida e
+    uniforme em todo andar — some junto, não distorce a forma da curva —, e
+    modelá-la exigiria amostrar o sorteio aqui dentro. `tests/test_economy.py`
+    cobra a distância contra o gerador de verdade.
+    """
+    regras = generation_rules()
+    unidades = float(routine_monster_count(dungeon_level))
+
+    if dungeon_level >= int(regras["advanced_role_min_floor"]):
+        unidades += float(regras["elite_spawn_chance"])
+
+    if dungeon_level % BOSS_FLOOR_INTERVAL == 0:
+        comum = max(1, calculate_monster_coin_reward(dungeon_level))
+        unidades += calculate_mini_boss_coin_reward(dungeon_level) / comum
+
+    return unidades
+
+
 def expected_floor_income(dungeon_level: int) -> int:
-    """Renda esperada do andar — a âncora de toda a escala econômica."""
-    return formulas.expected_floor_income(dungeon_level)
+    """Renda esperada do andar — a âncora de toda a escala econômica.
+
+    "Quanto ouro um full clear deste andar paga." É daqui que saem preço, teto de
+    juros, custo de recuperação e custo de reroll: todos são proporção da renda
+    do andar, e nenhum tem tabela própria.
+    """
+    return formulas.floor_income(dungeon_level, floor_income_units(dungeon_level))
 
 
 # --- Juros -----------------------------------------------------------------
@@ -98,11 +144,33 @@ def pay_interest(player: "Player", dungeon_level: int) -> int:
     """
     if dungeon_level <= int(getattr(player, "last_interest_floor", 0)):
         return 0
-    juros = formulas.interest_for(int(getattr(player, "coins", 0)), dungeon_level)
+    juros = formulas.interest_for(
+        int(getattr(player, "coins", 0)), expected_floor_income(dungeon_level)
+    )
     player.last_interest_floor = dungeon_level
     if juros > 0:
         player.earn_coins(juros, source="interest")
     return juros
+
+
+def reroll_cost(dungeon_level: int, rerolls_done: int) -> int:
+    """Custo do PRÓXIMO reroll neste andar, dadas as tentativas já feitas.
+
+    A mesma função para loja, skill e passiva. O que muda entre elas não é o
+    preço: é o CONTADOR, que vive no contexto de cada oferta e volta a zero
+    quando a oferta acaba. Uma visita à loja, uma oferta de skill e uma oferta de
+    passiva são três contextos independentes.
+    """
+    return formulas.reroll_price(expected_floor_income(dungeon_level), rerolls_done)
+
+
+def interest_cap(dungeon_level: int) -> int:
+    """Teto de juros do andar — o número que a tela mostra.
+
+    Existe aqui, e não em `shared/`, porque o teto é uma proporção da renda do
+    andar e quem conhece a renda é esta camada.
+    """
+    return formulas.interest_cap(expected_floor_income(dungeon_level))
 
 
 def interest_preview(player: "Player", dungeon_level: int) -> tuple[int, int]:
@@ -111,9 +179,10 @@ def interest_preview(player: "Player", dungeon_level: int) -> tuple[int, int]:
     Existe para o jogador poder decidir: sem ver o rendimento antes de gastar,
     "guardar capital" não é uma opção, é uma aposta às cegas.
     """
+    renda = expected_floor_income(dungeon_level)
     return (
-        formulas.interest_for(int(getattr(player, "coins", 0)), dungeon_level),
-        formulas.interest_cap(dungeon_level),
+        formulas.interest_for(int(getattr(player, "coins", 0)), renda),
+        formulas.interest_cap(renda),
     )
 
 
@@ -142,6 +211,7 @@ def recovery_offers(player: "Player", dungeon_level: int) -> list[dict]:
     jogador escolhe **quanto** reparar, e pode parar na metade para comprar
     outra coisa.
     """
+    renda = expected_floor_income(dungeon_level)
     ofertas: list[dict] = []
     for recurso, (rotulo, ratio) in _RECURSOS.items():
         falta, maximo = _faltando(player, recurso)
@@ -155,7 +225,7 @@ def recovery_offers(player: "Player", dungeon_level: int) -> list[dict]:
                 "label": rotulo,
                 "amount": quantidade,
                 "percent": percentual,
-                "price": formulas.recovery_price(dungeon_level, percentual, ratio),
+                "price": formulas.recovery_price(renda, percentual, ratio),
             }
         )
     return ofertas

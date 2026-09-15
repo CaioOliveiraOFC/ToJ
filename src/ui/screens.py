@@ -294,8 +294,14 @@ def render_post_battle(
 # =============================================================================
 
 
-def render_shop_main(shop: object, player_coins: int, has_equipable: bool = False) -> None:
-    """Renderiza a tela principal da loja."""
+def render_shop_main(options: dict[str, str], player_coins: int) -> None:
+    """Renderiza a tela principal da loja.
+
+    As opções chegam prontas: quem monta o menu é o fluxo, que é quem sabe se há
+    o que equipar e quanto custa o próximo reroll. Montá-lo aqui obrigava o
+    fluxo a recalcular as mesmas teclas por fora, e as duas contas divergiam na
+    primeira opção nova.
+    """
 
     renderer.console.clear()
     renderer.console.print(
@@ -306,21 +312,7 @@ def render_shop_main(shop: object, player_coins: int, has_equipable: bool = Fals
         )
     )
 
-    if has_equipable:
-        shop_options = {
-            "1": "Comprar Itens",
-            "2": "Vender Itens",
-            "3": "Equipar da Mochila",
-            "4": "Recuperar Vida/Mana",
-            "5": "Sair da Loja",
-        }
-    else:
-        shop_options = {
-            "1": "Comprar Itens",
-            "2": "Vender Itens",
-            "3": "Recuperar Vida/Mana",
-            "4": "Sair da Loja",
-        }
+    shop_options = options
 
     options_table = Table(
         show_header=False, expand=True, highlight=True, row_styles=["none", "dim"]
@@ -333,6 +325,24 @@ def render_shop_main(shop: object, player_coins: int, has_equipable: bool = Fals
 
     renderer.console.print(options_table)
     renderer.console.print("\n")
+
+
+def render_shop_reroll_success(paid: int, next_cost: int) -> None:
+    """O reroll aconteceu — e o próximo já custa o dobro, na cara do jogador."""
+    renderer.console.print(
+        f"[bold yellow]Estoque renovado[/bold yellow] por [bold yellow]{paid}[/bold yellow] "
+        f"de ouro. O próximo custa [bold red]{next_cost}[/bold red].",
+        justify="center",
+    )
+
+
+def render_shop_reroll_denied(cost: int, coins: int) -> None:
+    """Sem ouro não há reroll — e nada muda: nem estoque, nem contador."""
+    renderer.console.print(
+        f"[dim white]Renovar custa[/dim white] [bold yellow]{cost}[/bold yellow] "
+        f"[dim white]e você tem[/dim white] [bold yellow]{coins}[/bold yellow].",
+        justify="center",
+    )
 
 
 def render_recovery_menu(
@@ -991,7 +1001,36 @@ def render_map(map_lines: list[str]) -> None:
         renderer.console.print(colored_line)
 
 
-def render_passive_selection(choices: list) -> None:
+def _rodape_oferta(reroll_cost: int | None, coins: int | None, sufixo: str = "") -> str:
+    """A linha do rodapé das telas de oferta, com o preço do próximo reroll.
+
+    O preço fica visível SEMPRE, e não escondido atrás de um submenu: a decisão
+    que o reroll cria é ver 150 virar 300 virar 600 e apertar de novo assim
+    mesmo. Escondê-lo transformaria a curva exponencial numa surpresa.
+    """
+    partes = []
+    if reroll_cost is not None:
+        preço = f"[R] Trocar a oferta — {reroll_cost} ouro"
+        if coins is not None and coins < reroll_cost:
+            preço += f" (você tem {coins})"
+        partes.append(preço)
+    if sufixo:
+        partes.append(sufixo)
+    return "   |   ".join(partes)
+
+
+def render_offer_reroll_denied(cost: int, coins: int) -> None:
+    """Sem ouro, a oferta fica como está — e a tentativa não conta."""
+    renderer.console.print(
+        f"[dim white]Trocar custa[/dim white] [bold yellow]{cost}[/bold yellow] "
+        f"[dim white]e você tem[/dim white] [bold yellow]{coins}[/bold yellow].",
+        justify="center",
+    )
+
+
+def render_passive_selection(
+    choices: list, reroll_cost: int | None = None, coins: int | None = None
+) -> None:
     """Renderiza as 3 cartas de passivas para escolha."""
     rarity_colors = {
         "Common": "white",
@@ -1019,6 +1058,13 @@ def render_passive_selection(choices: list) -> None:
                 border_style=color,
             )
         )
+    if reroll_cost is not None:
+        renderer.console.print(
+            Panel(
+                Text(_rodape_oferta(reroll_cost, coins), justify="center", style="dim"),
+                border_style="dim",
+            )
+        )
 
 
 def render_passive_acquired(message: str) -> None:
@@ -1042,7 +1088,12 @@ def _dano_previsto(card, player) -> str:
     return str(damage_preview(card, player))
 
 
-def render_skill_selection(choices: list, player: "Player" | None = None) -> None:
+def render_skill_selection(
+    choices: list,
+    player: "Player" | None = None,
+    reroll_cost: int | None = None,
+    coins: int | None = None,
+) -> None:
     """Renderiza as 3 cartas de skills para escolha."""
     rarity_colors = {
         "Common": "white",
@@ -1099,7 +1150,10 @@ def render_skill_selection(choices: list, player: "Player" | None = None) -> Non
             )
         )
     renderer.console.print(
-        Panel(Text("Pressione 0 para cancelar", justify="center", style="dim"), border_style="dim")
+        Panel(
+            Text(_rodape_oferta(reroll_cost, coins, "Pressione 0 para cancelar"), justify="center"),
+            border_style="dim",
+        )
     )
 
 

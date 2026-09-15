@@ -182,6 +182,18 @@ class PickPolicy:
                 return max(mesmas, key=lambda c: _numeric(c.effect_value))
         return max(choices, key=lambda c: _numeric(c.effect_value))
 
+    def passive_off_intent(self, choices: list) -> bool:
+        """Nenhuma das cartas serve à intenção desta política.
+
+        É o sinal de "oferta fraca" que o bot usa para decidir se vale pagar por
+        outra amostra. A política aleatória nunca acha nada fraco — ela não tem
+        intenção a servir, e fazê-la rerrolar mediria a moeda, não a decisão.
+        """
+        if not self.deliberate or not choices:
+            return False
+        prioridades = PASSIVE_PRIORITIES[self.name]
+        return not any(c.effect_type in prioridades for c in choices)
+
     def pick_skill(self, hero, choices: list, rng: random.Random):
         """Escolhe uma skill nova e o slot que ela substitui.
 

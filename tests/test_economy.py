@@ -41,22 +41,26 @@ class TestRendaDoAndar:
     """A âncora. Se ela quebrar, todo preço do jogo se move junto."""
 
     def test_renda_cresce_com_o_andar(self):
-        rendas = [formulas.expected_floor_income(f) for f in range(1, 31)]
-        assert rendas == sorted(rendas)
-        assert rendas[0] > 0
+        """Cresce por CICLO de andar, e não andar a andar.
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "A âncora foi calibrada contra o plano de andar ANTIGO do simulador, que "
-            "levava 14 lutas ao andar 20 contra os 10 monstros que o jogo gera. Com o "
-            "simulador lendo a mesma fonte do jogo, a âncora aparece 37% acima do que o "
-            "andar paga de verdade no acumulado até o 20 (medido também contra "
-            "`generate_monsters_for_level`, sem o simulador no meio: 589 de ouro no andar "
-            "11 contra 976 estimados). O baseline media um andar que não existe mais. "
-            "Reancorar a economia é rodada própria — compensar aqui esconderia o achado."
-        ),
-    )
+        A âncora deixou de ser uma reta ajustada e passou a ser a população real
+        do andar. Com isso ela ganhou a cadência do chefe: o andar 10 paga o
+        chefe e o 11 não, então a renda sobe num pico e recua depois dele. É a
+        verdade sobre o que um full clear paga, e comparar andares vizinhos
+        deixou de ser a pergunta certa.
+
+        O que não pode acontecer é a renda parar de crescer: comparada no mesmo
+        ponto do ciclo — de cinco em cinco andares —, ela sobe sempre.
+        """
+        from src.shared.constants import BOSS_FLOOR_INTERVAL
+
+        rendas = [economy.expected_floor_income(f) for f in range(1, 31)]
+        assert rendas[0] > 0
+        for i in range(len(rendas) - BOSS_FLOOR_INTERVAL):
+            assert rendas[i + BOSS_FLOOR_INTERVAL] > rendas[i], (
+                f"andar {i + 1 + BOSS_FLOOR_INTERVAL} não paga mais que o {i + 1}"
+            )
+
     def test_renda_bate_com_o_que_os_andares_realmente_pagam(self):
         """Contra o gerador de andares de verdade, não contra outra fórmula.
 
@@ -99,7 +103,7 @@ class TestRendaDoAndar:
                         )
                 medidas.append(ouro)
             real = statistics.fmean(medidas)
-            estimada = formulas.expected_floor_income(andar)
+            estimada = economy.expected_floor_income(andar)
             acumulado_real += real
             acumulado_estimado += estimada
             assert 0.75 <= acumulado_estimado / acumulado_real <= 1.25, (
@@ -133,12 +137,14 @@ class TestJuros:
     def test_a_taxa_e_a_declarada_abaixo_do_cap(self, heroi):
         # Saldo pequeno o bastante para o cap não morder.
         heroi.earn_coins(200)
-        assert formulas.interest_for(200, 10) == int(200 * INTEREST_RATE_PERCENT / 100)
+        renda = economy.expected_floor_income(10)
+        assert formulas.interest_for(200, renda) == int(200 * INTEREST_RATE_PERCENT / 100)
 
     def test_o_cap_segura_a_fortuna(self):
-        teto = formulas.interest_cap(10)
-        assert teto == int(formulas.expected_floor_income(10) * INTEREST_CAP_INCOME_RATIO)
-        assert formulas.interest_for(10_000_000, 10) == teto, (
+        renda = economy.expected_floor_income(10)
+        teto = economy.interest_cap(10)
+        assert teto == int(renda * INTEREST_CAP_INCOME_RATIO)
+        assert formulas.interest_for(10_000_000, renda) == teto, (
             "sem cap, o juro composto vira renda principal e a masmorra vira detalhe"
         )
 
@@ -200,8 +206,8 @@ class TestPreco:
     def test_preco_acompanha_a_renda_do_andar(self):
         loja = Shop()
         item = get_all_items()["Espada de Ferro"]
-        razao_1 = loja.get_price(item, 1) / formulas.expected_floor_income(1)
-        razao_15 = loja.get_price(item, 15) / formulas.expected_floor_income(15)
+        razao_1 = loja.get_price(item, 1) / economy.expected_floor_income(1)
+        razao_15 = loja.get_price(item, 15) / economy.expected_floor_income(15)
         assert razao_1 == pytest.approx(razao_15, rel=0.05), (
             "preço e renda voltaram a crescer em curvas diferentes"
         )
@@ -220,7 +226,7 @@ class TestPreco:
         """O critério de sucesso: nem "compro tudo", nem "nunca compro nada"."""
         loja = Shop()
         for andar in (3, 10, 18):
-            renda = formulas.expected_floor_income(andar)
+            renda = economy.expected_floor_income(andar)
             precos = [
                 loja.get_price(i, andar)
                 for i in get_all_items().values()
@@ -317,7 +323,7 @@ class TestRecuperacao:
         gasto = 0
         while (oferta := economy.buy_recovery(heroi, 8, "hp")) is not None:
             gasto += oferta["price"]
-        renda = formulas.expected_floor_income(8)
+        renda = economy.expected_floor_income(8)
         assert 0.5 * renda <= gasto <= 1.3 * renda, f"cura completa custou {gasto} de {renda}"
 
     def test_paga_so_pelo_que_falta(self, heroi):

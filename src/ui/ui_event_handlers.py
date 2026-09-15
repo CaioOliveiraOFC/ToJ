@@ -62,7 +62,7 @@ def _on_open_passives(ev: GameEvent) -> None:
     player = ev.payload.get("player")
     choices = ev.payload.get("choices")
     if player and choices:
-        run_passive_selection_flow(player, choices)
+        run_passive_selection_flow(player, choices, ev.payload.get("dungeon_level", 1))
 
 
 def _on_extraction_prompt(ev: GameEvent) -> None:
@@ -111,7 +111,12 @@ def _on_open_skills(ev: GameEvent) -> None:
     player = ev.payload.get("player")
     choices = ev.payload.get("choices")
     if player and choices:
-        chosen_skill = run_skill_selection_flow(player, choices)
+        chosen_skill = run_skill_selection_flow(
+            player,
+            choices,
+            ev.payload.get("dungeon_level", 1),
+            ev.payload.get("offer_level"),
+        )
         if not chosen_skill:
             return
         # Com vaga no deck, aprender é aprender: a tela de substituição pedia ao

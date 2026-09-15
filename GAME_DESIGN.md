@@ -482,6 +482,15 @@ valor fixo. Armas somam percentual sobre o poder base.
 itens vendáveis têm `shop_max_floor = 15`; os 14 que sobrevivem são todos consumíveis.
 Numa masmorra infinita, isso significa que o comércio acaba e o jogo continua.
 
+**`[corrigido]`** A **renda esperada do andar** deixou de ser uma reta ajustada
+à mão e passa a sair da população real do andar — a mesma fonte que povoa o mapa
+—, com o chefe convertido em unidades de monstro comum nos andares de marco. A
+reta antiga tinha sido calibrada contra um plano de andar do simulador que
+levava 14 lutas ao andar 20 contra os 10 que o jogo gera: ela errava 38% para
+cima no acumulado até o 20 e 24% para BAIXO no andar 50, onde o platê mentia e o
+jogo continuava crescendo. Como consequência, a curva de renda ganhou a cadência
+do chefe: o andar de chefe paga um pico e o seguinte recua.
+
 **`[bug]`** **O preço cresce linearmente e a renda cresce geometricamente.**
 Preço: `base × (1 + andar × 0,05)` — dobra em 20 andares. Renda: razão 1,12 — cresce
 8,6× nos mesmos 20 andares. No andar 1 a renda de um andar compra meio item; no
@@ -495,7 +504,25 @@ dá 88% de sair pelo menos uma numa run de 20 andares.
 continua valendo para **venda**: uma Lendária dropada no andar 1 vende por 1.050 a
 1.470 de ouro — mais que a renda acumulada dos seis primeiros andares.
 
-**`[não existe]`** Um ralo de ouro. Ver **Decisões pendentes, D2**.
+**`[implementado]`** **Reroll pago** — o primeiro ralo de ouro do jogo. Loja,
+oferta de Skill e oferta de Passiva podem ser trocadas por ouro, pela **mesma
+fórmula**: o primeiro reroll custa 15% da renda esperada do andar e cada um
+seguinte **dobra** — 15%, 30%, 60%, 120%, 240%.
+
+**Não existe teto de tentativas.** O jogador pode continuar enquanto tiver ouro,
+e é isso que cria a decisão: numa run ruim dá para tentar mais uma, e mais uma,
+até já ter investido demais para parar. Quem segura não é uma regra, é o preço
+— e o que ele queima é o capital que compraria equipamento, consumível ou
+recuperação. Reroll é **controle de RNG comprado com risco econômico**.
+
+O contador é por CONTEXTO, não global: uma visita à loja, uma oferta de Skill e
+uma oferta de Passiva são três contextos independentes, e cada um volta a 15%
+quando a oferta acaba. Sair da loja encerra a visita; o Mercador Errante é uma
+visita nova.
+
+Skill descartada por reroll conta como **vista** — o jogador acabou de vê-la, e
+a oferta seguinte não a repete. Passiva não tem lista de vistas: o reroll compra
+outra amostra e não altera a distribuição do catálogo.
 
 ---
 

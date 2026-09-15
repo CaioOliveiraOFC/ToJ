@@ -323,7 +323,7 @@ def simulate_run(
                     # profundidade a menos em toda run que fugiu.
                     break
                 if outcome.hero_won:
-                    _award(hero, monsters, essence, rng, cfg, telemetry, picker)
+                    _award(hero, monsters, essence, rng, cfg, telemetry, picker, floor=floor)
 
             if died:
                 break
@@ -486,6 +486,7 @@ def _award(
     toggles: Toggles | None = None,
     telemetry=None,
     picker=None,
+    floor: int = 1,
 ) -> None:
     """Aplica XP, ouro, loot e as escolhas de nível, como o jogo faz.
 
@@ -531,7 +532,9 @@ def _award(
         hero.level_up(show=False)
     levels_gained = hero.get_level() - level_before
     if levels_gained > 0:
-        progression.on_level_up(hero, levels_gained, rng, toggles, telemetry, picker)
+        progression.on_level_up(
+            hero, levels_gained, rng, toggles, telemetry, picker, dungeon_level=floor
+        )
 
 
 def _percentile(values: list[int], q: float) -> float:

@@ -40,26 +40,53 @@ def _bonus_text(item) -> str:
 
 
 def run_shop_flow(player: "Player", shop: object, dungeon_level: int) -> None:
-    """Orquestra o fluxo completo da loja."""
+    """Orquestra o fluxo completo da loja.
+
+    A VISITA é criada aqui, uma vez, e o estoque dela vale até o jogador sair.
+    Era gerado a cada entrada na tela de compra, então sair e voltar rerrolava a
+    loja de graça — e um reroll pago ao lado de um gratuito não é decisão
+    nenhuma. Sair e voltar ao andar seguinte continua dando estoque novo, porque
+    é uma visita nova; o contador de rerolls morre junto com esta.
+    """
+    visita = shop.visit(dungeon_level, player.get_classname())
 
     while True:
         has_equipable = _has_equipable_in_inventory(player)
-        screens.render_shop_main(shop, player.coins, has_equipable)
+        opcoes: dict[str, str] = {"1": "Comprar Itens", "2": "Vender Itens"}
+        if has_equipable:
+            opcoes[str(len(opcoes) + 1)] = "Equipar da Mochila"
+        opcoes[str(len(opcoes) + 1)] = "Recuperar Vida/Mana"
+        # O preço do próximo reroll fica na própria opção: o jogador precisa ver
+        # 150 virar 300 virar 600 e decidir mesmo assim apertar de novo.
+        opcoes[str(len(opcoes) + 1)] = f"Renovar Estoque — {visita.next_reroll_cost} ouro"
+        opcoes[str(len(opcoes) + 1)] = "Sair da Loja"
+
+        acoes = list(opcoes)
+        screens.render_shop_main(opcoes, player.coins)
 
         choice = get_key()
+        if choice and choice.lower() == "q":
+            screens.render_shop_farewell()
+            break
+        if choice not in acoes:
+            continue
 
-        sair = "5" if has_equipable else "4"
-        recuperar = "4" if has_equipable else "3"
-
-        if choice == "1":
-            _run_buy_flow(player, shop, dungeon_level)
-        elif choice == "2":
+        rotulo = opcoes[choice]
+        if rotulo == "Comprar Itens":
+            _run_buy_flow(player, visita, dungeon_level)
+        elif rotulo == "Vender Itens":
             _run_sell_flow(player, shop, dungeon_level)
-        elif choice == "3" and has_equipable:
+        elif rotulo == "Equipar da Mochila":
             _run_equip_in_shop_flow(player, shop, dungeon_level)
-        elif choice == recuperar:
+        elif rotulo == "Recuperar Vida/Mana":
             _run_recovery_flow(player, dungeon_level)
-        elif choice == sair or (choice and choice.lower() == "q"):
+        elif rotulo.startswith("Renovar Estoque"):
+            custo = visita.next_reroll_cost
+            if visita.reroll(player):
+                screens.render_shop_reroll_success(custo, visita.next_reroll_cost)
+            else:
+                screens.render_shop_reroll_denied(custo, player.coins)
+        else:
             screens.render_shop_farewell()
             break
 
@@ -99,10 +126,13 @@ def _run_recovery_flow(player: "Player", dungeon_level: int) -> None:
             screens.render_recovery_success(paga["label"], paga["amount"], paga["price"])
 
 
-def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
-    """Fluxo de compra de itens usando menu navegável."""
-    player_class = player.get_classname()
-    items_for_sale = shop.get_available_items(dungeon_level, player_class)
+def _run_buy_flow(player: "Player", visita, dungeon_level: int) -> None:
+    """Fluxo de compra de itens usando menu navegável.
+
+    O estoque é o da VISITA: entrar e sair desta tela não sorteia nada.
+    """
+    shop = visita.shop
+    items_for_sale = visita.stock
 
     if not items_for_sale:
         return
@@ -128,8 +158,8 @@ def _run_buy_flow(player: "Player", shop: object, dungeon_level: int) -> None:
                 old_item = player.occupant_for(item_to_buy)
             if shop.buy_item(player, item_to_buy, dungeon_level):
                 screens.render_shop_purchase_success(item_to_buy.display_name, price)
-                # Remove o item da lista (não rerrola, mantém os outros)
-                items_for_sale.pop(selected_idx)
+                # Sai da vitrine desta visita. Comprar não rerrola o resto.
+                visita.take(selected_idx)
                 # Oferece equipar diretamente na loja — com comparativo e opção de vender o antigo
                 if slot and hasattr(player, "equipment"):
                     if old_item is None:

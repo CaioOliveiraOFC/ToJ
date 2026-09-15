@@ -85,6 +85,17 @@ class BandTotals:
     gold_spent_on_gear: int = 0
     gold_spent_on_consumables: int = 0
     gold_spent_on_recovery: int = 0
+    gold_spent_on_shop_reroll: int = 0
+    gold_spent_on_skill_reroll: int = 0
+    gold_spent_on_passive_reroll: int = 0
+    rerolls: int = 0
+    # Reroll: comprar outra amostra do RNG. Separado por CONTEXTO porque as três
+    # ofertas competem pelo mesmo ouro e a pergunta do balanceamento é em qual
+    # delas o jogador queima o capital.
+    gold_spent_on_shop_reroll: int = 0
+    gold_spent_on_skill_reroll: int = 0
+    gold_spent_on_passive_reroll: int = 0
+    rerolls: int = 0
     purchases: int = 0
     items_sold: int = 0
     interest_payments: int = 0
@@ -92,9 +103,20 @@ class BandTotals:
     carrying_balance_sum: int = 0
 
     @property
+    def gold_spent_on_rerolls(self) -> int:
+        return (
+            self.gold_spent_on_shop_reroll
+            + self.gold_spent_on_skill_reroll
+            + self.gold_spent_on_passive_reroll
+        )
+
+    @property
     def gold_spent_total(self) -> int:
         return (
-            self.gold_spent_on_gear + self.gold_spent_on_consumables + self.gold_spent_on_recovery
+            self.gold_spent_on_gear
+            + self.gold_spent_on_consumables
+            + self.gold_spent_on_recovery
+            + self.gold_spent_on_rerolls
         )
 
     @property
@@ -123,6 +145,11 @@ class BandTotals:
             "gold_spent_on_gear": self.gold_spent_on_gear,
             "gold_spent_on_consumables": self.gold_spent_on_consumables,
             "gold_spent_on_recovery": self.gold_spent_on_recovery,
+            "gold_spent_on_rerolls": self.gold_spent_on_rerolls,
+            "gold_spent_on_shop_reroll": self.gold_spent_on_shop_reroll,
+            "gold_spent_on_skill_reroll": self.gold_spent_on_skill_reroll,
+            "gold_spent_on_passive_reroll": self.gold_spent_on_passive_reroll,
+            "rerolls": self.rerolls,
             "purchases": self.purchases,
             "items_sold": self.items_sold,
             "interest_payments": self.interest_payments,
@@ -158,6 +185,10 @@ class RunTelemetry:
     gold_spent_on_gear: int = 0
     gold_spent_on_consumables: int = 0
     gold_spent_on_recovery: int = 0
+    gold_spent_on_shop_reroll: int = 0
+    gold_spent_on_skill_reroll: int = 0
+    gold_spent_on_passive_reroll: int = 0
+    rerolls: int = 0
     gold_from_sales: int = 0
     gold_from_interest: int = 0
     gold_unspent: int = 0
@@ -210,10 +241,21 @@ class RunTelemetry:
         return self.items_bought + self.recovery_purchases
 
     @property
+    def gold_spent_on_rerolls(self) -> int:
+        return (
+            self.gold_spent_on_shop_reroll
+            + self.gold_spent_on_skill_reroll
+            + self.gold_spent_on_passive_reroll
+        )
+
+    @property
     def gold_spent(self) -> int:
         """Todo ouro que saiu do jogador, por destino."""
         return (
-            self.gold_spent_on_gear + self.gold_spent_on_consumables + self.gold_spent_on_recovery
+            self.gold_spent_on_gear
+            + self.gold_spent_on_consumables
+            + self.gold_spent_on_recovery
+            + self.gold_spent_on_rerolls
         )
 
     @property
@@ -265,6 +307,9 @@ class RunTelemetry:
         faixa.gold_spent_on_gear += delta("gold_spent_on_gear")
         faixa.gold_spent_on_consumables += delta("gold_spent_on_consumable")
         faixa.gold_spent_on_recovery += delta("gold_spent_on_recovery")
+        faixa.gold_spent_on_shop_reroll += delta("gold_spent_on_shop_reroll")
+        faixa.gold_spent_on_skill_reroll += delta("gold_spent_on_skill_reroll")
+        faixa.gold_spent_on_passive_reroll += delta("gold_spent_on_passive_reroll")
         faixa.purchases += delta("purchases")
         faixa.items_sold += delta("items_sold")
         faixa.interest_payments += delta("interest_payments")
@@ -345,6 +390,11 @@ class RunTelemetry:
                 "total_liquid_gold_inflow": self.total_liquid_gold_inflow,
                 "gold_spent": self.gold_spent,
                 "gold_spent_on_gear": self.gold_spent_on_gear,
+                "gold_spent_on_rerolls": self.gold_spent_on_rerolls,
+                "gold_spent_on_shop_reroll": self.gold_spent_on_shop_reroll,
+                "gold_spent_on_skill_reroll": self.gold_spent_on_skill_reroll,
+                "gold_spent_on_passive_reroll": self.gold_spent_on_passive_reroll,
+                "rerolls": self.rerolls,
                 "gold_spent_on_consumables": self.gold_spent_on_consumables,
                 "gold_spent_on_recovery": self.gold_spent_on_recovery,
                 "gold_from_sales": self.gold_from_sales,

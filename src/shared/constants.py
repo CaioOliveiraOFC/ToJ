@@ -100,13 +100,27 @@ RARITY_MULTIPLIERS = {
 # balanceamento é convite a calibrar o que não está ligado em lugar nenhum.
 
 # --- Renda esperada do andar ---
-# Medido no gerador real de andares: a renda de um andar, dividida pelo valor de
-# um monstro do nível dele, vale 3,1 no andar 1, 9,2 no 10, 13,4 no 15 e para de
-# crescer em ~14 do 16 em diante — é onde o plano de andar deixa de ganhar
-# encontros. A reta abaixo reproduz a curva com erro < 8%.
-FLOOR_INCOME_BASE_UNITS = 3.0
-FLOOR_INCOME_UNITS_PER_FLOOR = 0.75
-FLOOR_INCOME_MAX_UNITS = 14.0
+# Não mora mais aqui. Eram três constantes de uma RETA ajustada à mão, com platô
+# em 14 unidades a partir do andar 16 — calibrada contra um plano de andar do
+# simulador que levava 14 lutas ao andar 20 contra os 10 monstros que o jogo
+# gera. Hoje as unidades vêm da população real (`content/economy.py`, a partir de
+# `content/factories/monsters.py`), e não há número a calibrar: se o gerador
+# mudar, a renda segue junto. O platô era o pior deles — no andar 50 a reta
+# pagava 24% a MENOS que o andar, porque o jogo continuava crescendo e ela não.
+
+# --- Reroll ---
+# Comprar outra amostra do RNG: loja, oferta de skill e oferta de passiva usam
+# esta mesma curva. O primeiro reroll custa uma fração da renda do andar e cada
+# um seguinte DOBRA.
+#
+# Não existe teto de tentativas, e é de propósito: o jogador que está numa run
+# ruim pode tentar mais uma, e mais uma, e a essa altura já investiu demais para
+# parar. Quem segura não é uma regra, é o próprio custo — no quinto reroll ele
+# já paga 2,4 andares inteiros. Um teto artificial tiraria a decisão; o custo
+# exponencial a devolve, e o preço dela é o capital que iria para equipamento,
+# consumível ou recuperação.
+REROLL_FIRST_INCOME_RATIO = 0.15
+REROLL_COST_GROWTH = 2.0
 
 # --- Juros ---
 # Pagos ao concluir o andar, sobre o ouro que sobrou depois da loja. O cap é uma

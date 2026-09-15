@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import random
 
-from src.content.economy import buy_recovery
+from src.content.economy import buy_recovery, reroll_cost
 from src.content.factories.loot import get_loot
 from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
@@ -58,6 +58,23 @@ def pick_skill(hero, choices: list, rng: random.Random, picker: PickPolicy | Non
     return (picker or get_pick_policy(DEFAULT_PICK_POLICY)).pick_skill(hero, choices, rng)
 
 
+# Quantos rerolls o BOT gasta numa oferta de nível. Um só, e de novo: é política
+# de simulação. O jogador não tem teto — o custo dobrando é que o segura.
+BOT_MAX_OFFER_REROLLS = 1
+
+
+def _pagar_reroll(hero, dungeon_level: int, feitos: int, fonte: str, telemetry=None) -> bool:
+    """Cobra um reroll de oferta pela MESMA função que o jogo cobra."""
+    custo = reroll_cost(dungeon_level, feitos)
+    if not hero.spend_coins(custo, source=fonte):
+        return False
+    if telemetry is not None:
+        campo = f"gold_spent_on_{fonte}"
+        setattr(telemetry, campo, getattr(telemetry, campo) + custo)
+        telemetry.rerolls += 1
+    return True
+
+
 def on_level_up(
     hero,
     levels_gained: int,
@@ -65,19 +82,30 @@ def on_level_up(
     toggles: Toggles | None = None,
     telemetry=None,
     picker: PickPolicy | None = None,
+    dungeon_level: int = 1,
 ) -> None:
     """Aplica as escolhas que o jogo oferece a cada nível ganho.
 
     Espelha `engine/loop.py`: uma passiva por nível, e uma oferta de skill a
-    cada `SKILL_OFFER_LEVEL_INTERVAL` níveis.
+    cada `SKILL_OFFER_LEVEL_INTERVAL` níveis. Inclusive o reroll pago — pela
+    mesma função de custo, para o gasto do bot medir o preço do jogo.
     """
     cfg = toggles or Toggles()
+    politica = picker if picker is not None else get_pick_policy(DEFAULT_PICK_POLICY)
 
     if cfg.passives:
         for _ in range(levels_gained):
             ofertas = [
                 c for c in generate_passive_choices(count=3) if c.id not in cfg.banned_passives
             ]
+            for feitos in range(BOT_MAX_OFFER_REROLLS):
+                if not politica.passive_off_intent(ofertas):
+                    break
+                if not _pagar_reroll(hero, dungeon_level, feitos, "passive_reroll", telemetry):
+                    break
+                ofertas = [
+                    c for c in generate_passive_choices(count=3) if c.id not in cfg.banned_passives
+                ]
             escolhida = pick_passive(hero, ofertas, rng, picker)
             if telemetry is not None:
                 telemetry.record_offer("passive", ofertas, escolhida)
@@ -87,19 +115,34 @@ def on_level_up(
     if not cfg.skill_choice:
         return
 
+    def _oferta_de_skill(lvl):
+        cartas = generate_skill_choices(
+            hero.get_classname(),
+            lvl,
+            hero.active_skill_ids(),
+            count=SKILL_OFFER_SIZE,
+            seen_ids=hero.seen_skill_ids,
+        )
+        cartas = [o for o in cartas if o.id not in cfg.banned_skills]
+        # Ver é conhecer, aqui como no jogo: as cartas recusadas por um reroll
+        # já contam como vistas, senão o reroll devolveria as mesmas três.
+        hero.seen_skill_ids.update(o.id for o in cartas)
+        return cartas
+
     nivel = hero.get_level()
     for lvl in range(nivel - levels_gained + 1, nivel + 1):
         if lvl > 1 and lvl % SKILL_OFFER_LEVEL_INTERVAL == 0:
-            ofertas = generate_skill_choices(
-                hero.get_classname(),
-                lvl,
-                hero.active_skill_ids(),
-                count=SKILL_OFFER_SIZE,
-                seen_ids=hero.seen_skill_ids,
-            )
-            ofertas = [o for o in ofertas if o.id not in cfg.banned_skills]
-            hero.seen_skill_ids.update(o.id for o in ofertas)
+            ofertas = _oferta_de_skill(lvl)
             nova, slot = pick_skill(hero, ofertas, rng, picker)
+            for feitos in range(BOT_MAX_OFFER_REROLLS):
+                # `(None, None)` é o veredito da política: nenhuma das três supera
+                # o que o herói já tem. É exatamente a hora de comprar outra amostra.
+                if nova is not None:
+                    break
+                if not _pagar_reroll(hero, dungeon_level, feitos, "skill_reroll", telemetry):
+                    break
+                ofertas = _oferta_de_skill(lvl)
+                nova, slot = pick_skill(hero, ofertas, rng, picker)
             if telemetry is not None:
                 telemetry.record_offer("skill", ofertas, nova)
             if nova is not None and slot is not None:
@@ -197,7 +240,9 @@ def visit_shop(
     _vender_dominados(hero, shop, dungeon_level)
     _repair(hero, dungeon_level, telemetry)
 
-    ofertas = shop.get_available_items(dungeon_level, hero.get_classname())
+    visita = shop.visit(dungeon_level, hero.get_classname())
+    _rerollar_estoque(hero, visita, telemetry)
+    ofertas = visita.stock
     if not ofertas:
         return
 
@@ -244,6 +289,63 @@ def visit_shop(
             if equip_if_better(hero, item) and telemetry is not None:
                 telemetry.items_equipped_from_shop += 1
                 telemetry.equipped_by_slot[str(item.slot)] += 1
+
+
+# Quantos rerolls de loja o BOT aceita por visita. É política de simulação, e
+# não regra do jogo: o jogador não tem teto nenhum. O bot é conservador porque a
+# pergunta desta fase é "o sistema é usável e aparece na telemetria?", e não
+# "qual é a linha ótima de cassino" — um bot que rerrolasse até secar mediria a
+# própria ganância, não a economia.
+BOT_MAX_SHOP_REROLLS = 2
+# Fatia do ouro que o bot aceita gastar rerrolando. O reroll nunca pode comer o
+# dinheiro que compraria a peça que ele está justamente procurando.
+BOT_REROLL_BUDGET_RATIO = 0.25
+
+
+def _tem_o_que_comprar(hero, ofertas) -> bool:
+    """A vitrine tem upgrade de equipamento ou poção que o bot ainda precisa?"""
+    faltam_pocoes = (
+        sum(
+            1
+            for i in hero.inventory
+            if getattr(i, "consumable", False) and getattr(i, "effect_type", None) == "max_hp"
+        )
+        < TARGET_HEALING_POTIONS
+    )
+    for oferta in ofertas:
+        item = oferta["item"]
+        if getattr(item, "consumable", False):
+            if faltam_pocoes and getattr(item, "effect_type", None) == "max_hp":
+                return True
+            continue
+        posicoes = _posicoes_do_bot(hero, item)
+        if not posicoes:
+            continue
+        atual = _pior_ocupante(hero, posicoes)
+        if atual is None or _peso_do_item(item) > _peso_do_item(atual):
+            return True
+    return False
+
+
+def _rerollar_estoque(hero, visita, telemetry=None) -> None:
+    """Troca a vitrine enquanto ela não tiver nada que sirva.
+
+    A regra do bot, e só dele: rerrola quando a loja não oferece upgrade nem a
+    poção que falta, e para assim que o custo passar da fatia do ouro que ele
+    reservou para isso. O jogo real não tem nenhum dos dois limites — quem segura
+    o jogador é o preço dobrando, não um contador.
+    """
+    orcamento = int(hero.coins * BOT_REROLL_BUDGET_RATIO)
+    for _ in range(BOT_MAX_SHOP_REROLLS):
+        if _tem_o_que_comprar(hero, visita.stock):
+            return
+        custo = visita.next_reroll_cost
+        if custo > orcamento or not visita.reroll(hero):
+            return
+        orcamento -= custo
+        if telemetry is not None:
+            telemetry.gold_spent_on_shop_reroll += custo
+            telemetry.rerolls += 1
 
 
 def _vender_dominados(hero, shop: Shop, dungeon_level: int) -> None:

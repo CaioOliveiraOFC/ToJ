@@ -9,7 +9,7 @@ import random
 from time import sleep
 from typing import TYPE_CHECKING
 
-from src.content.economy import pay_interest
+from src.content.economy import interest_cap, pay_interest
 from src.content.factories.dungeons import roll_random_event
 from src.content.factories.loot import get_loot
 from src.content.factories.monsters import (
@@ -45,7 +45,6 @@ from src.shared.constants import (
     SKILL_OFFER_SIZE,
     WALL_PERCENT_PER_LEVEL,
 )
-from src.shared.economy import interest_cap
 from src.shared.types import GameEvent
 from src.storage.save_manager import add_trophy, delete_save, save_game
 from src.ui import screens
@@ -246,6 +245,7 @@ def run_fight(
     monster: "Monster | list",
     rng: random.Random | None = None,
     essence_multiplier: float = 1.0,
+    dungeon_level: int = 1,
 ) -> None:
     """Loop principal de batalha: mecânica publica eventos; UI reage via inscrições no bus.
 
@@ -303,7 +303,10 @@ def run_fight(
             for lvl in range(level_before + 1, player.get_level() + 1):
                 # Escolha de passiva
                 choices = generate_passive_choices(count=3)
-                publish(topics.UI_OPEN_PASSIVES, {"player": player, "choices": choices})
+                publish(
+                    topics.UI_OPEN_PASSIVES,
+                    {"player": player, "choices": choices, "dungeon_level": dungeon_level},
+                )
 
                 # Escolha de skill. A cadência é do herói (`is_skill_offer_level`),
                 # e não um `lvl % 2` escrito aqui: o simulador chamava a mesma
@@ -320,7 +323,15 @@ def run_fight(
                     # Ver a carta já conta como conhecê-la, mesmo que ele recuse:
                     # sem isto a oferta seguinte devolveria as mesmas três.
                     player.seen_skill_ids.update(c.id for c in skill_choices)
-                    publish(topics.UI_OPEN_SKILLS, {"player": player, "choices": skill_choices})
+                    publish(
+                        topics.UI_OPEN_SKILLS,
+                        {
+                            "player": player,
+                            "choices": skill_choices,
+                            "dungeon_level": dungeon_level,
+                            "offer_level": lvl,
+                        },
+                    )
     finally:
         cleanup_combat()
         cleanup_ui()
@@ -331,9 +342,16 @@ def fight(
     monster: "Monster | list",
     rng: random.Random | None = None,
     essence_multiplier: float = 1.0,
+    dungeon_level: int = 1,
 ) -> None:
     """Alias legível para `run_fight` (compatível com chamadas antigas)."""
-    run_fight(player, monster, rng=rng, essence_multiplier=essence_multiplier)
+    run_fight(
+        player,
+        monster,
+        rng=rng,
+        essence_multiplier=essence_multiplier,
+        dungeon_level=dungeon_level,
+    )
 
 
 def process_post_battle(
@@ -494,7 +512,12 @@ def _handle_player_movement(
 
     # A casa devolve UM monstro. A lista some daqui junto com o encontro composto.
     if isinstance(collided_object, Monster):
-        fight(player, collided_object, essence_multiplier=essence_multiplier)
+        fight(
+            player,
+            collided_object,
+            essence_multiplier=essence_multiplier,
+            dungeon_level=dungeon_level,
+        )
         if not player.get_isalive():
             _get_game_publish()(topics.UI_GAME_OVER, {"player_name": player.get_nick_name()})
             add_trophy(
