@@ -81,6 +81,94 @@ PASSIVE_PRIORITIES: dict[str, tuple[str, ...]] = {
     ),
 }
 
+# Famílias de efeito que NENHUMA política prefere — e isso é declaração, não
+# esquecimento.
+#
+# O catálogo de passivas cresceu de 29 para 60 cartas e de 13 para 23 famílias.
+# As listas acima continuam ordenando as 13 originais, e as 10 abaixo entraram
+# depois. Enquanto elas estavam apenas AUSENTES dos dicionários, uma oferta só
+# com cartas dessas famílias caía no `max(choices, key=effect_value)` do fim do
+# `pick_passive` — que compara números de grandezas diferentes: +200 de HP
+# contra +5% de dano crítico contra 8% de chance de sangramento. O bot levava a
+# carta com o número maior impresso, e o scout lia isso como preferência.
+#
+# Declarar a indiferença resolve o acidente sem inventar preferência: a ordem
+# das 13 não mudou, ninguém ganhou posição nova, e o que era consequência de
+# ausência virou regra escrita. Atribuir intenção a estas 10 é decisão de
+# balanceamento, e por isso fica para a rodada que puder medi-la.
+PASSIVE_SEM_PREFERENCIA: frozenset[str] = frozenset(
+    {
+        "bleed_chance",
+        "crit_damage",
+        "damage_percent",
+        "fear_chance",
+        "life_steal",
+        "magic",
+        "mana_regen",
+        "poison_chance",
+        "precision",
+        "status_resistance",
+    }
+)
+
+# Como uma família se relaciona com a intenção de uma política. Quatro estados,
+# e nenhum deles é "não está no dicionário".
+#
+# A distinção existe porque NEUTRA e FORA_DA_INTENCAO levam a conclusões opostas
+# sobre a mesma carta. Enquanto as duas eram a mesma coisa, uma oferta só de
+# cartas sem classificação era lida como oferta ruim: o bot pagava reroll para
+# fugir dela e o scout contava a recusa como evidência de carta fraca. Isso é
+# circular — a carta é fraca porque ninguém classificou a família dela.
+PREFERIDA = "preferida"
+NEUTRA = "neutra"
+FORA_DA_INTENCAO = "fora_da_intencao"
+DESCONHECIDA = "desconhecida"
+
+# Toda família que aparece na ordem de alguma política. Hoje as três ordenam o
+# MESMO conjunto de 13, em ordens diferentes — então FORA_DA_INTENCAO está vazio
+# na prática, e `passive_off_intent` nunca dispara. Isso é um resultado, não um
+# descuido: com o catálogo atual não existe oferta de passiva que contrarie uma
+# intenção, e o bot não tem por que pagar reroll de passiva. A estrutura fica
+# pronta para o dia em que uma política deixar de ordenar uma família que outra
+# ordena.
+FAMILIAS_CLASSIFICADAS: frozenset[str] = frozenset(
+    familia for ordem in PASSIVE_PRIORITIES.values() for familia in ordem
+)
+
+
+def intent_fit(policy_name: str, effect_type: str) -> str:
+    """Em que estado esta família está para esta intenção.
+
+    DESCONHECIDA é erro de dados, não um quarto comportamento: significa que uma
+    família entrou no catálogo sem ninguém decidir nada sobre ela. Não levanta
+    exceção para não derrubar uma run por causa de um JSON, e é tratada como
+    neutra na decisão — o estado que não conclui nada. Quem a proíbe é o teste
+    estrutural.
+    """
+    if effect_type in PASSIVE_PRIORITIES.get(policy_name, ()):
+        return PREFERIDA
+    if effect_type in PASSIVE_SEM_PREFERENCIA:
+        return NEUTRA
+    if effect_type in FAMILIAS_CLASSIFICADAS:
+        return FORA_DA_INTENCAO
+    return DESCONHECIDA
+
+
+# Desempate DENTRO do tier indiferente. Raridade é o único comparador entre
+# famílias que o próprio jogo declara: uma Lendária é, por design, uma carta
+# maior que uma Comum, seja qual for o efeito. Não é uma opinião deste arquivo
+# sobre qual efeito vale mais — é a única ordem que não precisa de uma.
+RARIDADE_ORDEM: dict[str, int] = {"Common": 0, "Rare": 1, "Epic": 2, "Legendary": 3}
+
+
+def _chave_indiferente(carta) -> tuple[int, float]:
+    """Raridade primeiro, valor só como desempate entre iguais."""
+    return (
+        RARIDADE_ORDEM.get(str(getattr(carta, "rarity", "")), -1),
+        _numeric(getattr(carta, "effect_value", 0)),
+    )
+
+
 # Ordem de preferência de tipo de skill por intenção.
 SKILL_PRIORITIES: dict[str, tuple[str, ...]] = {
     "survival": ("heal", "damage_reduction", "buff", "status", "damage"),
@@ -180,7 +268,11 @@ class PickPolicy:
                 # ao lado da Comum do mesmo tipo — defeito do medidor lido
                 # como defeito do conteúdo.
                 return max(mesmas, key=lambda c: _numeric(c.effect_value))
-        return max(choices, key=lambda c: _numeric(c.effect_value))
+        # Nenhuma família preferida na oferta: todas as cartas pertencem ao tier
+        # declarado em `PASSIVE_SEM_PREFERENCIA`. O desempate é por raridade, e
+        # não pelo `effect_value` bruto, que aqui compararia grandezas
+        # diferentes. Ver o comentário daquela constante.
+        return max(choices, key=_chave_indiferente)
 
     def passive_off_intent(self, choices: list) -> bool:
         """Nenhuma das cartas serve à intenção desta política.
@@ -191,8 +283,20 @@ class PickPolicy:
         """
         if not self.deliberate or not choices:
             return False
-        prioridades = PASSIVE_PRIORITIES[self.name]
-        return not any(c.effect_type in prioridades for c in choices)
+        # "Sem preferência definida" NÃO é "contra a intenção". Uma carta neutra
+        # é uma carta sobre a qual ninguém decidiu nada, e recusar a oferta por
+        # causa dela transformaria a ausência de classificação em veredito de
+        # carta fraca.
+        #
+        # A oferta só é fraca quando NENHUMA carta é preferida E NENHUMA é
+        # neutra — ou seja, quando todas pertencem a famílias que alguma
+        # política ordena e esta não. Com o catálogo atual isso não acontece, e
+        # é por isso que o bot não paga reroll de passiva: não porque a regra
+        # sumiu, mas porque não existe oferta que a satisfaça.
+        estados = {intent_fit(self.name, c.effect_type) for c in choices}
+        if PREFERIDA in estados or NEUTRA in estados or DESCONHECIDA in estados:
+            return False
+        return True
 
     def pick_skill(self, hero, choices: list, rng: random.Random):
         """Escolhe uma skill nova e o slot que ela substitui.

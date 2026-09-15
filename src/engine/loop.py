@@ -555,10 +555,13 @@ def _handle_feature(
             },
         )
         if decision.get("choice") == "extract":
-            # A Extração ignora dívida e crédito esgotado. É a saída de
-            # emergência real da run: quem está em 3/3 e sem ouro ainda pode
-            # preservar o personagem, e é isso que impede a trava de virar morte
-            # certa.
+            # A Extração não custa nada e não olha a carteira. É a saída de
+            # emergência real da run: quem está sem ouro, acumulando saídas não
+            # pagas e com a Essência no piso ainda pode preservar o personagem.
+            # Não existe dívida nem bloqueio para ela ignorar — a punição por
+            # não pagar a saída é só Essência, e o jogador sobe de qualquer
+            # jeito. O que a Extração faz é encerrar a run antes que a run
+            # encerre o personagem.
             save_game(player, dungeon_level + 1, None, slot=slot)
             screens.render_extraction_success(dungeon_level)
             return "extracted"

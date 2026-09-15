@@ -23,11 +23,20 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.content.factories.archetypes import spawn_by_role  # noqa: E402
 from src.content.skills_loader import load_skills  # noqa: E402
 from src.mechanics import combat as cmb  # noqa: E402
+from src.shared.constants import (  # noqa: E402
+    MAX_ACTIVE_SKILLS,
+    SKILL_OFFER_LEVEL_INTERVAL,
+)
 from src.sim.harness import ALL_CLASSES, make_hero, simulate, simulate_run  # noqa: E402
 from src.sim.metrics import curve_deltas, spread, variance_explained  # noqa: E402
 from tests.balance import thresholds as T  # noqa: E402
 
 pytestmark = pytest.mark.balance
+
+# O nível em que a run medida começa. Era um 20 literal dentro da fixture, e
+# qualquer teste que precise raciocinar sobre a cadência de nível precisa saber
+# deste número.
+RUN_START_LEVEL = 20
 
 
 class TestEscalaRelativa:
@@ -156,7 +165,7 @@ class TestRunCompleta:
     def runs(self):
         return {
             (classe, politica): simulate_run(
-                classe, 20, T.FAST_RUN_ITERATIONS, politica, loadout="expected"
+                classe, RUN_START_LEVEL, T.FAST_RUN_ITERATIONS, politica, loadout="expected"
             )
             for classe in ALL_CLASSES
             for politica in ("smart", "greedy")
@@ -205,15 +214,53 @@ class TestRunCompleta:
 
     @pytest.mark.parametrize("classe", ALL_CLASSES)
     def test_a_run_entrega_a_progressao_do_jogo(self, runs, classe):
-        # O jogo dá uma passiva por nível e uma escolha de skill nos níveis
-        # ímpares a partir do 5. Uma simulação que não entrega isso mede um
-        # herói que ninguém joga, e todo número calibrado em cima dela é falso.
+        """A simulação roda a progressão do jogo — este teste é de VIDA, não de banda.
+
+        Ele nasceu para pegar o defeito em que `level_up(show=False)` devolvia
+        lista vazia e a run inteira acontecia com zero passivas e zero escolhas
+        de skill. Todo número calibrado sobre aquela run era falso.
+
+        O piso de skills era um `3.0` literal, escrito quando a oferta acontecia
+        nos níveis ÍMPARES A PARTIR DO 5. O jogo usa `SKILL_OFFER_LEVEL_INTERVAL
+        = 3` — oferta nos múltiplos de 3 —, e a diferença não é cosmética: um
+        herói que começa no nível 20 e ganha 8,9 níveis recebe 3 ofertas pela
+        cadência atual contra 4 pela antiga. Com deck começando na assinatura da
+        classe, o teto vira `1 + ofertas`; para o Mago, que ganha 4,3 níveis e
+        recebe 2 ofertas, o teto é 3 — ou seja, o literal exigia dele aceitar
+        100% das ofertas, e o bot recusa de propósito o que não melhora o deck.
+
+        Por isso o piso deixou de ser literal e passou a sair da própria
+        constante do jogo. A verificação é de dois lados e continua impossível de
+        passar com a progressão morta: mais que a assinatura (a escolha rodou) e
+        nunca acima do que a cadência ofereceu (a simulação não inventou carta).
+
+        Isto NÃO afrouxa a medição da fraqueza do Mago: ela é real, e continua
+        vermelha em `test_nenhuma_classe_domina_nem_e_inutil`.
+        """
         dados = runs[(classe, "smart")]
         assert dados["passives_at_end_mean"] >= T.MIN_PASSIVES_AT_END, (
             f"{classe} termina a run com {dados['passives_at_end_mean']:.1f} passivas: "
             "a progressão parou de rodar na simulação."
         )
-        assert dados["skills_at_end_mean"] >= 3.0
+
+        # Uma passiva por nível: é o número de níveis ganhos, medido e não suposto.
+        niveis_ganhos = dados["passives_at_end_mean"]
+        ofertas = sum(
+            1
+            for nivel in range(RUN_START_LEVEL + 1, int(RUN_START_LEVEL + niveis_ganhos) + 1)
+            if nivel % SKILL_OFFER_LEVEL_INTERVAL == 0
+        )
+        teto = min(MAX_ACTIVE_SKILLS, 1 + ofertas)
+
+        skills = dados["skills_at_end_mean"]
+        assert skills > 1.0, (
+            f"{classe} termina com {skills:.2f} skills: a escolha de skill não rodou, "
+            "o herói ficou só com a assinatura da classe."
+        )
+        assert skills <= teto, (
+            f"{classe} termina com {skills:.2f} skills, acima do teto de {teto} que "
+            f"{ofertas} ofertas permitem: a simulação entregou carta que ninguém ofereceu."
+        )
 
     @pytest.mark.parametrize("classe", ALL_CLASSES)
     def test_nenhum_andar_sozinho_decide_a_run(self, runs, classe):
