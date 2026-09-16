@@ -186,6 +186,15 @@ class BotPadrao:
         # Quantas vezes cada verbo de combate foi escolhido na run inteira.
         self.acoes: Counter = Counter()
         self.mp_gasto = 0
+        # Denominador honesto para "usou pouca mana": o MP que ele TINHA ao
+        # entrar em cada luta, somado. Comparar com `base_mp` ignoraria que ele
+        # entra na segunda luta já gastando o que sobrou da primeira.
+        self.mp_disponivel = 0
+        # `self.combates` é zerado a cada andar para a linha "Fim do andar".
+        # Este acumula a run inteira.
+        self.combates_na_run = 0
+        # O combate que encerrou a run, com o que era visível ANTES dele.
+        self.fatal: dict | None = None
 
     # -- observação -------------------------------------------------------
 
@@ -401,6 +410,20 @@ class BotPadrao:
 
         hp_antes, mp_antes = hero.get_hp(), hero.get_mp()
         nome = monstro.get_nick_name()
+        nivel_alvo = int(getattr(monstro, "level", hero.get_level()))
+        self.mp_disponivel += mp_antes
+        # Gravado ANTES de saber o resultado: se esta luta for a última, é isto
+        # que o jogador tinha na tela ao aceitá-la.
+        candidato = {
+            "monstro": nome,
+            "nivel": nivel_alvo,
+            "gap": nivel_alvo - hero.get_level(),
+            "hp_antes": hp_antes,
+            "hp_frac": hp_antes / max(1, hero.base_hp),
+            "mp_antes": mp_antes,
+            "mp_frac": mp_antes / max(1, hero.base_mp),
+            "andar": self.andar,
+        }
 
         def _apos_o_combate(resultado) -> None:
             """O que o bot faz com o resultado — ANTES das escolhas de nível.
@@ -444,10 +467,14 @@ class BotPadrao:
             on_results=_apos_o_combate,
         )
         self.combates += 1
+        self.combates_na_run += 1
 
         if resultado.fled:
             self.trace.diz(f"  Combate: {nome} -> FUGIU | HP {hp_antes}->{hero.get_hp()}")
-        return hero.get_isalive() and hero.get_hp() > 0
+        vivo = hero.get_isalive() and hero.get_hp() > 0
+        if not vivo:
+            self.fatal = candidato
+        return vivo
 
     def _escolher_do_nivel(self, jogador, oferta) -> None:
         """A resposta do bot quando o core pergunta o que levar deste nível.
@@ -975,8 +1002,15 @@ class BotPadrao:
         self.trace.diz(
             "  Combate: "
             + ", ".join(f"{verbo} {n}x" for verbo, n in sorted(self.acoes.items()))
-            + f" | MP gasto na run: {self.mp_gasto}"
+            + f" | MP gasto {self.mp_gasto} de {self.mp_disponivel} disponíveis"
         )
+        if self.fatal is not None:
+            f = self.fatal
+            self.trace.diz(
+                f"  Combate fatal: {f['monstro']} (Nv{f['nivel']}, {f['gap']:+d} de mim) no "
+                f"andar {f['andar']}, com HP {f['hp_antes']} ({f['hp_frac']:.0%}) e "
+                f"MP em {f['mp_frac']:.0%}"
+            )
         led = hero.ledger
         self.trace.diz(
             f"  Livro-caixa: ganhou {led.get('gold_earned', 0)}, "
