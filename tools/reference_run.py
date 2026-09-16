@@ -45,6 +45,7 @@ from src.content.floor_exit import effective_essence, unpaid_streak, use_exit
 from src.content.shop import Shop
 from src.engine.game_logic import create_player_from_data
 from src.engine.loop import _setup_dungeon_map, process_post_battle
+from src.engine.map import EventTile, FeatureTile
 from src.engine.map_analysis import campo_de_custo, rota_do_campo
 from src.mechanics.battle import run_battle
 from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
@@ -81,6 +82,10 @@ FOLGA_PARA_COMPRAR = 1.5
 # Altar cobra vida. Só vale com folga real.
 HP_PARA_ALTAR = 0.75
 
+# Quantos níveis acima de mim um duelo ainda é proporcional. Acima disto o
+# monstro não é "difícil": é outro patamar, e HP cheio não compensa.
+GAP_ACEITAVEL = 2
+
 # --- Extração ---------------------------------------------------------------
 # A Extração deixou de ser tratada só como botão de pânico. Sempre que existir
 # uma casa alcançável ela é AVALIADA, e o trace registra o veredito — inclusive
@@ -89,6 +94,12 @@ HP_DE_RISCO = 0.50
 STREAK_DE_RISCO = 3
 # Quantos sinais de risco simultâneos convencem a sair.
 SINAIS_PARA_EXTRAIR = 2
+
+
+# Passo -> tecla. Não é regra de jogo espelhada: é a tradução entre "a rota diz
+# para ir ao norte" e a letra que `move_player` espera. Quem decide o que
+# acontece ao pisar continua sendo `move_player`.
+DIRECAO = {(-1, 0): "w", (1, 0): "s", (0, -1): "a", (0, 1): "d"}
 
 
 def _pos(d: dict) -> tuple[int, int]:
@@ -210,27 +221,163 @@ class RunDeReferencia:
                 return casa
         return None
 
-    def _monstro_mais_perto(self):
-        visto = self._campo(por_combate=False)[0]
-        candidatos = [(visto[c][0], c) for c in self.mapa.enemies_pos if c in visto]
-        return min(candidatos)[1] if candidatos else None
+    def _alvos_visiveis(self) -> list[dict]:
+        """Os monstros alcançáveis, com o que o JOGADOR consegue ver de cada um.
+
+        Nível está no nome da casa, distância e combates extras saem do mapa.
+        Nada de resultado futuro, RNG ou loot: só o que está na tela.
+        """
+        campo = self._campo(por_combate=True)
+        nivel_heroi = self.hero.get_level()
+        alvos = []
+        for casa, monstro in self.mapa.enemies_pos.items():
+            rota, _ = rota_do_campo(campo, casa, True)
+            if not rota.alcancavel:
+                continue
+            nivel = int(getattr(monstro, "level", nivel_heroi))
+            alvos.append(
+                {
+                    "casa": casa,
+                    "nome": monstro.get_nick_name(),
+                    "nivel": nivel,
+                    "gap": nivel - nivel_heroi,
+                    "passos": rota.passos,
+                    # A rota até ele pode obrigar a lutar com OUTROS pelo
+                    # caminho. Um alvo fácil atrás de dois difíceis não é fácil.
+                    "extras": max(0, rota.combates - 1),
+                }
+            )
+        return alvos
+
+    def _razoavel(self, alvo: dict) -> bool:
+        """Um duelo que não é desproporcional ao personagem."""
+        return alvo["gap"] <= GAP_ACEITAVEL
+
+    def _melhor_alvo(self, alvos: list[dict]) -> dict | None:
+        """O alvo razoável mais barato: menor defasagem, menos lutas extras, mais perto.
+
+        Nunca "o mais perto". Era assim que um Bandido Nv.9 a 3 passos ganhava de
+        um Rato Nv.5 a 7 passos — e matava a run.
+        """
+        razoaveis = [a for a in alvos if self._razoavel(a)]
+        if not razoaveis:
+            return None
+        return min(razoaveis, key=lambda a: (a["gap"], a["extras"], a["passos"]))
+
+    def _descrever_alvos(self, alvos: list[dict], escolhido: dict | None) -> None:
+        """Põe no trace o que estava disponível e o que foi recusado."""
+        if not alvos:
+            return
+        partes = []
+        for a in sorted(alvos, key=lambda x: (x["gap"], x["passos"])):
+            marca = (
+                "ESCOLHIDO"
+                if escolhido is not None and a["casa"] == escolhido["casa"]
+                else ("recusado (desproporcional)" if not self._razoavel(a) else "descartado")
+            )
+            partes.append(
+                f"{a['nome']} (Nv{a['nivel']}, {a['gap']:+d} de mim, {a['passos']} passos"
+                + (f", +{a['extras']} luta(s) no caminho" if a["extras"] else "")
+                + f") — {marca}"
+            )
+        self.trace.diz("  Alvos visíveis: " + " | ".join(partes))
 
     # -- ações ------------------------------------------------------------
 
     def _ir_ate(self, destino, evitando: bool = True) -> bool:
-        """Anda até a casa, resolvendo o que estiver no caminho. False se morreu."""
+        """Anda até a casa, UM PASSO POR VEZ, pelo movimento real do jogo.
+
+        Cada passo é `MapOfGame.move_player`, a mesma função que o teclado
+        aciona: é ela que decide o que acontece ao pisar numa casa. Antes esta
+        função só olhava para `enemies_pos`, e o herói atravessava Loja,
+        Ferreiro, Evento e Extração como se fossem chão quando o objetivo era
+        outro — intangível às casas que o jogo faz o jogador encarar.
+
+        A policy ainda decide o que FAZER com a casa (abrir a loja ou passar
+        reto), mas não decide mais se a casa existe. Devolve False só quando a
+        run acabou.
+        """
         if destino == self.posicao:
             monstro = self.mapa.enemies_pos.get(destino)
             return self._duelo(monstro, destino) if monstro is not None else True
+
         rota, caminho = rota_do_campo(self._campo(evitando), destino, evitando)
         if not rota.alcancavel:
             return True
+
         for casa in caminho[1:]:
+            anterior = self.posicao
+            direcao = DIRECAO.get((casa[0] - anterior[0], casa[1] - anterior[1]))
+            if direcao is None:
+                return True
+            resultado = self.mapa.move_player(direcao)
+            self.posicao = _pos(self.mapa.player_pos)
+            if self.posicao == anterior and resultado is None:
+                # Parede ou borda: a rota e o mapa discordam. Parar é melhor que
+                # girar no lugar.
+                return True
             self.passos += 1
-            self.posicao = casa
-            monstro = self.mapa.enemies_pos.get(casa)
-            if monstro is not None and not self._duelo(monstro, casa):
+            if not self._resolver_casa(resultado, casa):
                 return False
+            if resultado == "level_complete":
+                self.posicao = self.saida
+                return True
+        return True
+
+    def _resolver_casa(self, resultado, casa) -> bool:
+        """O que a casa em que ele pisou produz. False se a run acabou."""
+        if resultado is None or resultado == "level_complete":
+            return True
+        if isinstance(resultado, EventTile):
+            # `move_player` JÁ consumiu o evento — e é a regra: recusar o Altar,
+            # ignorar a Fonte ou sair do Mercador sem comprar gastam a visita do
+            # mesmo jeito. O que a policy ainda decide é se ACEITA o efeito.
+            return self._resolver_evento(resultado.event_type)
+        if isinstance(resultado, FeatureTile):
+            return self._resolver_feature(resultado.feature, resultado.position)
+        return self._duelo(resultado, casa)
+
+    def _resolver_feature(self, tipo: str, casa) -> bool:
+        """Pisou num serviço. A casa NÃO foi consumida: quem gasta é abrir."""
+        hero = self.hero
+        taxa = exit_fee(self.andar)
+        hp = _frac_hp(hero)
+
+        if tipo == feat.EXTRACTION:
+            extrair, veredito = self._avaliar_extracao(casa)
+            if veredito == self._ultimo_veredito_extracao:
+                self.trace.diz("  Pisou na Extração — o veredito acima é o desta casa.")
+            else:
+                self.trace.diz(f"  Pisou na Extração. {veredito}")
+                self._ultimo_veredito_extracao = veredito
+            if extrair:
+                self.extraiu = True
+                return False
+            return True
+
+        if tipo == feat.SHOP:
+            if hp < HP_SAUDAVEL or hero.coins >= taxa * FOLGA_PARA_COMPRAR:
+                self.trace.diz("  Pisou na Loja e vale entrar.")
+                self.mapa.take_feature(casa)
+                self._comprar_com_orcamento("Loja")
+            else:
+                self.trace.diz(
+                    f"  Pisou na Loja e passou reto: {hero.coins} de ouro contra uma saída de "
+                    f"{taxa}, e {hp:.0%} de HP. Nada aqui que valha a reserva."
+                )
+            return True
+
+        if tipo == feat.FORGE:
+            if hero.coins >= taxa * FOLGA_PARA_COMPRAR and self._tem_peca_para_investir():
+                self.trace.diz("  Pisou no Ferreiro e vale entrar.")
+                self.mapa.take_feature(casa)
+                self._usar_ferreiro(casa)
+            else:
+                self.trace.diz(
+                    f"  Pisou no Ferreiro e passou reto: {hero.coins} de ouro contra uma saída "
+                    f"de {taxa}."
+                )
+            return True
         return True
 
     def _duelo(self, monstro, casa) -> bool:
@@ -364,21 +511,26 @@ class RunDeReferencia:
             f"  {rotulo}: ouro {ouro_antes} -> {hero.coins} | HP {hp_antes} -> {hero.get_hp()}"
         )
 
-    def _usar_loja(self, casa) -> None:
-        self.mapa.take_feature(casa)
-        self._comprar_com_orcamento("Loja")
-
     def _usar_ferreiro(self, casa) -> None:
         hero = self.hero
         ouro_antes = hero.coins
-        self.mapa.take_feature(casa)
         progression.visit_forge(hero, self.andar, self.toggles, None)
         self.trace.diz(f"  Ferreiro: ouro {ouro_antes} -> {hero.coins}")
 
-    def _usar_evento(self, casa) -> bool:
+    def _resolver_evento(self, tipo: str | None) -> bool:
+        """O evento em que ele pisou. A casa já foi gasta por `move_player`.
+
+        A policy ainda escolhe ACEITAR ou não: o Altar cobra vida, e pagá-lo com
+        pouco HP é como um jogador morre. Recusar não devolve a casa — é a regra
+        do jogo, e é por isso que atravessar um evento por acaso tem preço.
+        """
         hero = self.hero
-        tipo = self.mapa.event_type
-        self.mapa.take_event()
+        if tipo == "altar" and _frac_hp(hero) < HP_PARA_ALTAR:
+            self.trace.diz(
+                f"  Evento Altar: RECUSADO. Ele cobra vida e estou com "
+                f"{_frac_hp(hero):.0%} — a casa some do mesmo jeito, mas pagar aqui me mata."
+            )
+            return True
         if tipo == "fountain":
             curou = apply_fountain_heal(hero)
             self.trace.diz(f"  Evento Fonte: curou {int(curou)} (HP {hero.get_hp()})")
@@ -408,7 +560,8 @@ class RunDeReferencia:
         taxa = exit_fee(self.andar)
         loja, ferreiro, evento = (self._casa_de(t) for t in (feat.SHOP, feat.FORGE, "event"))
         extracao = self._casa_de(feat.EXTRACTION)
-        monstro = self._monstro_mais_perto()
+        alvos = self._alvos_visiveis()
+        alvo = self._melhor_alvo(alvos)
 
         # 1. Perigo. Em ordem: quem cura primeiro.
         if hp < HP_CRITICO:
@@ -448,27 +601,38 @@ class RunDeReferencia:
         #    emergência. O veredito entra no trace mesmo quando é "continuo".
         if extracao is not None and self._alcance(extracao) is not None:
             extrair, veredito = self._avaliar_extracao(extracao)
+            if extrair:
+                self._ultimo_veredito_extracao = veredito
+                return ("extrair", extracao, veredito)
             if veredito != self._ultimo_veredito_extracao:
                 self.trace.diz(f"  {veredito}")
                 self._ultimo_veredito_extracao = veredito
-            if extrair:
-                return ("extrair", extracao, veredito)
 
-        # 3. CAÇA OBRIGATÓRIA: falta ouro para a saída. Aceita risco moderado,
-        #    porque não lutar também cobra — a Essência do próximo andar.
-        if (
-            hero.coins < taxa
-            and monstro is not None
-            and hp >= HP_PARA_CACA_OBRIGATORIA
-            and mp >= MP_PARA_CACA_OBRIGATORIA
-        ):
-            return (
-                "lutar",
-                monstro,
-                f"Faltam {taxa - hero.coins} de ouro para a saída de {taxa}. Com {hp:.0%} de HP "
-                f"e {mp:.0%} de MP dá para encarar: é caça OBRIGATÓRIA, e recusá-la custa "
-                "Essência no andar seguinte.",
-            )
+        # 3. CAÇA POR NECESSIDADE. Não é "preciso pagar, logo preciso lutar" —
+        #    é "estou sem ouro; vale assumir UMA luta para conseguir pagar?".
+        #    Se todos os alvos forem desproporcionais, aceitar a saída não paga é
+        #    decisão válida: perder Essência é melhor que perder o personagem.
+        if hero.coins < taxa and hp >= HP_PARA_CACA_OBRIGATORIA and mp >= MP_PARA_CACA_OBRIGATORIA:
+            if alvo is not None:
+                self._descrever_alvos(alvos, alvo)
+                return (
+                    "lutar",
+                    alvo["casa"],
+                    f"Faltam {taxa - hero.coins} de ouro para a saída de {taxa}. O melhor alvo é "
+                    f"{alvo['nome']} (Nv{alvo['nivel']}, {alvo['gap']:+d} de mim) a "
+                    f"{alvo['passos']} passos, e estou com {hp:.0%} de HP e {mp:.0%} de MP. "
+                    "Vale a luta.",
+                )
+            if alvos:
+                self._descrever_alvos(alvos, None)
+                menor = min(a["gap"] for a in alvos)
+                return (
+                    "saida",
+                    self.saida,
+                    f"Faltam {taxa - hero.coins} de ouro, mas o melhor alvo disponível está "
+                    f"{menor:+d} níveis de mim. Aceito a saída não paga em vez de arriscar a "
+                    "run — Essência se recupera, personagem não.",
+                )
 
         # 3. Serviços, quando o desvio é pequeno e o bolso permite.
         if loja is not None:
@@ -533,24 +697,25 @@ class RunDeReferencia:
         #    munição. Foi exatamente esta decisão, tomada a 67% de HP, que matou
         #    a run anterior no andar 6.
         if (
-            monstro is not None
+            alvo is not None
             and hp >= HP_PARA_CACA_OPCIONAL
             and mp >= MP_PARA_CACA_OPCIONAL
             and hero.get_level() <= self.andar
         ):
-            passos = self._alcance(monstro)
+            self._descrever_alvos(alvos, alvo)
             return (
                 "lutar",
-                monstro,
+                alvo["casa"],
                 f"Nível {hero.get_level()} no andar {self.andar}: estou atrás da curva. Caça "
-                f"OPCIONAL, e estou confortável para ela — {hp:.0%} de HP e {mp:.0%} de MP, "
-                f"contra o monstro a {passos[0] if passos else '?'} passos.",
+                f"OPCIONAL, e estou confortável — {hp:.0%} de HP e {mp:.0%} de MP. Escolho "
+                f"{alvo['nome']} (Nv{alvo['nivel']}, {alvo['gap']:+d} de mim) a "
+                f"{alvo['passos']} passos.",
             )
 
         # 5. Sair. O motivo tem de ser o REAL: "já tenho o que precisava" com
         #    ouro abaixo da taxa é mentira, e um trace que mente não serve para
         #    revisar decisão nenhuma.
-        if monstro is not None and hero.coins < taxa:
+        if alvos and hero.coins < taxa:
             return (
                 "saida",
                 self.saida,
@@ -559,7 +724,7 @@ class RunDeReferencia:
                 f"{MP_PARA_CACA_OBRIGATORIA:.0%}) até para caça obrigatória. Prefiro subir sem "
                 "pagar a morrer tentando pagar.",
             )
-        if monstro is not None:
+        if alvos:
             return (
                 "saida",
                 self.saida,
@@ -577,11 +742,17 @@ class RunDeReferencia:
             or sum(1 for i in hero.equipment.values() if i) >= 2
         )
 
-    def _sinais_de_risco(self) -> list[str]:
-        """O que, no estado atual, diz que continuar é perigoso."""
+    def _sinais_de_risco(self) -> tuple[list[str], str]:
+        """(sinais normais, sinal grave). O grave vale por dois.
+
+        Grave é um só, e é estrutural: os combates que este andar oferece são
+        desproporcionais ao personagem. Quando isso acontece, não existe jogada
+        que recupere o atraso — nem lutar nem fugir —, e é o momento em que um
+        jogador olha a casa de Extração com outros olhos.
+        """
         hero = self.hero
         sinais = []
-        hp = _frac_hp(hero)
+        hp, mp = _frac_hp(hero), _frac_mp(hero)
         if hp < HP_DE_RISCO:
             sinais.append(f"HP em {hp:.0%}")
         if hero.get_level() < self.andar - 1:
@@ -589,9 +760,18 @@ class RunDeReferencia:
         streak = unpaid_streak(hero)
         if streak >= STREAK_DE_RISCO:
             sinais.append(f"{streak} saídas não pagas seguidas")
-        if _frac_mp(hero) < MP_PARA_CACA_OBRIGATORIA:
-            sinais.append(f"MP em {_frac_mp(hero):.0%}")
-        return sinais
+        if mp < MP_PARA_CACA_OBRIGATORIA:
+            sinais.append(f"MP em {mp:.0%}")
+
+        grave = ""
+        alvos = self._alvos_visiveis()
+        if alvos and self._melhor_alvo(alvos) is None:
+            pior = min(a["gap"] for a in alvos)
+            grave = (
+                f"nenhum dos {len(alvos)} combates acessíveis é proporcional — o mais fácil "
+                f"está {pior:+d} níveis de mim"
+            )
+        return sinais, grave
 
     def _avaliar_extracao(self, casa) -> tuple[bool, str]:
         """A Extração é SEMPRE avaliada quando alcançável, e o veredito vai ao trace.
@@ -602,7 +782,7 @@ class RunDeReferencia:
         """
         hero = self.hero
         preserva = self._tem_o_que_preservar()
-        sinais = self._sinais_de_risco()
+        sinais, grave = self._sinais_de_risco()
         resumo = (
             f"nível {hero.get_level()}, {len(hero.passives)} passivas, "
             f"{sum(1 for i in hero.equipment.values() if i)} peças"
@@ -612,6 +792,11 @@ class RunDeReferencia:
                 f"Extração avaliada: ainda não acumulei nada que valha preservar ({resumo}). "
                 "Continuo descendo."
             )
+        if grave:
+            return True, (
+                f"Extração avaliada: SINAL GRAVE — {grave}. Com {resumo} acumulados, insistir "
+                "num andar que não me oferece luta possível é entregar a run."
+            )
         if not sinais:
             return False, (
                 f"Extração avaliada: tenho {resumo} para preservar, mas nenhum sinal de risco "
@@ -619,8 +804,8 @@ class RunDeReferencia:
             )
         if len(sinais) < SINAIS_PARA_EXTRAIR:
             return False, (
-                f"Extração avaliada: {sinais[0]}, mas é um sinal só e tenho {resumo}. "
-                "Ainda dá para seguir."
+                f"Extração avaliada: {sinais[0]}, mas é um sinal só, sem nada grave, e tenho "
+                f"{resumo}. Ainda dá para seguir."
             )
         return True, (
             f"Extração avaliada: {' e '.join(sinais)}. Com {resumo} acumulados, "
@@ -642,6 +827,7 @@ class RunDeReferencia:
         self.passos = 0
         self.combates = 0
         self._ultimo_veredito_extracao = ""
+        self.extraiu = False
 
         rolada = progression.floor_essence_multiplier(andar)
         self.essencia = effective_essence(hero, rolada)
@@ -670,27 +856,16 @@ class RunDeReferencia:
             acao, alvo, motivo = self._decidir()
             self.trace.decisao(motivo)
 
-            if acao == "saida":
-                if not self._ir_ate(self.saida, evitando=True):
-                    return "morreu"
-                break
-            if acao == "extrair":
-                if not self._ir_ate(alvo, evitando=True):
-                    return "morreu"
+            # O destino é escolha da policy; o que acontece em cada casa do
+            # caminho é `move_player`. Por isso o laço não "usa" mais o serviço:
+            # ele anda até lá, e a casa se resolve ao ser pisada.
+            vivo = self._ir_ate(alvo, evitando=(acao != "lutar"))
+            if self.extraiu:
                 return "extraiu"
-            if acao == "lutar":
-                if not self._ir_ate(alvo, evitando=False):
-                    return "morreu"
-                continue
-            if not self._ir_ate(alvo, evitando=True):
+            if not vivo:
                 return "morreu"
-            if acao == "loja":
-                self._usar_loja(alvo)
-            elif acao == "ferreiro":
-                self._usar_ferreiro(alvo)
-            elif acao == "evento":
-                if not self._usar_evento(alvo):
-                    return "morreu"
+            if acao == "saida":
+                break
 
         # FIM DO ANDAR, na ordem do jogo: saída -> descanso -> juros.
         saida = use_exit(hero, andar)

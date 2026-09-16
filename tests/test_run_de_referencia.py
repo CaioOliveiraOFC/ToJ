@@ -207,9 +207,10 @@ class TestOrcamentoDeCompra:
 
 class TestExtracaoEAvaliadaAntesDaEmergencia:
     def _run(self, nivel: int, andar: int, hp_fracao: float):
-        run = ref.RunDeReferencia("warrior", seed=7, max_andar=1)
+        # Mapa sem monstro: assim não há SINAL GRAVE, e o teste isola os sinais
+        # normais. `_sinais_de_risco` precisa de um mapa para olhar os alvos.
+        run = _run_preparada(_mapa_de_teste(), nivel=nivel)
         run.andar = andar
-        run.hero.set_level(nivel)
         run.hero.take_damage(int(run.hero.base_hp * (1 - hp_fracao)))
         return run
 
@@ -233,3 +234,129 @@ class TestExtracaoEAvaliadaAntesDaEmergencia:
         extrair, veredito = run._avaliar_extracao((0, 0))
         assert extrair is True
         assert "sair vivo vale mais" in veredito
+
+
+def _mapa_de_teste(altura=9, largura=15):
+    from src.engine.map import MapOfGame
+
+    m = MapOfGame(height=altura, width=largura)
+    m.grid = [
+        ["#" if (y in (0, altura - 1) or x in (0, largura - 1)) else "." for x in range(largura)]
+        for y in range(altura)
+    ]
+    m.player_pos = {"y": 1, "x": 1}
+    m.exit_pos = {"y": altura - 2, "x": largura - 2}
+    m.grid[altura - 2][largura - 2] = "X"
+    return m
+
+
+def _run_preparada(mapa, nivel=4):
+    run = ref.RunDeReferencia("warrior", seed=7, max_andar=1)
+    run.hero.set_level(nivel)
+    run.andar = 5
+    run.mapa = mapa
+    run.posicao = (mapa.player_pos["y"], mapa.player_pos["x"])
+    run.saida = (mapa.exit_pos["y"], mapa.exit_pos["x"])
+    run.passos = 0
+    run.combates = 0
+    run.essencia = 1.0
+    run.trace = ref.Trace()
+    run.reserva_gasta = 0
+    run.extraiu = False
+    run._ultimo_veredito_extracao = ""
+    return run
+
+
+class TestMovimentoRespeitaTodaCasa:
+    """O herói não pode ser intangível às casas do andar."""
+
+    def test_o_passo_usa_o_movimento_real_do_engine(self, monkeypatch):
+        # Quem decide o que acontece ao pisar é `move_player`, e não uma cópia
+        # da regra dentro da ferramenta.
+        mapa = _mapa_de_teste()
+        run = _run_preparada(mapa)
+        chamadas = []
+        original = mapa.move_player
+        monkeypatch.setattr(mapa, "move_player", lambda d: (chamadas.append(d), original(d))[1])
+        run._ir_ate(run.saida, evitando=True)
+        assert chamadas, "andou sem chamar move_player"
+        assert set(chamadas) <= {"w", "a", "s", "d"}
+
+    def test_pisar_num_servico_a_caminho_de_outro_lugar_resolve_a_casa(self):
+        # O caso que a v2 errava: atravessar o Ferreiro indo para a saída, como
+        # se a casa fosse chão.
+        mapa = _mapa_de_teste()
+        mapa.features[(1, 5)] = ref.feat.FORGE
+        run = _run_preparada(mapa)
+        run.hero.coins = 0  # sem ouro: vai passar reto, mas TEM de ver a casa
+        run._ir_ate(run.saida, evitando=True)
+        assert "Pisou no Ferreiro" in str(run.trace)
+
+    def test_pisar_num_evento_consome_a_casa_como_no_jogo(self):
+        mapa = _mapa_de_teste()
+        mapa.place_event("fountain")
+        run = _run_preparada(mapa)
+        alvo = mapa.event_pos
+        run._ir_ate(alvo, evitando=True)
+        assert mapa.event_pos is None, "o evento continuou no mapa depois de pisado"
+
+
+class TestEscolhaDeAlvo:
+    """Nunca 'o mais perto'. O nível do alvo está visível e conta primeiro."""
+
+    def test_prefere_o_proporcional_ao_proximo(self):
+        from src.content.factories.monsters import create_monster
+
+        mapa = _mapa_de_teste()
+        mapa.enemies_pos[(1, 4)] = create_monster("Bandido", 9, "bruiser")
+        mapa.enemies_pos[(1, 8)] = create_monster("Rato", 5, "trash")
+        run = _run_preparada(mapa, nivel=4)
+
+        alvos = run._alvos_visiveis()
+        escolhido = run._melhor_alvo(alvos)
+        assert escolhido is not None
+        assert escolhido["nivel"] == 5, "escolheu o Nv9 só porque estava mais perto"
+
+    def test_alvo_desproporcional_e_recusado(self):
+        from src.content.factories.monsters import create_monster
+
+        mapa = _mapa_de_teste()
+        mapa.enemies_pos[(1, 4)] = create_monster("Bandido", 9, "bruiser")
+        run = _run_preparada(mapa, nivel=4)
+
+        alvos = run._alvos_visiveis()
+        assert alvos and not run._razoavel(alvos[0])
+        assert run._melhor_alvo(alvos) is None
+
+
+class TestCacaPorNecessidadePodeRecusar:
+    def test_sem_alvo_proporcional_aceita_a_saida_nao_paga(self):
+        from src.content.factories.monsters import create_monster
+
+        mapa = _mapa_de_teste()
+        for casa in ((1, 4), (1, 6), (3, 5)):
+            mapa.enemies_pos[casa] = create_monster("Bandido", 9, "bruiser")
+        run = _run_preparada(mapa, nivel=4)
+        run.hero.coins = 0  # não consegue pagar a taxa
+
+        acao, _alvo, motivo = run._decidir()
+        assert acao == "saida"
+        assert "níveis de mim" in motivo
+        assert "Essência se recupera, personagem não" in motivo
+
+
+class TestSinalGraveNaExtracao:
+    def test_um_sinal_grave_basta_para_considerar_extracao(self):
+        from src.content.factories.monsters import create_monster
+
+        mapa = _mapa_de_teste()
+        for casa in ((1, 4), (1, 6)):
+            mapa.enemies_pos[casa] = create_monster("Bandido", 9, "bruiser")
+        run = _run_preparada(mapa, nivel=4)
+        # HP cheio e MP cheio: NENHUM sinal normal. Só o grave.
+        sinais, grave = run._sinais_de_risco()
+        assert grave, "não detectou que nenhum combate acessível é proporcional"
+
+        extrair, veredito = run._avaliar_extracao((1, 1))
+        assert extrair is True
+        assert "SINAL GRAVE" in veredito
