@@ -1,4 +1,4 @@
-"""SMART_REAL: uma run de referência, jogada passo a passo e revisável.
+"""BOT_PADRÃO: o jogador automatizado do ToJ.
 
 As quatro políticas da auditoria anterior eram caricaturas úteis — limpar tudo,
 correr, economizar, explorar. Nenhuma delas é um jogador. Esta é a tentativa de
@@ -81,6 +81,27 @@ DESVIO_ACEITAVEL = 10
 FOLGA_PARA_COMPRAR = 1.5
 # Altar cobra vida. Só vale com folga real.
 HP_PARA_ALTAR = 0.75
+
+# --- Prioridade global de decisão ------------------------------------------
+# O bot avaliava cada serviço isoladamente, e por isso gastava no Ferreiro logo
+# antes de precisar do ouro para curar na Loja. A correção não é "no andar 7 não
+# entre no Ferreiro": é uma ESCADA, e nenhuma necessidade mais baixa é atendida
+# enquanto houver uma mais alta pendente e alcançável.
+SOBREVIVENCIA = 1
+EVITAR_DESPROPORCIONAL = 2
+RECUPERACAO = 3
+CONTINUIDADE = 4
+INVESTIMENTO = 5
+COMBATE_OPCIONAL = 6
+
+NOME_DA_NECESSIDADE = {
+    SOBREVIVENCIA: "sobrevivência",
+    EVITAR_DESPROPORCIONAL: "evitar combate desproporcional",
+    RECUPERACAO: "recuperação",
+    CONTINUIDADE: "continuidade da run",
+    INVESTIMENTO: "investimento",
+    COMBATE_OPCIONAL: "combate opcional",
+}
 
 # Quantos níveis acima de mim um duelo ainda é proporcional. Acima disto o
 # monstro não é "difícil": é outro patamar, e HP cheio não compensa.
@@ -172,8 +193,8 @@ class RegistroDeOfertas:
             self._contadores[nome] = valor
 
 
-class RunDeReferencia:
-    """Uma run, jogada decisão a decisão."""
+class BotPadrao:
+    """Um jogador automatizado. Observa, escolhe UMA ação, e o jogo executa."""
 
     def __init__(self, classe: str, seed: int, max_andar: int = 20) -> None:
         random.seed(seed)
@@ -368,15 +389,23 @@ class RunDeReferencia:
             return True
 
         if tipo == feat.FORGE:
-            if hero.coins >= taxa * FOLGA_PARA_COMPRAR and self._tem_peca_para_investir():
-                self.trace.diz("  Pisou no Ferreiro e vale entrar.")
-                self.mapa.take_feature(casa)
-                self._usar_ferreiro(casa)
-            else:
+            necessidade, porque = self._necessidade_atual()
+            if necessidade < INVESTIMENTO:
                 self.trace.diz(
-                    f"  Pisou no Ferreiro e passou reto: {hero.coins} de ouro contra uma saída "
-                    f"de {taxa}."
+                    f"  Pisou no Ferreiro e passou reto: o que importa agora é "
+                    f"{NOME_DA_NECESSIDADE[necessidade]} ({porque}). Aprimorar equipamento é "
+                    "investimento, e investimento espera."
                 )
+                return True
+            if not self._tem_peca_para_investir():
+                self.trace.diz("  Pisou no Ferreiro e passou reto: não tenho peça equipada.")
+                return True
+            self.trace.diz(
+                f"  Pisou no Ferreiro e vale entrar: {hero.coins} de ouro, saída de {taxa} "
+                "garantida, e nada mais urgente pendente."
+            )
+            self.mapa.take_feature(casa)
+            self._usar_ferreiro(casa)
             return True
         return True
 
@@ -812,6 +841,31 @@ class RunDeReferencia:
             "sair vivo vale mais que o próximo andar."
         )
 
+    def _necessidade_atual(self) -> tuple[int, str]:
+        """A necessidade mais alta que está pendente AGORA.
+
+        É o que substitui a avaliação isolada de cada serviço. Uma casa só é
+        aberta quando ela atende a necessidade corrente — ou uma igualmente
+        urgente. O Ferreiro atende INVESTIMENTO; se a necessidade for
+        RECUPERAÇÃO, ele espera, sem que ninguém precise escrever "andar 7".
+        """
+        hero = self.hero
+        hp, mp = _frac_hp(hero), _frac_mp(hero)
+        taxa = exit_fee(self.andar)
+
+        if hp < HP_CRITICO:
+            return SOBREVIVENCIA, f"HP em {hp:.0%}"
+        _sinais, grave = self._sinais_de_risco()
+        if grave and self._tem_o_que_preservar():
+            return EVITAR_DESPROPORCIONAL, grave
+        if hp < HP_SAUDAVEL or mp < MP_PARA_CACA_OBRIGATORIA:
+            return RECUPERACAO, f"HP em {hp:.0%}, MP em {mp:.0%}"
+        if hero.coins < taxa:
+            return CONTINUIDADE, f"{hero.coins} de ouro contra uma saída de {taxa}"
+        if hero.coins >= taxa * FOLGA_PARA_COMPRAR and self._tem_peca_para_investir():
+            return INVESTIMENTO, f"{hero.coins} de ouro, com a saída de {taxa} já garantida"
+        return COMBATE_OPCIONAL, "nada urgente"
+
     def _tem_peca_para_investir(self) -> bool:
         return any(i is not None for i in self.hero.equipment.values())
 
@@ -853,7 +907,9 @@ class RunDeReferencia:
         # Uma decisão por vez. O teto de voltas é generoso e existe só para a
         # ferramenta não pendurar: cada volta consome um monstro ou um serviço.
         for _ in range(len(self.mapa.enemies_pos) + 8):
+            necessidade, porque = self._necessidade_atual()
             acao, alvo, motivo = self._decidir()
+            self.trace.diz(f"  [prioridade: {NOME_DA_NECESSIDADE[necessidade]} — {porque}]")
             self.trace.decisao(motivo)
 
             # O destino é escolha da policy; o que acontece em cada casa do
@@ -882,7 +938,7 @@ class RunDeReferencia:
 
     def jogar(self) -> str:
         hero = self.hero
-        self.trace.secao("RUN DE REFERÊNCIA — SMART_REAL")
+        self.trace.secao("BOT_PADRÃO — uma run")
         self.trace.diz(f"  Seed {self.seed} | classe {hero.get_classname()}")
         self.trace.diz(
             f"  Estado inicial (criação real): nível {hero.get_level()}, "
@@ -928,12 +984,12 @@ class RunDeReferencia:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Uma run de referência do ToJ, com trace.")
+    parser = argparse.ArgumentParser(description="O bot padrão do ToJ jogando uma run, com trace.")
     parser.add_argument("--seed", type=int, default=20260916)
     parser.add_argument("--classe", default="warrior", choices=("warrior", "mage", "rogue"))
     parser.add_argument("--max-floor", type=int, default=20)
     args = parser.parse_args()
-    print(RunDeReferencia(args.classe, args.seed, args.max_floor).jogar())
+    print(BotPadrao(args.classe, args.seed, args.max_floor).jogar())
 
 
 if __name__ == "__main__":
