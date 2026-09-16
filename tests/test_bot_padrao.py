@@ -131,12 +131,29 @@ class TestCacaObrigatoriaESeparadaDaOpcional:
         assert bot.MP_PARA_CACA_OPCIONAL > bot.MP_PARA_CACA_OBRIGATORIA
 
     def test_nenhuma_das_duas_decide_so_por_hp(self):
-        # MP é munição: cheio de vida e sem mana, o herói briga no ataque básico.
-        import inspect
+        """MP é munição: cheio de vida e sem mana, o herói briga no ataque básico.
 
-        fonte = inspect.getsource(bot.BotPadrao._decidir)
-        assert "MP_PARA_CACA_OBRIGATORIA" in fonte
-        assert "MP_PARA_CACA_OPCIONAL" in fonte
+        A versão anterior procurava o nome da constante no código-fonte de
+        `_decidir`. Quebrou quando o limiar passou a vir do PERFIL — e quebrou
+        sem que nada de errado tivesse acontecido, que é o defeito dos testes
+        textuais. Agora a prova é de comportamento: com tudo igual menos o MP,
+        a decisão muda.
+        """
+        from src.content.factories.monsters import create_monster
+
+        def montar(mp_fracao: float):
+            mapa = _mapa_de_teste()
+            mapa.enemies_pos[(1, 5)] = create_monster("Alvo", 8, "trash")
+            run = _run_preparada(mapa, nivel=8)
+            run.andar = 8
+            run.hero.coins = 10_000  # taxa paga: sobra só a caça OPCIONAL
+            run.hero.reduce_mp(int(run.hero.base_mp * (1 - mp_fracao)))
+            return run
+
+        com_mana = montar(1.0)
+        sem_mana = montar(0.05)
+        assert com_mana._decidir()[0] == "lutar", "com HP e MP cheios devia caçar"
+        assert sem_mana._decidir()[0] != "lutar", "caçou sem munição, olhando só o HP"
 
 
 class TestOrcamentoDeCompra:

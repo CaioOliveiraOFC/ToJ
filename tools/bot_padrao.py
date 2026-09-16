@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import random
 from collections import Counter
+from dataclasses import dataclass
 
 from src.content import level_up
 from src.content.economy import exit_fee, pay_interest
@@ -72,6 +73,8 @@ HP_CRITICO = 0.35
 # mana entra no duelo com o ataque básico, que é a forma mais cara de brigar.
 HP_PARA_CACA_OBRIGATORIA = 0.50
 MP_PARA_CACA_OBRIGATORIA = 0.25
+# Os limiares do perfil CONSERVADOR, que é o BOT_PADRÃO de sempre. Continuam
+# aqui como nomes para os testes existentes; o perfil é quem os entrega.
 HP_PARA_CACA_OPCIONAL = 0.80
 MP_PARA_CACA_OPCIONAL = 0.60
 
@@ -104,6 +107,34 @@ NOME_DA_NECESSIDADE = {
     INVESTIMENTO: "investimento",
     COMBATE_OPCIONAL: "combate opcional",
 }
+
+
+@dataclass(frozen=True)
+class Perfil:
+    """Quanto este jogador procura combate NO MAPA. Só isso.
+
+    Nenhum perfil toca em `smart_policy`: dentro do duelo os três usam skill,
+    cura, fuga, buff e controle exatamente igual. A variável do experimento é o
+    APETITE, e ela mora aqui para que se possa apontar o que mudou.
+    """
+
+    nome: str
+    # Estado mínimo para aceitar uma luta que só dá XP.
+    hp_opcional: float
+    mp_opcional: float
+    # Só caça opcional quando está atrás da curva de nível?
+    #
+    # Não existe um campo "continua depois de poder pagar a saída": quem decide
+    # isso JÁ é este portão. A caça opcional é avaliada antes do "já dá, saio",
+    # então um perfil que passa nos limiares continua lutando por conta própria.
+    # Um campo a mais seria configuração morta.
+    so_quando_atrasado: bool
+
+
+CONSERVADOR = Perfil("conservador", 0.80, 0.60, True)
+MODERADO = Perfil("moderado", 0.65, 0.40, False)
+HARDCORE = Perfil("hardcore", 0.50, 0.25, False)
+PERFIS = {p.nome: p for p in (CONSERVADOR, MODERADO, HARDCORE)}
 
 # Quantos níveis acima de mim um duelo ainda é proporcional. Acima disto o
 # monstro não é "difícil": é outro patamar, e HP cheio não compensa.
@@ -169,11 +200,14 @@ class Trace:
 class BotPadrao:
     """Um jogador automatizado. Observa, escolhe UMA ação, e o jogo executa."""
 
-    def __init__(self, classe: str, seed: int, max_andar: int = 20) -> None:
+    def __init__(
+        self, classe: str, seed: int, max_andar: int = 20, perfil: Perfil = CONSERVADOR
+    ) -> None:
         random.seed(seed)
         self.rng = random.Random(seed)
         self.seed = seed
         self.max_andar = max_andar
+        self.perfil = perfil
         # O CAMINHO REAL de criação de personagem. Sem loadout, sem presente:
         # nível 1, sem ouro, sem inventário, sem equipamento, uma skill.
         self.hero = create_player_from_data(classe, "Referencia")
@@ -195,6 +229,12 @@ class BotPadrao:
         self.combates_na_run = 0
         # O combate que encerrou a run, com o que era visível ANTES dele.
         self.fatal: dict | None = None
+        # Por andar: quantos monstros o andar TINHA (contados uma vez, na
+        # entrada) e quantos duelos aconteceram. Contar na entrada evita somar o
+        # mesmo monstro toda vez que o bot reavalia os alvos.
+        self.por_andar: list[dict] = []
+        # Serviços efetivamente USADOS (não só pisados).
+        self.servicos: Counter = Counter()
 
     # -- observação -------------------------------------------------------
 
@@ -365,6 +405,7 @@ class BotPadrao:
             if hp < HP_SAUDAVEL or hero.coins >= taxa * FOLGA_PARA_COMPRAR:
                 self.trace.diz("  Pisou na Loja e vale entrar.")
                 self.mapa.take_feature(casa)
+                self.servicos["loja"] += 1
                 self._comprar_com_orcamento("Loja")
             else:
                 self.trace.diz(
@@ -390,6 +431,7 @@ class BotPadrao:
                 "garantida, e nada mais urgente pendente."
             )
             self.mapa.take_feature(casa)
+            self.servicos["ferreiro"] += 1
             self._usar_ferreiro(casa)
             return True
         return True
@@ -468,6 +510,8 @@ class BotPadrao:
         )
         self.combates += 1
         self.combates_na_run += 1
+        if self.por_andar:
+            self.por_andar[-1]["combates"] += 1
 
         if resultado.fled:
             self.trace.diz(f"  Combate: {nome} -> FUGIU | HP {hp_antes}->{hero.get_hp()}")
@@ -591,6 +635,7 @@ class BotPadrao:
                 f"{_frac_hp(hero):.0%} — a casa some do mesmo jeito, mas pagar aqui me mata."
             )
             return True
+        self.servicos[f"evento:{tipo}"] += 1
         if tipo == "fountain":
             curou = apply_fountain_heal(hero)
             self.trace.diz(f"  Evento Fonte: curou {int(curou)} (HP {hero.get_hp()})")
@@ -758,9 +803,9 @@ class BotPadrao:
         #    a run anterior no andar 6.
         if (
             alvo is not None
-            and hp >= HP_PARA_CACA_OPCIONAL
-            and mp >= MP_PARA_CACA_OPCIONAL
-            and hero.get_level() <= self.andar
+            and hp >= self.perfil.hp_opcional
+            and mp >= self.perfil.mp_opcional
+            and (not self.perfil.so_quando_atrasado or hero.get_level() <= self.andar)
         ):
             self._descrever_alvos(alvos, alvo)
             return (
@@ -916,6 +961,13 @@ class BotPadrao:
 
         rolada = progression.floor_essence_multiplier(andar)
         self.essencia = effective_essence(hero, rolada)
+        registro = {
+            "andar": andar,
+            "nivel": hero.get_level(),
+            "oferecidos": len(self.mapa.enemies_pos),
+            "combates": 0,
+        }
+        self.por_andar.append(registro)
 
         self.trace.secao(f"ANDAR {andar}")
         self.trace.diz(
@@ -1031,8 +1083,9 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=20260916)
     parser.add_argument("--classe", default="warrior", choices=("warrior", "mage", "rogue"))
     parser.add_argument("--max-floor", type=int, default=20)
+    parser.add_argument("--perfil", default="conservador", choices=sorted(PERFIS))
     args = parser.parse_args()
-    print(BotPadrao(args.classe, args.seed, args.max_floor).jogar())
+    print(BotPadrao(args.classe, args.seed, args.max_floor, PERFIS[args.perfil]).jogar())
 
 
 if __name__ == "__main__":
