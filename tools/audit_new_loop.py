@@ -549,7 +549,7 @@ def linha_resumo(nome: str, acc: Acumulador) -> str:
         f"{mobs:6.0f}% "
         f"{_media(acc.ouro_final):9.0f} "
         f"{_por_run(acc, 'gold_spent_on_enhancement'):7.0f} "
-        f"{acc.ledger.get('gems_socketed', 0) / max(1, acc.runs):6.2f} "
+        f"{_por_run(acc, 'gems_found'):6.2f} "
         f"{_media(acc.essencia_efetiva):8.3f}"
     )
 
@@ -604,7 +604,9 @@ def relatorio(por_politica: dict[str, Acumulador], por_classe: dict) -> list[str
         "gold_spent_on_gear",
         "gold_spent_on_consumable",
         "gold_spent_on_recovery",
-        "gold_spent_on_rerolls",
+        "gold_spent_on_shop_reroll",
+        "gold_spent_on_skill_reroll",
+        "gold_spent_on_passive_reroll",
         "gold_spent_on_enhancement",
         "gold_spent_on_socket",
         "gold_spent_on_enchant",
@@ -641,11 +643,32 @@ def relatorio(por_politica: dict[str, Acumulador], por_classe: dict) -> list[str
     return out
 
 
+def _serializar(acc: Acumulador) -> dict:
+    """O acumulador como dado puro, para reprocessar o relatório sem re-medir."""
+    from dataclasses import fields
+
+    saida = {}
+    for campo in fields(acc):
+        valor = getattr(acc, campo.name)
+        if isinstance(valor, Counter):
+            saida[campo.name] = dict(valor)
+        elif isinstance(valor, defaultdict) or isinstance(valor, dict):
+            saida[campo.name] = {str(k): v for k, v in valor.items()}
+        else:
+            saida[campo.name] = valor
+    return saida
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Auditoria do novo loop do ToJ.")
     parser.add_argument("--runs", type=int, default=50, help="runs por classe × política")
     parser.add_argument("--seed", type=int, default=20260915)
     parser.add_argument("--max-floor", type=int, default=MAX_ANDAR)
+    parser.add_argument(
+        "--dump",
+        default="",
+        help="grava os acumuladores crus em JSON, para refazer o relatório sem re-medir",
+    )
     args = parser.parse_args()
 
     por_politica = {nome: Acumulador() for nome in POLITICAS}
@@ -657,6 +680,16 @@ def main() -> None:
                 resultado = rodar_uma(classe, politica, args.seed + i, args.max_floor)
                 _somar(por_politica[politica], resultado["acc"])
                 _somar(por_classe[(politica, classe)], resultado["acc"])
+
+    if args.dump:
+        import json
+
+        cru = {
+            "por_politica": {n: _serializar(a) for n, a in por_politica.items()},
+            "por_classe": {f"{n}|{c}": _serializar(a) for (n, c), a in por_classe.items()},
+        }
+        with open(args.dump, "w", encoding="utf-8") as saida:
+            json.dump(cru, saida)
 
     print("\n".join(relatorio(por_politica, por_classe)))
 
