@@ -28,7 +28,7 @@ from src.content.factories.monsters import (  # noqa: E402
     create_boss_for_level,
     generate_monsters_for_level,
 )
-from src.engine import loop  # noqa: E402
+from src.engine import encounter  # noqa: E402
 from src.engine.map import MapOfGame  # noqa: E402
 from src.entities.heroes import Warrior  # noqa: E402
 
@@ -139,28 +139,30 @@ class TestPosCombate:
         heroi = Warrior("Teste")
         heroi.set_level(5)
         with pytest.raises(ValueError):
-            loop.process_post_battle(heroi, [spawn_by_role("trash", 5) for _ in range(3)])
+            encounter.process_post_battle(heroi, [spawn_by_role("trash", 5) for _ in range(3)])
 
     def test_chefe_paga_mais_que_monstro_comum(self):
         heroi = Warrior("Teste")
         heroi.set_level(8)
-        xp_comum, *_ = loop.process_post_battle(heroi, [spawn_by_role("trash", 8)])
+        xp_comum, *_ = encounter.process_post_battle(heroi, [spawn_by_role("trash", 8)])
 
         heroi = Warrior("Teste")
         heroi.set_level(8)
-        xp_chefe, *_ = loop.process_post_battle(heroi, [create_boss_for_level(8)])
+        xp_chefe, *_ = encounter.process_post_battle(heroi, [create_boss_for_level(8)])
 
         assert xp_chefe > xp_comum
 
     def test_derrota_nao_zera_a_recompensa_mas_reduz(self):
         vencedor = Warrior("Teste")
         vencedor.set_level(5)
-        xp_vitoria, *_ = loop.process_post_battle(vencedor, [spawn_by_role("bruiser", 5)])
+        xp_vitoria, *_ = encounter.process_post_battle(vencedor, [spawn_by_role("bruiser", 5)])
 
         derrotado = Warrior("Teste")
         derrotado.set_level(5)
         derrotado.set_isalive(False)
-        xp_derrota, venceu, *_ = loop.process_post_battle(derrotado, [spawn_by_role("bruiser", 5)])
+        xp_derrota, venceu, *_ = encounter.process_post_battle(
+            derrotado, [spawn_by_role("bruiser", 5)]
+        )
 
         assert not venceu
         assert 0 < xp_derrota < xp_vitoria
@@ -171,7 +173,7 @@ class TestPosCombate:
         heroi.set_level(5)
         heroi.take_damage(heroi.base_hp // 2)
         ferido = heroi.get_hp()
-        loop.process_post_battle(heroi, [spawn_by_role("trash", 5)])
+        encounter.process_post_battle(heroi, [spawn_by_role("trash", 5)])
         assert heroi.get_hp() <= ferido or heroi.get_level() > 5
 
 

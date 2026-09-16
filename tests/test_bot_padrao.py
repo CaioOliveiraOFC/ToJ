@@ -100,7 +100,9 @@ class TestFugaNaoPaga:
         chamou = []
         monkeypatch.setattr(encounter.battle, "run_battle", lambda *a, **k: Fuga())
         monkeypatch.setattr(
-            loop, "process_post_battle", lambda *a, **k: chamou.append(1) or (0, 0, 0, 0, 0, 0)
+            encounter,
+            "process_post_battle",
+            lambda *a, **k: chamou.append(1) or (0, 0, 0, 0, 0, 0),
         )
 
         run = bot.BotPadrao("warrior", seed=1, max_andar=1)
