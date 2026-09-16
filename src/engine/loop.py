@@ -19,9 +19,8 @@ from src.content.factories.monsters import (
 )
 from src.content.floor_exit import current_penalty, effective_essence, use_exit
 from src.content.forge import award_gem
-from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
-from src.content.skills_loader import generate_skill_choices
+from src.engine.encounter import resolve_encounter
 from src.engine.events import EventBus
 from src.engine.map import EventTile, FeatureTile, MapOfGame
 from src.entities.monsters import Monster
@@ -44,8 +43,6 @@ from src.shared.constants import (
     MAP_WIDTH_INCREMENT_PER_5_LEVELS,
     MAX_WALL_PERCENT_CAP,
     MIN_WALL_PERCENT,
-    SKILL_OFFER_LEVEL_INTERVAL,
-    SKILL_OFFER_SIZE,
     WALL_PERCENT_PER_LEVEL,
 )
 from src.shared.types import GameEvent
@@ -269,72 +266,55 @@ def run_fight(
             bus.publish(topic, event)
 
     monsters = list(monster) if isinstance(monster, list) else [monster]
-    level_before = player.get_level()
+
+    def _mostrar(resultado) -> None:
+        _render_battle_results(
+            player,
+            monsters[0],
+            resultado.xp_gained,
+            resultado.hero_won,
+            resultado.dropped_item,
+            resultado.level_up_messages,
+            resultado.coins_gained,
+            essence_multiplier,
+        )
+
+    def _perguntar_nivel(jogador, oferta) -> None:
+        """A tela pergunta, o jogador responde. A oferta veio do core."""
+        publish(
+            topics.UI_OPEN_PASSIVES,
+            {"player": jogador, "choices": oferta.passives, "dungeon_level": dungeon_level},
+        )
+        if oferta.tem_skill:
+            publish(
+                topics.UI_OPEN_SKILLS,
+                {
+                    "player": jogador,
+                    "choices": oferta.skills,
+                    "dungeon_level": dungeon_level,
+                    "offer_level": oferta.level,
+                },
+            )
 
     try:
         screens.render_fight_intro(player, monsters[0])
         safe_get_key(allow_escape=False)
 
-        outcome = battle.run_battle(
+        # A REGRA do encontro mora em `engine/encounter.py`, compartilhada com o
+        # bot. Daqui para baixo esta função só desenha: intro, resultados e as
+        # telas de escolha.
+        resolve_encounter(
             player,
             monsters,
-            _human_decision,
+            combat_decision=_human_decision,
+            level_up_provider=_perguntar_nivel,
             rng=rng,
+            essence_multiplier=essence_multiplier,
+            dungeon_level=dungeon_level,
             publish=publish,
             on_turn_start=_on_turn_start,
+            on_results=_mostrar,
         )
-
-        if outcome.fled:
-            return
-
-        xp_gained, player_won, dropped_item, level_up_msgs, coins_gained, levels_gained = (
-            process_post_battle(player, monsters, essence_multiplier, dungeon_level)
-        )
-        _render_battle_results(
-            player,
-            monsters[0],
-            xp_gained,
-            player_won,
-            dropped_item,
-            level_up_msgs,
-            coins_gained,
-            essence_multiplier,
-        )
-
-        if player_won and levels_gained > 0:
-            # Para cada nível ganho, oferecer escolhas na ordem: passiva primeiro, depois skill
-            for lvl in range(level_before + 1, player.get_level() + 1):
-                # Escolha de passiva
-                choices = generate_passive_choices(count=3)
-                publish(
-                    topics.UI_OPEN_PASSIVES,
-                    {"player": player, "choices": choices, "dungeon_level": dungeon_level},
-                )
-
-                # Escolha de skill. A cadência é do herói (`is_skill_offer_level`),
-                # e não um `lvl % 2` escrito aqui: o simulador chamava a mesma
-                # regra por conta própria e as duas podiam divergir sem ninguém
-                # notar. O nível 1 não oferece — ele entrega a carta da classe.
-                if lvl > 1 and lvl % SKILL_OFFER_LEVEL_INTERVAL == 0:
-                    skill_choices = generate_skill_choices(
-                        player.get_classname(),
-                        lvl,
-                        player.active_skill_ids(),
-                        count=SKILL_OFFER_SIZE,
-                        seen_ids=player.seen_skill_ids,
-                    )
-                    # Ver a carta já conta como conhecê-la, mesmo que ele recuse:
-                    # sem isto a oferta seguinte devolveria as mesmas três.
-                    player.seen_skill_ids.update(c.id for c in skill_choices)
-                    publish(
-                        topics.UI_OPEN_SKILLS,
-                        {
-                            "player": player,
-                            "choices": skill_choices,
-                            "dungeon_level": dungeon_level,
-                            "offer_level": lvl,
-                        },
-                    )
     finally:
         cleanup_combat()
         cleanup_ui()

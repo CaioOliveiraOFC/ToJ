@@ -462,18 +462,35 @@ class TestSaveLoad:
 # --- 9. o simulador e o jogo oferecem a mesma coisa ------------------------
 
 
-def test_o_simulador_usa_a_cadencia_do_jogo():
-    """Duas cadências divergentes fariam o bot medir outra progressão de deck."""
+def test_a_cadencia_de_oferta_e_uma_so():
+    """Duas cadências divergentes fariam o bot medir outra progressão de deck.
+
+    A versão anterior exigia que `engine/loop.py` E `sim/progression.py`
+    CITASSEM `SKILL_OFFER_LEVEL_INTERVAL` — ou seja, exigia que os dois
+    escrevessem a regra. Era a melhor garantia possível enquanto havia duas
+    cópias, e virou obsoleta quando a cadência passou a existir num lugar só.
+
+    Agora a prova é mais forte: nenhum consumidor decide sozinho quando um nível
+    oferece skill, e a resposta vem de `content/level_up.oferece_skill`.
+    """
     import inspect
 
+    from src.content import level_up
     from src.engine import loop
+    from src.shared.constants import SKILL_OFFER_LEVEL_INTERVAL
     from src.sim import progression
 
     for modulo in (loop, progression):
         fonte = inspect.getsource(modulo)
-        assert "SKILL_OFFER_LEVEL_INTERVAL" in fonte, (
-            f"{modulo.__name__} tem uma cadência de oferta própria"
+        assert "% SKILL_OFFER_LEVEL_INTERVAL" not in fonte, (
+            f"{modulo.__name__} voltou a calcular a cadência por conta própria"
         )
+
+    # A cadência real, conferida contra a constante do jogo.
+    assert not level_up.oferece_skill(1), "o nível 1 entrega a assinatura, não oferece"
+    for nivel in range(2, 31):
+        esperado = nivel % SKILL_OFFER_LEVEL_INTERVAL == 0
+        assert level_up.oferece_skill(nivel) is esperado
 
 
 def test_o_teto_de_deck_e_um_so():

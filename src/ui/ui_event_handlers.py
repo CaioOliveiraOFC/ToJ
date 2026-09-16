@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Protocol
 
+from src.content import level_up
 from src.shared import combat_topics as topics
 from src.shared.types import GameEvent
 from src.ui import screens
@@ -130,7 +131,7 @@ def _on_open_skills(ev: GameEvent) -> None:
         # jogador que sacrificasse uma carta mesmo com dois slots vazios, e a
         # única saída era o 0 — que descartava a carta escolhida.
         if player.has_free_skill_slot():
-            screens.render_skill_acquired(player.learn_skill(chosen_skill))
+            screens.render_skill_acquired(level_up.aplicar_skill(player, chosen_skill))
             return
         run_skill_selection_with_replacement(player, chosen_skill)
 

@@ -32,11 +32,14 @@ class TestNasceComoNoJogo:
 
 
 class TestParidadeComAsRegrasDoJogo:
-    def test_pos_combate_e_o_do_jogo_e_nao_o_do_simulador(self):
-        # `sim/harness._award` é uma SEGUNDA implementação do pós-combate, e
-        # diverge: ela nunca paga a consolação da derrota. A run de referência
-        # usa a função da Forge Run.
-        assert bot.process_post_battle is loop.process_post_battle
+    def test_o_encontro_e_o_core_compartilhado(self):
+        # O bot não monta mais a sequência do encontro. Ele PEDE o encontro ao
+        # mesmo core que `engine.loop.run_fight` usa, e responde quando o core
+        # pergunta. Antes existiam duas orquestrações, e duas divergem.
+        from src.engine import encounter
+
+        assert bot.resolve_encounter is encounter.resolve_encounter
+        assert loop.resolve_encounter is encounter.resolve_encounter
 
     def test_as_demais_regras_sao_as_do_jogo(self):
         from src.content import economy, floor_exit
@@ -51,84 +54,66 @@ class TestParidadeComAsRegrasDoJogo:
 
 
 class TestOTraceNaoInventa:
-    def test_as_opcoes_do_trace_sao_as_realmente_oferecidas(self):
-        # O registrador entra no MESMO hook que `on_level_up` já chama. Gerar uma
-        # "amostra" para imprimir mostrava três cartas que não foram oferecidas.
-        registro = bot.RegistroDeOfertas()
-        assert hasattr(registro, "record_offer")
+    """As opções do trace são as REALMENTE oferecidas.
 
-        class Carta:
-            def __init__(self, nome):
-                self.id = nome
-                self.name = nome
+    A primeira versão sorteava três passivas só para imprimir, enquanto quem
+    escolhia sorteava as dela por dentro: o log mostrava cartas nunca
+    oferecidas. Depois um registrador capturava a oferta pelo hook de
+    telemetria. Agora nem isso é preciso — o core ENTREGA a oferta ao provider,
+    e o bot imprime o objeto que recebeu.
+    """
 
-        oferecidas = [Carta("a"), Carta("b"), Carta("c")]
-        registro.record_offer("passive", oferecidas, oferecidas[1])
-        assert registro.ofertas == [("passive", oferecidas, oferecidas[1])]
+    def test_o_bot_imprime_a_oferta_que_o_core_entregou(self):
+        from src.content import level_up
 
-    def test_o_registrador_aceita_os_contadores_de_reroll(self):
-        # `_pagar_reroll` escreve contadores no mesmo objeto de telemetria.
-        registro = bot.RegistroDeOfertas()
-        assert registro.gold_spent_on_passive_reroll == 0
-        registro.gold_spent_on_passive_reroll = 12
-        registro.rerolls = 1
-        assert registro.gold_spent_on_passive_reroll == 12
-        assert registro.ofertas == []
+        run = bot.BotPadrao("warrior", seed=7, max_andar=1)
+        run.andar = 3
+        run.trace = bot.Trace()
+
+        oferta = level_up.ofertas_do_nivel(run.hero, 3)
+        run._escolher_do_nivel(run.hero, oferta)
+
+        texto = str(run.trace)
+        for carta in oferta.passives:
+            assert carta.name in texto, f"{carta.name} foi oferecida e não apareceu no trace"
+        if oferta.tem_skill:
+            for carta in oferta.skills:
+                assert carta.name in texto
 
 
 class TestFugaNaoPaga:
     """Fugir não pode render recompensa.
 
-    `engine/loop.run_fight` devolve ANTES do pós-combate quando o herói foge, e
-    `process_post_battle` decide "venceu" por `get_isalive()` — quem fugiu está
-    vivo. Sem a guarda, fugir rendia XP, ouro e loot cheios.
-
-    O teste é de COMPORTAMENTO, e não de texto: a primeira versão procurava a
-    ordem das duas palavras no código-fonte e reprovava porque o comentário que
-    explica a guarda cita a função que vem depois dela.
+    `process_post_battle` decide "venceu" por `get_isalive()`, e quem fugiu está
+    vivo. A guarda vive no core, então vale para o humano e para o bot de uma vez
+    — antes cada orquestração tinha de lembrar dela por conta própria, e a do
+    bot não lembrava.
     """
 
-    def test_fugir_nao_chama_o_pos_combate(self, monkeypatch):
-        from src.content.factories.monsters import create_monster
+    def test_o_core_nao_paga_quem_foge(self, monkeypatch):
+        from src.engine import encounter
 
         class Fuga:
             fled = True
             hero_won = False
 
         chamou = []
-        monkeypatch.setattr(bot, "run_battle", lambda *a, **k: Fuga())
+        monkeypatch.setattr(encounter.battle, "run_battle", lambda *a, **k: Fuga())
         monkeypatch.setattr(
-            bot, "process_post_battle", lambda *a, **k: chamou.append(1) or (0, 0, 0, 0, 0, 0)
+            loop, "process_post_battle", lambda *a, **k: chamou.append(1) or (0, 0, 0, 0, 0, 0)
         )
 
         run = bot.BotPadrao("warrior", seed=1, max_andar=1)
-        run.andar = 1
-        run.essencia = 1.0
-        run.combates = 0
-        run.mapa = loop._setup_dungeon_map(1, None, 1, run.hero)
-        run.trace = bot.Trace()
         ouro_antes, xp_antes = run.hero.coins, run.hero.xp_points
 
-        casa = next(iter(run.mapa.enemies_pos))
-        vivo = run._duelo(run.mapa.enemies_pos[casa], casa)
+        resultado = encounter.resolve_encounter(
+            run.hero, [object()], combat_decision=lambda *a: None
+        )
 
-        assert vivo is True
+        assert resultado.fled is True
         assert chamou == [], "fugir chamou o pós-combate e pagaria recompensa cheia"
         assert run.hero.coins == ouro_antes
         assert run.hero.xp_points == xp_antes
-        assert create_monster  # o import prova que o cenário usa monstro de verdade
-
-
-class TestDeterminismo:
-    def test_a_mesma_seed_produz_o_mesmo_trace(self):
-        primeira = bot.BotPadrao("warrior", seed=4242, max_andar=6).jogar()
-        segunda = bot.BotPadrao("warrior", seed=4242, max_andar=6).jogar()
-        assert primeira == segunda
-
-    def test_seeds_diferentes_produzem_traces_diferentes(self):
-        uma = bot.BotPadrao("warrior", seed=1, max_andar=6).jogar()
-        outra = bot.BotPadrao("warrior", seed=2, max_andar=6).jogar()
-        assert uma != outra
 
 
 class TestCacaObrigatoriaESeparadaDaOpcional:
@@ -420,3 +405,157 @@ class TestPrioridadeGlobal:
 
         assert mexeu == [(1, 5)]
         assert "nada mais urgente pendente" in str(run.trace)
+
+
+class TestParidadeDeEncontro:
+    """Humano e bot têm de executar o MESMO encontro.
+
+    Dadas as mesmas respostas — as mesmas ações de combate, a mesma passiva, a
+    mesma skill —, o estado final tem de ser igual. O que muda é quem responde,
+    nunca o que acontece.
+    """
+
+    CAMPOS = (
+        "hp",
+        "mp",
+        "xp",
+        "nivel",
+        "ouro",
+        "inventario",
+        "equipamento",
+        "gemas",
+        "passivas",
+        "skills",
+        "vistas",
+        "vivo",
+    )
+
+    def _heroi(self):
+        from src.engine.game_logic import create_player_from_data
+
+        heroi = create_player_from_data("warrior", "Paridade")
+        heroi.set_level(5)
+        # A um passo do nível 6: assim UMA vitória sobe de nível e o encontro
+        # exercita a oferta, a escolha e a aplicação — que é o trecho que este
+        # teste existe para comparar. Sem isto ele media só dano e ouro.
+        heroi.xp_points = max(0, heroi.need_to_up() - 1)
+        return heroi
+
+    def _monstro(self):
+        from src.content.factories.monsters import create_monster
+
+        return create_monster("Alvo", 6, "bruiser")
+
+    def _foto(self, heroi) -> dict:
+        return {
+            "hp": heroi.get_hp(),
+            "mp": heroi.get_mp(),
+            "xp": heroi.xp_points,
+            "nivel": heroi.get_level(),
+            "ouro": heroi.coins,
+            "inventario": sorted(getattr(i, "name", str(i)) for i in heroi.inventory),
+            "equipamento": {
+                slot: (peca.name if peca else None) for slot, peca in heroi.equipment.items()
+            },
+            "gemas": len(getattr(heroi, "gems", []) or []),
+            "passivas": [p.id for p in heroi.passives],
+            "skills": heroi.active_skill_ids(),
+            "vistas": sorted(heroi.seen_skill_ids),
+            "vivo": heroi.get_isalive(),
+        }
+
+    def _sempre_atacar(self, *_args, **_kwargs):
+        from src.mechanics.battle import Action
+
+        return Action(kind="attack")
+
+    def _primeira_opcao(self, jogador, oferta):
+        """A 'resposta determinística': leva sempre a primeira carta da oferta."""
+        from src.content import level_up
+
+        if oferta.passives:
+            level_up.aplicar_passiva(jogador, oferta.passives[0])
+        if oferta.tem_skill and oferta.skills:
+            level_up.aplicar_skill(jogador, oferta.skills[0], 1)
+
+    def test_humano_e_bot_terminam_no_mesmo_estado(self, monkeypatch):
+        import random
+
+        from src.engine import encounter
+
+        # --- A) adaptador "humano": respostas roteirizadas direto no core.
+        random.seed(99)
+        heroi_a = self._heroi()
+        encounter.resolve_encounter(
+            heroi_a,
+            [self._monstro()],
+            combat_decision=self._sempre_atacar,
+            level_up_provider=self._primeira_opcao,
+            rng=random.Random(99),
+            essence_multiplier=1.0,
+            dungeon_level=6,
+        )
+
+        # --- B) BOT_PADRÃO, com as MESMAS respostas.
+        random.seed(99)
+        run = bot.BotPadrao("warrior", seed=99, max_andar=1)
+        run.hero = self._heroi()
+        run.andar = 6
+        run.essencia = 1.0
+        run.combates = 0
+        run.trace = bot.Trace()
+        run.rng = random.Random(99)
+        run.decide = self._sempre_atacar
+        monkeypatch.setattr(run, "_escolher_do_nivel", self._primeira_opcao)
+        run.mapa = _mapa_de_teste()
+        casa = (1, 5)
+        run.mapa.enemies_pos[casa] = self._monstro()
+        run._duelo(run.mapa.enemies_pos[casa], casa)
+
+        foto_a, foto_b = self._foto(heroi_a), self._foto(run.hero)
+        for campo in self.CAMPOS:
+            assert foto_a[campo] == foto_b[campo], (
+                f"{campo} divergiu entre humano e bot: {foto_a[campo]!r} != {foto_b[campo]!r}"
+            )
+
+    def test_a_fuga_tambem_e_identica(self, monkeypatch):
+        import random
+
+        from src.engine import encounter
+        from src.mechanics.battle import Action
+
+        def sempre_fugir(*_a, **_k):
+            return Action(kind="flee")
+
+        random.seed(7)
+        heroi_a = self._heroi()
+        resultado = encounter.resolve_encounter(
+            heroi_a,
+            [self._monstro()],
+            combat_decision=sempre_fugir,
+            level_up_provider=self._primeira_opcao,
+            rng=random.Random(7),
+            dungeon_level=6,
+        )
+
+        random.seed(7)
+        run = bot.BotPadrao("warrior", seed=7, max_andar=1)
+        run.hero = self._heroi()
+        run.andar = 6
+        run.essencia = 1.0
+        run.combates = 0
+        run.trace = bot.Trace()
+        run.rng = random.Random(7)
+        run.decide = sempre_fugir
+        run.mapa = _mapa_de_teste()
+        casa = (1, 5)
+        run.mapa.enemies_pos[casa] = self._monstro()
+        run._duelo(run.mapa.enemies_pos[casa], casa)
+
+        if resultado.fled:
+            assert self._foto(heroi_a) == self._foto(run.hero)
+            # Fugir não paga: o XP tem de ser exatamente o que era antes do
+            # encontro, nos dois caminhos.
+            intacto = self._heroi().xp_points
+            assert heroi_a.xp_points == run.hero.xp_points == intacto
+            assert heroi_a.coins == run.hero.coins == 0

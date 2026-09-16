@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import random
 
+from src.content import level_up
 from src.content.economy import exit_fee, pay_interest
 from src.content.factories import features as feat
 from src.content.factories.dungeons import (
@@ -43,11 +44,11 @@ from src.content.factories.dungeons import (
 )
 from src.content.floor_exit import effective_essence, unpaid_streak, use_exit
 from src.content.shop import Shop
+from src.engine.encounter import resolve_encounter
 from src.engine.game_logic import create_player_from_data
-from src.engine.loop import _setup_dungeon_map, process_post_battle
+from src.engine.loop import _setup_dungeon_map
 from src.engine.map import EventTile, FeatureTile
 from src.engine.map_analysis import campo_de_custo, rota_do_campo
-from src.mechanics.battle import run_battle
 from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
 from src.sim import progression
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, get_pick_policy
@@ -162,35 +163,6 @@ class Trace:
 
     def __str__(self) -> str:
         return "\n".join(self.linhas)
-
-
-class RegistroDeOfertas:
-    """Captura as ofertas REAIS do level-up, pelo hook que o jogo já chama.
-
-    `progression.on_level_up` gera as três cartas por conta própria e avisa o
-    objeto de telemetria por `record_offer`. Gerar uma "amostra" aqui só para
-    imprimir mostraria três cartas que NÃO foram as oferecidas — um trace que
-    inventa a opção é pior que um trace sem opção nenhuma.
-
-    Aceita qualquer outro atributo porque `_pagar_reroll` escreve contadores de
-    reroll no mesmo objeto, e esta classe não quer conhecer a lista deles.
-    """
-
-    def __init__(self) -> None:
-        object.__setattr__(self, "ofertas", [])
-        object.__setattr__(self, "_contadores", {})
-
-    def record_offer(self, kind: str, offered: list, chosen) -> None:
-        self.ofertas.append((kind, list(offered), chosen))
-
-    def __getattr__(self, nome):
-        return self._contadores.get(nome, 0)
-
-    def __setattr__(self, nome, valor):
-        if nome in ("ofertas", "_contadores"):
-            object.__setattr__(self, nome, valor)
-        else:
-            self._contadores[nome] = valor
 
 
 class BotPadrao:
@@ -410,79 +382,98 @@ class BotPadrao:
         return True
 
     def _duelo(self, monstro, casa) -> bool:
-        """Um combate e todo o pós-combate, pelas funções do jogo."""
+        """Um encontro, pelo MESMO core que a tela do jogador usa.
+
+        O bot não monta mais a sequência (batalha, guarda de fuga, pós-combate,
+        ofertas): ele pede o encontro e responde quando o core pergunta. Montar
+        por fora era ter dois roteiros, e foi assim que fugir chegou a pagar
+        recompensa cheia.
+        """
         hero = self.hero
+        # `move_player` tira o monstro da casa AO COLIDIR, antes de saber o
+        # resultado — fugir também consome o encontro no jogo.
         self.mapa.enemies_pos.pop(casa, None)
         self.mapa.grid[casa[0]][casa[1]] = "D"
 
         hp_antes, mp_antes = hero.get_hp(), hero.get_mp()
         nome = monstro.get_nick_name()
-        resultado = run_battle(
-            hero, [monstro], lambda h, m, t: self.decide(h, m, t), rng=self.rng, publish=None
-        )
-        self.combates += 1
 
-        # FUGA NÃO PAGA. `engine/loop.run_fight` devolve ANTES do pós-combate
-        # quando o herói foge, e `process_post_battle` decide "venceu" por
-        # `player.get_isalive()` — quem fugiu está vivo. Sem esta guarda, fugir
-        # rendia XP, ouro e loot cheios.
-        if resultado.fled:
-            self.trace.diz(f"  Combate: {nome} -> FUGIU | HP {hp_antes}->{hero.get_hp()}")
-            return hero.get_isalive() and hero.get_hp() > 0
+        def _apos_o_combate(resultado) -> None:
+            """O que o bot faz com o resultado — ANTES das escolhas de nível.
 
-        # PÓS-COMBATE REAL: `engine.loop.process_post_battle`, a mesma função da
-        # Forge Run. Ela dá XP, ouro, loot, gema e sobe o nível.
-        xp, venceu, drop, _msgs, moedas, niveis = process_post_battle(
-            hero, [monstro], self.essencia, self.andar
-        )
-        self.trace.diz(
-            f"  Combate: {nome} -> {'vitória' if venceu else 'DERROTA'} | "
-            f"HP {hp_antes}->{hero.get_hp()} MP {mp_antes}->{hero.get_mp()} | "
-            f"+{xp} XP +{moedas} ouro"
-        )
-        if drop is not None:
+            É o mesmo gancho que a tela do jogador usa para desenhar os
+            resultados. Sem ele, o level-up aparecia no trace antes do combate
+            que o causou: a ordem do core é batalha -> pós-combate ->
+            apresentação -> ofertas.
+            """
+            self.trace.diz(
+                f"  Combate: {nome} -> {'vitória' if resultado.hero_won else 'DERROTA'} | "
+                f"HP {hp_antes}->{hero.get_hp()} MP {mp_antes}->{hero.get_mp()} | "
+                f"+{resultado.xp_gained} XP +{resultado.coins_gained} ouro"
+            )
+            drop = resultado.dropped_item
+            if drop is None:
+                return
             trocou = progression.equip_if_better(hero, drop)
             self.trace.diz(
                 f"  Drop: {drop.name} ({getattr(drop, 'rarity', '?')}) — "
                 + ("EQUIPOU, é melhor que o que estava no slot" if trocou else "guardou na mochila")
             )
-        if niveis:
-            self._subir_de_nivel(niveis)
-        if not hero.get_isalive() or hero.get_hp() <= 0:
-            return False
-        return True
 
-    def _subir_de_nivel(self, niveis: int) -> None:
-        """As escolhas do level-up, com as opções e a escolha no trace."""
-        hero = self.hero
-        self.trace.diz(f"  LEVEL UP -> nível {hero.get_level()} ({niveis} nível(is))")
-        registro = RegistroDeOfertas()
-        progression.on_level_up(
+        resultado = resolve_encounter(
             hero,
-            niveis,
-            self.rng,
-            self.toggles,
-            registro,
-            self.picker,
+            [monstro],
+            combat_decision=lambda h, m, t: self.decide(h, m, t),
+            level_up_provider=self._escolher_do_nivel,
+            rng=self.rng,
+            essence_multiplier=self.essencia,
             dungeon_level=self.andar,
+            on_results=_apos_o_combate,
         )
-        for tipo, oferecidas, escolhida in registro.ofertas:
-            rotulo = "Passivas" if tipo == "passive" else "Skills"
+        self.combates += 1
+
+        if resultado.fled:
+            self.trace.diz(f"  Combate: {nome} -> FUGIU | HP {hp_antes}->{hero.get_hp()}")
+        return hero.get_isalive() and hero.get_hp() > 0
+
+    def _escolher_do_nivel(self, jogador, oferta) -> None:
+        """A resposta do bot quando o core pergunta o que levar deste nível.
+
+        A oferta VEIO do core — as mesmas três cartas que a tela mostraria. Aqui
+        só se escolhe, e a aplicação passa por `content.level_up`, que é a mesma
+        função da tela.
+        """
+        self.trace.diz(f"  LEVEL UP -> nível {jogador.get_level()}")
+        self.trace.diz(
+            "  Passivas oferecidas: "
+            + ", ".join(f"{c.name} [{c.rarity}/{c.effect_type}]" for c in oferta.passives)
+        )
+        escolhida = self.picker.pick_passive(jogador, oferta.passives, self.rng)
+        if escolhida is not None:
+            level_up.aplicar_passiva(jogador, escolhida)
             self.trace.diz(
-                f"  {rotulo} oferecidas: "
-                + ", ".join(
-                    f"{c.name} [{getattr(c, 'rarity', '?')}/{getattr(c, 'effect_type', '?')}]"
-                    for c in oferecidas
-                )
+                f"  Escolha: {escolhida.name} [{escolhida.effect_type}] — primeira da ordem "
+                f"de preferência da política '{self.picker.name}' presente na oferta"
             )
-            if escolhida is None:
-                self.trace.diz("  Escolha: recusou — nenhuma melhora o que já tem")
-            else:
-                self.trace.diz(
-                    f"  Escolha: {escolhida.name} "
-                    f"[{getattr(escolhida, 'effect_type', '?')}] — primeira da ordem de "
-                    f"preferência da política '{self.picker.name}' presente na oferta"
-                )
+
+        if not oferta.tem_skill:
+            return
+        self.trace.diz(
+            "  Skills oferecidas: "
+            + ", ".join(
+                f"{c.name} [{getattr(c, 'rarity', '?')}/{getattr(c, 'effect_type', '?')}]"
+                for c in oferta.skills
+            )
+        )
+        nova, slot = self.picker.pick_skill(jogador, oferta.skills, self.rng)
+        if nova is None:
+            self.trace.diz("  Escolha: recusou — nenhuma melhora o que já tem")
+            return
+        level_up.aplicar_skill(jogador, nova, slot)
+        self.trace.diz(
+            f"  Escolha: {nova.name} — primeira da ordem de preferência da política "
+            f"'{self.picker.name}' presente na oferta"
+        )
 
     # -- serviços ---------------------------------------------------------
 
