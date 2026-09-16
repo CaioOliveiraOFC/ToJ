@@ -129,3 +129,107 @@ class TestDeterminismo:
         uma = ref.RunDeReferencia("warrior", seed=1, max_andar=6).jogar()
         outra = ref.RunDeReferencia("warrior", seed=2, max_andar=6).jogar()
         assert uma != outra
+
+
+class TestCacaObrigatoriaESeparadaDaOpcional:
+    """Precisar de ouro e querer XP não podem dividir o mesmo limiar.
+
+    Recusar a caça obrigatória custa Essência no andar seguinte; recusar a
+    opcional não custa nada agora. Foi a opcional, autorizada a 67% de HP, que
+    matou a run anterior no andar 6.
+    """
+
+    def test_a_opcional_exige_mais_que_a_obrigatoria(self):
+        assert ref.HP_PARA_CACA_OPCIONAL > ref.HP_PARA_CACA_OBRIGATORIA
+        assert ref.MP_PARA_CACA_OPCIONAL > ref.MP_PARA_CACA_OBRIGATORIA
+
+    def test_nenhuma_das_duas_decide_so_por_hp(self):
+        # MP é munição: cheio de vida e sem mana, o herói briga no ataque básico.
+        import inspect
+
+        fonte = inspect.getsource(ref.RunDeReferencia._decidir)
+        assert "MP_PARA_CACA_OBRIGATORIA" in fonte
+        assert "MP_PARA_CACA_OPCIONAL" in fonte
+
+
+class TestOrcamentoDeCompra:
+    """O jogador decide quanto leva à loja. A loja gasta o que vê."""
+
+    def _run_no_andar(self, ouro: int, hp_fracao: float):
+        run = ref.RunDeReferencia("warrior", seed=7, max_andar=1)
+        run.andar = 1
+        run.trace = ref.Trace()
+        run.reserva_gasta = 0
+        run.hero.coins = ouro
+        run.hero.take_damage(int(run.hero.base_hp * (1 - hp_fracao)))
+        return run
+
+    def test_saudavel_reserva_a_taxa_de_saida(self):
+        taxa = ref.exit_fee(1)
+        run = self._run_no_andar(taxa * 3, hp_fracao=1.0)
+        orcamento, reserva, quebrou = run._orcamento()
+        assert reserva == taxa
+        assert quebrou is False
+        assert orcamento == taxa * 3 - taxa
+
+    def test_ferido_quebra_a_reserva_conscientemente(self):
+        taxa = ref.exit_fee(1)
+        run = self._run_no_andar(taxa * 3, hp_fracao=0.3)
+        orcamento, reserva, quebrou = run._orcamento()
+        assert quebrou is True
+        assert orcamento == taxa * 3, "sobrevivência leva a carteira inteira"
+
+    def test_a_loja_so_enxerga_o_orcamento_e_a_reserva_volta(self, monkeypatch):
+        # A loja gasta TUDO que vê. A prova de que o orçamento segura é esta:
+        # com a loja gastando o saldo até zero, o herói sai com a reserva.
+        taxa = ref.exit_fee(1)
+        run = self._run_no_andar(taxa * 3, hp_fracao=1.0)
+        visto = {}
+
+        def loja_gastando_tudo(hero, *a, **k):
+            visto["levou"] = hero.coins
+            hero.coins = 0
+
+        monkeypatch.setattr(ref.progression, "visit_shop", loja_gastando_tudo)
+        run._comprar_com_orcamento("Loja")
+
+        assert visto["levou"] == taxa * 2, "a loja enxergou mais que o orçamento"
+        assert run.hero.coins == taxa, "a reserva não voltou para a carteira"
+        assert run.reserva_gasta == 0
+
+    def test_quebrar_a_reserva_e_registrado_em_voz_alta(self, monkeypatch):
+        run = self._run_no_andar(ref.exit_fee(1) * 3, hp_fracao=0.3)
+        monkeypatch.setattr(ref.progression, "visit_shop", lambda *a, **k: None)
+        run._comprar_com_orcamento("Loja")
+        assert "sacrificar a saída paga" in str(run.trace)
+        assert run.reserva_gasta == 1
+
+
+class TestExtracaoEAvaliadaAntesDaEmergencia:
+    def _run(self, nivel: int, andar: int, hp_fracao: float):
+        run = ref.RunDeReferencia("warrior", seed=7, max_andar=1)
+        run.andar = andar
+        run.hero.set_level(nivel)
+        run.hero.take_damage(int(run.hero.base_hp * (1 - hp_fracao)))
+        return run
+
+    def test_sem_nada_acumulado_recusa_e_diz_o_porque(self):
+        run = self._run(nivel=1, andar=5, hp_fracao=0.2)
+        extrair, veredito = run._avaliar_extracao((0, 0))
+        assert extrair is False
+        assert "não acumulei nada que valha preservar" in veredito
+
+    def test_com_acumulo_e_sem_risco_continua_descendo(self):
+        run = self._run(nivel=6, andar=5, hp_fracao=1.0)
+        extrair, veredito = run._avaliar_extracao((0, 0))
+        assert extrair is False
+        assert "nenhum sinal de risco" in veredito
+
+    def test_com_acumulo_e_risco_suficiente_extrai_fora_da_emergencia(self):
+        # HP em 45% NÃO é emergência (acima de HP_CRITICO), e mesmo assim a
+        # Extração é avaliada — era exatamente isso que faltava.
+        run = self._run(nivel=4, andar=8, hp_fracao=0.45)
+        assert 0.45 > ref.HP_CRITICO, "o cenário precisa estar fora da emergência"
+        extrair, veredito = run._avaliar_extracao((0, 0))
+        assert extrair is True
+        assert "sair vivo vale mais" in veredito

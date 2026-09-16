@@ -41,7 +41,7 @@ from src.content.factories.dungeons import (
     apply_altar_blessing,
     apply_fountain_heal,
 )
-from src.content.floor_exit import effective_essence, use_exit
+from src.content.floor_exit import effective_essence, unpaid_streak, use_exit
 from src.content.shop import Shop
 from src.engine.game_logic import create_player_from_data
 from src.engine.loop import _setup_dungeon_map, process_post_battle
@@ -59,7 +59,20 @@ from src.sim.toggles import Toggles
 
 # Abaixo disto o personagem está em perigo: nada de procurar briga.
 HP_CRITICO = 0.35
-# Acima disto ele se considera saudável para encarar um duelo a mais.
+
+# CAÇA OBRIGATÓRIA e CAÇA OPCIONAL são decisões diferentes e não podem dividir
+# o mesmo limiar. Obrigatória é "preciso de ouro para a saída": aceita risco
+# moderado, porque não lutar também cobra. Opcional é "quero XP": só acontece
+# com o personagem claramente confortável, porque recusá-la não custa nada agora.
+#
+# Nenhuma das duas olha só para HP. MP é munição: um herói cheio de vida e sem
+# mana entra no duelo com o ataque básico, que é a forma mais cara de brigar.
+HP_PARA_CACA_OBRIGATORIA = 0.50
+MP_PARA_CACA_OBRIGATORIA = 0.25
+HP_PARA_CACA_OPCIONAL = 0.80
+MP_PARA_CACA_OPCIONAL = 0.60
+
+# Abaixo disto ele prefere a Loja (recuperação paga) a seguir explorando.
 HP_SAUDAVEL = 0.65
 # Quantos passos a mais ele aceita andar por um serviço.
 DESVIO_ACEITAVEL = 10
@@ -67,6 +80,15 @@ DESVIO_ACEITAVEL = 10
 FOLGA_PARA_COMPRAR = 1.5
 # Altar cobra vida. Só vale com folga real.
 HP_PARA_ALTAR = 0.75
+
+# --- Extração ---------------------------------------------------------------
+# A Extração deixou de ser tratada só como botão de pânico. Sempre que existir
+# uma casa alcançável ela é AVALIADA, e o trace registra o veredito — inclusive
+# quando o veredito é continuar.
+HP_DE_RISCO = 0.50
+STREAK_DE_RISCO = 3
+# Quantos sinais de risco simultâneos convencem a sair.
+SINAIS_PARA_EXTRAIR = 2
 
 
 def _pos(d: dict) -> tuple[int, int]:
@@ -288,23 +310,63 @@ class RunDeReferencia:
 
     # -- serviços ---------------------------------------------------------
 
-    def _usar_loja(self, casa) -> None:
+    def _orcamento(self) -> tuple[int, int, bool]:
+        """Quanto o jogador está disposto a gastar: (orçamento, reserva, quebrou).
+
+        `ouro disponível = ouro atual - reserva desejada`, e a reserva desejada é
+        a taxa de saída deste andar. A EXCEÇÃO é sobrevivência: com o HP baixo,
+        recuperar vale mais que subir de graça, e aí a reserva é conscientemente
+        quebrada — mas o trace tem de dizer isso em voz alta.
+        """
         hero = self.hero
-        ouro_antes, hp_antes = hero.coins, hero.get_hp()
         taxa = exit_fee(self.andar)
-        self.mapa.take_feature(casa)
-        progression.visit_shop(hero, Shop(), self.andar, self.rng, self.toggles, None)
-        self.trace.diz(
-            f"  Loja: ouro {ouro_antes} -> {hero.coins} | HP {hp_antes} -> {hero.get_hp()}"
-        )
-        # A política de compra existente NÃO reserva ouro para a saída. Não vou
-        # forkar a regra para ensiná-la; vou MEDIR quando isso custa a taxa.
-        if ouro_antes >= taxa > hero.coins:
+        if _frac_hp(hero) < HP_SAUDAVEL:
+            return hero.coins, taxa, True
+        return max(0, hero.coins - taxa), taxa, False
+
+    def _comprar_com_orcamento(self, rotulo: str) -> None:
+        """Abre a loja levando SÓ o orçamento, e devolve a reserva depois.
+
+        A política de compra de `progression.visit_shop` é boa — vende o
+        dominado, repara a vida, repõe cura e só então melhora equipamento — mas
+        não conhece a taxa de saída e gasta até o fim. Ensinar a reserva a ela
+        seria forkar a regra.
+
+        Então quem decide o limite é o JOGADOR, no único lugar em que isso é
+        decisão e não regra: o quanto ele leva na carteira. A loja gasta o que vê.
+        O que ficou reservado volta depois, e o que ela conseguiu VENDENDO fica,
+        porque vender é receita e não orçamento.
+        """
+        hero = self.hero
+        orcamento, reserva, quebrou = self._orcamento()
+        ouro_antes, hp_antes = hero.coins, hero.get_hp()
+        guardado = ouro_antes - orcamento
+
+        if quebrou:
             self.trace.diz(
-                f"  !! A compra consumiu a reserva: entrou com {ouro_antes} podendo pagar a "
-                f"saída ({taxa}), saiu com {hero.coins}."
+                f"  Vou sacrificar a saída paga para recuperar HP: levo os {ouro_antes} "
+                f"inteiros, e a saída custa {reserva}."
             )
             self.reserva_gasta += 1
+        else:
+            self.trace.diz(
+                f"  Orçamento de compra: {orcamento} "
+                f"(ouro {ouro_antes} − reserva de saída {reserva}). O resto fica guardado."
+            )
+
+        hero.coins = orcamento
+        try:
+            progression.visit_shop(hero, Shop(), self.andar, self.rng, self.toggles, None)
+        finally:
+            hero.coins += guardado
+
+        self.trace.diz(
+            f"  {rotulo}: ouro {ouro_antes} -> {hero.coins} | HP {hp_antes} -> {hero.get_hp()}"
+        )
+
+    def _usar_loja(self, casa) -> None:
+        self.mapa.take_feature(casa)
+        self._comprar_com_orcamento("Loja")
 
     def _usar_ferreiro(self, casa) -> None:
         hero = self.hero
@@ -329,9 +391,8 @@ class RunDeReferencia:
                 hero.set_isalive(False)
                 return False
         elif tipo == "merchant":
-            ouro_antes = hero.coins
-            progression.visit_shop(hero, Shop(), self.andar, self.rng, self.toggles, None)
-            self.trace.diz(f"  Evento Mercador: ouro {ouro_antes} -> {hero.coins}")
+            # O Mercador ABRE A MESMA LOJA, então respeita o mesmo orçamento.
+            self._comprar_com_orcamento("Evento Mercador")
         return True
 
     # -- a decisão --------------------------------------------------------
@@ -383,13 +444,30 @@ class RunDeReferencia:
                 "andar pela rota de menos combate — o descanso do fim de andar é a cura.",
             )
 
-        # 2. Não consigo pagar a saída. Preciso de capital.
-        if hero.coins < taxa and monstro is not None and hp >= HP_SAUDAVEL:
+        # 2. Extração: avaliada SEMPRE que houver casa alcançável, e não só em
+        #    emergência. O veredito entra no trace mesmo quando é "continuo".
+        if extracao is not None and self._alcance(extracao) is not None:
+            extrair, veredito = self._avaliar_extracao(extracao)
+            if veredito != self._ultimo_veredito_extracao:
+                self.trace.diz(f"  {veredito}")
+                self._ultimo_veredito_extracao = veredito
+            if extrair:
+                return ("extrair", extracao, veredito)
+
+        # 3. CAÇA OBRIGATÓRIA: falta ouro para a saída. Aceita risco moderado,
+        #    porque não lutar também cobra — a Essência do próximo andar.
+        if (
+            hero.coins < taxa
+            and monstro is not None
+            and hp >= HP_PARA_CACA_OBRIGATORIA
+            and mp >= MP_PARA_CACA_OBRIGATORIA
+        ):
             return (
                 "lutar",
                 monstro,
-                f"Tenho {hero.coins} de ouro e a saída custa {taxa}. Estou "
-                f"com {hp:.0%} de HP: vale enfrentar o monstro mais perto para pagar.",
+                f"Faltam {taxa - hero.coins} de ouro para a saída de {taxa}. Com {hp:.0%} de HP "
+                f"e {mp:.0%} de MP dá para encarar: é caça OBRIGATÓRIA, e recusá-la custa "
+                "Essência no andar seguinte.",
             )
 
         # 3. Serviços, quando o desvio é pequeno e o bolso permite.
@@ -450,15 +528,23 @@ class RunDeReferencia:
                             f"saída de {taxa}: dá para gastar sem ficar sem a taxa.",
                         )
 
-        # 4. Progressão: estou atrás da masmorra?
-        if monstro is not None and hp >= HP_SAUDAVEL and hero.get_level() <= self.andar:
+        # 5. CAÇA OPCIONAL: só XP. Recusá-la não custa nada agora, então só
+        #    acontece com o personagem claramente confortável — em vida E em
+        #    munição. Foi exatamente esta decisão, tomada a 67% de HP, que matou
+        #    a run anterior no andar 6.
+        if (
+            monstro is not None
+            and hp >= HP_PARA_CACA_OPCIONAL
+            and mp >= MP_PARA_CACA_OPCIONAL
+            and hero.get_level() <= self.andar
+        ):
             passos = self._alcance(monstro)
             return (
                 "lutar",
                 monstro,
-                f"Nível {hero.get_level()} no andar {self.andar}: estou "
-                f"atrás da curva. Com {hp:.0%} de HP e MP em {mp:.0%}, vale caçar o monstro a "
-                f"{passos[0] if passos else '?'} passos.",
+                f"Nível {hero.get_level()} no andar {self.andar}: estou atrás da curva. Caça "
+                f"OPCIONAL, e estou confortável para ela — {hp:.0%} de HP e {mp:.0%} de MP, "
+                f"contra o monstro a {passos[0] if passos else '?'} passos.",
             )
 
         # 5. Sair. O motivo tem de ser o REAL: "já tenho o que precisava" com
@@ -469,8 +555,9 @@ class RunDeReferencia:
                 "saida",
                 self.saida,
                 f"Faltam {taxa - hero.coins} de ouro para a saída, mas estou com {hp:.0%} de HP "
-                f"— abaixo dos {HP_SAUDAVEL:.0%} que considero seguro para caçar. Prefiro subir "
-                "sem pagar a morrer tentando pagar.",
+                f"e {mp:.0%} de MP — abaixo do mínimo ({HP_PARA_CACA_OBRIGATORIA:.0%} / "
+                f"{MP_PARA_CACA_OBRIGATORIA:.0%}) até para caça obrigatória. Prefiro subir sem "
+                "pagar a morrer tentando pagar.",
             )
         if monstro is not None:
             return (
@@ -482,7 +569,63 @@ class RunDeReferencia:
         return ("saida", self.saida, "Andar resolvido. Sigo para a saída.")
 
     def _tem_o_que_preservar(self) -> bool:
-        return self.hero.get_level() >= 5 or len(self.hero.passives) >= 3
+        """Há progresso que valha a pena tirar vivo daqui?"""
+        hero = self.hero
+        return (
+            hero.get_level() >= 3
+            or len(hero.passives) >= 2
+            or sum(1 for i in hero.equipment.values() if i) >= 2
+        )
+
+    def _sinais_de_risco(self) -> list[str]:
+        """O que, no estado atual, diz que continuar é perigoso."""
+        hero = self.hero
+        sinais = []
+        hp = _frac_hp(hero)
+        if hp < HP_DE_RISCO:
+            sinais.append(f"HP em {hp:.0%}")
+        if hero.get_level() < self.andar - 1:
+            sinais.append(f"nível {hero.get_level()} contra andar {self.andar}")
+        streak = unpaid_streak(hero)
+        if streak >= STREAK_DE_RISCO:
+            sinais.append(f"{streak} saídas não pagas seguidas")
+        if _frac_mp(hero) < MP_PARA_CACA_OBRIGATORIA:
+            sinais.append(f"MP em {_frac_mp(hero):.0%}")
+        return sinais
+
+    def _avaliar_extracao(self, casa) -> tuple[bool, str]:
+        """A Extração é SEMPRE avaliada quando alcançável, e o veredito vai ao trace.
+
+        Limitá-la a HP crítico era tratá-la como botão de pânico: quando o
+        gatilho disparava já era tarde. Aqui ela é uma pergunta feita com o andar
+        ainda inteiro — e a resposta pode continuar sendo "sigo descendo".
+        """
+        hero = self.hero
+        preserva = self._tem_o_que_preservar()
+        sinais = self._sinais_de_risco()
+        resumo = (
+            f"nível {hero.get_level()}, {len(hero.passives)} passivas, "
+            f"{sum(1 for i in hero.equipment.values() if i)} peças"
+        )
+        if not preserva:
+            return False, (
+                f"Extração avaliada: ainda não acumulei nada que valha preservar ({resumo}). "
+                "Continuo descendo."
+            )
+        if not sinais:
+            return False, (
+                f"Extração avaliada: tenho {resumo} para preservar, mas nenhum sinal de risco "
+                "— HP, MP, nível e saídas em dia. Continuo descendo."
+            )
+        if len(sinais) < SINAIS_PARA_EXTRAIR:
+            return False, (
+                f"Extração avaliada: {sinais[0]}, mas é um sinal só e tenho {resumo}. "
+                "Ainda dá para seguir."
+            )
+        return True, (
+            f"Extração avaliada: {' e '.join(sinais)}. Com {resumo} acumulados, "
+            "sair vivo vale mais que o próximo andar."
+        )
 
     def _tem_peca_para_investir(self) -> bool:
         return any(i is not None for i in self.hero.equipment.values())
@@ -498,6 +641,7 @@ class RunDeReferencia:
         self.saida = _pos(self.mapa.exit_pos)
         self.passos = 0
         self.combates = 0
+        self._ultimo_veredito_extracao = ""
 
         rolada = progression.floor_essence_multiplier(andar)
         self.essencia = effective_essence(hero, rolada)
