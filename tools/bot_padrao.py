@@ -51,6 +51,7 @@ from src.engine.game_logic import create_player_from_data
 from src.engine.loop import _setup_dungeon_map
 from src.engine.map import EventTile, FeatureTile
 from src.engine.map_analysis import campo_de_custo, rota_do_campo
+from src.shared import combat_topics as T
 from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
 from src.sim import progression
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, get_pick_policy
@@ -107,6 +108,124 @@ NOME_DA_NECESSIDADE = {
     INVESTIMENTO: "investimento",
     COMBATE_OPCIONAL: "combate opcional",
 }
+
+
+class Observador:
+    """Escuta o barramento de combate e conta. Não decide, não altera, não sorteia.
+
+    `run_battle` e `combat.py` já publicam tudo que interessa — golpe, crítico,
+    esquiva, Égide, tick de veneno. O parâmetro `publish` existe desde sempre e o
+    bot passava `None`. Passar um ouvinte é observação pura: `_emit` só chama o
+    callback, sem tocar no RNG nem no fluxo.
+
+    O que NÃO dá para observar daqui: o dano MITIGADO pela curva de defesa. O
+    pipeline publica o dano final, não o de antes da mitigação. Inventar esse
+    número seria pior que não ter.
+    """
+
+    def __init__(self, heroi_nome: str) -> None:
+        self.heroi = heroi_nome
+        self.dado_total = 0
+        self.dado_max = 0
+        self.dado_min: int | None = None
+        self.recebido_total = 0
+        self.recebido_max = 0
+        self.recebido_min: int | None = None
+        self.ultimo_recebido = 0
+        self.crit_dados = 0
+        self.crit_recebidos = 0
+        self.erros_meus = 0
+        self.erros_deles = 0
+        self.absorvido_egide = 0
+        self.mp_egide = 0
+        self.dot_sofrido: Counter = Counter()
+        self.golpe_fatal: dict | None = None
+        # Reiniciado a cada encontro para medir a luta que mata.
+        self.recebido_no_encontro = 0
+        self.maior_no_encontro = 0
+
+    def novo_encontro(self) -> None:
+        self.recebido_no_encontro = 0
+        self.maior_no_encontro = 0
+
+    def __call__(self, topic: str, evento) -> None:
+        payload = getattr(evento, "payload", {}) or {}
+        if topic == T.COMBAT_PHYSICAL_STRIKE:
+            self._golpe(payload.get("attacker"), payload.get("defender"), payload.get("strike"))
+        elif topic == T.COMBAT_SKILL_OUTCOME:
+            resultado = payload.get("result")
+            golpe = getattr(resultado, "strike", None)
+            if golpe is not None:
+                self._golpe(payload.get("caster"), payload.get("target"), golpe)
+        elif topic == T.COMBAT_TURN_EFFECT:
+            self._efeito(payload)
+
+    def _nome(self, entidade) -> str:
+        obter = getattr(entidade, "get_nick_name", None)
+        return obter() if callable(obter) else str(entidade)
+
+    def _golpe(self, atacante, defensor, golpe) -> None:
+        if golpe is None:
+            return
+        dano = int(getattr(golpe, "damage", 0) or 0)
+        errou = bool(getattr(golpe, "was_evaded", False))
+        critico = bool(getattr(golpe, "was_critical", False))
+        meu = self._nome(atacante) == self.heroi
+
+        if errou:
+            # MISS não é "dano zero": contá-lo como golpe faria o mínimo ser
+            # sempre 0 e apagaria o piso real de dano.
+            if meu:
+                self.erros_meus += 1
+            else:
+                self.erros_deles += 1
+            return
+        if dano <= 0:
+            return
+
+        if meu:
+            self.dado_total += dano
+            self.dado_max = max(self.dado_max, dano)
+            self.dado_min = dano if self.dado_min is None else min(self.dado_min, dano)
+            self.crit_dados += int(critico)
+        elif self._nome(defensor) == self.heroi:
+            self.recebido_total += dano
+            self.recebido_max = max(self.recebido_max, dano)
+            self.recebido_min = dano if self.recebido_min is None else min(self.recebido_min, dano)
+            self.crit_recebidos += int(critico)
+            self.ultimo_recebido = dano
+            self.recebido_no_encontro += dano
+            self.maior_no_encontro = max(self.maior_no_encontro, dano)
+            self.golpe_fatal = {
+                "de": self._nome(atacante),
+                "dano": dano,
+                "critico": critico,
+                "tipo": "golpe",
+            }
+
+    def _efeito(self, payload) -> None:
+        if self._nome(payload.get("entity")) != self.heroi:
+            return
+        kind = str(payload.get("kind", ""))
+        if kind == "magic_shield":
+            self.absorvido_egide += int(payload.get("absorbed", 0) or 0)
+            self.mp_egide += int(payload.get("mp", 0) or 0)
+            return
+        if kind.endswith("_tick") and "damage" in payload:
+            dano = int(payload.get("damage", 0) or 0)
+            if dano <= 0:
+                return
+            efeito = kind[: -len("_tick")]
+            self.dot_sofrido[efeito] += dano
+            self.recebido_total += dano
+            self.recebido_no_encontro += dano
+            self.ultimo_recebido = dano
+            self.golpe_fatal = {
+                "de": efeito,
+                "dano": dano,
+                "critico": False,
+                "tipo": "tick",
+            }
 
 
 @dataclass(frozen=True)
@@ -235,6 +354,9 @@ class BotPadrao:
         self.por_andar: list[dict] = []
         # Serviços efetivamente USADOS (não só pisados).
         self.servicos: Counter = Counter()
+        # Ouvinte do barramento de combate. Só conta; `_emit` não consulta o
+        # RNG nem o retorno do callback, então plugar isto não muda uma decisão.
+        self.observador = Observador(self.hero.get_nick_name())
 
     # -- observação -------------------------------------------------------
 
@@ -451,6 +573,7 @@ class BotPadrao:
         self.mapa.grid[casa[0]][casa[1]] = "D"
 
         hp_antes, mp_antes = hero.get_hp(), hero.get_mp()
+        self.observador.novo_encontro()
         nome = monstro.get_nick_name()
         nivel_alvo = int(getattr(monstro, "level", hero.get_level()))
         self.mp_disponivel += mp_antes
@@ -507,6 +630,7 @@ class BotPadrao:
             essence_multiplier=self.essencia,
             dungeon_level=self.andar,
             on_results=_apos_o_combate,
+            publish=self.observador,
         )
         self.combates += 1
         self.combates_na_run += 1
@@ -517,6 +641,10 @@ class BotPadrao:
             self.trace.diz(f"  Combate: {nome} -> FUGIU | HP {hp_antes}->{hero.get_hp()}")
         vivo = hero.get_isalive() and hero.get_hp() > 0
         if not vivo:
+            candidato["turnos"] = int(getattr(resultado.outcome, "turns", 0) or 0)
+            candidato["dano_no_encontro"] = self.observador.recebido_no_encontro
+            candidato["maior_no_encontro"] = self.observador.maior_no_encontro
+            candidato["golpe_final"] = self.observador.golpe_fatal
             self.fatal = candidato
         return vivo
 
@@ -966,6 +1094,17 @@ class BotPadrao:
             "nivel": hero.get_level(),
             "oferecidos": len(self.mapa.enemies_pos),
             "combates": 0,
+            "essencia_sorteada": rolada,
+            "essencia_efetiva": self.essencia,
+            # A passiva de Essência é lida em `process_post_battle`; guardada
+            # aqui para o relatório não ter de reproduzir a conta do core.
+            "bonus_passiva": hero.get_passive_bonus("essence_bonus"),
+            "streak_antes": unpaid_streak(hero),
+            "xp_antes": hero.xp_points,
+            "ouro_antes": hero.coins,
+            "saida_paga": None,
+            "taxa": exit_fee(andar),
+            "juros": 0,
         }
         self.por_andar.append(registro)
 
@@ -1011,6 +1150,11 @@ class BotPadrao:
         hp_antes = hero.get_hp()
         hero.recover(FLOOR_CLEAR_RESTORE_PERCENT)
         juros = pay_interest(hero, andar)
+        registro["saida_paga"] = saida.was_paid
+        registro["streak_depois"] = saida.streak
+        registro["juros"] = juros
+        registro["xp_depois"] = hero.xp_points
+        registro["ouro_depois"] = hero.coins
         self.trace.diz(
             f"  Fim do andar: {self.combates} combate(s), {self.passos} passos. "
             f"Saída {'PAGA' if saida.was_paid else 'NÃO PAGA'} ({saida.fee}), "
