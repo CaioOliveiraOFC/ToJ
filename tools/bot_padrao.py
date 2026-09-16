@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import random
+from collections import Counter
 
 from src.content import level_up
 from src.content.economy import exit_fee, pay_interest
@@ -182,6 +183,9 @@ class BotPadrao:
         self.trace = Trace()
         self.fim = ""
         self.andar = 0
+        # Quantas vezes cada verbo de combate foi escolhido na run inteira.
+        self.acoes: Counter = Counter()
+        self.mp_gasto = 0
 
     # -- observação -------------------------------------------------------
 
@@ -411,6 +415,7 @@ class BotPadrao:
                 f"HP {hp_antes}->{hero.get_hp()} MP {mp_antes}->{hero.get_mp()} | "
                 f"+{resultado.xp_gained} XP +{resultado.coins_gained} ouro"
             )
+            self.mp_gasto += max(0, mp_antes - hero.get_mp())
             drop = resultado.dropped_item
             if drop is None:
                 return
@@ -420,10 +425,18 @@ class BotPadrao:
                 + ("EQUIPOU, é melhor que o que estava no slot" if trocou else "guardou na mochila")
             )
 
+        # OBSERVAÇÃO, não decisão: o wrapper conta o que a política devolveu e
+        # devolve exatamente isso. Sem ele não dá para responder "o Mago usa
+        # mana ou fica no ataque básico?" — e a resposta não pode ser um palpite.
+        def _observar(h, m, turno):
+            acao = self.decide(h, m, turno)
+            self.acoes[getattr(acao, "kind", "?")] += 1
+            return acao
+
         resultado = resolve_encounter(
             hero,
             [monstro],
-            combat_decision=lambda h, m, t: self.decide(h, m, t),
+            combat_decision=_observar,
             level_up_provider=self._escolher_do_nivel,
             rng=self.rng,
             essence_multiplier=self.essencia,
@@ -958,6 +971,11 @@ class BotPadrao:
             f"Ouro {hero.coins} | Passivas {len(hero.passives)} | Skills {len(hero.skills)} | "
             f"Equipado {sum(1 for i in hero.equipment.values() if i)} peças | "
             f"Mochila {len(hero.inventory)}"
+        )
+        self.trace.diz(
+            "  Combate: "
+            + ", ".join(f"{verbo} {n}x" for verbo, n in sorted(self.acoes.items()))
+            + f" | MP gasto na run: {self.mp_gasto}"
         )
         led = hero.ledger
         self.trace.diz(
