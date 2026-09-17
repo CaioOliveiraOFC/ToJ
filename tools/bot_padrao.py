@@ -51,11 +51,16 @@ from src.engine.game_logic import create_player_from_data
 from src.engine.loop import _setup_dungeon_map
 from src.engine.map import EventTile, FeatureTile
 from src.engine.map_analysis import campo_de_custo, rota_do_campo
+from src.mechanics.battle import Action
 from src.shared import combat_topics as T
 from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
 from src.sim import progression
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, get_pick_policy
-from src.sim.policies import get_policy
+from src.sim.policies import (
+    _estimate_basic_damage,
+    _estimated_turns,
+    get_policy,
+)
 from src.sim.toggles import Toggles
 
 # --------------------------------------------------------------------------
@@ -65,21 +70,29 @@ from src.sim.toggles import Toggles
 # Abaixo disto o personagem está em perigo: nada de procurar briga.
 HP_CRITICO = 0.35
 
-# CAÇA OBRIGATÓRIA e CAÇA OPCIONAL são decisões diferentes e não podem dividir
-# o mesmo limiar. Obrigatória é "preciso de ouro para a saída": aceita risco
-# moderado, porque não lutar também cobra. Opcional é "quero XP": só acontece
-# com o personagem claramente confortável, porque recusá-la não custa nada agora.
+# Não existem mais duas caças. Havia "obrigatória" (preciso de ouro para a saída)
+# e "opcional" (quero XP), e a segunda exigia 80% de HP — o que na prática
+# significava UMA luta por andar, porque uma luta custa quase metade da barra.
+# Pior: a obrigatória estava atrás de `coins < taxa`, então pagar a saída
+# DESLIGAVA a principal fonte de combate do bot. Ter ouro virava motivo para
+# abandonar o mapa.
 #
-# Nenhuma das duas olha só para HP. MP é munição: um herói cheio de vida e sem
-# mana entra no duelo com o ataque básico, que é a forma mais cara de brigar.
-HP_PARA_CACA_OBRIGATORIA = 0.50
-MP_PARA_CACA_OBRIGATORIA = 0.25
-# Os limiares do perfil CONSERVADOR, que é o BOT_PADRÃO de sempre. Continuam
-# aqui como nomes para os testes existentes; o perfil é quem os entrega.
-HP_PARA_CACA_OPCIONAL = 0.80
-MP_PARA_CACA_OPCIONAL = 0.60
+# Agora existe uma decisão só: ENGAJAR. Acima do piso ele luta; abaixo, procura
+# recuperação e volta. Ouro nunca é condição — no máximo é um motivo a mais.
+#
+# O piso fica 0,20 da barra acima do crítico: margem para a policy de combate
+# (que cura em 35% e foge em 12%) ainda ter turno de reagir.
+HP_PARA_ENGAJAR = 0.55
+# MP é munição, mas o ataque básico não custa mana: a barra aqui é baixa de
+# propósito. Exigir 60% era recusar luta que o herói ganharia no braço.
+MP_PARA_ENGAJAR = 0.15
 
-# Abaixo disto ele prefere a Loja (recuperação paga) a seguir explorando.
+# Quantas poções ele quer ter em mãos para sustentar o próximo andar. Não é uma
+# quota de combate: é estoque de cura, e existe porque beber no mapa passou a ser
+# o que devolve o andar depois de uma luta cara.
+POCOES_PARA_SUSTENTAR = 2
+
+# Abaixo disto a recuperação paga da Loja vale o desvio.
 HP_SAUDAVEL = 0.65
 # Quantos passos a mais ele aceita andar por um serviço.
 DESVIO_ACEITAVEL = 10
@@ -93,20 +106,28 @@ HP_PARA_ALTAR = 0.75
 # antes de precisar do ouro para curar na Loja. A correção não é "no andar 7 não
 # entre no Ferreiro": é uma ESCADA, e nenhuma necessidade mais baixa é atendida
 # enquanto houver uma mais alta pendente e alcançável.
+#
+# `CONTINUIDADE` (preciso de ouro) e `COMBATE_OPCIONAL` (quero XP) eram dois
+# degraus para o MESMO ato, e tê-los separados era o que permitia "já paguei a
+# saída, logo não preciso lutar". Viraram um só: PROGREDIR. Lutar não é o que
+# sobra quando não há mais nada urgente — é o objetivo do andar.
+#
+# `EVITAR_DESPROPORCIONAL` saiu da escada. Ele media desproporção pelo nível dos
+# monstros no mapa, que o jogador não vê, e — pior — freava o combate justamente
+# quando o herói estava atrasado, que é quando lutar é o único jeito de recuperar
+# o atraso. A desproporção agora é julgada na FICHA, depois da colisão.
 SOBREVIVENCIA = 1
-EVITAR_DESPROPORCIONAL = 2
-RECUPERACAO = 3
-CONTINUIDADE = 4
-INVESTIMENTO = 5
-COMBATE_OPCIONAL = 6
+RECUPERACAO = 2
+PROGREDIR = 3
+INVESTIMENTO = 4
+ENCERRAR = 5
 
 NOME_DA_NECESSIDADE = {
     SOBREVIVENCIA: "sobrevivência",
-    EVITAR_DESPROPORCIONAL: "evitar combate desproporcional",
     RECUPERACAO: "recuperação",
-    CONTINUIDADE: "continuidade da run",
+    PROGREDIR: "progredir",
     INVESTIMENTO: "investimento",
-    COMBATE_OPCIONAL: "combate opcional",
+    ENCERRAR: "encerrar o andar",
 }
 
 
@@ -238,26 +259,34 @@ class Perfil:
     """
 
     nome: str
-    # Estado mínimo para aceitar uma luta que só dá XP.
-    hp_opcional: float
-    mp_opcional: float
-    # Só caça opcional quando está atrás da curva de nível?
-    #
-    # Não existe um campo "continua depois de poder pagar a saída": quem decide
-    # isso JÁ é este portão. A caça opcional é avaliada antes do "já dá, saio",
-    # então um perfil que passa nos limiares continua lutando por conta própria.
-    # Um campo a mais seria configuração morta.
-    so_quando_atrasado: bool
+    # Estado mínimo para colidir com o próximo monstro.
+    hp_engajar: float
+    mp_engajar: float
 
 
-CONSERVADOR = Perfil("conservador", 0.80, 0.60, True)
-MODERADO = Perfil("moderado", 0.65, 0.40, False)
-HARDCORE = Perfil("hardcore", 0.50, 0.25, False)
+# O perfil não tem mais um campo "só luta quando está atrasado". Aquele portão
+# existia para conter a caça opcional, e o que ele produzia era o inverso da
+# intenção: o herói adiantado parava de lutar e voltava a ficar atrasado.
+CONSERVADOR = Perfil("conservador", HP_PARA_ENGAJAR, MP_PARA_ENGAJAR)
+MODERADO = Perfil("moderado", 0.45, 0.10)
+HARDCORE = Perfil("hardcore", 0.38, 0.05)
 PERFIS = {p.nome: p for p in (CONSERVADOR, MODERADO, HARDCORE)}
 
-# Quantos níveis acima de mim um duelo ainda é proporcional. Acima disto o
-# monstro não é "difícil": é outro patamar, e HP cheio não compensa.
-GAP_ACEITAVEL = 2
+# --- Desproporção, julgada na FICHA -----------------------------------------
+# Não existe mais um `GAP_ACEITAVEL` aplicado ao mapa: o jogador olha o mapa e vê
+# `&`, não "Nv7". A ficha do inimigo (nível, HP, ST, DF) só aparece em
+# `render_fight_intro`, DEPOIS da colisão — e ali a saída é `flee`, que é 50% por
+# turno.
+#
+# A régua: quantos turnos eu levo para matá-lo, contra quantos ele leva para me
+# matar. Em 1,0 a regra é "não entro numa corrida de dano que eu perco". Medido
+# na seed 20260918, as lutas ganhas ficaram em 0,20–0,83 e a que matou o Warrior
+# no andar 5 estava em 1,33 — o limiar separa as duas populações.
+#
+# Não é 2,0. Com 2,0 o bot aceitava lutas em que morre ao dobro da velocidade com
+# que mata, contando com skill e cura para virar. Isso não é ler a ficha: é
+# apostar o personagem e chamar de leitura.
+RAZAO_MAXIMA_PARA_LUTAR = 1.0
 
 # --- Extração ---------------------------------------------------------------
 # A Extração deixou de ser tratada só como botão de pânico. Sempre que existir
@@ -330,7 +359,11 @@ class BotPadrao:
         # O CAMINHO REAL de criação de personagem. Sem loadout, sem presente:
         # nível 1, sem ouro, sem inventário, sem equipamento, uma skill.
         self.hero = create_player_from_data(classe, "Referencia")
-        self.decide = get_policy("smart")
+        # A política de combate do bot é a do simulador MAIS a leitura da ficha.
+        # A composição acontece aqui, e não dentro do duelo, porque assim trocar
+        # `self.decide` troca a política INTEIRA — que é o que um teste quer
+        # dizer quando fixa a decisão para isolar o núcleo do encontro.
+        self.decide = self._com_leitura_de_ficha(get_policy("smart"))
         self.picker = get_pick_policy(DEFAULT_PICK_POLICY)
         self.toggles = Toggles()
         self.trace = Trace()
@@ -354,6 +387,15 @@ class BotPadrao:
         self.por_andar: list[dict] = []
         # Serviços efetivamente USADOS (não só pisados).
         self.servicos: Counter = Counter()
+        # Fugas decididas na FICHA, no turno 1 — separadas das que a política de
+        # combate toma no meio da luta, que já estão em `acoes["flee"]`.
+        self.fugas_na_run = 0
+        self.pocoes_bebidas = 0
+        # A ficha do encontro corrente já foi ao trace? Reler não muda decisão;
+        # só evita repetir a mesma linha a cada turno de uma fuga insistente.
+        self._ficha_lida = False
+        # Por que ele parou de lutar no andar corrente. Vai ao registro do andar.
+        self.parada = ""
         # Ouvinte do barramento de combate. Só conta; `_emit` não consulta o
         # RNG nem o retorno do callback, então plugar isto não muda uma decisão.
         self.observador = Observador(self.hero.get_nick_name())
@@ -390,65 +432,73 @@ class BotPadrao:
         return None
 
     def _alvos_visiveis(self) -> list[dict]:
-        """Os monstros alcançáveis, com o que o JOGADOR consegue ver de cada um.
+        """Os monstros alcançáveis, com o que o MAPA mostra de cada um.
 
-        Nível está no nome da casa, distância e combates extras saem do mapa.
-        Nada de resultado futuro, RNG ou loot: só o que está na tela.
+        O jogador olha o mapa e vê `&`, ou `B` se for chefe (`MapOfGame.draw_map`).
+        Nome e nível NÃO estão ali: a ficha do inimigo — nível, HP, MP, ST, AG,
+        MG, DF — só aparece em `render_fight_intro`, depois da colisão, e com
+        `allow_escape=False`. A versão anterior lia `get_nick_name()` e `.level`
+        daqui e escolhia alvo por defasagem de nível: informação que nenhum
+        jogador tem antes de encostar no monstro.
+
+        O que sobra é honesto e suficiente: onde ele está, quantos passos custa,
+        quantas OUTRAS lutas a rota obriga, e se é chefe.
         """
         campo = self._campo(por_combate=True)
-        nivel_heroi = self.hero.get_level()
         alvos = []
         for casa, monstro in self.mapa.enemies_pos.items():
             rota, _ = rota_do_campo(campo, casa, True)
             if not rota.alcancavel:
                 continue
-            nivel = int(getattr(monstro, "level", nivel_heroi))
             alvos.append(
                 {
                     "casa": casa,
-                    "nome": monstro.get_nick_name(),
-                    "nivel": nivel,
-                    "gap": nivel - nivel_heroi,
                     "passos": rota.passos,
                     # A rota até ele pode obrigar a lutar com OUTROS pelo
-                    # caminho. Um alvo fácil atrás de dois difíceis não é fácil.
+                    # caminho. Um alvo perto atrás de dois monstros não é perto.
                     "extras": max(0, rota.combates - 1),
+                    "chefe": bool(getattr(monstro, "is_boss", False)),
                 }
             )
         return alvos
 
-    def _razoavel(self, alvo: dict) -> bool:
-        """Um duelo que não é desproporcional ao personagem."""
-        return alvo["gap"] <= GAP_ACEITAVEL
-
     def _melhor_alvo(self, alvos: list[dict]) -> dict | None:
-        """O alvo razoável mais barato: menor defasagem, menos lutas extras, mais perto.
+        """O alvo mais barato de alcançar: menos lutas pelo caminho, depois mais perto.
 
-        Nunca "o mais perto". Era assim que um Bandido Nv.9 a 3 passos ganhava de
-        um Rato Nv.5 a 7 passos — e matava a run.
+        `extras` vem antes de `passos` de propósito: um monstro a 3 passos com
+        dois outros na frente custa três lutas, e um a 9 passos com o caminho
+        livre custa uma.
+
+        Chefe (`B`) não entra. É a única distinção de perigo que o mapa oferece
+        ao jogador, e ignorá-la seria jogar pior que um humano, não melhor.
         """
-        razoaveis = [a for a in alvos if self._razoavel(a)]
-        if not razoaveis:
+        candidatos = [a for a in alvos if not a["chefe"]]
+        if not candidatos:
             return None
-        return min(razoaveis, key=lambda a: (a["gap"], a["extras"], a["passos"]))
+        return min(candidatos, key=lambda a: (a["extras"], a["passos"]))
 
     def _descrever_alvos(self, alvos: list[dict], escolhido: dict | None) -> None:
-        """Põe no trace o que estava disponível e o que foi recusado."""
+        """Põe no trace o que o mapa mostrava e o que foi escolhido.
+
+        Sem nome e sem nível: o trace registra a decisão com a informação que a
+        decisão teve. O nome do monstro aparece na linha do combate, que é
+        quando o jogador também o descobre.
+        """
         if not alvos:
             return
         partes = []
-        for a in sorted(alvos, key=lambda x: (x["gap"], x["passos"])):
+        for a in sorted(alvos, key=lambda x: (x["extras"], x["passos"])):
             marca = (
                 "ESCOLHIDO"
                 if escolhido is not None and a["casa"] == escolhido["casa"]
-                else ("recusado (desproporcional)" if not self._razoavel(a) else "descartado")
+                else ("chefe — não é alvo opcional" if a["chefe"] else "descartado")
             )
             partes.append(
-                f"{a['nome']} (Nv{a['nivel']}, {a['gap']:+d} de mim, {a['passos']} passos"
+                f"{'B' if a['chefe'] else '&'} a {a['passos']} passos"
                 + (f", +{a['extras']} luta(s) no caminho" if a["extras"] else "")
-                + f") — {marca}"
+                + f" — {marca}"
             )
-        self.trace.diz("  Alvos visíveis: " + " | ".join(partes))
+        self.trace.diz("  Alvos visíveis no mapa: " + " | ".join(partes))
 
     # -- ações ------------------------------------------------------------
 
@@ -558,6 +608,65 @@ class BotPadrao:
             return True
         return True
 
+    def _com_leitura_de_ficha(self, politica):
+        """A política tática do simulador, precedida da leitura da ficha.
+
+        Fica ANTES de `smart_policy` pela mesma razão que o jogador lê
+        `render_compare_opponents` antes de escolher a tecla: a tela de confronto
+        vem primeiro, e o que ela diz pode ser "não lute isto".
+
+        Reavalia a cada turno, não só no primeiro: fugir é 50% por turno
+        (`FLEE_RANGE_MAX = 2`), e uma tentativa só seria aceitar a primeira
+        moeda e ficar na luta que já se decidiu não querer.
+        """
+
+        def decidir(heroi, monstros, turno):
+            alvo = monstros[0] if isinstance(monstros, list) else monstros
+            fuga = self._ler_a_ficha(heroi, alvo)
+            if fuga is not None:
+                if turno == 0:
+                    self.fugas_na_run += 1
+                    if self.por_andar:
+                        self.por_andar[-1]["fugas"] += 1
+                return fuga
+            return politica(heroi, monstros, turno)
+
+        return decidir
+
+    def _ler_a_ficha(self, heroi, monstro):
+        """A tela de confronto, e o que fazer com ela. Devolve `flee` ou None.
+
+        É aqui que a desproporção é julgada, e não no mapa. `render_fight_intro`
+        mostra nível, HP, MP, ST, AG, MG e DF dos dois lados — e mostra DEPOIS
+        da colisão, com `allow_escape=False`. O jogador não escolhe não lutar:
+        escolhe fugir, a 50% por turno.
+
+        A conta reusa `_estimate_basic_damage` e `_estimated_turns` de
+        `sim/policies`, que leem exatamente os campos da tela. Quantos turnos
+        para matá-lo, quantos para ele me matar. Se ele me mata muito mais
+        rápido, a aposta da fuga é melhor que a da luta.
+
+        Uma imprecisão registrada em vez de escondida: o humano vê a ficha antes
+        de qualquer turno; o bot vê no primeiro turno DELE, que pode vir depois
+        de um golpe do monstro se a agilidade dele for maior.
+        """
+        meu_dano = _estimate_basic_damage(heroi, monstro)
+        dano_dele = _estimate_basic_damage(monstro, heroi)
+        turnos_para_matar = _estimated_turns(monstro, meu_dano)
+        turnos_para_morrer = _estimated_turns(heroi, dano_dele)
+        if turnos_para_matar <= turnos_para_morrer * RAZAO_MAXIMA_PARA_LUTAR:
+            return None
+        if self._ficha_lida:
+            return Action(kind="flee")
+        self._ficha_lida = True
+        self.trace.diz(
+            f"  Ficha do inimigo: {monstro.get_nick_name()} Nv{getattr(monstro, 'level', '?')} "
+            f"| HP {monstro.get_hp()} ST {monstro.get_st()} DF {monstro.get_df()}. "
+            f"Mato em ~{turnos_para_matar} turnos, morro em ~{turnos_para_morrer}. "
+            "Perco a corrida de dano — tento fugir."
+        )
+        return Action(kind="flee")
+
     def _duelo(self, monstro, casa) -> bool:
         """Um encontro, pelo MESMO core que a tela do jogador usa.
 
@@ -574,6 +683,7 @@ class BotPadrao:
 
         hp_antes, mp_antes = hero.get_hp(), hero.get_mp()
         self.observador.novo_encontro()
+        self._ficha_lida = False
         nome = monstro.get_nick_name()
         nivel_alvo = int(getattr(monstro, "level", hero.get_level()))
         self.mp_disponivel += mp_antes
@@ -613,7 +723,7 @@ class BotPadrao:
                 + ("EQUIPOU, é melhor que o que estava no slot" if trocou else "guardou na mochila")
             )
 
-        # OBSERVAÇÃO, não decisão: o wrapper conta o que a política devolveu e
+        # OBSERVAÇÃO, não decisão: conta o verbo que a política devolveu e
         # devolve exatamente isso. Sem ele não dá para responder "o Mago usa
         # mana ou fica no ataque básico?" — e a resposta não pode ser um palpite.
         def _observar(h, m, turno):
@@ -696,12 +806,52 @@ class BotPadrao:
         a taxa de saída deste andar. A EXCEÇÃO é sobrevivência: com o HP baixo,
         recuperar vale mais que subir de graça, e aí a reserva é conscientemente
         quebrada — mas o trace tem de dizer isso em voz alta.
+
+        A exceção disparava em `HP_SAUDAVEL` (65%). Com o bot jogando o andar em
+        vez de correr para a saída, estar abaixo de 65% virou o estado NORMAL, e
+        a exceção passou a valer sempre: ele gastava 91 de 108 em recuperação,
+        saía sem pagar, perdia Essência e nunca sobrava ouro para poção — que é
+        justamente a cura que sustentaria o andar seguinte.
+        Agora a reserva só é quebrada em emergência de verdade.
         """
         hero = self.hero
         taxa = exit_fee(self.andar)
-        if _frac_hp(hero) < HP_SAUDAVEL:
+        if _frac_hp(hero) < HP_CRITICO:
             return hero.coins, taxa, True
         return max(0, hero.coins - taxa), taxa, False
+
+    def _beber_pocao(self) -> bool:
+        """Abre o inventário no mapa e bebe. Mesma porta que o jogador usa.
+
+        `navigation_menu.py:975` chama exatamente `player.use_potion(item)` fora
+        de combate — é uma ação de jogador que existe desde sempre e que o bot
+        nunca tomou. Em 60 partidas ele usou poção 22 vezes, todas DENTRO do
+        combate, e terminou runs com cura na mochila.
+
+        Este é o degrau que sustenta jogar o andar: depois de uma luta cara,
+        beber devolve o piso de engajamento sem custar ouro nem passos.
+        """
+        hero = self.hero
+        curas = [
+            i
+            for i in hero.inventory
+            if getattr(i, "consumable", False) and getattr(i, "effect_type", None) == "max_hp"
+        ]
+        if not curas:
+            return False
+        melhor = max(curas, key=lambda i: int(getattr(i, "effect_value", 0) or 0))
+        antes = hero.get_hp()
+        # `use_potion` já tira o item da mochila (heroes.py:750). Remover de novo
+        # aqui seria consumir duas poções para curar uma vez.
+        hero.use_potion(melhor)
+        self.pocoes_bebidas += 1
+        if self.por_andar:
+            self.por_andar[-1]["pocoes_bebidas"] += 1
+        self.trace.diz(
+            f"  Bebeu {melhor.name} no mapa: HP {antes} -> {hero.get_hp()} "
+            f"({self._pocoes()} restante(s) na mochila)."
+        )
+        return True
 
     def _comprar_com_orcamento(self, rotulo: str) -> None:
         """Abre a loja levando SÓ o orçamento, e devolve a reserva depois.
@@ -796,7 +946,7 @@ class BotPadrao:
         alvos = self._alvos_visiveis()
         alvo = self._melhor_alvo(alvos)
 
-        # 1. Perigo. Em ordem: quem cura primeiro.
+        # 1. Perigo. Em ordem: quem cura primeiro e mais barato.
         if hp < HP_CRITICO:
             if evento is not None and self.mapa.event_type == "fountain":
                 desvio = self._desvio(evento)
@@ -807,6 +957,13 @@ class BotPadrao:
                         f"HP em {hp:.0%}. Há uma Fonte a {desvio} passos de "
                         "desvio — curar antes de qualquer outra coisa.",
                     )
+            if self._pocoes() > 0:
+                return (
+                    "pocao",
+                    None,
+                    f"HP em {hp:.0%} e {self._pocoes()} poção(ões) na mochila. Bebo AGORA — "
+                    "morrer com cura guardada é o pior desfecho possível.",
+                )
             if loja is not None and hero.coins > 0 and self._desvio(loja) is not None:
                 return (
                     "loja",
@@ -816,6 +973,7 @@ class BotPadrao:
                 )
             if extracao is not None and self._tem_o_que_preservar():
                 if self._alcance(extracao) is not None:
+                    self.parada = f"HP em {hp:.0%} sem cura alcançável"
                     return (
                         "extrair",
                         extracao,
@@ -823,6 +981,7 @@ class BotPadrao:
                         f"nível {hero.get_level()} e {len(hero.passives)} passivas para "
                         "preservar. Extrair vale mais que insistir.",
                     )
+            self.parada = f"HP em {hp:.0%}, abaixo do crítico, e nada que cure no andar"
             return (
                 "saida",
                 self.saida,
@@ -841,33 +1000,54 @@ class BotPadrao:
                 self.trace.diz(f"  {veredito}")
                 self._ultimo_veredito_extracao = veredito
 
-        # 3. CAÇA POR NECESSIDADE. Não é "preciso pagar, logo preciso lutar" —
-        #    é "estou sem ouro; vale assumir UMA luta para conseguir pagar?".
-        #    Se todos os alvos forem desproporcionais, aceitar a saída não paga é
-        #    decisão válida: perder Essência é melhor que perder o personagem.
-        if hero.coins < taxa and hp >= HP_PARA_CACA_OBRIGATORIA and mp >= MP_PARA_CACA_OBRIGATORIA:
-            if alvo is not None:
+        # 2b. Beber é barato: não custa passo nem ouro, e poção parada na mochila
+        #     não cura ninguém. NÃO é pré-condição para lutar — acima do piso ele
+        #     luta sem cura garantida, como pedido. É só deixar de morrer com
+        #     cura guardada, que foi como a primeira versão desta policy perdeu o
+        #     Warrior no andar 5 com uma poção na bolsa.
+        if hp < HP_SAUDAVEL and self._pocoes() > 0 and alvo is not None:
+            return (
+                "pocao",
+                None,
+                f"HP em {hp:.0%} e ainda há monstro no andar. Bebo uma das "
+                f"{self._pocoes()} poções antes de encostar no próximo — beber é de graça em "
+                "passos e em ouro.",
+            )
+
+        # 3. RECUPERAÇÃO. Abaixo do piso de engajamento ele NÃO desiste do andar:
+        #    procura como voltar a poder lutar. Era aqui que a versão anterior
+        #    encerrava — 48 das 101 saídas prematuras saíram deste estado, e o
+        #    trace ainda dizia que o motivo era o ouro da saída.
+        if hp < self.perfil.hp_engajar:
+            cura = self._caminho_de_cura(loja, evento, taxa, hp)
+            if cura is not None:
+                return cura
+
+        # 4. PROGREDIR. O andar é para ser jogado. Não existe mais "já tenho
+        #    ouro para a saída, então não preciso lutar": ouro é consequência do
+        #    combate, não substituto dele. Se há alvo alcançável e o estado
+        #    permite encostar nele, ele encosta.
+        if alvo is not None:
+            impedimento = self._por_que_nao_engajar(hp, mp)
+            if impedimento is None:
                 self._descrever_alvos(alvos, alvo)
+                extra = (
+                    f" Faltam {taxa - hero.coins} de ouro para a saída, o que torna esta luta "
+                    "também necessária."
+                    if hero.coins < taxa
+                    else ""
+                )
                 return (
                     "lutar",
                     alvo["casa"],
-                    f"Faltam {taxa - hero.coins} de ouro para a saída de {taxa}. O melhor alvo é "
-                    f"{alvo['nome']} (Nv{alvo['nivel']}, {alvo['gap']:+d} de mim) a "
-                    f"{alvo['passos']} passos, e estou com {hp:.0%} de HP e {mp:.0%} de MP. "
-                    "Vale a luta.",
-                )
-            if alvos:
-                self._descrever_alvos(alvos, None)
-                menor = min(a["gap"] for a in alvos)
-                return (
-                    "saida",
-                    self.saida,
-                    f"Faltam {taxa - hero.coins} de ouro, mas o melhor alvo disponível está "
-                    f"{menor:+d} níveis de mim. Aceito a saída não paga em vez de arriscar a "
-                    "run — Essência se recupera, personagem não.",
+                    f"Nv{hero.get_level()} no andar {self.andar}, {hp:.0%} de HP e {mp:.0%} de "
+                    f"MP: dá para lutar. Vou ao & a {alvo['passos']} passos"
+                    + (f" (+{alvo['extras']} luta(s) no caminho)" if alvo["extras"] else "")
+                    + f".{extra}",
                 )
 
-        # 3. Serviços, quando o desvio é pequeno e o bolso permite.
+        # 5. INVESTIMENTO. Serviços vêm DEPOIS do combate: gastar antes é gastar
+        #    com o ouro e os drops que a luta ainda não deu.
         if loja is not None:
             desvio = self._desvio(loja)
             if desvio is not None and desvio <= DESVIO_ACEITAVEL:
@@ -878,6 +1058,14 @@ class BotPadrao:
                         f"Loja a {desvio} passos e estou com {hp:.0%} de HP. Vou pela "
                         f"recuperação paga, com {hero.coins} de ouro — mesmo que sobre pouco "
                         f"para a saída de {taxa}.",
+                    )
+                if self._quer_repor_cura() and hero.coins >= taxa:
+                    return (
+                        "loja",
+                        loja,
+                        f"Loja a {desvio} passos. Estou com {self._pocoes()} poção(ões) e a "
+                        f"saída de {taxa} já está coberta pelos {hero.coins} de ouro: repor "
+                        "cura é o que sustenta continuar lutando nos próximos andares.",
                     )
                 if hero.coins >= taxa * FOLGA_PARA_COMPRAR:
                     return (
@@ -914,9 +1102,6 @@ class BotPadrao:
                     )
                 if tipo == "merchant":
                     # O Mercador ABRE A MESMA LOJA, então vale a mesma reserva.
-                    # Sem isto ele era um ralo: na primeira versão desta run,
-                    # três visitas levaram 90->31, 148->39 e 183->21, e nas três
-                    # o herói chegou ao X sem poder pagar a taxa.
                     if hp < HP_SAUDAVEL or hero.coins >= taxa * FOLGA_PARA_COMPRAR:
                         return (
                             "evento",
@@ -925,46 +1110,91 @@ class BotPadrao:
                             f"saída de {taxa}: dá para gastar sem ficar sem a taxa.",
                         )
 
-        # 5. CAÇA OPCIONAL: só XP. Recusá-la não custa nada agora, então só
-        #    acontece com o personagem claramente confortável — em vida E em
-        #    munição. Foi exatamente esta decisão, tomada a 67% de HP, que matou
-        #    a run anterior no andar 6.
-        if (
-            alvo is not None
-            and hp >= self.perfil.hp_opcional
-            and mp >= self.perfil.mp_opcional
-            and (not self.perfil.so_quando_atrasado or hero.get_level() <= self.andar)
-        ):
-            self._descrever_alvos(alvos, alvo)
-            return (
-                "lutar",
-                alvo["casa"],
-                f"Nível {hero.get_level()} no andar {self.andar}: estou atrás da curva. Caça "
-                f"OPCIONAL, e estou confortável — {hp:.0%} de HP e {mp:.0%} de MP. Escolho "
-                f"{alvo['nome']} (Nv{alvo['nivel']}, {alvo['gap']:+d} de mim) a "
-                f"{alvo['passos']} passos.",
-            )
-
-        # 5. Sair. O motivo tem de ser o REAL: "já tenho o que precisava" com
-        #    ouro abaixo da taxa é mentira, e um trace que mente não serve para
-        #    revisar decisão nenhuma.
-        if alvos and hero.coins < taxa:
-            return (
-                "saida",
-                self.saida,
-                f"Faltam {taxa - hero.coins} de ouro para a saída, mas estou com {hp:.0%} de HP "
-                f"e {mp:.0%} de MP — abaixo do mínimo ({HP_PARA_CACA_OBRIGATORIA:.0%} / "
-                f"{MP_PARA_CACA_OBRIGATORIA:.0%}) até para caça obrigatória. Prefiro subir sem "
-                "pagar a morrer tentando pagar.",
-            )
+        # 6. ENCERRAR — e o motivo tem de ser o REAL.
+        #
+        #    A versão anterior imprimia "{ouro} de ouro e a saída custa {taxa}:
+        #    já dá" mesmo quando o portão que fechou tinha sido o HP. Um trace
+        #    que mente sobre a própria causa não serve para revisar decisão
+        #    nenhuma, e foi por isso que a auditoria das 60 runs leu errado o
+        #    comportamento do bot durante semanas.
         if alvos:
+            impedimento = self._por_que_nao_engajar(hp, mp) or (
+                "sobraram só alvos que o mapa marca como chefe"
+                if alvo is None
+                else "nada me impede, mas não há alvo alcançável"
+            )
+            self._descrever_alvos(alvos, None)
+            self.parada = impedimento
             return (
                 "saida",
                 self.saida,
-                f"Nível {hero.get_level()} no andar {self.andar}, {hero.coins} de ouro e a saída "
-                f"custa {taxa}: já dá. Sobram monstros, mas lutar por lutar só gasta HP.",
+                f"Encerro o andar com {len(alvos)} monstro(s) ainda no mapa. Motivo real: "
+                f"{impedimento}.",
             )
-        return ("saida", self.saida, "Andar resolvido. Sigo para a saída.")
+        self.parada = "andar limpo"
+        return ("saida", self.saida, "Andar resolvido: não sobrou monstro alcançável.")
+
+    # -- engajar ----------------------------------------------------------
+
+    def _por_que_nao_engajar(self, hp: float, mp: float) -> str | None:
+        """None quando dá para encostar no próximo monstro; senão, o que impede.
+
+        Uma condição só, com nome, para que a linha de saída possa citá-la. Note
+        o que NÃO está aqui: ouro. Ter a taxa da saída paga nunca foi motivo para
+        parar de jogar o andar — era só o lugar onde a policy antiga desligava.
+        """
+        if hp < self.perfil.hp_engajar:
+            return (
+                f"HP em {hp:.0%}, abaixo do piso de {self.perfil.hp_engajar:.0%}, e não há "
+                "caminho de recuperação neste andar"
+            )
+        if mp < self.perfil.mp_engajar:
+            return f"MP em {mp:.0%}, abaixo do piso de {self.perfil.mp_engajar:.0%}"
+        return None
+
+    def _pocoes(self) -> int:
+        return sum(
+            1
+            for i in self.hero.inventory
+            if getattr(i, "consumable", False) and getattr(i, "effect_type", None) == "max_hp"
+        )
+
+    def _quer_repor_cura(self) -> bool:
+        """Está sem estoque de cura para sustentar os próximos andares?
+
+        Compra saudável é a que não fura a reserva da saída — quem garante isso é
+        `_orcamento`. Aqui só se pergunta se vale a visita.
+        """
+        return self._pocoes() < POCOES_PARA_SUSTENTAR
+
+    def _caminho_de_cura(self, loja, evento, taxa: int, hp: float):
+        """Como voltar ao piso de engajamento, na ordem do mais barato.
+
+        A poção não está aqui porque o degrau 2b já bebeu, e mais cedo — assim
+        que o HP cai abaixo de saudável e ainda há monstro no andar. O que sobra
+        são os caminhos que custam passos ou ouro.
+        """
+        hero = self.hero
+        # A poção não aparece aqui: o degrau 2b já bebe antes, e mais cedo.
+        if evento is not None and self.mapa.event_type == "fountain":
+            desvio = self._desvio(evento)
+            if desvio is not None and desvio <= DESVIO_ACEITAVEL:
+                return (
+                    "evento",
+                    evento,
+                    f"HP em {hp:.0%} e uma Fonte a {desvio} passos. Cura de graça antes de "
+                    "voltar ao mapa.",
+                )
+        if loja is not None and hero.coins > taxa:
+            desvio = self._desvio(loja)
+            if desvio is not None and desvio <= DESVIO_ACEITAVEL:
+                return (
+                    "loja",
+                    loja,
+                    f"HP em {hp:.0%} e {hero.coins} de ouro contra uma saída de {taxa}: a "
+                    "recuperação paga cabe sem furar a reserva, e me devolve o andar.",
+                )
+        return None
 
     def _tem_o_que_preservar(self) -> bool:
         """Há progresso que valha a pena tirar vivo daqui?"""
@@ -975,13 +1205,19 @@ class BotPadrao:
             or sum(1 for i in hero.equipment.values() if i) >= 2
         )
 
-    def _sinais_de_risco(self) -> tuple[list[str], str]:
-        """(sinais normais, sinal grave). O grave vale por dois.
+    def _sinais_de_risco(self) -> list[str]:
+        """Os sinais que pesam na decisão de ENCERRAR A RUN pela Extração.
 
-        Grave é um só, e é estrutural: os combates que este andar oferece são
-        desproporcionais ao personagem. Quando isso acontece, não existe jogada
-        que recupere o atraso — nem lutar nem fugir —, e é o momento em que um
-        jogador olha a casa de Extração com outros olhos.
+        Nenhum deles freia combate. Em particular `nível < andar − 1`: ele é
+        alerta estrutural e contexto de risco, nunca gate de engajamento. Usá-lo
+        como gate fechava o ciclo errado — o herói atrasado parava de lutar, e
+        lutar era a única coisa que recuperava o atraso. O andar 5 do warrior
+        20260918 (Nv3, 4 combates, 396 XP, quase dois níveis) é exatamente o
+        catch-up que um gate desses proibiria.
+
+        O antigo sinal GRAVE morreu junto com o `gap` no mapa: ele dizia
+        "nenhum combate acessível é proporcional" lendo o nível dos monstros, que
+        o jogador não vê. A proporção agora se julga na ficha, dentro do duelo.
         """
         hero = self.hero
         sinais = []
@@ -993,18 +1229,9 @@ class BotPadrao:
         streak = unpaid_streak(hero)
         if streak >= STREAK_DE_RISCO:
             sinais.append(f"{streak} saídas não pagas seguidas")
-        if mp < MP_PARA_CACA_OBRIGATORIA:
+        if mp < MP_PARA_ENGAJAR:
             sinais.append(f"MP em {mp:.0%}")
-
-        grave = ""
-        alvos = self._alvos_visiveis()
-        if alvos and self._melhor_alvo(alvos) is None:
-            pior = min(a["gap"] for a in alvos)
-            grave = (
-                f"nenhum dos {len(alvos)} combates acessíveis é proporcional — o mais fácil "
-                f"está {pior:+d} níveis de mim"
-            )
-        return sinais, grave
+        return sinais
 
     def _avaliar_extracao(self, casa) -> tuple[bool, str]:
         """A Extração é SEMPRE avaliada quando alcançável, e o veredito vai ao trace.
@@ -1015,7 +1242,7 @@ class BotPadrao:
         """
         hero = self.hero
         preserva = self._tem_o_que_preservar()
-        sinais, grave = self._sinais_de_risco()
+        sinais = self._sinais_de_risco()
         resumo = (
             f"nível {hero.get_level()}, {len(hero.passives)} passivas, "
             f"{sum(1 for i in hero.equipment.values() if i)} peças"
@@ -1025,11 +1252,6 @@ class BotPadrao:
                 f"Extração avaliada: ainda não acumulei nada que valha preservar ({resumo}). "
                 "Continuo descendo."
             )
-        if grave:
-            return True, (
-                f"Extração avaliada: SINAL GRAVE — {grave}. Com {resumo} acumulados, insistir "
-                "num andar que não me oferece luta possível é entregar a run."
-            )
         if not sinais:
             return False, (
                 f"Extração avaliada: tenho {resumo} para preservar, mas nenhum sinal de risco "
@@ -1037,7 +1259,7 @@ class BotPadrao:
             )
         if len(sinais) < SINAIS_PARA_EXTRAIR:
             return False, (
-                f"Extração avaliada: {sinais[0]}, mas é um sinal só, sem nada grave, e tenho "
+                f"Extração avaliada: {sinais[0]}, mas é um sinal só e tenho "
                 f"{resumo}. Ainda dá para seguir."
             )
         return True, (
@@ -1059,16 +1281,17 @@ class BotPadrao:
 
         if hp < HP_CRITICO:
             return SOBREVIVENCIA, f"HP em {hp:.0%}"
-        _sinais, grave = self._sinais_de_risco()
-        if grave and self._tem_o_que_preservar():
-            return EVITAR_DESPROPORCIONAL, grave
-        if hp < HP_SAUDAVEL or mp < MP_PARA_CACA_OBRIGATORIA:
-            return RECUPERACAO, f"HP em {hp:.0%}, MP em {mp:.0%}"
-        if hero.coins < taxa:
-            return CONTINUIDADE, f"{hero.coins} de ouro contra uma saída de {taxa}"
+        if hp < self.perfil.hp_engajar:
+            return RECUPERACAO, f"HP em {hp:.0%}, abaixo do piso de engajamento"
+        if self._alvos_visiveis() and self._por_que_nao_engajar(hp, mp) is None:
+            # Havia aqui dois degraus, CONTINUIDADE ("preciso de ouro para a
+            # saída") e COMBATE_OPCIONAL ("se sobrar, luto"), e o primeiro
+            # desligava quando o ouro chegava. Os dois eram o mesmo ato, e
+            # separá-los era o que fazia pagar a saída parecer o fim do andar.
+            return PROGREDIR, f"há monstro alcançável, {hp:.0%} de HP e {mp:.0%} de MP"
         if hero.coins >= taxa * FOLGA_PARA_COMPRAR and self._tem_peca_para_investir():
             return INVESTIMENTO, f"{hero.coins} de ouro, com a saída de {taxa} já garantida"
-        return COMBATE_OPCIONAL, "nada urgente"
+        return ENCERRAR, self._por_que_nao_engajar(hp, mp) or "não há mais alvo alcançável"
 
     def _tem_peca_para_investir(self) -> bool:
         return any(i is not None for i in self.hero.equipment.values())
@@ -1086,6 +1309,7 @@ class BotPadrao:
         self.combates = 0
         self._ultimo_veredito_extracao = ""
         self.extraiu = False
+        self.parada = ""
 
         rolada = progression.floor_essence_multiplier(andar)
         self.essencia = effective_essence(hero, rolada)
@@ -1094,6 +1318,10 @@ class BotPadrao:
             "nivel": hero.get_level(),
             "oferecidos": len(self.mapa.enemies_pos),
             "combates": 0,
+            "fugas": 0,
+            "pocoes_bebidas": 0,
+            "hp_entrada": _frac_hp(hero),
+            "mp_entrada": _frac_mp(hero),
             "essencia_sorteada": rolada,
             "essencia_efetiva": self.essencia,
             # A passiva de Essência é lida em `process_post_battle`; guardada
@@ -1126,13 +1354,23 @@ class BotPadrao:
             f"| taxa de saída: {exit_fee(andar)}"
         )
 
-        # Uma decisão por vez. O teto de voltas é generoso e existe só para a
-        # ferramenta não pendurar: cada volta consome um monstro ou um serviço.
-        for _ in range(len(self.mapa.enemies_pos) + 8):
+        # Uma decisão por vez. O teto de voltas subiu porque o bot agora JOGA o
+        # andar: cada monstro pode custar uma volta para lutar e outra para se
+        # recuperar antes da próxima, e os serviços ainda entram por cima.
+        for _ in range(len(self.mapa.enemies_pos) * 2 + 12):
             necessidade, porque = self._necessidade_atual()
             acao, alvo, motivo = self._decidir()
             self.trace.diz(f"  [prioridade: {NOME_DA_NECESSIDADE[necessidade]} — {porque}]")
             self.trace.decisao(motivo)
+
+            # Beber não é ir a lugar nenhum: é o menu de inventário, no mapa.
+            if acao == "pocao":
+                if not self._beber_pocao():
+                    # Não deveria acontecer: `_decidir` só pede poção quando há
+                    # uma. Se acontecer, encerrar é melhor que girar no laço.
+                    self.parada = "pediu poção e não tinha"
+                    break
+                continue
 
             # O destino é escolha da policy; o que acontece em cada casa do
             # caminho é `move_player`. Por isso o laço não "usa" mais o serviço:
@@ -1155,8 +1393,16 @@ class BotPadrao:
         registro["juros"] = juros
         registro["xp_depois"] = hero.xp_points
         registro["ouro_depois"] = hero.coins
+        registro["restantes"] = len(self.mapa.enemies_pos)
+        registro["nivel_depois"] = hero.get_level()
+        registro["motivo_da_parada"] = self.parada or "saiu sem avaliar alvos"
+        registro["hp_saida"] = hp_antes / max(1, hero.base_hp)
+        registro["mp_saida"] = _frac_mp(hero)
         self.trace.diz(
-            f"  Fim do andar: {self.combates} combate(s), {self.passos} passos. "
+            f"  Fim do andar: {self.combates} combate(s) de "
+            f"{registro['oferecidos']} monstro(s) oferecidos, {registro['fugas']} fuga(s), "
+            f"{registro['pocoes_bebidas']} poção(ões) bebida(s), {self.passos} passos. "
+            f"Parou porque: {registro['motivo_da_parada']}. "
             f"Saída {'PAGA' if saida.was_paid else 'NÃO PAGA'} ({saida.fee}), "
             f"streak {saida.streak}. Descanso HP {hp_antes}->{hero.get_hp()}. "
             f"Juros +{juros}. Ouro {hero.coins}."
