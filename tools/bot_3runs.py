@@ -1,4 +1,4 @@
-"""Três partidas na mesma seed, com o diário lado a lado do artefato anterior.
+"""Partidas do BOT_PADRÃO, com o diário por andar e um compilado no topo.
 
 Não é amostra estatística e não deve virar uma: são as três runs que dizem se a
 mudança de INTENÇÃO fez o bot jogar o andar. O que importa aqui é a linha
@@ -6,11 +6,13 @@ mudança de INTENÇÃO fez o bot jogar o andar. O que importa aqui é a linha
 fechado tinha sido o HP.
 
     python -m tools.bot_3runs
+    python -m tools.bot_3runs --classes mage --seeds 20260916,20260917,20260918
 """
 
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from pathlib import Path
 
 from src.shared.formulas import xp_for_level
@@ -81,8 +83,6 @@ def _tabela(bot: BotPadrao) -> list[str]:
 
 
 def _motivos(bot: BotPadrao) -> list[str]:
-    from collections import Counter
-
     contagem = Counter(_motivo(a, bot).split(",")[0] for a in bot.por_andar)
     return [f"    {v}x  {k}" for k, v in contagem.most_common()]
 
@@ -133,18 +133,82 @@ def bloco(bot: BotPadrao) -> str:
     return "\n".join(out)
 
 
+def _lista(texto: str, conversor=str) -> list:
+    return [conversor(x.strip()) for x in texto.split(",") if x.strip()]
+
+
+def compilado(bots: list[BotPadrao]) -> list[str]:
+    """As N runs numa tabela só. Só agrega o que as partidas já mediram."""
+    out = ["", "=" * 148, f"COMPILADO — {len(bots)} partida(s)", "=" * 148]
+    out.append(
+        f"{'seed':>9} {'classe':<8} {'desfecho':<9} {'and':>4} {'nv':>3} "
+        f"{'ofer':>5} {'lutou':>6} {'fugiu':>6} {'engaj':>6} {'limpos':>7} {'poção':>6} "
+        f"{'XP':>7} {'dano dado':>10} {'sofrido':>8} {'ouro':>6} {'eq':>3} {'ps':>3}"
+    )
+    out.append("-" * 148)
+    for b in bots:
+        a = b.por_andar
+        ofer = sum(x["oferecidos"] for x in a)
+        lutou = sum(x["combates"] for x in a)
+        limpos = sum(1 for x in a if x.get("motivo_da_parada") == "andar limpo")
+        xp = sum(_xp_do_andar(x) for x in a)
+        obs = b.observador
+        out.append(
+            f"{b.seed:>9} {b.hero.get_classname():<8} {b.fim.split()[0]:<9} "
+            f"{len(a):>4} {b.hero.get_level():>3} {ofer:>5} {lutou:>6} "
+            f"{sum(x['fugas'] for x in a):>6} {(lutou / ofer if ofer else 0):>6.0%} "
+            f"{f'{limpos}/{len(a)}':>7} {sum(x['pocoes_bebidas'] for x in a):>6} "
+            f"{xp:>7} {obs.dado_total:>10} {obs.recebido_total:>8} "
+            f"{b.hero.coins:>6} {sum(1 for i in b.hero.equipment.values() if i):>3} "
+            f"{len(b.hero.passives):>3}"
+        )
+    ofer = sum(x["oferecidos"] for b in bots for x in b.por_andar)
+    lutou = sum(x["combates"] for b in bots for x in b.por_andar)
+    andares = sum(len(b.por_andar) for b in bots)
+    limpos = sum(1 for b in bots for x in b.por_andar if x.get("motivo_da_parada") == "andar limpo")
+    out.append("-" * 148)
+    out.append(
+        f"  AGREGADO: {lutou} de {ofer} monstros = {(lutou / ofer if ofer else 0):.0%} de "
+        f"engajamento | {limpos} de {andares} andares limpos | "
+        f"{sum(x['fugas'] for b in bots for x in b.por_andar)} fuga(s) na ficha | "
+        f"{sum(x['pocoes_bebidas'] for b in bots for x in b.por_andar)} poção(ões) no mapa"
+    )
+    desfechos = Counter(b.fim.split()[0] for b in bots)
+    out.append("  Desfechos: " + ", ".join(f"{k} {v}x" for k, v in desfechos.most_common()))
+
+    # Os motivos de parada, somados. É a coluna que existe para o trace parar de
+    # atribuir ao ouro o que sempre foi HP.
+    motivos = Counter(
+        _motivo(x, b).split(",")[0] for b in bots for x in b.por_andar if "restantes" in x
+    )
+    out.append("")
+    out.append("  Por que parou de lutar, nas 5 partidas:")
+    for k, v in motivos.most_common():
+        out.append(f"    {v:>3}x  {k}")
+    return out
+
+
 def main() -> None:
-    p = argparse.ArgumentParser(description="Três partidas na mesma seed.")
+    p = argparse.ArgumentParser(description="Partidas do BOT_PADRÃO, com diário por andar.")
     p.add_argument("--max-floor", type=int, default=20)
+    p.add_argument("--classes", default=",".join(CLASSES))
+    p.add_argument("--seeds", default=None, help="Lista separada por vírgula.")
+    # Apelido de uma `--seeds` de um item só: mantém vivo o comando da rodada
+    # em que esta ferramenta nasceu.
     p.add_argument("--seed", type=int, default=SEED)
     p.add_argument("--saida", default=str(DESTINO))
     args = p.parse_args()
 
-    bots = [jogar(c, args.seed, args.max_floor) for c in CLASSES]
+    classes = _lista(args.classes)
+    seeds = _lista(args.seeds, int) if args.seeds else [args.seed]
+    bots = [jogar(c, s, args.max_floor) for c in classes for s in seeds]
 
     destino = Path(args.saida)
     destino.parent.mkdir(parents=True, exist_ok=True)
-    destino.write_text("\n".join(bloco(b) for b in bots), encoding="utf-8")
+    destino.write_text(
+        "\n".join(compilado(bots)) + "\n\n" + "\n".join(bloco(b) for b in bots),
+        encoding="utf-8",
+    )
 
     for b in bots:
         print(f"\n{'=' * 148}")
@@ -153,6 +217,7 @@ def main() -> None:
         print("\n".join(_tabela(b)))
         print("  Por que parou de lutar:")
         print("\n".join(_motivos(b)))
+    print("\n".join(compilado(bots)))
     print(f"\nDiário completo: {destino}")
 
 
