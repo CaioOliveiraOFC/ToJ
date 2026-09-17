@@ -51,17 +51,13 @@ from src.engine.game_logic import create_player_from_data
 from src.engine.loop import _setup_dungeon_map
 from src.engine.map import EventTile, FeatureTile
 from src.engine.map_analysis import campo_de_custo, rota_do_campo
-from src.mechanics.battle import Action
 from src.shared import combat_topics as T
 from src.shared.constants import FLOOR_CLEAR_RESTORE_PERCENT
 from src.sim import progression
+from src.sim.bot import decidir_no_combate, decidir_no_mapa
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, get_pick_policy
-from src.sim.policies import (
-    _estimate_basic_damage,
-    _estimated_turns,
-    get_policy,
-)
 from src.sim.toggles import Toggles
+from tools import bot_adapter as adapter
 
 # --------------------------------------------------------------------------
 # Os limiares da política. Poucos, nomeados, e todos explicáveis em uma frase.
@@ -101,34 +97,10 @@ FOLGA_PARA_COMPRAR = 1.5
 # Altar cobra vida. Só vale com folga real.
 HP_PARA_ALTAR = 0.75
 
-# --- Prioridade global de decisão ------------------------------------------
-# O bot avaliava cada serviço isoladamente, e por isso gastava no Ferreiro logo
-# antes de precisar do ouro para curar na Loja. A correção não é "no andar 7 não
-# entre no Ferreiro": é uma ESCADA, e nenhuma necessidade mais baixa é atendida
-# enquanto houver uma mais alta pendente e alcançável.
-#
-# `CONTINUIDADE` (preciso de ouro) e `COMBATE_OPCIONAL` (quero XP) eram dois
-# degraus para o MESMO ato, e tê-los separados era o que permitia "já paguei a
-# saída, logo não preciso lutar". Viraram um só: PROGREDIR. Lutar não é o que
-# sobra quando não há mais nada urgente — é o objetivo do andar.
-#
-# `EVITAR_DESPROPORCIONAL` saiu da escada. Ele media desproporção pelo nível dos
-# monstros no mapa, que o jogador não vê, e — pior — freava o combate justamente
-# quando o herói estava atrasado, que é quando lutar é o único jeito de recuperar
-# o atraso. A desproporção agora é julgada na FICHA, depois da colisão.
-SOBREVIVENCIA = 1
-RECUPERACAO = 2
-PROGREDIR = 3
-INVESTIMENTO = 4
-ENCERRAR = 5
-
-NOME_DA_NECESSIDADE = {
-    SOBREVIVENCIA: "sobrevivência",
-    RECUPERACAO: "recuperação",
-    PROGREDIR: "progredir",
-    INVESTIMENTO: "investimento",
-    ENCERRAR: "encerrar o andar",
-}
+# A escada de prioridade NÃO mora mais aqui. Ela é `src/sim/bot/decision.Need`,
+# e a macro policy a usa para ordenar necessidades incompatíveis — ouro,
+# sobrevivência, extração e turnos não são conversíveis entre si. Este módulo
+# voltou a ser o que deveria: quem anda, colide, executa e registra.
 
 
 class Observador:
@@ -272,21 +244,9 @@ MODERADO = Perfil("moderado", 0.45, 0.10)
 HARDCORE = Perfil("hardcore", 0.38, 0.05)
 PERFIS = {p.nome: p for p in (CONSERVADOR, MODERADO, HARDCORE)}
 
-# --- Desproporção, julgada na FICHA -----------------------------------------
-# Não existe mais um `GAP_ACEITAVEL` aplicado ao mapa: o jogador olha o mapa e vê
-# `&`, não "Nv7". A ficha do inimigo (nível, HP, ST, DF) só aparece em
-# `render_fight_intro`, DEPOIS da colisão — e ali a saída é `flee`, que é 50% por
-# turno.
-#
-# A régua: quantos turnos eu levo para matá-lo, contra quantos ele leva para me
-# matar. Em 1,0 a regra é "não entro numa corrida de dano que eu perco". Medido
-# na seed 20260918, as lutas ganhas ficaram em 0,20–0,83 e a que matou o Warrior
-# no andar 5 estava em 1,33 — o limiar separa as duas populações.
-#
-# Não é 2,0. Com 2,0 o bot aceitava lutas em que morre ao dobro da velocidade com
-# que mata, contando com skill e cura para virar. Isso não é ler a ficha: é
-# apostar o personagem e chamar de leitura.
-RAZAO_MAXIMA_PARA_LUTAR = 1.0
+# A desproporção não tem mais um limiar próprio aqui. Ela é uma parcela da nota
+# de `flee` em `src/sim/bot/evaluators.py`, onde compete com buff, controle, cura
+# e item em vez de decidir antes deles.
 
 # --- Extração ---------------------------------------------------------------
 # A Extração deixou de ser tratada só como botão de pânico. Sempre que existir
@@ -359,11 +319,7 @@ class BotPadrao:
         # O CAMINHO REAL de criação de personagem. Sem loadout, sem presente:
         # nível 1, sem ouro, sem inventário, sem equipamento, uma skill.
         self.hero = create_player_from_data(classe, "Referencia")
-        # A política de combate do bot é a do simulador MAIS a leitura da ficha.
-        # A composição acontece aqui, e não dentro do duelo, porque assim trocar
-        # `self.decide` troca a política INTEIRA — que é o que um teste quer
-        # dizer quando fixa a decisão para isolar o núcleo do encontro.
-        self.decide = self._com_leitura_de_ficha(get_policy("smart"))
+        self.decide = self._decidir_no_combate
         self.picker = get_pick_policy(DEFAULT_PICK_POLICY)
         self.toggles = Toggles()
         self.trace = Trace()
@@ -391,9 +347,9 @@ class BotPadrao:
         # combate toma no meio da luta, que já estão em `acoes["flee"]`.
         self.fugas_na_run = 0
         self.pocoes_bebidas = 0
-        # A ficha do encontro corrente já foi ao trace? Reler não muda decisão;
-        # só evita repetir a mesma linha a cada turno de uma fuga insistente.
-        self._ficha_lida = False
+        # Qual foi a última ação de combate escolhida. Só serve para o trace
+        # não repetir a mesma linha em todo turno de uma sequência igual.
+        self._ultima_acao_de_combate = ""
         # Por que ele parou de lutar no andar corrente. Vai ao registro do andar.
         self.parada = ""
         # Ouvinte do barramento de combate. Só conta; `_emit` não consulta o
@@ -430,75 +386,6 @@ class BotPadrao:
             if nome == tipo:
                 return casa
         return None
-
-    def _alvos_visiveis(self) -> list[dict]:
-        """Os monstros alcançáveis, com o que o MAPA mostra de cada um.
-
-        O jogador olha o mapa e vê `&`, ou `B` se for chefe (`MapOfGame.draw_map`).
-        Nome e nível NÃO estão ali: a ficha do inimigo — nível, HP, MP, ST, AG,
-        MG, DF — só aparece em `render_fight_intro`, depois da colisão, e com
-        `allow_escape=False`. A versão anterior lia `get_nick_name()` e `.level`
-        daqui e escolhia alvo por defasagem de nível: informação que nenhum
-        jogador tem antes de encostar no monstro.
-
-        O que sobra é honesto e suficiente: onde ele está, quantos passos custa,
-        quantas OUTRAS lutas a rota obriga, e se é chefe.
-        """
-        campo = self._campo(por_combate=True)
-        alvos = []
-        for casa, monstro in self.mapa.enemies_pos.items():
-            rota, _ = rota_do_campo(campo, casa, True)
-            if not rota.alcancavel:
-                continue
-            alvos.append(
-                {
-                    "casa": casa,
-                    "passos": rota.passos,
-                    # A rota até ele pode obrigar a lutar com OUTROS pelo
-                    # caminho. Um alvo perto atrás de dois monstros não é perto.
-                    "extras": max(0, rota.combates - 1),
-                    "chefe": bool(getattr(monstro, "is_boss", False)),
-                }
-            )
-        return alvos
-
-    def _melhor_alvo(self, alvos: list[dict]) -> dict | None:
-        """O alvo mais barato de alcançar: menos lutas pelo caminho, depois mais perto.
-
-        `extras` vem antes de `passos` de propósito: um monstro a 3 passos com
-        dois outros na frente custa três lutas, e um a 9 passos com o caminho
-        livre custa uma.
-
-        Chefe (`B`) não entra. É a única distinção de perigo que o mapa oferece
-        ao jogador, e ignorá-la seria jogar pior que um humano, não melhor.
-        """
-        candidatos = [a for a in alvos if not a["chefe"]]
-        if not candidatos:
-            return None
-        return min(candidatos, key=lambda a: (a["extras"], a["passos"]))
-
-    def _descrever_alvos(self, alvos: list[dict], escolhido: dict | None) -> None:
-        """Põe no trace o que o mapa mostrava e o que foi escolhido.
-
-        Sem nome e sem nível: o trace registra a decisão com a informação que a
-        decisão teve. O nome do monstro aparece na linha do combate, que é
-        quando o jogador também o descobre.
-        """
-        if not alvos:
-            return
-        partes = []
-        for a in sorted(alvos, key=lambda x: (x["extras"], x["passos"])):
-            marca = (
-                "ESCOLHIDO"
-                if escolhido is not None and a["casa"] == escolhido["casa"]
-                else ("chefe — não é alvo opcional" if a["chefe"] else "descartado")
-            )
-            partes.append(
-                f"{'B' if a['chefe'] else '&'} a {a['passos']} passos"
-                + (f", +{a['extras']} luta(s) no caminho" if a["extras"] else "")
-                + f" — {marca}"
-            )
-        self.trace.diz("  Alvos visíveis no mapa: " + " | ".join(partes))
 
     # -- ações ------------------------------------------------------------
 
@@ -562,15 +449,17 @@ class BotPadrao:
         hp = _frac_hp(hero)
 
         if tipo == feat.EXTRACTION:
-            extrair, veredito = self._avaliar_extracao(casa)
-            if veredito == self._ultimo_veredito_extracao:
-                self.trace.diz("  Pisou na Extração — o veredito acima é o desta casa.")
-            else:
-                self.trace.diz(f"  Pisou na Extração. {veredito}")
-                self._ultimo_veredito_extracao = veredito
-            if extrair:
+            # EXECUTA a decisão que veio, e não reavalia.
+            #
+            # Antes esta casa chamava `_avaliar_extracao` de novo, com o estado
+            # de DEPOIS da caminhada — e produzia o loop EXTRAIR -> anda -> NÃO
+            # EXTRAIR. Uma decisão de extração é tomada uma vez, para aquele
+            # estado, e chegar à casa é executá-la.
+            if self.extracao_decidida:
+                self.trace.diz("  Pisou na Extração e executou a decisão que a trouxe até aqui.")
                 self.extraiu = True
                 return False
+            self.trace.diz("  Pisou na Extração de passagem: a decisão atual não era extrair.")
             return True
 
         if tipo == feat.SHOP:
@@ -587,12 +476,13 @@ class BotPadrao:
             return True
 
         if tipo == feat.FORGE:
-            necessidade, porque = self._necessidade_atual()
-            if necessidade < INVESTIMENTO:
+            # A escada global mora na macro policy agora. Aqui sobra a pergunta
+            # local: com o HP baixo ou sem folga de ouro, aprimorar equipamento
+            # é investimento, e investimento espera.
+            if hp < HP_SAUDAVEL or hero.coins < taxa * FOLGA_PARA_COMPRAR:
                 self.trace.diz(
-                    f"  Pisou no Ferreiro e passou reto: o que importa agora é "
-                    f"{NOME_DA_NECESSIDADE[necessidade]} ({porque}). Aprimorar equipamento é "
-                    "investimento, e investimento espera."
+                    f"  Pisou no Ferreiro e passou reto: {hp:.0%} de HP e {hero.coins} de ouro "
+                    f"contra uma saída de {taxa}. Investimento espera."
                 )
                 return True
             if not self._tem_peca_para_investir():
@@ -607,65 +497,6 @@ class BotPadrao:
             self._usar_ferreiro(casa)
             return True
         return True
-
-    def _com_leitura_de_ficha(self, politica):
-        """A política tática do simulador, precedida da leitura da ficha.
-
-        Fica ANTES de `smart_policy` pela mesma razão que o jogador lê
-        `render_compare_opponents` antes de escolher a tecla: a tela de confronto
-        vem primeiro, e o que ela diz pode ser "não lute isto".
-
-        Reavalia a cada turno, não só no primeiro: fugir é 50% por turno
-        (`FLEE_RANGE_MAX = 2`), e uma tentativa só seria aceitar a primeira
-        moeda e ficar na luta que já se decidiu não querer.
-        """
-
-        def decidir(heroi, monstros, turno):
-            alvo = monstros[0] if isinstance(monstros, list) else monstros
-            fuga = self._ler_a_ficha(heroi, alvo)
-            if fuga is not None:
-                if turno == 0:
-                    self.fugas_na_run += 1
-                    if self.por_andar:
-                        self.por_andar[-1]["fugas"] += 1
-                return fuga
-            return politica(heroi, monstros, turno)
-
-        return decidir
-
-    def _ler_a_ficha(self, heroi, monstro):
-        """A tela de confronto, e o que fazer com ela. Devolve `flee` ou None.
-
-        É aqui que a desproporção é julgada, e não no mapa. `render_fight_intro`
-        mostra nível, HP, MP, ST, AG, MG e DF dos dois lados — e mostra DEPOIS
-        da colisão, com `allow_escape=False`. O jogador não escolhe não lutar:
-        escolhe fugir, a 50% por turno.
-
-        A conta reusa `_estimate_basic_damage` e `_estimated_turns` de
-        `sim/policies`, que leem exatamente os campos da tela. Quantos turnos
-        para matá-lo, quantos para ele me matar. Se ele me mata muito mais
-        rápido, a aposta da fuga é melhor que a da luta.
-
-        Uma imprecisão registrada em vez de escondida: o humano vê a ficha antes
-        de qualquer turno; o bot vê no primeiro turno DELE, que pode vir depois
-        de um golpe do monstro se a agilidade dele for maior.
-        """
-        meu_dano = _estimate_basic_damage(heroi, monstro)
-        dano_dele = _estimate_basic_damage(monstro, heroi)
-        turnos_para_matar = _estimated_turns(monstro, meu_dano)
-        turnos_para_morrer = _estimated_turns(heroi, dano_dele)
-        if turnos_para_matar <= turnos_para_morrer * RAZAO_MAXIMA_PARA_LUTAR:
-            return None
-        if self._ficha_lida:
-            return Action(kind="flee")
-        self._ficha_lida = True
-        self.trace.diz(
-            f"  Ficha do inimigo: {monstro.get_nick_name()} Nv{getattr(monstro, 'level', '?')} "
-            f"| HP {monstro.get_hp()} ST {monstro.get_st()} DF {monstro.get_df()}. "
-            f"Mato em ~{turnos_para_matar} turnos, morro em ~{turnos_para_morrer}. "
-            "Perco a corrida de dano — tento fugir."
-        )
-        return Action(kind="flee")
 
     def _duelo(self, monstro, casa) -> bool:
         """Um encontro, pelo MESMO core que a tela do jogador usa.
@@ -683,7 +514,7 @@ class BotPadrao:
 
         hp_antes, mp_antes = hero.get_hp(), hero.get_mp()
         self.observador.novo_encontro()
-        self._ficha_lida = False
+        self._ultima_acao_de_combate = ""
         nome = monstro.get_nick_name()
         nivel_alvo = int(getattr(monstro, "level", hero.get_level()))
         self.mp_disponivel += mp_antes
@@ -723,18 +554,23 @@ class BotPadrao:
                 + ("EQUIPOU, é melhor que o que estava no slot" if trocou else "guardou na mochila")
             )
 
-        # OBSERVAÇÃO, não decisão: conta o verbo que a política devolveu e
-        # devolve exatamente isso. Sem ele não dá para responder "o Mago usa
-        # mana ou fica no ataque básico?" — e a resposta não pode ser um palpite.
-        def _observar(h, m, turno):
+        # `self.decide` é a COSTURA da decisão tática, e existe para poder ser
+        # substituída: é assim que `TestParidadeDeEncontro` fixa a ação dos dois
+        # lados para isolar o núcleo do encontro. Contar e registrar fica aqui,
+        # fora da costura, para valer nos dois casos.
+        def _um_turno(h, m, turno):
             acao = self.decide(h, m, turno)
             self.acoes[getattr(acao, "kind", "?")] += 1
+            if getattr(acao, "kind", "") == "flee" and turno == 0:
+                self.fugas_na_run += 1
+                if self.por_andar:
+                    self.por_andar[-1]["fugas"] += 1
             return acao
 
         resultado = resolve_encounter(
             hero,
             [monstro],
-            combat_decision=_observar,
+            combat_decision=_um_turno,
             level_up_provider=self._escolher_do_nivel,
             rng=self.rng,
             essence_multiplier=self.essencia,
@@ -932,225 +768,53 @@ class BotPadrao:
 
     # -- a decisão --------------------------------------------------------
 
-    def _decidir(self):
-        """O próximo objetivo, e a frase que o justifica.
+    # `DESVIO_ACEITAVEL` como atributo: o adaptador pergunta ao driver quanto
+    # desvio o jogador aceita, em vez de importar uma constante de módulo.
+    DESVIO_ACEITAVEL = DESVIO_ACEITAVEL
 
-        Uma decisão por vez, reavaliada depois de cada combate, drop, nível,
-        compra ou evento — porque o estado mudou e a decisão pode mudar.
+    def _streak(self) -> int:
+        return unpaid_streak(self.hero)
+
+    def _maior_pocao_percentual(self) -> float:
+        """O percentual de cura da melhor poção na mochila. Fato, não decisão."""
+        curas = [
+            float(getattr(i, "effect_value", 0) or 0)
+            for i in self.hero.inventory
+            if getattr(i, "consumable", False) and getattr(i, "effect_type", None) == "max_hp"
+        ]
+        return max(curas) if curas else 0.0
+
+    def _decidir_no_combate(self, heroi, monstros, turno: int):
+        """Um turno: observar -> enumerar o legal -> avaliar -> escolher.
+
+        A MESMA decisão que vira `Action` alimenta o trace: `decision.reason` é
+        escrito por quem avaliou, e `decision.scores` mostra todas as candidatas
+        com suas parcelas. Fuga é uma delas, e não uma porteira antes da
+        política — era assim que buff, controle, cura e item nunca chegavam a ser
+        comparados com fugir.
         """
-        hero = self.hero
-        hp, mp = _frac_hp(hero), _frac_mp(hero)
-        taxa = exit_fee(self.andar)
-        loja, ferreiro, evento = (self._casa_de(t) for t in (feat.SHOP, feat.FORGE, "event"))
-        extracao = self._casa_de(feat.EXTRACTION)
-        alvos = self._alvos_visiveis()
-        alvo = self._melhor_alvo(alvos)
+        alvo = monstros[0] if isinstance(monstros, list) else monstros
+        estado = adapter.estado_do_combate(heroi, alvo, turno)
+        opcoes, reais = adapter.acoes_do_combate(heroi, alvo, estado)
+        decisao = decidir_no_combate(estado, opcoes)
+        if turno == 0 or decisao.action_id != self._ultima_acao_de_combate:
+            self.trace.decisao(decisao.reason)
+            self.trace.diz(f"    candidatas: {decisao.explicar_candidatas()}")
+            self._ultima_acao_de_combate = decisao.action_id
+        return adapter.action_de(decisao.action_id, reais, alvo)
 
-        # 1. Perigo. Em ordem: quem cura primeiro e mais barato.
-        if hp < HP_CRITICO:
-            if evento is not None and self.mapa.event_type == "fountain":
-                desvio = self._desvio(evento)
-                if desvio is not None:
-                    return (
-                        "evento",
-                        evento,
-                        f"HP em {hp:.0%}. Há uma Fonte a {desvio} passos de "
-                        "desvio — curar antes de qualquer outra coisa.",
-                    )
-            if self._pocoes() > 0:
-                return (
-                    "pocao",
-                    None,
-                    f"HP em {hp:.0%} e {self._pocoes()} poção(ões) na mochila. Bebo AGORA — "
-                    "morrer com cura guardada é o pior desfecho possível.",
-                )
-            if loja is not None and hero.coins > 0 and self._desvio(loja) is not None:
-                return (
-                    "loja",
-                    loja,
-                    f"HP em {hp:.0%} e tenho {hero.coins} de ouro. Vou à Loja "
-                    "pagar recuperação antes de arriscar o resto do andar.",
-                )
-            if extracao is not None and self._tem_o_que_preservar():
-                if self._alcance(extracao) is not None:
-                    self.parada = f"HP em {hp:.0%} sem cura alcançável"
-                    return (
-                        "extrair",
-                        extracao,
-                        f"HP em {hp:.0%}, sem cura por perto, e já tenho "
-                        f"nível {hero.get_level()} e {len(hero.passives)} passivas para "
-                        "preservar. Extrair vale mais que insistir.",
-                    )
-            self.parada = f"HP em {hp:.0%}, abaixo do crítico, e nada que cure no andar"
-            return (
-                "saida",
-                self.saida,
-                f"HP em {hp:.0%} e nada que cure por perto. Encerro o "
-                "andar pela rota de menos combate — o descanso do fim de andar é a cura.",
-            )
+    def _decidir_no_mapa(self):
+        """UMA fonte de verdade para a decisão macro.
 
-        # 2. Extração: avaliada SEMPRE que houver casa alcançável, e não só em
-        #    emergência. O veredito entra no trace mesmo quando é "continuo".
-        if extracao is not None and self._alcance(extracao) is not None:
-            extrair, veredito = self._avaliar_extracao(extracao)
-            if extrair:
-                self._ultimo_veredito_extracao = veredito
-                return ("extrair", extracao, veredito)
-            if veredito != self._ultimo_veredito_extracao:
-                self.trace.diz(f"  {veredito}")
-                self._ultimo_veredito_extracao = veredito
-
-        # 2b. Beber é barato: não custa passo nem ouro, e poção parada na mochila
-        #     não cura ninguém. NÃO é pré-condição para lutar — acima do piso ele
-        #     luta sem cura garantida, como pedido. É só deixar de morrer com
-        #     cura guardada, que foi como a primeira versão desta policy perdeu o
-        #     Warrior no andar 5 com uma poção na bolsa.
-        if hp < HP_SAUDAVEL and self._pocoes() > 0 and alvo is not None:
-            return (
-                "pocao",
-                None,
-                f"HP em {hp:.0%} e ainda há monstro no andar. Bebo uma das "
-                f"{self._pocoes()} poções antes de encostar no próximo — beber é de graça em "
-                "passos e em ouro.",
-            )
-
-        # 3. RECUPERAÇÃO. Abaixo do piso de engajamento ele NÃO desiste do andar:
-        #    procura como voltar a poder lutar. Era aqui que a versão anterior
-        #    encerrava — 48 das 101 saídas prematuras saíram deste estado, e o
-        #    trace ainda dizia que o motivo era o ouro da saída.
-        if hp < self.perfil.hp_engajar:
-            cura = self._caminho_de_cura(loja, evento, taxa, hp)
-            if cura is not None:
-                return cura
-
-        # 4. PROGREDIR. O andar é para ser jogado. Não existe mais "já tenho
-        #    ouro para a saída, então não preciso lutar": ouro é consequência do
-        #    combate, não substituto dele. Se há alvo alcançável e o estado
-        #    permite encostar nele, ele encosta.
-        if alvo is not None:
-            impedimento = self._por_que_nao_engajar(hp, mp)
-            if impedimento is None:
-                self._descrever_alvos(alvos, alvo)
-                extra = (
-                    f" Faltam {taxa - hero.coins} de ouro para a saída, o que torna esta luta "
-                    "também necessária."
-                    if hero.coins < taxa
-                    else ""
-                )
-                return (
-                    "lutar",
-                    alvo["casa"],
-                    f"Nv{hero.get_level()} no andar {self.andar}, {hp:.0%} de HP e {mp:.0%} de "
-                    f"MP: dá para lutar. Vou ao & a {alvo['passos']} passos"
-                    + (f" (+{alvo['extras']} luta(s) no caminho)" if alvo["extras"] else "")
-                    + f".{extra}",
-                )
-
-        # 5. INVESTIMENTO. Serviços vêm DEPOIS do combate: gastar antes é gastar
-        #    com o ouro e os drops que a luta ainda não deu.
-        if loja is not None:
-            desvio = self._desvio(loja)
-            if desvio is not None and desvio <= DESVIO_ACEITAVEL:
-                if hp < HP_SAUDAVEL:
-                    return (
-                        "loja",
-                        loja,
-                        f"Loja a {desvio} passos e estou com {hp:.0%} de HP. Vou pela "
-                        f"recuperação paga, com {hero.coins} de ouro — mesmo que sobre pouco "
-                        f"para a saída de {taxa}.",
-                    )
-                if self._quer_repor_cura() and hero.coins >= taxa:
-                    return (
-                        "loja",
-                        loja,
-                        f"Loja a {desvio} passos. Estou com {self._pocoes()} poção(ões) e a "
-                        f"saída de {taxa} já está coberta pelos {hero.coins} de ouro: repor "
-                        "cura é o que sustenta continuar lutando nos próximos andares.",
-                    )
-                if hero.coins >= taxa * FOLGA_PARA_COMPRAR:
-                    return (
-                        "loja",
-                        loja,
-                        f"Loja a {desvio} passos de desvio, com {hero.coins} de ouro contra uma "
-                        f"saída de {taxa}. Sobra folga para comprar sem perder a reserva.",
-                    )
-        if ferreiro is not None:
-            desvio = self._desvio(ferreiro)
-            if desvio is not None and desvio <= DESVIO_ACEITAVEL:
-                if hero.coins >= taxa * FOLGA_PARA_COMPRAR and self._tem_peca_para_investir():
-                    return (
-                        "ferreiro",
-                        ferreiro,
-                        f"Ferreiro a {desvio} passos, {hero.coins} de "
-                        "ouro acima da reserva, e tenho peça equipada onde investir.",
-                    )
-        if evento is not None:
-            desvio = self._desvio(evento)
-            tipo = self.mapa.event_type
-            if desvio is not None and desvio <= DESVIO_ACEITAVEL:
-                if tipo == "fountain" and hp < 0.95:
-                    return (
-                        "evento",
-                        evento,
-                        f"Fonte a {desvio} passos e estou com {hp:.0%}. Cura de graça.",
-                    )
-                if tipo == "altar" and hp >= HP_PARA_ALTAR:
-                    return (
-                        "evento",
-                        evento,
-                        f"Altar a {desvio} passos. Com {hp:.0%} de HP dá para pagar o preço dele.",
-                    )
-                if tipo == "merchant":
-                    # O Mercador ABRE A MESMA LOJA, então vale a mesma reserva.
-                    if hp < HP_SAUDAVEL or hero.coins >= taxa * FOLGA_PARA_COMPRAR:
-                        return (
-                            "evento",
-                            evento,
-                            f"Mercador a {desvio} passos, com {hero.coins} de ouro contra uma "
-                            f"saída de {taxa}: dá para gastar sem ficar sem a taxa.",
-                        )
-
-        # 6. ENCERRAR — e o motivo tem de ser o REAL.
-        #
-        #    A versão anterior imprimia "{ouro} de ouro e a saída custa {taxa}:
-        #    já dá" mesmo quando o portão que fechou tinha sido o HP. Um trace
-        #    que mente sobre a própria causa não serve para revisar decisão
-        #    nenhuma, e foi por isso que a auditoria das 60 runs leu errado o
-        #    comportamento do bot durante semanas.
-        if alvos:
-            impedimento = self._por_que_nao_engajar(hp, mp) or (
-                "sobraram só alvos que o mapa marca como chefe"
-                if alvo is None
-                else "nada me impede, mas não há alvo alcançável"
-            )
-            self._descrever_alvos(alvos, None)
-            self.parada = impedimento
-            return (
-                "saida",
-                self.saida,
-                f"Encerro o andar com {len(alvos)} monstro(s) ainda no mapa. Motivo real: "
-                f"{impedimento}.",
-            )
-        self.parada = "andar limpo"
-        return ("saida", self.saida, "Andar resolvido: não sobrou monstro alcançável.")
-
-    # -- engajar ----------------------------------------------------------
-
-    def _por_que_nao_engajar(self, hp: float, mp: float) -> str | None:
-        """None quando dá para encostar no próximo monstro; senão, o que impede.
-
-        Uma condição só, com nome, para que a linha de saída possa citá-la. Note
-        o que NÃO está aqui: ouro. Ter a taxa da saída paga nunca foi motivo para
-        parar de jogar o andar — era só o lugar onde a policy antiga desligava.
+        Observa, pede ao adaptador as ações legais, entrega ao cérebro e devolve
+        a `Decision`. Não existe mais `_necessidade_atual` calculando prioridade
+        por um caminho e `_decidir` escrevendo a frase por outro — o motivo é
+        `decision.reason`, escrito por quem avaliou.
         """
-        if hp < self.perfil.hp_engajar:
-            return (
-                f"HP em {hp:.0%}, abaixo do piso de {self.perfil.hp_engajar:.0%}, e não há "
-                "caminho de recuperação neste andar"
-            )
-        if mp < self.perfil.mp_engajar:
-            return f"MP em {mp:.0%}, abaixo do piso de {self.perfil.mp_engajar:.0%}"
-        return None
+        mapa, prog = adapter.estado_do_mapa(self)
+        opcoes, destinos = adapter.acoes_do_mapa(self, mapa, prog)
+        decisao = decidir_no_mapa(mapa, prog, opcoes)
+        return decisao, destinos.get(decisao.action_id)
 
     def _pocoes(self) -> int:
         return sum(
@@ -1166,35 +830,6 @@ class BotPadrao:
         `_orcamento`. Aqui só se pergunta se vale a visita.
         """
         return self._pocoes() < POCOES_PARA_SUSTENTAR
-
-    def _caminho_de_cura(self, loja, evento, taxa: int, hp: float):
-        """Como voltar ao piso de engajamento, na ordem do mais barato.
-
-        A poção não está aqui porque o degrau 2b já bebeu, e mais cedo — assim
-        que o HP cai abaixo de saudável e ainda há monstro no andar. O que sobra
-        são os caminhos que custam passos ou ouro.
-        """
-        hero = self.hero
-        # A poção não aparece aqui: o degrau 2b já bebe antes, e mais cedo.
-        if evento is not None and self.mapa.event_type == "fountain":
-            desvio = self._desvio(evento)
-            if desvio is not None and desvio <= DESVIO_ACEITAVEL:
-                return (
-                    "evento",
-                    evento,
-                    f"HP em {hp:.0%} e uma Fonte a {desvio} passos. Cura de graça antes de "
-                    "voltar ao mapa.",
-                )
-        if loja is not None and hero.coins > taxa:
-            desvio = self._desvio(loja)
-            if desvio is not None and desvio <= DESVIO_ACEITAVEL:
-                return (
-                    "loja",
-                    loja,
-                    f"HP em {hp:.0%} e {hero.coins} de ouro contra uma saída de {taxa}: a "
-                    "recuperação paga cabe sem furar a reserva, e me devolve o andar.",
-                )
-        return None
 
     def _tem_o_que_preservar(self) -> bool:
         """Há progresso que valha a pena tirar vivo daqui?"""
@@ -1233,66 +868,6 @@ class BotPadrao:
             sinais.append(f"MP em {mp:.0%}")
         return sinais
 
-    def _avaliar_extracao(self, casa) -> tuple[bool, str]:
-        """A Extração é SEMPRE avaliada quando alcançável, e o veredito vai ao trace.
-
-        Limitá-la a HP crítico era tratá-la como botão de pânico: quando o
-        gatilho disparava já era tarde. Aqui ela é uma pergunta feita com o andar
-        ainda inteiro — e a resposta pode continuar sendo "sigo descendo".
-        """
-        hero = self.hero
-        preserva = self._tem_o_que_preservar()
-        sinais = self._sinais_de_risco()
-        resumo = (
-            f"nível {hero.get_level()}, {len(hero.passives)} passivas, "
-            f"{sum(1 for i in hero.equipment.values() if i)} peças"
-        )
-        if not preserva:
-            return False, (
-                f"Extração avaliada: ainda não acumulei nada que valha preservar ({resumo}). "
-                "Continuo descendo."
-            )
-        if not sinais:
-            return False, (
-                f"Extração avaliada: tenho {resumo} para preservar, mas nenhum sinal de risco "
-                "— HP, MP, nível e saídas em dia. Continuo descendo."
-            )
-        if len(sinais) < SINAIS_PARA_EXTRAIR:
-            return False, (
-                f"Extração avaliada: {sinais[0]}, mas é um sinal só e tenho "
-                f"{resumo}. Ainda dá para seguir."
-            )
-        return True, (
-            f"Extração avaliada: {' e '.join(sinais)}. Com {resumo} acumulados, "
-            "sair vivo vale mais que o próximo andar."
-        )
-
-    def _necessidade_atual(self) -> tuple[int, str]:
-        """A necessidade mais alta que está pendente AGORA.
-
-        É o que substitui a avaliação isolada de cada serviço. Uma casa só é
-        aberta quando ela atende a necessidade corrente — ou uma igualmente
-        urgente. O Ferreiro atende INVESTIMENTO; se a necessidade for
-        RECUPERAÇÃO, ele espera, sem que ninguém precise escrever "andar 7".
-        """
-        hero = self.hero
-        hp, mp = _frac_hp(hero), _frac_mp(hero)
-        taxa = exit_fee(self.andar)
-
-        if hp < HP_CRITICO:
-            return SOBREVIVENCIA, f"HP em {hp:.0%}"
-        if hp < self.perfil.hp_engajar:
-            return RECUPERACAO, f"HP em {hp:.0%}, abaixo do piso de engajamento"
-        if self._alvos_visiveis() and self._por_que_nao_engajar(hp, mp) is None:
-            # Havia aqui dois degraus, CONTINUIDADE ("preciso de ouro para a
-            # saída") e COMBATE_OPCIONAL ("se sobrar, luto"), e o primeiro
-            # desligava quando o ouro chegava. Os dois eram o mesmo ato, e
-            # separá-los era o que fazia pagar a saída parecer o fim do andar.
-            return PROGREDIR, f"há monstro alcançável, {hp:.0%} de HP e {mp:.0%} de MP"
-        if hero.coins >= taxa * FOLGA_PARA_COMPRAR and self._tem_peca_para_investir():
-            return INVESTIMENTO, f"{hero.coins} de ouro, com a saída de {taxa} já garantida"
-        return ENCERRAR, self._por_que_nao_engajar(hp, mp) or "não há mais alvo alcançável"
-
     def _tem_peca_para_investir(self) -> bool:
         return any(i is not None for i in self.hero.equipment.values())
 
@@ -1307,8 +882,8 @@ class BotPadrao:
         self.saida = _pos(self.mapa.exit_pos)
         self.passos = 0
         self.combates = 0
-        self._ultimo_veredito_extracao = ""
         self.extraiu = False
+        self.extracao_decidida = False
         self.parada = ""
 
         rolada = progression.floor_essence_multiplier(andar)
@@ -1358,16 +933,25 @@ class BotPadrao:
         # andar: cada monstro pode custar uma volta para lutar e outra para se
         # recuperar antes da próxima, e os serviços ainda entram por cima.
         for _ in range(len(self.mapa.enemies_pos) * 2 + 12):
-            necessidade, porque = self._necessidade_atual()
-            acao, alvo, motivo = self._decidir()
-            self.trace.diz(f"  [prioridade: {NOME_DA_NECESSIDADE[necessidade]} — {porque}]")
-            self.trace.decisao(motivo)
+            decisao, destino = self._decidir_no_mapa()
+            self.trace.decisao(decisao.reason)
+            self.trace.diz(f"    candidatas: {decisao.explicar_candidatas()}")
+            acao = decisao.action_id.split(":")[0]
+            # A decisão de extrair viaja com o bot: quem chega à casa executa o
+            # que a trouxe até lá, sem reavaliar.
+            self.extracao_decidida = acao == "extrair"
+            # Para a tabela por andar: a ação e a necessidade que a venceu. O
+            # motivo completo já está no trace, nesta mesma decisão.
+            vencedora = decisao.scores[0] if decisao.scores else None
+            self.parada = (
+                f"{decisao.action_id} ({vencedora.need.name})" if vencedora else decisao.action_id
+            )
 
             # Beber não é ir a lugar nenhum: é o menu de inventário, no mapa.
             if acao == "pocao":
                 if not self._beber_pocao():
-                    # Não deveria acontecer: `_decidir` só pede poção quando há
-                    # uma. Se acontecer, encerrar é melhor que girar no laço.
+                    # Não deveria acontecer: o adaptador só oferece a poção
+                    # quando ela existe. Encerrar é melhor que girar no laço.
                     self.parada = "pediu poção e não tinha"
                     break
                 continue
@@ -1375,7 +959,7 @@ class BotPadrao:
             # O destino é escolha da policy; o que acontece em cada casa do
             # caminho é `move_player`. Por isso o laço não "usa" mais o serviço:
             # ele anda até lá, e a casa se resolve ao ser pisada.
-            vivo = self._ir_ate(alvo, evitando=(acao != "lutar"))
+            vivo = self._ir_ate(destino, evitando=(acao != "lutar"))
             if self.extraiu:
                 return "extraiu"
             if not vivo:

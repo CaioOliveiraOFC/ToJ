@@ -1,4 +1,12 @@
-"""O BOT_PADRÃO tem de jogar o jogo, e não uma versão conveniente dele.
+"""O DRIVER do BOT_PADRÃO: nascer como no jogo, andar, comprar, e a paridade.
+
+As decisões migraram para `src/sim/bot/` e são testadas em
+`tests/test_bot_observation.py`, `test_bot_decision.py`,
+`test_bot_combat_policy.py` e `test_bot_macro_policy.py`. Aqui fica o que é do
+driver — e `TestParidadeDeEncontro`, que é a rede: humano e bot têm de executar
+o MESMO encontro quando respondem a mesma coisa.
+
+O BOT_PADRÃO tem de jogar o jogo, e não uma versão conveniente dele.
 
 O valor desta run é ser revisável. Um trace que mostra opções que não foram
 oferecidas, ou um herói que nasce com equipamento que o jogo não dá, produz uma
@@ -118,60 +126,36 @@ class TestFugaNaoPaga:
         assert run.hero.xp_points == xp_antes
 
 
-class TestQuandoEngajar:
-    """Existe UMA decisão de encostar no próximo monstro, e ouro não entra nela.
+def _mapa_de_teste(altura=9, largura=15):
+    from src.engine.map import MapOfGame
 
-    Havia duas caças: a "obrigatória" (preciso de ouro para a saída) e a
-    "opcional" (quero XP). A primeira estava atrás de `coins < taxa`, então PAGAR
-    A SAÍDA desligava a principal fonte de combate do bot; a segunda exigia 80%
-    de HP, o que na prática significava uma luta por andar. Nas 60 runs da
-    auditoria, 101 das 125 saídas de andar aconteceram com monstro ainda no mapa.
-    """
+    m = MapOfGame(height=altura, width=largura)
+    m.grid = [
+        ["#" if (y in (0, altura - 1) or x in (0, largura - 1)) else "." for x in range(largura)]
+        for y in range(altura)
+    ]
+    m.player_pos = {"y": 1, "x": 1}
+    m.exit_pos = {"y": altura - 2, "x": largura - 2}
+    m.grid[altura - 2][largura - 2] = "X"
+    return m
 
-    def test_ouro_suficiente_nao_impede_lutar(self):
-        run = _run_preparada(_mapa_de_teste(), nivel=8)
-        run.andar = 8
-        run.hero.coins = 10_000  # a taxa está paga muitas vezes
-        assert run._por_que_nao_engajar(1.0, 1.0) is None
 
-    def test_ouro_nao_aparece_no_motivo_de_parar(self):
-        """O motivo impresso tem de ser o que realmente fechou o portão.
-
-        A versão anterior dizia "{ouro} de ouro e a saída custa {taxa}: já dá"
-        mesmo nas 48 saídas em que quem fechou tinha sido o HP.
-        """
-        run = _run_preparada(_mapa_de_teste(), nivel=8)
-        run.hero.coins = 10_000
-        run.hero.take_damage(int(run.hero.base_hp * 0.8))
-        motivo = run._por_que_nao_engajar(_frac(run.hero), 1.0)
-        assert motivo is not None
-        assert "HP" in motivo and "ouro" not in motivo and "saída" not in motivo
-
-    def test_nem_so_por_hp(self):
-        """MP é munição — mas a barra é baixa, porque o básico não custa mana."""
-        run = _run_preparada(_mapa_de_teste(), nivel=8)
-        assert run._por_que_nao_engajar(1.0, 1.0) is None
-        assert run._por_que_nao_engajar(1.0, 0.01) is not None
-
-    def test_o_piso_de_engajar_fica_acima_do_critico(self):
-        """Com margem: a política de combate cura em 35% e foge em 12%."""
-        assert bot.HP_PARA_ENGAJAR > bot.HP_CRITICO
-
-    def test_nenhuma_constante_e_uma_quota(self):
-        """A taxa alta de combate tem de EMERGIR das condições, não de uma meta.
-
-        Uma constante do tipo "lute 90% dos monstros" produziria o número pedido
-        sem produzir o comportamento — e nenhuma medição feita em cima dela
-        significaria coisa alguma.
-        """
-        for nome in dir(bot):
-            if nome.startswith("_") or not nome.isupper():
-                continue
-            valor = getattr(bot, nome)
-            if isinstance(valor, float) and 0 < valor < 1:
-                assert "MONSTRO" not in nome and "LIMPAR" not in nome and "QUOTA" not in nome, (
-                    f"{nome} parece uma quota de combate"
-                )
+def _run_preparada(mapa, nivel=4):
+    run = bot.BotPadrao("warrior", seed=7, max_andar=1)
+    run.hero.set_level(nivel)
+    run.andar = 5
+    run.mapa = mapa
+    run.posicao = (mapa.player_pos["y"], mapa.player_pos["x"])
+    run.saida = (mapa.exit_pos["y"], mapa.exit_pos["x"])
+    run.passos = 0
+    run.combates = 0
+    run.essencia = 1.0
+    run.trace = bot.Trace()
+    run.reserva_gasta = 0
+    run.extraiu = False
+    run.extracao_decidida = False
+    run.parada = ""
+    return run
 
 
 class TestCuraNoMapa:
@@ -204,57 +188,6 @@ class TestCuraNoMapa:
         assert run._beber_pocao() is True
         assert run.hero.get_hp() > antes
         assert run._pocoes() == 0, "consumiu duas poções para curar uma vez"
-
-    def test_ferido_e_com_monstro_no_mapa_a_decisao_e_beber(self):
-        from src.content.factories.monsters import create_monster
-
-        mapa = _mapa_de_teste()
-        mapa.enemies_pos[(1, 5)] = create_monster("Alvo", 4, "trash")
-        run = _run_preparada(mapa)
-        run.hero.take_damage(int(run.hero.base_hp * 0.5))
-        run.hero.inventory.append(self._pocao())
-
-        acao, _alvo, motivo = run._decidir()
-        assert acao == "pocao"
-        assert "poç" in motivo
-
-    def test_sem_pocao_e_acima_do_piso_ele_luta_mesmo_assim(self):
-        """Cura NÃO é pré-condição universal para lutar.
-
-        Acima do piso de engajamento ele encosta no monstro sem garantia de
-        recuperação — exigir o contrário travaria o andar sempre que a loja e a
-        fonte não estivessem no mapa.
-        """
-        from src.content.factories.monsters import create_monster
-
-        mapa = _mapa_de_teste()
-        mapa.enemies_pos[(1, 5)] = create_monster("Alvo", 4, "trash")
-        run = _run_preparada(mapa)
-        run.hero.take_damage(int(run.hero.base_hp * (1 - bot.HP_PARA_ENGAJAR) * 0.9))
-        assert run._pocoes() == 0
-
-        acao, _alvo, _motivo = run._decidir()
-        assert acao == "lutar"
-
-
-class TestAParadaDizOMotivoReal:
-    def test_sair_com_monstro_no_mapa_nomeia_a_condicao(self):
-        """O trace mentia: dizia ouro quando o portão fechado tinha sido o HP."""
-        from src.content.factories.monsters import create_monster
-
-        mapa = _mapa_de_teste()
-        mapa.enemies_pos[(1, 5)] = create_monster("Alvo", 4, "trash")
-        run = _run_preparada(mapa)
-        run.hero.coins = 10_000
-        # Abaixo do piso de engajamento, acima do crítico, e sem nada que cure
-        # no mapa: é o estado exato das 48 saídas que o trace atribuía ao ouro.
-        run.hero.take_damage(int(run.hero.base_hp * 0.5))
-
-        acao, _alvo, motivo = run._decidir()
-        assert acao == "saida"
-        assert "Motivo real" in motivo and "HP" in motivo
-        assert "já dá" not in motivo
-        assert run.parada and "HP" in run.parada
 
 
 class TestOrcamentoDeCompra:
@@ -310,73 +243,6 @@ class TestOrcamentoDeCompra:
         assert run.reserva_gasta == 1
 
 
-class TestExtracaoEAvaliadaAntesDaEmergencia:
-    def _run(self, nivel: int, andar: int, hp_fracao: float):
-        # Mapa sem monstro: assim não há SINAL GRAVE, e o teste isola os sinais
-        # normais. `_sinais_de_risco` precisa de um mapa para olhar os alvos.
-        run = _run_preparada(_mapa_de_teste(), nivel=nivel)
-        run.andar = andar
-        run.hero.take_damage(int(run.hero.base_hp * (1 - hp_fracao)))
-        return run
-
-    def test_sem_nada_acumulado_recusa_e_diz_o_porque(self):
-        run = self._run(nivel=1, andar=5, hp_fracao=0.2)
-        extrair, veredito = run._avaliar_extracao((0, 0))
-        assert extrair is False
-        assert "não acumulei nada que valha preservar" in veredito
-
-    def test_com_acumulo_e_sem_risco_continua_descendo(self):
-        run = self._run(nivel=6, andar=5, hp_fracao=1.0)
-        extrair, veredito = run._avaliar_extracao((0, 0))
-        assert extrair is False
-        assert "nenhum sinal de risco" in veredito
-
-    def test_com_acumulo_e_risco_suficiente_extrai_fora_da_emergencia(self):
-        # HP em 45% NÃO é emergência (acima de HP_CRITICO), e mesmo assim a
-        # Extração é avaliada — era exatamente isso que faltava.
-        run = self._run(nivel=4, andar=8, hp_fracao=0.45)
-        assert 0.45 > bot.HP_CRITICO, "o cenário precisa estar fora da emergência"
-        extrair, veredito = run._avaliar_extracao((0, 0))
-        assert extrair is True
-        assert "sair vivo vale mais" in veredito
-
-
-def _frac(heroi) -> float:
-    return heroi.get_hp() / max(1, heroi.base_hp)
-
-
-def _mapa_de_teste(altura=9, largura=15):
-    from src.engine.map import MapOfGame
-
-    m = MapOfGame(height=altura, width=largura)
-    m.grid = [
-        ["#" if (y in (0, altura - 1) or x in (0, largura - 1)) else "." for x in range(largura)]
-        for y in range(altura)
-    ]
-    m.player_pos = {"y": 1, "x": 1}
-    m.exit_pos = {"y": altura - 2, "x": largura - 2}
-    m.grid[altura - 2][largura - 2] = "X"
-    return m
-
-
-def _run_preparada(mapa, nivel=4):
-    run = bot.BotPadrao("warrior", seed=7, max_andar=1)
-    run.hero.set_level(nivel)
-    run.andar = 5
-    run.mapa = mapa
-    run.posicao = (mapa.player_pos["y"], mapa.player_pos["x"])
-    run.saida = (mapa.exit_pos["y"], mapa.exit_pos["x"])
-    run.passos = 0
-    run.combates = 0
-    run.essencia = 1.0
-    run.trace = bot.Trace()
-    run.reserva_gasta = 0
-    run.extraiu = False
-    run.parada = ""
-    run._ultimo_veredito_extracao = ""
-    return run
-
-
 class TestMovimentoRespeitaTodaCasa:
     """O herói não pode ser intangível às casas do andar."""
 
@@ -409,181 +275,6 @@ class TestMovimentoRespeitaTodaCasa:
         alvo = mapa.event_pos
         run._ir_ate(alvo, evitando=True)
         assert mapa.event_pos is None, "o evento continuou no mapa depois de pisado"
-
-
-class TestEscolhaDeAlvo:
-    """A régua é o MAPA. O jogador vê `&` e `B`, não nome nem nível."""
-
-    def test_escolhe_por_custo_de_rota_e_nao_por_distancia_crua(self):
-        """Menos lutas no caminho vence menos passos.
-
-        Um monstro a 3 passos com dois outros na frente custa três lutas; um a 9
-        passos com o caminho livre custa uma.
-        """
-        run = _run_preparada(_mapa_de_teste(), nivel=4)
-        alvos = [
-            {"casa": (1, 4), "passos": 3, "extras": 2, "chefe": False},
-            {"casa": (1, 9), "passos": 9, "extras": 0, "chefe": False},
-        ]
-        assert run._melhor_alvo(alvos)["casa"] == (1, 9)
-
-    def test_a_selecao_nao_le_nome_nem_nivel_do_monstro(self):
-        """`draw_map` desenha `&`. Nome e nível só existem depois da colisão.
-
-        Escolher alvo por defasagem de nível era jogar com informação que nenhum
-        jogador tem — e é uma regressão fácil de reintroduzir sem perceber, por
-        isso a prova é sobre as CHAVES que a seleção enxerga.
-        """
-        from src.content.factories.monsters import create_monster
-
-        mapa = _mapa_de_teste()
-        mapa.enemies_pos[(1, 4)] = create_monster("Bandido", 9, "bruiser")
-        mapa.enemies_pos[(1, 8)] = create_monster("Rato", 5, "trash")
-        run = _run_preparada(mapa, nivel=4)
-
-        alvos = run._alvos_visiveis()
-        assert alvos
-        for a in alvos:
-            assert set(a) == {"casa", "passos", "extras", "chefe"}, (
-                f"o alvo carrega informação que o mapa não mostra: {sorted(a)}"
-            )
-
-    def test_chefe_nao_e_alvo_opcional(self):
-        """`B` é a única marca de perigo que o mapa dá. Ignorá-la é jogar pior."""
-        run = _run_preparada(_mapa_de_teste(), nivel=4)
-        so_chefe = [{"casa": (1, 4), "passos": 2, "extras": 0, "chefe": True}]
-        assert run._melhor_alvo(so_chefe) is None
-        com_um_comum = so_chefe + [{"casa": (1, 9), "passos": 9, "extras": 0, "chefe": False}]
-        assert run._melhor_alvo(com_um_comum)["casa"] == (1, 9)
-
-
-class TestDesproporcaoSeJulgaNaFicha:
-    """Depois da colisão, com a tela de confronto à vista — nunca antes."""
-
-    def _par(self, nivel_monstro: int):
-        from src.content.factories.monsters import create_monster
-
-        run = _run_preparada(_mapa_de_teste(), nivel=4)
-        return run, create_monster("Alvo", nivel_monstro, "bruiser")
-
-    def test_foge_da_corrida_de_dano_que_perde(self):
-        run, monstro = self._par(12)
-        acao = run._ler_a_ficha(run.hero, monstro)
-        assert acao is not None and acao.kind == "flee"
-
-    def test_luta_a_corrida_que_ganha(self):
-        run, monstro = self._par(1)
-        assert run._ler_a_ficha(run.hero, monstro) is None
-
-    def test_insiste_na_fuga_enquanto_a_corrida_seguir_perdida(self):
-        """Fugir é 50% por turno. Tentar uma vez é aceitar a primeira moeda."""
-        run, monstro = self._par(12)
-        politica = run._com_leitura_de_ficha(lambda h, m, t: bot.Action(kind="attack"))
-        for turno in range(4):
-            assert politica(run.hero, [monstro], turno).kind == "flee"
-
-    def test_trocar_a_politica_troca_tambem_a_leitura_da_ficha(self):
-        """A leitura é parte da política do bot, não um enxerto no encontro.
-
-        É o que permite a um teste fixar a decisão para isolar o núcleo do
-        encontro — e é por isso que a composição mora no `__init__`.
-        """
-        run, monstro = self._par(12)
-        run.decide = lambda h, m, t: bot.Action(kind="attack")
-        assert run.decide(run.hero, [monstro], 0).kind == "attack"
-
-
-class TestAtrasoNaoImpedeLutar:
-    """Estar atrás do andar é ALERTA, nunca portão.
-
-    Um gate de `nível < andar - 1` fecharia o ciclo errado: o herói atrasado para
-    de lutar, e lutar é a única coisa que recupera o atraso. Na seed 20260918 o
-    Warrior chegou ao andar 5 no Nv3 e foi ali que fez 4 combates e ganhou 396 XP.
-    """
-
-    def test_o_atraso_e_sinal_de_risco(self):
-        run = _run_preparada(_mapa_de_teste(), nivel=1)
-        run.andar = 8
-        assert any("contra andar" in s for s in run._sinais_de_risco())
-
-    def test_mas_nao_impede_engajar(self):
-        run = _run_preparada(_mapa_de_teste(), nivel=1)
-        run.andar = 8
-        assert run._por_que_nao_engajar(1.0, 1.0) is None, (
-            "o atraso de nível virou portão de combate — é o ciclo de subprogressão"
-        )
-
-
-class TestPrioridadeGlobal:
-    """Serviço não é avaliado isoladamente. Existe uma escada, e ela manda.
-
-    A v3 gastava no Ferreiro logo antes de precisar do ouro para curar na Loja,
-    porque cada casa decidia sozinha. A correção é genérica: enquanto houver uma
-    necessidade mais alta pendente, a mais baixa espera — em qualquer andar, com
-    qualquer ouro, a qualquer distância.
-    """
-
-    def _run(self, hp_fracao=1.0, ouro=10_000, nivel=8, andar=5):
-        run = _run_preparada(_mapa_de_teste(), nivel=nivel)
-        run.andar = andar
-        run.hero.coins = ouro
-        run.hero.take_damage(int(run.hero.base_hp * (1 - hp_fracao)))
-        return run
-
-    def test_a_escada_esta_ordenada(self):
-        assert bot.SOBREVIVENCIA < bot.RECUPERACAO < bot.PROGREDIR < bot.INVESTIMENTO < bot.ENCERRAR
-
-    def test_progredir_vem_antes_de_investir_e_de_encerrar(self):
-        """Serviço e saída são o que vem DEPOIS de jogar o andar, não o atalho."""
-        assert bot.PROGREDIR < bot.INVESTIMENTO
-        assert bot.PROGREDIR < bot.ENCERRAR
-
-    def test_ferido_com_ouro_a_necessidade_e_recuperacao(self):
-        run = self._run(hp_fracao=0.52)
-        necessidade, _porque = run._necessidade_atual()
-        assert necessidade == bot.RECUPERACAO
-
-    def test_inteiro_e_com_folga_a_necessidade_e_progredir(self):
-        """Com ouro sobrando e um monstro no mapa, a resposta é LUTAR.
-
-        Era `INVESTIMENTO`: ter ouro bastava para o andar virar uma ida às
-        compras. Ouro é consequência do combate, não substituto dele.
-        """
-        from src.content.factories.monsters import create_monster
-
-        run = self._run(hp_fracao=1.0)
-        run.mapa.enemies_pos[(1, 5)] = create_monster("Alvo", 5, "trash")
-        run.hero.equipment[next(iter(run.hero.equipment))] = object()
-        necessidade, _porque = run._necessidade_atual()
-        assert necessidade == bot.PROGREDIR
-
-    def test_sem_alvo_e_com_folga_ai_sim_investe(self):
-        run = self._run(hp_fracao=1.0)
-        run.hero.equipment[next(iter(run.hero.equipment))] = object()
-        necessidade, _porque = run._necessidade_atual()
-        assert necessidade == bot.INVESTIMENTO
-
-    def test_ferreiro_espera_quando_a_necessidade_e_mais_alta(self, monkeypatch):
-        # O caso genérico do que a v3 errava no andar 7.
-        run = self._run(hp_fracao=0.52)
-        mexeu = []
-        monkeypatch.setattr(run, "_usar_ferreiro", lambda casa: mexeu.append(casa))
-
-        run._resolver_feature(bot.feat.FORGE, (1, 5))
-
-        assert mexeu == [], "gastou no Ferreiro com recuperação pendente"
-        assert "investimento espera" in str(run.trace)
-
-    def test_ferreiro_abre_quando_nada_mais_urgente_pende(self, monkeypatch):
-        run = self._run(hp_fracao=1.0)
-        run.hero.equipment[next(iter(run.hero.equipment))] = object()
-        mexeu = []
-        monkeypatch.setattr(run, "_usar_ferreiro", lambda casa: mexeu.append(casa))
-
-        run._resolver_feature(bot.feat.FORGE, (1, 5))
-
-        assert mexeu == [(1, 5)]
-        assert "nada mais urgente pendente" in str(run.trace)
 
 
 class TestParidadeDeEncontro:
