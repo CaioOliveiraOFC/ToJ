@@ -86,6 +86,12 @@ class ActionMechanicsView:
     # procs on-hit, roubo de vida, `death_ignore` e as interações de golpe.
     # Chamá-lo de `final_damage` seria mentir sobre três estágios.
     expected_strike_damage: int = 0
+    # As DUAS pontas da média acima, sem a média. Existem porque "mata agora" não
+    # pode sair de uma expectativa: o golpe sem crítico é a certeza, o golpe com
+    # crítico é o que só acontece com `crit_chance`. Com os dois, a policy calcula
+    # a CHANCE de resolver o turno por aritmética exata, sem rolar nada.
+    strike_damage_no_crit: int = 0
+    strike_damage_on_crit: int = 0
     hit_chance: float = 1.0
     crit_chance: float = 0.0
     healing: int = 0
@@ -134,6 +140,15 @@ class ActionMechanicsView:
     # a ação quebra TODOS os que quebram com dano, e fixar "apenas um" seria
     # limitação artificial do contrato.
     breaks_statuses: tuple[str, ...] = ()
+    # Turnos de controle que ESTA ação abre mão: o que ela consome (Emboscada
+    # gasta a invisibilidade, Quebra Gélida gasta o gelo) ou quebra (dano acorda
+    # quem dorme), medido pela duração que a instância AINDA tinha. O benefício
+    # da interação já está dentro de `expected_strike_damage`; isto é o preço.
+    forfeited_control_turns: int = 0
+    # MP que esta ação REALMENTE tira do alvo dentro do horizonte da luta.
+    # `mana_burn` drena recurso ATUAL por turno, então o número depende do MP que
+    # o alvo tem — e o MP do alvo está na ficha que o confronto mostra.
+    target_mp_drained: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -186,6 +201,8 @@ class CombatState:
     alvo_nivel: int
     alvo_hp: int
     alvo_hp_max: int
+    alvo_mp: int
+    alvo_mp_max: int
     # O golpe dele em mim, já calculado pelo adaptador.
     alvo_dano: int
     alvo_efeitos: tuple[str, ...] = ()

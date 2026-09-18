@@ -36,6 +36,8 @@ def _combate(**kwargs) -> CombatState:
         alvo_nivel=3,
         alvo_hp=240,
         alvo_hp_max=240,
+        alvo_mp=30,
+        alvo_mp_max=30,
         alvo_dano=50,
     )
     base.update(kwargs)

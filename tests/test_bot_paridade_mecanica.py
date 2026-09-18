@@ -25,6 +25,7 @@ from src.content.skills_loader import get_skill_by_id
 from src.engine.game_logic import create_player_from_data
 from src.mechanics import combat as combat_mech
 from src.mechanics.battle import build_turn_order
+from src.shared import effect_core as core
 from src.shared import effects as fx
 from tools import bot_adapter as ad
 
@@ -323,3 +324,156 @@ class TestOAdaptadorNaoMudaOEstado:
         antes = r.getstate()
         ad.acoes_do_combate(hero, alvo, estado)
         assert r.getstate() == antes
+
+
+class TestPontasDoFunil:
+    """FASE C: "mata agora" não pode sair de uma média.
+
+    `expected_strike_damage` é a média sobre o crítico. As duas pontas viajam
+    separadas para a policy poder distinguir a certeza da expectativa.
+    """
+
+    def test_as_duas_pontas_cercam_a_media(self):
+        hero, alvo = _heroi("warrior", 9), _monstro(9)
+        opcoes, _ = ad.acoes_do_combate(hero, alvo, ad.estado_do_combate(hero, alvo, 1))
+        ataque = next(o for o in opcoes if o.action_id == "attack")
+        m = ataque.mechanics
+        assert m.strike_damage_no_crit <= m.expected_strike_damage <= m.strike_damage_on_crit
+
+    def test_a_ponta_sem_critico_e_o_funil_sem_critico(self):
+        hero, alvo = _heroi("rogue", 9), _monstro(9)
+        base = combat_mech.basic_attack_power(hero)
+        opcoes, _ = ad.acoes_do_combate(hero, alvo, ad.estado_do_combate(hero, alvo, 1))
+        m = next(o for o in opcoes if o.action_id == "attack").mechanics
+        assert m.strike_damage_no_crit == max(1, ad._dano_do_funil(hero, alvo, base, critico=False))
+        assert m.strike_damage_on_crit == max(1, ad._dano_do_funil(hero, alvo, base, critico=True))
+
+
+class TestEgideDepoisDoCusto:
+    """A ordem do motor: `apply_skill` cobra o MP ANTES de o golpe resolver.
+
+    `_absorve_com_egide` só dispara quando o herói é DEFENSOR — no turno do
+    monstro, com a mana já gasta. Declarar a capacidade com o MP de antes seria
+    prometer um escudo que não vai existir.
+    """
+
+    def test_com_mp_curto_a_skill_declara_menos_egide_que_o_ataque(self):
+        """Quando o MP é o gargalo, gastar mana ENCOLHE o escudo do próximo golpe."""
+        hero, alvo = _heroi("mage", 12), _monstro(12)
+        hero.magic_shield_percent = 100
+        estado = ad.estado_do_combate(hero, alvo, 1)
+        # MP baixo o bastante para a capacidade ser limitada pela mana, e não
+        # pela fração do golpe que entra.
+        hero._mp = max(1, int(estado.alvo_dano / ad.MAGIC_SHIELD_DAMAGE_PER_MP))
+        estado = ad.estado_do_combate(hero, alvo, 1)
+        opcoes, _ = ad.acoes_do_combate(hero, alvo, estado)
+        ataque = next(o for o in opcoes if o.action_id == "attack")
+        caras = [o for o in opcoes if o.mechanics.mana_cost > 0]
+        assert caras, "o mago do nível 12 não tinha skill com custo — o teste ficaria vazio"
+        for opcao in caras:
+            assert (
+                opcao.mechanics.aegis_absorbable_damage < ataque.mechanics.aegis_absorbable_damage
+            )
+
+    def test_a_capacidade_declarada_e_a_do_mp_que_sobra(self):
+        hero, alvo = _heroi("mage", 12), _monstro(12)
+        hero.magic_shield_percent = 50
+        estado = ad.estado_do_combate(hero, alvo, 1)
+        opcoes, _ = ad.acoes_do_combate(hero, alvo, estado)
+        for opcao in opcoes:
+            m = opcao.mechanics
+            sobra = estado.mp - m.mana_cost + m.mana_restored
+            assert m.aegis_absorbable_damage == ad._egide_absorve(hero, estado.alvo_dano, mp=sobra)
+
+
+class TestSondaDeStatusNoAlvo:
+    """Status de ATRIBUTO chegava como nome e chance, sem consequência nenhuma.
+
+    São 15 cartas acessíveis ao jogador de hoje: weakened, hexed, slowed,
+    vulnerable e clouded.
+    """
+
+    def test_a_sonda_nao_deixa_residuo_no_alvo(self):
+        hero, alvo = _heroi("mage", 10), _monstro(10)
+        antes = (alvo.get_hp(), alvo.get_mp(), dict(getattr(alvo, "active_effects", {})))
+        for efeito in ("weakened", "vulnerable", "slowed", "hexed", "clouded"):
+            ad._sonda_de_status(hero, alvo, efeito)
+        depois = (alvo.get_hp(), alvo.get_mp(), dict(getattr(alvo, "active_effects", {})))
+        assert antes == depois
+
+    def test_o_declarado_e_o_que_um_apply_real_produz(self):
+        """Paridade: a sonda escreve a instância direto; o motor aplica de verdade."""
+        for efeito in ("weakened", "vulnerable", "slowed", "hexed"):
+            hero, alvo = _heroi("mage", 10), _monstro(10)
+            declarado = ad._sonda_de_status(hero, alvo, efeito)
+            if not declarado:
+                continue
+            definicao = core.definition(efeito)
+            core.apply_effect(
+                alvo,
+                efeito,
+                intensity=definicao.default_intensity,
+                duration=definicao.default_duration,
+                source_id="real",
+            )
+            real = {
+                "entrando": ad._dano_basico_esperado(alvo, hero),
+                "saindo": ad._dano_basico_esperado(hero, alvo),
+                "age_antes": ad._age_antes(hero, alvo),
+            }
+            assert declarado == real, efeito
+
+    def test_vulnerable_aumenta_o_golpe_que_sai(self):
+        hero, alvo = _heroi("warrior", 10), _monstro(10, "tank")
+        antes = ad._dano_basico_esperado(hero, alvo)
+        campos = ad._consequencias_do_status(hero, alvo, "vulnerable")
+        assert campos.get("outgoing_damage_after", antes) > antes
+
+    def test_weakened_reduz_o_golpe_que_entra(self):
+        hero, alvo = _heroi("warrior", 10), _monstro(10)
+        antes = ad._dano_basico_esperado(alvo, hero)
+        campos = ad._consequencias_do_status(hero, alvo, "weakened")
+        assert campos.get("incoming_damage_after", antes) < antes
+
+
+class TestDrenoDeclarado:
+    """`mana_burn` é família DRAIN: tira MP ATUAL por turno, pela duração."""
+
+    def test_o_dreno_nunca_passa_do_mp_que_o_alvo_tem(self):
+        alvo = _monstro(10)
+        alvo._mp = 5
+        assert ad._dreno_declarado("mana_burn", alvo, 4) <= 5
+
+    def test_alvo_sem_mp_nao_tem_o_que_drenar(self):
+        alvo = _monstro(10)
+        alvo._mp = 0
+        assert ad._dreno_declarado("mana_burn", alvo, 3) == 0
+
+    def test_efeito_que_nao_e_dreno_declara_zero(self):
+        alvo = _monstro(10)
+        assert ad._dreno_declarado("poison", alvo, 3) == 0
+
+
+class TestCustoDoEstadoConsumido:
+    """O benefício da interação já está no dano; o preço não estava em lugar nenhum."""
+
+    def test_gelo_consumido_conta_os_turnos_que_ainda_tinha(self):
+        hero, alvo = _heroi("rogue", 10), _monstro(10)
+        core.apply_effect(alvo, "frozen", intensity=0.0, duration=3, source_id="teste")
+        leis = ad._interacoes_do_ataque(hero, alvo)
+        perdidos = ad._turnos_de_controle_perdidos(alvo, leis, ad._quebra_ao_dar_dano(alvo))
+        gelo = [i for i in core.instances(alvo) if i.effect == "frozen"]
+        if any(v.consumes_status == "frozen" for v in leis):
+            assert perdidos == sum(int(i.duration) for i in gelo)
+
+    def test_acordar_quem_dorme_custa_os_turnos_de_sono(self):
+        alvo = _monstro(10)
+        core.apply_effect(alvo, "sleep", intensity=0.0, duration=2, source_id="teste")
+        quebras = ad._quebra_ao_dar_dano(alvo)
+        assert "sleep" in quebras
+        assert ad._turnos_de_controle_perdidos(alvo, (), quebras) == 2
+
+    def test_estado_que_nao_rouba_turno_nao_custa_turno(self):
+        alvo = _monstro(10)
+        core.apply_effect(alvo, "weakened", intensity=10.0, duration=3, source_id="teste")
+        assert ad._turnos_de_controle_perdidos(alvo, (), ("weakened",)) == 0

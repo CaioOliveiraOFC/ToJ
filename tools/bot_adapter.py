@@ -158,18 +158,25 @@ def _dano_basico_esperado(atacante, defensor) -> int:
     return _golpe_esperado(atacante, defensor, combat_mech.basic_attack_power(atacante))
 
 
-def _egide_absorve(defensor, dano_de_entrada: int) -> int:
-    """Quanto a Égide absorve do próximo golpe, com o MP ATUAL.
+def _egide_absorve(defensor, dano_de_entrada: int, mp: int | None = None) -> int:
+    """Quanto a Égide absorve do próximo golpe, com o MP que ela TERÁ.
 
     Leitura NÃO-MUTANTE: não gasta mana, não simula ataque, não reproduz a
     execução. Só a capacidade, a partir do estado real e de
     `MAGIC_SHIELD_DAMAGE_PER_MP`.
 
+    `mp` existe porque a ORDEM do motor importa: `combat.apply_skill` faz
+    `caster.reduce_mp(custo)` ANTES de o golpe resolver, e `_absorve_com_egide`
+    só dispara quando o herói é DEFENSOR — ou seja, no turno do monstro, depois
+    de a skill já ter cobrado a mana. Declarar a capacidade com o MP de antes
+    seria prometer um escudo que não vai existir. Cada ação declara a Égide que
+    sobra DEPOIS do que ela mesma gasta ou repõe.
+
     Mesma dívida registrada de `_chance_de_critico`: `_absorve_com_egide` é
     privada E muta, então não há leitura canônica para reutilizar.
     """
     fracao = int(getattr(defensor, "magic_shield_percent", 0) or 0)
-    mana = int(getattr(defensor, "get_mp", lambda: 0)())
+    mana = int(getattr(defensor, "get_mp", lambda: 0)()) if mp is None else max(0, int(mp))
     if fracao <= 0 or mana <= 0 or dano_de_entrada <= 1:
         return 0
     return max(0, min(int(dano_de_entrada * fracao / 100), int(mana * MAGIC_SHIELD_DAMAGE_PER_MP)))
@@ -201,6 +208,11 @@ def estado_do_combate(hero, monstro, turno: int) -> CombatState:
         alvo_nivel=int(getattr(monstro, "level", 0)),
         alvo_hp=monstro.get_hp(),
         alvo_hp_max=int(getattr(monstro, "base_hp", monstro.get_hp())),
+        # O MP do alvo está na MESMA ficha do confronto que o HP e os atributos
+        # (`render_compare_opponents`), então é informação legítima. É o que
+        # `mana_burn` tem para drenar.
+        alvo_mp=int(getattr(monstro, "get_mp", lambda: 0)()),
+        alvo_mp_max=int(getattr(monstro, "base_mp", 0) or 0),
         alvo_dano=_dano_basico_esperado(monstro, hero),
         alvo_efeitos=tuple(sorted(getattr(monstro, "active_effects", {}) or {})),
         meus_efeitos=tuple(sorted(getattr(hero, "active_effects", {}) or {})),
@@ -260,6 +272,145 @@ def _consequencias_do_buff(hero, monstro, stat: str, valor: int, rotulo: str) ->
         campos["acts_before_enemy"] = antes_ordem
         campos["acts_before_enemy_after"] = depois["age_antes"]
     return campos
+
+
+def _sonda_de_status(hero, monstro, efeito: str) -> dict:
+    """Levanta o STATUS de verdade NO ALVO, mede, e desfaz.
+
+    Gêmea de `_sonda_de_buff`, apontada para o outro lado. Existe porque status
+    de ATRIBUTO — `weakened` (ST), `hexed` (MG), `slowed` (AG), `vulnerable`
+    (DF), `clouded` (MP) — são 15 cartas acessíveis ao jogador de hoje e
+    chegavam ao cérebro como "custa um turno e não faz nada": o nome do efeito e
+    a chance, sem consequência nenhuma.
+
+    Escreve a `EffectInstance` DIRETO no estado ativo, no formato canônico
+    (`core.instance_key`, intensidade e duração do catálogo), em vez de chamar
+    `core.apply`: aplicar de verdade dispara `after_apply`, que MUTA — stack,
+    refresh e interações. Observar não pode cobrar o preço da ação.
+
+    Mede com as MESMAS funções canônicas do resto do módulo e remove no
+    `finally`. Há teste provando que o monstro volta ao estado anterior e teste
+    de paridade provando que o declarado é o que um `core.apply` real produz.
+    """
+    definicao = core.definition(efeito)
+    if definicao is None or definicao.family != core.FAMILY_ATTRIBUTE:
+        return {}
+    ativos = getattr(monstro, "active_effects", None)
+    if ativos is None:
+        return {}
+    chave = core.instance_key(efeito, "__sonda__")
+    anterior = ativos.get(chave)
+    try:
+        ativos[chave] = core.EffectInstance(
+            effect=efeito,
+            source_id="__sonda__",
+            intensity=definicao.default_intensity,
+            duration=definicao.default_duration,
+        )
+        return {
+            "entrando": _dano_basico_esperado(monstro, hero),
+            "saindo": _dano_basico_esperado(hero, monstro),
+            "age_antes": _age_antes(hero, monstro),
+        }
+    finally:
+        ativos.pop(chave, None)
+        if anterior is not None:
+            ativos[chave] = anterior
+
+
+def _consequencias_do_status(hero, monstro, efeito: str) -> dict:
+    """Os campos do view que a sonda de status preenche, só quando MUDAM algo.
+
+    Simétrica à do buff, e nos DOIS sentidos: um status que baixa a Força do
+    alvo diminui o golpe que entra, um que baixa a Defesa dele aumenta o golpe
+    que sai, e `slowed` mexe nos dois mais a ordem de turno.
+    """
+    antes_entrando = _dano_basico_esperado(monstro, hero)
+    antes_saindo = _dano_basico_esperado(hero, monstro)
+    antes_ordem = _age_antes(hero, monstro)
+    depois = _sonda_de_status(hero, monstro, efeito)
+    if not depois:
+        return {}
+    campos: dict = {}
+    if depois["entrando"] != antes_entrando:
+        campos["incoming_damage_after"] = depois["entrando"]
+    if depois["saindo"] != antes_saindo:
+        campos["outgoing_damage_after"] = depois["saindo"]
+    if depois["age_antes"] != antes_ordem:
+        campos["acts_before_enemy"] = antes_ordem
+        campos["acts_before_enemy_after"] = depois["age_antes"]
+    return campos
+
+
+def _custo_da_ocultacao_perdida(hero, monstro, views: tuple[InteractionView, ...]) -> dict:
+    """O golpe que passo a tomar quando a ação GASTA um efeito meu.
+
+    Emboscada consome a invisibilidade do atacante, e a invisibilidade é o que
+    está segurando a mira do monstro (`core.concealment_penalty` dentro de
+    `combat.hit_chance`). O benefício do ×1,20 já está dentro do dano declarado;
+    o preço não estava em lugar nenhum.
+
+    Mesma técnica das outras sondas: tira o efeito de verdade, mede pela função
+    canônica, devolve no `finally`.
+    """
+    consumidos = [v.consumes_status for v in views if v.consumes_status and v.consumes_from_self]
+    if not consumidos:
+        return {}
+    ativos = getattr(hero, "active_effects", None)
+    if not ativos:
+        return {}
+    antes = _dano_basico_esperado(monstro, hero)
+    removidos = {}
+    try:
+        for efeito in consumidos:
+            for chave in [k for k in ativos if str(k).split("#")[0] == efeito]:
+                removidos[chave] = ativos.pop(chave)
+        if not removidos:
+            return {}
+        depois = _dano_basico_esperado(monstro, hero)
+    finally:
+        ativos.update(removidos)
+    return {"incoming_damage_after": depois} if depois != antes else {}
+
+
+def _turnos_de_controle_perdidos(
+    monstro, views: tuple[InteractionView, ...], quebrados: tuple[str, ...]
+) -> int:
+    """Quantos turnos de controle esta ação abre mão, no alvo.
+
+    Duas fontes, o mesmo preço: o que a lei CONSOME do alvo (Quebra Gélida gasta
+    o gelo) e o que o DANO quebra (acordar quem dorme). Conta só o que rouba
+    turno — perder um efeito que não estava segurando o inimigo não custa turno
+    nenhum —, e o número é a duração que a instância AINDA tinha.
+    """
+    alvos = {v.consumes_status for v in views if v.consumes_status and not v.consumes_from_self}
+    alvos.update(quebrados)
+    total = 0
+    for instancia in core.instances(monstro):
+        if instancia.effect in alvos and instancia.effect in TURN_SKIPPING_STATUSES:
+            total += max(0, int(instancia.duration))
+    return total
+
+
+def _dreno_declarado(efeito: str, monstro, duracao_da_carta: int) -> int:
+    """Quanto MP esta ação tira do alvo, pelo catálogo canônico.
+
+    `mana_burn` é família DRAIN: `tick_effects` reduz `intensity × stacks` do MP
+    ATUAL a cada turno, pela duração do efeito. O teto é o MP que o alvo tem —
+    e o MP do alvo é o que a ficha do confronto mostra, então não há informação
+    escondida nesta conta.
+
+    O fator de `Colapso Mental` entra pela função canônica `ix.drain_scale`, a
+    mesma que `tick_effects` consulta.
+    """
+    definicao = core.definition(efeito)
+    if definicao is None or definicao.family != core.FAMILY_DRAIN:
+        return 0
+    fator, _leis = ix.drain_scale(monstro, efeito)
+    duracao = int(duracao_da_carta or definicao.default_duration)
+    por_turno = int(definicao.default_intensity * fator)
+    mp = int(getattr(monstro, "get_mp", lambda: 0)())
+    return max(0, min(mp, por_turno * max(0, duracao)))
 
 
 def _dot_declarado(efeito: str, hero, duracao_da_carta: int) -> tuple[int, int]:
@@ -414,7 +565,14 @@ def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
         normal = _dano_do_funil(hero, monstro, base, critico=False)
         critico = _dano_do_funil(hero, monstro, base, critico=True)
         campos["expected_strike_damage"] = max(1, int(normal * (1 - p_crit) + critico * p_crit))
+        # As duas pontas, sem a média: é o que separa "mata" de "deve matar".
+        campos["strike_damage_no_crit"] = max(1, int(normal))
+        campos["strike_damage_on_crit"] = max(1, int(critico))
         campos["breaks_statuses"] = _quebra_ao_dar_dano(monstro)
+        campos["forfeited_control_turns"] = _turnos_de_controle_perdidos(
+            monstro, campos["interactions"], campos["breaks_statuses"]
+        )
+        campos.update(_custo_da_ocultacao_perdida(hero, monstro, campos["interactions"]))
         # O secundário da carta é um status de verdade, com chance própria.
         sec = getattr(skill, "secondary", None)
         if sec is not None:
@@ -445,6 +603,13 @@ def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
         por_turno, dur = _dot_declarado(efeito, monstro, duracao)
         campos["dot_damage_per_turn"] = por_turno
         campos["dot_duration"] = dur
+        # Status de ATRIBUTO tem consequência medida, não só nome: sem isto,
+        # `weakened`, `hexed`, `slowed`, `vulnerable` e `clouded` chegavam ao
+        # cérebro como um turno gasto à toa.
+        if not campos["already_active"]:
+            campos.update(_consequencias_do_status(hero, monstro, efeito))
+        # E `mana_burn` tem consequência de RECURSO, que não é dano nem status.
+        campos["target_mp_drained"] = _dreno_declarado(efeito, monstro, duracao)
 
     elif familia in ("buff", "damage_reduction"):
         stat = str(getattr(skill, "effect_stat", "") or "")
@@ -482,27 +647,39 @@ def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOpt
     """
     opcoes: list[ActionOption] = []
     reais: dict[str, Any] = {}
-    absorvivel = _egide_absorve(hero, state.alvo_dano)
     age_antes = _age_antes(hero, monstro)
+
+    def egide(custo: int = 0, reposto: int = 0) -> int:
+        """A Égide que sobra DEPOIS do que esta ação gasta ou repõe."""
+        return _egide_absorve(hero, state.alvo_dano, mp=state.mp - custo + reposto)
 
     base = combat_mech.basic_attack_power(hero)
     p_crit = _chance_de_critico(hero)
     normal = _dano_do_funil(hero, monstro, base, critico=False)
     critico = _dano_do_funil(hero, monstro, base, critico=True)
+    leis_do_ataque = _interacoes_do_ataque(hero, monstro)
+    quebras_do_ataque = _quebra_ao_dar_dano(monstro)
+    ataque: dict = {
+        "expected_strike_damage": max(1, int(normal * (1 - p_crit) + critico * p_crit)),
+        "strike_damage_no_crit": max(1, int(normal)),
+        "strike_damage_on_crit": max(1, int(critico)),
+        "hit_chance": _chance_de_acerto(hero, monstro),
+        "crit_chance": p_crit,
+        "acts_before_enemy": age_antes,
+        "aegis_absorbable_damage": egide(),
+        "interactions": leis_do_ataque,
+        "breaks_statuses": quebras_do_ataque,
+        "forfeited_control_turns": _turnos_de_controle_perdidos(
+            monstro, leis_do_ataque, quebras_do_ataque
+        ),
+    }
+    ataque.update(_custo_da_ocultacao_perdida(hero, monstro, leis_do_ataque))
     opcoes.append(
         ActionOption(
             action_id="attack",
             family="attack",
             label="ataque básico",
-            mechanics=ActionMechanicsView(
-                expected_strike_damage=max(1, int(normal * (1 - p_crit) + critico * p_crit)),
-                hit_chance=_chance_de_acerto(hero, monstro),
-                crit_chance=p_crit,
-                acts_before_enemy=age_antes,
-                aegis_absorbable_damage=absorvivel,
-                interactions=_interacoes_do_ataque(hero, monstro),
-                breaks_statuses=_quebra_ao_dar_dano(monstro),
-            ),
+            mechanics=ActionMechanicsView(**ataque),
         )
     )
 
@@ -514,7 +691,9 @@ def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOpt
                 action_id=action_id,
                 family=str(skill.effect_type),
                 label=str(skill.name),
-                mechanics=replace(mecanica, aegis_absorbable_damage=absorvivel),
+                mechanics=replace(
+                    mecanica, aegis_absorbable_damage=egide(custo=mecanica.mana_cost)
+                ),
             )
         )
         reais[action_id] = skill
@@ -529,11 +708,13 @@ def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOpt
         campos: dict = {
             "duration": int(getattr(item, "duration", 1) or 1),
             "acts_before_enemy": age_antes,
-            "aegis_absorbable_damage": absorvivel,
             # Recurso finito: sem este número a policy não sabe que está
             # gastando o último frasco.
             "uses_left": max(1, restantes),
         }
+        campos["aegis_absorbable_damage"] = egide(
+            reposto=int(hero.base_mp * valor / 100) if tipo in MANA else 0
+        )
         if tipo in CURA:
             bruto = int(hero.base_hp * valor / 100)
             campos["healing"] = bruto + int(
@@ -569,7 +750,7 @@ def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOpt
             mechanics=ActionMechanicsView(
                 flee_chance=CHANCE_DE_FUGA,
                 acts_before_enemy=age_antes,
-                aegis_absorbable_damage=absorvivel,
+                aegis_absorbable_damage=egide(),
             ),
         )
     )
