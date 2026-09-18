@@ -21,7 +21,7 @@ from src.shared import effects as fx
 from src.sim.bot import decidir_no_combate
 from src.sim.bot.decision import ActionOption
 from src.sim.bot.evaluators import avaliar_combate
-from src.sim.bot.observation import ActionMechanicsView, CombatState
+from src.sim.bot.observation import ActionMechanicsView, CombatState, StatusView
 
 
 def _estado(**kwargs) -> CombatState:
@@ -67,6 +67,11 @@ def _ataque(dano=50, **extra) -> ActionOption:
 
 def _pocao(cura=150, restantes=3) -> ActionOption:
     return _opcao("item:pocao", "heal", "poção", healing=cura, uses_left=restantes, duration=1)
+
+
+def _status(efeito: str, chance: float, **campos) -> tuple[StatusView, ...]:
+    """Um efeito aplicado no alvo. Principal ou `secondary` — o view não distingue."""
+    return (StatusView(effect=efeito, chance=chance, **campos),)
 
 
 def _nota(opcao: ActionOption, state: CombatState) -> float:
@@ -199,10 +204,7 @@ class TestControle:
             "skill:atordoar",
             "status",
             "Atordoar",
-            status_effect="stun",
-            status_chance=0.9,
-            status_skips_turn=True,
-            duration=3,
+            statuses=_status("stun", 0.9, skips_turn=True, duration=3),
             mana_cost=10,
         )
         d = decidir_no_combate(state, (_ataque(), atordoar))
@@ -215,10 +217,7 @@ class TestControle:
             "skill:atordoar",
             "status",
             "Atordoar",
-            status_effect="stun",
-            status_chance=0.9,
-            status_skips_turn=True,
-            duration=2,
+            statuses=_status("stun", 0.9, skips_turn=True, duration=2),
             mana_cost=10,
         )
         fuga = _opcao("flee", "flee", "fugir", flee_chance=0.5)
@@ -231,10 +230,7 @@ class TestControle:
             "skill:atordoar",
             "status",
             "Atordoar",
-            status_effect="stun",
-            status_chance=0.9,
-            status_skips_turn=True,
-            duration=2,
+            statuses=_status("stun", 0.9, skips_turn=True, duration=2),
             mana_cost=10,
         )
         d = decidir_no_combate(state, (_ataque(), atordoar))
@@ -249,11 +245,7 @@ class TestDanoAoLongoDoTempo:
             "skill:veneno",
             "status",
             "Veneno",
-            status_effect="poison",
-            status_chance=1.0,
-            dot_damage_per_turn=30,
-            dot_duration=5,
-            duration=5,
+            statuses=_status("poison", 1.0, duration=5, dot_damage_per_turn=30, dot_duration=5),
             mana_cost=10,
         )
 
@@ -362,6 +354,14 @@ class TestEstadoConsumido:
         componentes = dict(avaliar_combate(_ataque(forfeited_control_turns=2), state).components)
         assert componentes["estado gasto"] < 0
 
+    def test_o_custo_do_estado_e_proporcional_a_chance_de_perde_lo(self):
+        """O preço é ESPERADO: cobrar a duração cheia seria cobrar por um
+        consumo que o motor só executa no crítico que acerta."""
+        state = _estado(alvo_hp=600, dano_basico=50, alvo_dano=40, hp=120)
+        provavel = _ataque(forfeited_control_turns=3 * 0.8 * 0.25)
+        certo = _ataque(forfeited_control_turns=3.0)
+        assert _nota(provavel, state) > _nota(certo, state)
+
     def test_perder_a_ocultacao_conta_como_golpe_que_passa_a_doer_mais(self):
         state = _estado(alvo_hp=600, dano_basico=50, alvo_dano=40, hp=200)
         oculto = _ataque()
@@ -429,10 +429,7 @@ class TestStatusDeAtributo:
             "skill:vulneravel",
             "status",
             "Expor Fraqueza",
-            status_effect="vulnerable",
-            status_chance=1.0,
-            outgoing_damage_after=130,
-            duration=6,
+            statuses=_status("vulnerable", 1.0, duration=6, outgoing_damage_after=130),
             mana_cost=10,
         )
         d = decidir_no_combate(state, (_ataque(), vulneravel))
@@ -444,10 +441,7 @@ class TestStatusDeAtributo:
             "skill:fraco",
             "status",
             "Enfraquecer",
-            status_effect="weakened",
-            status_chance=1.0,
-            incoming_damage_after=25,
-            duration=4,
+            statuses=_status("weakened", 1.0, duration=4, incoming_damage_after=25),
             mana_cost=10,
         )
         componentes = dict(avaliar_combate(fraco, state).components)
@@ -461,10 +455,7 @@ class TestStatusDeAtributo:
                 "skill:fraco",
                 "status",
                 "Enfraquecer",
-                status_effect="weakened",
-                status_chance=chance,
-                incoming_damage_after=25,
-                duration=4,
+                statuses=_status("weakened", chance, duration=4, incoming_damage_after=25),
                 mana_cost=10,
             )
 
@@ -479,10 +470,7 @@ class TestDrenoDeRecurso:
             "skill:dreno",
             "status",
             "Queima de Mana",
-            status_effect="mana_burn",
-            status_chance=1.0,
-            target_mp_drained=drenado,
-            duration=2,
+            statuses=_status("mana_burn", 1.0, duration=2, target_mp_drained=drenado),
             mana_cost=10,
         )
 

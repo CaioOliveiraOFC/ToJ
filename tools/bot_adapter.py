@@ -56,6 +56,7 @@ from src.sim.bot import (
     MapState,
     ProgressionState,
     ServiceView,
+    StatusView,
     TargetView,
 )
 from src.sim.policies import (
@@ -374,21 +375,47 @@ def _custo_da_ocultacao_perdida(hero, monstro, views: tuple[InteractionView, ...
 
 
 def _turnos_de_controle_perdidos(
-    monstro, views: tuple[InteractionView, ...], quebrados: tuple[str, ...]
-) -> int:
-    """Quantos turnos de controle esta ação abre mão, no alvo.
+    monstro,
+    views: tuple[InteractionView, ...],
+    quebrados: tuple[str, ...],
+    *,
+    hit_chance: float = 1.0,
+    crit_chance: float = 0.0,
+) -> float:
+    """Turnos de controle que esta ação abre mão, em VALOR ESPERADO.
 
-    Duas fontes, o mesmo preço: o que a lei CONSOME do alvo (Quebra Gélida gasta
-    o gelo) e o que o DANO quebra (acordar quem dorme). Conta só o que rouba
-    turno — perder um efeito que não estava segurando o inimigo não custa turno
-    nenhum —, e o número é a duração que a instância AINDA tinha.
+    Duas fontes, e elas NÃO têm a mesma condição — tratá-las como certas cobrava
+    de todo golpe contra alvo controlado um preço que o motor só cobra às vezes:
+
+    - o que a LEI consome do alvo (Quebra Gélida gasta o gelo) só acontece se o
+      golpe ACERTAR, e só se for CRÍTICO quando a lei exige crítico;
+    - o que o DANO quebra (acordar quem dorme) só acontece se a ação de fato
+      causar dano, isto é, se ela acertar.
+
+    A condição vem dos fatos, não de peso inventado: `hit_chance` e `crit_chance`
+    já são fatos do próprio view, e `requires_critical` é o fato que a FASE B
+    derivou comparando `strike_interactions` nos dois valores de crítico.
+
+    Não entra aqui o que sai de MIM: `invisible` é removido NA TENTATIVA,
+    inclusive no erro, então é custo CERTO — e ocultação não rouba turno, então
+    o preço dela é o golpe que passo a tomar (`incoming_damage_after`).
     """
-    alvos = {v.consumes_status for v in views if v.consumes_status and not v.consumes_from_self}
-    alvos.update(quebrados)
-    total = 0
+    # efeito -> probabilidade de ele ser perdido por esta ação, a maior delas
+    # quando mais de uma condição alcança o mesmo efeito.
+    risco: dict[str, float] = {}
+    for view in views:
+        if not view.consumes_status or view.consumes_from_self:
+            continue
+        p = hit_chance * (crit_chance if view.requires_critical else 1.0)
+        risco[view.consumes_status] = max(risco.get(view.consumes_status, 0.0), p)
+    for efeito in quebrados:
+        risco[efeito] = max(risco.get(efeito, 0.0), hit_chance)
+
+    total = 0.0
     for instancia in core.instances(monstro):
-        if instancia.effect in alvos and instancia.effect in TURN_SKIPPING_STATUSES:
-            total += max(0, int(instancia.duration))
+        if instancia.effect not in TURN_SKIPPING_STATUSES:
+            continue
+        total += max(0, int(instancia.duration)) * risco.get(instancia.effect, 0.0)
     return total
 
 
@@ -570,46 +597,19 @@ def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
         campos["strike_damage_on_crit"] = max(1, int(critico))
         campos["breaks_statuses"] = _quebra_ao_dar_dano(monstro)
         campos["forfeited_control_turns"] = _turnos_de_controle_perdidos(
-            monstro, campos["interactions"], campos["breaks_statuses"]
+            monstro,
+            campos["interactions"],
+            campos["breaks_statuses"],
+            hit_chance=campos["hit_chance"],
+            crit_chance=campos["crit_chance"],
         )
         campos.update(_custo_da_ocultacao_perdida(hero, monstro, campos["interactions"]))
-        # O secundário da carta é um status de verdade, com chance própria.
-        sec = getattr(skill, "secondary", None)
-        if sec is not None:
-            campos["status_effect"] = str(sec.effect)
-            campos["status_chance"] = _chance_efetiva(monstro, str(sec.effect), float(sec.chance))
-            campos["status_skips_turn"] = str(sec.effect) in TURN_SKIPPING_STATUSES
-            por_turno, dur = _dot_declarado(str(sec.effect), monstro, int(sec.duration or 0))
-            campos["dot_damage_per_turn"] = por_turno
-            campos["dot_duration"] = dur
 
     elif familia == "heal":
         # Percentual do HP máximo, MAIS `potion_heal_bonus` — a mesma ordem de
         # `apply_skill`, que aplica o bônus sobre o valor já calculado.
         bruto = int(hero.base_hp * float(getattr(skill, "effect_value", 0) or 0) / 100)
         campos["healing"] = bruto + int(bruto * fx.combat_modifier(hero, "potion_heal_bonus") / 100)
-
-    elif familia == "status":
-        # `effect_value` de uma skill de status é o NOME do efeito, não um
-        # número. Tratá-lo como número levantava `ValueError` e derrubava a run
-        # na primeira skill de status que o herói recebesse — 37 são acessíveis.
-        efeito = str(getattr(skill, "effect_value", "") or "")
-        campos["status_effect"] = efeito
-        campos["status_chance"] = _chance_efetiva(
-            monstro, efeito, float(getattr(skill, "chance", 100) or 100)
-        )
-        campos["status_skips_turn"] = efeito in TURN_SKIPPING_STATUSES
-        campos["already_active"] = efeito in (getattr(monstro, "active_effects", {}) or {})
-        por_turno, dur = _dot_declarado(efeito, monstro, duracao)
-        campos["dot_damage_per_turn"] = por_turno
-        campos["dot_duration"] = dur
-        # Status de ATRIBUTO tem consequência medida, não só nome: sem isto,
-        # `weakened`, `hexed`, `slowed`, `vulnerable` e `clouded` chegavam ao
-        # cérebro como um turno gasto à toa.
-        if not campos["already_active"]:
-            campos.update(_consequencias_do_status(hero, monstro, efeito))
-        # E `mana_burn` tem consequência de RECURSO, que não é dano nem status.
-        campos["target_mp_drained"] = _dreno_declarado(efeito, monstro, duracao)
 
     elif familia in ("buff", "damage_reduction"):
         stat = str(getattr(skill, "effect_stat", "") or "")
@@ -622,7 +622,73 @@ def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
         if not campos["already_active"] and isinstance(valor, int | float):
             campos.update(_consequencias_do_buff(hero, monstro, stat, int(valor), nome))
 
+    # Principal e `secondary` saem do MESMO construtor, porque no motor eles
+    # passam pelo mesmo `apply_effect`. Vale para a carta de dano com secundário
+    # e para a de status que aplica dois efeitos.
+    campos["statuses"] = _statuses_da_skill(hero, monstro, skill)
     return ActionMechanicsView(**campos)
+
+
+def _status_declarado(hero, monstro, efeito: str, chance_base: float, duracao: int) -> StatusView:
+    """UM efeito aplicado no alvo, com a consequência inteira.
+
+    Ponto ÚNICO de construção, e é isso que o torna importante: principal e
+    `secondary` passam pelas mesmas linhas, porque no motor eles passam pelo
+    mesmo `apply_effect`. Antes o secundário chegava com nome e chance e sem
+    consequência, e o bot valorava `vulnerable` de uma carta de status diferente
+    do `vulnerable` da mesma família vindo no campo `secondary` — duas notas para
+    a mesma peça do jogo.
+    """
+    if not efeito:
+        return StatusView(effect="")
+    por_turno, dur_dot = _dot_declarado(efeito, monstro, duracao)
+    campos: dict = {
+        "effect": efeito,
+        "chance": _chance_efetiva(monstro, efeito, chance_base),
+        "duration": int(duracao or 0),
+        "skips_turn": efeito in TURN_SKIPPING_STATUSES,
+        "already_active": efeito in (getattr(monstro, "active_effects", {}) or {}),
+        "dot_damage_per_turn": por_turno,
+        "dot_duration": dur_dot,
+        "target_mp_drained": _dreno_declarado(efeito, monstro, duracao),
+    }
+    if not campos["already_active"]:
+        consequencias = _consequencias_do_status(hero, monstro, efeito)
+        campos["incoming_damage_after"] = consequencias.get("incoming_damage_after", 0)
+        campos["outgoing_damage_after"] = consequencias.get("outgoing_damage_after", 0)
+        campos["acts_before_enemy_after"] = consequencias.get("acts_before_enemy_after")
+    return StatusView(**campos)
+
+
+def _statuses_da_skill(hero, monstro, skill) -> tuple[StatusView, ...]:
+    """Todos os efeitos que a carta aplica no alvo: o próprio e o `secondary`.
+
+    A carta de DANO não tem efeito próprio — o dano é o efeito dela —, então só o
+    `secondary` entra. A de STATUS tem os dois, e os dois contam.
+    """
+    declarados: list[StatusView] = []
+    if str(skill.effect_type) == "status":
+        declarados.append(
+            _status_declarado(
+                hero,
+                monstro,
+                str(getattr(skill, "effect_value", "") or ""),
+                float(getattr(skill, "chance", 100) or 100),
+                int(getattr(skill, "duration", 0) or 0),
+            )
+        )
+    sec = getattr(skill, "secondary", None)
+    if sec is not None:
+        declarados.append(
+            _status_declarado(
+                hero,
+                monstro,
+                str(sec.effect),
+                float(sec.chance),
+                int(sec.duration or 0),
+            )
+        )
+    return tuple(d for d in declarados if d.effect)
 
 
 def _chance_efetiva(alvo, efeito: str, base: float) -> float:
@@ -670,7 +736,11 @@ def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOpt
         "interactions": leis_do_ataque,
         "breaks_statuses": quebras_do_ataque,
         "forfeited_control_turns": _turnos_de_controle_perdidos(
-            monstro, leis_do_ataque, quebras_do_ataque
+            monstro,
+            leis_do_ataque,
+            quebras_do_ataque,
+            hit_chance=_chance_de_acerto(hero, monstro),
+            crit_chance=p_crit,
         ),
     }
     ataque.update(_custo_da_ocultacao_perdida(hero, monstro, leis_do_ataque))

@@ -59,7 +59,8 @@ class TestStatusNaoDerrubaAConstrucao:
             if skill is None:
                 continue
             m = ad._mecanica_de_skill(hero, alvo, skill)
-            assert m.status_effect, f"{dados['name']} chegou sem nome de efeito"
+            assert m.statuses, f"{dados['name']} chegou sem efeito declarado"
+            assert m.statuses[0].effect, f"{dados['name']} chegou sem nome de efeito"
 
     def test_o_efeito_declarado_e_o_que_a_carta_aplica(self):
         hero, alvo = _heroi("mage", 10), _monstro(10)
@@ -68,7 +69,7 @@ class TestStatusNaoDerrubaAConstrucao:
             if skill is None:
                 continue
             m = ad._mecanica_de_skill(hero, alvo, skill)
-            assert m.status_effect == str(skill.effect_value)
+            assert m.statuses[0].effect == str(skill.effect_value)
 
 
 class TestChanceDeStatusUsaAResistencia:
@@ -457,23 +458,101 @@ class TestDrenoDeclarado:
 class TestCustoDoEstadoConsumido:
     """O benefício da interação já está no dano; o preço não estava em lugar nenhum."""
 
-    def test_gelo_consumido_conta_os_turnos_que_ainda_tinha(self):
+    def test_gelo_consumido_cobra_so_a_chance_real_de_ser_consumido(self):
+        """Quebra Gélida gasta o gelo no CRÍTICO QUE ACERTA, não em todo golpe."""
         hero, alvo = _heroi("rogue", 10), _monstro(10)
         core.apply_effect(alvo, "frozen", intensity=0.0, duration=3, source_id="teste")
         leis = ad._interacoes_do_ataque(hero, alvo)
-        perdidos = ad._turnos_de_controle_perdidos(alvo, leis, ad._quebra_ao_dar_dano(alvo))
-        gelo = [i for i in core.instances(alvo) if i.effect == "frozen"]
-        if any(v.consumes_status == "frozen" for v in leis):
-            assert perdidos == sum(int(i.duration) for i in gelo)
+        gelo = [v for v in leis if v.consumes_status == "frozen"]
+        assert gelo, "sem a lei do gelo declarada, o teste ficaria verde sem verificar"
+        assert gelo[0].requires_critical, "Quebra Gélida exige crítico"
+        perdidos = ad._turnos_de_controle_perdidos(
+            alvo, leis, ad._quebra_ao_dar_dano(alvo), hit_chance=0.8, crit_chance=0.25
+        )
+        assert perdidos == 3 * 0.8 * 0.25
 
-    def test_acordar_quem_dorme_custa_os_turnos_de_sono(self):
+    def test_gelo_certo_seria_cobrado_inteiro(self):
+        """O contraste: com acerto e crítico garantidos, o preço é a duração cheia."""
+        hero, alvo = _heroi("rogue", 10), _monstro(10)
+        core.apply_effect(alvo, "frozen", intensity=0.0, duration=3, source_id="teste")
+        leis = ad._interacoes_do_ataque(hero, alvo)
+        perdidos = ad._turnos_de_controle_perdidos(
+            alvo, leis, ad._quebra_ao_dar_dano(alvo), hit_chance=1.0, crit_chance=1.0
+        )
+        assert perdidos == 3.0
+
+    def test_acordar_quem_dorme_custa_so_o_que_o_golpe_acerta(self):
+        """Sono só quebra se a ação CAUSAR dano: o preço é a chance de acertar."""
         alvo = _monstro(10)
         core.apply_effect(alvo, "sleep", intensity=0.0, duration=2, source_id="teste")
         quebras = ad._quebra_ao_dar_dano(alvo)
         assert "sleep" in quebras
-        assert ad._turnos_de_controle_perdidos(alvo, (), quebras) == 2
+        assert ad._turnos_de_controle_perdidos(alvo, (), quebras, hit_chance=1.0) == 2.0
+        assert ad._turnos_de_controle_perdidos(alvo, (), quebras, hit_chance=0.5) == 1.0
+        # E o crítico não entra: quebrar sono não depende de crítico.
+        assert (
+            ad._turnos_de_controle_perdidos(alvo, (), quebras, hit_chance=0.5, crit_chance=1.0)
+            == 1.0
+        )
 
     def test_estado_que_nao_rouba_turno_nao_custa_turno(self):
         alvo = _monstro(10)
         core.apply_effect(alvo, "weakened", intensity=10.0, duration=3, source_id="teste")
         assert ad._turnos_de_controle_perdidos(alvo, (), ("weakened",)) == 0
+
+
+class TestEmboscadaCustaCerto:
+    """`invisible` sai NA TENTATIVA, inclusive no erro — custo certo, não provável.
+
+    É o contraste com Quebra Gélida e com o sono: aquelas dependem de acertar (e
+    de critar), esta não depende de nada. `reveal_on_attempt` remove a ocultação
+    mesmo quando o golpe passa longe.
+    """
+
+    def _com_invisibilidade(self):
+        hero, alvo = _heroi("rogue", 10), _monstro(10)
+        definicao = core.definition("invisible")
+        core.apply_effect(
+            hero,
+            "invisible",
+            intensity=definicao.default_intensity,
+            duration=3,
+            source_id="teste",
+        )
+        return hero, alvo
+
+    def test_ocultacao_nao_entra_no_custo_de_controle(self):
+        """Invisibilidade não rouba turno, então o preço dela não é turno de controle."""
+        hero, alvo = self._com_invisibilidade()
+        leis = ad._interacoes_do_ataque(hero, alvo)
+        do_atacante = [v for v in leis if v.consumes_from_self]
+        assert do_atacante, "sem Emboscada declarada, o teste ficaria verde sem verificar"
+        assert do_atacante[0].consumes_status == "invisible"
+        perdidos = ad._turnos_de_controle_perdidos(
+            alvo, leis, ad._quebra_ao_dar_dano(alvo), hit_chance=1.0, crit_chance=1.0
+        )
+        assert perdidos == 0.0
+
+    def test_o_preco_da_ocultacao_e_o_golpe_que_passa_a_doer(self):
+        hero, alvo = self._com_invisibilidade()
+        leis = ad._interacoes_do_ataque(hero, alvo)
+        antes = ad._dano_basico_esperado(alvo, hero)
+        campos = ad._custo_da_ocultacao_perdida(hero, alvo, leis)
+        assert campos["incoming_damage_after"] > antes
+
+    def test_o_custo_declarado_nao_depende_da_chance_de_acerto(self):
+        """A prova de que é CERTO: o número é o mesmo qualquer que seja a mira."""
+        hero, alvo = self._com_invisibilidade()
+        leis = ad._interacoes_do_ataque(hero, alvo)
+        primeiro = ad._custo_da_ocultacao_perdida(hero, alvo, leis)
+        hero.base_ag = 1
+        segundo = ad._custo_da_ocultacao_perdida(hero, alvo, leis)
+        assert primeiro["incoming_damage_after"] > 0
+        assert segundo["incoming_damage_after"] > 0
+
+    def test_observar_a_emboscada_nao_gasta_a_invisibilidade(self):
+        hero, alvo = self._com_invisibilidade()
+        leis = ad._interacoes_do_ataque(hero, alvo)
+        ad._custo_da_ocultacao_perdida(hero, alvo, leis)
+        ad._turnos_de_controle_perdidos(alvo, leis, (), hit_chance=1.0, crit_chance=1.0)
+        assert core.has_effect(hero, "invisible")

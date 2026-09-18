@@ -64,6 +64,42 @@ class InteractionView:
 
 
 @dataclass(frozen=True, slots=True)
+class StatusView:
+    """Um efeito que ESTA ação aplica no alvo, com a consequência inteira.
+
+    Principal ou `secondary`, é a MESMA peça do jogo: `combat.apply_skill` passa
+    as duas pelo mesmo `apply_effect`, com a mesma resistência e as mesmas leis
+    de interação. Uma ação que aplica dois efeitos declara dois destes.
+
+    Antes só cabia um efeito por ação, num punhado de campos soltos no view. 66
+    das 150 cartas do catálogo têm `secondary` — 24 delas são skills de status
+    que aplicam DOIS efeitos —, e o segundo simplesmente não existia para o bot,
+    ou chegava sem a consequência que o primeiro tinha.
+    """
+
+    effect: str
+    # Chance EFETIVA, já descontada a resistência do alvo.
+    chance: float = 0.0
+    duration: int = 0
+    # Se o status rouba turno. É lei do jogo (`shared/effects`), lida pelo
+    # adaptador — a policy não classifica efeito, só usa a classificação.
+    skips_turn: bool = False
+    # Já está no ar? Reaplicar é turno morto, e era assim que o combate do
+    # Ladino inflava de 11 para 50 turnos.
+    already_active: bool = False
+    # Dano por turno e duração, quando o efeito é da família DoT.
+    dot_damage_per_turn: int = 0
+    dot_duration: int = 0
+    # Consequências MEDIDAS quando o efeito é de ATRIBUTO: o golpe dos dois lados
+    # e a ordem de turno, com o efeito no ar. Zero/None = não muda.
+    incoming_damage_after: int = 0
+    outgoing_damage_after: int = 0
+    acts_before_enemy_after: bool | None = None
+    # MP que o dreno tira do alvo dentro do horizonte, quando o efeito é DRAIN.
+    target_mp_drained: int = 0
+
+
+@dataclass(frozen=True, slots=True)
 class ActionMechanicsView:
     """O que uma ação FAZ. Fatos mecânicos, nenhuma decisão.
 
@@ -82,9 +118,16 @@ class ActionMechanicsView:
     # BASE + flat, ×(1+Σmult), ×Πxmult capado, × curva de defesa, × mitigação —
     # já com a expectativa do crítico embutida pelo adaptador.
     #
+    # INCLUI as INTERAÇÕES DE GOLPE (Emboscada, Quebra Gélida). Elas não são um
+    # estágio posterior: `combat.damage_modifiers` chama
+    # `strike_xmult(strike_interactions(...))` por dentro e as entrega dentro do
+    # bucket ×MULT, ao lado do crítico e sob o mesmo teto. Medido: 131 de dano
+    # sem invisibilidade, 157 com. Por isso `InteractionView.damage_xmult` é
+    # INFORMATIVO — multiplicar por ele aqui conta a interação duas vezes.
+    #
     # NÃO inclui, porque são estágios POSTERIORES no motor: Égide de Mana,
-    # procs on-hit, roubo de vida, `death_ignore` e as interações de golpe.
-    # Chamá-lo de `final_damage` seria mentir sobre três estágios.
+    # procs on-hit, roubo de vida e `death_ignore`. Chamá-lo de `final_damage`
+    # seria mentir sobre três estágios.
     expected_strike_damage: int = 0
     # As DUAS pontas da média acima, sem a média. Existem porque "mata agora" não
     # pode sair de uma expectativa: o golpe sem crítico é a certeza, o golpe com
@@ -99,12 +142,6 @@ class ActionMechanicsView:
     mana_restored: int = 0
     cooldown: int = 0
     duration: int = 0
-    # Chance EFETIVA, já descontada a resistência do alvo.
-    status_chance: float = 0.0
-    status_effect: str = ""
-    # Se o status rouba turno. É lei do jogo (`shared/effects`), lida pelo
-    # adaptador — a policy não classifica efeito, só usa a classificação.
-    status_skips_turn: bool = False
     buff_stat: str = ""
     buff_value: float = 0.0
     # O que esta ação faz com os dois golpes, se ela os altera. Zero = não altera.
@@ -123,15 +160,16 @@ class ActionMechanicsView:
     # Quanto do próximo golpe a Égide ainda absorve com o MP ATUAL. Leitura
     # não-mutante: não gasta mana e não simula ataque.
     aegis_absorbable_damage: int = 0
-    # Dano por turno e duração do efeito ao longo do tempo que a ação aplica.
-    dot_damage_per_turn: int = 0
-    dot_duration: int = 0
     # Quantas unidades deste consumível restam. Recurso finito é decisão, e sem
     # o número a policy não sabe que está gastando o último.
     uses_left: int = 0
-    # O buff/status que esta ação aplica já está no ar? Reaplicar é turno morto,
-    # e era assim que o combate do Ladino inflava de 11 para 50 turnos.
+    # O buff que esta ação aplica já está no ar? Reaplicar é turno morto, e era
+    # assim que o combate do Ladino inflava de 11 para 50 turnos. Para STATUS a
+    # resposta vive em `StatusView.already_active`, um por efeito aplicado.
     already_active: bool = False
+    # Os efeitos que esta ação aplica NO ALVO — principal e `secondary`, sem
+    # distinção, porque o motor também não faz distinção.
+    statuses: tuple[StatusView, ...] = ()
     flee_chance: float = 0.0
     # As leis que ESTA ação destrava contra ESTE alvo, no estado atual.
     interactions: tuple[InteractionView, ...] = ()
@@ -140,15 +178,18 @@ class ActionMechanicsView:
     # a ação quebra TODOS os que quebram com dano, e fixar "apenas um" seria
     # limitação artificial do contrato.
     breaks_statuses: tuple[str, ...] = ()
-    # Turnos de controle que ESTA ação abre mão: o que ela consome (Emboscada
-    # gasta a invisibilidade, Quebra Gélida gasta o gelo) ou quebra (dano acorda
-    # quem dorme), medido pela duração que a instância AINDA tinha. O benefício
+    # Turnos de controle que ESTA ação abre mão, em VALOR ESPERADO. O benefício
     # da interação já está dentro de `expected_strike_damage`; isto é o preço.
-    forfeited_control_turns: int = 0
-    # MP que esta ação REALMENTE tira do alvo dentro do horizonte da luta.
-    # `mana_burn` drena recurso ATUAL por turno, então o número depende do MP que
-    # o alvo tem — e o MP do alvo está na ficha que o confronto mostra.
-    target_mp_drained: int = 0
+    #
+    # Fracionário porque a perda quase nunca é certa, e tratá-la como certa
+    # cobrava caro demais de todo golpe contra alvo controlado:
+    #
+    #   - Quebra Gélida gasta o gelo só se o golpe ACERTAR e for CRÍTICO;
+    #   - o sono só é quebrado se a ação realmente CAUSAR dano;
+    #   - Emboscada é o caso oposto: `invisible` sai NA TENTATIVA, inclusive no
+    #     erro — custo certo, e por isso ele viaja em `incoming_damage_after`,
+    #     não aqui (ocultação não rouba turno).
+    forfeited_control_turns: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)

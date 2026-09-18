@@ -24,6 +24,7 @@ from src.sim.bot.observation import (
     MapState,
     ProgressionState,
     ServiceView,
+    StatusView,
     TargetView,
 )
 
@@ -38,6 +39,7 @@ __all__ = [
     "ProgressionState",
     "Score",
     "ServiceView",
+    "StatusView",
     "TargetView",
     "decidir_no_combate",
     "decidir_no_mapa",

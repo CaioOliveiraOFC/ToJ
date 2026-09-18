@@ -201,15 +201,15 @@ def _ganhos_de_vida(
     Tudo em TURNOS DE VIDA, a mesma unidade dos dois lados da corrida. Nada aqui
     é fórmula de combate: são os fatos que o adaptador mediu, divididos pelo
     golpe que entra.
+
+    Os efeitos aplicados no alvo entram por `m.statuses`, um por peça, e cada um
+    desconta a PRÓPRIA chance. Principal e `secondary` são indistinguíveis aqui
+    de propósito: é a mesma peça do jogo, e uma carta que aplica dois efeitos
+    soma as duas consequências.
     """
     m = opcao.mechanics
-    # Consequência de STATUS é probabilística; consequência de buff próprio e de
-    # item é certa. O adaptador já entrega a chance efetiva, com resistência
-    # descontada.
-    certeza = m.status_chance if opcao.family == "status" else 1.0
     # O inimigo não age depois de morrer: toda janela é limitada pela luta.
     turnos_da_luta = max(1, math.ceil(matar))
-    janela = min(max(1, m.duration), turnos_da_luta)
     ganhos: list[tuple[str, float]] = []
 
     if m.healing:
@@ -223,37 +223,61 @@ def _ganhos_de_vida(
         escudo = _turnos_para_morrer(state.hp + m.aegis_absorbable_damage, state.alvo_dano)
         ganhos.append(("égide", min(1.0, escudo - morrer_base)))
 
-    if m.incoming_damage_after and m.incoming_damage_after != state.alvo_dano:
-        # O adaptador já disse qual fica o golpe dele — nos DOIS sentidos. Perder
-        # a ocultação numa Emboscada faz o golpe dele subir, e isso é custo.
-        delta = _turnos_para_morrer(state.hp, m.incoming_damage_after) - morrer_base
-        ganhos.append(("mitigação", max(-janela, min(janela, delta)) * certeza))
+    def mitigacao(golpe: int, janela: float, certeza: float) -> float:
+        """Turnos de vida que um golpe recebido diferente compra — ou cobra."""
+        delta = _turnos_para_morrer(state.hp, golpe) - morrer_base
+        return max(-janela, min(janela, delta)) * certeza
 
-    if m.status_skips_turn and m.status_chance > 0:
-        # Turno roubado é turno em que não tomo dano.
-        ganhos.append(("controle", m.status_chance * janela))
+    # Buff próprio e elixir: consequência CERTA, medida pela sonda do adaptador.
+    if m.incoming_damage_after and m.incoming_damage_after != state.alvo_dano:
+        # Nos DOIS sentidos: perder a ocultação numa Emboscada faz o golpe dele
+        # subir, e isso é custo.
+        ganhos.append(
+            (
+                "mitigação",
+                mitigacao(m.incoming_damage_after, min(max(1, m.duration), turnos_da_luta), 1.0),
+            )
+        )
 
     if m.acts_before_enemy_after is not None and m.acts_before_enemy_after != m.acts_before_enemy:
         respostas = _acoes_inimigas(matar, morrer_base, m.acts_before_enemy) - _acoes_inimigas(
             matar, morrer_base, m.acts_before_enemy_after
         )
         if respostas:
-            ganhos.append(("iniciativa", respostas * certeza))
+            ganhos.append(("iniciativa", float(respostas)))
 
-    if m.target_mp_drained and state.alvo_mp_max > 0:
-        # Negar recurso vale a FRAÇÃO do recurso negado, aplicada às respostas que
-        # o inimigo ainda daria. Precificar pelo custo das skills DELE seria usar
-        # propriedade escondida: a ficha do confronto mostra o MP, não o
-        # repertório. O modelo é proporcional e deliberadamente conservador.
-        respostas = _acoes_inimigas(matar, morrer_base, m.acts_before_enemy)
-        fracao = min(1.0, m.target_mp_drained / state.alvo_mp_max)
-        ganhos.append(("recurso negado", fracao * respostas * certeza))
+    # Efeitos aplicados NO ALVO — cada um com a própria chance e a própria janela.
+    for st in m.statuses:
+        if st.already_active or st.chance <= 0:
+            continue
+        janela = min(max(1, st.duration), turnos_da_luta)
+        if st.skips_turn:
+            # Turno roubado é turno em que não tomo dano.
+            ganhos.append(("controle", st.chance * janela))
+        if st.incoming_damage_after and st.incoming_damage_after != state.alvo_dano:
+            ganhos.append(("mitigação", mitigacao(st.incoming_damage_after, janela, st.chance)))
+        if st.acts_before_enemy_after is not None and st.acts_before_enemy_after != (
+            m.acts_before_enemy
+        ):
+            respostas = _acoes_inimigas(matar, morrer_base, m.acts_before_enemy) - _acoes_inimigas(
+                matar, morrer_base, st.acts_before_enemy_after
+            )
+            if respostas:
+                ganhos.append(("iniciativa", respostas * st.chance))
+        if st.target_mp_drained and state.alvo_mp_max > 0:
+            # Negar recurso vale a FRAÇÃO do recurso negado, aplicada às respostas
+            # que o inimigo ainda daria. Precificar pelo custo das skills DELE
+            # seria usar propriedade escondida: a ficha do confronto mostra o MP,
+            # não o repertório. O modelo é proporcional e conservador de propósito.
+            respostas = _acoes_inimigas(matar, morrer_base, m.acts_before_enemy)
+            fracao = min(1.0, st.target_mp_drained / state.alvo_mp_max)
+            ganhos.append(("recurso negado", fracao * respostas * st.chance))
 
     if m.forfeited_control_turns:
         # O benefício da interação JÁ está dentro de `expected_strike_damage`.
-        # Isto é o preço: o gelo que a Quebra Gélida gasta e o sono que o dano
-        # acorda eram turnos em que o inimigo não agia.
-        ganhos.append(("estado gasto", -float(min(m.forfeited_control_turns, turnos_da_luta))))
+        # Isto é o preço, e ele já vem em VALOR ESPERADO do adaptador: o gelo só
+        # é gasto no crítico que acerta, e o sono só quebra se a ação causar dano.
+        ganhos.append(("estado gasto", -min(m.forfeited_control_turns, float(turnos_da_luta))))
 
     return [(nome, valor) for nome, valor in ganhos if valor]
 
@@ -283,7 +307,17 @@ def avaliar_combate(opcao: ActionOption, state: CombatState) -> Score:
     if opcao.family == "flee":
         return _avaliar_fuga(opcao, state)
 
-    if m.already_active:
+    # Reaplicar o que já está no ar é turno morto — era assim que o combate do
+    # Ladino inflava de 11 para 50 turnos. Vale para o buff próprio e para a
+    # carta cujos efeitos TODOS já estão no alvo, desde que ela não faça mais
+    # nada além de aplicá-los.
+    parado = m.already_active or (
+        bool(m.statuses)
+        and all(st.already_active for st in m.statuses)
+        and not m.expected_strike_damage
+        and not m.healing
+    )
+    if parado:
         return Score(
             opcao.action_id,
             Need.PROGREDIR,
@@ -293,18 +327,37 @@ def avaliar_combate(opcao: ActionOption, state: CombatState) -> Score:
         )
 
     nota = ""
-    certeza = m.status_chance if opcao.family == "status" else 1.0
     morrer_base = _turnos_para_morrer(state.hp, state.alvo_dano)
 
     # 1. Velocidade: o que a ação faz com o tamanho do combate.
+    #    O DoT de cada efeito aplicado desconta a chance DELE, e o ritmo
+    #    reforçado pode vir de um buff meu (certo) ou de um status no alvo que
+    #    baixa a defesa dele, como `vulnerable` (provável).
+    ativos = [st for st in m.statuses if not st.already_active and st.chance > 0]
+    dot_por_turno = sum(int(st.dot_damage_per_turn * st.chance) for st in ativos)
+    dot_duracao = max((st.dot_duration for st in ativos if st.dot_damage_per_turn), default=0)
+
+    reforco, turnos_do_reforco = 0, 0
+    if m.outgoing_damage_after:
+        reforco, turnos_do_reforco = m.outgoing_damage_after, max(1, m.duration)
+    else:
+        for st in ativos:
+            if st.outgoing_damage_after > reforco:
+                # A esperança do golpe reforçado: com chance `p`, o ritmo médio
+                # fica entre o básico e o reforçado.
+                reforco = int(
+                    state.dano_basico + (st.outgoing_damage_after - state.dano_basico) * st.chance
+                )
+                turnos_do_reforco = max(1, st.duration)
+
     esperado = m.expected_strike_damage * m.hit_chance
     matar = _turnos_para_matar(
         state,
         dano_agora=esperado,
-        dot_por_turno=int(m.dot_damage_per_turn * certeza),
-        dot_duracao=m.dot_duration,
-        dano_por_turno=int(m.outgoing_damage_after * certeza) if m.outgoing_damage_after else 0,
-        turnos_do_ritmo=max(1, m.duration) if m.outgoing_damage_after else 0,
+        dot_por_turno=dot_por_turno,
+        dot_duracao=dot_duracao,
+        dano_por_turno=reforco,
+        turnos_do_ritmo=turnos_do_reforco,
     )
     componentes: list[tuple[str, float]] = [("duração", _linha_de_base(state) - matar)]
 
