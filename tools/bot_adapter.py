@@ -29,14 +29,23 @@ reescrita aqui nem no cérebro.
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Any
 
 from src.content.economy import exit_fee
 from src.content.factories import features as feat
+from src.entities.heroes import POTION_BUFFS
 from src.mechanics import combat as combat_mech
-from src.mechanics.battle import Action
+from src.mechanics.battle import Action, build_turn_order
+from src.shared import effect_core as core
 from src.shared import effects as fx
-from src.shared.constants import FLEE_RANGE_MAX
+from src.shared.constants import (
+    CRIT_CHANCE_CAP,
+    CRIT_CHANCE_DEFAULT,
+    CRIT_CHANCE_HIGH,
+    FLEE_RANGE_MAX,
+    MAGIC_SHIELD_DAMAGE_PER_MP,
+)
 from src.shared.effects import TURN_SKIPPING_STATUSES
 from src.sim.bot import (
     ActionMechanicsView,
@@ -49,8 +58,6 @@ from src.sim.bot import (
 )
 from src.sim.policies import (
     _consumables,
-    _estimate_basic_damage,
-    _estimate_skill_damage,
     _usable_skills,
 )
 
@@ -75,15 +82,101 @@ CHANCE_DE_FUGA = 1.0 / FLEE_RANGE_MAX
 # --- observação do combate -------------------------------------------------
 
 
-def _dano_esperado(atacante, defensor) -> int:
-    """Dano por turno ESPERADO: a estimativa canônica vezes a chance de acerto.
+def _chance_de_acerto(atacante, defensor, accuracy_modifier: int = 0) -> float:
+    """A chance de acerto REAL, pela função canônica.
 
-    As duas contas são do jogo (`sim/policies._estimate_basic_damage` e
-    `mechanics.combat.hit_chance`); aqui elas só se encontram, e o resultado é um
-    FATO que a policy compara.
+    `hit_chance` já resolve agilidade relativa, evasão, precisão, medo,
+    ocultação e o modificador de mira da ação. Nada disso é recalculado aqui.
     """
-    bruto = _estimate_basic_damage(atacante, defensor)
-    return max(1, int(bruto * combat_mech.hit_chance(atacante, defensor) / 100))
+    return combat_mech.hit_chance(atacante, defensor, accuracy_modifier) / 100
+
+
+def _chance_de_critico(atacante, nome_da_skill: str = "") -> float:
+    """Mirror mínimo da regra de crit em `mechanics/combat.py:383-391`.
+    Protegido por teste de paridade.
+
+    Não existe função canônica: a regra é código inline dentro de
+    `resolve_physical_attack`. O mirror usa SÓ constantes e modificadores
+    canônicos e a condição que já está no motor, sem duplicar número nenhum.
+
+    DÍVIDA REGISTRADA: promover esta leitura a função pública do engine em
+    rodada estrutural própria. Enquanto isso, o teste de paridade é o contrato.
+    """
+    base = (
+        CRIT_CHANCE_HIGH
+        if (
+            hasattr(atacante, "get_classname")
+            and atacante.get_classname() == "Rogue"
+            and nome_da_skill == "Ataque Furtivo"
+        )
+        else CRIT_CHANCE_DEFAULT
+    )
+    base += int(fx.combat_modifier(atacante, "crit_chance"))
+    return min(base, CRIT_CHANCE_CAP) / 100
+
+
+def _dano_do_funil(atacante, defensor, base_power: int, *, critico: bool) -> int:
+    """O dano que SAI DO FUNIL, para um golpe que acerta.
+
+    DEPENDÊNCIA DE API PRIVADA, deliberada: `combat._calculate_damage` é o funil
+    único do jogo, e `tools/` é a camada autorizada a conhecer `mechanics`.
+    Chamar a privada é estritamente melhor que copiar a fórmula — uma cópia
+    diverge na primeira mudança de balanceamento, e esta chamada não pode.
+    O uso fica encapsulado NESTE módulo, e o teste de paridade falha se o
+    comportamento divergir.
+
+    Estágio: BASE + flat, ×(1+Σmult), ×Πxmult capado, × defesa, × mitigação.
+    ANTES de Égide, procs on-hit, roubo de vida e interações de golpe.
+    """
+    mods = combat_mech.damage_modifiers(atacante, defensor, is_critical=critico)
+    return combat_mech._calculate_damage(
+        base_power=float(base_power),
+        flat_mods=list(getattr(mods, "flat", ()) or ()),
+        mult_mods=list(mods.mult),
+        xmult_mods=list(mods.xmult),
+        defense_target=defensor.get_df(),
+        mitigation=list(mods.mitigation),
+    )
+
+
+def _golpe_esperado(atacante, defensor, base_power: int, nome_da_skill: str = "") -> int:
+    """O golpe esperado: funil, com a expectativa do crítico e do acerto.
+
+    Uma média sobre as duas rolagens que o motor faz — acerto e crítico. É o
+    número que a policy compara, e é a MESMA unidade dos dois lados do combate.
+    """
+    p_crit = _chance_de_critico(atacante, nome_da_skill)
+    normal = _dano_do_funil(atacante, defensor, base_power, critico=False)
+    critico = _dano_do_funil(atacante, defensor, base_power, critico=True)
+    por_acerto = normal * (1 - p_crit) + critico * p_crit
+    return max(1, int(por_acerto * _chance_de_acerto(atacante, defensor)))
+
+
+def _dano_basico_esperado(atacante, defensor) -> int:
+    return _golpe_esperado(atacante, defensor, combat_mech.basic_attack_power(atacante))
+
+
+def _egide_absorve(defensor, dano_de_entrada: int) -> int:
+    """Quanto a Égide absorve do próximo golpe, com o MP ATUAL.
+
+    Leitura NÃO-MUTANTE: não gasta mana, não simula ataque, não reproduz a
+    execução. Só a capacidade, a partir do estado real e de
+    `MAGIC_SHIELD_DAMAGE_PER_MP`.
+
+    Mesma dívida registrada de `_chance_de_critico`: `_absorve_com_egide` é
+    privada E muta, então não há leitura canônica para reutilizar.
+    """
+    fracao = int(getattr(defensor, "magic_shield_percent", 0) or 0)
+    mana = int(getattr(defensor, "get_mp", lambda: 0)())
+    if fracao <= 0 or mana <= 0 or dano_de_entrada <= 1:
+        return 0
+    return max(0, min(int(dano_de_entrada * fracao / 100), int(mana * MAGIC_SHIELD_DAMAGE_PER_MP)))
+
+
+def _age_antes(hero, monstro) -> bool:
+    """Quem começa. Derivado da regra real: `battle.build_turn_order`."""
+    ordem = build_turn_order(hero, [monstro])
+    return bool(ordem) and ordem[0] is hero
 
 
 def estado_do_combate(hero, monstro, turno: int) -> CombatState:
@@ -102,88 +195,166 @@ def estado_do_combate(hero, monstro, turno: int) -> CombatState:
         # vida. Se a linha de base não tivesse o mesmo desconto que as ações, o
         # ataque básico se penalizaria pela própria taxa de erro e apareceria
         # como pior que ele mesmo.
-        dano_basico=_dano_esperado(hero, monstro),
+        dano_basico=_dano_basico_esperado(hero, monstro),
         alvo_nivel=int(getattr(monstro, "level", 0)),
         alvo_hp=monstro.get_hp(),
         alvo_hp_max=int(getattr(monstro, "base_hp", monstro.get_hp())),
-        alvo_dano=_dano_esperado(monstro, hero),
+        alvo_dano=_dano_basico_esperado(monstro, hero),
         alvo_efeitos=tuple(sorted(getattr(monstro, "active_effects", {}) or {})),
         meus_efeitos=tuple(sorted(getattr(hero, "active_effects", {}) or {})),
     )
 
 
-def _mecanica_de_skill(hero, monstro, skill, dano_basico_recebido: int) -> ActionMechanicsView:
-    """O que esta skill FAZ. Fatos, pelas funções canônicas do jogo."""
-    familia = str(skill.effect_type)
-    custo = combat_mech.skill_mana_cost(hero, skill)
-    duracao = int(getattr(skill, "duration", 0) or 0)
-    efeito = str(getattr(skill, "effect_value", "") or "")
-    ja_ativo = False
-    dano = cura = 0
-    entrando = 0
-    chance_status = 0.0
+def _sonda_de_buff(hero, monstro, stat: str, valor: int, rotulo: str) -> dict:
+    """Levanta o buff de VERDADE, mede pelas funções canônicas, e desfaz.
 
-    if familia == "damage":
-        dano = _estimate_skill_damage(hero, skill, monstro)
-    elif familia == "heal":
-        # O motor aplica cura como percentual do HP máximo.
-        cura = int(hero.base_hp * float(getattr(skill, "effect_value", 0)) / 100)
-    elif familia == "status":
-        chance_status = float(getattr(skill, "chance", 100) or 100) / 100
-        ja_ativo = efeito in (getattr(monstro, "active_effects", {}) or {})
-    elif familia in ("buff", "damage_reduction"):
-        ja_ativo = str(skill.name) in (getattr(hero, "active_buffs", {}) or {})
-        if not ja_ativo:
-            entrando = _dano_recebido_com_buff(hero, monstro, skill, dano_basico_recebido)
+    É o que evita reimplementar a curva de defesa, o teto de redução e a conta
+    de acerto: a resposta vem de quem é dono dela. Escreve no MESMO formato que
+    `combat.apply_skill` usa (`{stat, value, duration}`), com `fx.buff_value`
+    resolvendo o valor — então o que se mede é o buff que o jogo aplicaria.
 
-    return ActionMechanicsView(
-        estimated_damage=dano,
-        hit_chance=combat_mech.hit_chance(hero, monstro) / 100,
-        crit_chance=fx.combat_modifier(hero, "crit_chance") / 100,
-        healing=cura,
-        mana_cost=custo,
-        cooldown=int(getattr(skill, "cooldown", 0) or 0),
-        duration=duracao,
-        status_chance=chance_status,
-        status_effect=efeito if familia == "status" else "",
-        status_skips_turn=efeito in TURN_SKIPPING_STATUSES,
-        buff_stat=str(getattr(skill, "effect_stat", "") or ""),
-        buff_value=float(getattr(skill, "effect_value", 0) or 0),
-        already_active=ja_ativo,
-        incoming_damage_after=entrando,
-    )
+    Mede as TRÊS consequências da agilidade, porque o motor tem as três:
+    quanto o golpe dele passa a doer, quanto o meu passa a doer, e quem age
+    primeiro (`build_turn_order`). A versão anterior media só a primeira, e
+    comparava bruto com esperado — por isso `Guarda Alta` marcava zero e
+    `Sombra Rápida` era invisível.
 
-
-def _dano_recebido_com_buff(hero, monstro, skill, dano_atual: int) -> int:
-    """Quanto o golpe dele passa a doer se eu levantar este buff.
-
-    Medido, não deduzido: escreve o buff no MESMO formato que
-    `combat.apply_skill` usa, chama o estimador canônico, e desfaz. É o que
-    evita reimplementar a curva de defesa ou o teto de redução — a resposta vem
-    de quem é dono dela.
-
-    Não toca RNG e desfaz no `finally`; há teste provando que o herói volta
-    exatamente ao estado anterior.
+    Não toca RNG e desfaz no `finally`. Há teste provando que o herói volta ao
+    estado anterior.
     """
-    stat = str(getattr(skill, "effect_stat", "") or "")
-    if skill.effect_type == "damage_reduction":
-        stat = "damage_reduction"
-    if not stat:
-        return 0
-    chave = f"__sonda__{skill.name}"
     buffs = getattr(hero, "active_buffs", None)
-    if buffs is None:
-        return 0
+    if buffs is None or not stat:
+        return {}
+    chave = f"__sonda__{rotulo}"
     try:
         buffs[chave] = {
             "stat": stat,
-            "value": fx.buff_value(hero, stat, int(getattr(skill, "effect_value", 0) or 0)),
-            "duration": int(getattr(skill, "duration", 1) or 1),
+            "value": fx.buff_value(hero, stat, int(valor)),
+            "duration": 1,
         }
-        depois = _estimate_basic_damage(monstro, hero)
+        return {
+            "entrando": _dano_basico_esperado(monstro, hero),
+            "saindo": _dano_basico_esperado(hero, monstro),
+            "age_antes": _age_antes(hero, monstro),
+        }
     finally:
         buffs.pop(chave, None)
-    return depois if depois < dano_atual else 0
+
+
+def _consequencias_do_buff(hero, monstro, stat: str, valor: int, rotulo: str) -> dict:
+    """Os campos do view que a sonda preenche, só quando MUDAM algo."""
+    antes_entrando = _dano_basico_esperado(monstro, hero)
+    antes_saindo = _dano_basico_esperado(hero, monstro)
+    antes_ordem = _age_antes(hero, monstro)
+    depois = _sonda_de_buff(hero, monstro, stat, valor, rotulo)
+    if not depois:
+        return {}
+    campos: dict = {}
+    if depois["entrando"] < antes_entrando:
+        campos["incoming_damage_after"] = depois["entrando"]
+    if depois["saindo"] > antes_saindo:
+        campos["outgoing_damage_after"] = depois["saindo"]
+    if depois["age_antes"] != antes_ordem:
+        campos["acts_before_enemy"] = antes_ordem
+        campos["acts_before_enemy_after"] = depois["age_antes"]
+    return campos
+
+
+def _dot_declarado(efeito: str, hero, duracao_da_carta: int) -> tuple[int, int]:
+    """Dano por turno e duração de um DoT que ESTA ação aplicaria.
+
+    Usa o catálogo canônico (`effect_core.definition`): família, intensidade
+    padrão por stack e duração padrão. O dano é `% do HP máximo`, a mesma regra
+    de `effect_core.dot_damage`.
+    """
+    definicao = core.definition(efeito)
+    if definicao is None or definicao.family != core.FAMILY_DOT:
+        return 0, 0
+    max_hp = int(getattr(hero, "base_hp", 1) or 1)
+    por_turno = int(max_hp * definicao.default_intensity / 100)
+    return max(0, por_turno), int(duracao_da_carta or definicao.default_duration)
+
+
+def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
+    """O que esta skill FAZ. Fatos, pelas funções canônicas do jogo."""
+    familia = str(skill.effect_type)
+    nome = str(skill.name)
+    custo = combat_mech.skill_mana_cost(hero, skill)
+    duracao = int(getattr(skill, "duration", 0) or 0)
+    mira = int(getattr(skill, "accuracy_modifier", 0) or 0)
+
+    campos: dict = {
+        "mana_cost": custo,
+        "cooldown": int(getattr(skill, "cooldown", 0) or 0),
+        "duration": duracao,
+        "hit_chance": _chance_de_acerto(hero, monstro, mira),
+        "crit_chance": _chance_de_critico(hero, nome),
+        "acts_before_enemy": _age_antes(hero, monstro),
+    }
+
+    if familia == "damage":
+        base = combat_mech.skill_damage_base(hero, skill, monstro)
+        # `_golpe_esperado` já embute acerto; o view separa os dois, então aqui
+        # entra o golpe POR ACERTO e a chance viaja no seu próprio campo.
+        p_crit = _chance_de_critico(hero, nome)
+        normal = _dano_do_funil(hero, monstro, base, critico=False)
+        critico = _dano_do_funil(hero, monstro, base, critico=True)
+        campos["expected_strike_damage"] = max(1, int(normal * (1 - p_crit) + critico * p_crit))
+        # O secundário da carta é um status de verdade, com chance própria.
+        sec = getattr(skill, "secondary", None)
+        if sec is not None:
+            campos["status_effect"] = str(sec.effect)
+            campos["status_chance"] = _chance_efetiva(monstro, str(sec.effect), float(sec.chance))
+            campos["status_skips_turn"] = str(sec.effect) in TURN_SKIPPING_STATUSES
+            por_turno, dur = _dot_declarado(str(sec.effect), monstro, int(sec.duration or 0))
+            campos["dot_damage_per_turn"] = por_turno
+            campos["dot_duration"] = dur
+
+    elif familia == "heal":
+        # Percentual do HP máximo, MAIS `potion_heal_bonus` — a mesma ordem de
+        # `apply_skill`, que aplica o bônus sobre o valor já calculado.
+        bruto = int(hero.base_hp * float(getattr(skill, "effect_value", 0) or 0) / 100)
+        campos["healing"] = bruto + int(bruto * fx.combat_modifier(hero, "potion_heal_bonus") / 100)
+
+    elif familia == "status":
+        # `effect_value` de uma skill de status é o NOME do efeito, não um
+        # número. Tratá-lo como número levantava `ValueError` e derrubava a run
+        # na primeira skill de status que o herói recebesse — 37 são acessíveis.
+        efeito = str(getattr(skill, "effect_value", "") or "")
+        campos["status_effect"] = efeito
+        campos["status_chance"] = _chance_efetiva(
+            monstro, efeito, float(getattr(skill, "chance", 100) or 100)
+        )
+        campos["status_skips_turn"] = efeito in TURN_SKIPPING_STATUSES
+        campos["already_active"] = efeito in (getattr(monstro, "active_effects", {}) or {})
+        por_turno, dur = _dot_declarado(efeito, monstro, duracao)
+        campos["dot_damage_per_turn"] = por_turno
+        campos["dot_duration"] = dur
+
+    elif familia in ("buff", "damage_reduction"):
+        stat = str(getattr(skill, "effect_stat", "") or "")
+        if familia == "damage_reduction":
+            stat = "damage_reduction"
+        valor = getattr(skill, "effect_value", 0)
+        campos["buff_stat"] = stat
+        campos["buff_value"] = float(valor) if isinstance(valor, int | float) else 0.0
+        campos["already_active"] = nome in (getattr(hero, "active_buffs", {}) or {})
+        if not campos["already_active"] and isinstance(valor, int | float):
+            campos.update(_consequencias_do_buff(hero, monstro, stat, int(valor), nome))
+
+    return ActionMechanicsView(**campos)
+
+
+def _chance_efetiva(alvo, efeito: str, base: float) -> float:
+    """A chance que o status REALMENTE tem, já descontada a resistência do alvo.
+
+    Duas funções canônicas, zero conta nova: `fx.status_resistance` e
+    `fx.effective_status_chance`. Antes o adaptador entregava a chance da carta,
+    e um alvo imune parecia tão atordoável quanto qualquer outro.
+    """
+    if not efeito:
+        return 0.0
+    return fx.effective_status_chance(base, fx.status_resistance(alvo, efeito)) / 100
 
 
 def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOption, ...], dict]:
@@ -196,32 +367,37 @@ def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOpt
     """
     opcoes: list[ActionOption] = []
     reais: dict[str, Any] = {}
+    absorvivel = _egide_absorve(hero, state.alvo_dano)
+    age_antes = _age_antes(hero, monstro)
 
+    base = combat_mech.basic_attack_power(hero)
+    p_crit = _chance_de_critico(hero)
+    normal = _dano_do_funil(hero, monstro, base, critico=False)
+    critico = _dano_do_funil(hero, monstro, base, critico=True)
     opcoes.append(
         ActionOption(
             action_id="attack",
             family="attack",
             label="ataque básico",
             mechanics=ActionMechanicsView(
-                # BRUTO, porque a policy multiplica por `hit_chance`. Passar o
-                # esperado aqui descontava a chance de acerto duas vezes, e o
-                # ataque básico aparecia com duração negativa — pior que ele
-                # mesmo, que é a linha de base contra a qual tudo é medido.
-                estimated_damage=_estimate_basic_damage(hero, monstro),
-                hit_chance=combat_mech.hit_chance(hero, monstro) / 100,
-                crit_chance=fx.combat_modifier(hero, "crit_chance") / 100,
+                expected_strike_damage=max(1, int(normal * (1 - p_crit) + critico * p_crit)),
+                hit_chance=_chance_de_acerto(hero, monstro),
+                crit_chance=p_crit,
+                acts_before_enemy=age_antes,
+                aegis_absorbable_damage=absorvivel,
             ),
         )
     )
 
     for skill in _usable_skills(hero, FAMILIAS_DE_SKILL):
         action_id = f"skill:{skill.id}"
+        mecanica = _mecanica_de_skill(hero, monstro, skill)
         opcoes.append(
             ActionOption(
                 action_id=action_id,
                 family=str(skill.effect_type),
                 label=str(skill.name),
-                mechanics=_mecanica_de_skill(hero, monstro, skill, state.alvo_dano),
+                mechanics=replace(mecanica, aegis_absorbable_damage=absorvivel),
             )
         )
         reais[action_id] = skill
@@ -230,18 +406,40 @@ def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOpt
         tipo = str(getattr(item, "effect_type", ""))
         action_id = f"item:{getattr(item, 'id', item.name)}"
         valor = float(getattr(item, "effect_value", 0) or 0)
+        restantes = sum(
+            1 for i in hero.inventory if getattr(i, "id", None) == getattr(item, "id", None)
+        )
+        campos: dict = {
+            "duration": int(getattr(item, "duration", 1) or 1),
+            "acts_before_enemy": age_antes,
+            "aegis_absorbable_damage": absorvivel,
+            # Recurso finito: sem este número a policy não sabe que está
+            # gastando o último frasco.
+            "uses_left": max(1, restantes),
+        }
+        if tipo in CURA:
+            bruto = int(hero.base_hp * valor / 100)
+            campos["healing"] = bruto + int(
+                bruto * fx.combat_modifier(hero, "potion_heal_bonus") / 100
+            )
+            familia = "heal"
+        elif tipo in MANA:
+            campos["mana_restored"] = int(hero.base_mp * valor / 100)
+            familia = "mana"
+        else:
+            familia = "buff"
+            stat = POTION_BUFFS.get(tipo, ("", ""))[0]
+            campos["buff_stat"] = stat
+            campos["buff_value"] = valor
+            # A MESMA sonda das skills. Antes ela não rodava para item, e todo
+            # elixir chegava ao evaluator como "custa um turno e não faz nada".
+            campos.update(_consequencias_do_buff(hero, monstro, stat, int(valor), str(item.name)))
         opcoes.append(
             ActionOption(
                 action_id=action_id,
-                family="heal" if tipo in CURA else ("mana" if tipo in MANA else "buff"),
+                family=familia,
                 label=str(item.name),
-                mechanics=ActionMechanicsView(
-                    healing=int(hero.base_hp * valor / 100) if tipo in CURA else 0,
-                    mana_restored=int(hero.base_mp * valor / 100) if tipo in MANA else 0,
-                    buff_stat=tipo if tipo in ELIXIR else "",
-                    buff_value=valor,
-                    duration=int(getattr(item, "duration", 1) or 1),
-                ),
+                mechanics=ActionMechanicsView(**campos),
             )
         )
         reais[action_id] = item
@@ -251,7 +449,11 @@ def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOpt
             action_id="flee",
             family="flee",
             label="fugir",
-            mechanics=ActionMechanicsView(flee_chance=CHANCE_DE_FUGA),
+            mechanics=ActionMechanicsView(
+                flee_chance=CHANCE_DE_FUGA,
+                acts_before_enemy=age_antes,
+                aegis_absorbable_damage=absorvivel,
+            ),
         )
     )
     return tuple(opcoes), reais

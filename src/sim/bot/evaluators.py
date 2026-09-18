@@ -112,7 +112,7 @@ def avaliar_combate(opcao: ActionOption, state: CombatState) -> Score:
         )
 
     # 1. Duração: o que a ação faz com o tamanho do combate.
-    esperado = m.estimated_damage * m.hit_chance
+    esperado = m.expected_strike_damage * m.hit_chance
     duracao = turnos_base - _turnos_com(state, esperado)
     componentes.append(("duração", duracao))
     if esperado >= state.alvo_hp > 0:

@@ -42,8 +42,16 @@ class ActionMechanicsView:
     chance.
     """
 
-    # Dano ESPERADO por golpe que acerta, crítico já embutido pelo adaptador.
-    estimated_damage: int = 0
+    # NOME PELO ESTÁGIO REAL DO PIPELINE, e não pelo que seria conveniente.
+    #
+    # Isto é o que sai do FUNIL de `mechanics.combat._calculate_damage`:
+    # BASE + flat, ×(1+Σmult), ×Πxmult capado, × curva de defesa, × mitigação —
+    # já com a expectativa do crítico embutida pelo adaptador.
+    #
+    # NÃO inclui, porque são estágios POSTERIORES no motor: Égide de Mana,
+    # procs on-hit, roubo de vida, `death_ignore` e as interações de golpe.
+    # Chamá-lo de `final_damage` seria mentir sobre três estágios.
+    expected_strike_damage: int = 0
     hit_chance: float = 1.0
     crit_chance: float = 0.0
     healing: int = 0
@@ -51,6 +59,7 @@ class ActionMechanicsView:
     mana_restored: int = 0
     cooldown: int = 0
     duration: int = 0
+    # Chance EFETIVA, já descontada a resistência do alvo.
     status_chance: float = 0.0
     status_effect: str = ""
     # Se o status rouba turno. É lei do jogo (`shared/effects`), lida pelo
@@ -61,8 +70,25 @@ class ActionMechanicsView:
     # O que esta ação faz com os dois golpes, se ela os altera. Zero = não altera.
     # Existem para que a policy não precise da fórmula de defesa: ela recebe o
     # golpe DEPOIS da ação como fato e faz aritmética de turnos sobre ele.
+    # Ambos são dano ESPERADO — mesma unidade de `CombatState.alvo_dano` e
+    # `dano_basico`, com a chance de acerto embutida. É por isso que agilidade e
+    # evasão aparecem aqui: elas só existem dentro de `hit_chance`.
     incoming_damage_after: int = 0
     outgoing_damage_after: int = 0
+    # Iniciativa, derivada de `battle.build_turn_order`. `None` quando a ação não
+    # mexe na ordem. Agilidade muda TRÊS coisas no motor — acerto, esquiva e
+    # ordem —, e sem este campo a terceira não existia para o bot.
+    acts_before_enemy: bool | None = None
+    acts_before_enemy_after: bool | None = None
+    # Quanto do próximo golpe a Égide ainda absorve com o MP ATUAL. Leitura
+    # não-mutante: não gasta mana e não simula ataque.
+    aegis_absorbable_damage: int = 0
+    # Dano por turno e duração do efeito ao longo do tempo que a ação aplica.
+    dot_damage_per_turn: int = 0
+    dot_duration: int = 0
+    # Quantas unidades deste consumível restam. Recurso finito é decisão, e sem
+    # o número a policy não sabe que está gastando o último.
+    uses_left: int = 0
     # O buff/status que esta ação aplica já está no ar? Reaplicar é turno morto,
     # e era assim que o combate do Ladino inflava de 11 para 50 turnos.
     already_active: bool = False

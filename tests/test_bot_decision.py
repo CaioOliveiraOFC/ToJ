@@ -66,7 +66,7 @@ ATAQUE = ActionOption(
     action_id="attack",
     family="attack",
     label="ataque básico",
-    mechanics=ActionMechanicsView(estimated_damage=60, hit_chance=1.0),
+    mechanics=ActionMechanicsView(expected_strike_damage=60, hit_chance=1.0),
 )
 FUGA = ActionOption(
     action_id="flee", family="flee", label="fugir", mechanics=ActionMechanicsView(flee_chance=0.5)

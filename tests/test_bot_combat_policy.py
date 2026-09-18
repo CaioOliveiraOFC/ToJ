@@ -35,7 +35,7 @@ def _ataque(dano=50) -> ActionOption:
         action_id="attack",
         family="attack",
         label="ataque básico",
-        mechanics=ActionMechanicsView(estimated_damage=dano, hit_chance=1.0),
+        mechanics=ActionMechanicsView(expected_strike_damage=dano, hit_chance=1.0),
     )
 
 
@@ -44,7 +44,7 @@ def _skill(dano, custo, action_id="skill:x") -> ActionOption:
         action_id=action_id,
         family="damage",
         label="skill de dano",
-        mechanics=ActionMechanicsView(estimated_damage=dano, hit_chance=1.0, mana_cost=custo),
+        mechanics=ActionMechanicsView(expected_strike_damage=dano, hit_chance=1.0, mana_cost=custo),
     )
 
 
