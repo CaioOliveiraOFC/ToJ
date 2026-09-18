@@ -366,18 +366,33 @@ class BotPadrao:
         rota, _ = rota_do_campo(self._campo(por_combate), casa, por_combate)
         return (rota.passos, rota.combates) if rota.alcancavel else None
 
-    def _desvio(self, casa) -> int | None:
-        """Passos a mais para passar pela casa antes da saída."""
-        ida = self._alcance(casa)
-        direto = self._alcance(self.saida)
-        if ida is None or direto is None:
+    def _desvio(self, casa) -> tuple[int, int] | None:
+        """O preço de passar pela casa antes da saída: (passos, lutas ÚNICAS).
+
+        Passo é desempate — não existe custo mecânico de andar no jogo. O que o
+        desvio cobra de verdade são os ENCONTROS que ele força, e eles se contam
+        por CASA, nunca somando contadores de rota: um monstro que caia na ida e
+        na volta é um combate só, porque depois do primeiro ele não existe mais.
+        E o que já estava na rota direta para a saída não é custo do desvio —
+        seria enfrentado de qualquer jeito.
+
+        Puro: lê as posições que o engine já gerou e roda Dijkstra. Não sorteia
+        nem consome RNG.
+        """
+        ida, caminho_ida = adapter.rota_para(self, casa, lutar=False)
+        direto, caminho_direto = adapter.rota_para(self, self.saida, lutar=False)
+        if not ida.alcancavel or not direto.alcancavel:
             return None
-        volta, _ = rota_do_campo(
+        volta, caminho_volta = rota_do_campo(
             campo_de_custo(self.mapa, casa, por_combate=True), self.saida, True
         )
         if not volta.alcancavel:
             return None
-        return max(0, ida[0] + volta.passos - direto[0])
+        encontros = adapter.encontros_do_caminho
+        pelo_desvio = (
+            encontros(self.mapa, caminho_ida) | encontros(self.mapa, caminho_volta)
+        ) - encontros(self.mapa, caminho_direto)
+        return max(0, ida.passos + volta.passos - direto.passos), len(pelo_desvio)
 
     def _casa_de(self, tipo: str):
         if tipo == "event":
@@ -406,7 +421,10 @@ class BotPadrao:
             monstro = self.mapa.enemies_pos.get(destino)
             return self._duelo(monstro, destino) if monstro is not None else True
 
-        rota, caminho = rota_do_campo(self._campo(evitando), destino, evitando)
+        # A MESMA função que o adaptador usou para DECLARAR passos e encontros.
+        # Duas cópias da regra divergiam, e a policy decidia por uma rota que o
+        # driver não andava.
+        rota, caminho = adapter.rota_para(self, destino, lutar=not evitando)
         if not rota.alcancavel:
             return True
 
@@ -446,7 +464,6 @@ class BotPadrao:
         """Pisou num serviço. A casa NÃO foi consumida: quem gasta é abrir."""
         hero = self.hero
         taxa = exit_fee(self.andar)
-        hp = _frac_hp(hero)
 
         if tipo == feat.EXTRACTION:
             # EXECUTA a decisão que veio, e não reavalia.
@@ -462,36 +479,24 @@ class BotPadrao:
             self.trace.diz("  Pisou na Extração de passagem: a decisão atual não era extrair.")
             return True
 
+        # LEGALIDADE é do driver; VALE A PENA é da macro policy. Quem decidiu VIR
+        # até aqui foi ela, e chegar é EXECUTAR a decisão — não reavaliá-la.
+        #
+        # Havia um segundo veto neste ponto (`hp < HP_SAUDAVEL or ouro >= taxa *
+        # FOLGA_PARA_COMPRAR`, e "tenho peça equipada" no Ferreiro): limiares
+        # legados que descartavam em silêncio a decisão que trouxe o herói até a
+        # casa, depois de ele já ter gasto os passos. O que continua sendo
+        # política INTERNA do serviço é o ORÇAMENTO — `_orcamento` protege a
+        # reserva da saída —, e essa é a separação que o §7 pede.
         if tipo == feat.SHOP:
-            if hp < HP_SAUDAVEL or hero.coins >= taxa * FOLGA_PARA_COMPRAR:
-                self.trace.diz("  Pisou na Loja e vale entrar.")
-                self.mapa.take_feature(casa)
-                self.servicos["loja"] += 1
-                self._comprar_com_orcamento("Loja")
-            else:
-                self.trace.diz(
-                    f"  Pisou na Loja e passou reto: {hero.coins} de ouro contra uma saída de "
-                    f"{taxa}, e {hp:.0%} de HP. Nada aqui que valha a reserva."
-                )
+            self.trace.diz(f"  Pisou na Loja e entrou: {hero.coins} de ouro, saída de {taxa}.")
+            self.mapa.take_feature(casa)
+            self.servicos["loja"] += 1
+            self._comprar_com_orcamento("Loja")
             return True
 
         if tipo == feat.FORGE:
-            # A escada global mora na macro policy agora. Aqui sobra a pergunta
-            # local: com o HP baixo ou sem folga de ouro, aprimorar equipamento
-            # é investimento, e investimento espera.
-            if hp < HP_SAUDAVEL or hero.coins < taxa * FOLGA_PARA_COMPRAR:
-                self.trace.diz(
-                    f"  Pisou no Ferreiro e passou reto: {hp:.0%} de HP e {hero.coins} de ouro "
-                    f"contra uma saída de {taxa}. Investimento espera."
-                )
-                return True
-            if not self._tem_peca_para_investir():
-                self.trace.diz("  Pisou no Ferreiro e passou reto: não tenho peça equipada.")
-                return True
-            self.trace.diz(
-                f"  Pisou no Ferreiro e vale entrar: {hero.coins} de ouro, saída de {taxa} "
-                "garantida, e nada mais urgente pendente."
-            )
+            self.trace.diz(f"  Pisou no Ferreiro e entrou: {hero.coins} de ouro, saída de {taxa}.")
             self.mapa.take_feature(casa)
             self.servicos["ferreiro"] += 1
             self._usar_ferreiro(casa)
@@ -743,10 +748,15 @@ class BotPadrao:
         do jogo, e é por isso que atravessar um evento por acaso tem preço.
         """
         hero = self.hero
-        if tipo == "altar" and _frac_hp(hero) < HP_PARA_ALTAR:
+        # Recusa por FATO, não por limiar: `take_damage` não tem piso e
+        # `get_hp() <= 0` encerra a run. O antigo `HP_PARA_ALTAR = 0,75` recusava
+        # a bênção em três quartos da barra, que é onde o herói passa a run
+        # inteira — e quem decide se vale a pena é a macro policy, que já
+        # precificou o risco antes de mandar vir até aqui.
+        if tipo == "altar" and altar_hp_cost(hero) >= hero.get_hp():
             self.trace.diz(
-                f"  Evento Altar: RECUSADO. Ele cobra vida e estou com "
-                f"{_frac_hp(hero):.0%} — a casa some do mesmo jeito, mas pagar aqui me mata."
+                f"  Evento Altar: RECUSADO. Ele cobra {altar_hp_cost(hero)} de vida e eu tenho "
+                f"{hero.get_hp()} — a casa some do mesmo jeito, mas pagar aqui me mata."
             )
             return True
         self.servicos[f"evento:{tipo}"] += 1
@@ -921,7 +931,11 @@ class BotPadrao:
         self.trace.diz(
             f"  Mapa: {len(self.mapa.enemies_pos)} monstros | "
             f"serviços: {', '.join(servicos) if servicos else 'nenhum'} | "
-            f"evento: {self.mapa.event_type or 'nenhum'} | "
+            # O TIPO não entra aqui: o mapa desenha `?`, e imprimir "fountain" ao
+            # lado das decisões do andar convida a confundir o que o bot sabe com
+            # o que o andar tem. O tipo aparece no trace quando ele for revelado,
+            # que é quando o herói pisa na casa.
+            f"evento: {'? (tipo só é revelado ao pisar)' if self.mapa.event_pos else 'nenhum'} | "
             f"saída a {self._alcance(self.saida)[0] if self._alcance(self.saida) else '?'} passos"
         )
         self.trace.diz(

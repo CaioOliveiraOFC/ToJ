@@ -472,6 +472,8 @@ def avaliar_mapa(opcao: ActionOption, mapa: MapState, prog: ProgressionState) ->
         return _avaliar_extracao(opcao, prog)
     if familia == "saida":
         return _avaliar_saida(opcao, mapa, prog)
+    if familia == "evento":
+        return _avaliar_evento(opcao, mapa, prog)
     return _avaliar_servico(opcao, mapa, prog)
 
 
@@ -484,28 +486,36 @@ def _avaliar_luta(opcao: ActionOption, prog: ProgressionState) -> Score:
     próprio estado.
     """
     alvo = opcao.target
-    if alvo is None or alvo.chefe:
-        return Score(
-            opcao.action_id,
-            Need.PROGREDIR,
-            0.0,
-            note="chefe: o mapa marca `B`, e é a única pista de perigo que ele dá",
-        )
+    if alvo is None:
+        return Score(opcao.action_id, Need.PROGREDIR, 0.0, note="alvo sem rota")
     # A capacidade é medida CONTRA o ponto de aposta, não em absoluto. Com
     # `hp_frac` puro a nota nunca ficava negativa, e o bot aceitava a próxima
     # luta com 16% de vida — o mesmo defeito do gate antigo, pelo avesso.
-    componentes = [
-        ("capacidade", prog.hp_frac - HP_DE_APOSTA),
-        ("lutas no caminho", -float(alvo.extras)),
-    ]
+    #
+    # As lutas que esta escolha obriga: a do alvo, as do caminho, e mais uma se o
+    # mapa marcou `B` — a única pista de perigo que ele dá.
+    #
+    # A margem é DIVIDIDA entre elas, não subtraída. Subtrair misturava unidades
+    # com uma taxa de câmbio inventada (uma luta valia uma barra de vida
+    # inteira), e o efeito era um veto silencioso: a margem vale no máximo
+    # `1 - HP_DE_APOSTA = 0,65`, então QUALQUER alvo com um encontro no caminho
+    # ficava negativo e nunca era escolhido — e o chefe, que já vinha com 0,0
+    # fixo, era intocável mesmo com a barra cheia.
+    #
+    # Dividir mantém tudo numa unidade só, preserva a ordem (menos encontros é
+    # melhor), não inventa constante, e devolve o veto para onde ele pertence: o
+    # ponto de aposta, que é o único limiar de HP do cérebro.
+    lutas = 1 + alvo.extras + (1 if alvo.chefe else 0)
+    componentes = [("capacidade por luta", (prog.hp_frac - HP_DE_APOSTA) / lutas)]
     return Score(
         opcao.action_id,
         Need.PROGREDIR,
         sum(v for _n, v in componentes),
         tuple(componentes),
-        # Passos desempatam sem serem somados: passo e luta têm unidades
-        # diferentes, e converter uma na outra seria a constante inventada.
+        # Passos desempatam sem serem somados: passo não tem custo mecânico no
+        # jogo, e converter passo em vida seria a constante inventada.
         tiebreak=-float(alvo.passos),
+        note=f"{lutas} luta(s) até resolver este alvo" if lutas > 1 else "",
     )
 
 
@@ -545,24 +555,26 @@ def _avaliar_pocao(opcao: ActionOption, prog: ProgressionState) -> Score:
 
 
 def _avaliar_servico(opcao: ActionOption, mapa: MapState, prog: ProgressionState) -> Score:
-    """Loja, Fonte, Altar, Ferreiro e Mercador.
+    """Loja e Ferreiro. São as ÚNICAS casas de serviço do jogo.
 
-    A Fonte cura de graça; a Loja cura pagando. As duas atendem RECUPERAR quando
-    há o que curar, e só então. Ferreiro e Mercador atendem INVESTIR.
+    `FEATURE_CHARS` tem três entradas — `$`, `F` e `E` —, e a Extração tem
+    avaliador próprio. Fonte, Altar e Mercador NÃO são serviços: são os três
+    desfechos do EVENTO, que o mapa desenha como `?`. Eles tinham ramo aqui, e
+    esse ramo só era alcançável porque o tipo do evento vazava para o cérebro
+    antes de o jogador pisar na casa.
+
+    O custo de ir até o serviço são as LUTAS do desvio, não os passos: andar não
+    tem custo mecânico no jogo, e passo segue sendo desempate.
     """
     servico = mapa.servico(opcao.family)
-    desvio = servico.desvio if servico else (mapa.desvio_evento or 0)
+    desvio = servico.desvio if servico else 0
+    lutas = servico.lutas_no_desvio if servico else 0
     falta = (prog.hp_max - prog.hp) / max(1, prog.hp_max)
+    # Mesma correção de unidade da luta: o que o serviço vale é DIVIDIDO pelos
+    # encontros que o desvio obriga, e não subtraído deles. Subtrair equivalia a
+    # dizer que um combate custa uma barra de ouro inteira.
+    por_encontro = 1 + lutas
 
-    if opcao.family == "fountain":
-        return Score(
-            opcao.action_id,
-            _necessidade_de_cura(prog),
-            falta,
-            (("HP a recuperar", falta),),
-            tiebreak=-float(desvio),
-            note="cura de graça",
-        )
     if opcao.family == "shop":
         if falta > 0 and prog.ouro > prog.taxa_de_saida:
             componentes = [
@@ -576,7 +588,7 @@ def _avaliar_servico(opcao: ActionOption, mapa: MapState, prog: ProgressionState
             return Score(
                 opcao.action_id,
                 _necessidade_de_cura(prog),
-                sum(v for _n, v in componentes),
+                sum(v for _n, v in componentes) / por_encontro,
                 tuple(componentes),
                 tiebreak=-float(desvio),
             )
@@ -590,31 +602,84 @@ def _avaliar_servico(opcao: ActionOption, mapa: MapState, prog: ProgressionState
         return Score(
             opcao.action_id,
             Need.INVESTIR,
-            sum(v for _n, v in componentes),
+            sum(v for _n, v in componentes) / por_encontro,
             tuple(componentes),
             tiebreak=-float(desvio),
         )
-    if opcao.family == "altar":
-        # Altar cobra vida. Só vale com folga real.
-        valor = prog.hp_frac - 0.5
+
+    # Ferreiro. A elegibilidade é FATO, pelas funções canônicas do jogo: sem peça
+    # que ele possa aprimorar ou engastar, visitar não rende nada. "Tem peça
+    # equipada" era proxy, e dava valor a quem já estava no teto.
+    if not prog.pecas_para_o_ferreiro:
+        # FATO, não limiar: `forge.enhanceable` e `forge.socketable` dizem que não
+        # há o que aprimorar nem onde engastar. A visita não faz nada, e folga de
+        # ouro não compra o que não existe — somá-la aqui dava valor a ir a um
+        # lugar que não tem serviço a prestar.
         return Score(
             opcao.action_id,
             Need.INVESTIR,
-            valor,
-            (("folga de vida", valor),),
+            0.0,
+            (("peça para investir", 0.0),),
             tiebreak=-float(desvio),
+            note="nenhuma peça que o Ferreiro possa aprimorar ou engastar",
         )
-    # forge e merchant
     componentes = [
         ("folga de ouro", max(0.0, (prog.ouro - prog.taxa_de_saida) / max(1, prog.taxa_de_saida))),
-        ("peça para investir", 1.0 if prog.pecas_equipadas else -1.0),
+        ("peça para investir", 1.0),
     ]
     return Score(
         opcao.action_id,
         Need.INVESTIR,
-        sum(v for _n, v in componentes),
+        sum(v for _n, v in componentes) / por_encontro,
         tuple(componentes),
         tiebreak=-float(desvio),
+    )
+
+
+def _avaliar_evento(opcao: ActionOption, mapa: MapState, prog: ProgressionState) -> Score:
+    """O `?`. O jogador sabe que existe; NÃO sabe qual dos três desfechos é.
+
+    O tipo só é revelado por `move_player`, que ao revelar já consumiu a casa.
+    Então o que se avalia aqui é uma LOTERIA, com as consequências públicas de
+    cada desfecho e a probabilidade real de cada um.
+
+    NÃO se soma cura, HP perdido e ouro numa média só. Normalizar os três para
+    caberem numa conta seria inventar uma moeda comum que o jogo não tem: HP e
+    ouro não se convertem. Entram só as parcelas que já estão na MESMA unidade —
+    fração da barra de vida —, cada uma com a chance real do sorteio.
+
+    O MERCADOR fica fora da soma de propósito: uma oferta que ninguém viu não tem
+    valor declarável, e transformá-la em HP seria exatamente a moeda artificial.
+    A conta fica conservadora, e é melhor assim — subestimar um desfecho neutro é
+    barato; inventar uma taxa de câmbio contamina toda decisão que a usar.
+
+    Nunca SOBREVIVER: com a vida no fim, ir ao `?` é apostar que não é o Altar.
+    """
+    evento = mapa.evento
+    if evento is None:
+        return Score(opcao.action_id, Need.INVESTIR, 0.0, note="sem evento no andar")
+
+    chance = 1.0 / max(1, evento.desfechos)
+    falta = (prog.hp_max - prog.hp) / max(1, prog.hp_max)
+    # Perder a run não é perder 30% da barra. A moeda desta conta é FRAÇÃO DA
+    # BARRA, e nela não existe custo maior que a barra inteira — então morrer
+    # custa 1,0, que é o teto da unidade e não um peso escolhido a dedo. Usar
+    # `hp_frac` aqui seria pior que errado: com pouca vida, morrer sairia MAIS
+    # BARATO que pagar os 30%.
+    custo = 1.0 if evento.altar_mataria else evento.custo_do_altar
+    componentes = [
+        ("chance de cura", chance * min(falta, evento.cura_da_fonte)),
+        ("risco do altar", -chance * custo),
+    ]
+    nota = "o `?` pode ser o Altar, e ele me mataria" if evento.altar_mataria else ""
+    return Score(
+        opcao.action_id,
+        Need.INVESTIR,
+        # Mesma divisão por encontro das outras casas do andar.
+        sum(v for _n, v in componentes) / (1 + evento.lutas_no_desvio),
+        tuple(componentes),
+        tiebreak=-float(evento.desvio),
+        note=nota,
     )
 
 
@@ -673,7 +738,12 @@ def _avaliar_saida(opcao: ActionOption, mapa: MapState, prog: ProgressionState) 
         )
     componentes = [("andar sem mais alvo", 1.0 if not mapa.alvos else 0.0)]
     if prog.ouro < prog.taxa_de_saida:
-        componentes.append(("saída não paga", -0.5))
+        # O preço REAL de sair sem pagar, não um número inventado. `use_exit` não
+        # cobra nada quando falta ouro — não existe pagamento parcial nem recusa
+        # voluntária —, e a punição aparece no multiplicador de Essência do andar
+        # seguinte, já com o piso de `essence_after_penalty`. O adaptador entrega
+        # essa perda medida; o `-0,5` que estava aqui não representava nada.
+        componentes.append(("Essência que a saída não paga custa", -prog.perda_de_essencia))
     return Score(
         opcao.action_id,
         Need.ENCERRAR,

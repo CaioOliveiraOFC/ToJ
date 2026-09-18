@@ -102,9 +102,31 @@ class TestRiscoPesaSemVirarPortao:
         assert need is Need.RECUPERAR
 
 
-class TestChefeNaoEAlvoOpcional:
-    def test_o_b_do_mapa_e_a_unica_pista_de_perigo_e_ela_conta(self):
-        decisao = decidir_no_mapa(_mapa(alvos=(CHEFE,)), _prog(), (_lutar(CHEFE), SAIDA))
+class TestChefeContaMasNaoVeta:
+    """`B` é a única pista de perigo do mapa — pista, não proibição.
+
+    Este teste exigia `saida` contra um chefe: era o VETO, porque `_avaliar_luta`
+    devolvia 0,0 para o chefe e só vence quem tem utilidade > 0. O andar 5, 10 e
+    15 eram atravessados sem que o `B` jamais fosse encarado. Agora ele custa uma
+    luta a mais na rota, e o go/no-go continua sendo o ponto de aposta — o mesmo
+    para `&` e para `B`, porque o cérebro tem um limiar de HP só.
+    """
+
+    def test_o_chefe_vale_menos_que_um_monstro_comum_equivalente(self):
+        decisao = decidir_no_mapa(_mapa(alvos=(ALVO, CHEFE)), _prog(), (_lutar(), _lutar(CHEFE)))
+        assert decisao.action_id == "lutar:3,3"
+        assert _nota(decisao, "lutar:9,9") < _nota(decisao, "lutar:3,3")
+
+    def test_de_barra_cheia_o_chefe_deixa_de_ser_intocavel(self):
+        decisao = decidir_no_mapa(
+            _mapa(alvos=(CHEFE,)), _prog(hp=500, hp_max=500), (_lutar(CHEFE), SAIDA)
+        )
+        assert decisao.action_id == "lutar:9,9"
+
+    def test_abaixo_do_ponto_de_aposta_o_chefe_e_recusado_como_qualquer_alvo(self):
+        decisao = decidir_no_mapa(
+            _mapa(alvos=(CHEFE,)), _prog(hp=100, hp_max=500), (_lutar(CHEFE), SAIDA)
+        )
         assert decisao.action_id == "saida"
 
 

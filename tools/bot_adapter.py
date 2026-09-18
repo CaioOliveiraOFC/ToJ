@@ -32,8 +32,12 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Any
 
+from src.content import forge
 from src.content.economy import exit_fee
 from src.content.factories import features as feat
+from src.content.factories.dungeons import RANDOM_EVENT_TYPES, altar_hp_cost
+from src.content.floor_exit import unpaid_streak
+from src.engine.map_analysis import campo_de_custo, rota_do_campo
 from src.entities.heroes import POTION_BUFFS
 from src.mechanics import combat as combat_mech
 from src.mechanics.battle import Action, build_turn_order
@@ -46,12 +50,16 @@ from src.shared.constants import (
     CRIT_CHANCE_HIGH,
     FLEE_RANGE_MAX,
     MAGIC_SHIELD_DAMAGE_PER_MP,
+    RANDOM_EVENT_ALTAR_HP_COST_PERCENT,
+    RANDOM_EVENT_FOUNTAIN_HEAL_PERCENT,
 )
+from src.shared.economy import essence_after_penalty
 from src.shared.effects import TURN_SKIPPING_STATUSES
 from src.sim.bot import (
     ActionMechanicsView,
     ActionOption,
     CombatState,
+    EventoView,
     InteractionView,
     MapState,
     ProgressionState,
@@ -847,6 +855,75 @@ def action_de(action_id: str, reais: dict, monstro) -> Action:
 # --- observação do mapa ----------------------------------------------------
 
 
+def rota_para(bot, casa, *, lutar: bool):
+    """A rota canônica até `casa`. UMA regra, usada pelos DOIS lados.
+
+    O driver ia lutar pelo caminho mais CURTO e o adaptador declarava pelo
+    caminho que EVITA luta. Medido em 366 alvos: 12 divergências, e em todas o
+    executado lutava MAIS que o declarado — o `-extras` que a policy subtraía era
+    ficção. A regra em si (luta vai pelo curto, serviço vai pelo que evita)
+    continua a mesma; o que muda é que agora existe um lugar só onde ela mora.
+
+    PURA: lê `enemies_pos` como o mapa está agora e roda Dijkstra. Não sorteia,
+    não antecipa e não consome RNG — quem rola dado é o engine, quando a ação
+    acontecer.
+    """
+    por_combate = not lutar
+    campo = campo_de_custo(bot.mapa, bot.posicao, por_combate=por_combate)
+    return rota_do_campo(campo, casa, por_combate)
+
+
+def encontros_do_caminho(mapa, caminho) -> set:
+    """As casas de monstro que ESTE caminho obriga a encarar.
+
+    CONJUNTO, e não contador, porque é assim que o custo se soma sem mentir: um
+    monstro que aparece em duas pernas da mesma viagem é UM combate, já que
+    depois do primeiro ele não existe mais. Somar `ida.combates + volta.combates`
+    contaria duas vezes.
+    """
+    inimigos = mapa.enemies_pos
+    return {casa for casa in caminho if casa in inimigos}
+
+
+def _evento_declarado(bot, desvio: int, lutas: int) -> EventoView:
+    """O `?` como o jogador o vê: onde está, e os desfechos que a REGRA permite.
+
+    Nada aqui olha `mapa.event_type`. As duas frações saem de constantes
+    canônicas, e `altar_mataria` é um fato sobre o HP de agora.
+    """
+    custo = altar_hp_cost(bot.hero)
+    return EventoView(
+        desvio=desvio,
+        lutas_no_desvio=lutas,
+        cura_da_fonte=RANDOM_EVENT_FOUNTAIN_HEAL_PERCENT / 100,
+        custo_do_altar=RANDOM_EVENT_ALTAR_HP_COST_PERCENT / 100,
+        altar_mataria=custo >= bot.hero.get_hp(),
+        desfechos=len(RANDOM_EVENT_TYPES),
+    )
+
+
+def _pecas_para_o_ferreiro(hero) -> int:
+    """Quantas peças o Ferreiro pode mexer, pelas funções canônicas do jogo."""
+    elegiveis = {id(i) for i in forge.enhanceable(hero)}
+    elegiveis.update(id(i) for i in forge.socketable(hero))
+    return len(elegiveis)
+
+
+def _perda_de_essencia(hero, rolada: float = 1.0) -> float:
+    """Quanto a PRÓXIMA saída não paga tiraria do multiplicador do andar.
+
+    `use_exit` não tem pagamento parcial nem recusa voluntária: ou paga inteiro e
+    zera o streak, ou cobra zero e incrementa. O preço aparece na Essência do
+    andar seguinte, e `essence_after_penalty` tem piso — então a perda REAL é a
+    diferença entre os dois multiplicadores, não o `-0,5` que o evaluator usava.
+    """
+    streak = unpaid_streak(hero)
+    return max(
+        0.0,
+        essence_after_penalty(rolada, streak) - essence_after_penalty(rolada, streak + 1),
+    )
+
+
 def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
     """O andar e a run, como o jogador os vê.
 
@@ -854,19 +931,21 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
     desenha `&`, ou `B` se for chefe. Nome e nível só existem depois da colisão.
     """
     hero = bot.hero
-    campo = bot._campo(por_combate=True)
-    from src.engine.map_analysis import rota_do_campo
 
     alvos = []
     for casa, monstro in bot.mapa.enemies_pos.items():
-        rota, _ = rota_do_campo(campo, casa, True)
+        # MESMA rota que `_ir_ate` vai andar para lutar. Declarar por uma e
+        # caminhar por outra era a divergência medida.
+        rota, caminho = rota_para(bot, casa, lutar=True)
         if not rota.alcancavel:
             continue
+        # Os OUTROS monstros do caminho, por casa única e sem o próprio alvo.
+        pelo_caminho = encontros_do_caminho(bot.mapa, caminho) - {casa}
         alvos.append(
             TargetView(
                 casa=casa,
                 passos=rota.passos,
-                extras=max(0, rota.combates - 1),
+                extras=len(pelo_caminho),
                 chefe=bool(getattr(monstro, "is_boss", False)),
             )
         )
@@ -875,11 +954,12 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
     for casa, tipo in bot.mapa.features.items():
         desvio = bot._desvio(casa)
         if desvio is not None:
-            servicos.append(ServiceView(tipo=tipo, desvio=desvio))
+            servicos.append(ServiceView(tipo=tipo, desvio=desvio[0], lutas_no_desvio=desvio[1]))
 
     evento_casa = bot.mapa.event_pos
     desvio_evento = bot._desvio(evento_casa) if evento_casa is not None else None
     extracao = bot._casa_de(feat.EXTRACTION)
+    desvio_extracao = bot._desvio(extracao) if extracao is not None else None
 
     alcance = bot._alcance(bot.saida)
     mapa = MapState(
@@ -889,9 +969,14 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
         alvos=tuple(alvos),
         monstros_no_andar=len(bot.mapa.enemies_pos),
         servicos=tuple(servicos),
-        evento=bot.mapa.event_type,
-        desvio_evento=desvio_evento,
-        desvio_extracao=bot._desvio(extracao) if extracao is not None else None,
+        # `tem_evento` é o que o mapa mostra: um `?`. O TIPO não atravessa.
+        tem_evento=evento_casa is not None,
+        evento=(
+            _evento_declarado(bot, desvio_evento[0], desvio_evento[1])
+            if desvio_evento is not None
+            else None
+        ),
+        desvio_extracao=desvio_extracao[0] if desvio_extracao is not None else None,
     )
     prog = ProgressionState(
         nivel=hero.get_level(),
@@ -905,6 +990,8 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
         pocoes_de_cura=bot._pocoes(),
         passivas=len(hero.passives),
         pecas_equipadas=sum(1 for i in hero.equipment.values() if i),
+        pecas_para_o_ferreiro=_pecas_para_o_ferreiro(hero),
+        perda_de_essencia=_perda_de_essencia(hero),
         sinais_de_risco=tuple(bot._sinais_de_risco()),
     )
     return mapa, prog
@@ -946,22 +1033,21 @@ def acoes_do_mapa(
         # Enumerá-la também como serviço a fazia cair no ramo genérico de
         # investimento e ganhar por "folga de ouro" — o bot ia até a casa de
         # extração para investir nela.
-        if servico.tipo == feat.EXTRACTION or servico.desvio > bot.DESVIO_ACEITAVEL:
+        #
+        # LEGALIDADE é o único filtro: entra tudo que é ALCANÇÁVEL. Antes um
+        # `DESVIO_ACEITAVEL = 10` apagava a opção da mesa (7 de 45 serviços
+        # medidos), e "vale a pena andar até lá" é pergunta da policy, não do
+        # adaptador.
+        if servico.tipo == feat.EXTRACTION:
             continue
         action_id = servico.tipo
         opcoes.append(ActionOption(action_id=action_id, family=servico.tipo, label=servico.tipo))
         destinos[action_id] = bot._casa_de(servico.tipo)
 
-    if (
-        mapa.evento
-        and mapa.desvio_evento is not None
-        and mapa.desvio_evento <= bot.DESVIO_ACEITAVEL
-    ):
-        action_id = mapa.evento
-        opcoes.append(
-            ActionOption(action_id=action_id, family=mapa.evento, label=f"evento {mapa.evento}")
-        )
-        destinos[action_id] = bot.mapa.event_pos
+    if mapa.tem_evento and mapa.evento is not None:
+        # UMA família, `evento`, porque o mapa mostra UM símbolo: `?`.
+        opcoes.append(ActionOption(action_id="evento", family="evento", label="? no mapa (evento)"))
+        destinos["evento"] = bot.mapa.event_pos
 
     if mapa.desvio_extracao is not None:
         opcoes.append(ActionOption(action_id="extrair", family="extrair", label="extração"))

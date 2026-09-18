@@ -211,10 +211,50 @@ class TargetView:
 
 @dataclass(frozen=True, slots=True)
 class ServiceView:
-    """Uma casa de serviço alcançável, e o desvio que ela cobra."""
+    """Uma casa de serviço alcançável, e o que o desvio até ela cobra.
+
+    `desvio` é em PASSOS, e passo não tem custo mecânico no jogo: `move_player`
+    só move o herói e resolve a casa em que ele pisou — não há contador de
+    turnos, fome, decaimento nem respawn. Por isso ele é DESEMPATE, e não
+    parcela de utilidade.
+
+    O que o desvio cobra de verdade são os ENCONTROS que ele força, e eles são
+    contados por casa ÚNICA: um monstro que caia na ida e na volta é um combate
+    só, porque depois do primeiro ele não existe mais.
+    """
 
     tipo: str
     desvio: int
+    lutas_no_desvio: int = 0
+
+
+@dataclass(frozen=True, slots=True)
+class EventoView:
+    """O `?` do mapa: o que o jogador sabe ANTES de pisar nele.
+
+    O mapa desenha `?` e nada mais. O tipo — Mercador, Altar ou Fonte — só é
+    revelado por `move_player`, que ao revelar JÁ consumiu a casa. Por isso esta
+    view não tem campo de tipo: ela carrega o desvio e as consequências
+    PÚBLICAS dos três desfechos possíveis, que são regra de jogo e não segredo
+    do andar.
+
+    O tipo chegava ao cérebro em `MapState.evento` e virava a FAMÍLIA da opção,
+    e o evaluator entrava direto no ramo da Fonte ou do Altar. O bot escolhia o
+    caminho sabendo o resultado escondido.
+    """
+
+    desvio: int
+    lutas_no_desvio: int = 0
+    # Fração do HP máximo que a Fonte devolve, e que o Altar cobra. Constantes
+    # canônicas do jogo, não estimativas.
+    cura_da_fonte: float = 0.0
+    custo_do_altar: float = 0.0
+    # O custo do Altar derrubaria o herói AGORA? `take_damage` não tem piso, e
+    # `get_hp() <= 0` encerra a run.
+    altar_mataria: bool = False
+    # Quantos desfechos o sorteio tem. Regra pública (`RANDOM_EVENT_TYPES`), e é
+    # o denominador honesto da chance de cada um.
+    desfechos: int = 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -290,8 +330,10 @@ class MapState:
     alvos: tuple[TargetView, ...] = ()
     monstros_no_andar: int = 0
     servicos: tuple[ServiceView, ...] = ()
-    evento: str | None = None
-    desvio_evento: int | None = None
+    # BOOLEANO, e nunca o tipo: o mapa desenha `?`. O que o bot pode saber sobre
+    # o desfecho vive em `EventoView`, e é só regra pública.
+    tem_evento: bool = False
+    evento: EventoView | None = None
     desvio_extracao: int | None = None
 
     def servico(self, tipo: str) -> ServiceView | None:
@@ -322,6 +364,14 @@ class ProgressionState:
     pocoes_de_cura: int = 0
     passivas: int = 0
     pecas_equipadas: int = 0
+    # Quantas peças o Ferreiro REALMENTE pode mexer, pelas funções canônicas
+    # `forge.enhanceable` e `forge.socketable`. "Tem peça equipada" era proxy: um
+    # herói com tudo no teto ganhava valor por visitar quem não tem o que fazer.
+    pecas_para_o_ferreiro: int = 0
+    # Quanto do multiplicador de Essência a PRÓXIMA saída não paga custaria, já
+    # com o piso de `essence_after_penalty`. É o preço real de sair sem pagar —
+    # o evaluator usava um `-0.5` inventado no lugar dele.
+    perda_de_essencia: float = 0.0
     # Sinais de risco JÁ apurados pelo adaptador, como texto. Entram na decisão
     # de extrair; nenhum deles freia combate — um gate de "estou atrasado" fecha
     # o ciclo errado, porque lutar é o que recupera o atraso.
