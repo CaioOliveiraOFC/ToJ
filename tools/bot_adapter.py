@@ -39,6 +39,7 @@ from src.mechanics import combat as combat_mech
 from src.mechanics.battle import Action, build_turn_order
 from src.shared import effect_core as core
 from src.shared import effects as fx
+from src.shared import interactions as ix
 from src.shared.constants import (
     CRIT_CHANCE_CAP,
     CRIT_CHANCE_DEFAULT,
@@ -51,6 +52,7 @@ from src.sim.bot import (
     ActionMechanicsView,
     ActionOption,
     CombatState,
+    InteractionView,
     MapState,
     ProgressionState,
     ServiceView,
@@ -275,6 +277,117 @@ def _dot_declarado(efeito: str, hero, duracao_da_carta: int) -> tuple[int, int]:
     return max(0, por_turno), int(duracao_da_carta or definicao.default_duration)
 
 
+# Mirror mínimo de `interactions.consume_strike`. Protegido por teste que EXECUTA
+# a função real e exige que o declarado seja exatamente o que sumiu.
+#
+# Existe porque `consume_strike` MUTA — ela é o preço cobrado DEPOIS do golpe, e
+# observar não pode gastar o gelo nem a invisibilidade de ninguém. Não há leitura
+# canônica do custo.
+#
+# DÍVIDA REGISTRADA, junto com os mirrors de crítico e Égide da FASE A: promover
+# a leitura a função pública do engine em rodada estrutural própria.
+CONSUMO_DA_LEI: dict[str, tuple[str, bool]] = {
+    # id -> (efeito consumido, sai de quem ATACA?)
+    "emboscada": ("invisible", True),
+    "quebra_gelida": ("frozen", False),
+}
+
+
+def _leis_de_golpe_por_critico(hero, monstro) -> dict[str, bool]:
+    """Quais leis de golpe disparam, e quais delas DEPENDEM do crítico.
+
+    Duas chamadas à mesma função canônica, e a diferença entre elas responde a
+    pergunta. Nenhum branching de `interactions.py` é reproduzido aqui.
+    """
+    sem_crit = set(ix.strike_interactions(hero, monstro, is_critical=False))
+    com_crit = set(ix.strike_interactions(hero, monstro, is_critical=True))
+    return {lei: lei not in sem_crit for lei in sem_crit | com_crit}
+
+
+def _view_da_lei(lei_id: str, *, exige_critico: bool, bonus_de_duracao: int = 0) -> InteractionView:
+    lei = ix.CATALOG.get(lei_id)
+    fatores = ix.strike_xmult((lei_id,))
+    consome, do_atacante = CONSUMO_DA_LEI.get(lei_id, ("", False))
+    return InteractionView(
+        interaction_id=lei_id,
+        label=ix.label(lei_id),
+        kind=str(getattr(lei, "kind", "")),
+        trigger=str(getattr(lei, "trigger", "")),
+        requires_critical=exige_critico,
+        # Neutro é 1.0: quem não mexe em dano não multiplica nada.
+        damage_xmult=fatores[0] if fatores else 1.0,
+        duration_bonus=bonus_de_duracao,
+        consumes_status=consome,
+        consumes_from_self=do_atacante,
+    )
+
+
+def _bonus_de_duracao(monstro, skill) -> dict[str, int]:
+    """Quantos turnos a mais cada lei de APLICAÇÃO dá, pela função canônica.
+
+    `duration_before_apply` é pura e devolve a duração com que a peça entraria e
+    quais leis a mudaram. Chamando com 1 turno, a diferença É o bônus.
+    """
+    bonus: dict[str, int] = {}
+    for efeito in ix.applicable_effects(skill):
+        duracao, disparadas = ix.duration_before_apply(monstro, efeito, 1)
+        for lei in disparadas:
+            bonus[lei] = duracao - 1
+    return bonus
+
+
+def _interacoes_da_skill(hero, monstro, skill) -> tuple[InteractionView, ...]:
+    """As leis que ESTA carta destrava contra ESTE alvo, agora.
+
+    `interactions.opportunities` é a função canônica da pergunta — pública,
+    pura, e já conhecendo todas as condições. O adaptador transporta o resultado
+    e enriquece com os fatos que outras funções canônicas dão.
+
+    NÃO usa `opportunity_weight`: aquele carrega `OPPORTUNITY_BONUS`, que é
+    ESTRATÉGIA. Quanto uma oportunidade vale é pergunta da policy.
+    """
+    exige_critico = _leis_de_golpe_por_critico(hero, monstro)
+    bonus = _bonus_de_duracao(monstro, skill)
+    return tuple(
+        _view_da_lei(
+            lei,
+            exige_critico=exige_critico.get(lei, False),
+            bonus_de_duracao=bonus.get(lei, 0),
+        )
+        for lei in ix.opportunities(hero, monstro, skill)
+    )
+
+
+def _interacoes_do_ataque(hero, monstro) -> tuple[InteractionView, ...]:
+    """As leis de golpe do ataque básico.
+
+    `opportunities` pede uma carta, e o ataque básico não tem uma — então aqui
+    a fonte é `strike_interactions`, que é a mesma função que o motor consulta
+    dentro de `damage_modifiers`.
+    """
+    exige_critico = _leis_de_golpe_por_critico(hero, monstro)
+    return tuple(
+        _view_da_lei(lei, exige_critico=exige) for lei, exige in sorted(exige_critico.items())
+    )
+
+
+def _quebra_ao_dar_dano(monstro) -> tuple[str, ...]:
+    """Os efeitos do alvo que o DANO desta ação quebraria.
+
+    É a lei `sleep_damage` do catálogo, resolvida por
+    `effect_core.break_on_damage` e declarada no catálogo de efeitos em
+    `breaks_on_damage`. Não é interação que o bot ativa: é custo da ação
+    escolhida — quem ataca um alvo dormindo acorda o alvo.
+    """
+    ativos = getattr(monstro, "active_effects", {}) or {}
+    quebram = []
+    for efeito in sorted(ativos):
+        definicao = core.definition(str(efeito))
+        if definicao is not None and definicao.breaks_on_damage:
+            quebram.append(str(efeito))
+    return tuple(quebram)
+
+
 def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
     """O que esta skill FAZ. Fatos, pelas funções canônicas do jogo."""
     familia = str(skill.effect_type)
@@ -290,6 +403,7 @@ def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
         "hit_chance": _chance_de_acerto(hero, monstro, mira),
         "crit_chance": _chance_de_critico(hero, nome),
         "acts_before_enemy": _age_antes(hero, monstro),
+        "interactions": _interacoes_da_skill(hero, monstro, skill),
     }
 
     if familia == "damage":
@@ -300,6 +414,7 @@ def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
         normal = _dano_do_funil(hero, monstro, base, critico=False)
         critico = _dano_do_funil(hero, monstro, base, critico=True)
         campos["expected_strike_damage"] = max(1, int(normal * (1 - p_crit) + critico * p_crit))
+        campos["breaks_statuses"] = _quebra_ao_dar_dano(monstro)
         # O secundário da carta é um status de verdade, com chance própria.
         sec = getattr(skill, "secondary", None)
         if sec is not None:
@@ -385,6 +500,8 @@ def acoes_do_combate(hero, monstro, state: CombatState) -> tuple[tuple[ActionOpt
                 crit_chance=p_crit,
                 acts_before_enemy=age_antes,
                 aegis_absorbable_damage=absorvivel,
+                interactions=_interacoes_do_ataque(hero, monstro),
+                breaks_statuses=_quebra_ao_dar_dano(monstro),
             ),
         )
     )

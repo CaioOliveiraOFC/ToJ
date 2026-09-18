@@ -20,6 +20,7 @@ from src.sim.bot.macro_policy import decidir as decidir_no_mapa
 from src.sim.bot.observation import (
     ActionMechanicsView,
     CombatState,
+    InteractionView,
     MapState,
     ProgressionState,
     ServiceView,
@@ -31,6 +32,7 @@ __all__ = [
     "ActionOption",
     "CombatState",
     "Decision",
+    "InteractionView",
     "MapState",
     "Need",
     "ProgressionState",

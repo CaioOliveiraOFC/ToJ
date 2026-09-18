@@ -30,6 +30,40 @@ from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True, slots=True)
+class InteractionView:
+    """Uma LEI do jogo que esta ação destrava contra este alvo, AGORA.
+
+    Fato, nunca estratégia. Não existe `interaction_is_good` nem
+    `interaction_score`: o que vale a pena é pergunta da policy, e ela é
+    respondida com estes números, não com uma opinião embutida no adaptador.
+
+    `interactions.py` declara as leis; `interactions.opportunities()` responde
+    quais existem no estado atual. O adaptador transporta — não reproduz.
+    """
+
+    interaction_id: str
+    label: str
+    kind: str  # strike | apply | tick
+    # A prosa do catálogo, para o trace dizer o que foi visto.
+    trigger: str = ""
+    requires_critical: bool = False
+    # INFORMATIVO, e é preciso ler isto antes de usar: `expected_strike_damage`
+    # JÁ INCLUI este fator, porque `combat.damage_modifiers` chama
+    # `strike_xmult(strike_interactions(...))` por dentro. Medido: 131 de dano
+    # sem invisibilidade, 157 com. Multiplicar de novo conta duas vezes.
+    #
+    # NEUTRO É 1.0, nunca 0.0: é multiplicador, e 0.0 zeraria o dano — um
+    # neutro que zera é a armadilha esperando a primeira multiplicação
+    # distraída.
+    damage_xmult: float = 1.0
+    # Turnos a mais que o efeito entra, quando a lei mexe em duração.
+    duration_bonus: int = 0
+    # O que a lei GASTA ao disparar, e de quem. "" quando não gasta nada.
+    consumes_status: str = ""
+    consumes_from_self: bool = False
+
+
+@dataclass(frozen=True, slots=True)
 class ActionMechanicsView:
     """O que uma ação FAZ. Fatos mecânicos, nenhuma decisão.
 
@@ -93,6 +127,13 @@ class ActionMechanicsView:
     # e era assim que o combate do Ladino inflava de 11 para 50 turnos.
     already_active: bool = False
     flee_chance: float = 0.0
+    # As leis que ESTA ação destrava contra ESTE alvo, no estado atual.
+    interactions: tuple[InteractionView, ...] = ()
+    # Os efeitos que a ação QUEBRA ao causar dano — `sleep` é o caso do jogo
+    # hoje (`effect_core.definition(...).breaks_on_damage`). Tupla e não string:
+    # a ação quebra TODOS os que quebram com dano, e fixar "apenas um" seria
+    # limitação artificial do contrato.
+    breaks_statuses: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
