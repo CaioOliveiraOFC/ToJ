@@ -173,10 +173,15 @@ def _restaurar_skills(player, skills_data: dict) -> None:
             player.skills[indice] = skill
 
 
-def save_game(
-    player: "Player", dungeon_level: int, map_state: dict | None = None, slot: int = 1
-) -> SaveResult:
-    """Salva o estado atual do jogo num ficheiro JSON."""
+def to_save_data(player: "Player", dungeon_level: int, map_state: dict | None = None) -> dict:
+    """O estado do personagem em dicionário, pronto para JSON.
+
+    Separado da escrita porque salvar em slot não é a única coisa que precisa
+    desta serialização: o benchmark da Arena congela um personagem REAL pelo
+    mesmo caminho, e uma segunda serialização em paralelo envelheceria no
+    primeiro campo novo — exatamente como `+N`, socket e encantamento já
+    envelheceram o formato "só o nome".
+    """
     inventory_names = [_serializar(item) for item in player.inventory]
     equipment_names = {slot: _serializar(item) for slot, item in player.equipment.items()}
     passive_ids = [p.id for p in player.passives]
@@ -231,6 +236,14 @@ def save_game(
         "dungeon_level": dungeon_level,
         "map_state": map_state,
     }
+    return save_data
+
+
+def save_game(
+    player: "Player", dungeon_level: int, map_state: dict | None = None, slot: int = 1
+) -> SaveResult:
+    """Salva o estado atual do jogo num ficheiro JSON."""
+    save_data = to_save_data(player, dungeon_level, map_state)
 
     try:
         _ensure_save_dir()
@@ -242,6 +255,130 @@ def save_game(
         return {"success": False, "message": f"Ocorreu um erro ao salvar: {e}"}
 
 
+def player_from_save_data(
+    save_data: dict, item_registry: ItemRegistry, player_factory: dict[str, PlayerFactory]
+) -> tuple["Player" | None, int | None, dict | None]:
+    """Reidrata o personagem a partir do dicionário salvo.
+
+    Separada da leitura de arquivo pelo mesmo motivo que `to_save_data`: o
+    benchmark da Arena carrega um personagem congelado por ESTE caminho, e não
+    por uma reconstrução campo a campo em paralelo. Reconstruir à mão perderia
+    silenciosamente o próximo campo que o save aprender a guardar.
+
+    NÃO engole exceção: quem chama decide. `load_game` continua devolvendo
+    `(None, None, None)` num save corrompido, porque um jogador com save ruim
+    precisa voltar ao menu; já um benchmark que não carrega é bug de código, e
+    falhar calado ali entregaria uma comparação contra o personagem errado.
+    """
+    player_class_name = save_data["player_class"]
+    player_name = save_data["player_name"]
+
+    player_class = player_factory.get(player_class_name)
+    if not player_class:
+        return None, None, None
+
+    player = player_class(player_name)
+
+    skills_data = save_data.get("skills", {})
+    player.seen_skill_ids.update(save_data.get("seen_skill_ids", ()))
+    if skills_data:
+        _restaurar_skills(player, skills_data)
+
+    player.initial_skills_learned = save_data.get("initial_skills_learned", len(player.skills))
+
+    # Define o nível (isso vai disparar aprendizado de skills iniciais)
+    saved_level = save_data["level"]
+    player.set_level(saved_level)
+
+    # `set_level` limpa o deck e reaprende a inicial: restaurar depois dele é
+    # o que faz o save mandar sobre o que o motor supõe.
+    if skills_data:
+        _restaurar_skills(player, skills_data)
+
+    recargas = save_data.get("skill_cooldowns") or {}
+    player.skill_cooldowns = {str(k): int(v) for k, v in recargas.items() if int(v) > 0}
+
+    player.xp_points = save_data["xp"]
+    player.coins = save_data["coins"]
+    # `.get` com o padrão do herói: saves anteriores a esta economia não têm
+    # os campos, e um KeyError aqui torna o save velho ilegível.
+    player.ledger.update(save_data.get("ledger") or {})
+    player.last_interest_floor = int(save_data.get("last_interest_floor", 0))
+    for campo in (
+        "unpaid_exit_streak",
+        "shop_miss_streak",
+        "forge_miss_streak",
+        "extraction_miss_streak",
+        "extraction_keys",
+        "extracted_on_floor",
+    ):
+        setattr(player, campo, int(save_data.get(campo, 0) or 0))
+
+    # Reconstrói o inventário (pula itens que não existem mais no registro)
+    player.gems = [g for g in (gem_from_dict(d) for d in save_data.get("gems", [])) if g]
+
+    player.inventory = []
+    for registro in save_data["inventory"]:
+        item = _desserializar(registro, item_registry)
+        if item:
+            player.inventory.append(item)
+
+    for slot, registro in save_data["equipment"].items():
+        if registro:
+            item_to_equip = _desserializar(registro, item_registry)
+            if item_to_equip is None:
+                continue
+            posicao = POSICAO_LEGADA.get(slot, slot)
+            player.equip(item_to_equip, posicao if posicao in player.equipment else None)
+            # `equip` pode recusar: classe errada, ou uma posição que este
+            # personagem não tem (um save com arma secundária carregado por
+            # quem não empunha duas). A peça recusada volta para a mochila.
+            # Antes ela era retirada do inventário ANTES da tentativa e
+            # sumia do jogo — o save perdia o item em silêncio.
+            if (
+                item_to_equip not in player.equipment.values()
+                and item_to_equip not in player.inventory
+            ):
+                player.inventory.append(item_to_equip)
+            player.gems.extend(getattr(item_to_equip, "gems_excedentes", ()))
+
+    player.active_buffs = save_data.get("active_buffs", {})
+    player.active_effects = save_data.get("active_effects", {})
+    # Save anterior à paridade guardava a redução de dano do monstro como
+    # dicionário solto em `active_effects`. Ela agora é buff, como a do
+    # herói sempre foi; sem esta migração ela ficaria no estado sem nunca
+    # ser lida nem expirar.
+    legado = player.active_effects.pop("damage_reduction", None)
+    if isinstance(legado, dict):
+        player.active_buffs["Redução de Dano"] = {
+            "stat": "damage_reduction",
+            "value": int(legado.get("value", 0)),
+            "duration": int(legado.get("duration", 1)),
+        }
+
+    passive_ids = save_data.get("passives", [])
+    if passive_ids:
+        for pid in passive_ids:
+            passive = get_passive_by_id(pid)
+            if passive:
+                player.add_passive_load(passive)
+
+    # Restaurar por último: passivas e equipamento alteram `base_hp`/`base_mp`,
+    # então o teto só é conhecido depois deles. Save antigo (sem os campos)
+    # mantém o comportamento anterior e entra com os recursos cheios.
+    hp_salvo = save_data.get("hp")
+    if hp_salvo is not None:
+        player._hp = max(1, min(int(hp_salvo), player.base_hp))
+    mp_salvo = save_data.get("mp")
+    if mp_salvo is not None:
+        player._mp = max(0, min(int(mp_salvo), player.base_mp))
+
+    dungeon_level = save_data["dungeon_level"]
+    map_state = save_data.get("map_state", None)
+
+    return player, dungeon_level, map_state
+
+
 def load_game(
     item_registry: ItemRegistry, player_factory: dict[str, PlayerFactory], slot: int = 1
 ) -> tuple["Player" | None, int | None, dict | None]:
@@ -249,119 +386,10 @@ def load_game(
     filepath = get_slot_file(slot)
     if not os.path.exists(filepath):
         return None, None, None
-
     try:
         with open(filepath, "r") as f:
             save_data = json.load(f)
-
-        player_class_name = save_data["player_class"]
-        player_name = save_data["player_name"]
-
-        player_class = player_factory.get(player_class_name)
-        if not player_class:
-            return None, None, None
-
-        player = player_class(player_name)
-
-        skills_data = save_data.get("skills", {})
-        player.seen_skill_ids.update(save_data.get("seen_skill_ids", ()))
-        if skills_data:
-            _restaurar_skills(player, skills_data)
-
-        player.initial_skills_learned = save_data.get("initial_skills_learned", len(player.skills))
-
-        # Define o nível (isso vai disparar aprendizado de skills iniciais)
-        saved_level = save_data["level"]
-        player.set_level(saved_level)
-
-        # `set_level` limpa o deck e reaprende a inicial: restaurar depois dele é
-        # o que faz o save mandar sobre o que o motor supõe.
-        if skills_data:
-            _restaurar_skills(player, skills_data)
-
-        recargas = save_data.get("skill_cooldowns") or {}
-        player.skill_cooldowns = {str(k): int(v) for k, v in recargas.items() if int(v) > 0}
-
-        player.xp_points = save_data["xp"]
-        player.coins = save_data["coins"]
-        # `.get` com o padrão do herói: saves anteriores a esta economia não têm
-        # os campos, e um KeyError aqui torna o save velho ilegível.
-        player.ledger.update(save_data.get("ledger") or {})
-        player.last_interest_floor = int(save_data.get("last_interest_floor", 0))
-        for campo in (
-            "unpaid_exit_streak",
-            "shop_miss_streak",
-            "forge_miss_streak",
-            "extraction_miss_streak",
-            "extraction_keys",
-            "extracted_on_floor",
-        ):
-            setattr(player, campo, int(save_data.get(campo, 0) or 0))
-
-        # Reconstrói o inventário (pula itens que não existem mais no registro)
-        player.gems = [g for g in (gem_from_dict(d) for d in save_data.get("gems", [])) if g]
-
-        player.inventory = []
-        for registro in save_data["inventory"]:
-            item = _desserializar(registro, item_registry)
-            if item:
-                player.inventory.append(item)
-
-        for slot, registro in save_data["equipment"].items():
-            if registro:
-                item_to_equip = _desserializar(registro, item_registry)
-                if item_to_equip is None:
-                    continue
-                posicao = POSICAO_LEGADA.get(slot, slot)
-                player.equip(item_to_equip, posicao if posicao in player.equipment else None)
-                # `equip` pode recusar: classe errada, ou uma posição que este
-                # personagem não tem (um save com arma secundária carregado por
-                # quem não empunha duas). A peça recusada volta para a mochila.
-                # Antes ela era retirada do inventário ANTES da tentativa e
-                # sumia do jogo — o save perdia o item em silêncio.
-                if (
-                    item_to_equip not in player.equipment.values()
-                    and item_to_equip not in player.inventory
-                ):
-                    player.inventory.append(item_to_equip)
-                player.gems.extend(getattr(item_to_equip, "gems_excedentes", ()))
-
-        player.active_buffs = save_data.get("active_buffs", {})
-        player.active_effects = save_data.get("active_effects", {})
-        # Save anterior à paridade guardava a redução de dano do monstro como
-        # dicionário solto em `active_effects`. Ela agora é buff, como a do
-        # herói sempre foi; sem esta migração ela ficaria no estado sem nunca
-        # ser lida nem expirar.
-        legado = player.active_effects.pop("damage_reduction", None)
-        if isinstance(legado, dict):
-            player.active_buffs["Redução de Dano"] = {
-                "stat": "damage_reduction",
-                "value": int(legado.get("value", 0)),
-                "duration": int(legado.get("duration", 1)),
-            }
-
-        passive_ids = save_data.get("passives", [])
-        if passive_ids:
-            for pid in passive_ids:
-                passive = get_passive_by_id(pid)
-                if passive:
-                    player.add_passive_load(passive)
-
-        # Restaurar por último: passivas e equipamento alteram `base_hp`/`base_mp`,
-        # então o teto só é conhecido depois deles. Save antigo (sem os campos)
-        # mantém o comportamento anterior e entra com os recursos cheios.
-        hp_salvo = save_data.get("hp")
-        if hp_salvo is not None:
-            player._hp = max(1, min(int(hp_salvo), player.base_hp))
-        mp_salvo = save_data.get("mp")
-        if mp_salvo is not None:
-            player._mp = max(0, min(int(mp_salvo), player.base_mp))
-
-        dungeon_level = save_data["dungeon_level"]
-        map_state = save_data.get("map_state", None)
-
-        return player, dungeon_level, map_state
-
+        return player_from_save_data(save_data, item_registry, player_factory)
     except Exception:
         return None, None, None
 

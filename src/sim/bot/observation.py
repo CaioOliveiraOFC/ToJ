@@ -406,6 +406,26 @@ class ProgressionState:
     # seja Fonte, o drop que talvez caia, o preço que a Loja talvez tenha, nem o
     # descanso do próximo andar — nenhum deles é conhecido agora.
     cura_garantida: float = 0.0
+    # --- COMPARAÇÃO COM O ALVO DA ARENA ---------------------------------
+    #
+    # `bot_power / benchmark_power`, os dois medidos pela mesma régua de
+    # nível-equivalente. É a QUALIDADE DA BUILD, e não se confunde com a razão
+    # de runway: uma diz quão bom ficou o personagem, a outra quanto de estrada
+    # ainda cabe no estado atual. Somá-las contaria o mesmo atrito duas vezes.
+    #
+    # ZERO significa NÃO MEDIDO — o adaptador só paga a medição quando extrair é
+    # possível (chave no bolso e a casa `E` alcançável), porque ela custa
+    # centenas de duelos reais. Sem essa condição a comparação não decide nada.
+    poder_relativo: float = 0.0
+    # Se a razão acima pode ser LIDA como diferença de poder. Ela só cancela a
+    # pilotagem quando os dois lados carregam kit comparável — deck, poção e
+    # mana que o deck exige. Comparar quem está sem poção contra um alvo com
+    # poção desloca a razão em cerca de 20%, e aí ela mede inventário disfarçado
+    # de poder. Só tem sentido quando `poder_relativo > 0`.
+    poder_confiavel: bool = False
+    # Por que a comparação não é confiável, quando não é. Texto para o motivo da
+    # decisão; não entra em conta nenhuma.
+    motivo_do_poder: str = ""
 
     @property
     def hp_frac(self) -> float:

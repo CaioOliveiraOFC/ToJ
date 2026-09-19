@@ -71,6 +71,7 @@ from src.sim.policies import (
     _consumables,
     _usable_skills,
 )
+from tools.arena_alvo import comparar_com_benchmark
 
 # As famílias de skill que o jogo conhece. Quem classifica é o dado da carta.
 FAMILIAS_DE_SKILL = ("damage", "heal", "buff", "damage_reduction", "status")
@@ -1058,8 +1059,35 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
         andares_concluidos=int(getattr(bot, "andares_concluidos", 0) or 0),
         cura_garantida=_cura_garantida(hero),
         perda_de_essencia=_perda_de_essencia(hero),
+        **_comparacao_com_a_arena(
+            hero, extrair_e_possivel=desvio_extracao is not None and extraction.has_key(hero)
+        ),
     )
     return mapa, prog
+
+
+def _comparacao_com_a_arena(hero, *, extrair_e_possivel: bool) -> dict:
+    """`bot_power / benchmark_power`, medido só quando extrair é possível.
+
+    A medição roda centenas de duelos reais contra o boneco de referência: são
+    segundos, não microssegundos. Pagá-la em toda decisão de mapa seria trocar a
+    run por uma medição, e o número não decide nada enquanto não houver chave no
+    bolso e casa `E` alcançável — que é exatamente a condição do portão.
+
+    Dentro de um mesmo build o custo é pago UMA vez: `overall_power` responde por
+    assinatura de build, então a segunda chamada do mesmo andar é instantânea.
+
+    Não altera o herói nem consome o sorteio da run: quem garante as duas coisas
+    é `sim.arena`, com cópia em repouso e o gerador global restaurado.
+    """
+    if not extrair_e_possivel:
+        return {}
+    resultado = comparar_com_benchmark(hero)
+    return {
+        "poder_relativo": resultado.relativo,
+        "poder_confiavel": resultado.confiavel,
+        "motivo_do_poder": resultado.motivo,
+    }
 
 
 def acoes_do_mapa(

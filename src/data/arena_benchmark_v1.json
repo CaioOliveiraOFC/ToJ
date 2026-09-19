@@ -1,0 +1,212 @@
+{
+    "player_class": "Rogue",
+    "player_name": "Referencia",
+    "level": 22,
+    "xp": 2652,
+    "hp": 5313,
+    "mp": 523,
+    "coins": 3216,
+    "ledger": {
+        "gold_earned": 22398,
+        "gold_spent": 19182,
+        "max_gold_held": 5792,
+        "purchases": 67,
+        "interest_payments": 19,
+        "items_dropped": 33,
+        "items_sold": 21,
+        "items_equipped": 25,
+        "gold_from_combat": 17086,
+        "extraction_keys_found": 1,
+        "gold_from_sale": 4382,
+        "gold_spent_on_gear": 8191,
+        "gold_spent_on_exit_fee": 4336,
+        "paid_exits": 19,
+        "gold_from_interest": 930,
+        "gold_spent_on_enhancement": 1819,
+        "gold_spent_on_recovery": 815,
+        "gold_spent_on_consumable": 3576,
+        "gems_found": 5,
+        "gold_spent_on_socket": 445
+    },
+    "last_interest_floor": 19,
+    "unpaid_exit_streak": 0,
+    "shop_miss_streak": 1,
+    "forge_miss_streak": 0,
+    "extraction_miss_streak": 0,
+    "extraction_keys": 1,
+    "extracted_on_floor": 0,
+    "gems": [],
+    "inventory": [
+        {
+            "name": "Elixir de Pedra"
+        },
+        {
+            "name": "Elixir de Precisão"
+        },
+        {
+            "name": "Poção de Mana Pequena"
+        },
+        {
+            "name": "Elixir Vampírico"
+        },
+        {
+            "name": "Elixir de Couraça"
+        },
+        {
+            "name": "Porrete",
+            "enhancement_level": 1
+        },
+        {
+            "name": "Cajado de Cristal",
+            "socket_count": 2
+        },
+        {
+            "name": "Amuleto de Pedra"
+        },
+        {
+            "name": "Armadura de Fenrir",
+            "socket_count": 2
+        }
+    ],
+    "equipment": {
+        "Helmet": {
+            "name": "Elmo de Dragão",
+            "enhancement_level": 1,
+            "socket_count": 2,
+            "gems": [
+                {
+                    "gem_type": "Topázio",
+                    "level": 1
+                },
+                {
+                    "gem_type": "Topázio",
+                    "level": 3
+                }
+            ]
+        },
+        "Amulet": {
+            "name": "Amuleto de Prata",
+            "enhancement_level": 1,
+            "socket_count": 1
+        },
+        "Weapon1": {
+            "name": "Espada de Aço",
+            "socket_count": 1,
+            "gems": [
+                {
+                    "gem_type": "Rubi",
+                    "level": 2
+                }
+            ]
+        },
+        "Weapon2": {
+            "name": "Faca de Caça"
+        },
+        "Body": {
+            "name": "Armadura de Cota de Malha",
+            "socket_count": 1,
+            "gems": [
+                {
+                    "gem_type": "Topázio",
+                    "level": 2
+                }
+            ]
+        },
+        "Legs": {
+            "name": "Perneiras de Ferro",
+            "socket_count": 1,
+            "gems": [
+                {
+                    "gem_type": "Ametista",
+                    "level": 2
+                }
+            ]
+        },
+        "Hands": {
+            "name": "Luvas de Aço",
+            "socket_count": 1
+        },
+        "Shoes": {
+            "name": "Botas de Aço",
+            "socket_count": 1
+        },
+        "Ring1": {
+            "name": "Anel Vegetal",
+            "enhancement_level": 1
+        },
+        "Ring2": {
+            "name": "Anel da Esmeralda",
+            "socket_count": 1
+        },
+        "Accessory": null
+    },
+    "passives": [
+        "pulso_certeiro",
+        "coracao_ferro",
+        "sangue_guerreiro",
+        "toque_dragao",
+        "coracao_ferro",
+        "coracao_ferro",
+        "escudo_fe",
+        "olho_aguia",
+        "passo_de_corca",
+        "unha_suja",
+        "pele_grossa",
+        "postura_fechada",
+        "furia_berserker",
+        "alma_eterna",
+        "sangue_guerreiro",
+        "sangue_guerreiro",
+        "mente_serena",
+        "olho_aguia",
+        "escudo_fe",
+        "reflexos_rapidos",
+        "pele_grossa"
+    ],
+    "skills": {
+        "1": "ataque_furtivo",
+        "2": "n_guarda_cruzada",
+        "3": "golpe_sombras",
+        "4": "n_travar_o_pulso"
+    },
+    "initial_skills_learned": 1,
+    "seen_skill_ids": [
+        "ataque_furtivo",
+        "bolso_do_alfaiate",
+        "capa_rasgada",
+        "chuva_de_ferrões",
+        "corte_de_tendao",
+        "envenenar",
+        "faro_de_rua",
+        "golpe_baixo",
+        "golpe_sombras",
+        "leitura_de_guarda",
+        "n_estocada_seca",
+        "n_guarda_alta",
+        "n_guarda_cruzada",
+        "n_marca_do_cacador",
+        "n_mira_calma",
+        "n_olho_treinado",
+        "n_pausa_util",
+        "n_travar_o_pulso",
+        "nó_corredio",
+        "olho_do_falcão",
+        "pó_nos_olhos",
+        "sangria_lenta"
+    ],
+    "skill_cooldowns": {},
+    "active_buffs": {},
+    "active_effects": {},
+    "dungeon_level": 20,
+    "map_state": null,
+    "_benchmark": {
+        "versao": "v1",
+        "origem": "run real do BotPadrao, snapshot na entrada do andar 20",
+        "classe": "Rogue",
+        "seed": 20261007,
+        "andar_de_captura": 20,
+        "hp_na_chegada": 5313,
+        "mp_na_chegada": 523,
+        "ouro_na_chegada": 3216
+    }
+}
