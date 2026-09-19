@@ -34,14 +34,17 @@ from src.content.factories.archetypes import spawn_by_role
 from src.content.factories.monsters import calculate_scaled_monster_level
 from src.shared.constants import (
     ARENA_EQUIVALENCE_BAND,
+    ARENA_LEVEL_BRACKET,
     ARENA_LEVEL_FLOOR,
     ARENA_REFERENCE_ROLE,
 )
+from src.sim import arena
 from src.sim.arena import (
     ABAIXO,
     EQUIVALENTE,
     NAO_CONFIAVEL,
     SUPEROU,
+    PoderForaDeEscalaError,
     assinatura_de_build,
     classificar,
     comparar,
@@ -348,3 +351,77 @@ def test_o_numero_se_repete_entre_blocos_de_seed_independentes():
         ]
         media = sum(valores) / len(valores)
         assert (max(valores) - min(valores)) / media < 0.02, (classe, valores)
+
+
+# --- O teto que não é teto -------------------------------------------------
+
+
+# Multiplicador do campeão de teste. Medido com `POUCOS_DUELOS`: com 400× o
+# resultado fica em 60,6–62,9 — margem de 1% sobre o bracket, que é ruído de
+# amostra e não prova nada. Com 4.000× fica em 70,7–72,8: 18% acima, folga
+# suficiente para o teste falhar só quando a expansão realmente quebrar.
+#
+# A escala é logarítmica nos atributos porque o orçamento de monstro é
+# geométrico — 10× de força não vale 10× de nível, vale cerca de +20.
+FORCA_FORA_DE_ESCALA = 4_000
+
+
+def campeao_fora_de_escala(fator: int = FORCA_FORA_DE_ESCALA):
+    """Um personagem forte o bastante para passar do bracket inicial.
+
+    Artificial de propósito: o que está sob teste é o MECANISMO DE BUSCA, não um
+    build que a progressão produza. Os atributos entram pelos setters do próprio
+    herói, então tudo abaixo continua saindo das funções canônicas.
+    """
+    heroi = make_hero("Warrior", 20, "best")
+    heroi.base_hp = heroi.base_hp * fator
+    heroi.base_st = heroi.base_st * fator
+    heroi.base_df = heroi.base_df * fator
+    heroi.rest()
+    return heroi
+
+
+@pytest.mark.balance
+def test_o_bracket_inicial_nao_e_teto_do_resultado():
+    """A dungeon é infinita; o número não pode saturar em 60.
+
+    Com teto fixo, dois campeões diferentes liam o mesmo valor e
+    `relative_power` entre eles dava 1,000 sem que nenhum tivesse sido medido —
+    a saturação que a régua existe para não ter.
+    """
+    leitura = overall_power(campeao_fora_de_escala(), duelos=POUCOS_DUELOS)
+    assert leitura.nivel_equivalente > ARENA_LEVEL_BRACKET
+
+
+@pytest.mark.balance
+def test_dois_campeoes_acima_do_bracket_continuam_distinguiveis():
+    """O que a saturação quebrava: comparar quem passou do teto."""
+    um = overall_power(campeao_fora_de_escala(), duelos=POUCOS_DUELOS).nivel_equivalente
+    outro = overall_power(
+        campeao_fora_de_escala(FORCA_FORA_DE_ESCALA * 8), duelos=POUCOS_DUELOS
+    ).nivel_equivalente
+    assert um > ARENA_LEVEL_BRACKET
+    assert outro > um
+
+
+def test_a_trava_tecnica_falha_em_vez_de_virar_resultado(monkeypatch):
+    """O limite de segurança não pode ser devolvido calado.
+
+    Devolvê-lo seria trocar um número medido por um número escolhido — e
+    reintroduzir, no limite técnico, a mesma saturação que o bracket fixo tinha.
+    """
+    monkeypatch.setattr(arena, "ARENA_LEVEL_HARD_LIMIT", 4.0)
+    monkeypatch.setattr(arena, "ARENA_LEVEL_BRACKET", 2.0)
+    with pytest.raises(PoderForaDeEscalaError) as erro:
+        overall_power(campeao_fora_de_escala(), duelos=1, usar_cache=False)
+    assert "não foi medido" in str(erro.value)
+
+
+def test_a_expansao_nao_cobra_sondagem_de_quem_esta_na_escala():
+    """Quem cabe no bracket inicial não paga pela busca dos que não cabem."""
+    normal = make_hero("Warrior", 8, "expected")
+    leitura = overall_power(normal, duelos=POUCOS_DUELOS, usar_cache=False)
+    assert ARENA_LEVEL_FLOOR < leitura.nivel_equivalente < ARENA_LEVEL_BRACKET
+    # Piso, topo do bracket e a bisseção até a tolerância relativa. Uma expansão
+    # a mais apareceria aqui como sondagem extra.
+    assert leitura.sondagens <= 16

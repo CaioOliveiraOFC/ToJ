@@ -47,10 +47,12 @@ from src.mechanics.battle import run_battle
 from src.mechanics.combat import skill_mana_cost
 from src.shared import effects as fx
 from src.shared.constants import (
+    ARENA_BRACKET_GROWTH,
     ARENA_DUELS_PER_PROBE,
     ARENA_EQUIVALENCE_BAND,
-    ARENA_LEVEL_CEILING,
+    ARENA_LEVEL_BRACKET,
     ARENA_LEVEL_FLOOR,
+    ARENA_LEVEL_HARD_LIMIT,
     ARENA_LEVEL_TOLERANCE,
     ARENA_MEASURE_SEED,
     ARENA_REFERENCE_ROLE,
@@ -69,6 +71,16 @@ ABAIXO = "ABAIXO"
 EQUIVALENTE = "EQUIVALENTE"
 SUPEROU = "SUPEROU"
 NAO_CONFIAVEL = "NAO_CONFIAVEL"
+
+
+class PoderForaDeEscalaError(RuntimeError):
+    """A busca bateu no limite técnico sem achar o nível de equilíbrio.
+
+    Erro, e não um número: devolver o próprio limite faria dois personagens
+    incomparáveis lerem o mesmo valor, que é precisamente o que a expansão do
+    bracket existe para impedir.
+    """
+
 
 # Os modificadores de combate que entram na assinatura de build. São os canais
 # por onde equipamento, encantamento e passiva mudam um golpe sem mudar um
@@ -195,15 +207,35 @@ def overall_power(
             sondagens += 1
             return _taxa_de_vitoria(prototipo, nivel, duelos, semente)
 
-        baixo, alto = ARENA_LEVEL_FLOOR, ARENA_LEVEL_CEILING
+        baixo, alto = ARENA_LEVEL_FLOOR, ARENA_LEVEL_BRACKET
         if taxa(baixo) < ARENA_WIN_TARGET:
             # Perde até para o menor monstro que o jogo constrói. O piso é a
             # resposta honesta; inventar um número abaixo dele seria extrapolar
             # uma curva de orçamento que não existe.
             leitura = PoderGeral(baixo, sondagens * duelos, sondagens)
-        elif taxa(alto) >= ARENA_WIN_TARGET:
-            leitura = PoderGeral(alto, sondagens * duelos, sondagens)
         else:
+            # O bracket inicial é PALPITE, não teto. Enquanto o personagem
+            # continuar vencendo no topo, o topo sobe: a dungeon é infinita, e um
+            # teto fixo faria dois campeões diferentes saturarem no mesmo número
+            # — `relative_power` entre eles daria 1,000 sem que nenhum dos dois
+            # tivesse sido medido. A expansão é mecanismo de BUSCA e não toca em
+            # fórmula, piloto, amostra nem banda.
+            while taxa(alto) >= ARENA_WIN_TARGET:
+                if alto >= ARENA_LEVEL_HARD_LIMIT:
+                    # Trava técnica contra laço infinito. Ela FALHA em vez de
+                    # devolver o próprio limite: um teto que vira resultado é
+                    # exatamente o defeito que a expansão existe para corrigir,
+                    # e devolvê-lo calado seria trocar um número medido por um
+                    # número escolhido.
+                    raise PoderForaDeEscalaError(
+                        f"{personagem.get_classname()} ainda vence no nível "
+                        f"{alto:.0f}, o limite técnico da busca. O resultado não "
+                        f"foi medido — aumente ARENA_LEVEL_HARD_LIMIT ou "
+                        f"investigue por que o personagem não tem oponente."
+                    )
+                baixo = alto
+                alto = min(alto * ARENA_BRACKET_GROWTH, ARENA_LEVEL_HARD_LIMIT)
+
             while alto - baixo > ARENA_LEVEL_TOLERANCE * (baixo + alto) / 2:
                 meio = (baixo + alto) / 2
                 if taxa(meio) >= ARENA_WIN_TARGET:

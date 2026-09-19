@@ -645,11 +645,28 @@ ARENA_DUELS_PER_PROBE = 100
 # metade da banda de equivalência.
 ARENA_LEVEL_TOLERANCE = 0.006
 
-# O intervalo da busca. O piso é o menor monstro que o jogo constrói; o teto é
-# folgado de propósito, porque um personagem de nível 20 com equipamento de topo
-# já empata perto de 31.
+# O piso da busca: o menor monstro que o jogo constrói. Abaixo dele não há curva
+# de orçamento para ler, então quem perde para ele lê 1,0 — resposta honesta, e
+# não teto, porque o jogo não tem monstro mais fraco para servir de régua.
 ARENA_LEVEL_FLOOR = 1.0
-ARENA_LEVEL_CEILING = 60.0
+
+# O PALPITE inicial do topo da busca, folgado de propósito: um personagem de
+# nível 20 com equipamento de topo já empata perto de 31.
+#
+# NÃO é teto do resultado. A dungeon é infinita, então um teto fixo faria dois
+# campeões diferentes saturarem no mesmo número, e `relative_power` entre eles
+# daria 1,000 sem que nenhum dos dois tivesse sido medido. Quando o personagem
+# ainda vence aqui, o bracket DOBRA e a busca continua — mecanismo de busca, não
+# balanceamento: fórmula, piloto, amostra e banda seguem intactos.
+ARENA_LEVEL_BRACKET = 60.0
+ARENA_BRACKET_GROWTH = 2.0
+
+# Trava técnica contra laço infinito, não resposta. Atingi-la levanta
+# `PoderForaDeEscalaError`: um limite que vira resultado calado é exatamente o
+# defeito que a expansão existe para corrigir. O valor é absurdo de propósito —
+# um monstro de nível 10 mil tem HP na casa dos 10^54 —, então chegar lá
+# significa bug, não campeão.
+ARENA_LEVEL_HARD_LIMIT = 10_000.0
 
 # Semente da medição. Fixa para que dois cálculos do mesmo personagem devolvam o
 # mesmo número — a decisão de extrair não pode oscilar por sorteio. O gerador
