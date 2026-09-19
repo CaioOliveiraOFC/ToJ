@@ -364,6 +364,10 @@ class ProgressionState:
     pocoes_de_cura: int = 0
     passivas: int = 0
     pecas_equipadas: int = 0
+    # Tenho a Chave de Extração? Ela cai de monstro derrotado, o teto é uma, e
+    # sem ela a casa `E` não deixa encerrar a run. É informação do próprio
+    # bolso do herói — o jogador sabe o que carrega.
+    tem_chave: bool = False
     # Quantas peças o Ferreiro REALMENTE pode mexer, pelas funções canônicas
     # `forge.enhanceable` e `forge.socketable`. "Tem peça equipada" era proxy: um
     # herói com tudo no teto ganhava valor por visitar quem não tem o que fazer.

@@ -22,6 +22,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Callable
 
 from src.content import level_up
+from src.content.extraction import award_key
 from src.content.factories.loot import get_loot
 from src.content.forge import award_gem
 from src.mechanics import battle
@@ -115,6 +116,10 @@ def process_post_battle(
         # Rolagem SEPARADA da do item: a gema não ocupa o lugar dele, e a mesma
         # vitória pode largar os dois.
         award_gem(player, dungeon_level)
+        # E a Chave de Extração, terceira rolagem independente. Ela só cai de
+        # monstro derrotado: não se compra, não se vende, nenhum serviço a dá.
+        # Quem já tem a chave nem rola — ver `extraction.award_key`.
+        award_key(player)
 
     level_up_messages: list[str] = []
     levels_gained = 0

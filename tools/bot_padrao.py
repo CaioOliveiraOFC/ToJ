@@ -36,7 +36,7 @@ import random
 from collections import Counter
 from dataclasses import dataclass
 
-from src.content import level_up
+from src.content import extraction, level_up
 from src.content.economy import exit_fee, pay_interest
 from src.content.factories import features as feat
 from src.content.factories.dungeons import (
@@ -472,8 +472,18 @@ class BotPadrao:
             # de DEPOIS da caminhada — e produzia o loop EXTRAIR -> anda -> NÃO
             # EXTRAIR. Uma decisão de extração é tomada uma vez, para aquele
             # estado, e chegar à casa é executá-la.
+            #
+            # A casa NUNCA é consumida, como no engine: sem chave ela fica de pé,
+            # e passar reto também. Quem acaba com a oportunidade é mudar de andar.
+            if not extraction.has_key(hero):
+                self.trace.diz("  Pisou na Extração sem a Chave: o portal continua trancado.")
+                return True
             if self.extracao_decidida:
-                self.trace.diz("  Pisou na Extração e executou a decisão que a trouxe até aqui.")
+                extraction.consume_key(hero)
+                self.trace.diz(
+                    "  Pisou na Extração e executou a decisão que a trouxe até aqui, "
+                    "gastando a Chave."
+                )
                 self.extraiu = True
                 return False
             self.trace.diz("  Pisou na Extração de passagem: a decisão atual não era extrair.")

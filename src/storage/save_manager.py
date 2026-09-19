@@ -202,6 +202,10 @@ def save_game(
         "shop_miss_streak": int(getattr(player, "shop_miss_streak", 0)),
         "forge_miss_streak": int(getattr(player, "forge_miss_streak", 0)),
         "extraction_miss_streak": int(getattr(player, "extraction_miss_streak", 0)),
+        # A chave é estado da RUN e precisa sobreviver ao save: sem ela aqui,
+        # salvar e carregar devolveria a chave já gasta, ou apagaria a que o
+        # herói acabou de conquistar.
+        "extraction_keys": int(getattr(player, "extraction_keys", 0)),
         "gems": [gem_to_dict(g) for g in getattr(player, "gems", ())],
         "inventory": inventory_names,
         "equipment": equipment_names,
@@ -283,6 +287,7 @@ def load_game(
             "shop_miss_streak",
             "forge_miss_streak",
             "extraction_miss_streak",
+            "extraction_keys",
         ):
             setattr(player, campo, int(save_data.get(campo, 0) or 0))
 

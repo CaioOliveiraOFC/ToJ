@@ -152,6 +152,24 @@ EXTRACTION_MIN_FLOOR = 3
 EXTRACTION_SPAWN_CHANCE = 0.15
 EXTRACTION_PITY_INCREMENT = 0.10
 
+# --- Chave de Extração ---
+# A casa `E` deixou de ser suficiente por si. Antes desta regra, extrair era
+# grátis, repetível e nem sequer encerrava a run: o laço não tratava o desfecho,
+# a casa não era consumida, e ir até o `E` era estritamente dominante sempre que
+# ele aparecesse. Não havia decisão a tomar — só a sorte de o `E` nascer.
+#
+# A CHAVE é o que devolve a decisão ao jogador. Ela cai de monstro derrotado, e
+# só de lá: não se compra, não se vende, nenhum serviço a oferece. Quem quer a
+# saída de emergência precisa ter LUTADO por ela.
+#
+# Teto de UMA. Sem teto, a chave viraria estoque e a extração voltaria a ser
+# garantida para quem lutou bastante — exatamente o que esta regra remove.
+#
+# Os 15% são valor INICIAL, para a mecânica ser jogável. Não são balanceamento:
+# a medição vem na rodada global.
+EXTRACTION_KEY_DROP_CHANCE = 0.15
+EXTRACTION_KEY_MAX = 1
+
 # --- Ferreiro ---
 # Três serviços, três curvas, e todas ancoradas na renda do andar ou no preço da
 # peça. Nenhuma tem teto: o soft cap é o próprio custo.

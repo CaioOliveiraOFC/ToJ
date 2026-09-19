@@ -175,6 +175,11 @@ class Player(Entity):
         # aprender a ignorá-la — a loja, o descarte do bot, a tela de itens do
         # combate. Separar é a solução menor.
         self.gems: list = []
+        # Chave de Extração: 0 ou 1. Cai de monstro derrotado e é o que a casa
+        # `E` cobra para deixar encerrar a run. Mora no personagem porque
+        # atravessa andares — o mapa do 7 não sabe o que caiu no 4. Ver
+        # `content/extraction.py`, que é a porta única da regra.
+        self.extraction_keys: int = 0
 
     # As posições físicas do personagem, na ordem em que a UI as mostra.
     #

@@ -10,6 +10,7 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from src.content.economy import interest_cap, pay_interest
+from src.content.extraction import consume_key, has_key
 from src.content.factories.dungeons import roll_random_event
 from src.content.factories.features import roll_features
 from src.content.factories.monsters import (
@@ -437,6 +438,13 @@ def _handle_feature(
         return None
 
     if tile.feature == "extraction":
+        # A casa NUNCA é consumida aqui, e isso é regra: sem chave ela continua
+        # esperando, e recusar a extração também a deixa de pé. O que faz a
+        # oportunidade acabar é AVANÇAR DE ANDAR — o próximo mapa é outro.
+        if not has_key(player):
+            screens.render_extraction_no_key(dungeon_level)
+            return None
+
         decision: dict[str, str | None] = {"choice": None}
         _get_game_publish()(
             topics.UI_EXTRACTION_PROMPT,
@@ -450,13 +458,18 @@ def _handle_feature(
             },
         )
         if decision.get("choice") == "extract":
-            # A Extração não custa nada e não olha a carteira. É a saída de
-            # emergência real da run: quem está sem ouro, acumulando saídas não
-            # pagas e com a Essência no piso ainda pode preservar o personagem.
-            # Não existe dívida nem bloqueio para ela ignorar — a punição por
+            # A Extração não olha a carteira. É a saída de emergência real da
+            # run: quem está sem ouro, acumulando saídas não pagas e com a
+            # Essência no piso ainda pode preservar o personagem. A punição por
             # não pagar a saída é só Essência, e o jogador sobe de qualquer
-            # jeito. O que a Extração faz é encerrar a run antes que a run
-            # encerre o personagem.
+            # jeito.
+            #
+            # O preço dela é a CHAVE, e ela é cobrada aqui — depois do "sim" e
+            # antes do save, para que o estado gravado já seja o de quem gastou.
+            # Antes da chave a extração não cobrava nada, não gastava a casa e
+            # nem sequer encerrava a run: ir até o `E` era estritamente
+            # dominante sempre que ele aparecesse, e não havia decisão nenhuma.
+            consume_key(player)
             save_game(player, dungeon_level + 1, None, slot=slot)
             screens.render_extraction_success(dungeon_level)
             return "extracted"
@@ -641,5 +654,13 @@ def start_game(
                 dungeon_level += 1
                 initial_map_state = None
                 break
+            elif result == "extracted":
+                # A EXTRAÇÃO ENCERRA A DUNGEON. Este ramo faltava: `"extracted"`
+                # subia de `_handle_feature` e caía no vazio, então o laço
+                # continuava, o herói seguia em pé sobre o `E` no mesmo andar, e
+                # o save recém-gravado era apagado por `delete_save` se ele
+                # morresse em seguida. Extrair gravava um checkpoint e não
+                # encerrava nada.
+                return
             elif result == "player_died":
                 return

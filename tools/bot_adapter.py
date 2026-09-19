@@ -32,7 +32,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Any
 
-from src.content import forge
+from src.content import extraction, forge
 from src.content.economy import exit_fee
 from src.content.factories import features as feat
 from src.content.factories.dungeons import RANDOM_EVENT_TYPES, altar_hp_cost
@@ -991,6 +991,7 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
         passivas=len(hero.passives),
         pecas_equipadas=sum(1 for i in hero.equipment.values() if i),
         pecas_para_o_ferreiro=_pecas_para_o_ferreiro(hero),
+        tem_chave=extraction.has_key(hero),
         perda_de_essencia=_perda_de_essencia(hero),
         sinais_de_risco=tuple(bot._sinais_de_risco()),
     )
@@ -1049,7 +1050,10 @@ def acoes_do_mapa(
         opcoes.append(ActionOption(action_id="evento", family="evento", label="? no mapa (evento)"))
         destinos["evento"] = bot.mapa.event_pos
 
-    if mapa.desvio_extracao is not None:
+    # LEGALIDADE, não estratégia: sem a Chave de Extração a casa `E` não deixa
+    # encerrar a run, então extrair não é uma ação possível e não entra como
+    # candidata. Quanto ela VALE continua sendo pergunta de `_avaliar_extracao`.
+    if mapa.desvio_extracao is not None and prog.tem_chave:
         opcoes.append(ActionOption(action_id="extrair", family="extrair", label="extração"))
         destinos["extrair"] = bot._casa_de(feat.EXTRACTION)
 
