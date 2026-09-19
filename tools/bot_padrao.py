@@ -479,7 +479,13 @@ class BotPadrao:
                 self.trace.diz("  Pisou na Extração sem a Chave: o portal continua trancado.")
                 return True
             if self.extracao_decidida:
-                extraction.consume_key(hero)
+                # A MESMA porta do motor. O bot não grava em disco, então a
+                # "gravação" sempre dá certo — mas passar por aqui é o que
+                # garante que ele cobre a chave e marque o fim da run exatamente
+                # como o jogo faz, em vez de manter uma segunda versão da regra.
+                extraction.finish_run(
+                    hero, self.andar, lambda: {"success": True, "message": "memória"}
+                )
                 self.trace.diz(
                     "  Pisou na Extração e executou a decisão que a trouxe até aqui, "
                     "gastando a Chave."

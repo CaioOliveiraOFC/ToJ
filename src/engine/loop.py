@@ -10,7 +10,7 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from src.content.economy import interest_cap, pay_interest
-from src.content.extraction import consume_key, has_key, mark_extracted
+from src.content.extraction import finish_run, has_key
 from src.content.factories.dungeons import roll_random_event
 from src.content.factories.features import roll_features
 from src.content.factories.monsters import (
@@ -469,13 +469,27 @@ def _handle_feature(
             # Antes da chave a extração não cobrava nada, não gastava a casa e
             # nem sequer encerrava a run: ir até o `E` era estritamente
             # dominante sempre que ele aparecesse, e não havia decisão nenhuma.
-            consume_key(player)
-            # ANDAR EM QUE A RUN ACABOU, e não `andar + 1`. O `+1` era um ponto
-            # de RETOMADA, e o loop do jogo é de mão única: dungeon -> extração
-            # -> personagem preservado -> camada pós-dungeon. Não há volta para
-            # esta dungeon, então não há andar seguinte a marcar.
-            mark_extracted(player, dungeon_level)
-            save_game(player, dungeon_level, None, slot=slot)
+            # A extração só está concluída quando o personagem foi REALMENTE
+            # preservado. Ignorar o resultado da gravação era o pior desfecho
+            # possível do jogo: chave gasta, run marcada, tela de sucesso, saída
+            # da dungeon — e nada no disco.
+            #
+            # `finish_run` cobra a chave e marca o fim ANTES de gravar, porque é
+            # o personagem que vai para o arquivo, e desfaz tudo se o disco
+            # falhar. O ANDAR gravado é aquele em que a run acabou, e não
+            # `andar + 1`: o `+1` era um ponto de RETOMADA, e o loop é de mão
+            # única — dungeon -> extração -> personagem preservado -> camada
+            # pós-dungeon.
+            if not finish_run(
+                player,
+                dungeon_level,
+                lambda: save_game(player, dungeon_level, None, slot=slot),
+            ):
+                # Nada foi cobrado e nada foi marcado. A casa continua de pé, a
+                # chave continua no bolso, e a run segue viva — o jogador decide
+                # o que fazer com a informação.
+                screens.render_extraction_failed(dungeon_level)
+                return None
             screens.render_extraction_success(dungeon_level)
             return "extracted"
     return None

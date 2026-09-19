@@ -108,3 +108,42 @@ def was_extracted(player) -> bool:
 def extracted_floor(player) -> int:
     """Em que andar a run foi extraída. Zero quando ela não foi."""
     return max(0, int(getattr(player, CAMPO_EXTRAIDA, 0) or 0))
+
+
+def finish_run(player: "Player", dungeon_level: int, gravar) -> bool:
+    """Cobra a chave, marca o fim da run, e SÓ confirma se o save gravar.
+
+    A ordem é obrigatória e é o motivo desta função existir: o save serializa o
+    personagem, então a chave já precisa estar gasta e a marca já precisa estar
+    posta ANTES da gravação — senão o arquivo guardaria um herói que ainda tem a
+    chave e cuja run ainda está viva.
+
+    O risco de fazer nessa ordem é o disco falhar no meio: o jogo cobraria a
+    chave, marcaria a run como encerrada, mostraria sucesso e sairia da dungeon
+    **sem ter preservado nada**. O personagem morreria de verdade, e o jogador
+    teria pago a chave por isso.
+
+    Por isso a mutação é REVERSÍVEL. Falhou a gravação, tudo volta: a chave, a
+    marca e os contadores do livro-caixa. `gravar` é passado de fora porque quem
+    decide slot e caminho é o motor, e esta função só precisa saber se deu certo.
+
+    Devolve se a run foi realmente encerrada.
+    """
+    chaves = keys_of(player)
+    andar_anterior = extracted_floor(player)
+    livro = getattr(player, "ledger", None)
+    livro_anterior = dict(livro) if isinstance(livro, dict) else None
+
+    consume_key(player)
+    mark_extracted(player, dungeon_level)
+
+    resultado = gravar()
+    if isinstance(resultado, dict) and resultado.get("success"):
+        return True
+
+    setattr(player, CAMPO, chaves)
+    setattr(player, CAMPO_EXTRAIDA, andar_anterior)
+    if livro_anterior is not None:
+        livro.clear()
+        livro.update(livro_anterior)
+    return False

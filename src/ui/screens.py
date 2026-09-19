@@ -969,6 +969,24 @@ def render_extraction_no_key(dungeon_level: int) -> None:
     )
 
 
+def render_extraction_failed(dungeon_level: int) -> None:
+    """A gravação falhou. Nada foi cobrado, e a run continua de pé."""
+    renderer.console.print(
+        Panel(
+            Text(
+                f"A Extração do andar {dungeon_level} NÃO foi concluída:\n"
+                "não foi possível gravar o personagem.\n"
+                "Sua Chave continua com você e o portal continua aqui — "
+                "a run não foi encerrada.",
+                justify="center",
+                style="bold red",
+            ),
+            border_style="red",
+            title="Extração falhou",
+        )
+    )
+
+
 def render_extraction_success(dungeon_level: int) -> None:
     """Confirmação após extração bem-sucedida."""
     renderer.console.print(

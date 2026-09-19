@@ -154,7 +154,7 @@ class TestExtrairEncerraARunEmVezDeAdiantarOAndar:
     def test_o_codigo_da_extracao_grava_o_andar_do_fim(self):
         """Fixa a chamada em `engine/loop.py`, não só a semântica do save."""
         fonte = (RAIZ / "src" / "engine" / "loop.py").read_text(encoding="utf-8")
-        assert "mark_extracted(player, dungeon_level)" in fonte
+        assert "finish_run(" in fonte, "a extração deixou de ser atômica"
         assert "save_game(player, dungeon_level, None, slot=slot)" in fonte
         assert "save_game(player, dungeon_level + 1, None, slot=slot)" not in fonte, (
             "a extração voltou a gravar um ponto de retomada"

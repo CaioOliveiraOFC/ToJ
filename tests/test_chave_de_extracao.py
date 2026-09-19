@@ -58,11 +58,24 @@ def porta_da_extracao(monkeypatch):
     informa o que o engine devolveu, o que foi salvo e se a casa continua lá.
     """
     gravados: list = []
-    monkeypatch.setattr(L, "save_game", lambda *a, **k: gravados.append(a))
+    estado = {"gravacao_falha": False}
+
+    def _gravar(*a, **k):
+        # O MESMO contrato de `save_manager.save_game`: um dicionário com
+        # `success`. A gravação de verdade devolve isso, e a extração agora
+        # depende dele.
+        if estado["gravacao_falha"]:
+            return {"success": False, "message": "disco cheio"}
+        gravados.append(a)
+        return {"success": True, "message": "ok"}
+
+    monkeypatch.setattr(L, "save_game", _gravar)
     monkeypatch.setattr(L.screens, "render_extraction_success", lambda *a, **k: None)
     monkeypatch.setattr(L.screens, "render_extraction_no_key", lambda *a, **k: None)
+    monkeypatch.setattr(L.screens, "render_extraction_failed", lambda *a, **k: None)
 
-    def abrir(hero, escolha="extract", andar=6):
+    def abrir(hero, escolha="extract", andar=6, gravacao_falha=False):
+        estado["gravacao_falha"] = gravacao_falha
         random.seed(20260918)
         mapa = L._setup_dungeon_map(andar, None, andar, hero)
         casa = (2, 2)
@@ -201,6 +214,88 @@ class TestPortaDaExtracao:
         extraction.award_key(com_chave, rng=_sempre())
         assert porta_da_extracao(com_chave, "extract")["casa_continua"]
         assert porta_da_extracao(_heroi(), "continue")["casa_continua"]
+
+
+class TestGravacaoQueFalhaNaoExtrai:
+    """O pior desfecho possível do jogo, e ele era alcançável.
+
+    `_handle_feature` ignorava o resultado de `save_game`. Com o disco falhando,
+    o jogo cobrava a chave, marcava a run como encerrada, mostrava a tela de
+    sucesso e SAÍA DA DUNGEON — sem nada gravado. O personagem morria de
+    verdade, e o jogador tinha pago a chave por isso.
+
+    A mutação acontece antes da gravação de propósito (é o personagem que vai
+    para o arquivo), então ela precisa ser reversível.
+    """
+
+    def _com_chave(self):
+        hero = _heroi()
+        extraction.award_key(hero, rng=_sempre())
+        return hero
+
+    def test_save_que_falha_nao_encerra_a_run(self, porta_da_extracao):
+        hero = self._com_chave()
+        r = porta_da_extracao(hero, "extract", gravacao_falha=True)
+        assert r["resultado"] is None, "encerrou a dungeon sem ter preservado o personagem"
+
+    def test_save_que_falha_nao_cobra_a_chave(self, porta_da_extracao):
+        hero = self._com_chave()
+        porta_da_extracao(hero, "extract", gravacao_falha=True)
+        assert extraction.keys_of(hero) == 1, "pagou a chave por uma extração que não houve"
+
+    def test_save_que_falha_nao_deixa_a_marca_de_run_extraida(self, porta_da_extracao):
+        hero = self._com_chave()
+        porta_da_extracao(hero, "extract", gravacao_falha=True)
+        assert not extraction.was_extracted(hero)
+        assert extraction.extracted_floor(hero) == 0
+
+    def test_save_que_falha_nao_mexe_no_livro_caixa(self, porta_da_extracao):
+        """O contador de chaves gastas não pode registrar o que não aconteceu."""
+        hero = self._com_chave()
+        antes = dict(hero.ledger)
+        porta_da_extracao(hero, "extract", gravacao_falha=True)
+        assert dict(hero.ledger) == antes
+
+    def test_save_que_falha_mantem_a_casa_no_mapa(self, porta_da_extracao):
+        hero = self._com_chave()
+        r = porta_da_extracao(hero, "extract", gravacao_falha=True)
+        assert r["casa_continua"], "o portal sumiu depois de uma extração que falhou"
+
+    def test_save_que_falha_informa_o_jogador(self, porta_da_extracao, monkeypatch):
+        avisos: list = []
+        monkeypatch.setattr(L.screens, "render_extraction_failed", lambda *a, **k: avisos.append(a))
+        monkeypatch.setattr(
+            L.screens, "render_extraction_success", lambda *a, **k: avisos.append(("SUCESSO",))
+        )
+        porta_da_extracao(self._com_chave(), "extract", gravacao_falha=True)
+        assert avisos, "falhou em silêncio"
+        assert ("SUCESSO",) not in avisos, "mostrou sucesso para uma extração que não houve"
+
+    def test_depois_da_falha_a_extracao_ainda_pode_dar_certo(self, porta_da_extracao):
+        """A prova de que o rollback deixou o estado utilizável, e não só limpo."""
+        hero = self._com_chave()
+        porta_da_extracao(hero, "extract", gravacao_falha=True)
+        r = porta_da_extracao(hero, "extract", gravacao_falha=False)
+        assert r["resultado"] == "extracted"
+        assert extraction.keys_of(hero) == 0
+        assert extraction.extracted_floor(hero) == 6
+
+    def test_finish_run_devolve_se_encerrou(self):
+        """A função sozinha, sem o motor em volta."""
+        hero = self._com_chave()
+        assert extraction.finish_run(hero, 5, lambda: {"success": False, "message": "x"}) is False
+        assert extraction.keys_of(hero) == 1
+        assert extraction.finish_run(hero, 5, lambda: {"success": True, "message": "ok"}) is True
+        assert extraction.keys_of(hero) == 0
+        assert extraction.extracted_floor(hero) == 5
+
+    def test_retorno_que_nao_e_o_contrato_conta_como_falha(self):
+        """Falta de `success` é falha: na dúvida, o personagem não é sacrificado."""
+        for resposta in (None, {}, {"message": "sem success"}, "ok", True):
+            hero = self._com_chave()
+            assert extraction.finish_run(hero, 5, lambda r=resposta: r) is False
+            assert extraction.keys_of(hero) == 1
+            assert not extraction.was_extracted(hero)
 
 
 class TestExtrairEncerraARun:
