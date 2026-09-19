@@ -619,3 +619,49 @@ FLOOR_CLEAR_RESTORE_PERCENT = 25
 # Subir de nível restaura parte dos recursos, não tudo. Cura completa a cada
 # nível era uma das cinco fontes de cura gratuita que zeravam o atrito da run.
 LEVEL_UP_RESTORE_PERCENT = 30
+
+# --- Arena: poder geral do personagem ---
+# `overall_power` responde uma pergunta só: contra um monstro de que nível este
+# personagem fica em equilíbrio? A resposta sai na unidade que o jogo já tem —
+# NÍVEL DE MONSTRO —, e por isso nenhum câmbio entre HP, dano, mana e status
+# precisa ser inventado: quem converte é o duelo.
+#
+# O boneco é FIXO e neutro, pelo mesmo motivo que `MONSTER_REFERENCE_LEVEL`
+# existe para as cartas: trocar a régua por caso faria dois personagens
+# incomparáveis. Medido, trocar o arquétipo move `relative_power` em até ~4%.
+ARENA_REFERENCE_ROLE = "bruiser"
+
+# Equilíbrio é meio a meio. Não é peso: é a definição de empate.
+ARENA_WIN_TARGET = 0.5
+
+# Duelos por sondagem. Medido em 5 blocos de seed independentes: com 100, o piso
+# de ruído fica em 0,0–1,6% do valor acima do nível 8 (4,7% no nível 5, onde o
+# personagem tem pouco com que decidir a luta). Com 60 o piso chegava a 5,4% —
+# do tamanho da banda de equivalência, o que tornaria o veredito ruído.
+ARENA_DUELS_PER_PROBE = 100
+
+# Precisão da bisseção, RELATIVA ao valor. Uma tolerância absoluta erraria por
+# escala: 0,15 nível vale 1% em L=15 e 2,5% em L=6, e a segunda sozinha comeria
+# metade da banda de equivalência.
+ARENA_LEVEL_TOLERANCE = 0.006
+
+# O intervalo da busca. O piso é o menor monstro que o jogo constrói; o teto é
+# folgado de propósito, porque um personagem de nível 20 com equipamento de topo
+# já empata perto de 31.
+ARENA_LEVEL_FLOOR = 1.0
+ARENA_LEVEL_CEILING = 60.0
+
+# Semente da medição. Fixa para que dois cálculos do mesmo personagem devolvam o
+# mesmo número — a decisão de extrair não pode oscilar por sorteio. O gerador
+# global é restaurado ao fim (`sim.rng_guard`), então a run não perde sorteio.
+ARENA_MEASURE_SEED = 20260919
+
+# Banda de equivalência: ±5%, decisão de design aprovada. Abaixo dela o
+# personagem está ABAIXO do alvo da Arena; acima, SUPEROU.
+#
+# LIMITAÇÃO CONHECIDA DA V1, registrada e aceita: o resíduo de pilotagem medido
+# na região de kit compatível tem mediana de 3,5% e MÁXIMO OBSERVADO DE 6,3% —
+# ou seja, o máximo NÃO cabe dentro desta banda. A banda permanece em 5% por
+# decisão de design. Fechar isso exige um segundo piloto competente de medição,
+# que o repositório ainda não tem.
+ARENA_EQUIVALENCE_BAND = 0.05
