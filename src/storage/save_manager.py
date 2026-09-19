@@ -60,6 +60,9 @@ def list_slots() -> list[dict]:
                             "class": data.get("player_class", "?"),
                             "level": data.get("level", 0),
                             "floor": data.get("dungeon_level", 0),
+                            # Run encerrada pela Extração: o slot guarda um
+                            # personagem preservado, não uma run em andamento.
+                            "extracted": int(data.get("extracted_on_floor", 0) or 0) > 0,
                         }
                     )
             except Exception:
@@ -206,6 +209,9 @@ def save_game(
         # salvar e carregar devolveria a chave já gasta, ou apagaria a que o
         # herói acabou de conquistar.
         "extraction_keys": int(getattr(player, "extraction_keys", 0)),
+        # Fim de run pela Extração. Sem isto no save, carregar devolveria um
+        # personagem já extraído para dentro da dungeon como se a run seguisse.
+        "extracted_on_floor": int(getattr(player, "extracted_on_floor", 0)),
         "gems": [gem_to_dict(g) for g in getattr(player, "gems", ())],
         "inventory": inventory_names,
         "equipment": equipment_names,
@@ -288,6 +294,7 @@ def load_game(
             "forge_miss_streak",
             "extraction_miss_streak",
             "extraction_keys",
+            "extracted_on_floor",
         ):
             setattr(player, campo, int(save_data.get(campo, 0) or 0))
 

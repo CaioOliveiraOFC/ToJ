@@ -10,7 +10,7 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from src.content.economy import interest_cap, pay_interest
-from src.content.extraction import consume_key, has_key
+from src.content.extraction import consume_key, has_key, mark_extracted
 from src.content.factories.dungeons import roll_random_event
 from src.content.factories.features import roll_features
 from src.content.factories.monsters import (
@@ -470,7 +470,12 @@ def _handle_feature(
             # nem sequer encerrava a run: ir até o `E` era estritamente
             # dominante sempre que ele aparecesse, e não havia decisão nenhuma.
             consume_key(player)
-            save_game(player, dungeon_level + 1, None, slot=slot)
+            # ANDAR EM QUE A RUN ACABOU, e não `andar + 1`. O `+1` era um ponto
+            # de RETOMADA, e o loop do jogo é de mão única: dungeon -> extração
+            # -> personagem preservado -> camada pós-dungeon. Não há volta para
+            # esta dungeon, então não há andar seguinte a marcar.
+            mark_extracted(player, dungeon_level)
+            save_game(player, dungeon_level, None, slot=slot)
             screens.render_extraction_success(dungeon_level)
             return "extracted"
     return None

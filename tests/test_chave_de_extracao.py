@@ -176,7 +176,10 @@ class TestPortaDaExtracao:
         extraction.award_key(hero, rng=_sempre())
         r = porta_da_extracao(hero, "extract")
         assert r["resultado"] == "extracted"
-        assert r["salvou_no_andar"] == 7, "o save da extração é do andar SEGUINTE"
+        # FIM DE RUN, não ponto de retomada: grava o andar em que ela acabou.
+        assert r["salvou_no_andar"] == 6
+        assert extraction.was_extracted(hero)
+        assert extraction.extracted_floor(hero) == 6
 
     def test_extrair_consome_a_chave(self, porta_da_extracao):
         hero = _heroi()

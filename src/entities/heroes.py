@@ -180,6 +180,10 @@ class Player(Entity):
         # atravessa andares — o mapa do 7 não sabe o que caiu no 4. Ver
         # `content/extraction.py`, que é a porta única da regra.
         self.extraction_keys: int = 0
+        # Em que andar esta run foi EXTRAÍDA. Zero enquanto ela continua viva.
+        # É registro de fim de run, não ponto de retomada: o loop é de mão
+        # única, e um personagem extraído não volta para a mesma dungeon.
+        self.extracted_on_floor: int = 0
 
     # As posições físicas do personagem, na ordem em que a UI as mostra.
     #

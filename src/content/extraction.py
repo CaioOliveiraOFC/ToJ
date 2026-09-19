@@ -29,6 +29,10 @@ if TYPE_CHECKING:
 # andar 7 não tem como saber o que caiu no 4.
 CAMPO = "extraction_keys"
 
+# O andar em que a run foi EXTRAÍDA, ou 0 se ela nunca foi. É registro, não
+# checkpoint — ver `mark_extracted`.
+CAMPO_EXTRAIDA = "extracted_on_floor"
+
 
 def keys_of(player) -> int:
     """Quantas chaves o personagem carrega. Zero ou uma — nunca mais que isso."""
@@ -75,3 +79,32 @@ def consume_key(player: "Player") -> bool:
     if isinstance(livro, dict):
         livro["extraction_keys_spent"] = livro.get("extraction_keys_spent", 0) + 1
     return True
+
+
+def mark_extracted(player: "Player", dungeon_level: int) -> None:
+    """Registra que a run foi EXTRAÍDA, e em qual andar ela terminou.
+
+    O loop do jogo é de mão única:
+
+        DUNGEON -> EXTRAÇÃO -> personagem preservado -> camada pós-dungeon
+
+    Não há volta para a mesma dungeon. Por isso o que se grava é o andar em que
+    a run ACABOU, e não `andar + 1`: o `+1` era um ponto de retomada, e retomada
+    é exatamente o que a extração não oferece.
+
+    O `+1` existia para tapar um buraco antigo — a extração gravava o andar
+    recém-concluído, e voltar ao save refazia esse andar e pagava as recompensas
+    de novo. A marca resolve o mesmo buraco por cima: uma run extraída não
+    reentra na dungeon em andar nenhum, então não há o que refazer.
+    """
+    setattr(player, CAMPO_EXTRAIDA, max(0, int(dungeon_level)))
+
+
+def was_extracted(player) -> bool:
+    """A run deste personagem já foi encerrada pela Extração?"""
+    return extracted_floor(player) > 0
+
+
+def extracted_floor(player) -> int:
+    """Em que andar a run foi extraída. Zero quando ela não foi."""
+    return max(0, int(getattr(player, CAMPO_EXTRAIDA, 0) or 0))
