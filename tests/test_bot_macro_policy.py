@@ -160,26 +160,59 @@ class TestCuraSoEUrgenteQuandoBarraProgredir:
         assert need is Need.SOBREVIVER
 
 
-class TestExtracaoEUmaDecisaoSo:
-    def test_sem_acumulo_nao_extrai(self):
-        cru = _prog(nivel=1, passivas=0, pecas_equipadas=0)
+class TestExtracaoPelaRazaoDeRunway:
+    """O modelo de VOTOS morreu aqui.
+
+    Era `len(sinais_de_risco) - 1`: quatro textos booleanos (HP<50%, MP<15%,
+    nível<andar-1, streak>=3), dois convenciam, um não. Magnitude não existia —
+    HP 34% e HP 4% eram o mesmo voto —, e o portão de acúmulo era
+    `nivel>=3 or passivas>=2 or pecas>=2`, três números mágicos unidos por OR.
+
+    No lugar entrou uma razão que a própria run mede: quanto ainda dá para andar
+    dividido por quanto já foi andado.
+    """
+
+    def _com_historico(self, **kwargs) -> ProgressionState:
+        # Uma run que já mediu: cada luta custou 10% da barra, 3 lutas por andar.
+        base = dict(
+            dano_por_luta=0.10,
+            combates_observados=9,
+            lutas_por_andar=3.0,
+            andares_concluidos=3,
+        )
+        base.update(kwargs)
+        return _prog(**base)
+
+    def test_sem_historico_nao_extrai(self):
+        """Evidência insuficiente tem regra própria: não se inventa média."""
+        cru = _prog(combates_observados=0, andares_concluidos=0)
         decisao = decidir_no_mapa(_mapa(desvio_extracao=2), cru, (_lutar(), EXTRAIR, SAIDA))
         assert decisao.action_id != "extrair"
+        assert _nota(decisao, "extrair") == 0.0
 
-    def test_um_sinal_so_nao_convence(self):
-        prog = _prog(nivel=5, passivas=3, sinais_de_risco=("HP em 40%",))
-        decisao = decidir_no_mapa(_mapa(desvio_extracao=2), prog, (_lutar(), EXTRAIR, SAIDA))
-        assert _nota(decisao, "extrair") <= 0
+    def test_com_estrada_pela_frente_nao_extrai(self):
+        """Barra cheia e lutas baratas: ainda dá para andar mais do que já andei."""
+        prog = self._com_historico(hp=500, hp_max=500, dano_por_luta=0.05)
+        decisao = decidir_no_mapa(_mapa(andar=4, desvio_extracao=2), prog, (EXTRAIR, SAIDA))
+        assert _nota(decisao, "extrair") < 0
 
-    def test_dois_sinais_com_acumulo_convencem(self):
-        prog = _prog(
-            hp=200,
-            nivel=5,
-            passivas=3,
-            sinais_de_risco=("HP em 40%", "3 saídas não pagas seguidas"),
+    def test_com_o_folego_no_fim_extrai(self):
+        prog = self._com_historico(hp=60, hp_max=500, dano_por_luta=0.30)
+        decisao = decidir_no_mapa(
+            _mapa(andar=12, desvio_extracao=2), prog, (_lutar(), EXTRAIR, SAIDA)
         )
-        decisao = decidir_no_mapa(_mapa(desvio_extracao=2), prog, (_lutar(), EXTRAIR, SAIDA))
         assert decisao.action_id == "extrair"
+
+    def test_a_nota_e_a_distancia_ate_o_empate_da_razao(self):
+        """`runway = 1` é o ponto de empate da razão, não limiar escolhido."""
+        prog = self._com_historico(hp=150, hp_max=500)
+        score = next(
+            s
+            for s in decidir_no_mapa(_mapa(andar=10, desvio_extracao=1), prog, (EXTRAIR,)).scores
+            if s.action_id == "extrair"
+        )
+        assert [n for n, _v in score.components] == ["fôlego que falta"]
+        assert "aguento" in score.note
 
 
 class TestServicoDepoisDoCombate:

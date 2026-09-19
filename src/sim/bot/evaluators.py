@@ -469,7 +469,7 @@ def avaliar_mapa(opcao: ActionOption, mapa: MapState, prog: ProgressionState) ->
     if familia == "pocao":
         return _avaliar_pocao(opcao, prog)
     if familia == "extrair":
-        return _avaliar_extracao(opcao, prog)
+        return _avaliar_extracao(opcao, mapa, prog)
     if familia == "saida":
         return _avaliar_saida(opcao, mapa, prog)
     if familia == "evento":
@@ -683,33 +683,90 @@ def _avaliar_evento(opcao: ActionOption, mapa: MapState, prog: ProgressionState)
     )
 
 
-def _avaliar_extracao(opcao: ActionOption, prog: ProgressionState) -> Score:
-    """Sair vivo com o que foi acumulado.
+def _runway_relativo(mapa: MapState, prog: ProgressionState) -> float | None:
+    """Quanto ainda dá para andar, relativo ao que já foi andado.
+
+    NÃO é probabilidade de ruína, e não é valor esperado. É uma RAZÃO
+    ESTRUTURAL: capacidade restante estimada dividida pelo progresso já
+    atravessado. Os dois lados vêm da própria run, e a taxa que converte um no
+    outro também — nenhuma constante nova entra aqui.
+
+        custo de uma luta   dano REAL recebido / encontros medidos
+        HP útil             vida agora + cura que já está na mão
+        lutas que absorvo   HP útil / custo de uma luta
+        andares que aguento lutas que absorvo / lutas por andar observadas
+        runway relativo     andares que aguento / andar atual
+
+    As duas pontas acabam em ANDARES, que é a unidade do progresso: o andar é o
+    que a run atravessou, e o andar é o que ela ainda tem pela frente. Por isso
+    a razão é adimensional e não precisa de peso para existir.
+
+    A rota até o `E` é descontada em LUTAS, na mesma unidade: quem precisa
+    atravessar dois encontros para alcançar o portal tem dois encontros a menos
+    de fôlego para o resto da run.
+
+    Devolve `None` quando NÃO HÁ EVIDÊNCIA — sem encontro medido ou sem andar
+    concluído, não existe custo observado, e inventar uma média global seria
+    trocar medição por chute. Quem trata esse caso é `_avaliar_extracao`, com
+    regra separada e declarada.
+    """
+    if prog.combates_observados < 1 or prog.andares_concluidos < 1:
+        return None
+    if prog.dano_por_luta <= 0 or prog.lutas_por_andar <= 0:
+        return None
+
+    hp_util = prog.hp_frac + prog.cura_garantida
+    lutas = hp_util / prog.dano_por_luta - mapa.lutas_ate_extracao
+    if lutas <= 0:
+        # Nem o portal é alcançável com o fôlego que resta.
+        return 0.0
+    return (lutas / prog.lutas_por_andar) / max(1, mapa.andar)
+
+
+def _avaliar_extracao(opcao: ActionOption, mapa: MapState, prog: ProgressionState) -> Score:
+    """Preservar o personagem inteiro, ou seguir construindo.
+
+    Morrer apaga tudo (`delete_save`); extrair grava tudo e encerra a run. O que
+    está em jogo é a run inteira, e o que decide é quanto dela ainda dá para
+    percorrer — a razão de runway.
+
+    A virada é `runway = 1`: aguento mais um tanto igual ao que já andei. Não é
+    limiar escolhido a dedo, é o ponto de empate da própria razão — acima dele a
+    run ainda tem estrada pela frente, abaixo dele ela está no fim. A utilidade é
+    a distância até essa virada, então ela cresce conforme o fôlego encurta e
+    nunca vence enquanto houver estrada.
 
     Decidida UMA vez: quem alcança a casa executa a decisão que veio, e não
     reavalia. Era esse o loop EXTRAIR -> anda -> NÃO EXTRAIR.
     """
-    if not prog.tem_o_que_preservar:
+    runway = _runway_relativo(mapa, prog)
+    if runway is None:
+        # EVIDÊNCIA INSUFICIENTE, e ela tem regra própria: sem luta medida ou sem
+        # andar concluído não há custo observado, e uma média inventada decidiria
+        # o destino da run com um número que ninguém mediu. Extrair não vence por
+        # falta de dados — a run continua, e a evidência chega no primeiro combate.
         return Score(
             opcao.action_id,
             Need.SOBREVIVER,
             0.0,
-            note="ainda não acumulei nada que valha preservar",
+            (("sem histórico", 0.0),),
+            note="nenhuma luta medida ainda: sem custo observado, não há runway a estimar",
         )
-    # O acúmulo NÃO entra na soma: ele é pré-condição, e já foi checada acima.
-    # Somá-lo empurrava para a extração por ter progredido bem, e um único sinal
-    # de risco passava a bastar.
-    componentes = [
-        ("sinais de risco", float(len(prog.sinais_de_risco))),
-        # Um sinal só não convence; dois começam a convencer.
-        ("dúvida", -1.0),
-    ]
-    resumo = f"{prog.nivel} de nível e {prog.passivas} passivas a preservar; " + (
-        ", ".join(prog.sinais_de_risco) or "sem sinal de risco"
+
+    componentes = [("fôlego que falta", 1.0 - runway)]
+    resumo = (
+        f"aguento ~{runway * mapa.andar:.1f} andar(es) tendo atravessado {mapa.andar}; "
+        f"cada luta custou {prog.dano_por_luta:.0%} da barra em "
+        f"{prog.combates_observados} medida(s)"
     )
+    if mapa.lutas_ate_extracao:
+        resumo += f"; {mapa.lutas_ate_extracao} luta(s) até o portal"
     return Score(
         opcao.action_id,
-        Need.SOBREVIVER,
+        # A MESMA necessidade da cura, e pelo mesmo motivo: com o fôlego no fim,
+        # preservar é sobreviver. Acima do ponto de aposta, é investimento — e
+        # perde para lutar, que é o que faz a run crescer.
+        _necessidade_de_cura(prog),
         sum(v for _n, v in componentes),
         tuple(componentes),
         note=resumo,

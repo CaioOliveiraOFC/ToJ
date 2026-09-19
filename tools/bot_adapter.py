@@ -924,6 +924,57 @@ def _perda_de_essencia(hero, rolada: float = 1.0) -> float:
     )
 
 
+def _dano_por_luta(bot) -> float:
+    """Dano REAL recebido por encontro, em fração do teto de HP.
+
+    O driver soma `Observador.recebido_no_encontro` — golpes e ticks de DoT que
+    de fato acertaram o herói — e normaliza cada encontro pelo teto DAQUELE
+    momento. Não é `HP de entrada - HP de saída`: o delta líquido é contaminado
+    por cura, Égide e regeneração, e diria que uma luta cara foi barata só porque
+    o herói bebeu no meio dela.
+
+    Zero quando ainda não houve encontro medido. Sem evidência não se inventa
+    média — quem trata o caso é o evaluator, com regra própria.
+    """
+    medidos = int(getattr(bot, "encontros_medidos", 0) or 0)
+    if medidos <= 0:
+        return 0.0
+    return float(getattr(bot, "dano_recebido_frac", 0.0) or 0.0) / medidos
+
+
+def _lutas_por_andar(bot) -> float:
+    """Quantas lutas custou um andar, pelos andares já CONCLUÍDOS.
+
+    É a taxa que converte "lutas que ainda absorvo" em "andares que ainda
+    aguento", e ela vem da própria run — não de constante. Andar em curso não
+    entra: ele ainda não terminou, e dividir por ele daria uma taxa parcial.
+    """
+    andares = int(getattr(bot, "andares_concluidos", 0) or 0)
+    if andares <= 0:
+        return 0.0
+    return float(getattr(bot, "combates_na_run", 0) or 0) / andares
+
+
+def _cura_garantida(hero) -> float:
+    """Cura que já está na mão, em fração do teto de HP.
+
+    Só o que é CONHECIDO e DETERMINÍSTICO: poção que o herói já carrega, cujo
+    percentual está na carta do item. Fica de fora tudo que depende de sorte ou
+    de chegar em algum lugar — o `?` que talvez seja Fonte, o drop que talvez
+    caia, o preço que a Loja talvez tenha, o descanso do próximo andar.
+
+    Limitada pelo que falta de vida: cura que transborda não é capacidade.
+    """
+    teto = max(1, int(getattr(hero, "base_hp", 1) or 1))
+    falta = max(0, teto - int(hero.get_hp())) / teto
+    total = sum(
+        float(getattr(i, "effect_value", 0) or 0) / 100
+        for i in hero.inventory
+        if getattr(i, "consumable", False) and getattr(i, "effect_type", None) == "max_hp"
+    )
+    return min(total, falta)
+
+
 def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
     """O andar e a run, como o jogador os vê.
 
@@ -960,6 +1011,14 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
     desvio_evento = bot._desvio(evento_casa) if evento_casa is not None else None
     extracao = bot._casa_de(feat.EXTRACTION)
     desvio_extracao = bot._desvio(extracao) if extracao is not None else None
+    # A rota até o `E` TERMINA nele: extrair encerra a run, e não há volta para a
+    # saída. Por isso o custo é o da ida, medido pela mesma rota canônica que o
+    # driver vai andar — e não pela fórmula de desvio, que assume passagem.
+    lutas_ate_extracao = 0
+    if extracao is not None:
+        rota_e, caminho_e = rota_para(bot, extracao, lutar=False)
+        if rota_e.alcancavel:
+            lutas_ate_extracao = len(encontros_do_caminho(bot.mapa, caminho_e))
 
     alcance = bot._alcance(bot.saida)
     mapa = MapState(
@@ -977,6 +1036,7 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
             else None
         ),
         desvio_extracao=desvio_extracao[0] if desvio_extracao is not None else None,
+        lutas_ate_extracao=lutas_ate_extracao,
     )
     prog = ProgressionState(
         nivel=hero.get_level(),
@@ -992,8 +1052,12 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
         pecas_equipadas=sum(1 for i in hero.equipment.values() if i),
         pecas_para_o_ferreiro=_pecas_para_o_ferreiro(hero),
         tem_chave=extraction.has_key(hero),
+        dano_por_luta=_dano_por_luta(bot),
+        combates_observados=int(getattr(bot, "encontros_medidos", 0) or 0),
+        lutas_por_andar=_lutas_por_andar(bot),
+        andares_concluidos=int(getattr(bot, "andares_concluidos", 0) or 0),
+        cura_garantida=_cura_garantida(hero),
         perda_de_essencia=_perda_de_essencia(hero),
-        sinais_de_risco=tuple(bot._sinais_de_risco()),
     )
     return mapa, prog
 

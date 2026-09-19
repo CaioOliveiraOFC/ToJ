@@ -335,6 +335,19 @@ class BotPadrao:
         # `self.combates` é zerado a cada andar para a linha "Fim do andar".
         # Este acumula a run inteira.
         self.combates_na_run = 0
+        # HISTÓRICO OBSERVADO DA RUN — o que sustenta a razão de runway.
+        #
+        # `dano_recebido_frac` soma o DANO REAL RECEBIDO em cada encontro, e não
+        # `HP de entrada - HP de saída`: o delta líquido é contaminado por cura,
+        # Égide e regeneração, e diria que uma luta cara foi barata só porque o
+        # herói bebeu no meio dela.
+        #
+        # Cada encontro é normalizado pelo teto de HP DAQUELE momento, porque o
+        # teto cresce com o nível e com as passivas: somar dano absoluto de
+        # nível 3 com dano de nível 15 compararia coisas diferentes.
+        self.dano_recebido_frac = 0.0
+        self.encontros_medidos = 0
+        self.andares_concluidos = 0
         # O combate que encerrou a run, com o que era visível ANTES dele.
         self.fatal: dict | None = None
         # Por andar: quantos monstros o andar TINHA (contados uma vez, na
@@ -601,6 +614,9 @@ class BotPadrao:
         )
         self.combates += 1
         self.combates_na_run += 1
+        # O custo REAL desta luta, em fração do teto de agora.
+        self.dano_recebido_frac += self.observador.recebido_no_encontro / max(1, hero.base_hp)
+        self.encontros_medidos += 1
         if self.por_andar:
             self.por_andar[-1]["combates"] += 1
 
@@ -964,6 +980,12 @@ class BotPadrao:
         # recuperar antes da próxima, e os serviços ainda entram por cima.
         for _ in range(len(self.mapa.enemies_pos) * 2 + 12):
             decisao, destino = self._decidir_no_mapa()
+            # Os antigos "sinais de risco" sobrevivem AQUI e só aqui: texto para
+            # quem lê o trace. Eles não entram mais na decisão — eram booleanos
+            # pré-digeridos que o cérebro só conseguia contar.
+            sinais = self._sinais_de_risco()
+            if sinais:
+                self.trace.diz(f"    sinais observados: {', '.join(sinais)}")
             self.trace.decisao(decisao.reason)
             self.trace.diz(f"    candidatas: {decisao.explicar_candidatas()}")
             acao = decisao.action_id.split(":")[0]
@@ -1011,6 +1033,8 @@ class BotPadrao:
         registro["nivel_depois"] = hero.get_level()
         registro["motivo_da_parada"] = self.parada or "saiu sem avaliar alvos"
         registro["hp_saida"] = hp_antes / max(1, hero.base_hp)
+        # Andar CONCLUÍDO: é o denominador de "quantas lutas custa um andar".
+        self.andares_concluidos += 1
         registro["mp_saida"] = _frac_mp(hero)
         self.trace.diz(
             f"  Fim do andar: {self.combates} combate(s) de "

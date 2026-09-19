@@ -26,7 +26,7 @@ Nada aqui carrega RNG futuro, próximo drop, próxima oferta ou resultado.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)
@@ -335,6 +335,10 @@ class MapState:
     tem_evento: bool = False
     evento: EventoView | None = None
     desvio_extracao: int | None = None
+    # Encontros obrigatórios na rota até o `E`, por casa ÚNICA. A extração
+    # TERMINA nele — não há "e depois a saída" —, então o que conta é o custo de
+    # chegar, e não o desvio de passar por ele antes de sair do andar.
+    lutas_ate_extracao: int = 0
 
     def servico(self, tipo: str) -> ServiceView | None:
         for s in self.servicos:
@@ -376,10 +380,32 @@ class ProgressionState:
     # com o piso de `essence_after_penalty`. É o preço real de sair sem pagar —
     # o evaluator usava um `-0.5` inventado no lugar dele.
     perda_de_essencia: float = 0.0
-    # Sinais de risco JÁ apurados pelo adaptador, como texto. Entram na decisão
-    # de extrair; nenhum deles freia combate — um gate de "estou atrasado" fecha
-    # o ciclo errado, porque lutar é o que recupera o atraso.
-    sinais_de_risco: tuple[str, ...] = field(default_factory=tuple)
+    # --- HISTÓRICO OBSERVADO DA RUN -------------------------------------
+    #
+    # Aqui NÃO entram sinais pré-digeridos. Havia uma tupla de textos
+    # (`HP em 22%`, `3 saídas não pagas`) que o cérebro só conseguia CONTAR, e
+    # `len(sinais) - 1` era a decisão inteira: dois textos convenciam, um não.
+    # Magnitude não existia — HP 34% e HP 4% eram o mesmo voto.
+    #
+    # O que entra são números que a própria run mediu. O jogador os conhece:
+    # ele viu cada golpe que tomou e cada andar que atravessou.
+
+    # DANO REAL RECEBIDO por encontro, em fração do teto de HP. Não é
+    # `HP de entrada - HP de saída`: o delta líquido é contaminado por cura e
+    # Égide, e diria que uma luta cara foi barata porque o herói bebeu no meio.
+    # Cada encontro é normalizado pelo teto DAQUELE momento, porque o teto cresce.
+    dano_por_luta: float = 0.0
+    # Quantos encontros sustentam esse número. Zero significa SEM EVIDÊNCIA, e
+    # sem evidência não se inventa média — ver `_runway_relativo`.
+    combates_observados: int = 0
+    # Quantas lutas custou um andar, pela média dos andares já CONCLUÍDOS.
+    lutas_por_andar: float = 0.0
+    andares_concluidos: int = 0
+    # Cura DETERMINÍSTICA que já está na mão, em fração do teto de HP. Só entra o
+    # que é conhecido e certo: poção que já possuo. NÃO entram o `?` que talvez
+    # seja Fonte, o drop que talvez caia, o preço que a Loja talvez tenha, nem o
+    # descanso do próximo andar — nenhum deles é conhecido agora.
+    cura_garantida: float = 0.0
 
     @property
     def hp_frac(self) -> float:
@@ -388,7 +414,3 @@ class ProgressionState:
     @property
     def mp_frac(self) -> float:
         return self.mp / max(1, self.mp_max)
-
-    @property
-    def tem_o_que_preservar(self) -> bool:
-        return self.nivel >= 3 or self.passivas >= 2 or self.pecas_equipadas >= 2
