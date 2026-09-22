@@ -552,22 +552,29 @@ def navigate_inventory(
         is_usable = getattr(item, "is_usable", False)
 
         # Category: 1=Equippable, 2=Usable, 3=Other
+        #
+        # `slot_rank` tem nome PRÓPRIO, e não é detalhe de estilo: escrever
+        # `slot_order = slot_order.get(...)` fazia de `slot_order` uma local em
+        # toda a função, e a leitura do lado direito acontecia antes da
+        # atribuição. Abrir o inventário com qualquer peça equipável estourava
+        # `UnboundLocalError`. `effect_order` nunca teve o problema porque
+        # nunca é reatribuído aqui.
         if is_equippable:
             category = 1
-            slot_order = slot_order.get(slot, 99)
+            slot_rank = slot_order.get(slot, 99)
         elif is_usable:
             category = 2
-            slot_order = effect_order.get(getattr(item, "effect_type", ""), 99)
+            slot_rank = effect_order.get(getattr(item, "effect_type", ""), 99)
         else:
             category = 3
-            slot_order = 99
+            slot_rank = 99
 
         # Within category, sort by rarity (Common < Rare < Epic < Legendary)
         rarity_order = {"Common": 0, "Rare": 1, "Epic": 2, "Legendary": 3}.get(
             getattr(item, "rarity", "Common"), 99
         )
 
-        return (category, slot_order, rarity_order, item.name)
+        return (category, slot_rank, rarity_order, item.name)
 
     current_index = 0
     max_visible = 10
