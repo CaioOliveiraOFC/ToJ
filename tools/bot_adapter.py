@@ -1060,19 +1060,27 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
         cura_garantida=_cura_garantida(hero),
         perda_de_essencia=_perda_de_essencia(hero),
         **_comparacao_com_a_arena(
-            hero, extrair_e_possivel=desvio_extracao is not None and extraction.has_key(hero)
+            bot, hero, extrair_e_possivel=desvio_extracao is not None and extraction.has_key(hero)
         ),
     )
     return mapa, prog
 
 
-def _comparacao_com_a_arena(hero, *, extrair_e_possivel: bool) -> dict:
+def _comparacao_com_a_arena(bot, hero, *, extrair_e_possivel: bool, **kwargs) -> dict:
     """`bot_power / benchmark_power`, medido só quando extrair é possível.
 
     A medição roda centenas de duelos reais contra o boneco de referência: são
     segundos, não microssegundos. Pagá-la em toda decisão de mapa seria trocar a
     run por uma medição, e o número não decide nada enquanto não houver chave no
-    bolso e casa `E` alcançável — que é exatamente a condição do portão.
+    bolso e casa `E` alcançável.
+
+    Mas "tenho chave e a casa existe" é PROXY de "extrair é possível PARA MIM", e
+    o proxy estava incompleto: um piloto que não recebe a opção de extrair jamais
+    poderá usar o número, e mesmo assim pagava por ele. Era o caso do gerador de
+    benchmark, e custava 132 minutos nas 900 runs contra ~7. Por isso o portão
+    também pergunta ao próprio bot, por duck typing — como já pergunta
+    `_pocoes()` e `_streak()`. O default é medir: quem não declara nada é uma run
+    normal.
 
     Dentro de um mesmo build o custo é pago UMA vez: `overall_power` responde por
     assinatura de build, então a segunda chamada do mesmo andar é instantânea.
@@ -1080,14 +1088,9 @@ def _comparacao_com_a_arena(hero, *, extrair_e_possivel: bool) -> dict:
     Não altera o herói nem consome o sorteio da run: quem garante as duas coisas
     é `sim.arena`, com cópia em repouso e o gerador global restaurado.
     """
-    if not extrair_e_possivel:
+    if not extrair_e_possivel or not getattr(bot, "extracao_habilitada", True):
         return {}
-    resultado = comparar_com_benchmark(hero)
-    return {
-        "poder_relativo": resultado.relativo,
-        "poder_confiavel": resultado.confiavel,
-        "motivo_do_poder": resultado.motivo,
-    }
+    return {"poder_relativo": comparar_com_benchmark(hero, **kwargs).relativo}
 
 
 def acoes_do_mapa(

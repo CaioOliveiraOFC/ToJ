@@ -52,6 +52,13 @@ class PilotoDaArena(BotPadrao):
        quem entrou nele.
     """
 
+    # Declarado para o adaptador, que pergunta antes de pagar a comparação com o
+    # alvo da Arena. Sem isto a ferramenta media o poder do bot a cada build
+    # nova — centenas de duelos reais — para um número que ela nunca poderia
+    # usar, já que aqui extrair não está no cardápio. Medido: 132 min contra ~7
+    # nas 900 runs.
+    extracao_habilitada = False
+
     def __init__(self, classe: str, seed: int, andar_alvo: int = ANDAR_ALVO) -> None:
         super().__init__(classe, seed, max_andar=andar_alvo)
         self.andar_alvo = andar_alvo

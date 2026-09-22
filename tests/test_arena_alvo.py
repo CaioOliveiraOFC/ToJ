@@ -11,7 +11,7 @@ O que estes testes fixam:
 1. o congelamento é FIEL — o que foi salvo é o que volta, peça por peça;
 2. o alvo não se move — `overall_power` dele continua onde foi medido;
 3. quem carrega usa o caminho CANÔNICO do save, não uma reconstrução paralela;
-4. `NAO_CONFIAVEL` existe e não se disfarça de veredito.
+4. o portão da medição só paga quando o número pode ser usado.
 """
 
 from __future__ import annotations
@@ -21,10 +21,7 @@ import json
 import pytest
 
 from src.sim.arena import (
-    ABAIXO,
     EQUIVALENTE,
-    NAO_CONFIAVEL,
-    SUPEROU,
     assinatura_de_build,
     limpar_cache,
 )
@@ -121,7 +118,6 @@ def test_o_benchmark_comparado_consigo_mesmo_da_equivalente():
     resultado = comparar_com_benchmark(benchmark())
     assert resultado.relativo == pytest.approx(1.0)
     assert resultado.veredito == EQUIVALENTE
-    assert resultado.confiavel
 
 
 # --- 3. O caminho canônico -------------------------------------------------
@@ -154,32 +150,69 @@ def test_o_jogo_nao_depende_do_benchmark():
         assert "arena_alvo" not in arquivo.read_text(encoding="utf-8"), arquivo
 
 
-# --- 4. NAO_CONFIAVEL não se disfarça --------------------------------------
+# --- 4. O portão da medição ------------------------------------------------
 
 
-def test_kit_incompativel_nao_vira_veredito():
-    """O número continua saindo; o que muda é a promessa sobre ele."""
-    resultado = comparar_com_benchmark(make_hero("Warrior", 12, "expected"), duelos=POUCOS_DUELOS)
-    assert resultado.veredito == NAO_CONFIAVEL
-    assert resultado.veredito not in (ABAIXO, EQUIVALENTE, SUPEROU)
-    assert not resultado.confiavel
-    assert resultado.motivo
+def test_o_portao_mede_quando_extrair_e_possivel():
+    """Run normal: com chave no bolso e a casa `E` alcançável, paga a medição."""
+    from tools.bot_adapter import _comparacao_com_a_arena
+
+    class RunNormal:
+        pass
+
+    heroi = make_hero("Warrior", 8, "expected")
+    medido = _comparacao_com_a_arena(
+        RunNormal(), heroi, extrair_e_possivel=True, duelos=POUCOS_DUELOS
+    )
+    assert "poder_relativo" in medido
+    assert medido["poder_relativo"] > 0
 
 
-def test_a_observacao_do_bot_carrega_o_fato_sem_pre_digerir():
-    """O cérebro recebe MAGNITUDE e confiabilidade, não um veredito pronto.
+def test_o_portao_nao_mede_quem_nao_pode_extrair():
+    """Quem não recebe a opção de extrair nunca poderá usar o número.
+
+    O portão perguntava só "tenho chave e a casa existe?", que é PROXY de
+    "extrair é possível PARA MIM". O gerador de benchmark retira `extrair` do
+    cardápio e mesmo assim pagava centenas de duelos por build nova: 132 minutos
+    nas 900 runs contra ~7.
+    """
+    from tools.arena_benchmark import PilotoDaArena
+    from tools.bot_adapter import _comparacao_com_a_arena
+
+    class SemExtracao:
+        extracao_habilitada = False
+
+    heroi = make_hero("Warrior", 8, "expected")
+    assert _comparacao_com_a_arena(SemExtracao(), heroi, extrair_e_possivel=True) == {}
+    # E o gerador declara isso de verdade, não só o dublê deste teste.
+    assert PilotoDaArena.extracao_habilitada is False
+
+
+def test_sem_chave_ou_sem_casa_ninguem_mede():
+    from tools.bot_adapter import _comparacao_com_a_arena
+
+    class RunNormal:
+        pass
+
+    heroi = make_hero("Warrior", 8, "expected")
+    assert _comparacao_com_a_arena(RunNormal(), heroi, extrair_e_possivel=False) == {}
+
+
+def test_a_observacao_do_bot_carrega_magnitude_e_nada_mais():
+    """O cérebro recebe MAGNITUDE, não um veredito pronto nem um selo.
 
     Classificar é política, e política mora no evaluator. Entregar a etiqueta
     pronta pela porta da observação repetiria o modelo de votos que a rodada da
-    razão de runway derrubou.
+    razão de runway derrubou. E não há mais campo de confiabilidade ao lado: a
+    guarda de kit foi removida, então não existe estado morto para carregar.
     """
     from src.sim.bot.observation import ProgressionState
 
     campos = ProgressionState.__dataclass_fields__
     assert "poder_relativo" in campos
-    assert "poder_confiavel" in campos
     assert campos["poder_relativo"].type == "float"
-    assert campos["poder_confiavel"].type == "bool"
+    assert "poder_confiavel" not in campos
+    assert "motivo_do_poder" not in campos
     # zero significa NÃO MEDIDO: a medição custa centenas de duelos e só é paga
     # quando extrair é possível.
     assert (

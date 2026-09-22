@@ -414,18 +414,13 @@ class ProgressionState:
     # ainda cabe no estado atual. Somá-las contaria o mesmo atrito duas vezes.
     #
     # ZERO significa NÃO MEDIDO — o adaptador só paga a medição quando extrair é
-    # possível (chave no bolso e a casa `E` alcançável), porque ela custa
-    # centenas de duelos reais. Sem essa condição a comparação não decide nada.
+    # possível, porque ela custa centenas de duelos reais. Sem essa condição a
+    # comparação não decide nada.
+    #
+    # Não há campo de confiabilidade ao lado: a guarda de kit foi removida.
+    # Deck, mana e equipamento diferentes não tornam dois gladiadores
+    # incomparáveis — são o que a régua existe para medir.
     poder_relativo: float = 0.0
-    # Se a razão acima pode ser LIDA como diferença de poder. Ela só cancela a
-    # pilotagem quando os dois lados carregam kit comparável — deck, poção e
-    # mana que o deck exige. Comparar quem está sem poção contra um alvo com
-    # poção desloca a razão em cerca de 20%, e aí ela mede inventário disfarçado
-    # de poder. Só tem sentido quando `poder_relativo > 0`.
-    poder_confiavel: bool = False
-    # Por que a comparação não é confiável, quando não é. Texto para o motivo da
-    # decisão; não entra em conta nenhuma.
-    motivo_do_poder: str = ""
 
     @property
     def hp_frac(self) -> float:

@@ -39,12 +39,10 @@ from __future__ import annotations
 
 import copy
 import random
-from collections import Counter
 from dataclasses import dataclass
 
 from src.content.factories.archetypes import spawn_by_role
 from src.mechanics.battle import run_battle
-from src.mechanics.combat import skill_mana_cost
 from src.shared import effects as fx
 from src.shared.constants import (
     ARENA_BRACKET_GROWTH,
@@ -58,19 +56,12 @@ from src.shared.constants import (
     ARENA_REFERENCE_ROLE,
     ARENA_WIN_TARGET,
 )
-
-# `_consumables` é privada de uma política congelada, e é de propósito que a
-# guarda de kit leia por ela: "kit comparável" tem de significar comparável PARA
-# O PILOTO QUE VAI MEDIR. Uma segunda leitura do inventário aqui poderia contar
-# como recurso algo que `smart_policy` nunca usaria, e a guarda passaria a
-# liberar comparações que o duelo não sustenta.
-from src.sim.policies import _consumables, smart_policy
+from src.sim.policies import smart_policy
 from src.sim.rng_guard import rng_isolado
 
 ABAIXO = "ABAIXO"
 EQUIVALENTE = "EQUIVALENTE"
 SUPEROU = "SUPEROU"
-NAO_CONFIAVEL = "NAO_CONFIAVEL"
 
 
 class PoderForaDeEscalaError(RuntimeError):
@@ -112,58 +103,140 @@ class PoderGeral:
 
 @dataclass(frozen=True)
 class Comparacao:
-    """O veredito de `bot_power / benchmark_power`, e se dá para confiar nele."""
+    """O veredito de `bot_power / benchmark_power`.
+
+    Sem campo de confiabilidade: a guarda de kit foi removida. Deck diferente,
+    mana diferente e equipamento diferente NÃO tornam dois gladiadores
+    incomparáveis — são exatamente o que `overall_power` existe para medir, e
+    vetá-los era a régua se recusando a responder a própria pergunta.
+    """
 
     relativo: float
     veredito: str
-    confiavel: bool
-    motivo: str
 
 
-def assinatura_de_build(personagem) -> tuple:
-    """A identidade do personagem para efeito de poder.
+def _normalizado(personagem):
+    """A BUILD do personagem, sem nada que seja estado da run.
 
-    Assina o que o DUELO lê, não a lista de peças: atributos já resolvidos
-    (nível, equipamento, `+N`, gema e encantamento chegam dentro deles), deck,
-    passivas, consumíveis e os modificadores de combate. Assinar o inventário
-    cru deixaria de fora o aprimoramento; assinar só os atributos deixaria de
-    fora o crítico.
-    """
-    consumiveis = Counter(
-        getattr(item, "name", "?")
-        for item in getattr(personagem, "inventory", [])
-        if getattr(item, "consumable", False)
-    )
-    return (
-        personagem.get_classname(),
-        int(personagem.get_level()),
-        int(personagem.base_hp),
-        int(personagem.base_mp),
-        int(personagem.get_st()),
-        int(personagem.get_mg()),
-        int(personagem.get_ag()),
-        int(personagem.get_df()),
-        tuple(sorted(personagem.active_skill_ids())),
-        tuple(sorted(p.id for p in getattr(personagem, "passives", []))),
-        tuple(sorted(consumiveis.items())),
-        tuple(
-            (canal, float(fx.combat_modifier(personagem, canal))) for canal in _CANAIS_DE_COMBATE
-        ),
-        int(getattr(personagem, "magic_shield_percent", 0) or 0),
-    )
+    UMA normalização, usada pelo duelo E pela chave do cache. Enquanto forem dois
+    caminhos eles divergem, e a divergência é silenciosa: o cache devolve um
+    número plausível medido sobre outra coisa.
 
+    O que sai, e por quê:
 
-def _prototipo(personagem):
-    """A cópia em repouso que o duelo vai usar, sem tocar no personagem da run.
+    - `rest()` devolve HP/MP ao teto e limpa `active_effects` e `active_buffs`.
+      Sem isso o poder cairia porque o herói estava ferido, e a razão de runway
+      já mede o desgaste — somar os dois contaria o mesmo atrito duas vezes.
+    - `skill_cooldowns` é limpo à mão porque `rest()` NÃO o limpa, e
+      `policies._usable_skills` consulta recarga: sem isto o número dependia do
+      instante da run em que a medição caiu.
+    - `_death_ignore_used` volta a falso. `run_battle` já o zera na entrada do
+      combate; normalizar aqui torna o protótipo autocontido em vez de depender
+      desse detalhe do motor.
+    - Consumíveis saem. Poção e elixir são recurso descartável da run, não força
+      do gladiador. A classificação é a CANÔNICA — `Item.is_potion`, que é
+      `bool(self.consumable)` —, nunca uma lista de nomes: adivinhar por
+      `effect_type` já transformou amuleto com bônus de vida em poção uma vez.
+      É o mesmo campo que `policies._consumables` filtra, então some exatamente
+      o que o piloto de medição conseguiria beber.
 
-    `deepcopy` porque `run_battle` machuca quem entra nele, e o herói que chega
-    aqui pode ser o da partida em andamento. `rest()` porque `overall_power` é
-    propriedade da BUILD: o desgaste do momento é o que a razão de runway mede,
-    e somar as duas coisas num número só contaria o mesmo atrito duas vezes.
+    `Player.rest()` não é alterado globalmente: a normalização pertence à régua.
+
+    `deepcopy` porque `run_battle` machuca quem entra nele, e quem chega aqui
+    pode ser o herói da partida em andamento.
     """
     clone = copy.deepcopy(personagem)
     clone.rest()
+    clone.skill_cooldowns.clear()
+    clone._death_ignore_used = False
+    clone.inventory = [item for item in clone.inventory if not item.is_potion]
     return clone
+
+
+def _maos(heroi) -> tuple:
+    """As mãos, no que elas decidem: se a carta do deck pode ser lançada.
+
+    `Player.can_use_skill` lê três coisas das posições de mão — quantas peças
+    estão empunhadas (`two_weapons`), `hands_required` de cada uma e o
+    `hand_type` de cada uma. Duas builds de números idênticos com espada ou com
+    adaga têm decks utilizáveis diferentes, e sem isto dividiriam cache.
+
+    A OCUPAÇÃO entra e não é redundante: `hands_required(None)` devolve 1 e um
+    `hand_type` ausente vira `""`, então a mão vazia assinaria `("", 1)` —
+    idêntico a uma arma de uma mão sem `hand_type`. Sem o booleano, empunhar uma
+    arma e empunhar duas colidiriam, que é justamente a contagem que
+    `req.two_weapons` faz.
+    """
+    maos = []
+    for posicao in heroi.HAND_POSITIONS:
+        peca = heroi.equipment.get(posicao)
+        maos.append(
+            (
+                peca is not None,
+                str(getattr(peca, "hand_type", "") or ""),
+                int(heroi.hands_required(peca)) if peca is not None else 0,
+            )
+        )
+    return tuple(maos)
+
+
+def assinatura_de_build(personagem) -> tuple:
+    """A identidade ESTRUTURAL do personagem, para efeito de poder.
+
+    Calculada sobre o clone normalizado, e não sobre o personagem cru: do jeito
+    cru ela carregava estado temporário, porque `get_st`/`get_mg`/`get_ag`/
+    `get_df` somam buffs e `fx.combat_modifier` soma `active_buffs` junto com
+    passiva e equipamento. Assinar o que o duelo mede é o que garante que a
+    chave e o valor nunca falem de personagens diferentes.
+
+    Assina o que o DUELO lê, e não a lista de peças: nível, `+N`, gema e
+    encantamento chegam já resolvidos dentro dos atributos e dos canais. A
+    mochila não entra — item não equipado não toca o combate.
+
+    Quatro coisas entram por terem sido colisões reais:
+
+    - `get_avg_damage()`, que é o BASE_POWER canônico. Ele passa por
+      `weighted_power`, que aplica `weapon_percent()` por cima da soma ponderada;
+      `get_st()` sozinho não carrega isso, então duas builds de atributos iguais
+      com armas de `damage_bonus` diferente tinham BASE diferente e a MESMA
+      assinatura.
+    - `_maos()`, pelo requisito de carta (acima).
+    - A ORDEM do deck, SEM `sorted`. `policies._melhor` é `max(candidatos, key=…)`
+      sobre uma lista tirada de `hero.skills.values()`, e `max` devolve o
+      PRIMEIRO máximo: a ordem dos slots é o desempate, como o docstring de
+      `_melhor` declara. As mesmas quatro cartas em ordens diferentes jogam
+      diferente.
+    - As passivas, estas SIM ordenadas. `get_passive_bonus` soma e
+      `_apply_passive_stats` acumula flat, então a ordem delas não muda nada, e
+      ordenar mantém duplicatas comparáveis. A assimetria com o deck é
+      deliberada: cada lado segue o que a mecânica faz com ele.
+    """
+    return _assinatura_do_clone(_normalizado(personagem))
+
+
+def _assinatura_do_clone(h) -> tuple:
+    """A assinatura de um clone JÁ normalizado.
+
+    Existe para que `overall_power` normalize UMA vez e use o mesmo clone para a
+    chave e para os duelos. Corpo único: `assinatura_de_build` é esta função
+    depois de `_normalizado`, e não uma segunda cópia da lista de campos.
+    """
+    return (
+        h.get_classname(),
+        int(h.get_level()),
+        int(h.base_hp),
+        int(h.base_mp),
+        int(h.get_st()),
+        int(h.get_mg()),
+        int(h.get_ag()),
+        int(h.get_df()),
+        int(h.get_avg_damage()),
+        tuple(h.active_skill_ids()),
+        tuple(sorted(p.id for p in getattr(h, "passives", []))),
+        _maos(h),
+        tuple((canal, float(fx.combat_modifier(h, canal))) for canal in _CANAIS_DE_COMBATE),
+        int(getattr(h, "magic_shield_percent", 0) or 0),
+    )
 
 
 def _taxa_de_vitoria(prototipo, nivel: float, duelos: int, semente: int) -> float:
@@ -193,11 +266,13 @@ def overall_power(
     Não consome sorteio da run e não altera o personagem: o gerador global volta
     ao estado anterior e o duelo roda sobre uma cópia em repouso.
     """
-    chave = (assinatura_de_build(personagem), duelos, semente)
+    # UMA normalização: o mesmo clone responde pela chave do cache e entra nos
+    # duelos. Chave e valor não conseguem falar de personagens diferentes.
+    prototipo = _normalizado(personagem)
+    chave = (_assinatura_do_clone(prototipo), duelos, semente)
     if usar_cache and chave in _cache:
         return _cache[chave]
 
-    prototipo = _prototipo(personagem)
     sondagens = 0
 
     with rng_isolado():
@@ -249,48 +324,6 @@ def overall_power(
     return leitura
 
 
-def _lanca_alguma_carta(personagem) -> bool:
-    """Se o deck tem ao menos uma carta que este personagem consegue lançar.
-
-    Um deck que o teto de mana não paga, ou cujo requisito o equipamento não
-    satisfaz, é kit no papel e nada no duelo.
-    """
-    return any(
-        personagem.base_mp >= skill_mana_cost(personagem, carta) and personagem.can_use_skill(carta)
-        for carta in personagem.skills.values()
-    )
-
-
-def kit_comparavel(um, outro) -> tuple[bool, str]:
-    """Se os dois lados têm as mesmas CLASSES de recurso que o piloto sabe usar.
-
-    Verifica DIRETAMENTE, ponta por ponta — deck, consumível, e mana que o
-    próprio deck exige. Nada de proxy: "tem chave, está no andar 3 e está
-    equipado" não prova kit comparável, porque um personagem pode ter as três
-    coisas e ter gastado a última poção no andar anterior.
-
-    Não é igualdade de inventário: é presença. `relative_power` só cancela a
-    pilotagem quando os dois lados perdem as mesmas coisas ao trocar de piloto.
-    Medido: entre personagens de kit compatível o resíduo entre pilotos tem
-    mediana de 3,5% e máximo observado de 6,3% — o máximo NÃO cabe na banda de
-    ±5%, e isso está aceito como limitação conhecida desta versão. Já comparando
-    um personagem sem poção contra um benchmark com poção, o resíduo vai a ~20%:
-    aí a razão deixa de medir poder e passa a medir a diferença de inventário.
-    """
-    faltas = []
-    if bool(um.skills) != bool(outro.skills):
-        faltas.append("deck")
-    if bool(_consumables(um, ("max_hp",))) != bool(_consumables(outro, ("max_hp",))):
-        faltas.append("poção de cura")
-    if bool(_consumables(um, ("max_mp",))) != bool(_consumables(outro, ("max_mp",))):
-        faltas.append("poção de mana")
-    if _lanca_alguma_carta(um) != _lanca_alguma_carta(outro):
-        faltas.append("mana para o deck")
-    if not faltas:
-        return True, ""
-    return False, "kit incompatível: " + ", ".join(faltas)
-
-
 def classificar(relativo: float) -> str:
     """Onde o personagem cai em relação ao alvo, dentro da banda aprovada."""
     if relativo < 1 - ARENA_EQUIVALENCE_BAND:
@@ -301,19 +334,24 @@ def classificar(relativo: float) -> str:
 
 
 def comparar(personagem, benchmark, **kwargs) -> Comparacao:
-    """`bot_power / benchmark_power`, com a guarda de kit na frente.
+    """`bot_power / benchmark_power`, medidos pela mesma régua.
 
-    Quando os kits não são comparáveis o veredito sai NAO_CONFIAVEL em vez de um
-    número que já se sabe deslocado. Um veredito que se conhece errado não pode
-    entrar na decisão de extrair disfarçado de medida.
+    Não há guarda na frente. A antiga `kit_comparavel` vetava a comparação
+    quando os dois lados diferiam em deck, em poção ou na mana que o deck exige,
+    e marcava o resultado como não-confiável — 93,7% das vezes, medido em 378
+    momentos reais, e 81% disso só por poção de mana.
+
+    Ela caiu por duas razões. A primeira é que consumível saiu da régua, então a
+    diferença que dominava a reprovação deixou de existir. A segunda é mais
+    forte: deck, mana e equipamento diferentes NÃO tornam dois gladiadores
+    incomparáveis — são exatamente o que `overall_power` existe para medir.
+    Vetá-los era a régua se recusando a responder a pergunta que ela foi feita
+    para responder.
     """
     meu = overall_power(personagem, **kwargs).nivel_equivalente
     alvo = overall_power(benchmark, **kwargs).nivel_equivalente
     relativo = meu / alvo if alvo > 0 else 0.0
-    ok, motivo = kit_comparavel(personagem, benchmark)
-    if not ok:
-        return Comparacao(relativo, NAO_CONFIAVEL, False, motivo)
-    return Comparacao(relativo, classificar(relativo), True, "")
+    return Comparacao(relativo, classificar(relativo))
 
 
 def limpar_cache() -> None:

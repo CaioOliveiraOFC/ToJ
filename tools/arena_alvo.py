@@ -44,7 +44,12 @@ ARQUIVO = Path(__file__).resolve().parents[1] / "src" / "data" / "arena_benchmar
 # 20. Escolhido por ser o mais próximo da MEDIANA de 54 sobreviventes em 900
 # runs (6,00% chegaram vivos), e as três classes convergiram para perto de 30
 # apesar de taxas de sobrevivência 9x diferentes.
-PODER_ESPERADO = 29.98
+#
+# 29,98 -> 29,87 na V2, quando consumível saiu da régua. Este snapshot cai pouco
+# porque não carrega poção de CURA: são 4 elixires e 1 poção de mana, e nenhum
+# dos dois muda muito um duelo 1x1 curto. Sobreviventes com poção de cura caíram
+# de 3,8% a 5,0%.
+PODER_ESPERADO = 29.87
 
 _FABRICA = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 

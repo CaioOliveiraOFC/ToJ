@@ -12,8 +12,7 @@ O que estes testes fixam, em ordem de importância:
 
 1. a medição não altera o jogo — nem o personagem, nem o sorteio da run;
 2. o número é da BUILD, não do desgaste do momento;
-3. a guarda de kit impede que uma diferença de inventário se disfarce de
-   diferença de poder;
+3. consumível, desgaste e recarga NÃO movem o número: eles são run, não build;
 4. as monotonicidades, que são o que impede a fórmula de inverter o sinal do que
    mede.
 
@@ -42,13 +41,10 @@ from src.sim import arena
 from src.sim.arena import (
     ABAIXO,
     EQUIVALENTE,
-    NAO_CONFIAVEL,
     SUPEROU,
     PoderForaDeEscalaError,
     assinatura_de_build,
     classificar,
-    comparar,
-    kit_comparavel,
     limpar_cache,
     overall_power,
 )
@@ -182,65 +178,6 @@ def test_quem_perde_para_o_menor_monstro_para_no_piso():
     assert leitura.sondagens == 1  # uma sondagem basta para saber que perde
 
 
-# --- 3. A guarda de kit ----------------------------------------------------
-
-
-def test_kit_incompativel_sai_como_nao_confiavel():
-    """Sem poção contra um alvo com poção, a razão mede inventário, não poder.
-
-    Medido: entre kits compatíveis o resíduo entre pilotos tem mediana de 3,5%;
-    comparando um personagem sem poção contra um benchmark com poção, ele vai a
-    ~20%. Um veredito que se sabe deslocado não entra na decisão de extrair
-    disfarçado de medida.
-    """
-    pelado = make_hero("Warrior", 8, "naked")
-    equipado = make_hero("Warrior", 8, "expected")
-    resultado = comparar(pelado, equipado, duelos=POUCOS_DUELOS)
-    assert resultado.veredito == NAO_CONFIAVEL
-    assert not resultado.confiavel
-    assert resultado.motivo
-    # O número continua sendo devolvido; o que muda é a promessa sobre ele.
-    assert resultado.relativo > 0
-
-
-def test_kits_compativeis_recebem_veredito():
-    dele = make_hero("Rogue", 8, "expected")
-    alvo = make_hero("Warrior", 8, "expected")
-    resultado = comparar(dele, alvo, duelos=POUCOS_DUELOS)
-    assert resultado.confiavel
-    assert resultado.veredito in (ABAIXO, EQUIVALENTE, SUPEROU)
-
-
-@pytest.mark.parametrize(
-    "remover",
-    [
-        pytest.param("pocoes", id="sem poção de cura"),
-        pytest.param("deck", id="sem deck"),
-    ],
-)
-def test_cada_classe_de_recurso_entra_na_guarda(remover):
-    """Deck, consumível e mana para o deck: as três pontas que o piloto usa."""
-    cheio = make_hero("Mage", 8, "expected")
-    faltando = copy.deepcopy(cheio)
-    if remover == "pocoes":
-        faltando.inventory = [i for i in faltando.inventory if not getattr(i, "consumable", False)]
-    else:
-        faltando.skills.clear()
-    ok, motivo = kit_comparavel(faltando, cheio)
-    assert not ok
-    assert motivo
-
-
-def test_deck_que_a_mana_nao_paga_nao_conta_como_kit():
-    """Carta no papel não é carta no duelo."""
-    com_mana = make_hero("Mage", 8, "expected")
-    sem_mana = copy.deepcopy(com_mana)
-    sem_mana.base_mp = 0
-    ok, motivo = kit_comparavel(sem_mana, com_mana)
-    assert not ok
-    assert "mana" in motivo
-
-
 # --- A banda aprovada ------------------------------------------------------
 
 
@@ -273,19 +210,20 @@ def test_o_cache_responde_pela_assinatura_da_build():
     "mudanca",
     [
         pytest.param("nivel", id="subir de nível"),
-        pytest.param("pocao", id="gastar a última poção"),
         pytest.param("deck", id="perder a carta"),
         pytest.param("equipamento", id="desequipar"),
     ],
 )
 def test_a_assinatura_muda_quando_a_build_muda(mudanca):
-    """Uma assinatura que não enxerga a mudança devolve poder velho."""
+    """Uma assinatura que não enxerga a mudança devolve poder velho.
+
+    Gastar a última poção NÃO está nesta lista, e a ausência é o desenho: a
+    partir da V2 consumível não é build, e a invariância tem teste próprio.
+    """
     antes = make_hero("Warrior", 8, "expected")
     depois = copy.deepcopy(antes)
     if mudanca == "nivel":
         depois.set_level(9)
-    elif mudanca == "pocao":
-        depois.inventory = [i for i in depois.inventory if not getattr(i, "consumable", False)]
     elif mudanca == "deck":
         depois.skills.clear()
     else:
@@ -425,3 +363,240 @@ def test_a_expansao_nao_cobra_sondagem_de_quem_esta_na_escala():
     # Piso, topo do bracket e a bisseção até a tolerância relativa. Uma expansão
     # a mais apareceria aqui como sondagem extra.
     assert leitura.sondagens <= 16
+
+
+# --- A FRONTEIRA: recurso da run não é build ------------------------------
+#
+# Consumível, desgaste, buff e recarga são estado da RUN. Quem os mede é a razão
+# de runway. Se entrarem aqui, o mesmo gladiador lê poderes diferentes conforme a
+# mochila e o momento — e a comparação com a Arena passa a premiar estoque.
+
+
+def _consumivel():
+    from src.content.items import get_all_items
+
+    for definicao in get_all_items().values():
+        if getattr(definicao, "consumable", False):
+            return definicao.instance()
+    raise AssertionError("catálogo sem consumível")
+
+
+def _item_guardado():
+    """Uma peça equipável que fica NA MOCHILA, sem ser equipada."""
+    from src.content.items import get_all_items
+
+    for definicao in get_all_items().values():
+        if getattr(definicao, "slot", None) == "Helmet":
+            return definicao.instance()
+    raise AssertionError("catálogo sem elmo")
+
+
+def _arma(predicado):
+    from src.content.items import get_all_items
+
+    for definicao in get_all_items().values():
+        if getattr(definicao, "slot", None) == "Weapon" and predicado(definicao):
+            return definicao.instance()
+    raise AssertionError("catálogo sem arma para este caso")
+
+
+def _mede(heroi):
+    return overall_power(heroi, duelos=POUCOS_DUELOS, usar_cache=False).nivel_equivalente
+
+
+def test_a_poção_nao_move_o_poder():
+    """(A) 0 contra 5 consumíveis, mesma build permanente."""
+    sem = make_hero("Warrior", 10, "expected")
+    sem.inventory = [i for i in sem.inventory if not i.is_potion]
+    com = copy.deepcopy(sem)
+    for _ in range(5):
+        com.add_item_to_inventory(_consumivel())
+
+    assert assinatura_de_build(sem) == assinatura_de_build(com)
+    assert _mede(sem) == _mede(com)
+
+
+def test_item_guardado_na_mochila_nao_move_o_poder():
+    """(B) Item não equipado não toca o duelo."""
+    antes = make_hero("Rogue", 10, "expected")
+    depois = copy.deepcopy(antes)
+    depois.add_item_to_inventory(_item_guardado())
+
+    assert assinatura_de_build(antes) == assinatura_de_build(depois)
+    assert _mede(antes) == _mede(depois)
+
+
+def test_equipar_peca_melhor_move_o_poder():
+    """(C) Equipamento é build, e build muda o número."""
+    pelado = make_hero("Warrior", 10, "naked")
+    armado = make_hero("Warrior", 10, "best")
+    assert assinatura_de_build(pelado) != assinatura_de_build(armado)
+    assert _mede(armado) > _mede(pelado)
+
+
+def test_skill_a_mais_muda_a_identidade():
+    """(D) Deck é build."""
+    from src.content.skills_loader import get_skills_for_class
+
+    antes = make_hero("Mage", 10, "expected")
+    depois = copy.deepcopy(antes)
+    for carta in get_skills_for_class("Mage"):
+        if carta.id not in depois.active_skill_ids() and depois.has_free_skill_slot():
+            depois.learn_skill(carta)
+            break
+    assert len(depois.skills) > len(antes.skills)
+    assert assinatura_de_build(antes) != assinatura_de_build(depois)
+
+
+def test_passiva_a_mais_muda_a_identidade():
+    """(E) Passiva é build."""
+    from src.content.passives import load_passives
+
+    antes = make_hero("Warrior", 10, "expected")
+    depois = copy.deepcopy(antes)
+    depois.add_passive_load(load_passives()[0])
+    assert assinatura_de_build(antes) != assinatura_de_build(depois)
+
+
+def test_desgaste_buff_e_recarga_nao_movem_o_poder():
+    """(F) A mesma build, em estados de run diferentes, é a mesma build.
+
+    `rest()` sozinho não bastava: ele não limpa `skill_cooldowns`, e
+    `policies._usable_skills` consulta recarga. Sem a normalização, o poder
+    dependia do instante da run em que a medição caiu.
+    """
+    limpa = make_hero("Rogue", 10, "expected")
+    suja = copy.deepcopy(limpa)
+    suja.take_damage(int(suja.base_hp * 0.6))
+    suja.reduce_mp(suja.get_mp() // 2)
+    suja.active_buffs["Teste"] = {"stat": "st", "value": 999, "duration": 3}
+    suja.active_effects["poison"] = {"duration": 2, "value": 5}
+    for carta in suja.skills.values():
+        suja.skill_cooldowns[carta.id] = 9
+
+    assert assinatura_de_build(limpa) == assinatura_de_build(suja)
+    assert _mede(limpa) == _mede(suja)
+
+
+def test_recarga_sozinha_nao_move_o_poder():
+    """(G) Isola a recarga das outras sujeiras do estado."""
+    pronta = make_hero("Mage", 10, "expected")
+    recarregando = copy.deepcopy(pronta)
+    for carta in recarregando.skills.values():
+        recarregando.skill_cooldowns[carta.id] = 5
+
+    assert assinatura_de_build(pronta) == assinatura_de_build(recarregando)
+    assert _mede(pronta) == _mede(recarregando)
+
+
+# --- As colisões de cache -------------------------------------------------
+
+
+def _com_arma(classe, arma, segunda=None):
+    heroi = make_hero(classe, 10, "naked")
+    heroi.add_item_to_inventory(arma)
+    heroi.equip(arma, "Weapon1")
+    if segunda is not None:
+        heroi.add_item_to_inventory(segunda)
+        heroi.equip(segunda, "Weapon2")
+    return heroi
+
+
+def test_armas_de_dano_diferente_nao_dividem_cache():
+    """(I) `get_avg_damage` passa por `weapon_percent`, e `get_st` não carrega isso."""
+    armas = sorted(
+        (
+            d.instance()
+            for d in __import__("src.content.items", fromlist=["x"]).get_all_items().values()
+            if getattr(d, "slot", None) == "Weapon" and getattr(d, "damage_bonus", 0)
+        ),
+        key=lambda i: i.damage_bonus,
+    )
+    fraca, forte = armas[0], armas[-1]
+    assert fraca.damage_bonus != forte.damage_bonus
+    assert assinatura_de_build(_com_arma("Warrior", fraca)) != assinatura_de_build(
+        _com_arma("Warrior", forte)
+    )
+
+
+def test_maos_diferentes_nao_dividem_cache():
+    """(H) `can_use_skill` lê `hand_type`, e ele decide se a carta sai."""
+    tipos = {}
+    from src.content.items import get_all_items
+
+    for definicao in get_all_items().values():
+        tipo = getattr(definicao, "hand_type", None)
+        if getattr(definicao, "slot", None) == "Weapon" and tipo:
+            tipos.setdefault(tipo, definicao)
+    if len(tipos) < 2:
+        pytest.skip("catálogo com um só hand_type de arma")
+    (_, uma), (_, outra) = list(tipos.items())[:2]
+    assert assinatura_de_build(_com_arma("Warrior", uma.instance())) != assinatura_de_build(
+        _com_arma("Warrior", outra.instance())
+    )
+
+
+def test_uma_arma_e_duas_armas_nao_dividem_cache():
+    """(J) `req.two_weapons` conta peças empunhadas.
+
+    Sem a OCUPAÇÃO na assinatura, a mão vazia assinaria `("", 1)` — igual a uma
+    arma de uma mão sem `hand_type` —, e as duas builds colidiriam.
+    """
+    from src.content.items import get_all_items
+
+    de_uma_mao = [
+        d
+        for d in get_all_items().values()
+        if getattr(d, "slot", None) == "Weapon"
+        and int(getattr(d, "hands_required", 1) or 1) == 1
+        and (not d.classes or "Warrior" in d.classes)
+    ]
+    if len(de_uma_mao) < 2:
+        pytest.skip("catálogo sem duas armas de uma mão")
+    uma = _com_arma("Warrior", de_uma_mao[0].instance())
+    duas = _com_arma("Warrior", de_uma_mao[0].instance(), de_uma_mao[1].instance())
+    if duas.equipment.get("Weapon2") is None:
+        pytest.skip("este personagem não empunha duas armas")
+    assert assinatura_de_build(uma) != assinatura_de_build(duas)
+
+
+def test_a_ordem_do_deck_nao_divide_cache():
+    """(K) `policies._melhor` é `max`, e `max` devolve o PRIMEIRO máximo.
+
+    A lista vem de `hero.skills.values()`, que é a ordem dos slots — o docstring
+    de `_melhor` declara que a ordem do deck é o desempate. As mesmas cartas em
+    ordens diferentes jogam diferente.
+    """
+    from src.content.skills_loader import get_skills_for_class
+
+    heroi = make_hero("Rogue", 10, "expected")
+    for carta in get_skills_for_class("Rogue"):
+        if heroi.has_free_skill_slot() and carta.id not in heroi.active_skill_ids():
+            heroi.learn_skill(carta)
+    if len(heroi.skills) < 2:
+        pytest.skip("deck pequeno demais para trocar a ordem")
+
+    trocado = copy.deepcopy(heroi)
+    chaves = sorted(trocado.skills)
+    a, b = chaves[0], chaves[1]
+    trocado.skills[a], trocado.skills[b] = trocado.skills[b], trocado.skills[a]
+
+    assert set(heroi.active_skill_ids()) == set(trocado.active_skill_ids())
+    assert assinatura_de_build(heroi) != assinatura_de_build(trocado)
+
+
+def test_o_clone_medido_nao_tem_consumivel_e_o_original_mantem_os_dele():
+    """A normalização é do CLONE. O personagem da run não perde a poção dele."""
+    from src.sim.arena import _normalizado
+
+    heroi = make_hero("Warrior", 10, "expected")
+    for _ in range(3):
+        heroi.add_item_to_inventory(_consumivel())
+    quantos_antes = sum(1 for i in heroi.inventory if i.is_potion)
+    assert quantos_antes > 0
+
+    clone = _normalizado(heroi)
+    assert not [i for i in clone.inventory if i.is_potion]
+    assert not clone.skill_cooldowns
+    assert clone.get_hp() == clone.base_hp
+    assert sum(1 for i in heroi.inventory if i.is_potion) == quantos_antes
