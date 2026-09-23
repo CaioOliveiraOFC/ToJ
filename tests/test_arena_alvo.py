@@ -52,8 +52,9 @@ def test_o_snapshot_veio_de_uma_run_real():
     """Procedência declarada no próprio arquivo, não em comentário."""
     origem = procedencia()
     assert origem["classe"] == "Rogue"
-    assert origem["seed"] == 20261007
+    assert origem["seed"] == 20260976
     assert origem["andar_de_captura"] == 20
+    assert origem["versao"] == "v2"
     assert "run real" in origem["origem"]
 
 
@@ -66,7 +67,8 @@ def test_o_benchmark_volta_inteiro_do_arquivo():
     assert len(h.passives) == 21
     assert sum(1 for i in h.equipment.values() if i) == 10
     assert any(getattr(i, "enhancement_level", 0) > 0 for i in h.equipment.values() if i)
-    assert any(g for i in h.equipment.values() if i for g in getattr(i, "gems", []))
+    assert any(getattr(i, "socket_count", 0) > 0 for i in h.equipment.values() if i)
+    assert any(getattr(i, "enchantments", ()) for i in h.equipment.values() if i)
     assert [i for i in h.inventory if getattr(i, "consumable", False)]
 
 
@@ -80,7 +82,47 @@ def test_o_arquivo_guarda_o_estado_por_peca_e_nao_so_o_nome():
     pecas = [p for p in dados["equipment"].values() if p]
     assert any(p.get("enhancement_level", 0) > 0 for p in pecas)
     assert any(p.get("socket_count", 0) > 0 for p in pecas)
-    assert any(p.get("gems") for p in pecas)
+    assert any(p.get("enchantments") for p in pecas)
+    # GEMA não é afirmada aqui de propósito: o representante V2 tem 8 peças com
+    # socket e NENHUMA gema encaixada, e isso é propriedade dele, não da
+    # serialização. Exigir gema neste arquivo travaria o teste a um snapshot em
+    # vez de ao contrato — o contrato tem teste próprio, logo abaixo.
+
+
+def test_a_serializacao_preserva_gema_encaixada():
+    """O contrato da gema, testado no CONTRATO e não no representante da vez.
+
+    O snapshot V2 tem socket sem gema, então afirmar gema na ficha dele seria
+    travar o teste a um personagem. Aqui a peça é construída, engastada e passada
+    pelo mesmo `to_save_data`/`player_from_save_data` do save do jogo — se a gema
+    parar de sobreviver ao disco, é aqui que aparece.
+    """
+    from src.content.gems import Gem
+    from src.content.items import get_all_items
+    from src.entities.heroes import Warrior
+    from src.storage.save_manager import player_from_save_data, to_save_data
+
+    heroi = Warrior("Teste")
+    peca = next(
+        d.instance()
+        for d in get_all_items().values()
+        if getattr(d, "slot", None) == "Weapon" and (not d.classes or "Warrior" in d.classes)
+    )
+    peca.socket_count = 1
+    peca.gems = [Gem("Rubi", 3)]
+    heroi.add_item_to_inventory(peca)
+    heroi.equip(peca, "Weapon1")
+
+    from src.entities.heroes import Mage, Rogue
+
+    volta, _, _ = player_from_save_data(
+        to_save_data(heroi, 1, None),
+        get_all_items(),
+        {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue},
+    )
+    arma = volta.equipment.get("Weapon1")
+    assert arma is not None
+    assert [g.display_name for g in arma.gems if g] == ["Rubi Nv. 3"]
 
 
 def test_carregar_duas_vezes_da_o_mesmo_personagem():
@@ -110,7 +152,7 @@ def test_o_poder_do_benchmark_continua_onde_foi_medido():
     número para o teste passar.
     """
     medido = poder_do_benchmark()
-    assert abs(medido - PODER_ESPERADO) < 0.05, f"{medido:.2f} != {PODER_ESPERADO}"
+    assert abs(medido - PODER_ESPERADO) < 0.05, f"{medido!r} != {PODER_ESPERADO!r}"
 
 
 @pytest.mark.balance

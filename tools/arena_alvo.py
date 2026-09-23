@@ -40,16 +40,14 @@ ARQUIVO = Path(__file__).resolve().parents[1] / "src" / "data" / "arena_benchmar
 # novo e o teste falha se divergir. Um alvo que se desloca em silêncio
 # recalibraria a decisão de extrair sem ninguém perceber.
 #
-# O snapshot é um Rogue nível 22, seed 20261007, capturado na entrada do andar
-# 20. Escolhido por ser o mais próximo da MEDIANA de 54 sobreviventes em 900
-# runs (6,00% chegaram vivos), e as três classes convergiram para perto de 30
-# apesar de taxas de sobrevivência 9x diferentes.
+# O snapshot V2 é um Rogue nível 22, seed 20260976, capturado na entrada do andar
+# 20. Escolhido por ser o mais próximo da MEDIANA de 54 sobreviventes em 900 runs
+# (6,00% chegaram vivos), já com a régua V2 — a que não conta consumível.
 #
-# 29,98 -> 29,87 na V2, quando consumível saiu da régua. Este snapshot cai pouco
-# porque não carrega poção de CURA: são 4 elixires e 1 poção de mana, e nenhum
-# dos dois muda muito um duelo 1x1 curto. Sobreviventes com poção de cura caíram
-# de 3,8% a 5,0%.
-PODER_ESPERADO = 29.87
+# O valor é a PRECISÃO REAL da medição, e não o "29,52" do relatório: a bisseção
+# devolve o meio do intervalo final, e arredondar aqui esconderia um
+# deslocamento de até meio centésimo na hora de conferir.
+PODER_ESPERADO = 29.5205078125
 
 _FABRICA = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 
