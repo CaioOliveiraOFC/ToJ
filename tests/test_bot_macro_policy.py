@@ -160,16 +160,22 @@ class TestCuraSoEUrgenteQuandoBarraProgredir:
         assert need is Need.SOBREVIVER
 
 
-class TestExtracaoPelaRazaoDeRunway:
-    """O modelo de VOTOS morreu aqui.
+class TestExtracaoPelaMatriz:
+    """O modelo de VOTOS morreu aqui, e a razão de runway sozinha também.
 
-    Era `len(sinais_de_risco) - 1`: quatro textos booleanos (HP<50%, MP<15%,
-    nível<andar-1, streak>=3), dois convenciam, um não. Magnitude não existia —
-    HP 34% e HP 4% eram o mesmo voto —, e o portão de acúmulo era
-    `nivel>=3 or passivas>=2 or pecas>=2`, três números mágicos unidos por OR.
+    Era `len(sinais_de_risco) - 1`: quatro textos booleanos, dois convenciam, um
+    não. Depois virou uma razão só — quanto ainda dá para andar dividido por
+    quanto já foi andado —, e isso decidia sem nunca olhar se o gladiador já
+    estava pronto.
 
-    No lugar entrou uma razão que a própria run mede: quanto ainda dá para andar
-    dividido por quanto já foi andado.
+    Agora são DUAS grandezas que não se somam: `poder_relativo` (qualidade
+    permanente da build, contra o alvo da Arena) e `runway` (fôlego restante).
+    Uma MATRIZ discreta as combina, e o resultado viaja na `Need` — `PRESERVAR`
+    quando preserva, `ENCERRAR` com utility zero quando não.
+
+    A matriz inteira, com fronteiras, tem arquivo próprio. Aqui o que se fixa é a
+    INTEGRAÇÃO: que o veredito chega em `decidir_no_mapa` e ganha ou perde de
+    verdade contra as outras ações do mapa.
     """
 
     def _com_historico(self, **kwargs) -> ProgressionState:
@@ -179,40 +185,62 @@ class TestExtracaoPelaRazaoDeRunway:
             combates_observados=9,
             lutas_por_andar=3.0,
             andares_concluidos=3,
+            poder_relativo=1.0,
         )
         base.update(kwargs)
         return _prog(**base)
 
-    def test_sem_historico_nao_extrai(self):
+    def test_sem_historico_de_runway_a_build_equivalente_continua(self):
         """Evidência insuficiente tem regra própria: não se inventa média."""
-        cru = _prog(combates_observados=0, andares_concluidos=0)
+        cru = _prog(combates_observados=0, andares_concluidos=0, poder_relativo=1.0)
         decisao = decidir_no_mapa(_mapa(desvio_extracao=2), cru, (_lutar(), EXTRAIR, SAIDA))
         assert decisao.action_id != "extrair"
         assert _nota(decisao, "extrair") == 0.0
 
-    def test_com_estrada_pela_frente_nao_extrai(self):
+    def test_com_estrada_pela_frente_a_build_equivalente_nao_extrai(self):
         """Barra cheia e lutas baratas: ainda dá para andar mais do que já andei."""
         prog = self._com_historico(hp=500, hp_max=500, dano_por_luta=0.05)
         decisao = decidir_no_mapa(_mapa(andar=4, desvio_extracao=2), prog, (EXTRAIR, SAIDA))
-        assert _nota(decisao, "extrair") < 0
+        assert decisao.action_id != "extrair"
+        assert _nota(decisao, "extrair") == 0.0
 
-    def test_com_o_folego_no_fim_extrai(self):
+    def test_com_o_folego_no_fim_a_build_equivalente_extrai(self):
         prog = self._com_historico(hp=60, hp_max=500, dano_por_luta=0.30)
         decisao = decidir_no_mapa(
             _mapa(andar=12, desvio_extracao=2), prog, (_lutar(), EXTRAIR, SAIDA)
         )
         assert decisao.action_id == "extrair"
 
-    def test_a_nota_e_a_distancia_ate_o_empate_da_razao(self):
-        """`runway = 1` é o ponto de empate da razão, não limiar escolhido."""
-        prog = self._com_historico(hp=150, hp_max=500)
+    def test_a_nota_explica_as_duas_grandezas(self):
+        """Quem lê o trace precisa ver banda, poder, runway e lutas até o portal."""
+        prog = self._com_historico(hp=150, hp_max=500, poder_relativo=1.08)
         score = next(
             s
             for s in decidir_no_mapa(_mapa(andar=10, desvio_extracao=1), prog, (EXTRAIR,)).scores
             if s.action_id == "extrair"
         )
-        assert [n for n, _v in score.components] == ["fôlego que falta"]
-        assert "aguento" in score.note
+        assert "SUPEROU" in score.note
+        assert "1.08" in score.note
+        assert "runway" in score.note
+        assert "portal" in score.note
+
+    def test_quem_superou_o_alvo_preserva_em_vez_de_lutar(self):
+        """`PRESERVAR` fica acima de `PROGREDIR`: cumprido o objetivo, sai."""
+        prog = self._com_historico(hp=500, hp_max=500, dano_por_luta=0.05, poder_relativo=1.20)
+        decisao = decidir_no_mapa(
+            _mapa(andar=4, desvio_extracao=2), prog, (_lutar(), EXTRAIR, SAIDA)
+        )
+        assert decisao.action_id == "extrair"
+
+    def test_quem_recusou_continua_visivel_no_trace(self):
+        """Perder não é sumir: a opção segue enumerada, avaliada e explicada."""
+        prog = self._com_historico(hp=500, hp_max=500, dano_por_luta=0.05, poder_relativo=0.70)
+        decisao = decidir_no_mapa(
+            _mapa(andar=4, desvio_extracao=2), prog, (_lutar(), EXTRAIR, SAIDA)
+        )
+        assert decisao.action_id != "extrair"
+        extrair = next(s for s in decisao.scores if s.action_id == "extrair")
+        assert "ABAIXO" in extrair.note
 
 
 class TestServicoDepoisDoCombate:

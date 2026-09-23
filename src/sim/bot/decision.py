@@ -36,10 +36,23 @@ class Need(IntEnum):
     """
 
     SOBREVIVER = 1
-    RECUPERAR = 2
-    PROGREDIR = 3
-    INVESTIR = 4
-    ENCERRAR = 5
+    # PRESERVAR nasceu porque a decisão de extrair é BOOLEANA e não cabia em
+    # nenhum tier existente sem uma constante calibrada contra outro avaliador.
+    # A matriz de extração diz apenas "preserve" ou "continue"; encaixá-la em
+    # `SOBREVIVER` exigiria utility acima do teto da Loja (2,0) e faria extrair
+    # vencer beber poção com vida crítica, e em `RECUPERAR` exigiria passar do
+    # teto da saída (`HP_DE_APOSTA - hp_frac`). Os dois números quebrariam em
+    # silêncio quando aqueles avaliadores mudassem.
+    #
+    # Sozinha no tier, a utility da extração não é comparada com nada: qualquer
+    # valor positivo dá o mesmo comportamento, e por isso ela deixa de ser um
+    # câmbio entre grandezas. Emergência de vida continua acima; recuperação e
+    # progressão passam a ficar abaixo — que é exatamente a ordem pedida.
+    PRESERVAR = 2
+    RECUPERAR = 3
+    PROGREDIR = 4
+    INVESTIR = 5
+    ENCERRAR = 6
 
 
 @dataclass(frozen=True, slots=True)

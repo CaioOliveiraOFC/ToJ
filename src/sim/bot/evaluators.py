@@ -56,6 +56,7 @@ from __future__ import annotations
 
 import math
 
+from src.shared.constants import ARENA_EQUIVALENCE_BAND
 from src.sim.bot.decision import ActionOption, Need, Score
 from src.sim.bot.observation import CombatState, MapState, ProgressionState
 
@@ -64,6 +65,19 @@ from src.sim.bot.observation import CombatState, MapState, ProgressionState
 # faz a utilidade da retirada ficar positiva, e a retirada ganha por ser de
 # necessidade mais urgente — não por impedir as outras de serem avaliadas.
 HP_DE_APOSTA = 0.35
+
+# As bandas da build, contra o alvo da Arena. Os nomes vivem aqui porque
+# classificar é POLÍTICA; o número que as separa vive em `shared.constants`, que
+# é fonte única e também é de onde `sim.arena` o lê.
+ABAIXO = "ABAIXO"
+EQUIVALENTE = "EQUIVALENTE"
+SUPEROU = "SUPEROU"
+
+# Os estados do fôlego. Não são limiares novos: `runway = 1` é o empate da
+# própria razão e `runway = 0` é o fim dela.
+SAUDAVEL = "SAUDAVEL"
+CURTO = "CURTO"
+ESGOTADO = "ESGOTADO"
 
 # A fuga abre mão da recompensa do encontro. O número não converte ouro em
 # turnos: é o desconto sobre o valor de fugir quando a luta ainda é vencível.
@@ -723,54 +737,131 @@ def _runway_relativo(mapa: MapState, prog: ProgressionState) -> float | None:
     return (lutas / prog.lutas_por_andar) / max(1, mapa.andar)
 
 
+def _banda_da_build(poder_relativo: float) -> str:
+    """Onde a build está em relação ao alvo da Arena.
+
+    A banda é a MESMA de `sim.arena.classificar`, e o número que a define é o
+    MESMO `ARENA_EQUIVALENCE_BAND`. Existem duas implementações porque o cérebro
+    não pode importar `sim.arena` — ela importa `content` e `mechanics`, e este
+    pacote é fechado para os dois. O que impede as duas de divergirem é a
+    constante única mais um teste de paridade sobre uma grade que inclui as
+    fronteiras.
+    """
+    if poder_relativo < 1 - ARENA_EQUIVALENCE_BAND:
+        return ABAIXO
+    if poder_relativo > 1 + ARENA_EQUIVALENCE_BAND:
+        return SUPEROU
+    return EQUIVALENTE
+
+
+def _estado_do_runway(runway: float) -> str:
+    """Os pontos são os naturais da própria razão, não limiares escolhidos.
+
+    `runway = 1` é o empate: aguento mais um tanto igual ao que já atravessei.
+    `runway = 0` é o fim: depois do custo da rota até o portal não sobra
+    capacidade para outra luta.
+    """
+    if runway > 1:
+        return SAUDAVEL
+    if runway > 0:
+        return CURTO
+    return ESGOTADO
+
+
+# A matriz. Ela é a autoridade da decisão, e é DISCRETA de propósito: `runway` e
+# `poder_relativo` medem coisas diferentes — fôlego da run e qualidade da build —
+# e somá-las exigiria um câmbio inventado. Ler a tabela é a conversão.
+#
+#                     SAUDÁVEL   CURTO      ESGOTADO
+#   ABAIXO            continua   continua   PRESERVA
+#   EQUIVALENTE       continua   PRESERVA   PRESERVA
+#   SUPEROU           PRESERVA   PRESERVA   PRESERVA
+_MATRIZ = {
+    (ABAIXO, SAUDAVEL): False,
+    (ABAIXO, CURTO): False,
+    (ABAIXO, ESGOTADO): True,
+    (EQUIVALENTE, SAUDAVEL): False,
+    (EQUIVALENTE, CURTO): True,
+    (EQUIVALENTE, ESGOTADO): True,
+    (SUPEROU, SAUDAVEL): True,
+    (SUPEROU, CURTO): True,
+    (SUPEROU, ESGOTADO): True,
+}
+
+
 def _avaliar_extracao(opcao: ActionOption, mapa: MapState, prog: ProgressionState) -> Score:
     """Preservar o personagem inteiro, ou seguir construindo.
 
-    Morrer apaga tudo (`delete_save`); extrair grava tudo e encerra a run. O que
-    está em jogo é a run inteira, e o que decide é quanto dela ainda dá para
-    percorrer — a razão de runway.
+    Morrer apaga tudo (`delete_save`); extrair grava tudo e encerra a run. Duas
+    coisas decidem, e elas NÃO se somam:
 
-    A virada é `runway = 1`: aguento mais um tanto igual ao que já andei. Não é
-    limiar escolhido a dedo, é o ponto de empate da própria razão — acima dele a
-    run ainda tem estrada pela frente, abaixo dele ela está no fim. A utilidade é
-    a distância até essa virada, então ela cresce conforme o fôlego encurta e
-    nunca vence enquanto houver estrada.
+        poder_relativo   qualidade PERMANENTE da build, contra o alvo da Arena
+        runway           fôlego RESTANTE da run
+
+    Uma diz se o gladiador já está pronto; a outra, se ainda há estrada. São
+    grandezas diferentes, e `a·runway + b·poder` precisaria de um câmbio que
+    ninguém mediu. Por isso a decisão é uma MATRIZ discreta, resolvida num
+    booleano — e é a `Need` que carrega o resultado, que é para isso que a
+    escada de necessidades existe.
+
+    Quando preserva, a ação atende `PRESERVAR`: acima de recuperar e progredir,
+    abaixo de não morrer agora. Quando não preserva, ela continua enumerada,
+    avaliada e no trace, com utility 0,0 — `escolher` só deixa vencer quem tem
+    utility positiva, e a saída do andar tem piso positivo, então nunca falta
+    candidata.
 
     Decidida UMA vez: quem alcança a casa executa a decisão que veio, e não
     reavalia. Era esse o loop EXTRAIR -> anda -> NÃO EXTRAIR.
     """
     runway = _runway_relativo(mapa, prog)
-    if runway is None:
-        # EVIDÊNCIA INSUFICIENTE, e ela tem regra própria: sem luta medida ou sem
-        # andar concluído não há custo observado, e uma média inventada decidiria
-        # o destino da run com um número que ninguém mediu. Extrair não vence por
-        # falta de dados — a run continua, e a evidência chega no primeiro combate.
+    poder = prog.poder_relativo
+
+    if poder <= 0:
+        # AUSÊNCIA DE MEDIÇÃO, e não "build fraca". Sem banda a matriz não se
+        # aplica, e tratar isto como ABAIXO seria decidir o destino da run com um
+        # número que ninguém mediu. Não deveria acontecer numa oportunidade real:
+        # o adaptador mede quando há chave, casa alcançável e extração habilitada.
         return Score(
             opcao.action_id,
-            Need.SOBREVIVER,
+            Need.ENCERRAR,
             0.0,
-            (("sem histórico", 0.0),),
-            note="nenhuma luta medida ainda: sem custo observado, não há runway a estimar",
+            (("poder não medido", 0.0),),
+            note="poder relativo não foi medido: sem banda de build, a matriz não decide",
         )
 
-    componentes = [("fôlego que falta", 1.0 - runway)]
-    resumo = (
-        f"aguento ~{runway * mapa.andar:.1f} andar(es) tendo atravessado {mapa.andar}; "
-        f"cada luta custou {prog.dano_por_luta:.0%} da barra em "
-        f"{prog.combates_observados} medida(s)"
+    banda = _banda_da_build(poder)
+
+    if runway is None:
+        # EVIDÊNCIA INSUFICIENTE de runway: sem luta medida ou sem andar
+        # concluído não há custo observado, e uma média inventada decidiria a run
+        # com um número que ninguém mediu. Só quem já superou o alvo preserva
+        # assim mesmo — para esse, continuar não constrói mais nada.
+        preserva = banda == SUPEROU
+        nota = f"{banda} ({poder:.2f}), runway sem evidência: nenhuma luta medida ainda — " + (
+            "alvo da Arena superado, preservar." if preserva else "seguir construindo."
+        )
+        return _score_da_extracao(opcao, preserva, nota)
+
+    estado = _estado_do_runway(runway)
+    preserva = _MATRIZ[(banda, estado)]
+    nota = (
+        f"{banda} ({poder:.2f}), runway {runway:.2f} ({estado.lower()}); "
+        f"{mapa.lutas_ate_extracao} luta(s) até o portal — "
+        + ("preservar a build." if preserva else "a run ainda constrói: continuar.")
     )
-    if mapa.lutas_ate_extracao:
-        resumo += f"; {mapa.lutas_ate_extracao} luta(s) até o portal"
-    return Score(
-        opcao.action_id,
-        # A MESMA necessidade da cura, e pelo mesmo motivo: com o fôlego no fim,
-        # preservar é sobreviver. Acima do ponto de aposta, é investimento — e
-        # perde para lutar, que é o que faz a run crescer.
-        _necessidade_de_cura(prog),
-        sum(v for _n, v in componentes),
-        tuple(componentes),
-        note=resumo,
-    )
+    return _score_da_extracao(opcao, preserva, nota)
+
+
+def _score_da_extracao(opcao: ActionOption, preserva: bool, nota: str) -> Score:
+    """O veredito da matriz, traduzido para a escada de necessidades.
+
+    A utility quando preserva é 1,0 e poderia ser qualquer positivo: `PRESERVAR`
+    não tem outra ação disputando o tier, então o número não é comparado com
+    nada. É a `Need` que decide, e a matriz que decide a `Need`.
+    """
+    if preserva:
+        return Score(opcao.action_id, Need.PRESERVAR, 1.0, (("preservar a build", 1.0),), note=nota)
+    return Score(opcao.action_id, Need.ENCERRAR, 0.0, (("preservar a build", 0.0),), note=nota)
 
 
 def _avaliar_saida(opcao: ActionOption, mapa: MapState, prog: ProgressionState) -> Score:

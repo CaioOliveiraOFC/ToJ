@@ -263,3 +263,32 @@ def test_a_observacao_do_bot_carrega_magnitude_e_nada_mais():
         ).poder_relativo
         == 0.0
     )
+
+
+def test_uma_oportunidade_real_chega_ao_evaluator_com_poder_medido():
+    """INTEGRAÇÃO: chave + `E` alcançável + medição habilitada => poder > 0.
+
+    O evaluator trata `poder_relativo <= 0` como AUSÊNCIA DE MEDIÇÃO e recusa
+    aplicar a matriz. Este teste é a garantia de que isso não é o caminho normal:
+    numa oportunidade real de extração, o adaptador já mediu. Sem ele, um portão
+    que parasse de disparar transformaria toda extração em "não medido" e
+    ninguém notaria — os testes da matriz continuariam verdes.
+    """
+    from tools.bot_adapter import _comparacao_com_a_arena
+
+    class RunNormal:
+        pass
+
+    heroi = make_hero("Rogue", 12, "expected")
+    medido = _comparacao_com_a_arena(
+        RunNormal(), heroi, extrair_e_possivel=True, duelos=POUCOS_DUELOS
+    )
+    assert medido.get("poder_relativo", 0.0) > 0
+
+    # E o que o adaptador produz alimenta o campo que o evaluator lê.
+    from src.sim.bot.observation import ProgressionState
+
+    prog = ProgressionState(
+        nivel=12, hp=1, hp_max=1, mp=0, mp_max=0, ouro=0, taxa_de_saida=0, **medido
+    )
+    assert prog.poder_relativo > 0
