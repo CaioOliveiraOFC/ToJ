@@ -65,7 +65,11 @@ def list_slots() -> list[dict]:
                             "extracted": int(data.get("extracted_on_floor", 0) or 0) > 0,
                         }
                     )
-            except Exception:
+            # Arquivo ilegível é tratado como slot livre. `except Exception` aqui
+            # também engolia defeito de esquema — um campo que o save aprendeu a
+            # guardar num tipo que esta leitura não espera aparecia como "slot
+            # vazio", e o jogador podia salvar em cima.
+            except (OSError, json.JSONDecodeError):
                 slots.append({"slot": i, "occupied": False})
         else:
             slots.append({"slot": i, "occupied": False})
@@ -382,16 +386,29 @@ def player_from_save_data(
 def load_game(
     item_registry: ItemRegistry, player_factory: dict[str, PlayerFactory], slot: int = 1
 ) -> tuple["Player" | None, int | None, dict | None]:
-    """Carrega o estado do jogo a partir de um ficheiro JSON."""
+    """Carrega o estado do jogo a partir de um ficheiro JSON.
+
+    Só ARQUIVO ILEGÍVEL vira "não há save": JSON malformado e falha de leitura.
+    O que `player_from_save_data` levantar sobe.
+
+    A guarda era `except Exception`, e ela já custou caro uma vez: `equip`
+    levantava `ValueError` em TODO carregamento de save com equipamento — porque
+    `load_game` retirava a peça do inventário antes de equipar — e o jogador via
+    "save corrompido" em vez do defeito. Está registrado em `heroes.equip`. O bug
+    de origem foi corrigido; o engolidor continuava aqui, pronto para o próximo.
+    Um `KeyError` de item renomeado ou um campo que o save aprendeu a guardar e a
+    releitura não conhece são defeitos nossos, e defeito calado é defeito que
+    volta.
+    """
     filepath = get_slot_file(slot)
     if not os.path.exists(filepath):
         return None, None, None
     try:
         with open(filepath, "r") as f:
             save_data = json.load(f)
-        return player_from_save_data(save_data, item_registry, player_factory)
-    except Exception:
+    except (OSError, json.JSONDecodeError):
         return None, None, None
+    return player_from_save_data(save_data, item_registry, player_factory)
 
 
 def check_save_file(slot: int = 1) -> bool:

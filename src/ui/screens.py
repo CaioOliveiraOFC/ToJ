@@ -12,6 +12,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from src.content.skills_loader import get_skill_by_id
 from src.shared.constants import (
     ESSENCE_MULT_GOOD,
     ESSENCE_MULT_MAX,
@@ -1290,15 +1291,19 @@ def render_character_status(player) -> None:
         Panel(Text(title, justify="center", style="bold cyan"), border_style="cyan")
     )
 
-    # XP
-    try:
-        xp_atual = player.xp_points
-        xp_needed = player.need_to_next()
-        xp_total = player.need_to_up()
-    except Exception:
-        xp_atual = getattr(player, "xp_points", 0)
-        xp_needed = 0
-        xp_total = 0
+    # XP, HP/MP e atributos vêm direto do `Player`, sem rede de proteção.
+    #
+    # Os três blocos ficavam dentro de `try/except Exception` com valor de
+    # consolo: XP virava "XP: 0", HP virava "HP: 0/0" e os atributos viravam
+    # "Atributos indisponíveis". Um `need_to_up()` quebrado, um `base_hp` que
+    # sumisse do save ou um `get_avg_damage()` que estourasse apareciam como
+    # personagem zerado, e o jogador não tem como distinguir isso de um
+    # personagem que de fato está em zero. A anotação da função é `Player`, e o
+    # único chamador (`character_status_flow`) passa um `Player` — não há
+    # duck typing a sustentar aqui. Erro nesta tela é defeito, e defeito sobe.
+    xp_atual = player.xp_points
+    xp_needed = player.need_to_next()
+    xp_total = player.need_to_up()
     xp_text = (
         f"XP: {xp_atual} / {xp_total}  (falta {xp_needed} pro próximo nível)"
         if xp_total
@@ -1309,34 +1314,19 @@ def render_character_status(player) -> None:
     )
 
     # HP/MP
-    try:
-        hp = player.get_hp()
-        max_hp = getattr(player, "base_hp", hp)
-        mp = player.get_mp()
-        max_mp = getattr(player, "base_mp", mp)
-    except Exception:
-        hp = max_hp = mp = max_mp = 0
-    hp_mp_text = f"HP: {hp}/{max_hp}   |   MP: {mp}/{max_mp}"
+    hp_mp_text = (
+        f"HP: {renderer.hp_exibido(player)}/{player.base_hp}"
+        f"   |   MP: {player.get_mp()}/{player.base_mp}"
+    )
     renderer.console.print(
         Panel(Text(hp_mp_text, justify="center", style="bold white"), border_style="white")
     )
 
     # Atributos base
-    try:
-        atk = (
-            player.get_avg_damage()
-            if hasattr(player, "get_avg_damage")
-            else getattr(player, "avg_damage", 0)
-        )
-        base_df = getattr(player, "base_df", getattr(player, "base_ag", 0))
-        base_ag = getattr(player, "base_ag", 0)
-        base_st = getattr(player, "base_st", 0)
-        base_mg = getattr(player, "base_mg", 0)
-        attrs_text = (
-            f"ATK: {atk}  |  DEF: {base_df}  |  AGI: {base_ag}  |  ST: {base_st}  |  MG: {base_mg}"
-        )
-    except Exception:
-        attrs_text = "Atributos indisponíveis"
+    attrs_text = (
+        f"ATK: {player.get_avg_damage()}  |  DEF: {player.base_df}  "
+        f"|  AGI: {player.base_ag}  |  ST: {player.base_st}  |  MG: {player.base_mg}"
+    )
     renderer.console.print(
         Panel(
             Text(attrs_text, justify="center", style="yellow"),
@@ -1384,21 +1374,16 @@ def render_character_status(player) -> None:
     )
 
     # Cooldowns
-    cooldowns = getattr(player, "skill_cooldowns", {})
+    cooldowns = player.skill_cooldowns
     if cooldowns:
         cd_lines = []
         for sid, rem in cooldowns.items():
-            # Tenta resolver nome da skill pelo id
-            skill_name = sid
-            try:
-                from src.content.skills_loader import get_skill_by_id
-
-                sc = get_skill_by_id(sid)
-                if sc:
-                    skill_name = sc.name
-            except Exception:
-                pass
-            cd_lines.append(f"{escape_markup(skill_name)}: {rem} turno(s)")
+            # Um id fora do catálogo é exibido como id: `get_skill_by_id` já
+            # devolve `None` para isso, e não é erro. O `try/except Exception`
+            # que envolvia estas três linhas só podia pegar falha de import do
+            # loader — que é defeito, não carta desconhecida.
+            sc = get_skill_by_id(sid)
+            cd_lines.append(f"{escape_markup(sc.name if sc else sid)}: {rem} turno(s)")
         cd_text = "\n".join(cd_lines)
     else:
         cd_text = "[dim]Nenhum cooldown ativo[/dim]"
@@ -1407,17 +1392,13 @@ def render_character_status(player) -> None:
     )
 
     # Efeitos temporários
-    active_effects = getattr(player, "active_effects", {})
-    active_buffs = getattr(player, "active_buffs", {})
     effect_lines = []
-    for name, data in {**active_effects, **active_buffs}.items():
-        try:
-            dur = data.get("duration", "?") if isinstance(data, dict) else "?"
-            val = data.get("value", "") if isinstance(data, dict) else ""
-            val_str = f" (+{val})" if val != "" else ""
-            effect_lines.append(f"{escape_markup(str(name))}{val_str} - {dur} turno(s) restantes")
-        except Exception:
-            effect_lines.append(f"{escape_markup(str(name))}")
+    for name, data in {**player.active_effects, **player.active_buffs}.items():
+        # `isinstance` já decide os dois casos; o `except` em volta era inalcançável.
+        dur = data.get("duration", "?") if isinstance(data, dict) else "?"
+        val = data.get("value", "") if isinstance(data, dict) else ""
+        val_str = f" (+{val})" if val != "" else ""
+        effect_lines.append(f"{escape_markup(str(name))}{val_str} - {dur} turno(s) restantes")
     if effect_lines:
         effect_text = "\n".join(effect_lines)
     else:

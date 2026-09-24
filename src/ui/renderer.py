@@ -10,16 +10,30 @@ from src.shared.types import CombatResult
 console = Console()
 
 
+def hp_exibido(entt) -> int:
+    """O HP que o jogador vê. Nunca abaixo de zero.
+
+    `reduce_hp` NÃO limita em zero, e é correto que não limite: o excedente do
+    golpe fatal é dado real, que o pós-combate e a telemetria leem. Mas "-71/440"
+    na tela não é informação, é vazamento do modelo — HP negativo não existe na
+    ficha que o jogador tem na mão.
+
+    A barra já tomava essa decisão e o número ao lado dela não: o mesmo painel
+    mostrava dez casas vazias com "-71" escrito na frente. Uma função só, para os
+    dois não voltarem a divergir.
+    """
+    return max(0, int(entt.get_hp()))
+
+
 def get_hp_bar(entt) -> str:
     if getattr(entt, "base_hp", 0) == 0:
         percent_of_bar = 0
     else:
-        current_hp = max(0, entt.get_hp())
-        percent_of_bar = int((current_hp / entt.base_hp) * 10)
+        percent_of_bar = int((hp_exibido(entt) / entt.base_hp) * 10)
     percent_of_bar = min(percent_of_bar, 10)
     hp_bar_fill = "[#]" * percent_of_bar
     hp_bar_empty = "[ ]" * (10 - percent_of_bar)
-    return f"|{hp_bar_fill}{hp_bar_empty}| {entt.get_hp()}/{entt.base_hp} HP"
+    return f"|{hp_bar_fill}{hp_bar_empty}| {hp_exibido(entt)}/{entt.base_hp} HP"
 
 
 def render_menu(options: tuple[str, ...] | list[str], prompt: str) -> None:
@@ -57,9 +71,9 @@ def render_compare_opponents(ennt1, ennt2) -> None:
         f"Nível: [green]{ennt2.get_level()}[/green]",
     )
     table.add_row(
-        f"HP: [red]{ennt1.get_hp()}[/red]/[dim red]{ennt1.base_hp}[/dim red]",
+        f"HP: [red]{hp_exibido(ennt1)}[/red]/[dim red]{ennt1.base_hp}[/dim red]",
         "",
-        f"HP: [red]{ennt2.get_hp()}[/red]/[dim red]{ennt2.base_hp}[/dim red]",
+        f"HP: [red]{hp_exibido(ennt2)}[/red]/[dim red]{ennt2.base_hp}[/dim red]",
     )
     table.add_row(
         f"MP: [cyan]{ennt1.get_mp()}[/cyan]/[dim cyan]{ennt1.base_mp}[/dim cyan]",

@@ -27,7 +27,7 @@ def build_player_status(player, selected_item=None) -> str:
     content = f"[bold]Classe:[/bold] {player.get_classname()}\n"
     content += f"[bold]Nível:[/bold] {player.level}\n\n"
 
-    content += f"[red]HP:[/red] {player.get_hp()}/{player.base_hp}\n"
+    content += f"[red]HP:[/red] {renderer.hp_exibido(player)}/{player.base_hp}\n"
     content += f"[blue]MP:[/blue] {player.get_mp()}/{player.base_mp}\n\n"
 
     current_atk = player.avg_damage + player.get_passive_bonus("strength")
