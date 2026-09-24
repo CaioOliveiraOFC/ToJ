@@ -219,13 +219,13 @@ class TestExtracaoPelaMatriz:
             for s in decidir_no_mapa(_mapa(andar=10, desvio_extracao=1), prog, (EXTRAIR,)).scores
             if s.action_id == "extrair"
         )
-        assert "SUPEROU" in score.note
+        assert "HARD_STOP" in score.note
         assert "1.08" in score.note
-        assert "runway" in score.note
+        assert "andar(es)" in score.note
         assert "portal" in score.note
 
-    def test_quem_superou_o_alvo_preserva_em_vez_de_lutar(self):
-        """`PRESERVAR` fica acima de `PROGREDIR`: cumprido o objetivo, sai."""
+    def test_quem_passou_do_limite_preserva_em_vez_de_lutar(self):
+        """`PRESERVAR` fica acima de `PROGREDIR`: no HARD_STOP, sai."""
         prog = self._com_historico(hp=500, hp_max=500, dano_por_luta=0.05, poder_relativo=1.20)
         decisao = decidir_no_mapa(
             _mapa(andar=4, desvio_extracao=2), prog, (_lutar(), EXTRAIR, SAIDA)

@@ -69,9 +69,13 @@ HP_DE_APOSTA = 0.35
 # As bandas da build, contra o alvo da Arena. Os nomes vivem aqui porque
 # classificar é POLÍTICA; o número que as separa vive em `shared.constants`, que
 # é fonte única e também é de onde `sim.arena` o lê.
-ABAIXO = "ABAIXO"
-EQUIVALENTE = "EQUIVALENTE"
-SUPEROU = "SUPEROU"
+# Quatro MARCOS COMPORTAMENTAIS, não uma banda estatística de equivalência. Os
+# cortes saem do mesmo `ARENA_EQUIVALENCE_BAND` mais o 1,00, que é o ponto de
+# igualdade da própria razão — nenhuma constante nova.
+ABAIXO = "ABAIXO"  # < 0,95        ainda abaixo do aceitável
+CLOSE_ENOUGH = "CLOSE_ENOUGH"  # 0,95 a 1,00 abaixo do alvo, mas aceitável
+META_BATIDA = "META_BATIDA"  # 1,00 a 1,05 alvo da Arena atingido
+HARD_STOP = "HARD_STOP"  # > 1,05      limite de ganância
 
 # Os estados do fôlego. Não são limiares novos: `runway = 1` é o empate da
 # própria razão e `runway = 0` é o fim dela.
@@ -697,23 +701,27 @@ def _avaliar_evento(opcao: ActionOption, mapa: MapState, prog: ProgressionState)
     )
 
 
-def _runway_relativo(mapa: MapState, prog: ProgressionState) -> float | None:
-    """Quanto ainda dá para andar, relativo ao que já foi andado.
+def _runway_em_andares(mapa: MapState, prog: ProgressionState) -> float | None:
+    """Quantos ANDARES ADICIONAIS a run ainda sustenta.
 
-    NÃO é probabilidade de ruína, e não é valor esperado. É uma RAZÃO
-    ESTRUTURAL: capacidade restante estimada dividida pelo progresso já
-    atravessado. Os dois lados vêm da própria run, e a taxa que converte um no
-    outro também — nenhuma constante nova entra aqui.
+    NÃO é probabilidade de ruína, e não é valor esperado. É capacidade restante
+    estimada, em andares — a unidade do progresso. Tudo vem da própria run:
 
-        custo de uma luta   dano REAL recebido / encontros medidos
-        HP útil             vida agora + cura que já está na mão
-        lutas que absorvo   HP útil / custo de uma luta
-        andares que aguento lutas que absorvo / lutas por andar observadas
-        runway relativo     andares que aguento / andar atual
+        custo de uma luta    dano REAL recebido / encontros medidos
+        HP útil              vida agora + cura que já está na mão
+        lutas que absorvo    HP útil / custo de uma luta
+        runway               lutas que absorvo / lutas por andar observadas
 
-    As duas pontas acabam em ANDARES, que é a unidade do progresso: o andar é o
-    que a run atravessou, e o andar é o que ela ainda tem pela frente. Por isso
-    a razão é adimensional e não precisa de peso para existir.
+    ANTES isto era dividido por `mapa.andar`, e a razão respondia "quanto isso
+    representa em relação a tudo que já percorri". Medido em 900 runs, essa
+    escala comprimia o eixo até ele não decidir nada: 461 de 461 oportunidades
+    caíam em CURTO, nenhuma em SAUDÁVEL, nenhuma em ESGOTADO. Pior, o valor CAÍA
+    com a profundidade justamente enquanto a capacidade ABSOLUTA crescia — 0,314
+    no andar 3 (≈0,94 andar restante) contra 0,085 no andar 20 (≈1,70 andar
+    restante). O divisor media a pergunta errada para esta decisão.
+
+    Sem ele, o número é comparável entre profundidades: dois heróis com o mesmo
+    estado mecânico restante leem o mesmo runway, estejam no andar 4 ou no 18.
 
     A rota até o `E` é descontada em LUTAS, na mesma unidade: quem precisa
     atravessar dois encontros para alcançar o portal tem dois encontros a menos
@@ -734,24 +742,32 @@ def _runway_relativo(mapa: MapState, prog: ProgressionState) -> float | None:
     if lutas <= 0:
         # Nem o portal é alcançável com o fôlego que resta.
         return 0.0
-    return (lutas / prog.lutas_por_andar) / max(1, mapa.andar)
+    return lutas / prog.lutas_por_andar
 
 
 def _banda_da_build(poder_relativo: float) -> str:
-    """Onde a build está em relação ao alvo da Arena.
+    """Onde a build está em relação ao alvo da Arena, em quatro marcos.
 
-    A banda é a MESMA de `sim.arena.classificar`, e o número que a define é o
-    MESMO `ARENA_EQUIVALENCE_BAND`. Existem duas implementações porque o cérebro
-    não pode importar `sim.arena` — ela importa `content` e `mechanics`, e este
-    pacote é fechado para os dois. O que impede as duas de divergirem é a
-    constante única mais um teste de paridade sobre uma grade que inclui as
-    fronteiras.
+    Os cortes são os MESMOS de `sim.arena.classificar` — `ARENA_EQUIVALENCE_BAND`
+    para 0,95 e 1,05, com `>` no topo, para que exatamente 1,05 continue sendo
+    "alvo atingido" e não "limite de ganância". O 1,00 no meio não é limiar novo:
+    é o ponto de igualdade da razão, onde a build empata com o alvo.
+
+    O cérebro tem QUATRO bandas onde a régua tem três, porque aqui elas
+    descrevem comportamento e lá descrevem equivalência. O mapeamento é fechado —
+    `ABAIXO→ABAIXO`, `{CLOSE_ENOUGH, META_BATIDA}→EQUIVALENTE`,
+    `HARD_STOP→SUPEROU` — e um teste de paridade o verifica numa grade que inclui
+    as fronteiras. Existem duas implementações porque o cérebro não pode importar
+    `sim.arena`: ela importa `content` e `mechanics`, e este pacote é fechado
+    para os dois. A constante única é o que impede a divergência.
     """
     if poder_relativo < 1 - ARENA_EQUIVALENCE_BAND:
         return ABAIXO
+    if poder_relativo < 1.0:
+        return CLOSE_ENOUGH
     if poder_relativo > 1 + ARENA_EQUIVALENCE_BAND:
-        return SUPEROU
-    return EQUIVALENTE
+        return HARD_STOP
+    return META_BATIDA
 
 
 def _estado_do_runway(runway: float) -> str:
@@ -769,23 +785,36 @@ def _estado_do_runway(runway: float) -> str:
 
 
 # A matriz. Ela é a autoridade da decisão, e é DISCRETA de propósito: `runway` e
-# `poder_relativo` medem coisas diferentes — fôlego da run e qualidade da build —
-# e somá-las exigiria um câmbio inventado. Ler a tabela é a conversão.
+# `poder_relativo` medem coisas diferentes — andares que ainda sustento e
+# qualidade da build — e somá-las exigiria um câmbio inventado. Ler a tabela é a
+# conversão.
 #
-#                     SAUDÁVEL   CURTO      ESGOTADO
-#   ABAIXO            continua   continua   PRESERVA
-#   EQUIVALENTE       continua   PRESERVA   PRESERVA
-#   SUPEROU           PRESERVA   PRESERVA   PRESERVA
+#                       SAUDÁVEL   CURTO      ESGOTADO
+#   ABAIXO              continua   continua   PRESERVA
+#   CLOSE_ENOUGH        continua   PRESERVA   PRESERVA
+#   META_BATIDA         continua   PRESERVA   PRESERVA
+#   HARD_STOP           PRESERVA   PRESERVA   PRESERVA
+#
+# CLOSE_ENOUGH e META_BATIDA têm a MESMA linha, e isso é decisão tomada, não
+# duplicação a simplificar: com três estados de runway, quatro bandas não
+# produzem quatro linhas distintas sem inventar comportamento para diferenciá-las.
+# As duas seguem separadas no trace e na telemetria — uma é "abaixo do alvo mas
+# aceitável", a outra é "alvo atingido" — e divergirão sozinhas no dia em que
+# houver um quarto estado de fôlego ou outro eixo de decisão. Fundi-las aqui
+# apagaria a distinção semântica para economizar duas linhas de tabela.
 _MATRIZ = {
     (ABAIXO, SAUDAVEL): False,
     (ABAIXO, CURTO): False,
     (ABAIXO, ESGOTADO): True,
-    (EQUIVALENTE, SAUDAVEL): False,
-    (EQUIVALENTE, CURTO): True,
-    (EQUIVALENTE, ESGOTADO): True,
-    (SUPEROU, SAUDAVEL): True,
-    (SUPEROU, CURTO): True,
-    (SUPEROU, ESGOTADO): True,
+    (CLOSE_ENOUGH, SAUDAVEL): False,
+    (CLOSE_ENOUGH, CURTO): True,
+    (CLOSE_ENOUGH, ESGOTADO): True,
+    (META_BATIDA, SAUDAVEL): False,
+    (META_BATIDA, CURTO): True,
+    (META_BATIDA, ESGOTADO): True,
+    (HARD_STOP, SAUDAVEL): True,
+    (HARD_STOP, CURTO): True,
+    (HARD_STOP, ESGOTADO): True,
 }
 
 
@@ -813,7 +842,7 @@ def _avaliar_extracao(opcao: ActionOption, mapa: MapState, prog: ProgressionStat
     Decidida UMA vez: quem alcança a casa executa a decisão que veio, e não
     reavalia. Era esse o loop EXTRAIR -> anda -> NÃO EXTRAIR.
     """
-    runway = _runway_relativo(mapa, prog)
+    runway = _runway_em_andares(mapa, prog)
     poder = prog.poder_relativo
 
     if poder <= 0:
@@ -836,7 +865,7 @@ def _avaliar_extracao(opcao: ActionOption, mapa: MapState, prog: ProgressionStat
         # concluído não há custo observado, e uma média inventada decidiria a run
         # com um número que ninguém mediu. Só quem já superou o alvo preserva
         # assim mesmo — para esse, continuar não constrói mais nada.
-        preserva = banda == SUPEROU
+        preserva = banda == HARD_STOP
         nota = f"{banda} ({poder:.2f}), runway sem evidência: nenhuma luta medida ainda — " + (
             "alvo da Arena superado, preservar." if preserva else "seguir construindo."
         )
@@ -845,7 +874,7 @@ def _avaliar_extracao(opcao: ActionOption, mapa: MapState, prog: ProgressionStat
     estado = _estado_do_runway(runway)
     preserva = _MATRIZ[(banda, estado)]
     nota = (
-        f"{banda} ({poder:.2f}), runway {runway:.2f} ({estado.lower()}); "
+        f"{banda} ({poder:.2f}), runway {runway:.2f} andar(es) ({estado.lower()}); "
         f"{mapa.lutas_ate_extracao} luta(s) até o portal — "
         + ("preservar a build." if preserva else "a run ainda constrói: continuar.")
     )
