@@ -1,12 +1,11 @@
 # Ambiente virtual
 .venv/
 venv/
- 
+
 # Variáveis de ambiente (NUNCA commitar chaves de API)
 .env
 .env.*
 .env*
-.venv/
 
 # Cache do Python
 __pycache__*
@@ -30,9 +29,6 @@ reports/*
 .idea/
 .vscode/
 *.swp
-
-# Graphify (cache de grafo)
-graphify-out/
 
 # Graphify (cache de grafo)
 graphify-out/
