@@ -175,80 +175,6 @@ def _find_equipped_slot_by_item(player, item) -> str | None:
     return None
 
 
-def navigate_menu(
-    items: list[str],
-    title: str,
-    max_visible: int = 10,
-    show_index: bool = True,
-) -> int | None:
-    """Menu navegável com arrow keys.
-
-    Args:
-        items: Lista de opções a mostrar.
-        title: Título do menu.
-        max_visible: Máximo de itens visíveis por página.
-        show_index: Se True, mostra número antes de cada opção.
-
-    Returns:
-        Índice selecionado (0-based) ou None se Cancelar (ESC).
-    """
-    if not items:
-        return None
-
-    current_index = 0
-    total_items = len(items)
-    total_pages = (total_items + max_visible - 1) // max_visible
-    current_page = 0
-
-    while True:
-        renderer.console.clear()
-
-        start_idx = current_page * max_visible
-        end_idx = min(start_idx + max_visible, total_items)
-        visible_items = items[start_idx:end_idx]
-
-        panel_content = f"[bold yellow]{escape_markup(title)}[/bold yellow]\n"
-        panel_content += "[dim]" + "=" * 40 + "[/dim]\n\n"
-
-        for i, item in enumerate(visible_items):
-            real_index = start_idx + i
-            prefix = ">" if real_index == current_index else " "
-
-            if show_index:
-                panel_content += f"{prefix} [{real_index + 1:2}] {escape_markup(item)}\n"
-            else:
-                panel_content += f"{prefix} {escape_markup(item)}\n"
-
-        if total_pages > 1:
-            panel_content += f"\n[dim]Página {current_page + 1}/{total_pages}[/dim]\n"
-
-        panel_content += "\n[dim]W/S navegar | ENTER selecionar | Q sair[/dim]"
-
-        renderer.console.print(Panel(panel_content, border_style="cyan"))
-
-        key = get_key()
-
-        if key in ("w", "W"):
-            current_index -= 1
-            if current_index < 0:
-                current_index = total_items - 1
-            if current_index // max_visible != current_page:
-                current_page = current_index // max_visible
-
-        elif key in ("s", "S"):
-            current_index += 1
-            if current_index >= total_items:
-                current_index = 0
-            if current_index // max_visible != current_page:
-                current_page = current_index // max_visible
-
-        elif key == "ENTER":
-            return current_index
-
-        elif key.lower() == "q":
-            return None
-
-
 def navigate_shop_buy(
     items: list[dict],
     player_coins: int,
@@ -587,12 +513,7 @@ def navigate_inventory(
         """Constrói o conteúdo do painel de detalhes do item - comparativo rico."""
         # Cores por raridade para o nome
         rarity = getattr(item, "rarity", "Common")
-        rarity_color = {
-            "Common": "white",
-            "Rare": "cyan",
-            "Epic": "magenta",
-            "Legendary": "yellow",
-        }.get(rarity, "white")
+        rarity_color = _get_rarity_color(rarity)
         content = (
             f"[bold {rarity_color}]{escape_markup(item.display_name)}[/bold {rarity_color}]"
             f"  [dim][{rarity}][/dim]\n"
@@ -854,12 +775,7 @@ def navigate_inventory(
                 qty_str = f" [dim]x{qty}[/dim]" if qty > 1 else ""
                 # Cor por raridade
                 rarity = getattr(item, "rarity", "Common")
-                rarity_color = {
-                    "Common": "white",
-                    "Rare": "cyan",
-                    "Epic": "magenta",
-                    "Legendary": "yellow",
-                }.get(rarity, "white")
+                rarity_color = _get_rarity_color(rarity)
                 # Preço
                 price = getattr(item, "price", 0)
                 price_str = f" [dim]{price}o[/dim]" if price else ""

@@ -74,14 +74,6 @@ def get_key() -> str:
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 
-def wait_enter_to_continue() -> None:
-    """Bloqueia até Enter/Return (após o jogador ler o layout no console)."""
-    while True:
-        key = get_key()
-        if key == "ENTER":
-            return
-
-
 def safe_get_key(valid_keys=None, allow_escape: bool = True) -> str | None:
     """Lê uma tecla com segurança, retornando apenas teclas válidas ou None se Escape."""
     while True:

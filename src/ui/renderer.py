@@ -22,46 +22,6 @@ def get_hp_bar(entt) -> str:
     return f"|{hp_bar_fill}{hp_bar_empty}| {entt.get_hp()}/{entt.base_hp} HP"
 
 
-def show_status(entity) -> None:
-    """Exibe os status detalhados de uma entidade usando Rich para uma estética premium."""
-    title = f"Status de {entity.get_nick_name()}"
-
-    table = Table(show_header=False, expand=True, border_style="cyan")
-    table.add_column("Atributo", style="bold white")
-    table.add_column("Valor", style="bold yellow")
-
-    if hasattr(entity, "get_classname"):
-        class_name = entity.get_classname()
-    elif hasattr(entity, "my_type") and entity.my_type() == "COM":
-        class_name = "Monstro"
-    else:
-        class_name = "Desconhecido"
-
-    table.add_row("Classe", class_name)
-
-    level = entity.get_level() if hasattr(entity, "get_level") else getattr(entity, "level", "N/A")
-    table.add_row("Nível", str(level))
-
-    if hasattr(entity, "xp_points"):
-        table.add_row("XP", f"{entity.xp_points} / {entity.need_to_up()}")
-        table.add_row("Falta para Up", f"{entity.need_to_next()}")
-
-    table.add_row("HP", f"[red]{entity.get_hp()}[/red] / [red]{entity.base_hp}[/red]")
-    table.add_row("MP", f"[blue]{entity.get_mp()}[/blue] / [blue]{entity.base_mp}[/blue]")
-    table.add_row("Força", str(entity.get_st()))
-    table.add_row("Magia", str(entity.get_mg()))
-    table.add_row("Agilidade", str(entity.get_ag()))
-    table.add_row("Defesa", str(entity.get_df()))
-    table.add_row("Dano Médio", str(entity.get_avg_damage()))
-
-    if hasattr(entity, "coins"):
-        table.add_row("Moedas", f"[yellow]{entity.coins}[/yellow]")
-
-    console.print(
-        Panel(table, title=f"[bold green]{title}[/bold green]", border_style="green", expand=False)
-    )
-
-
 def render_menu(options: tuple[str, ...] | list[str], prompt: str) -> None:
     """Menu numérico simples (Rich)."""
     console.print(Panel(Text(prompt, justify="center", style="bold yellow"), border_style="yellow"))

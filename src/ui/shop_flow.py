@@ -229,17 +229,14 @@ def _run_equip_in_shop_flow(player: "Player", shop: object, dungeon_level: int) 
         screens.render_shop_equip_inventory_empty()
         return
 
-    # Reutiliza navegação de venda mas com desempenho de equipar
-    # Para simplicidade, lista com navegação simples e comparativo a cada seleção
-    # Usa navigate_shop_sell adaptado? Vamos fazer loop manual com get_key e details via screens
-    # Em vez de criar novo navigation, reaproveita navigate_shop_sell para escolher índice
+    # `navigate_shop_sell` é reaproveitado como SELETOR, e não como venda: ele já
+    # lista peça por peça com preço, que é a informação que interessa também na
+    # hora de equipar. Um navegador próprio para isto seria um quarto navegador
+    # com o mesmo corpo.
     while True:
         if not equipables:
             screens.render_shop_equip_inventory_empty()
             break
-        # Usa o menu de venda como seletor (mostra preço), mas o título será
-        # equipar — ok para o fluxo mínimo.
-        # Para manter UX coerente, usamos navigate_shop_sell como picker
         selected_idx = navigate_shop_sell(equipables, player.coins)
         if selected_idx is None:
             break
