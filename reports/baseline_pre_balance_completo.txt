@@ -1,0 +1,780 @@
+
+==============================================================================
+BASELINE — 3000 runs, 1621 oportunidades, 10658 avaliacoes
+==============================================================================
+seeds distintas: 1000  (20260000..20260999)
+runs por classe: warrior=1000  mage=1000  rogue=1000
+
+==============================================================================
+1. DESFECHO POR CLASSE
+==============================================================================
+         MORREU                      EXTRAIU                     CHEGOU AO 20                
+warrior   94.7% [93.1;95.9]  947/1000  1.0% [ 0.5; 1.8]  10/1000   5.0% [ 3.8; 6.5]  50/1000 
+mage      97.7% [96.6;98.5]  977/1000  0.7% [ 0.3; 1.4]  7/1000    2.1% [ 1.4; 3.2]  21/1000 
+rogue     90.0% [88.0;91.7]  900/1000  2.7% [ 1.9; 3.9]  27/1000   9.3% [ 7.7;11.3]  93/1000 
+TODAS     94.1% [93.2;94.9]  2824/3000  1.5% [ 1.1; 2.0]  44/3000   5.5% [ 4.7; 6.3]  164/3000
+
+desfechos crus: MORREU=2824  CHEGOU AO ANDAR 20 vivo=132  EXTRAIU=44
+
+-- sobrevivencia: quem termina a run vivo (extraiu OU chegou ao 20) ----------
+  warrior    5.3% [ 4.1; 6.9]  53/1000
+  mage       2.3% [ 1.5; 3.4]  23/1000
+  rogue     10.0% [ 8.3;12.0]  100/1000
+  TODAS      5.9% [ 5.1; 6.8]  176/3000
+
+==============================================================================
+2. ANDAR FINAL E NIVEL
+==============================================================================
+                        n       min     p10     p25     p50     p75     p90     max
+  andar final warrior    n=1000      1.0     1.0     1.0     3.0     5.0     9.0    20.0
+  andar final mage       n=1000      1.0     1.0     1.0     2.0     4.0     7.0    20.0
+  andar final rogue      n=1000      1.0     1.0     2.0     3.0     5.0    18.0    20.0
+  andar final TODAS      n=3000      1.0     1.0     1.0     3.0     5.0     9.0    20.0
+
+  nivel final warrior    n=1000      1.0     1.0     1.0     2.0     3.0     6.0    25.0
+  nivel final mage       n=1000      1.0     1.0     1.0     2.0     3.0     4.0    25.0
+  nivel final rogue      n=1000      1.0     1.0     1.0     2.0     4.2    14.3    26.0
+  nivel final TODAS      n=3000      1.0     1.0     1.0     2.0     3.0     6.0    26.0
+
+  combates warrior       n=1000      1.0     2.0     3.0     5.5    11.0    22.0   131.0
+  combates mage          n=1000      1.0     2.0     3.0     5.0     9.0    15.0   130.0
+  combates rogue         n=1000      1.0     2.0     3.0     6.0    14.0    66.9   133.0
+  combates TODAS         n=3000      1.0     2.0     3.0     5.0    11.0    23.0   133.0
+
+-- onde a run morre: histograma do andar final (todas as classes) ------------
+  andar  1    781   26.0%  acum  26.0%  ############################################################
+  andar  2    660   22.0%  acum  48.0%  ##################################################
+  andar  3    464   15.5%  acum  63.5%  ###################################
+  andar  4    294    9.8%  acum  73.3%  ######################
+  andar  5    218    7.3%  acum  80.6%  ################
+  andar  6    138    4.6%  acum  85.2%  ##########
+  andar  7     69    2.3%  acum  87.5%  #####
+  andar  8     53    1.8%  acum  89.2%  ####
+  andar  9     46    1.5%  acum  90.8%  ###
+  andar 10     29    1.0%  acum  91.7%  ##
+  andar 11     20    0.7%  acum  92.4%  #
+  andar 12     12    0.4%  acum  92.8%  
+  andar 13     12    0.4%  acum  93.2%  
+  andar 14      7    0.2%  acum  93.4%  
+  andar 15     13    0.4%  acum  93.9%  
+  andar 16      4    0.1%  acum  94.0%  
+  andar 17      1    0.0%  acum  94.0%  
+  andar 18      3    0.1%  acum  94.1%  
+  andar 19     12    0.4%  acum  94.5%  
+  andar 20    164    5.5%  acum 100.0%  ############
+
+-- mortalidade condicional: entrou no andar e morreu nele --------------------
+  andar  1   26.0% [24.5;27.6]  781/3000
+  andar  2   29.7% [27.9;31.7]  660/2219
+  andar  3   29.8% [27.5;32.1]  464/1559
+  andar  4   26.8% [24.3;29.6]  294/1095
+  andar  5   27.2% [24.2;30.4]  218/801
+  andar  6   23.7% [20.4;27.3]  138/583
+  andar  7   15.5% [12.4;19.2]  69/445
+  andar  8   14.1% [10.9;18.0]  53/376
+  andar  9   14.2% [10.8;18.5]  46/323
+  andar 10   10.5% [ 7.4;14.6]  29/277
+  andar 11    8.1% [ 5.3;12.1]  20/248
+  andar 12    5.3% [ 3.0; 9.0]  12/228
+  andar 13    5.6% [ 3.2; 9.5]  12/216
+  andar 14    3.4% [ 1.7; 6.9]  7/204
+  andar 15    6.6% [ 3.9;11.0]  13/197
+  andar 16    2.2% [ 0.8; 5.5]  4/184
+  andar 17    0.6% [ 0.1; 3.1]  1/180
+  andar 18    0.6% [ 0.1; 3.1]  1/179
+  andar 19    1.1% [ 0.3; 4.0]  2/176
+  andar 20    0.0% [ 0.0; 2.3]  0/164
+
+==============================================================================
+3. MATRIZ 4x3 DE EXTRACAO
+==============================================================================
+
+-- PRIMEIRA avaliacao de cada oportunidade unica -----------------------------
+                SAUDAVEL            CURTO               ESGOTADO            SEM_EVIDENCIA       
+  ABAIXO        0/1053 cont         0/490 cont          -                   -                   
+  CLOSE_ENOUGH  0/42 cont           -                   -                   -                   
+  META_BATIDA   0/23 cont           -                   -                   -                   
+  HARD_STOP     13/13 PRES          -                   -                   -                   
+  NAO_MEDIDO    -                   -                   -                   -                   
+  total 1621   celulas ocupadas 5/20
+  bandas:  ABAIXO=1543  CLOSE_ENOUGH=42  META_BATIDA=23  HARD_STOP=13  NAO_MEDIDO=0
+  estados: SAUDAVEL=1131  CURTO=490  ESGOTADO=0  SEM_EVIDENCIA=0
+
+-- TODAS as avaliacoes -------------------------------------------------------
+                SAUDAVEL            CURTO               ESGOTADO            SEM_EVIDENCIA       
+  ABAIXO        0/6615 cont         0/3086 cont         -                   -                   
+  CLOSE_ENOUGH  0/550 cont          6/6 PRES            -                   -                   
+  META_BATIDA   0/363 cont          -                   -                   -                   
+  HARD_STOP     38/38 PRES          -                   -                   -                   
+  NAO_MEDIDO    -                   -                   -                   -                   
+  total 10658   celulas ocupadas 6/20
+  bandas:  ABAIXO=9701  CLOSE_ENOUGH=556  META_BATIDA=363  HARD_STOP=38  NAO_MEDIDO=0
+  estados: SAUDAVEL=7566  CURTO=3092  ESGOTADO=0  SEM_EVIDENCIA=0
+
+-- snapshot INICIAL x snapshot DA EXTRACAO (oportunidades que extrairam) -----
+  oportunidades em que a extracao venceu: 44 de 1621
+  banda mudou entre a primeira avaliacao e a vencedora:  68.2% [53.4;80.0]  30/44
+    rogue    seed 20260008 andar 19: META_BATIDA/SAUDAVEL -> HARD_STOP/SAUDAVEL
+    rogue    seed 20260020 andar 20: ABAIXO/CURTO -> CLOSE_ENOUGH/CURTO
+    warrior  seed 20260052 andar 20: ABAIXO/SAUDAVEL -> CLOSE_ENOUGH/CURTO
+    warrior  seed 20260054 andar 20: META_BATIDA/SAUDAVEL -> HARD_STOP/SAUDAVEL
+    mage     seed 20260094 andar 19: META_BATIDA/SAUDAVEL -> HARD_STOP/SAUDAVEL
+    rogue    seed 20260108 andar 18: META_BATIDA/SAUDAVEL -> HARD_STOP/SAUDAVEL
+    warrior  seed 20260188 andar 19: ABAIXO/SAUDAVEL -> CLOSE_ENOUGH/CURTO
+    rogue    seed 20260213 andar 20: CLOSE_ENOUGH/SAUDAVEL -> HARD_STOP/SAUDAVEL
+    rogue    seed 20260279 andar 18: ABAIXO/SAUDAVEL -> CLOSE_ENOUGH/CURTO
+    rogue    seed 20260396 andar 19: META_BATIDA/SAUDAVEL -> HARD_STOP/SAUDAVEL
+
+==============================================================================
+4. DISTRIBUICAO DE PODER E RUNWAY
+==============================================================================
+                        n       min     p10     p25     p50     p75     p90     max
+
+-- poder relativo (so onde foi medido naturalmente) --------------------------
+  todas as avaliacoes    n=10658   0.091   0.243   0.353   0.579   0.817   0.941   1.223
+    warrior              n=3557    0.106   0.227   0.333   0.548   0.817   0.938   1.074
+    mage                 n=1738    0.091   0.190   0.275   0.466   0.754   0.931   1.078
+    rogue                n=5363    0.115   0.283   0.404   0.626   0.836   0.953   1.223
+  ultimo poder da run    n=631     0.091   0.156   0.212   0.309   0.852   1.008   1.223
+  poder ABSOLUTO (cache) n=1065     2.69    2.69    2.69    3.12    6.29   11.46   36.09
+  runs com poder medido de graca:  21.0% [19.6;22.5]  631/3000
+
+-- runway em andares ---------------------------------------------------------
+  todas as avaliacoes    n=10658    0.00    0.58    0.93    1.30    1.61    1.90    3.26
+    warrior              n=3557     0.00    0.53    0.87    1.22    1.49    1.74    2.55
+    mage                 n=1738     0.00    0.48    0.77    1.17    1.50    1.80    2.59
+    rogue                n=5363     0.00    0.69    1.04    1.40    1.73    2.06    3.26
+
+-- runway por faixa de andar -------------------------------------------------
+  andares 3-6            n=2833     0.00    0.38    0.61    0.94    1.28    1.60    3.26
+  andares 7-10           n=2351     0.00    0.55    0.84    1.18    1.46    1.75    3.25
+  andares 11-14          n=2177     0.00    0.78    1.13    1.38    1.65    1.95    2.83
+  andares 15-20          n=3297     0.00    1.03    1.29    1.55    1.80    2.09    3.18
+
+==============================================================================
+5. COMPORTAMENTO POR FAIXA DE ANDAR
+==============================================================================
+  faixa     oport   aval    PRES                      bandas
+  3-6       640     2833      0.0% [ 0.0; 0.6]  0/640 ABAIXO=640
+  7-10      386     2351      0.0% [ 0.0; 1.0]  0/386 ABAIXO=386
+  11-14     269     2177      0.0% [ 0.0; 1.4]  0/269 ABAIXO=269
+  15-20     326     3297      4.0% [ 2.3; 6.7]  13/326ABAIXO=248 CLOSE_ENOUGH=42 META_BATIDA=23 HARD_STOP=13
+
+  faixa     estados do runway
+  3-6       SAUDAVEL=363 (57%) CURTO=277 (43%)
+  7-10      SAUDAVEL=256 (66%) CURTO=130 (34%)
+  11-14     SAUDAVEL=212 (79%) CURTO=57 (21%)
+  15-20     SAUDAVEL=300 (92%) CURTO=26 (8%)
+
+-- oportunidades por andar e o que aconteceu depois --------------------------
+  andar  oport   extraiu aqui    abandonou   morreu no andar
+  3      154     0               119         35
+  4      153     0               115         38
+  5      168     0               133         35
+  6      165     0               119         46
+  7      112     0               97          15
+  8      104     0               93          11
+  9      94      0               79          15
+  10     76      0               66          10
+  11     83      0               77          6
+  12     55      0               55          0
+  13     70      0               67          3
+  14     61      0               59          2
+  15     65      0               62          3
+  16     47      0               45          2
+  17     59      0               58          1
+  18     58      2               56          0
+  19     49      10              39          0
+  20     48      32              16          0
+
+==============================================================================
+6. SKILLS, PASSIVAS E EQUIPAMENTO
+==============================================================================
+
+-- SKILLS: oferecida x escolhida (taxa de captura) ---------------------------
+  ofertas de skill: 2415   recusadas por completo:   2.0% [ 1.5; 2.7]  49/2415
+  skill                     oferecida   escolhida   captura
+  Passo Lateral             353         66           18.7% [15.0;23.1]  66/353
+  Respirar Fundo            317         178          56.2% [50.6;61.5]  178/317
+  Mira Calma                315         241          76.5% [71.5;80.9]  241/315
+  Pausa Útil                306         26            8.5% [ 5.9;12.2]  26/306
+  Grito Curto               302         14            4.6% [ 2.8; 7.6]  14/302
+  Guarda Alta               297         73           24.6% [20.0;29.8]  73/297
+  Evasão                    158         31           19.6% [14.2;26.5]  31/158
+  Golpe Baixo               157         7             4.5% [ 2.2; 8.9]  7/157
+  Capa Rasgada              148         93           62.8% [54.8;70.2]  93/148
+  Sombra Rápida             147         49           33.3% [26.2;41.3]  49/147
+  Respiração de Ladrão      143         20           14.0% [ 9.2;20.6]  20/143
+  Picada Certeira           142         67           47.2% [39.2;55.4]  67/142
+  Faro de Rua               135         11            8.1% [ 4.6;14.0]  11/135
+  Travar o Pulso            134         35           26.1% [19.4;34.1]  35/134
+  Corte de Tendão           130         84           64.6% [56.1;72.3]  84/130
+  Areia no Chão             114         33           28.9% [21.4;37.9]  33/114
+  Couro Batido              113         77           68.1% [59.1;76.0]  77/113
+  Fôlego de Marcha          112         35           31.2% [23.4;40.3]  35/112
+  Couraça Improvisada       111         52           46.8% [37.8;56.1]  52/111
+  Grito de Guerra           110         30           27.3% [19.8;36.3]  30/110
+  Escudo Protetor           109         37           33.9% [25.7;43.2]  37/109
+  Estocada Seca             105         39           37.1% [28.5;46.7]  39/105
+  Berro de Ferro            104         4             3.8% [ 1.5; 9.5]  4/104
+  Quebra-Guarda             96          60           62.5% [52.5;71.5]  60/96
+  Postura de Muro           96          22           22.9% [15.6;32.3]  22/96
+  Soco de Placa             93          52           55.9% [45.8;65.6]  52/93
+  Investida                 92          47           51.1% [41.0;61.1]  47/92
+  Olho Treinado             88          17           19.3% [12.4;28.8]  17/88
+  Fagulha Teimosa           86          47           54.7% [44.2;64.7]  47/86
+  Drenar Vida               81          39           48.1% [37.6;58.9]  39/81
+  Encarar                   80          27           33.8% [24.3;44.6]  27/80
+  Curativo de Campo         78          19           24.4% [16.2;34.9]  19/78
+  Pancada na Nuca           78          27           34.6% [25.0;45.7]  27/78
+  Envenenar                 77          33           42.9% [32.4;54.0]  33/77
+  Lasca de Gelo             73          65           89.0% [79.8;94.3]  65/73
+  Flecha pela Fresta        72          7             9.7% [ 4.8;18.7]  7/72
+  Pele de Quartzo           71          25           35.2% [25.1;46.8]  25/71
+  Escudo Mágico             70          26           37.1% [26.8;48.9]  26/70
+  Joelho Torto              68          18           26.5% [17.4;38.0]  18/68
+  Dose da Viúva             67          13           19.4% [11.7;30.4]  13/67
+  Foco do Estudante         65          7            10.8% [ 5.3;20.6]  7/65
+  Veias de Éter             63          3             4.8% [ 1.6;13.1]  3/63
+  Míssil Mágico             62          29           46.8% [34.9;59.0]  29/62
+  Pó nos Olhos              52          9            17.3% [ 9.4;29.7]  9/52
+  Golpe nas Sombras         50          9            18.0% [ 9.8;30.8]  9/50
+  Guarda Cruzada            45          31           68.9% [54.3;80.5]  31/45
+  Leitura de Guarda         41          16           39.0% [25.7;54.3]  16/41
+  Sangue nos Olhos          41          7            17.1% [ 8.5;31.3]  7/41
+  Ritmo de Duelo            40          21           52.5% [37.5;67.1]  21/40
+  Olho de Ferreiro          40          5            12.5% [ 5.5;26.1]  5/40
+  Pisada de Ferro           39          5            12.8% [ 5.6;26.7]  5/39
+  Bolso Furado              38          9            23.7% [13.0;39.2]  9/38
+  Cutelada                  37          4            10.8% [ 4.3;24.7]  4/37
+  Duas Mãos, Um Tempo       37          1             2.7% [ 0.5;13.8]  1/37
+  Gancho e Corda            36          12           33.3% [20.2;49.7]  12/36
+  Disciplina de Forja       36          16           44.4% [29.5;60.4]  16/36
+  Ferida Paga               35          29           82.9% [67.3;91.9]  29/35
+  Lâmina Assentada          35          16           45.7% [30.5;61.8]  16/35
+  Investida de Aríete       34          2             5.9% [ 1.6;19.1]  2/34
+  Marca do Açougueiro       32          0             0.0% [ 0.0;10.7]  0/32
+  Amuleto Rachado           31          12           38.7% [23.7;56.2]  12/31
+  Provocação                31          10           32.3% [18.6;49.9]  10/31
+  Leitura de Terreno        30          14           46.7% [30.2;63.9]  14/30
+  Fio no Rebite             30          13           43.3% [27.4;60.8]  13/30
+  Voto de Silêncio          29          6            20.7% [ 9.8;38.4]  6/29
+  Tomar Fôlego              27          23           85.2% [67.5;94.1]  23/27
+  Couro Endurecido          27          12           44.4% [27.6;62.7]  12/27
+  Marcar a Presa            26          1             3.8% [ 0.7;18.9]  1/26
+  Olho do Falcão            26          12           46.2% [28.8;64.5]  12/26
+  Peso do Machado           25          0             0.0% [ 0.0;13.3]  0/25
+  Baluarte                  25          17           68.0% [48.4;82.8]  17/25
+  Marca do Caçador          23          2             8.7% [ 2.4;26.8]  2/23
+  Corte de Passagem         23          13           56.5% [36.8;74.4]  13/23
+  Assassinato               21          4            19.0% [ 7.7;40.0]  4/21
+  Lâmina no Escuro          20          1             5.0% [ 0.9;23.6]  1/20
+  Reserva Profunda          19          12           63.2% [41.0;80.9]  12/19
+  Rasgo de Gancho           19          0             0.0% [ 0.0;16.8]  0/19
+  Lançar Adaga              19          8            42.1% [23.1;63.7]  8/19
+  Nó Corredio               18          1             5.6% [ 1.0;25.8]  1/18
+  Relâmpago                 18          2            11.1% [ 3.1;32.8]  2/18
+  Chuva de Ferrões          18          0             0.0% [ 0.0;17.6]  0/18
+  Sangria Lenta             18          5            27.8% [12.5;50.9]  5/18
+  Lançar Pedra              17          0             0.0% [ 0.0;18.4]  0/17
+  Bolso do Alfaiate         17          11           64.7% [41.3;82.7]  11/17
+  Cortina de Fumaça         16          4            25.0% [10.2;49.5]  4/16
+  Palavra de Torpor         15          7            46.7% [24.8;69.9]  7/15
+  Marca Ardente             15          1             6.7% [ 1.2;29.8]  1/15
+  Pulso de Força            15          2            13.3% [ 3.7;37.9]  2/15
+  Dissonância               14          4            28.6% [11.7;54.6]  4/14
+  Postura Impecável         14          8            57.1% [32.6;78.6]  8/14
+  Tremor de Bigorna         14          0             0.0% [ 0.0;21.5]  0/14
+  Veterania                 14          3            21.4% [ 7.6;47.6]  3/14
+  Dissolver a Guarda        14          3            21.4% [ 7.6;47.6]  3/14
+  Paciência do Coveiro      14          8            57.1% [32.6;78.6]  8/14
+  Golpe Devastador          13          0             0.0% [ 0.0;22.8]  0/13
+  Quebra-Ossos              13          3            23.1% [ 8.2;50.3]  3/13
+  Passo Borrado             13          5            38.5% [17.7;64.5]  5/13
+  Ferro Contra Ferro        13          3            23.1% [ 8.2;50.3]  3/13
+  Mão Firme                 12          2            16.7% [ 4.7;44.8]  2/12
+  Hora do Arauto            11          5            45.5% [21.3;72.0]  5/11
+  Dança das Lâminas         9           0             0.0% [ 0.0;29.9]  0/9
+  Mão Dupla                 9           2            22.2% [ 6.3;54.7]  2/9
+  A Mão que Não Treme       9           3            33.3% [12.1;64.6]  3/9
+  Hora do Lobo              9           1            11.1% [ 2.0;43.5]  1/9
+  Golpe Duplo               9           0             0.0% [ 0.0;29.9]  0/9
+  Sede de Batalha           9           0             0.0% [ 0.0;29.9]  0/9
+  Respiração de Forja       8           4            50.0% [21.5;78.5]  4/8
+  Clarividência             7           2            28.6% [ 8.2;64.1]  2/7
+  Pancada de Elmo           7           4            57.1% [25.0;84.2]  4/7
+  Pacto de Ferro            7           3            42.9% [15.8;75.0]  3/7
+  Última Carta              7           0             0.0% [ 0.0;35.4]  0/7
+  Raio Congelante           7           5            71.4% [35.9;91.8]  5/7
+  Sanguessuga Arcana        6           3            50.0% [18.8;81.2]  3/6
+  Evasão Perfeita           6           1            16.7% [ 3.0;56.4]  1/6
+  Palavra de Pavor          5           4            80.0% [37.6;96.4]  4/5
+  Mão Leve                  5           3            60.0% [23.1;88.2]  3/5
+  Égide de Runas            5           3            60.0% [23.1;88.2]  3/5
+  Silêncio de Seda          5           3            60.0% [23.1;88.2]  3/5
+  Lente de Obsidiana        5           0             0.0% [ 0.0;43.4]  0/5
+  Juramento da Muralha      4           0             0.0% [ 0.0;49.0]  0/4
+  Explosão Arcana           4           0             0.0% [ 0.0;49.0]  0/4
+  Dreno de Mana             4           0             0.0% [ 0.0;49.0]  0/4
+  Fantasma                  4           2            50.0% [15.0;85.0]  2/4
+  Vigor Emprestado          3           0             0.0% [ 0.0;56.1]  0/3
+  Resistência Heróica       3           3           100.0% [43.9;100.0]  3/3
+  Esmagar                   3           1            33.3% [ 6.1;79.2]  1/3
+  Troca de Sangue           3           0             0.0% [ 0.0;56.1]  0/3
+  Testamento do Ladrão      3           0             0.0% [ 0.0;56.1]  0/3
+  Maldição de Cinzas        2           0             0.0% [ 0.0;65.8]  0/2
+  Silêncio do Veterano      2           0             0.0% [ 0.0;65.8]  0/2
+  Carga do Condenado        2           0             0.0% [ 0.0;65.8]  0/2
+  Colheita de Ferro         2           0             0.0% [ 0.0;65.8]  0/2
+  Hora Parada               2           2           100.0% [34.2;100.0]  2/2
+  Prisma de Devastação      2           0             0.0% [ 0.0;65.8]  0/2
+  Imortal                   1           1           100.0% [20.7;100.0]  1/1
+  Sono Profundo             1           1           100.0% [20.7;100.0]  1/1
+  Cobrança de Juros         1           0             0.0% [ 0.0;79.3]  0/1
+  Pacto do Vazio            1           0             0.0% [ 0.0;79.3]  0/1
+  Grilhões de Gelo          1           1           100.0% [20.7;100.0]  1/1
+
+-- SKILLS: uso real (no deck final x turnos gastos) --------------------------
+  skill                     no deck   usos      usos/deck   dano        mp        dano/mp
+  Bola de Fogo              1000      10407     10.4        3029248     135773    22.3
+  Golpe Poderoso            995       18981     19.1        5904055     261320    22.6
+  Ataque Furtivo            992       19960     20.1        8985770     472498    19.0
+  Mira Calma                241       6805      28.2        4668632     298015    15.7
+  Respirar Fundo            178       66        0.4         0           846       0.0
+  Corte de Tendão           84        4658      55.5        3174488     168310    18.9
+  Capa Rasgada              73        35        0.5         0           350       0.0
+  Picada Certeira           66        1016      15.4        532172      28111     18.9
+  Lasca de Gelo             65        889       13.7        559625      21603     25.9
+  Quebra-Guarda             60        557       9.3         399167      19368     20.6
+  Soco de Placa             52        1502      28.9        596743      31453     19.0
+  Guarda Alta               48        3         0.1         0           48        0.0
+  Investida                 47        2878      61.2        1453673     66260     21.9
+  Fagulha Teimosa           47        876       18.6        427121      18211     23.5
+  Couro Batido              45        23        0.5         0           355       0.0
+  Couraça Improvisada       44        11        0.2         0           108       0.0
+  Drenar Vida               39        25        0.6         0           280       0.0
+  Escudo Protetor           31        3         0.1         0           34        0.0
+  Passo Lateral             30        42        1.4         0           490       0.0
+  Míssil Mágico             29        1326      45.7        764587      30621     25.0
+  Ferida Paga               28        5         0.2         0           119       0.0
+  Tomar Fôlego              23        4         0.2         0           101       0.0
+  Sombra Rápida             23        0         0.0         0           0         0.0
+  Escudo Mágico             22        0         0.0         0           0         0.0
+  Pele de Quartzo           20        3         0.1         0           44        0.0
+  Guarda Cruzada            19        0         0.0         0           0         0.0
+  Grito de Guerra           19        0         0.0         0           0         0.0
+  Evasão                    18        22        1.2         0           238       0.0
+  Estocada Seca             16        23        1.4         0           1216      0.0
+  Dose da Viúva             13        248       19.1        118765      8494      14.0
+  Postura de Muro           13        0         0.0         0           0         0.0
+  Envenenar                 13        51        3.9         0           6371      0.0
+  Respiração de Ladrão      12        0         0.0         0           0         0.0
+  Fôlego de Marcha          11        0         0.0         0           0         0.0
+  Pausa Útil                10        0         0.0         0           0         0.0
+  Baluarte                  10        0         0.0         0           0         0.0
+  Areia no Chão             9         0         0.0         0           0         0.0
+  Golpe nas Sombras         9         448       49.8        288754      19376     14.9
+  Bolso do Alfaiate         8         0         0.0         0           0         0.0
+  Travar o Pulso            8         1         0.1         0           31        0.0
+  Flecha pela Fresta        7         150       21.4        107625      6476      16.6
+  Faro de Rua               7         0         0.0         0           0         0.0
+  Amuleto Rachado           6         0         0.0         0           0         0.0
+  Pancada na Nuca           6         0         0.0         0           0         0.0
+  Reserva Profunda          5         0         0.0         0           0         0.0
+  Leitura de Guarda         5         0         0.0         0           0         0.0
+  Joelho Torto              5         0         0.0         0           0         0.0
+  Foco do Estudante         5         0         0.0         0           0         0.0
+  Fio no Rebite             5         0         0.0         0           0         0.0
+  Pisada de Ferro           5         197       39.4        97312       5648      17.2
+  Olho do Falcão            5         0         0.0         0           0         0.0
+  Ritmo de Duelo            5         1         0.2         0           53        0.0
+  Provocação                5         0         0.0         0           0         0.0
+  Corte de Passagem         5         22        4.4         0           2061      0.0
+  Disciplina de Forja       5         1         0.2         0           21        0.0
+  Lâmina Assentada          5         0         0.0         0           0         0.0
+  Curativo de Campo         5         0         0.0         0           0         0.0
+  Leitura de Terreno        4         0         0.0         0           0         0.0
+  Postura Impecável         4         0         0.0         0           0         0.0
+  Palavra de Torpor         4         0         0.0         0           0         0.0
+  Assassinato               4         193       48.2        188912      15122     12.5
+  Olho Treinado             4         0         0.0         0           0         0.0
+  Cutelada                  4         19        4.8         4871        260       18.7
+  Gancho e Corda            4         0         0.0         0           0         0.0
+  Encarar                   3         0         0.0         0           0         0.0
+  Ferro Contra Ferro        3         97        32.3        80105       5064      15.8
+  Paciência do Coveiro      3         2         0.7         0           152       0.0
+  Bolso Furado              3         0         0.0         0           0         0.0
+  Voto de Silêncio          3         0         0.0         0           0         0.0
+  A Mão que Não Treme       3         0         0.0         0           0         0.0
+  Pancada de Elmo           2         0         0.0         0           0         0.0
+  Golpe Baixo               2         1         0.5         0           28        0.0
+  Pulso de Força            2         23        11.5        18763       690       27.2
+  Mão Dupla                 2         47        23.5        52839       3367      15.7
+  Investida de Aríete       2         0         0.0         0           0         0.0
+  Raio Congelante           2         0         0.0         0           0         0.0
+  Pó nos Olhos              2         0         0.0         0           0         0.0
+  Relâmpago                 2         63        31.5        51346       1917      26.8
+  Lançar Adaga              2         0         0.0         0           0         0.0
+  Marca do Caçador          2         6         3.0         13488       706       19.1
+  Grito Curto               2         0         0.0         0           0         0.0
+  Resistência Heróica       1         0         0.0         0           0         0.0
+  Palavra de Pavor          1         0         0.0         0           0         0.0
+  Sangria Lenta             1         0         0.0         0           0         0.0
+  Esmagar                   1         1         1.0         0           128       0.0
+  Égide de Runas            1         0         0.0         0           0         0.0
+  Veias de Éter             1         0         0.0         0           0         0.0
+  Passo Borrado             1         2         2.0         0           42        0.0
+  Olho de Ferreiro          1         0         0.0         0           0         0.0
+  Cortina de Fumaça         1         0         0.0         0           0         0.0
+  Duas Mãos, Um Tempo       1         76        76.0        62600       3438      18.2
+  Silêncio de Seda          1         0         0.0         0           0         0.0
+  Hora do Lobo              1         0         0.0         0           0         0.0
+  Pacto de Ferro            1         0         0.0         0           0         0.0
+  Fantasma                  1         0         0.0         0           0         0.0
+  Hora do Arauto            1         0         0.0         0           0         0.0
+  Couro Endurecido          1         1         1.0         0           30        0.0
+  Dissonância               1         0         0.0         0           0         0.0
+  Marcar a Presa            1         93        93.0        67307       4917      13.7
+  Lâmina no Escuro          1         0         0.0         0           0         0.0
+  Evasão Perfeita           1         0         0.0         0           0         0.0
+  Grilhões de Gelo          1         0         0.0         0           0         0.0
+  Mão Firme                 1         0         0.0         0           0         0.0
+  Veterania                 1         0         0.0         0           0         0.0
+  Marca Ardente             1         0         0.0         0           0         0.0
+  ** no deck e NUNCA usadas: 57 -> Leitura de Terreno (4x), Guarda Cruzada (19x), Reserva Profunda (5x), Resistência Heróica (1x), Pancada de Elmo (2x), Leitura de Guarda (5x), Postura Impecável (4x), Fôlego de Marcha (11x), Grito de Guerra (19x), Amuleto Rachado (6x), Palavra de Torpor (4x), Postura de Muro (13x), Sombra Rápida (23x), Encarar (3x), Bolso do Alfaiate (8x), Areia no Chão (9x), Respiração de Ladrão (12x), Joelho Torto (5x), Foco do Estudante (5x), Pancada na Nuca (6x), Fio no Rebite (5x), Palavra de Pavor (1x), Pausa Útil (10x), Sangria Lenta (1x), Escudo Mágico (22x), Investida de Aríete (2x), Olho do Falcão (5x), Faro de Rua (7x), Provocação (5x), Baluarte (10x), Raio Congelante (2x), Olho Treinado (4x), Pó nos Olhos (2x), Égide de Runas (1x), Veias de Éter (1x), Gancho e Corda (4x), Bolso Furado (3x), Voto de Silêncio (3x), Olho de Ferreiro (1x), Lâmina Assentada (5x), Cortina de Fumaça (1x), Lançar Adaga (2x), Silêncio de Seda (1x), Hora do Lobo (1x), Curativo de Campo (5x), Pacto de Ferro (1x), Fantasma (1x), Grito Curto (2x), A Mão que Não Treme (3x), Hora do Arauto (1x), Dissonância (1x), Lâmina no Escuro (1x), Evasão Perfeita (1x), Grilhões de Gelo (1x), Mão Firme (1x), Veterania (1x), Marca Ardente (1x)
+
+-- PASSIVAS: oferecida x escolhida (taxa de captura) -------------------------
+  passiva                   oferecida   escolhida   captura
+  Pele de Sal               793         33            4.2% [ 3.0; 5.8]  33/793
+  Ódio Baixo                781         3             0.4% [ 0.1; 1.1]  3/781
+  Pele Grossa               776         605          78.0% [74.9;80.7]  605/776
+  Boca de Sangue            775         7             0.9% [ 0.4; 1.9]  7/775
+  Passos Leves              764         314          41.1% [37.7;44.6]  314/764
+  Passo de Corça            761         325          42.7% [39.2;46.2]  325/761
+  Mente Serena              761         210          27.6% [24.5;30.9]  210/761
+  Fio Serrilhado            759         11            1.4% [ 0.8; 2.6]  11/759
+  Sangue de Guerreiro       757         719          95.0% [93.2;96.3]  719/757
+  Pulso Certeiro            754         47            6.2% [ 4.7; 8.2]  47/754
+  Olho de Águia             753         379          50.3% [46.8;53.9]  379/753
+  Respiração Contada        742         3             0.4% [ 0.1; 1.2]  3/742
+  Sangue de Vidente         740         0             0.0% [ 0.0; 0.5]  0/740
+  Músculos de Aço           734         422          57.5% [53.9;61.0]  422/734
+  Coração de Ferro          733         648          88.4% [85.9;90.5]  648/733
+  Reserva Arcana            717         224          31.2% [28.0;34.7]  224/717
+  Sorte de Principiante     714         143          20.0% [17.3;23.1]  143/714
+  Postura Fechada           706         515          72.9% [69.6;76.1]  515/706
+  Olho de Caçador           675         19            2.8% [ 1.8; 4.4]  19/675
+  Sede Silenciosa           408         37            9.1% [ 6.7;12.2]  37/408
+  Poço Fundo                395         143          36.2% [31.6;41.1]  143/395
+  Essência Fluída           382         372          97.4% [95.2;98.6]  372/382
+  Bebida dos Deuses         377         137          36.3% [31.6;41.3]  137/377
+  Casco Calejado            376         315          83.8% [79.7;87.2]  315/376
+  Fúria Berserker           372         221          59.4% [54.3;64.3]  221/372
+  Ritmo Profano             367         22            6.0% [ 4.0; 8.9]  22/367
+  Instinto Frio             361         38           10.5% [ 7.8;14.1]  38/361
+  Ódio Antigo               361         28            7.8% [ 5.4;11.0]  28/361
+  Unha Suja                 359         48           13.4% [10.2;17.3]  48/359
+  Agulha no Osso            357         46           12.9% [ 9.8;16.8]  46/357
+  Cabeça Dura               355         93           26.2% [21.9;31.0]  93/355
+  Mãos de Midas             344         46           13.4% [10.2;17.4]  46/344
+  Voz no Escuro             342         38           11.1% [ 8.2;14.9]  38/342
+  Escudo da Fé              337         243          72.1% [67.1;76.6]  243/337
+  Lâmina Afiada             336         203          60.4% [55.1;65.5]  203/336
+  Reflexos Rápidos          335         98           29.3% [24.6;34.3]  98/335
+  Herança do Abismo         331         45           13.6% [10.3;17.7]  45/331
+  Essência Viva             323         65           20.1% [16.1;24.8]  65/323
+  Pele de Adamântio         154         122          79.2% [72.1;84.9]  122/154
+  Sede de Sangue            145         67           46.2% [38.3;54.3]  67/145
+  Voracidade                144         27           18.8% [13.2;25.9]  27/144
+  Lâmina do Juízo           141         37           26.2% [19.7;34.1]  37/141
+  Alquimia do Desespero     141         58           41.1% [33.4;49.4]  58/141
+  Fome de Batalha           136         36           26.5% [19.8;34.5]  36/136
+  Dívida de Ouro            134         28           20.9% [14.9;28.5]  28/134
+  Vulto                     134         33           24.6% [18.1;32.6]  33/134
+  Toque do Dragão           128         75           58.6% [49.9;66.8]  75/128
+  Presença Errada           127         14           11.0% [ 6.7;17.7]  14/127
+  Sangue Tóxico             123         24           19.5% [13.5;27.4]  24/123
+  Punho Atordoante          123         20           16.3% [10.8;23.8]  20/123
+  Alma Eterna               121         120          99.2% [95.5;99.9]  120/121
+  Oráculo Partido           120         18           15.0% [ 9.7;22.5]  18/120
+  Bênção Divina             110         110         100.0% [96.6;100.0]  110/110
+  Estrela Quebrada          32          8            25.0% [13.3;42.1]  8/32
+  Fortuna Absoluta          29          2             6.9% [ 1.9;22.0]  2/29
+  Lâmina Lendária           28          14           50.0% [32.6;67.4]  14/28
+  Corpo Inviolável          26          2             7.7% [ 2.1;24.1]  2/26
+  Essência Pura             23          6            26.1% [12.5;46.5]  6/23
+  Imortalidade Momentânea   20          18           90.0% [69.9;97.2]  18/20
+  Coração de Titã           20          20          100.0% [83.9;100.0]  20/20
+
+-- EQUIPAMENTO: ocupacao do slot na build final ------------------------------
+  slot        preenchido                  pecas distintas   mais frequente
+  Helmet       16.9% [15.6;18.3]  508/300013                Elmo de Aço (82)
+  Amulet       17.9% [16.6;19.3]  538/300013                Amuleto da Vida (98)
+  Weapon1      29.4% [27.8;31.1]  883/300044                Adaga de Madeira (73)
+  Weapon2      12.5% [11.4;13.7]  375/300043                Espada de Treino (53)
+  Body         20.2% [18.8;21.7]  606/300028                Armadura Divina (53)
+  Legs         18.0% [16.6;19.4]  539/300011                Calça de Cota (83)
+  Hands        18.2% [16.9;19.7]  547/300013                Luvas Rasas (78)
+  Shoes        17.7% [16.3;19.1]  530/300012                Chinelos de Pano (90)
+  Ring1        19.3% [17.9;20.8]  579/300011                Anel de Palha (93)
+  Ring2         8.5% [ 7.5; 9.5]  254/300011                Anel Vegetal (50)
+  Accessory     0.0% [ 0.0; 0.1]  0/3000  0                 -
+
+-- EQUIPAMENTO: as 25 pecas mais equipadas (qualquer slot) -------------------
+  Anel de Palha                        136    4.5% das runs
+  Anel Vegetal                         123    4.1% das runs
+  Anel de Bronze                       122    4.1% das runs
+  Adaga de Madeira                     110    3.7% das runs
+  Espada de Treino                     108    3.6% das runs
+  Amuleto da Vida                       98    3.3% das runs
+  Chinelos de Pano                      90    3.0% das runs
+  Amuleto da Mana                       86    2.9% das runs
+  Calça de Cota                         83    2.8% das runs
+  Elmo de Aço                           82    2.7% das runs
+  Luvas Rasas                           78    2.6% das runs
+  Anel de Couro                         78    2.6% das runs
+  Luvas de Lã                           77    2.6% das runs
+  Bastão Cru                            76    2.5% das runs
+  Perneiras de Aço                      75    2.5% das runs
+  Anel de Diamante                      75    2.5% das runs
+  Anel da Esmeralda                     74    2.5% das runs
+  Anel de Ouro                          68    2.3% das runs
+  Porrete                               68    2.3% das runs
+  Clava de Madeira                      67    2.2% das runs
+  Gravetos Mágicos                      67    2.2% das runs
+  Botas de Pano                         65    2.2% das runs
+  Luvas de Couro                        60    2.0% das runs
+  Tamancos de Madeira                   60    2.0% das runs
+  Lâmina Veloz                          58    1.9% das runs
+  raridades equipadas: Common=3151  Rare=1781  Epic=339  Legendary=88
+
+-- upgrades: +N, gemas, encantos (build final) -------------------------------
+  +N somado              n=3000      0.0     0.0     0.0     0.0     0.0     1.0     7.0
+  gemas cravadas         n=3000      0.0     0.0     0.0     0.0     0.0     0.0     9.0
+  encantos               n=3000      0.0     0.0     0.0     0.0     0.0     0.0     7.0
+  sockets                n=3000      0.0     0.0     0.0     0.0     1.0     3.0    17.0
+  pecas equipadas        n=3000      0.0     0.0     0.0     1.0     2.0     5.0    10.0
+  runs com +N somado == 0:  83.3% [81.9;84.6]  2499/3000
+  runs com gemas cravadas == 0:  90.9% [89.8;91.8]  2726/3000
+  runs com encantos == 0:  95.8% [95.1;96.5]  2875/3000
+
+-- sobreviventes (nao morreram): upgrades ------------------------------------
+  vivos: +N somado       n=176       0.0     1.0     1.0     3.0     3.0     4.0     7.0
+  vivos: gemas cravadas  n=176       0.0     1.5     3.0     4.0     5.0     6.0     9.0
+  vivos: encantos        n=176       0.0     0.0     0.0     1.0     2.0     2.0     7.0
+  vivos: pecas equipadas n=176       7.0     9.5    10.0    10.0    10.0    10.0    10.0
+
+==============================================================================
+7. WARRIOR x MAGE x ROGUE
+==============================================================================
+  metrica (MEDIANA)       warrior       mage          rogue         
+  andar final             3.0           2.0           3.0           
+  nivel final             2.0           2.0           2.0           
+  combates                5.5           5.0           6.0           
+  fugas na ficha          0.0           1.0           0.0           
+  hp max                  493.0         414.0         414.0         
+  mp max                  67.0          157.0         101.0         
+  dano medio              109.0         120.0         110.0         
+  ouro final              63.0          45.0          78.0          
+  pocoes bebidas          0.0           0.0           0.0           
+  passivas                1.0           1.0           1.0           
+  skills no deck          1.0           1.0           1.0           
+  pecas equipadas         1.0           1.0           1.0           
+  dano dado               1469.5        1017.0        1910.5        
+  dano recebido           944.0         739.0         858.5         
+  dano recebido frac      2.0           1.9           2.1           
+  egide absorvida         0.0           51.0          0.0           
+  mp gasto                14.0          53.0          19.0          
+
+  metrica (MEDIA)         warrior       mage          rogue         
+  andar final             4.2           3.5           4.9           
+  nivel final             3.5           2.5           4.7           
+  combates                14.0          9.2           19.9          
+  fugas na ficha          1.1           1.2           0.7           
+  hp max                  880.3         567.5         990.2         
+  mp max                  119.4         209.6         237.8         
+  dano medio              197.9         162.5         256.5         
+  ouro final              368.9         192.3         637.9         
+  pocoes bebidas          0.8           0.4           1.0           
+  passivas                2.5           1.5           3.7           
+  skills no deck          1.5           1.4           1.8           
+  pecas equipadas         1.8           1.2           2.4           
+  dano dado               13714.4       6594.8        23087.7       
+  dano recebido           2719.6        1471.3        2917.4        
+  dano recebido frac      3.0           2.5           3.3           
+  egide absorvida         0.0           96.7          0.0           
+  mp gasto                201.2         127.5         384.7         
+
+-- verbos de combate por classe (fracao dos turnos) --------------------------
+  warrior  skill=53.2%  attack=41.7%  flee=4.8%  item=0.3%
+  mage     skill=54.6%  attack=36.3%  flee=8.8%  item=0.3%
+  rogue    attack=48.9%  skill=48.3%  flee=2.5%  item=0.3%
+
+-- skills mais usadas por classe ---------------------------------------------
+  warrior:
+    Golpe Poderoso               18981   72.9%
+    Investida                     2878   11.1%
+    Mira Calma                    1693    6.5%
+    Soco de Placa                 1502    5.8%
+    Quebra-Guarda                  557    2.1%
+    Pisada de Ferro                197    0.8%
+    Ferro Contra Ferro              97    0.4%
+    Mão Dupla                       47    0.2%
+  mage:
+    Bola de Fogo                 10407   72.4%
+    Míssil Mágico                 1326    9.2%
+    Lasca de Gelo                  889    6.2%
+    Fagulha Teimosa                876    6.1%
+    Mira Calma                     751    5.2%
+    Relâmpago                       63    0.4%
+    Drenar Vida                     25    0.2%
+    Pulso de Força                  23    0.2%
+  rogue:
+    Ataque Furtivo               19960   63.5%
+    Corte de Tendão               4658   14.8%
+    Mira Calma                    4361   13.9%
+    Picada Certeira               1016    3.2%
+    Golpe nas Sombras              448    1.4%
+    Dose da Viúva                  248    0.8%
+    Assassinato                    193    0.6%
+    Flecha pela Fresta             150    0.5%
+
+-- passivas mais frequentes na build final por classe ------------------------
+  warrior:
+    Coração de Ferro               226   22.6% das runs
+    Sangue de Guerreiro            216   21.6% das runs
+    Pele Grossa                    188   18.8% das runs
+    Postura Fechada                177   17.7% das runs
+    Olho de Águia                  126   12.6% das runs
+    Músculos de Aço                125   12.5% das runs
+    Essência Fluída                123   12.3% das runs
+    Passo de Corça                 115   11.5% das runs
+  mage:
+    Sangue de Guerreiro            141   14.1% das runs
+    Coração de Ferro               126   12.6% das runs
+    Pele Grossa                    119   11.9% das runs
+    Postura Fechada                103   10.3% das runs
+    Olho de Águia                   89    8.9% das runs
+    Músculos de Aço                 88    8.8% das runs
+    Essência Fluída                 74    7.4% das runs
+    Passos Leves                    59    5.9% das runs
+  rogue:
+    Sangue de Guerreiro            362   36.2% das runs
+    Pele Grossa                    298   29.8% das runs
+    Coração de Ferro               296   29.6% das runs
+    Postura Fechada                235   23.5% das runs
+    Músculos de Aço                209   20.9% das runs
+    Essência Fluída                175   17.5% das runs
+    Casco Calejado                 173   17.3% das runs
+    Olho de Águia                  164   16.4% das runs
+
+-- causa da morte: monstro e gap de nivel ------------------------------------
+  warrior (n=947)  gap: -1=16 +0=290 +1=348 +2=256 +3=16 +4=6 +5=6 +6=4 +7=2 +8=2 +9=1
+    top monstros: Lich Aprendiz (86), Anomalia Arcana (78), Necromante (75), Aparição (69), Cultista (65), Assassino das Sombras (58)
+    hp_frac ao aceitar a luta fatal: mediana 0.56  p10 0.39
+  mage (n=977)  gap: -2=1 -1=12 +0=290 +1=339 +2=296 +3=12 +4=2 +5=6 +6=5 +7=2 +8=5 +9=1 +10=2 +11=3 +14=1
+    top monstros: Lich Aprendiz (85), Anomalia Arcana (78), Elemental do Fogo Menor (73), Necromante (72), Aparição (71), Cultista (69)
+    hp_frac ao aceitar a luta fatal: mediana 0.53  p10 0.38
+  rogue (n=900)  gap: -1=22 +0=318 +1=361 +2=167 +3=16 +4=7 +5=2 +6=1 +7=2 +8=1 +9=2 +12=1
+    top monstros: Lich Aprendiz (62), Cultista (61), Necromante (61), Aparição (59), Elemental do Fogo Menor (58), Anomalia Arcana (53)
+    hp_frac ao aceitar a luta fatal: mediana 0.57  p10 0.40
+
+==============================================================================
+8. OUTLIERS E BUILDS INTERESSANTES
+==============================================================================
+
+-- as 12 runs de maior poder medido ------------------------------------------
+  rogue    seed 20260548  andar 20 nv 23  poder 1.223 (abs 36.1)  EXTRAIU
+    10 pecas, +3, 3 gemas, 2 encantos | 22 passivas | ouro 2464
+    deck: Ataque Furtivo, Mira Calma, Pó nos Olhos, Ferida Paga
+  rogue    seed 20260333  andar 20 nv 23  poder 1.152 (abs 34.0)  EXTRAIU
+    10 pecas, +3, 4 gemas, 3 encantos | 22 passivas | ouro 4200
+    deck: Ataque Furtivo, Corte de Passagem, Corte de Tendão, Respirar Fundo
+  rogue    seed 20260668  andar 20 nv 24  poder 1.152 (abs 34.0)  EXTRAIU
+    10 pecas, +5, 1 gemas, 1 encantos | 23 passivas | ouro 3451
+    deck: Ataque Furtivo, Picada Certeira, Bolso do Alfaiate, Ferida Paga
+  rogue    seed 20260792  andar 20 nv 24  poder 1.117 (abs 33.0)  EXTRAIU
+    10 pecas, +3, 7 gemas, 0 encantos | 23 passivas | ouro 5642
+    deck: Ataque Furtivo, Ferida Paga, Couro Batido, Corte de Tendão
+  rogue    seed 20260308  andar 20 nv 22  poder 1.094 (abs 32.3)  EXTRAIU
+    10 pecas, +5, 3 gemas, 0 encantos | 21 passivas | ouro 4270
+    deck: Ataque Furtivo, Respirar Fundo, Bolso do Alfaiate, Corte de Tendão
+  rogue    seed 20260402  andar 20 nv 24  poder 1.090 (abs 32.2)  EXTRAIU
+    10 pecas, +3, 3 gemas, 1 encantos | 23 passivas | ouro 6527
+    deck: Ataque Furtivo, Picada Certeira, Corte de Passagem, Respirar Fundo
+  rogue    seed 20260518  andar 19 nv 26  poder 1.082 (abs 31.9)  EXTRAIU
+    10 pecas, +2, 3 gemas, 1 encantos | 25 passivas | ouro 6293
+    deck: Hora do Lobo, Corte de Tendão, Ferida Paga, Curativo de Campo
+  mage     seed 20260094  andar 19 nv 22  poder 1.078 (abs 31.8)  EXTRAIU
+    10 pecas, +2, 7 gemas, 0 encantos | 21 passivas | ouro 4827
+    deck: Bola de Fogo, Drenar Vida, Pulso de Força, Palavra de Pavor
+  rogue    seed 20260578  andar 19 nv 23  poder 1.078 (abs 31.8)  EXTRAIU
+    10 pecas, +1, 2 gemas, 1 encantos | 22 passivas | ouro 4672
+    deck: Ataque Furtivo, Mira Calma, Respirar Fundo, Capa Rasgada
+  rogue    seed 20260811  andar 20 nv 22  poder 1.078 (abs 31.8)  EXTRAIU
+    10 pecas, +3, 4 gemas, 1 encantos | 21 passivas | ouro 4025
+    deck: Marca do Caçador, Guarda Cruzada, Corte de Tendão, Evasão Perfeita
+  mage     seed 20260269  andar 19 nv 20  poder 1.074 (abs 31.7)  EXTRAIU
+    10 pecas, +1, 4 gemas, 4 encantos | 19 passivas | ouro 2720
+    deck: Bola de Fogo, Respirar Fundo, Relâmpago, Égide de Runas
+  rogue    seed 20260790  andar 20 nv 23  poder 1.074 (abs 31.7)  EXTRAIU
+    10 pecas, +7, 7 gemas, 0 encantos | 22 passivas | ouro 9045
+    deck: Ataque Furtivo, Corte de Tendão, Couro Batido, Ferida Paga
+
+-- as 8 runs mais profundas --------------------------------------------------
+  rogue    seed 20260086  andar 20 nv 26 CHEGOU AO ANDAR 20 vivo hp 6540 dano 1907 ouro 2835  deck: Ataque Furtivo, Mira Calma, Capa Rasgada, Pancada na Nuca
+  warrior  seed 20260014  andar 20 nv 25 CHEGOU AO ANDAR 20 vivo hp 8686 dano 1647 ouro 7563  deck: Golpe Poderoso, Couraça Improvisada, Quebra-Guarda, Resistência Heróica
+  rogue    seed 20260241  andar 20 nv 25 CHEGOU AO ANDAR 20 vivo hp 7538 dano 1686 ouro 4008  deck: Ataque Furtivo, Corte de Tendão, Envenenar, Couro Batido
+  mage     seed 20260255  andar 20 nv 25 CHEGOU AO ANDAR 20 vivo hp 10730 dano 1852 ouro 8411  deck: Bola de Fogo, Fagulha Teimosa, Respirar Fundo, Ritmo de Duelo
+  warrior  seed 20260286  andar 20 nv 25 CHEGOU AO ANDAR 20 vivo hp 7369 dano 1710 ouro 4764  deck: Golpe Poderoso, Amuleto Rachado, Quebra-Guarda, Respirar Fundo
+  warrior  seed 20260393  andar 20 nv 25 CHEGOU AO ANDAR 20 vivo hp 10264 dano 1788 ouro 11363  deck: Golpe Poderoso, Investida, Provocação, Tomar Fôlego
+  warrior  seed 20260756  andar 20 nv 25 CHEGOU AO ANDAR 20 vivo hp 8888 dano 1659 ouro 4798  deck: Golpe Poderoso, Soco de Placa, Voto de Silêncio, Couro Batido
+  rogue    seed 20260853  andar 20 nv 25 CHEGOU AO ANDAR 20 vivo hp 6226 dano 1804 ouro 5056  deck: Ataque Furtivo, Mira Calma, Sombra Rápida, Bolso do Alfaiate
+
+-- extremos de economia e nivel ----------------------------------------------
+  mais ouro     warrior/20260558 = 11932 (andar 20)   warrior/20260393 = 11363 (andar 20)   warrior/20260291 = 10823 (andar 20)
+  maior nivel   rogue/20260086 = 26 (andar 20)   rogue/20260518 = 26 (andar 19)   warrior/20260014 = 25 (andar 20)
+  mais combates rogue/20260427 = 133 (andar 20)   rogue/20260156 = 131 (andar 20)   warrior/20260582 = 131 (andar 20)
+  mais +N       rogue/20260790 = 7 (andar 20)   warrior/20260558 = 6 (andar 20)   warrior/20260762 = 6 (andar 20)
+  mais gemas    rogue/20260614 = 9 (andar 19)   warrior/20260613 = 8 (andar 20)   rogue/20260874 = 8 (andar 20)
+
+==============================================================================
+9. SINAIS DE CONTEUDO DOMINANTE OU MORTO
+==============================================================================
+
+-- skills: captura >=80% (dominante) ou <=5% com n>=30 (morta) ---------------
+
+-- passivas: captura >=80% (dominante) ou <=5% com n>=30 (morta) -------------
+  MORTA       Ódio Baixo                  0.4% [ 0.1; 1.1]  3/781
+  MORTA       Boca de Sangue              0.9% [ 0.4; 1.9]  7/775
+  MORTA       Fio Serrilhado              1.4% [ 0.8; 2.6]  11/759
+  MORTA       Respiração Contada          0.4% [ 0.1; 1.2]  3/742
+  MORTA       Sangue de Vidente           0.0% [ 0.0; 0.5]  0/740
+  MORTA       Olho de Caçador             2.8% [ 1.8; 4.4]  19/675
+  DOMINANTE   Sangue de Guerreiro        95.0% [93.2;96.3]  719/757
+  DOMINANTE   Coração de Ferro           88.4% [85.9;90.5]  648/733
+  DOMINANTE   Essência Fluída            97.4% [95.2;98.6]  372/382
+  DOMINANTE   Alma Eterna                99.2% [95.5;99.9]  120/121
+  DOMINANTE   Bênção Divina             100.0% [96.6;100.0]  110/110
+
+-- servicos e eventos: quantas runs USARAM -----------------------------------
+  loja                     53.1% [51.3;54.9]  1593/3000
+  ferreiro                 31.0% [29.4;32.7]  930/3000
+  evento:fountain           7.7% [ 6.8; 8.7]  230/3000
+  evento:altar              7.2% [ 6.3; 8.2]  216/3000
+  evento:merchant           7.2% [ 6.3; 8.1]  215/3000
+
+-- consumiveis: pocoes bebidas e estoque final -------------------------------
+  runs que NAO beberam nenhuma pocao:  81.4% [80.0;82.8]  2443/3000
+  pocoes bebidas         n=3000      0.0     0.0     0.0     0.0     0.0     2.0    16.0
+  estoque final somado: Poção de Cura Pequena=132  Poção de Mana Pequena=105  Poção de Cura Média=70  Poção de Cura Grande=64  Elixir Vampírico=58  Elixir de Precisão=50  Pedra Fantasma=50  Poção de Mana Grande=49
+  outros consumiveis: vazio
+
+-- dot sofrido e egide -------------------------------------------------------
+  dano total por DoT: bleed=260829  poison=71980
+  runs com Egide absorvendo algo:  32.5% [30.9;34.2]  976/3000
+
+-- chaves de extracao --------------------------------------------------------
+  chaves na build final  n=3000     0.00    0.00    0.00    0.00    1.00    1.00    1.00
+  runs terminando com chave no bolso:  46.4% [44.6;48.2]  1392/3000
+  runs que TIVERAM alguma oportunidade de extrair:  21.0% [19.6;22.5]  631/3000
