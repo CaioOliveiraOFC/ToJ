@@ -210,8 +210,8 @@ fixos por classe (ex: Guerreiro +10 HP, +2 Força)"*.
 Hoje os atributos são **derivados do nível por uma razão geométrica única**
 (`GROWTH_RATE = 1.12`), a mesma que os monstros usam. Valor fixo contra uma base que
 cresce foi o defeito estrutural que produziu 99-100% de vitória contra o monstro
-comum — está documentado em `BALANCE_REPORT.md`. A mudança é deliberada e não deve
-voltar.
+comum. A mudança é deliberada e não deve voltar, e as bandas que a guardam estão
+em `tests/balance/thresholds.py`, com o valor medido ao lado de cada uma.
 
 **`[não existe]`** *"O jogador recebe pontos de atributo para distribuir livremente."*
 Não há pontos de atributo no código. Os atributos são inteiramente derivados do nível
@@ -442,9 +442,9 @@ como falha esperada no teste e é backlog de balanceamento, não de código.
 
 ## Combate Tático
 
-**`[implementado]`** O pipeline de dano está especificado em `COMBAT_DESIGN.md` e o
-código o segue exatamente. Uma fórmula única para todas as classes; a identidade vem
-dos pesos.
+**`[implementado]`** O pipeline de dano vive em `src/mechanics/combat.py` — fórmula é
+código, por ARCHITECTURE.md §5. Uma fórmula única para todas as classes; a
+identidade vem dos pesos.
 
 **`[implementado]`** Cooldowns, `damage_reduction`, atordoamento (Esmagar a 30%).
 

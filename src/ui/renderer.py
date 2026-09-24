@@ -10,56 +10,30 @@ from src.shared.types import CombatResult
 console = Console()
 
 
+def hp_exibido(entt) -> int:
+    """O HP que o jogador vê. Nunca abaixo de zero.
+
+    `reduce_hp` NÃO limita em zero, e é correto que não limite: o excedente do
+    golpe fatal é dado real, que o pós-combate e a telemetria leem. Mas "-71/440"
+    na tela não é informação, é vazamento do modelo — HP negativo não existe na
+    ficha que o jogador tem na mão.
+
+    A barra já tomava essa decisão e o número ao lado dela não: o mesmo painel
+    mostrava dez casas vazias com "-71" escrito na frente. Uma função só, para os
+    dois não voltarem a divergir.
+    """
+    return max(0, int(entt.get_hp()))
+
+
 def get_hp_bar(entt) -> str:
     if getattr(entt, "base_hp", 0) == 0:
         percent_of_bar = 0
     else:
-        current_hp = max(0, entt.get_hp())
-        percent_of_bar = int((current_hp / entt.base_hp) * 10)
+        percent_of_bar = int((hp_exibido(entt) / entt.base_hp) * 10)
     percent_of_bar = min(percent_of_bar, 10)
     hp_bar_fill = "[#]" * percent_of_bar
     hp_bar_empty = "[ ]" * (10 - percent_of_bar)
-    return f"|{hp_bar_fill}{hp_bar_empty}| {entt.get_hp()}/{entt.base_hp} HP"
-
-
-def show_status(entity) -> None:
-    """Exibe os status detalhados de uma entidade usando Rich para uma estética premium."""
-    title = f"Status de {entity.get_nick_name()}"
-
-    table = Table(show_header=False, expand=True, border_style="cyan")
-    table.add_column("Atributo", style="bold white")
-    table.add_column("Valor", style="bold yellow")
-
-    if hasattr(entity, "get_classname"):
-        class_name = entity.get_classname()
-    elif hasattr(entity, "my_type") and entity.my_type() == "COM":
-        class_name = "Monstro"
-    else:
-        class_name = "Desconhecido"
-
-    table.add_row("Classe", class_name)
-
-    level = entity.get_level() if hasattr(entity, "get_level") else getattr(entity, "level", "N/A")
-    table.add_row("Nível", str(level))
-
-    if hasattr(entity, "xp_points"):
-        table.add_row("XP", f"{entity.xp_points} / {entity.need_to_up()}")
-        table.add_row("Falta para Up", f"{entity.need_to_next()}")
-
-    table.add_row("HP", f"[red]{entity.get_hp()}[/red] / [red]{entity.base_hp}[/red]")
-    table.add_row("MP", f"[blue]{entity.get_mp()}[/blue] / [blue]{entity.base_mp}[/blue]")
-    table.add_row("Força", str(entity.get_st()))
-    table.add_row("Magia", str(entity.get_mg()))
-    table.add_row("Agilidade", str(entity.get_ag()))
-    table.add_row("Defesa", str(entity.get_df()))
-    table.add_row("Dano Médio", str(entity.get_avg_damage()))
-
-    if hasattr(entity, "coins"):
-        table.add_row("Moedas", f"[yellow]{entity.coins}[/yellow]")
-
-    console.print(
-        Panel(table, title=f"[bold green]{title}[/bold green]", border_style="green", expand=False)
-    )
+    return f"|{hp_bar_fill}{hp_bar_empty}| {hp_exibido(entt)}/{entt.base_hp} HP"
 
 
 def render_menu(options: tuple[str, ...] | list[str], prompt: str) -> None:
@@ -97,9 +71,9 @@ def render_compare_opponents(ennt1, ennt2) -> None:
         f"Nível: [green]{ennt2.get_level()}[/green]",
     )
     table.add_row(
-        f"HP: [red]{ennt1.get_hp()}[/red]/[dim red]{ennt1.base_hp}[/dim red]",
+        f"HP: [red]{hp_exibido(ennt1)}[/red]/[dim red]{ennt1.base_hp}[/dim red]",
         "",
-        f"HP: [red]{ennt2.get_hp()}[/red]/[dim red]{ennt2.base_hp}[/dim red]",
+        f"HP: [red]{hp_exibido(ennt2)}[/red]/[dim red]{ennt2.base_hp}[/dim red]",
     )
     table.add_row(
         f"MP: [cyan]{ennt1.get_mp()}[/cyan]/[dim cyan]{ennt1.base_mp}[/dim cyan]",

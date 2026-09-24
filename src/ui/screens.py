@@ -12,6 +12,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from src.content.skills_loader import get_skill_by_id
 from src.shared.constants import (
     ESSENCE_MULT_GOOD,
     ESSENCE_MULT_MAX,
@@ -421,49 +422,6 @@ def render_interest_paid(amount: int, saldo: int, cap: int) -> None:
     )
 
 
-def render_shop_buy_menu(items_for_sale: list[dict], player_coins: int) -> None:
-    """Renderiza o menu de compra de itens."""
-    renderer.console.clear()
-    renderer.console.print(
-        Panel(
-            Text("Itens à Venda", justify="center", style="bold cyan"),
-            border_style="cyan",
-            subtitle=f"Seu Ouro: [bold yellow]{player_coins}[/bold yellow]",
-        )
-    )
-
-    if not items_for_sale:
-        renderer.console.print(
-            Panel(
-                Text(
-                    "O mercador não tem nada para vender no momento.",
-                    justify="center",
-                    style="dim white",
-                ),
-                border_style="dim white",
-            )
-        )
-        sleep(0.8)
-        return
-
-    item_table = Table(show_header=True, expand=True, border_style="dim white")
-    item_table.add_column("ID", style="bold blue")
-    item_table.add_column("Item", style="cyan")
-    item_table.add_column("Preço", style="yellow", justify="right")
-    item_table.add_column("Descrição", style="dim white")
-
-    for i, item_data in enumerate(items_for_sale, 1):
-        item = item_data["item"]
-        price = item_data["price"]
-        item_table.add_row(
-            str(i), item.display_name, str(price), getattr(item, "description", "Sem descrição")
-        )
-    item_table.add_row("0", "Voltar", "", "")
-
-    renderer.console.print(item_table)
-    renderer.console.print("\n")
-
-
 def render_shop_purchase_success(item_name: str, price: int) -> None:
     """Renderiza mensagem de compra bem-sucedida."""
     renderer.console.print(
@@ -493,49 +451,6 @@ def render_shop_insufficient_gold() -> None:
         )
     )
     sleep(0.8)
-
-
-def render_shop_sell_menu(
-    inventory: list, shop: object, dungeon_level: int, player_coins: int
-) -> None:
-    """Renderiza o menu de venda de itens."""
-    renderer.console.clear()
-    renderer.console.print(
-        Panel(
-            Text("Seus Itens para Venda", justify="center", style="bold magenta"),
-            border_style="magenta",
-            subtitle=f"Seu Ouro: [bold yellow]{player_coins}[/bold yellow]",
-        )
-    )
-
-    if not inventory:
-        renderer.console.print(
-            Panel(
-                Text("Você não tem itens para vender.", justify="center", style="dim white"),
-                border_style="dim white",
-            )
-        )
-        sleep(0.8)
-        return
-
-    player_inventory_table = Table(show_header=True, expand=True, border_style="dim white")
-    player_inventory_table.add_column("ID", style="bold blue")
-    player_inventory_table.add_column("Item", style="cyan")
-    player_inventory_table.add_column("Preço Venda", style="yellow", justify="right")
-    player_inventory_table.add_column("Descrição", style="dim white")
-
-    for i, item in enumerate(inventory, 1):
-        sell_price = shop.get_sell_price(item, dungeon_level)
-        player_inventory_table.add_row(
-            str(i),
-            item.display_name,
-            str(sell_price),
-            getattr(item, "description", "Sem descrição"),
-        )
-    player_inventory_table.add_row("0", "Voltar", "", "")
-
-    renderer.console.print(player_inventory_table)
-    renderer.console.print("\n")
 
 
 def render_shop_sell_success(item_name: str, sell_price: int) -> None:
@@ -776,66 +691,6 @@ def render_shop_kept_in_inventory(item_name: str) -> None:
 # =============================================================================
 # INVENTÁRIO - Funções puras de renderização
 # =============================================================================
-
-
-def _create_inventory_header_panel(player: "Player") -> Panel:
-    """Cria o painel de cabeçalho do inventário."""
-    return Panel(
-        Text("Mochila e Equipamentos", justify="center", style="bold green"),
-        border_style="green",
-        subtitle=f"Ouro: [bold yellow]{player.coins}[/bold yellow]",
-    )
-
-
-def _create_equipment_table(player: "Player") -> Table:
-    """Cria a tabela de equipamentos do jogador."""
-    equip_table = Table(
-        title="[bold cyan]--- Equipamento ---[/bold cyan]",
-        show_header=False,
-        expand=True,
-        border_style="dim cyan",
-    )
-    equip_table.add_column("Slot", style="bold blue")
-    equip_table.add_column("Item", style="cyan")
-
-    for slot, item in player.equipment.items():
-        if item:
-            equip_table.add_row(slot.capitalize(), item.display_name)
-        else:
-            equip_table.add_row(slot.capitalize(), "[dim]Vazio[/dim]")
-
-    return equip_table
-
-
-def _create_inventory_table(player: "Player") -> Table | None:
-    """Cria a tabela de itens na mochila. Retorna None se o inventário estiver vazio."""
-    if not player.inventory:
-        return None
-
-    inv_table = Table(
-        title="[bold magenta]--- Itens na Mochila ---[/bold magenta]",
-        show_header=True,
-        expand=True,
-        border_style="dim magenta",
-    )
-    inv_table.add_column("ID", style="bold blue", justify="right")
-    inv_table.add_column("Item", style="cyan")
-    inv_table.add_column("Tipo", style="yellow")
-
-    for i, item in enumerate(player.inventory):
-        inv_table.add_row(str(i + 1), item.display_name, item.__class__.__name__)
-
-    return inv_table
-
-
-def _render_empty_inventory_message() -> None:
-    """Renderiza mensagem de inventário vazio."""
-    renderer.console.print(
-        Panel(
-            Text("Sua mochila está vazia.", justify="center", style="dim white"),
-            border_style="dim white",
-        )
-    )
 
 
 def render_dungeon_status(
@@ -1436,15 +1291,19 @@ def render_character_status(player) -> None:
         Panel(Text(title, justify="center", style="bold cyan"), border_style="cyan")
     )
 
-    # XP
-    try:
-        xp_atual = player.xp_points
-        xp_needed = player.need_to_next()
-        xp_total = player.need_to_up()
-    except Exception:
-        xp_atual = getattr(player, "xp_points", 0)
-        xp_needed = 0
-        xp_total = 0
+    # XP, HP/MP e atributos vêm direto do `Player`, sem rede de proteção.
+    #
+    # Os três blocos ficavam dentro de `try/except Exception` com valor de
+    # consolo: XP virava "XP: 0", HP virava "HP: 0/0" e os atributos viravam
+    # "Atributos indisponíveis". Um `need_to_up()` quebrado, um `base_hp` que
+    # sumisse do save ou um `get_avg_damage()` que estourasse apareciam como
+    # personagem zerado, e o jogador não tem como distinguir isso de um
+    # personagem que de fato está em zero. A anotação da função é `Player`, e o
+    # único chamador (`character_status_flow`) passa um `Player` — não há
+    # duck typing a sustentar aqui. Erro nesta tela é defeito, e defeito sobe.
+    xp_atual = player.xp_points
+    xp_needed = player.need_to_next()
+    xp_total = player.need_to_up()
     xp_text = (
         f"XP: {xp_atual} / {xp_total}  (falta {xp_needed} pro próximo nível)"
         if xp_total
@@ -1455,34 +1314,19 @@ def render_character_status(player) -> None:
     )
 
     # HP/MP
-    try:
-        hp = player.get_hp()
-        max_hp = getattr(player, "base_hp", hp)
-        mp = player.get_mp()
-        max_mp = getattr(player, "base_mp", mp)
-    except Exception:
-        hp = max_hp = mp = max_mp = 0
-    hp_mp_text = f"HP: {hp}/{max_hp}   |   MP: {mp}/{max_mp}"
+    hp_mp_text = (
+        f"HP: {renderer.hp_exibido(player)}/{player.base_hp}"
+        f"   |   MP: {player.get_mp()}/{player.base_mp}"
+    )
     renderer.console.print(
         Panel(Text(hp_mp_text, justify="center", style="bold white"), border_style="white")
     )
 
     # Atributos base
-    try:
-        atk = (
-            player.get_avg_damage()
-            if hasattr(player, "get_avg_damage")
-            else getattr(player, "avg_damage", 0)
-        )
-        base_df = getattr(player, "base_df", getattr(player, "base_ag", 0))
-        base_ag = getattr(player, "base_ag", 0)
-        base_st = getattr(player, "base_st", 0)
-        base_mg = getattr(player, "base_mg", 0)
-        attrs_text = (
-            f"ATK: {atk}  |  DEF: {base_df}  |  AGI: {base_ag}  |  ST: {base_st}  |  MG: {base_mg}"
-        )
-    except Exception:
-        attrs_text = "Atributos indisponíveis"
+    attrs_text = (
+        f"ATK: {player.get_avg_damage()}  |  DEF: {player.base_df}  "
+        f"|  AGI: {player.base_ag}  |  ST: {player.base_st}  |  MG: {player.base_mg}"
+    )
     renderer.console.print(
         Panel(
             Text(attrs_text, justify="center", style="yellow"),
@@ -1530,21 +1374,16 @@ def render_character_status(player) -> None:
     )
 
     # Cooldowns
-    cooldowns = getattr(player, "skill_cooldowns", {})
+    cooldowns = player.skill_cooldowns
     if cooldowns:
         cd_lines = []
         for sid, rem in cooldowns.items():
-            # Tenta resolver nome da skill pelo id
-            skill_name = sid
-            try:
-                from src.content.skills_loader import get_skill_by_id
-
-                sc = get_skill_by_id(sid)
-                if sc:
-                    skill_name = sc.name
-            except Exception:
-                pass
-            cd_lines.append(f"{escape_markup(skill_name)}: {rem} turno(s)")
+            # Um id fora do catálogo é exibido como id: `get_skill_by_id` já
+            # devolve `None` para isso, e não é erro. O `try/except Exception`
+            # que envolvia estas três linhas só podia pegar falha de import do
+            # loader — que é defeito, não carta desconhecida.
+            sc = get_skill_by_id(sid)
+            cd_lines.append(f"{escape_markup(sc.name if sc else sid)}: {rem} turno(s)")
         cd_text = "\n".join(cd_lines)
     else:
         cd_text = "[dim]Nenhum cooldown ativo[/dim]"
@@ -1553,17 +1392,13 @@ def render_character_status(player) -> None:
     )
 
     # Efeitos temporários
-    active_effects = getattr(player, "active_effects", {})
-    active_buffs = getattr(player, "active_buffs", {})
     effect_lines = []
-    for name, data in {**active_effects, **active_buffs}.items():
-        try:
-            dur = data.get("duration", "?") if isinstance(data, dict) else "?"
-            val = data.get("value", "") if isinstance(data, dict) else ""
-            val_str = f" (+{val})" if val != "" else ""
-            effect_lines.append(f"{escape_markup(str(name))}{val_str} - {dur} turno(s) restantes")
-        except Exception:
-            effect_lines.append(f"{escape_markup(str(name))}")
+    for name, data in {**player.active_effects, **player.active_buffs}.items():
+        # `isinstance` já decide os dois casos; o `except` em volta era inalcançável.
+        dur = data.get("duration", "?") if isinstance(data, dict) else "?"
+        val = data.get("value", "") if isinstance(data, dict) else ""
+        val_str = f" (+{val})" if val != "" else ""
+        effect_lines.append(f"{escape_markup(str(name))}{val_str} - {dur} turno(s) restantes")
     if effect_lines:
         effect_text = "\n".join(effect_lines)
     else:
