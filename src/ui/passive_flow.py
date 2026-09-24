@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from src.content import level_up
 from src.content.economy import reroll_cost
 from src.content.passives import generate_passive_choices
 from src.ui import screens
@@ -45,6 +46,8 @@ def run_passive_selection_flow(
         if choice and choice.isdigit():
             index = int(choice) - 1
             if 0 <= index < len(choices):
-                msg = player.add_passive(choices[index])
+                # Aplicar pela MESMA função que o bot usa: escolher é do
+                # jogador, aplicar é do jogo.
+                msg = level_up.aplicar_passiva(player, choices[index])
                 screens.render_passive_acquired(msg)
                 return

@@ -9,6 +9,7 @@ from __future__ import annotations
 from time import sleep
 from typing import TYPE_CHECKING
 
+from src.content.extraction import extracted_floor, was_extracted
 from src.content.items import ALL_ITEMS, get_all_items
 from src.engine.events import EventBus
 from src.engine.game_logic import create_player_from_data
@@ -118,7 +119,17 @@ def run_main_loop() -> None:
                     player_factory=PLAYER_FACTORY,
                     slot=slot,
                 )
-                if player:
+                if player and was_extracted(player):
+                    # Run já encerrada pela Extração. O personagem está
+                    # preservado, e o caminho dele agora é a camada pós-dungeon
+                    # — que ainda não existe. O que NÃO pode acontecer é ele
+                    # voltar para a mesma dungeon como se a run continuasse.
+                    screens.render_game_saved(
+                        f"{player.get_nick_name()} extraiu no andar "
+                        f"{extracted_floor(player)} e está preservado. "
+                        "A dungeon desta run foi encerrada — a Arena ainda não está aberta."
+                    )
+                elif player:
                     start_game(player, dungeon_level, map_state, slot=slot)
                 else:
                     screens.render_game_saved(

@@ -82,28 +82,21 @@ def _andavel(game_map: "MapOfGame", y: int, x: int) -> bool:
     return game_map.grid[y][x] in (".", "D", "X")
 
 
-def _melhor_rota(game_map: "MapOfGame", origem, destino, por_combate: bool) -> Rota:
-    """Dijkstra sobre a grade, com o custo que a pergunta pede.
+def campo_de_custo(game_map: "MapOfGame", origem, por_combate: bool) -> tuple[dict, dict]:
+    """Varre o andar inteiro a partir de `origem`. Custo e predecessor por casa.
 
-    `por_combate=True` faz cada casa com monstro custar uma unidade cara e o
-    passo uma barata, então o caminho ótimo é o que luta menos e, entre os que
-    lutam o mesmo, o mais curto. Com `False`, conta só passos.
+    Uma varredura responde "qual a distância até TODAS as casas", que é a
+    pergunta de quem procura o monstro mais perto ou compara o desvio de três
+    serviços. Perguntar casa a casa custava um Dijkstra por alvo, e num andar
+    fundo com dez monstros isso era cem buscas por andar.
     """
-    if origem == destino:
-        return Rota(passos=0, combates=0)
-
     inimigos = game_map.enemies_pos
     fila = [(0, 0, origem)]
     visto: dict[tuple[int, int], tuple[int, int]] = {origem: (0, 0)}
+    veio_de: dict[tuple[int, int], tuple[int, int]] = {}
 
     while fila:
         custo_a, custo_b, atual = heapq.heappop(fila)
-        if atual == destino:
-            return (
-                Rota(passos=custo_b, combates=custo_a)
-                if por_combate
-                else Rota(passos=custo_a, combates=custo_b)
-            )
         if visto.get(atual, (10**9, 10**9)) < (custo_a, custo_b):
             continue
         y, x = atual
@@ -115,9 +108,86 @@ def _melhor_rota(game_map: "MapOfGame", origem, destino, por_combate: bool) -> R
             novo = (custo_a + luta, custo_b + 1) if por_combate else (custo_a + 1, custo_b + luta)
             if novo < visto.get((ny, nx), (10**9, 10**9)):
                 visto[(ny, nx)] = novo
+                veio_de[(ny, nx)] = atual
                 heapq.heappush(fila, (novo[0], novo[1], (ny, nx)))
 
-    return Rota.impossivel()
+    return visto, veio_de
+
+
+def rota_do_campo(campo, destino, por_combate: bool) -> tuple[Rota, list[tuple[int, int]]]:
+    """Extrai rota e caminho até um destino de um campo já varrido."""
+    visto, veio_de = campo
+    if destino not in visto:
+        return Rota.impossivel(), []
+    custo_a, custo_b = visto[destino]
+    caminho = [destino]
+    while caminho[-1] in veio_de:
+        caminho.append(veio_de[caminho[-1]])
+    caminho.reverse()
+    rota = (
+        Rota(passos=custo_b, combates=custo_a)
+        if por_combate
+        else Rota(passos=custo_a, combates=custo_b)
+    )
+    return rota, caminho
+
+
+def _dijkstra(
+    game_map: "MapOfGame", origem, destino, por_combate: bool
+) -> tuple[Rota, list[tuple[int, int]]]:
+    """Dijkstra sobre a grade, com o custo que a pergunta pede.
+
+    `por_combate=True` faz cada casa com monstro custar uma unidade cara e o
+    passo uma barata, então o caminho ótimo é o que luta menos e, entre os que
+    lutam o mesmo, o mais curto. Com `False`, conta só passos.
+
+    Devolve a rota E o caminho. O caminho existe porque quem SIMULA um jogador
+    precisa saber em quais casas ele pisa — contar "dois combates" não diz quais
+    dois monstros são. Uma segunda busca só para recuperar isso seria um segundo
+    algoritmo divergindo do primeiro na primeira mudança.
+    """
+    if origem == destino:
+        return Rota(passos=0, combates=0), [origem]
+
+    inimigos = game_map.enemies_pos
+    fila = [(0, 0, origem)]
+    visto: dict[tuple[int, int], tuple[int, int]] = {origem: (0, 0)}
+    veio_de: dict[tuple[int, int], tuple[int, int]] = {}
+
+    while fila:
+        custo_a, custo_b, atual = heapq.heappop(fila)
+        if atual == destino:
+            caminho = [atual]
+            while caminho[-1] != origem:
+                caminho.append(veio_de[caminho[-1]])
+            caminho.reverse()
+            rota = (
+                Rota(passos=custo_b, combates=custo_a)
+                if por_combate
+                else Rota(passos=custo_a, combates=custo_b)
+            )
+            return rota, caminho
+        if visto.get(atual, (10**9, 10**9)) < (custo_a, custo_b):
+            continue
+        y, x = atual
+        for dy, dx in VIZINHOS:
+            ny, nx = y + dy, x + dx
+            if not _andavel(game_map, ny, nx):
+                continue
+            luta = 1 if (ny, nx) in inimigos else 0
+            novo = (custo_a + luta, custo_b + 1) if por_combate else (custo_a + 1, custo_b + luta)
+            if novo < visto.get((ny, nx), (10**9, 10**9)):
+                visto[(ny, nx)] = novo
+                veio_de[(ny, nx)] = atual
+                heapq.heappush(fila, (novo[0], novo[1], (ny, nx)))
+
+    return Rota.impossivel(), []
+
+
+def _melhor_rota(game_map: "MapOfGame", origem, destino, por_combate: bool) -> Rota:
+    """Só o custo da melhor rota. Mesmo algoritmo de `_dijkstra`, sem o caminho."""
+    rota, _ = _dijkstra(game_map, origem, destino, por_combate)
+    return rota
 
 
 def analisar(game_map: "MapOfGame") -> Geometria:

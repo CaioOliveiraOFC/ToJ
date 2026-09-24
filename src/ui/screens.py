@@ -940,6 +940,7 @@ def render_extraction_prompt(
     )
     body.append("Se você EXTRAIR, a run encerra agora e seu personagem\n", style="bold green")
     body.append("é preservado com tudo que conquistou até aqui.\n", style="green")
+    body.append("Custa a sua Chave de Extração.\n", style="bold yellow")
     renderer.console.print(Panel(body, border_style="cyan", title="Extrair ou Continuar?"))
     renderer.console.print(
         Text(
@@ -949,6 +950,41 @@ def render_extraction_prompt(
         )
     )
     renderer.console.print(Text("Escolha 1 ou 2 e pressione ENTER.", justify="center", style="dim"))
+
+
+def render_extraction_no_key(dungeon_level: int) -> None:
+    """A casa da Extração sem a Chave. Ela fica; o que falta é o preço."""
+    renderer.console.print(
+        Panel(
+            Text(
+                f"Portal de Extração do andar {dungeon_level}.\n"
+                "Falta a CHAVE DE EXTRAÇÃO — ela cai de monstro derrotado, e só de lá.\n"
+                "O portal continua aqui enquanto você estiver neste andar.",
+                justify="center",
+                style="yellow",
+            ),
+            border_style="yellow",
+            title="Portal trancado",
+        )
+    )
+
+
+def render_extraction_failed(dungeon_level: int) -> None:
+    """A gravação falhou. Nada foi cobrado, e a run continua de pé."""
+    renderer.console.print(
+        Panel(
+            Text(
+                f"A Extração do andar {dungeon_level} NÃO foi concluída:\n"
+                "não foi possível gravar o personagem.\n"
+                "Sua Chave continua com você e o portal continua aqui — "
+                "a run não foi encerrada.",
+                justify="center",
+                style="bold red",
+            ),
+            border_style="red",
+            title="Extração falhou",
+        )
+    )
 
 
 def render_extraction_success(dungeon_level: int) -> None:

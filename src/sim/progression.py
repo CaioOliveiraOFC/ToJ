@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import random
 
-from src.content import forge
+from src.content import forge, level_up
 from src.content.economy import (
     buy_recovery,
     enchant_cost,
@@ -27,11 +27,9 @@ from src.content.economy import (
 from src.content.enchantments import MAX_ENCHANTMENTS
 from src.content.factories.loot import get_loot
 from src.content.forge import award_gem
-from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
-from src.content.skills_loader import generate_skill_choices
 from src.mechanics.math_operations import generate_essence_multiplier
-from src.shared.constants import CLASS_WEIGHTS, SKILL_OFFER_LEVEL_INTERVAL, SKILL_OFFER_SIZE
+from src.shared.constants import CLASS_WEIGHTS
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, PickPolicy, get_pick_policy
 from src.sim.toggles import Toggles
 
@@ -95,52 +93,48 @@ def on_level_up(
 ) -> None:
     """Aplica as escolhas que o jogo oferece a cada nível ganho.
 
-    Espelha `engine/loop.py`: uma passiva por nível, e uma oferta de skill a
-    cada `SKILL_OFFER_LEVEL_INTERVAL` níveis. Inclusive o reroll pago — pela
-    mesma função de custo, para o gasto do bot medir o preço do jogo.
+    A GERAÇÃO das ofertas e a CADÊNCIA saem de `content/level_up.py`, a mesma
+    fonte que a tela do jogador usa — antes estavam escritas aqui e lá, e duas
+    cópias divergem na primeira mudança. O que mora aqui é só a decisão: qual
+    carta levar, e quando pagar reroll.
+
+    RESSALVA REGISTRADA: esta função ainda percorre TODAS as passivas e depois
+    todas as skills, enquanto o jogo pergunta passiva-e-skill por nível. As duas
+    ordens consomem o mesmo gerador, então mudam o sorteio. Unificar move as
+    bandas de balanceamento, e por isso fica para a rodada que puder medi-las.
+    O BOT_PADRÃO não passa por aqui: ele usa `engine.encounter.resolve_encounter`.
     """
     cfg = toggles or Toggles()
     politica = picker if picker is not None else get_pick_policy(DEFAULT_PICK_POLICY)
 
     if cfg.passives:
         for _ in range(levels_gained):
-            ofertas = [
-                c for c in generate_passive_choices(count=3) if c.id not in cfg.banned_passives
-            ]
+            ofertas = [c for c in level_up.ofertas_de_passiva() if c.id not in cfg.banned_passives]
             for feitos in range(BOT_MAX_OFFER_REROLLS):
                 if not politica.passive_off_intent(ofertas):
                     break
                 if not _pagar_reroll(hero, dungeon_level, feitos, "passive_reroll", telemetry):
                     break
                 ofertas = [
-                    c for c in generate_passive_choices(count=3) if c.id not in cfg.banned_passives
+                    c for c in level_up.ofertas_de_passiva() if c.id not in cfg.banned_passives
                 ]
             escolhida = pick_passive(hero, ofertas, rng, picker)
             if telemetry is not None:
                 telemetry.record_offer("passive", ofertas, escolhida)
             if escolhida is not None:
-                hero.add_passive(escolhida)
+                level_up.aplicar_passiva(hero, escolhida)
 
     if not cfg.skill_choice:
         return
 
     def _oferta_de_skill(lvl):
-        cartas = generate_skill_choices(
-            hero.get_classname(),
-            lvl,
-            hero.active_skill_ids(),
-            count=SKILL_OFFER_SIZE,
-            seen_ids=hero.seen_skill_ids,
-        )
-        cartas = [o for o in cartas if o.id not in cfg.banned_skills]
-        # Ver é conhecer, aqui como no jogo: as cartas recusadas por um reroll
-        # já contam como vistas, senão o reroll devolveria as mesmas três.
-        hero.seen_skill_ids.update(o.id for o in cartas)
-        return cartas
+        # `ofertas_de_skill` já marca as cartas como VISTAS — inclusive as que um
+        # reroll descarta, que é a regra do jogo.
+        return [o for o in level_up.ofertas_de_skill(hero, lvl) if o.id not in cfg.banned_skills]
 
     nivel = hero.get_level()
-    for lvl in range(nivel - levels_gained + 1, nivel + 1):
-        if lvl > 1 and lvl % SKILL_OFFER_LEVEL_INTERVAL == 0:
+    for lvl in level_up.niveis_ganhos(nivel, levels_gained):
+        if level_up.oferece_skill(lvl):
             ofertas = _oferta_de_skill(lvl)
             nova, slot = pick_skill(hero, ofertas, rng, picker)
             for feitos in range(BOT_MAX_OFFER_REROLLS):
@@ -155,7 +149,9 @@ def on_level_up(
             if telemetry is not None:
                 telemetry.record_offer("skill", ofertas, nova)
             if nova is not None and slot is not None:
-                hero.skills[slot] = nova
+                # Aplicar pela MESMA função da tela: o bot escrevia direto em
+                # `hero.skills[slot]` e pulava `learn_skill`.
+                level_up.aplicar_skill(hero, nova, slot)
 
 
 def collect_loot(

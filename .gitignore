@@ -1,7 +1,6 @@
 # Ambiente virtual
 .venv/
 venv/
-reports/
  
 # Variáveis de ambiente (NUNCA commitar chaves de API)
 .env
@@ -19,9 +18,13 @@ __pycache__*
 # Dados gerados
 savegame.json
 saves/
-# Exceto a evidência citada no BALANCE_REPORT.md: um relatório que ninguém
-# consegue abrir não é evidência de nada. A lista é nominal de propósito —
-# curinga aqui faria toda execução do simulador aparecer no `git status`.
+reports/*
+# Exceto a evidência CITADA: um relatório que ninguém consegue abrir não é
+# evidência de nada. A lista é nominal de propósito — curinga aqui faria toda
+# execução do simulador aparecer no `git status`.
+!reports/BASELINE_PRE_BALANCE.md
+!reports/baseline_pre_balance_agregados.json
+!reports/baseline_pre_balance_completo.txt
 
 # IDEs
 .idea/

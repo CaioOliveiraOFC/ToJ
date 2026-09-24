@@ -1,0 +1,3219 @@
+{
+ "execucao": {
+  "nome": "BASELINE OFICIAL PRE-BALANCE",
+  "commit": "88190c5f230163718ff1b287bb97ef035f134964",
+  "branch_de_origem": "audit/new-loop",
+  "coletor": "tools/baseline_pre_balance.py",
+  "agregador": "tools/baseline_agrega.py",
+  "seed_inicio": 20260000,
+  "seed_fim_exclusivo": 20261000,
+  "seeds": 1000,
+  "classes": [
+   "warrior",
+   "mage",
+   "rogue"
+  ],
+  "runs": 3000,
+  "max_andar": 20,
+  "shards": 4,
+  "faixas_de_seed_por_shard": [
+   [
+    20260000,
+    20260250
+   ],
+   [
+    20260250,
+    20260500
+   ],
+   [
+    20260500,
+    20260750
+   ],
+   [
+    20260750,
+    20261000
+   ]
+  ],
+  "determinismo": "verificado byte a byte re-executando seeds 20260000-20260001",
+  "regras_de_gameplay_alteradas_durante_a_coleta": 0,
+  "oportunidades_unicas": 1621,
+  "avaliacoes": 10658,
+  "fator_de_inflacao_aval_por_oportunidade": 6.575,
+  "excecoes": 0
+ },
+ "desfecho": {
+  "warrior": {
+   "n": 1000,
+   "morreu": [
+    0.947,
+    0.93133,
+    0.95925
+   ],
+   "extraiu": [
+    0.01,
+    0.00544,
+    0.01831
+   ],
+   "chegou_ao_20": [
+    0.05,
+    0.03813,
+    0.06531
+   ],
+   "vivo_no_fim": [
+    0.053,
+    0.04075,
+    0.06867
+   ]
+  },
+  "mage": {
+   "n": 1000,
+   "morreu": [
+    0.977,
+    0.96572,
+    0.98463
+   ],
+   "extraiu": [
+    0.007,
+    0.00339,
+    0.01438
+   ],
+   "chegou_ao_20": [
+    0.021,
+    0.01378,
+    0.03189
+   ],
+   "vivo_no_fim": [
+    0.023,
+    0.01537,
+    0.03428
+   ]
+  },
+  "rogue": {
+   "n": 1000,
+   "morreu": [
+    0.9,
+    0.87985,
+    0.91709
+   ],
+   "extraiu": [
+    0.027,
+    0.01862,
+    0.039
+   ],
+   "chegou_ao_20": [
+    0.093,
+    0.07652,
+    0.11259
+   ],
+   "vivo_no_fim": [
+    0.1,
+    0.08291,
+    0.12015
+   ]
+  },
+  "todas": {
+   "n": 3000,
+   "morreu": [
+    0.94133,
+    0.93235,
+    0.94919
+   ],
+   "extraiu": [
+    0.01467,
+    0.01094,
+    0.01963
+   ],
+   "chegou_ao_20": [
+    0.05467,
+    0.04709,
+    0.06339
+   ],
+   "vivo_no_fim": [
+    0.05867,
+    0.05081,
+    0.06765
+   ]
+  }
+ },
+ "progresso": {
+  "warrior": {
+   "andar_final": {
+    "n": 1000,
+    "min": 1,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 3.0,
+    "p75": 5.0,
+    "p90": 9.0,
+    "max": 20,
+    "media": 4.243
+   },
+   "nivel_final": {
+    "n": 1000,
+    "min": 1,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 2.0,
+    "p75": 3.0,
+    "p90": 6.0,
+    "max": 25,
+    "media": 3.5
+   },
+   "combates": {
+    "n": 1000,
+    "min": 1,
+    "p10": 2.0,
+    "p25": 3.0,
+    "p50": 5.5,
+    "p75": 11.0,
+    "p90": 22.0,
+    "max": 131,
+    "media": 14.014
+   }
+  },
+  "mage": {
+   "andar_final": {
+    "n": 1000,
+    "min": 1,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 2.0,
+    "p75": 4.0,
+    "p90": 7.0,
+    "max": 20,
+    "media": 3.531
+   },
+   "nivel_final": {
+    "n": 1000,
+    "min": 1,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 2.0,
+    "p75": 3.0,
+    "p90": 4.0,
+    "max": 25,
+    "media": 2.515
+   },
+   "combates": {
+    "n": 1000,
+    "min": 1,
+    "p10": 2.0,
+    "p25": 3.0,
+    "p50": 5.0,
+    "p75": 9.0,
+    "p90": 15.0,
+    "max": 130,
+    "media": 9.189
+   }
+  },
+  "rogue": {
+   "andar_final": {
+    "n": 1000,
+    "min": 1,
+    "p10": 1.0,
+    "p25": 2.0,
+    "p50": 3.0,
+    "p75": 5.0,
+    "p90": 18.0,
+    "max": 20,
+    "media": 4.88
+   },
+   "nivel_final": {
+    "n": 1000,
+    "min": 1,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 2.0,
+    "p75": 4.25,
+    "p90": 14.3,
+    "max": 26,
+    "media": 4.709
+   },
+   "combates": {
+    "n": 1000,
+    "min": 1,
+    "p10": 2.0,
+    "p25": 3.0,
+    "p50": 6.0,
+    "p75": 14.0,
+    "p90": 66.9,
+    "max": 133,
+    "media": 19.916
+   }
+  },
+  "todas": {
+   "andar_final": {
+    "n": 3000,
+    "min": 1,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 3.0,
+    "p75": 5.0,
+    "p90": 9.0,
+    "max": 20,
+    "media": 4.218
+   },
+   "nivel_final": {
+    "n": 3000,
+    "min": 1,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 2.0,
+    "p75": 3.0,
+    "p90": 6.0,
+    "max": 26,
+    "media": 3.5747
+   },
+   "combates": {
+    "n": 3000,
+    "min": 1,
+    "p10": 2.0,
+    "p25": 3.0,
+    "p50": 5.0,
+    "p75": 11.0,
+    "p90": 23.0,
+    "max": 133,
+    "media": 14.373
+   }
+  }
+ },
+ "andar_final_histograma": {
+  "1": 781,
+  "2": 660,
+  "3": 464,
+  "4": 294,
+  "5": 218,
+  "6": 138,
+  "7": 69,
+  "8": 53,
+  "9": 46,
+  "10": 29,
+  "11": 20,
+  "12": 12,
+  "13": 12,
+  "14": 7,
+  "15": 13,
+  "16": 4,
+  "17": 1,
+  "18": 3,
+  "19": 12,
+  "20": 164
+ },
+ "mortalidade_condicional": {
+  "1": {
+   "entrou": 3000,
+   "morreu": 781,
+   "taxa": [
+    0.26033,
+    0.24494,
+    0.27634
+   ]
+  },
+  "2": {
+   "entrou": 2219,
+   "morreu": 660,
+   "taxa": [
+    0.29743,
+    0.27877,
+    0.31679
+   ]
+  },
+  "3": {
+   "entrou": 1559,
+   "morreu": 464,
+   "taxa": [
+    0.29763,
+    0.27545,
+    0.3208
+   ]
+  },
+  "4": {
+   "entrou": 1095,
+   "morreu": 294,
+   "taxa": [
+    0.26849,
+    0.24309,
+    0.29552
+   ]
+  },
+  "5": {
+   "entrou": 801,
+   "morreu": 218,
+   "taxa": [
+    0.27216,
+    0.24248,
+    0.30401
+   ]
+  },
+  "6": {
+   "entrou": 583,
+   "morreu": 138,
+   "taxa": [
+    0.23671,
+    0.204,
+    0.27286
+   ]
+  },
+  "7": {
+   "entrou": 445,
+   "morreu": 69,
+   "taxa": [
+    0.15506,
+    0.12439,
+    0.19162
+   ]
+  },
+  "8": {
+   "entrou": 376,
+   "morreu": 53,
+   "taxa": [
+    0.14096,
+    0.10941,
+    0.17977
+   ]
+  },
+  "9": {
+   "entrou": 323,
+   "morreu": 46,
+   "taxa": [
+    0.14241,
+    0.1085,
+    0.18474
+   ]
+  },
+  "10": {
+   "entrou": 277,
+   "morreu": 29,
+   "taxa": [
+    0.10469,
+    0.07389,
+    0.14631
+   ]
+  },
+  "11": {
+   "entrou": 248,
+   "morreu": 20,
+   "taxa": [
+    0.08065,
+    0.05281,
+    0.12127
+   ]
+  },
+  "12": {
+   "entrou": 228,
+   "morreu": 12,
+   "taxa": [
+    0.05263,
+    0.03036,
+    0.08973
+   ]
+  },
+  "13": {
+   "entrou": 216,
+   "morreu": 12,
+   "taxa": [
+    0.05556,
+    0.03206,
+    0.09458
+   ]
+  },
+  "14": {
+   "entrou": 204,
+   "morreu": 7,
+   "taxa": [
+    0.03431,
+    0.01672,
+    0.06912
+   ]
+  },
+  "15": {
+   "entrou": 197,
+   "morreu": 13,
+   "taxa": [
+    0.06599,
+    0.03897,
+    0.10962
+   ]
+  },
+  "16": {
+   "entrou": 184,
+   "morreu": 4,
+   "taxa": [
+    0.02174,
+    0.00849,
+    0.05455
+   ]
+  },
+  "17": {
+   "entrou": 180,
+   "morreu": 1,
+   "taxa": [
+    0.00556,
+    0.00098,
+    0.03079
+   ]
+  },
+  "18": {
+   "entrou": 179,
+   "morreu": 1,
+   "taxa": [
+    0.00559,
+    0.00099,
+    0.03096
+   ]
+  },
+  "19": {
+   "entrou": 176,
+   "morreu": 2,
+   "taxa": [
+    0.01136,
+    0.00312,
+    0.04048
+   ]
+  },
+  "20": {
+   "entrou": 164,
+   "morreu": 0,
+   "taxa": [
+    0.0,
+    0.0,
+    0.02289
+   ]
+  }
+ },
+ "matriz_4x3": {
+  "primeira_avaliacao": {
+   "ABAIXO|SAUDAVEL": {
+    "n": 1053,
+    "preservou": 0
+   },
+   "ABAIXO|CURTO": {
+    "n": 490,
+    "preservou": 0
+   },
+   "CLOSE_ENOUGH|SAUDAVEL": {
+    "n": 42,
+    "preservou": 0
+   },
+   "META_BATIDA|SAUDAVEL": {
+    "n": 23,
+    "preservou": 0
+   },
+   "HARD_STOP|SAUDAVEL": {
+    "n": 13,
+    "preservou": 13
+   }
+  },
+  "todas_avaliacoes": {
+   "ABAIXO|SAUDAVEL": {
+    "n": 6615,
+    "preservou": 0
+   },
+   "ABAIXO|CURTO": {
+    "n": 3086,
+    "preservou": 0
+   },
+   "CLOSE_ENOUGH|SAUDAVEL": {
+    "n": 550,
+    "preservou": 0
+   },
+   "META_BATIDA|SAUDAVEL": {
+    "n": 363,
+    "preservou": 0
+   },
+   "HARD_STOP|SAUDAVEL": {
+    "n": 38,
+    "preservou": 38
+   },
+   "CLOSE_ENOUGH|CURTO": {
+    "n": 6,
+    "preservou": 6
+   }
+  },
+  "celulas_possiveis": 12,
+  "estados_nunca_observados": [
+   "ESGOTADO",
+   "SEM_EVIDENCIA"
+  ],
+  "bandas_nunca_observadas": [
+   "NAO_MEDIDO"
+  ],
+  "extracoes": {
+   "oportunidades_que_extrairam": 44,
+   "banda_mudou_ate_a_vencedora": [
+    0.68182,
+    0.53443,
+    0.80001
+   ],
+   "por_andar": {
+    "18": 2,
+    "19": 10,
+    "20": 32
+   }
+  }
+ },
+ "poder": {
+  "regua": "overall_power V2, benchmark ARENA V2, PODER_ESPERADO=29.5205078125",
+  "relativo_por_classe": {
+   "warrior": {
+    "n": 3557,
+    "min": 0.1058,
+    "p10": 0.2266,
+    "p25": 0.3335,
+    "p50": 0.5482,
+    "p75": 0.8165,
+    "p90": 0.9375,
+    "max": 1.0742,
+    "media": 0.569
+   },
+   "mage": {
+    "n": 1738,
+    "min": 0.0912,
+    "p10": 0.1902,
+    "p25": 0.2754,
+    "p50": 0.4662,
+    "p75": 0.7541,
+    "p90": 0.9309,
+    "max": 1.0781,
+    "media": 0.5166
+   },
+   "rogue": {
+    "n": 5363,
+    "min": 0.1151,
+    "p10": 0.2832,
+    "p25": 0.4037,
+    "p50": 0.6262,
+    "p75": 0.8361,
+    "p90": 0.9532,
+    "max": 1.2225,
+    "media": 0.6173
+   }
+  },
+  "relativo_todas": {
+   "n": 10658,
+   "min": 0.0912,
+   "p10": 0.2432,
+   "p25": 0.353,
+   "p50": 0.5794,
+   "p75": 0.8165,
+   "p90": 0.9414,
+   "max": 1.2225,
+   "media": 0.5848
+  },
+  "runs_com_poder_medido_de_graca": [
+   0.21033,
+   0.19612,
+   0.22528
+  ],
+  "no_andar_20": {
+   "n": 373,
+   "min": 0.8829,
+   "p10": 0.9414,
+   "p25": 0.9688,
+   "p50": 0.9922,
+   "p75": 1.0273,
+   "p90": 1.0429,
+   "max": 1.2225,
+   "media": 0.9954
+  },
+  "no_andar_20_bandas": {
+   "ABAIXO": 45,
+   "CLOSE_ENOUGH": 149,
+   "HARD_STOP": 28,
+   "META_BATIDA": 151
+  },
+  "absoluto_build_final": {
+   "n": 1065,
+   "min": 2.6925,
+   "p10": 2.6925,
+   "p25": 2.6925,
+   "p50": 3.1246,
+   "p75": 6.2864,
+   "p90": 11.4575,
+   "max": 36.0889,
+   "media": 6.0899
+  }
+ },
+ "runway": {
+  "unidade": "andares adicionais sustentados (sem divisao por mapa.andar)",
+  "todas": {
+   "n": 10658,
+   "min": 0.0016,
+   "p10": 0.5768,
+   "p25": 0.9253,
+   "p50": 1.3001,
+   "p75": 1.6115,
+   "p90": 1.9046,
+   "max": 3.2639,
+   "media": 1.2791
+  },
+  "por_classe": {
+   "warrior": {
+    "n": 3557,
+    "min": 0.0016,
+    "p10": 0.5293,
+    "p25": 0.8658,
+    "p50": 1.2188,
+    "p75": 1.4918,
+    "p90": 1.7356,
+    "max": 2.5503,
+    "media": 1.176
+   },
+   "mage": {
+    "n": 1738,
+    "min": 0.0021,
+    "p10": 0.4787,
+    "p25": 0.7673,
+    "p50": 1.1723,
+    "p75": 1.5025,
+    "p90": 1.7957,
+    "max": 2.5866,
+    "media": 1.154
+   },
+   "rogue": {
+    "n": 5363,
+    "min": 0.0029,
+    "p10": 0.6862,
+    "p25": 1.0393,
+    "p50": 1.3956,
+    "p75": 1.7285,
+    "p90": 2.0577,
+    "max": 3.2639,
+    "media": 1.388
+   }
+  },
+  "por_faixa_de_andar": {
+   "3-6": {
+    "runway": {
+     "n": 2833,
+     "min": 0.0029,
+     "p10": 0.3846,
+     "p25": 0.6055,
+     "p50": 0.9415,
+     "p75": 1.2765,
+     "p90": 1.5967,
+     "max": 3.2639,
+     "media": 0.9761
+    },
+    "estados_na_primeira_avaliacao": {
+     "SAUDAVEL": 363,
+     "CURTO": 277
+    }
+   },
+   "7-10": {
+    "runway": {
+     "n": 2351,
+     "min": 0.0021,
+     "p10": 0.5494,
+     "p25": 0.8435,
+     "p50": 1.1826,
+     "p75": 1.4607,
+     "p90": 1.7493,
+     "max": 3.2549,
+     "media": 1.1674
+    },
+    "estados_na_primeira_avaliacao": {
+     "SAUDAVEL": 256,
+     "CURTO": 130
+    }
+   },
+   "11-14": {
+    "runway": {
+     "n": 2177,
+     "min": 0.0037,
+     "p10": 0.782,
+     "p25": 1.1276,
+     "p50": 1.3762,
+     "p75": 1.6465,
+     "p90": 1.9478,
+     "max": 2.8299,
+     "media": 1.3734
+    },
+    "estados_na_primeira_avaliacao": {
+     "SAUDAVEL": 212,
+     "CURTO": 57
+    }
+   },
+   "15-20": {
+    "runway": {
+     "n": 3297,
+     "min": 0.0016,
+     "p10": 1.0339,
+     "p25": 1.2907,
+     "p50": 1.5484,
+     "p75": 1.7982,
+     "p90": 2.095,
+     "max": 3.1825,
+     "media": 1.5567
+    },
+    "estados_na_primeira_avaliacao": {
+     "SAUDAVEL": 300,
+     "CURTO": 26
+    }
+   }
+  }
+ },
+ "extracao_por_faixa": {
+  "3-6": {
+   "oportunidades": 640,
+   "preservou_na_primeira": [
+    0.0,
+    0.0,
+    0.00597
+   ],
+   "extraiu_de_fato": 0,
+   "bandas_na_primeira": {
+    "ABAIXO": 640
+   }
+  },
+  "7-10": {
+   "oportunidades": 386,
+   "preservou_na_primeira": [
+    0.0,
+    0.0,
+    0.00985
+   ],
+   "extraiu_de_fato": 0,
+   "bandas_na_primeira": {
+    "ABAIXO": 386
+   }
+  },
+  "11-14": {
+   "oportunidades": 269,
+   "preservou_na_primeira": [
+    0.0,
+    0.0,
+    0.01408
+   ],
+   "extraiu_de_fato": 0,
+   "bandas_na_primeira": {
+    "ABAIXO": 269
+   }
+  },
+  "15-17": {
+   "oportunidades": 171,
+   "preservou_na_primeira": [
+    0.0,
+    0.0,
+    0.02197
+   ],
+   "extraiu_de_fato": 0,
+   "bandas_na_primeira": {
+    "ABAIXO": 169,
+    "CLOSE_ENOUGH": 2
+   }
+  },
+  "18-20": {
+   "oportunidades": 155,
+   "preservou_na_primeira": [
+    0.08387,
+    0.04967,
+    0.1382
+   ],
+   "extraiu_de_fato": 44,
+   "bandas_na_primeira": {
+    "CLOSE_ENOUGH": 40,
+    "META_BATIDA": 23,
+    "ABAIXO": 79,
+    "HARD_STOP": 13
+   }
+  }
+ },
+ "skills": {
+  "ofertas_totais": 2415,
+  "ofertas_recusadas_por_completo": [
+   0.02029,
+   0.01538,
+   0.02672
+  ],
+  "captura_por_effect_type": {
+   "heal": {
+    "oferecida": 460,
+    "escolhida": 269,
+    "taxa": [
+     0.58478,
+     0.53923,
+     0.62893
+    ]
+   },
+   "damage_reduction": {
+    "oferecida": 529,
+    "escolhida": 301,
+    "taxa": [
+     0.569,
+     0.52645,
+     0.61055
+    ]
+   },
+   "buff": {
+    "oferecida": 2831,
+    "escolhida": 675,
+    "taxa": [
+     0.23843,
+     0.2231,
+     0.25448
+    ]
+   },
+   "status": {
+    "oferecida": 1641,
+    "escolhida": 368,
+    "taxa": [
+     0.22425,
+     0.20473,
+     0.24506
+    ]
+   },
+   "damage": {
+    "oferecida": 1784,
+    "escolhida": 753,
+    "taxa": [
+     0.42209,
+     0.39936,
+     0.44515
+    ]
+   }
+  },
+  "deck_x_uso_por_effect_type": {
+   "heal": {
+    "slots_no_deck": 268,
+    "pct_dos_slots": 5.76,
+    "turnos_de_uso": 100,
+    "pct_dos_turnos": 0.14
+   },
+   "damage_reduction": {
+    "slots_no_deck": 213,
+    "pct_dos_slots": 4.58,
+    "turnos_de_uso": 72,
+    "pct_dos_turnos": 0.1
+   },
+   "buff": {
+    "slots_no_deck": 327,
+    "pct_dos_slots": 7.03,
+    "turnos_de_uso": 75,
+    "pct_dos_turnos": 0.1
+   },
+   "status": {
+    "slots_no_deck": 106,
+    "pct_dos_slots": 2.28,
+    "turnos_de_uso": 100,
+    "pct_dos_turnos": 0.14
+   },
+   "damage": {
+    "slots_no_deck": 3739,
+    "pct_dos_slots": 80.36,
+    "turnos_de_uso": 71516,
+    "pct_dos_turnos": 99.52
+   }
+  },
+  "por_carta": {
+   "A Mão que Não Treme": {
+    "effect_type": "buff",
+    "oferecida": 9,
+    "escolhida": 3,
+    "no_deck_final": 3,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Amuleto Rachado": {
+    "effect_type": "buff",
+    "oferecida": 31,
+    "escolhida": 12,
+    "no_deck_final": 6,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Areia no Chão": {
+    "effect_type": "status",
+    "oferecida": 114,
+    "escolhida": 33,
+    "no_deck_final": 9,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Assassinato": {
+    "effect_type": "damage",
+    "oferecida": 21,
+    "escolhida": 4,
+    "no_deck_final": 4,
+    "usos": 193,
+    "dano": 188912,
+    "mp": 15122
+   },
+   "Ataque Furtivo": {
+    "effect_type": "damage",
+    "oferecida": 0,
+    "escolhida": 0,
+    "no_deck_final": 992,
+    "usos": 19960,
+    "dano": 8985770,
+    "mp": 472498
+   },
+   "Baluarte": {
+    "effect_type": "damage_reduction",
+    "oferecida": 25,
+    "escolhida": 17,
+    "no_deck_final": 10,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Berro de Ferro": {
+    "effect_type": "status",
+    "oferecida": 104,
+    "escolhida": 4,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Bola de Fogo": {
+    "effect_type": "damage",
+    "oferecida": 0,
+    "escolhida": 0,
+    "no_deck_final": 1000,
+    "usos": 10407,
+    "dano": 3029248,
+    "mp": 135773
+   },
+   "Bolso Furado": {
+    "effect_type": "status",
+    "oferecida": 38,
+    "escolhida": 9,
+    "no_deck_final": 3,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Bolso do Alfaiate": {
+    "effect_type": "buff",
+    "oferecida": 17,
+    "escolhida": 11,
+    "no_deck_final": 8,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Capa Rasgada": {
+    "effect_type": "damage_reduction",
+    "oferecida": 148,
+    "escolhida": 93,
+    "no_deck_final": 73,
+    "usos": 35,
+    "dano": 0,
+    "mp": 350
+   },
+   "Carga do Condenado": {
+    "effect_type": "damage",
+    "oferecida": 2,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Chuva de Ferrões": {
+    "effect_type": "damage",
+    "oferecida": 18,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Clarividência": {
+    "effect_type": "buff",
+    "oferecida": 7,
+    "escolhida": 2,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Cobrança de Juros": {
+    "effect_type": "damage",
+    "oferecida": 1,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Colheita de Ferro": {
+    "effect_type": "damage",
+    "oferecida": 2,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Corte de Passagem": {
+    "effect_type": "status",
+    "oferecida": 23,
+    "escolhida": 13,
+    "no_deck_final": 5,
+    "usos": 22,
+    "dano": 0,
+    "mp": 2061
+   },
+   "Corte de Tendão": {
+    "effect_type": "damage",
+    "oferecida": 130,
+    "escolhida": 84,
+    "no_deck_final": 84,
+    "usos": 4658,
+    "dano": 3174488,
+    "mp": 168310
+   },
+   "Cortina de Fumaça": {
+    "effect_type": "status",
+    "oferecida": 16,
+    "escolhida": 4,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Couraça Improvisada": {
+    "effect_type": "damage_reduction",
+    "oferecida": 111,
+    "escolhida": 52,
+    "no_deck_final": 44,
+    "usos": 11,
+    "dano": 0,
+    "mp": 108
+   },
+   "Couro Batido": {
+    "effect_type": "damage_reduction",
+    "oferecida": 113,
+    "escolhida": 77,
+    "no_deck_final": 45,
+    "usos": 23,
+    "dano": 0,
+    "mp": 355
+   },
+   "Couro Endurecido": {
+    "effect_type": "buff",
+    "oferecida": 27,
+    "escolhida": 12,
+    "no_deck_final": 1,
+    "usos": 1,
+    "dano": 0,
+    "mp": 30
+   },
+   "Curativo de Campo": {
+    "effect_type": "buff",
+    "oferecida": 78,
+    "escolhida": 19,
+    "no_deck_final": 5,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Cutelada": {
+    "effect_type": "damage",
+    "oferecida": 37,
+    "escolhida": 4,
+    "no_deck_final": 4,
+    "usos": 19,
+    "dano": 4871,
+    "mp": 260
+   },
+   "Dança das Lâminas": {
+    "effect_type": "damage",
+    "oferecida": 9,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Disciplina de Forja": {
+    "effect_type": "buff",
+    "oferecida": 36,
+    "escolhida": 16,
+    "no_deck_final": 5,
+    "usos": 1,
+    "dano": 0,
+    "mp": 21
+   },
+   "Dissolver a Guarda": {
+    "effect_type": "status",
+    "oferecida": 14,
+    "escolhida": 3,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Dissonância": {
+    "effect_type": "status",
+    "oferecida": 14,
+    "escolhida": 4,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Dose da Viúva": {
+    "effect_type": "damage",
+    "oferecida": 67,
+    "escolhida": 13,
+    "no_deck_final": 13,
+    "usos": 248,
+    "dano": 118765,
+    "mp": 8494
+   },
+   "Drenar Vida": {
+    "effect_type": "heal",
+    "oferecida": 81,
+    "escolhida": 39,
+    "no_deck_final": 39,
+    "usos": 25,
+    "dano": 0,
+    "mp": 280
+   },
+   "Dreno de Mana": {
+    "effect_type": "status",
+    "oferecida": 4,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Duas Mãos, Um Tempo": {
+    "effect_type": "damage",
+    "oferecida": 37,
+    "escolhida": 1,
+    "no_deck_final": 1,
+    "usos": 76,
+    "dano": 62600,
+    "mp": 3438
+   },
+   "Encarar": {
+    "effect_type": "status",
+    "oferecida": 80,
+    "escolhida": 27,
+    "no_deck_final": 3,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Envenenar": {
+    "effect_type": "status",
+    "oferecida": 77,
+    "escolhida": 33,
+    "no_deck_final": 13,
+    "usos": 51,
+    "dano": 0,
+    "mp": 6371
+   },
+   "Escudo Mágico": {
+    "effect_type": "buff",
+    "oferecida": 70,
+    "escolhida": 26,
+    "no_deck_final": 22,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Escudo Protetor": {
+    "effect_type": "buff",
+    "oferecida": 109,
+    "escolhida": 37,
+    "no_deck_final": 31,
+    "usos": 3,
+    "dano": 0,
+    "mp": 34
+   },
+   "Esmagar": {
+    "effect_type": "damage",
+    "oferecida": 3,
+    "escolhida": 1,
+    "no_deck_final": 1,
+    "usos": 1,
+    "dano": 0,
+    "mp": 128
+   },
+   "Estocada Seca": {
+    "effect_type": "status",
+    "oferecida": 105,
+    "escolhida": 39,
+    "no_deck_final": 16,
+    "usos": 23,
+    "dano": 0,
+    "mp": 1216
+   },
+   "Evasão": {
+    "effect_type": "buff",
+    "oferecida": 158,
+    "escolhida": 31,
+    "no_deck_final": 18,
+    "usos": 22,
+    "dano": 0,
+    "mp": 238
+   },
+   "Evasão Perfeita": {
+    "effect_type": "buff",
+    "oferecida": 6,
+    "escolhida": 1,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Explosão Arcana": {
+    "effect_type": "damage",
+    "oferecida": 4,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Fagulha Teimosa": {
+    "effect_type": "damage",
+    "oferecida": 86,
+    "escolhida": 47,
+    "no_deck_final": 47,
+    "usos": 876,
+    "dano": 427121,
+    "mp": 18211
+   },
+   "Fantasma": {
+    "effect_type": "status",
+    "oferecida": 4,
+    "escolhida": 2,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Faro de Rua": {
+    "effect_type": "buff",
+    "oferecida": 135,
+    "escolhida": 11,
+    "no_deck_final": 7,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Ferida Paga": {
+    "effect_type": "heal",
+    "oferecida": 35,
+    "escolhida": 29,
+    "no_deck_final": 28,
+    "usos": 5,
+    "dano": 0,
+    "mp": 119
+   },
+   "Ferro Contra Ferro": {
+    "effect_type": "damage",
+    "oferecida": 13,
+    "escolhida": 3,
+    "no_deck_final": 3,
+    "usos": 97,
+    "dano": 80105,
+    "mp": 5064
+   },
+   "Fio no Rebite": {
+    "effect_type": "buff",
+    "oferecida": 30,
+    "escolhida": 13,
+    "no_deck_final": 5,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Flecha pela Fresta": {
+    "effect_type": "damage",
+    "oferecida": 72,
+    "escolhida": 7,
+    "no_deck_final": 7,
+    "usos": 150,
+    "dano": 107625,
+    "mp": 6476
+   },
+   "Foco do Estudante": {
+    "effect_type": "buff",
+    "oferecida": 65,
+    "escolhida": 7,
+    "no_deck_final": 5,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Fôlego de Marcha": {
+    "effect_type": "buff",
+    "oferecida": 112,
+    "escolhida": 35,
+    "no_deck_final": 11,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Gancho e Corda": {
+    "effect_type": "status",
+    "oferecida": 36,
+    "escolhida": 12,
+    "no_deck_final": 4,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Golpe Baixo": {
+    "effect_type": "status",
+    "oferecida": 157,
+    "escolhida": 7,
+    "no_deck_final": 2,
+    "usos": 1,
+    "dano": 0,
+    "mp": 28
+   },
+   "Golpe Devastador": {
+    "effect_type": "damage",
+    "oferecida": 13,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Golpe Duplo": {
+    "effect_type": "damage",
+    "oferecida": 9,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Golpe Poderoso": {
+    "effect_type": "damage",
+    "oferecida": 0,
+    "escolhida": 0,
+    "no_deck_final": 995,
+    "usos": 18981,
+    "dano": 5904055,
+    "mp": 261320
+   },
+   "Golpe nas Sombras": {
+    "effect_type": "damage",
+    "oferecida": 50,
+    "escolhida": 9,
+    "no_deck_final": 9,
+    "usos": 448,
+    "dano": 288754,
+    "mp": 19376
+   },
+   "Grilhões de Gelo": {
+    "effect_type": "status",
+    "oferecida": 1,
+    "escolhida": 1,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Grito Curto": {
+    "effect_type": "status",
+    "oferecida": 302,
+    "escolhida": 14,
+    "no_deck_final": 2,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Grito de Guerra": {
+    "effect_type": "buff",
+    "oferecida": 110,
+    "escolhida": 30,
+    "no_deck_final": 19,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Guarda Alta": {
+    "effect_type": "buff",
+    "oferecida": 297,
+    "escolhida": 73,
+    "no_deck_final": 48,
+    "usos": 3,
+    "dano": 0,
+    "mp": 48
+   },
+   "Guarda Cruzada": {
+    "effect_type": "damage_reduction",
+    "oferecida": 45,
+    "escolhida": 31,
+    "no_deck_final": 19,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Hora Parada": {
+    "effect_type": "status",
+    "oferecida": 2,
+    "escolhida": 2,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Hora do Arauto": {
+    "effect_type": "status",
+    "oferecida": 11,
+    "escolhida": 5,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Hora do Lobo": {
+    "effect_type": "damage",
+    "oferecida": 9,
+    "escolhida": 1,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Imortal": {
+    "effect_type": "buff",
+    "oferecida": 1,
+    "escolhida": 1,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Investida": {
+    "effect_type": "damage",
+    "oferecida": 92,
+    "escolhida": 47,
+    "no_deck_final": 47,
+    "usos": 2878,
+    "dano": 1453673,
+    "mp": 66260
+   },
+   "Investida de Aríete": {
+    "effect_type": "damage",
+    "oferecida": 34,
+    "escolhida": 2,
+    "no_deck_final": 2,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Joelho Torto": {
+    "effect_type": "status",
+    "oferecida": 68,
+    "escolhida": 18,
+    "no_deck_final": 5,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Juramento da Muralha": {
+    "effect_type": "damage_reduction",
+    "oferecida": 4,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Lançar Adaga": {
+    "effect_type": "status",
+    "oferecida": 19,
+    "escolhida": 8,
+    "no_deck_final": 2,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Lançar Pedra": {
+    "effect_type": "damage",
+    "oferecida": 17,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Lasca de Gelo": {
+    "effect_type": "damage",
+    "oferecida": 73,
+    "escolhida": 65,
+    "no_deck_final": 65,
+    "usos": 889,
+    "dano": 559625,
+    "mp": 21603
+   },
+   "Leitura de Guarda": {
+    "effect_type": "buff",
+    "oferecida": 41,
+    "escolhida": 16,
+    "no_deck_final": 5,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Leitura de Terreno": {
+    "effect_type": "buff",
+    "oferecida": 30,
+    "escolhida": 14,
+    "no_deck_final": 4,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Lente de Obsidiana": {
+    "effect_type": "damage",
+    "oferecida": 5,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Lâmina Assentada": {
+    "effect_type": "buff",
+    "oferecida": 35,
+    "escolhida": 16,
+    "no_deck_final": 5,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Lâmina no Escuro": {
+    "effect_type": "damage",
+    "oferecida": 20,
+    "escolhida": 1,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Maldição de Cinzas": {
+    "effect_type": "damage",
+    "oferecida": 2,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Marca Ardente": {
+    "effect_type": "damage",
+    "oferecida": 15,
+    "escolhida": 1,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Marca do Açougueiro": {
+    "effect_type": "damage",
+    "oferecida": 32,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Marca do Caçador": {
+    "effect_type": "damage",
+    "oferecida": 23,
+    "escolhida": 2,
+    "no_deck_final": 2,
+    "usos": 6,
+    "dano": 13488,
+    "mp": 706
+   },
+   "Marcar a Presa": {
+    "effect_type": "damage",
+    "oferecida": 26,
+    "escolhida": 1,
+    "no_deck_final": 1,
+    "usos": 93,
+    "dano": 67307,
+    "mp": 4917
+   },
+   "Mira Calma": {
+    "effect_type": "damage",
+    "oferecida": 315,
+    "escolhida": 241,
+    "no_deck_final": 241,
+    "usos": 6805,
+    "dano": 4668632,
+    "mp": 298015
+   },
+   "Mão Dupla": {
+    "effect_type": "damage",
+    "oferecida": 9,
+    "escolhida": 2,
+    "no_deck_final": 2,
+    "usos": 47,
+    "dano": 52839,
+    "mp": 3367
+   },
+   "Mão Firme": {
+    "effect_type": "buff",
+    "oferecida": 12,
+    "escolhida": 2,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Mão Leve": {
+    "effect_type": "buff",
+    "oferecida": 5,
+    "escolhida": 3,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Míssil Mágico": {
+    "effect_type": "damage",
+    "oferecida": 62,
+    "escolhida": 29,
+    "no_deck_final": 29,
+    "usos": 1326,
+    "dano": 764587,
+    "mp": 30621
+   },
+   "Nó Corredio": {
+    "effect_type": "status",
+    "oferecida": 18,
+    "escolhida": 1,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Olho Treinado": {
+    "effect_type": "buff",
+    "oferecida": 88,
+    "escolhida": 17,
+    "no_deck_final": 4,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Olho de Ferreiro": {
+    "effect_type": "buff",
+    "oferecida": 40,
+    "escolhida": 5,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Olho do Falcão": {
+    "effect_type": "buff",
+    "oferecida": 26,
+    "escolhida": 12,
+    "no_deck_final": 5,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Paciência do Coveiro": {
+    "effect_type": "status",
+    "oferecida": 14,
+    "escolhida": 8,
+    "no_deck_final": 3,
+    "usos": 2,
+    "dano": 0,
+    "mp": 152
+   },
+   "Pacto de Ferro": {
+    "effect_type": "damage_reduction",
+    "oferecida": 7,
+    "escolhida": 3,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Pacto do Vazio": {
+    "effect_type": "buff",
+    "oferecida": 1,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Palavra de Pavor": {
+    "effect_type": "status",
+    "oferecida": 5,
+    "escolhida": 4,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Palavra de Torpor": {
+    "effect_type": "status",
+    "oferecida": 15,
+    "escolhida": 7,
+    "no_deck_final": 4,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Pancada de Elmo": {
+    "effect_type": "status",
+    "oferecida": 7,
+    "escolhida": 4,
+    "no_deck_final": 2,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Pancada na Nuca": {
+    "effect_type": "status",
+    "oferecida": 78,
+    "escolhida": 27,
+    "no_deck_final": 6,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Passo Borrado": {
+    "effect_type": "buff",
+    "oferecida": 13,
+    "escolhida": 5,
+    "no_deck_final": 1,
+    "usos": 2,
+    "dano": 0,
+    "mp": 42
+   },
+   "Passo Lateral": {
+    "effect_type": "buff",
+    "oferecida": 353,
+    "escolhida": 66,
+    "no_deck_final": 30,
+    "usos": 42,
+    "dano": 0,
+    "mp": 490
+   },
+   "Pausa Útil": {
+    "effect_type": "buff",
+    "oferecida": 306,
+    "escolhida": 26,
+    "no_deck_final": 10,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Pele de Quartzo": {
+    "effect_type": "damage_reduction",
+    "oferecida": 71,
+    "escolhida": 25,
+    "no_deck_final": 20,
+    "usos": 3,
+    "dano": 0,
+    "mp": 44
+   },
+   "Peso do Machado": {
+    "effect_type": "damage",
+    "oferecida": 25,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Picada Certeira": {
+    "effect_type": "damage",
+    "oferecida": 142,
+    "escolhida": 67,
+    "no_deck_final": 66,
+    "usos": 1016,
+    "dano": 532172,
+    "mp": 28111
+   },
+   "Pisada de Ferro": {
+    "effect_type": "damage",
+    "oferecida": 39,
+    "escolhida": 5,
+    "no_deck_final": 5,
+    "usos": 197,
+    "dano": 97312,
+    "mp": 5648
+   },
+   "Postura Impecável": {
+    "effect_type": "buff",
+    "oferecida": 14,
+    "escolhida": 8,
+    "no_deck_final": 4,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Postura de Muro": {
+    "effect_type": "buff",
+    "oferecida": 96,
+    "escolhida": 22,
+    "no_deck_final": 13,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Prisma de Devastação": {
+    "effect_type": "damage",
+    "oferecida": 2,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Provocação": {
+    "effect_type": "status",
+    "oferecida": 31,
+    "escolhida": 10,
+    "no_deck_final": 5,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Pulso de Força": {
+    "effect_type": "damage",
+    "oferecida": 15,
+    "escolhida": 2,
+    "no_deck_final": 2,
+    "usos": 23,
+    "dano": 18763,
+    "mp": 690
+   },
+   "Pó nos Olhos": {
+    "effect_type": "status",
+    "oferecida": 52,
+    "escolhida": 9,
+    "no_deck_final": 2,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Quebra-Guarda": {
+    "effect_type": "damage",
+    "oferecida": 96,
+    "escolhida": 60,
+    "no_deck_final": 60,
+    "usos": 557,
+    "dano": 399167,
+    "mp": 19368
+   },
+   "Quebra-Ossos": {
+    "effect_type": "status",
+    "oferecida": 13,
+    "escolhida": 3,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Raio Congelante": {
+    "effect_type": "status",
+    "oferecida": 7,
+    "escolhida": 5,
+    "no_deck_final": 2,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Rasgo de Gancho": {
+    "effect_type": "damage",
+    "oferecida": 19,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Relâmpago": {
+    "effect_type": "damage",
+    "oferecida": 18,
+    "escolhida": 2,
+    "no_deck_final": 2,
+    "usos": 63,
+    "dano": 51346,
+    "mp": 1917
+   },
+   "Reserva Profunda": {
+    "effect_type": "buff",
+    "oferecida": 19,
+    "escolhida": 12,
+    "no_deck_final": 5,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Resistência Heróica": {
+    "effect_type": "buff",
+    "oferecida": 3,
+    "escolhida": 3,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Respirar Fundo": {
+    "effect_type": "heal",
+    "oferecida": 317,
+    "escolhida": 178,
+    "no_deck_final": 178,
+    "usos": 66,
+    "dano": 0,
+    "mp": 846
+   },
+   "Respiração de Forja": {
+    "effect_type": "buff",
+    "oferecida": 8,
+    "escolhida": 4,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Respiração de Ladrão": {
+    "effect_type": "buff",
+    "oferecida": 143,
+    "escolhida": 20,
+    "no_deck_final": 12,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Ritmo de Duelo": {
+    "effect_type": "buff",
+    "oferecida": 40,
+    "escolhida": 21,
+    "no_deck_final": 5,
+    "usos": 1,
+    "dano": 0,
+    "mp": 53
+   },
+   "Sangria Lenta": {
+    "effect_type": "buff",
+    "oferecida": 18,
+    "escolhida": 5,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Sangue nos Olhos": {
+    "effect_type": "status",
+    "oferecida": 41,
+    "escolhida": 7,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Sanguessuga Arcana": {
+    "effect_type": "buff",
+    "oferecida": 6,
+    "escolhida": 3,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Sede de Batalha": {
+    "effect_type": "buff",
+    "oferecida": 9,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Silêncio de Seda": {
+    "effect_type": "status",
+    "oferecida": 5,
+    "escolhida": 3,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Silêncio do Veterano": {
+    "effect_type": "status",
+    "oferecida": 2,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Soco de Placa": {
+    "effect_type": "damage",
+    "oferecida": 93,
+    "escolhida": 52,
+    "no_deck_final": 52,
+    "usos": 1502,
+    "dano": 596743,
+    "mp": 31453
+   },
+   "Sombra Rápida": {
+    "effect_type": "buff",
+    "oferecida": 147,
+    "escolhida": 49,
+    "no_deck_final": 23,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Sono Profundo": {
+    "effect_type": "status",
+    "oferecida": 1,
+    "escolhida": 1,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Testamento do Ladrão": {
+    "effect_type": "damage",
+    "oferecida": 3,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Tomar Fôlego": {
+    "effect_type": "heal",
+    "oferecida": 27,
+    "escolhida": 23,
+    "no_deck_final": 23,
+    "usos": 4,
+    "dano": 0,
+    "mp": 101
+   },
+   "Travar o Pulso": {
+    "effect_type": "status",
+    "oferecida": 134,
+    "escolhida": 35,
+    "no_deck_final": 8,
+    "usos": 1,
+    "dano": 0,
+    "mp": 31
+   },
+   "Tremor de Bigorna": {
+    "effect_type": "damage",
+    "oferecida": 14,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Troca de Sangue": {
+    "effect_type": "damage",
+    "oferecida": 3,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Veias de Éter": {
+    "effect_type": "buff",
+    "oferecida": 63,
+    "escolhida": 3,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Veterania": {
+    "effect_type": "buff",
+    "oferecida": 14,
+    "escolhida": 3,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Vigor Emprestado": {
+    "effect_type": "buff",
+    "oferecida": 3,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Voto de Silêncio": {
+    "effect_type": "status",
+    "oferecida": 29,
+    "escolhida": 6,
+    "no_deck_final": 3,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Égide de Runas": {
+    "effect_type": "damage_reduction",
+    "oferecida": 5,
+    "escolhida": 3,
+    "no_deck_final": 1,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   },
+   "Última Carta": {
+    "effect_type": "damage",
+    "oferecida": 7,
+    "escolhida": 0,
+    "no_deck_final": 0,
+    "usos": 0,
+    "dano": 0,
+    "mp": 0
+   }
+  },
+  "adquiridas_no_deck_final": 1666,
+  "adquiridas_acionadas_ao_menos_uma_vez": [
+   0.47479,
+   0.4509,
+   0.4988
+  ],
+  "fracao_do_dano_vinda_da_skill_inicial": 56.62
+ },
+ "passivas": {
+  "RESSALVA": "Captura de passiva NAO mede forca de carta. 23 das 60 passivas pertencem a effect_types do tier PASSIVE_SEM_PREFERENCIA, que pick_passive so alcanca quando as TRES cartas da oferta sao neutras. Captura 0% nesse tier e propriedade do picker, nao do conteudo.",
+  "por_carta": {
+   "Agulha no Osso": {
+    "oferecida": 357,
+    "escolhida": 46,
+    "taxa": [
+     0.12885,
+     0.09801,
+     0.1676
+    ]
+   },
+   "Alma Eterna": {
+    "oferecida": 121,
+    "escolhida": 120,
+    "taxa": [
+     0.99174,
+     0.95467,
+     0.99854
+    ]
+   },
+   "Alquimia do Desespero": {
+    "oferecida": 141,
+    "escolhida": 58,
+    "taxa": [
+     0.41135,
+     0.33353,
+     0.49387
+    ]
+   },
+   "Bebida dos Deuses": {
+    "oferecida": 377,
+    "escolhida": 137,
+    "taxa": [
+     0.3634,
+     0.31645,
+     0.4131
+    ]
+   },
+   "Boca de Sangue": {
+    "oferecida": 775,
+    "escolhida": 7,
+    "taxa": [
+     0.00903,
+     0.00438,
+     0.01853
+    ]
+   },
+   "Bênção Divina": {
+    "oferecida": 110,
+    "escolhida": 110,
+    "taxa": [
+     1.0,
+     0.96626,
+     1.0
+    ]
+   },
+   "Cabeça Dura": {
+    "oferecida": 355,
+    "escolhida": 93,
+    "taxa": [
+     0.26197,
+     0.21895,
+     0.31009
+    ]
+   },
+   "Casco Calejado": {
+    "oferecida": 376,
+    "escolhida": 315,
+    "taxa": [
+     0.83777,
+     0.79712,
+     0.87158
+    ]
+   },
+   "Coração de Ferro": {
+    "oferecida": 733,
+    "escolhida": 648,
+    "taxa": [
+     0.88404,
+     0.85883,
+     0.90524
+    ]
+   },
+   "Coração de Titã": {
+    "oferecida": 20,
+    "escolhida": 20,
+    "taxa": [
+     1.0,
+     0.83887,
+     1.0
+    ]
+   },
+   "Corpo Inviolável": {
+    "oferecida": 26,
+    "escolhida": 2,
+    "taxa": [
+     0.07692,
+     0.02136,
+     0.24142
+    ]
+   },
+   "Dívida de Ouro": {
+    "oferecida": 134,
+    "escolhida": 28,
+    "taxa": [
+     0.20896,
+     0.14871,
+     0.28542
+    ]
+   },
+   "Escudo da Fé": {
+    "oferecida": 337,
+    "escolhida": 243,
+    "taxa": [
+     0.72107,
+     0.6709,
+     0.76625
+    ]
+   },
+   "Essência Fluída": {
+    "oferecida": 382,
+    "escolhida": 372,
+    "taxa": [
+     0.97382,
+     0.95249,
+     0.98572
+    ]
+   },
+   "Essência Pura": {
+    "oferecida": 23,
+    "escolhida": 6,
+    "taxa": [
+     0.26087,
+     0.12549,
+     0.4647
+    ]
+   },
+   "Essência Viva": {
+    "oferecida": 323,
+    "escolhida": 65,
+    "taxa": [
+     0.20124,
+     0.16114,
+     0.24836
+    ]
+   },
+   "Estrela Quebrada": {
+    "oferecida": 32,
+    "escolhida": 8,
+    "taxa": [
+     0.25,
+     0.13252,
+     0.42107
+    ]
+   },
+   "Fio Serrilhado": {
+    "oferecida": 759,
+    "escolhida": 11,
+    "taxa": [
+     0.01449,
+     0.00811,
+     0.02576
+    ]
+   },
+   "Fome de Batalha": {
+    "oferecida": 136,
+    "escolhida": 36,
+    "taxa": [
+     0.26471,
+     0.19776,
+     0.34458
+    ]
+   },
+   "Fortuna Absoluta": {
+    "oferecida": 29,
+    "escolhida": 2,
+    "taxa": [
+     0.06897,
+     0.01912,
+     0.21965
+    ]
+   },
+   "Fúria Berserker": {
+    "oferecida": 372,
+    "escolhida": 221,
+    "taxa": [
+     0.59409,
+     0.54347,
+     0.64278
+    ]
+   },
+   "Herança do Abismo": {
+    "oferecida": 331,
+    "escolhida": 45,
+    "taxa": [
+     0.13595,
+     0.10318,
+     0.17708
+    ]
+   },
+   "Imortalidade Momentânea": {
+    "oferecida": 20,
+    "escolhida": 18,
+    "taxa": [
+     0.9,
+     0.69897,
+     0.97213
+    ]
+   },
+   "Instinto Frio": {
+    "oferecida": 361,
+    "escolhida": 38,
+    "taxa": [
+     0.10526,
+     0.07766,
+     0.14118
+    ]
+   },
+   "Lâmina Afiada": {
+    "oferecida": 336,
+    "escolhida": 203,
+    "taxa": [
+     0.60417,
+     0.55098,
+     0.655
+    ]
+   },
+   "Lâmina Lendária": {
+    "oferecida": 28,
+    "escolhida": 14,
+    "taxa": [
+     0.5,
+     0.32633,
+     0.67367
+    ]
+   },
+   "Lâmina do Juízo": {
+    "oferecida": 141,
+    "escolhida": 37,
+    "taxa": [
+     0.26241,
+     0.19679,
+     0.34064
+    ]
+   },
+   "Mente Serena": {
+    "oferecida": 761,
+    "escolhida": 210,
+    "taxa": [
+     0.27595,
+     0.24538,
+     0.30878
+    ]
+   },
+   "Mãos de Midas": {
+    "oferecida": 344,
+    "escolhida": 46,
+    "taxa": [
+     0.13372,
+     0.10177,
+     0.17376
+    ]
+   },
+   "Músculos de Aço": {
+    "oferecida": 734,
+    "escolhida": 422,
+    "taxa": [
+     0.57493,
+     0.53887,
+     0.61021
+    ]
+   },
+   "Olho de Caçador": {
+    "oferecida": 675,
+    "escolhida": 19,
+    "taxa": [
+     0.02815,
+     0.01809,
+     0.04354
+    ]
+   },
+   "Olho de Águia": {
+    "oferecida": 753,
+    "escolhida": 379,
+    "taxa": [
+     0.50332,
+     0.46768,
+     0.53892
+    ]
+   },
+   "Oráculo Partido": {
+    "oferecida": 120,
+    "escolhida": 18,
+    "taxa": [
+     0.15,
+     0.09704,
+     0.22468
+    ]
+   },
+   "Passo de Corça": {
+    "oferecida": 761,
+    "escolhida": 325,
+    "taxa": [
+     0.42707,
+     0.39238,
+     0.46249
+    ]
+   },
+   "Passos Leves": {
+    "oferecida": 764,
+    "escolhida": 314,
+    "taxa": [
+     0.41099,
+     0.37664,
+     0.44624
+    ]
+   },
+   "Pele Grossa": {
+    "oferecida": 776,
+    "escolhida": 605,
+    "taxa": [
+     0.77964,
+     0.74914,
+     0.80739
+    ]
+   },
+   "Pele de Adamântio": {
+    "oferecida": 154,
+    "escolhida": 122,
+    "taxa": [
+     0.79221,
+     0.7214,
+     0.84879
+    ]
+   },
+   "Pele de Sal": {
+    "oferecida": 793,
+    "escolhida": 33,
+    "taxa": [
+     0.04161,
+     0.02978,
+     0.05786
+    ]
+   },
+   "Postura Fechada": {
+    "oferecida": 706,
+    "escolhida": 515,
+    "taxa": [
+     0.72946,
+     0.69552,
+     0.76092
+    ]
+   },
+   "Poço Fundo": {
+    "oferecida": 395,
+    "escolhida": 143,
+    "taxa": [
+     0.36203,
+     0.31617,
+     0.41054
+    ]
+   },
+   "Presença Errada": {
+    "oferecida": 127,
+    "escolhida": 14,
+    "taxa": [
+     0.11024,
+     0.06681,
+     0.17655
+    ]
+   },
+   "Pulso Certeiro": {
+    "oferecida": 754,
+    "escolhida": 47,
+    "taxa": [
+     0.06233,
+     0.0472,
+     0.08191
+    ]
+   },
+   "Punho Atordoante": {
+    "oferecida": 123,
+    "escolhida": 20,
+    "taxa": [
+     0.1626,
+     0.1078,
+     0.23784
+    ]
+   },
+   "Reflexos Rápidos": {
+    "oferecida": 335,
+    "escolhida": 98,
+    "taxa": [
+     0.29254,
+     0.24639,
+     0.34339
+    ]
+   },
+   "Reserva Arcana": {
+    "oferecida": 717,
+    "escolhida": 224,
+    "taxa": [
+     0.31241,
+     0.27956,
+     0.34726
+    ]
+   },
+   "Respiração Contada": {
+    "oferecida": 742,
+    "escolhida": 3,
+    "taxa": [
+     0.00404,
+     0.00138,
+     0.01182
+    ]
+   },
+   "Ritmo Profano": {
+    "oferecida": 367,
+    "escolhida": 22,
+    "taxa": [
+     0.05995,
+     0.03992,
+     0.08909
+    ]
+   },
+   "Sangue Tóxico": {
+    "oferecida": 123,
+    "escolhida": 24,
+    "taxa": [
+     0.19512,
+     0.13477,
+     0.27394
+    ]
+   },
+   "Sangue de Guerreiro": {
+    "oferecida": 757,
+    "escolhida": 719,
+    "taxa": [
+     0.9498,
+     0.93185,
+     0.96321
+    ]
+   },
+   "Sangue de Vidente": {
+    "oferecida": 740,
+    "escolhida": 0,
+    "taxa": [
+     0.0,
+     0.0,
+     0.00516
+    ]
+   },
+   "Sede Silenciosa": {
+    "oferecida": 408,
+    "escolhida": 37,
+    "taxa": [
+     0.09069,
+     0.06651,
+     0.1225
+    ]
+   },
+   "Sede de Sangue": {
+    "oferecida": 145,
+    "escolhida": 67,
+    "taxa": [
+     0.46207,
+     0.38295,
+     0.54315
+    ]
+   },
+   "Sorte de Principiante": {
+    "oferecida": 714,
+    "escolhida": 143,
+    "taxa": [
+     0.20028,
+     0.17256,
+     0.2312
+    ]
+   },
+   "Toque do Dragão": {
+    "oferecida": 128,
+    "escolhida": 75,
+    "taxa": [
+     0.58594,
+     0.49932,
+     0.66755
+    ]
+   },
+   "Unha Suja": {
+    "oferecida": 359,
+    "escolhida": 48,
+    "taxa": [
+     0.1337,
+     0.10235,
+     0.17282
+    ]
+   },
+   "Voracidade": {
+    "oferecida": 144,
+    "escolhida": 27,
+    "taxa": [
+     0.1875,
+     0.13218,
+     0.25906
+    ]
+   },
+   "Voz no Escuro": {
+    "oferecida": 342,
+    "escolhida": 38,
+    "taxa": [
+     0.11111,
+     0.08203,
+     0.14883
+    ]
+   },
+   "Vulto": {
+    "oferecida": 134,
+    "escolhida": 33,
+    "taxa": [
+     0.24627,
+     0.18107,
+     0.32561
+    ]
+   },
+   "Ódio Antigo": {
+    "oferecida": 361,
+    "escolhida": 28,
+    "taxa": [
+     0.07756,
+     0.05421,
+     0.10981
+    ]
+   },
+   "Ódio Baixo": {
+    "oferecida": 781,
+    "escolhida": 3,
+    "taxa": [
+     0.00384,
+     0.00131,
+     0.01123
+    ]
+   }
+  }
+ },
+ "equipamento": {
+  "ocupacao_por_slot": {
+   "Helmet": {
+    "todas": [
+     0.16933,
+     0.15634,
+     0.18317
+    ],
+    "sobreviventes": [
+     0.97727,
+     0.94303,
+     0.99113
+    ]
+   },
+   "Amulet": {
+    "todas": [
+     0.17933,
+     0.16602,
+     0.19347
+    ],
+    "sobreviventes": [
+     0.99432,
+     0.96852,
+     0.999
+    ]
+   },
+   "Weapon1": {
+    "todas": [
+     0.29433,
+     0.2783,
+     0.3109
+    ],
+    "sobreviventes": [
+     1.0,
+     0.97864,
+     1.0
+    ]
+   },
+   "Weapon2": {
+    "todas": [
+     0.125,
+     0.11364,
+     0.13732
+    ],
+    "sobreviventes": [
+     1.0,
+     0.97864,
+     1.0
+    ]
+   },
+   "Body": {
+    "todas": [
+     0.202,
+     0.18802,
+     0.21674
+    ],
+    "sobreviventes": [
+     0.99432,
+     0.96852,
+     0.999
+    ]
+   },
+   "Legs": {
+    "todas": [
+     0.17967,
+     0.16634,
+     0.19381
+    ],
+    "sobreviventes": [
+     0.97727,
+     0.94303,
+     0.99113
+    ]
+   },
+   "Hands": {
+    "todas": [
+     0.18233,
+     0.16893,
+     0.19655
+    ],
+    "sobreviventes": [
+     0.97159,
+     0.93523,
+     0.98781
+    ]
+   },
+   "Shoes": {
+    "todas": [
+     0.17667,
+     0.16344,
+     0.19073
+    ],
+    "sobreviventes": [
+     0.98295,
+     0.95109,
+     0.99419
+    ]
+   },
+   "Ring1": {
+    "todas": [
+     0.193,
+     0.17927,
+     0.20751
+    ],
+    "sobreviventes": [
+     1.0,
+     0.97864,
+     1.0
+    ]
+   },
+   "Ring2": {
+    "todas": [
+     0.08467,
+     0.07523,
+     0.09517
+    ],
+    "sobreviventes": [
+     0.97159,
+     0.93523,
+     0.98781
+    ]
+   },
+   "Accessory": {
+    "todas": [
+     0.0,
+     0.0,
+     0.00128
+    ],
+    "sobreviventes": [
+     0.0,
+     0.0,
+     0.02136
+    ]
+   }
+  },
+  "raridade_equipada": {
+   "Rare": 1781,
+   "Common": 3151,
+   "Legendary": 88,
+   "Epic": 339
+  },
+  "raridade_equipada_sobreviventes": {
+   "Common": 577,
+   "Rare": 925,
+   "Epic": 194,
+   "Legendary": 41
+  },
+  "upgrades": {
+   "mais_n_total": {
+    "n": 3000,
+    "min": 0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 0.0,
+    "p90": 1.0,
+    "max": 7,
+    "media": 0.2807
+   },
+   "gemas_cravadas": {
+    "n": 3000,
+    "min": 0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 0.0,
+    "p90": 0.0,
+    "max": 9,
+    "media": 0.268
+   },
+   "encantos_totais": {
+    "n": 3000,
+    "min": 0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 0.0,
+    "p90": 0.0,
+    "max": 7,
+    "media": 0.0643
+   },
+   "sockets_totais": {
+    "n": 3000,
+    "min": 0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 0.0,
+    "p75": 1.0,
+    "p90": 3.0,
+    "max": 17,
+    "media": 1.0827
+   },
+   "pecas_equipadas": {
+    "n": 3000,
+    "min": 0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 1.0,
+    "p75": 2.0,
+    "p90": 5.0,
+    "max": 10,
+    "media": 1.7863
+   }
+  },
+  "upgrades_sobreviventes": {
+   "mais_n_total": {
+    "n": 176,
+    "min": 0,
+    "p10": 1.0,
+    "p25": 1.0,
+    "p50": 3.0,
+    "p75": 3.0,
+    "p90": 4.0,
+    "max": 7,
+    "media": 2.5057
+   },
+   "gemas_cravadas": {
+    "n": 176,
+    "min": 0,
+    "p10": 1.5,
+    "p25": 3.0,
+    "p50": 4.0,
+    "p75": 5.0,
+    "p90": 6.0,
+    "max": 9,
+    "media": 3.8239
+   },
+   "encantos_totais": {
+    "n": 176,
+    "min": 0,
+    "p10": 0.0,
+    "p25": 0.0,
+    "p50": 1.0,
+    "p75": 2.0,
+    "p90": 2.0,
+    "max": 7,
+    "media": 1.0341
+   },
+   "pecas_equipadas": {
+    "n": 176,
+    "min": 7,
+    "p10": 9.5,
+    "p25": 10.0,
+    "p50": 10.0,
+    "p75": 10.0,
+    "p90": 10.0,
+    "max": 10,
+    "media": 9.8693
+   }
+  },
+  "runs_com_zero": {
+   "mais_n_total": [
+    0.833,
+    0.81923,
+    0.84592
+   ],
+   "gemas_cravadas": [
+    0.90867,
+    0.89783,
+    0.91846
+   ],
+   "encantos_totais": [
+    0.95833,
+    0.95058,
+    0.96492
+   ]
+  },
+  "NOTA_ACCESSORY": "slot existe em EQUIPMENT_POSITIONS e nenhum item do catalogo declara slot=='Accessory'"
+ },
+ "economia": {
+  "ouro_final_mortos": {
+   "n": 2824,
+   "min": 3,
+   "p10": 7.0,
+   "p25": 33.0,
+   "p50": 59.0,
+   "p75": 103.0,
+   "p90": 180.0,
+   "max": 2798,
+   "media": 90.8463
+  },
+  "ouro_final_vivos": {
+   "n": 176,
+   "min": 430,
+   "p10": 3002.5,
+   "p25": 3931.25,
+   "p50": 5198.5,
+   "p75": 6423.0,
+   "p90": 8287.0,
+   "max": 11932,
+   "media": 5355.5625
+  },
+  "pocoes_bebidas": {
+   "n": 3000,
+   "min": 0,
+   "p10": 0.0,
+   "p25": 0.0,
+   "p50": 0.0,
+   "p75": 0.0,
+   "p90": 2.0,
+   "max": 16,
+   "media": 0.719
+  },
+  "mortos_que_nunca_beberam_pocao": [
+   0.86402,
+   0.85089,
+   0.87617
+  ],
+  "vivos_que_nunca_beberam_pocao": [
+   0.01705,
+   0.00581,
+   0.04891
+  ],
+  "servicos_usados": {
+   "loja": [
+    0.531,
+    0.51311,
+    0.54881
+   ],
+   "ferreiro": [
+    0.31,
+    0.2937,
+    0.32678
+   ],
+   "evento:fountain": [
+    0.07667,
+    0.06768,
+    0.08674
+   ],
+   "evento:altar": [
+    0.072,
+    0.06329,
+    0.08181
+   ],
+   "evento:merchant": [
+    0.07167,
+    0.06297,
+    0.08145
+   ]
+  }
+ },
+ "combate": {
+  "verbos_por_classe": {
+   "warrior": {
+    "turnos": 48909,
+    "skill": 53.23,
+    "attack": 41.68,
+    "flee": 4.82,
+    "item": 0.27
+   },
+   "mage": {
+    "turnos": 26316,
+    "skill": 54.62,
+    "attack": 36.3,
+    "flee": 8.81,
+    "item": 0.26
+   },
+   "rogue": {
+    "turnos": 65119,
+    "skill": 48.3,
+    "attack": 48.95,
+    "item": 0.29,
+    "flee": 2.46
+   }
+  },
+  "dot_sofrido": {
+   "poison": 71980,
+   "bleed": 260829
+  },
+  "runs_com_egide_absorvendo": [
+   0.32533,
+   0.3088,
+   0.34231
+  ]
+ },
+ "morte": {
+  "gap_de_nivel": {
+   "-2": 1,
+   "-1": 50,
+   "0": 898,
+   "1": 1048,
+   "2": 719,
+   "3": 44,
+   "4": 15,
+   "5": 14,
+   "6": 10,
+   "7": 6,
+   "8": 8,
+   "9": 4,
+   "10": 2,
+   "11": 3,
+   "12": 1,
+   "14": 1
+  },
+  "gap_menor_ou_igual_a_zero": [
+   0.33605,
+   0.31886,
+   0.35368
+  ],
+  "hp_frac_ao_aceitar_a_luta_fatal": {
+   "n": 2824,
+   "min": 0.0162,
+   "p10": 0.3865,
+   "p25": 0.4475,
+   "p50": 0.552,
+   "p75": 0.7271,
+   "p90": 0.9495,
+   "max": 1.0,
+   "media": 0.6001
+  },
+  "turnos_da_luta_fatal": {
+   "n": 2824,
+   "min": 1,
+   "p10": 2.0,
+   "p25": 3.0,
+   "p50": 5.0,
+   "p75": 7.0,
+   "p90": 10.0,
+   "max": 42,
+   "media": 5.2546
+  },
+  "top_monstros": {
+   "Lich Aprendiz": 233,
+   "Anomalia Arcana": 209,
+   "Necromante": 208,
+   "Aparição": 199,
+   "Cultista": 195,
+   "Elemental do Fogo Menor": 186,
+   "Assassino das Sombras": 129,
+   "Sombra": 118,
+   "Warg": 113,
+   "Lobo Faminto": 111,
+   "Bandido": 111,
+   "Orc": 107
+  }
+ },
+ "cobertura_de_conteudo": {
+  "terminou_nivel_1": [
+   0.418,
+   0.40047,
+   0.43574
+  ],
+  "nunca_recebeu_oferta_de_skill": [
+   0.649,
+   0.63174,
+   0.66588
+  ],
+  "nunca_recebeu_oferta_de_passiva": [
+   0.418,
+   0.40047,
+   0.43574
+  ],
+  "terminou_com_deck_de_1_skill": [
+   0.649,
+   0.63174,
+   0.66588
+  ],
+  "terminou_com_deck_cheio_4": [
+   0.077,
+   0.06799,
+   0.08709
+  ],
+  "terminou_sem_equipamento": [
+   0.39433,
+   0.37699,
+   0.41195
+  ],
+  "morreu_no_andar_1_ou_2": [
+   0.48033,
+   0.46249,
+   0.49823
+  ],
+  "teve_alguma_oportunidade_de_extrair": [
+   0.21033,
+   0.19612,
+   0.22528
+  ]
+ }
+}

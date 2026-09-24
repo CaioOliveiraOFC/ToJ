@@ -293,3 +293,45 @@ class TestCombateNaoConheceEquipamento:
         """Explicar a regra num comentário não pode derrubar o teste."""
         tree = ast.parse('"""Nada aqui lê equipment."""\n# nem equipment_percent\nx = 1\n')
         assert not [nome for nome, _ in nomes_de_codigo(tree) if nome in ESTRUTURAS_DE_EQUIPAMENTO]
+
+
+# --- O core do encontro não pode depender do adaptador humano ---------------
+
+# `engine/loop.py` é o adaptador do JOGADOR: telas, EventBus, teclado.
+# `engine/encounter.py` é a REGRA do encontro, dividida entre o jogador e o bot.
+# A seta aponta num sentido só:
+#
+#     loop -> core        bot -> core        core -> loop  NUNCA
+#
+# Houve uma versão em que o core chamava `engine.loop.process_post_battle` por
+# um import DENTRO da função. Não quebrava em tempo de execução — o import
+# tardio evita o ciclo —, mas fazia a regra depender do desenho da tela. Por
+# isso este teste varre TODOS os imports, e não só os de topo de módulo.
+NUCLEO_SEM_ADAPTADOR = {
+    "src/engine/encounter.py": ("src.engine.loop",),
+    "src/content/level_up.py": ("src.engine.loop", "src.engine.encounter", "src.ui"),
+}
+
+
+def _todos_os_imports(tree: ast.AST) -> list[tuple[str, int]]:
+    """Todo import do arquivo, inclusive os escondidos dentro de funções."""
+    achados: list[tuple[str, int]] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            achados.extend((alias.name, node.lineno) for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            achados.append((node.module, node.lineno))
+    return achados
+
+
+def test_o_core_do_encontro_nao_importa_o_adaptador():
+    for caminho, proibidos in NUCLEO_SEM_ADAPTADOR.items():
+        arquivo = SRC.parent / caminho
+        assert arquivo.exists(), f"{caminho} sumiu"
+        tree = ast.parse(arquivo.read_text(encoding="utf-8"))
+        for modulo, linha in _todos_os_imports(tree):
+            for proibido in proibidos:
+                assert not modulo.startswith(proibido), (
+                    f"{caminho}:{linha} importa {modulo}. A regra não pode depender de "
+                    f"{proibido} — a seta aponta do adaptador para o core, nunca o contrário."
+                )

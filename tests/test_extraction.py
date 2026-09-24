@@ -21,6 +21,7 @@ import pytest
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
 
+from src.content import extraction  # noqa: E402
 from src.content.items import get_all_items  # noqa: E402
 from src.entities.heroes import Mage, Rogue, Warrior  # noqa: E402
 from src.storage import save_manager  # noqa: E402
@@ -99,31 +100,113 @@ class TestRecursosSobrevivemAoSave:
         assert andar == 5
 
 
-class TestExtracaoNaoRefazOAndar:
-    def test_extrair_salva_o_proximo_andar(self, save_isolado):
-        """O andar corrente já foi concluído quando a extração é oferecida.
+class TestExtrairEncerraARunEmVezDeAdiantarOAndar:
+    """A extração grava FIM DE RUN, não ponto de retomada.
 
-        Reproduz o que `engine/loop.py` faz ao extrair. Se voltasse a gravar o
-        andar concluído, o jogador o refaria e receberia as recompensas de novo.
-        """
+    Esta classe guardava outra coisa: que a extração gravasse `andar + 1`. O `+1`
+    existia para tapar um buraco real — a extração gravava o andar recém-concluído,
+    e voltar ao save refazia esse andar e pagava as recompensas de novo.
+
+    O loop hoje é de mão única — dungeon → extração → personagem preservado →
+    camada pós-dungeon —, e a marca de run extraída fecha o mesmo buraco por
+    cima e mais fundo: quem extraiu NÃO REENTRA na dungeon em andar nenhum,
+    então não há andar a refazer nem recompensa a repetir. Gravar `+1` seria
+    prometer uma retomada que não existe.
+    """
+
+    def test_a_marca_de_extracao_sobrevive_ao_save(self, save_isolado):
         heroi = Warrior("Teste")
         heroi.set_level(9)
-        andar_concluido = 8
+        extraction.mark_extracted(heroi, 8)
+        save_manager.save_game(heroi, 8, None, slot=1)
 
-        save_manager.save_game(heroi, andar_concluido + 1, None, slot=1)
-        _, andar_ao_voltar, mapa = _recarrega()
+        recarregado, andar, mapa = _recarrega()
+        assert extraction.was_extracted(recarregado), "o save perdeu o fim da run"
+        assert extraction.extracted_floor(recarregado) == 8
+        assert andar == 8, "o registro é o andar em que a run ACABOU"
+        assert mapa is None
 
-        assert andar_ao_voltar == andar_concluido + 1, (
-            "voltou para o andar já limpo: as recompensas dele podem ser refeitas"
-        )
-        assert mapa is None, "o próximo andar tem de ser gerado do zero"
+    def test_save_de_run_viva_nao_vem_marcado(self, save_isolado):
+        heroi = Warrior("Teste")
+        heroi.set_level(4)
+        save_manager.save_game(heroi, 5, None, slot=1)
+        recarregado, andar, _mapa = _recarrega()
+        assert not extraction.was_extracted(recarregado)
+        assert andar == 5, "uma run viva continua retomando onde parou"
 
-    def test_o_codigo_da_extracao_soma_um(self):
+    def test_save_antigo_sem_o_campo_carrega_como_run_viva(self, save_isolado):
+        """Compatibilidade: o campo não existia, e a ausência dele é 'não extraída'."""
+        import json
+
+        heroi = Warrior("Teste")
+        heroi.set_level(6)
+        save_manager.save_game(heroi, 7, None, slot=1)
+        caminho = save_manager.get_slot_file(1)
+        dados = json.loads(Path(caminho).read_text(encoding="utf-8"))
+        del dados["extracted_on_floor"]
+        Path(caminho).write_text(json.dumps(dados), encoding="utf-8")
+
+        recarregado, andar, _mapa = _recarrega()
+        assert recarregado is not None, "o save antigo tem de continuar legível"
+        assert not extraction.was_extracted(recarregado)
+        assert andar == 7
+
+    def test_o_codigo_da_extracao_grava_o_andar_do_fim(self):
         """Fixa a chamada em `engine/loop.py`, não só a semântica do save."""
         fonte = (RAIZ / "src" / "engine" / "loop.py").read_text(encoding="utf-8")
-        assert "save_game(player, dungeon_level + 1, None, slot=slot)" in fonte, (
-            "a extração voltou a gravar o andar concluído"
+        assert "finish_run(" in fonte, "a extração deixou de ser atômica"
+        assert "save_game(player, dungeon_level, None, slot=slot)" in fonte
+        assert "save_game(player, dungeon_level + 1, None, slot=slot)" not in fonte, (
+            "a extração voltou a gravar um ponto de retomada"
         )
+
+    def test_a_listagem_de_slots_distingue_run_extraida(self, save_isolado):
+        heroi = Warrior("Teste")
+        heroi.set_level(9)
+        extraction.mark_extracted(heroi, 8)
+        save_manager.save_game(heroi, 8, None, slot=1)
+        slot = next(s for s in save_manager.list_slots() if s["slot"] == 1)
+        assert slot["extracted"] is True
+
+
+class TestCarregarExtraidoNaoVoltaParaADungeon:
+    """A garantia estrutural: o personagem preservado não reentra na masmorra."""
+
+    def _carregar(self, monkeypatch, marcado: bool):
+        from src.engine import bootstrap
+
+        chamadas: list = []
+        avisos: list = []
+        monkeypatch.setattr(bootstrap, "start_game", lambda *a, **k: chamadas.append(a))
+        monkeypatch.setattr(bootstrap.screens, "render_game_saved", lambda m="": avisos.append(m))
+
+        heroi = Warrior("Teste")
+        heroi.set_level(9)
+        if marcado:
+            extraction.mark_extracted(heroi, 8)
+        save_manager.save_game(heroi, 8, None, slot=1)
+
+        jogador, andar, mapa = save_manager.load_game(get_all_items(), CLASSES, slot=1)
+        # O MESMO trecho do `bootstrap`, sem o menu interativo em volta.
+        if jogador and bootstrap.was_extracted(jogador):
+            bootstrap.screens.render_game_saved("extraída")
+        elif jogador:
+            bootstrap.start_game(jogador, andar, mapa, slot=1)
+        return chamadas, avisos
+
+    def test_extraido_nao_inicia_a_dungeon(self, save_isolado, monkeypatch):
+        chamadas, avisos = self._carregar(monkeypatch, marcado=True)
+        assert chamadas == [], "um personagem extraído foi devolvido à dungeon"
+        assert avisos, "nem entrou na dungeon nem avisou: o jogador ficaria sem resposta"
+
+    def test_run_viva_continua_carregando_normalmente(self, save_isolado, monkeypatch):
+        chamadas, _avisos = self._carregar(monkeypatch, marcado=False)
+        assert len(chamadas) == 1, "a run viva parou de retomar"
+        assert chamadas[0][1] == 8
+
+    def test_o_bootstrap_checa_a_marca_antes_de_iniciar(self):
+        fonte = (RAIZ / "src" / "engine" / "bootstrap.py").read_text(encoding="utf-8")
+        assert "was_extracted(player)" in fonte
 
 
 if __name__ == "__main__":

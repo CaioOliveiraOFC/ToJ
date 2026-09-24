@@ -9,7 +9,6 @@ combates por cenário em menos de um segundo.
 
 from __future__ import annotations
 
-import functools
 import random
 import statistics
 from dataclasses import asdict, dataclass, field
@@ -42,6 +41,7 @@ from src.sim.loadouts import apply_loadout
 from src.sim.metrics import wilson_interval
 from src.sim.pick_policies import DEFAULT_PICK_POLICY, get_pick_policy
 from src.sim.policies import get_policy
+from src.sim.rng_guard import isola_rng_global as _isolates_global_rng
 from src.sim.telemetry import RunTelemetry
 from src.sim.toggles import Toggles
 
@@ -115,37 +115,6 @@ def make_hero(hero_class: str, level: int, loadout: str = "naked"):
     hero.set_level(level)
     apply_loadout(hero, loadout, level)
     return hero
-
-
-def _isolates_global_rng(func):
-    """Semeia e restaura o gerador global do módulo `random` em volta da função.
-
-    A camada de conteúdo não sorteia pelo `rng` que a simulação injeta: a oferta
-    de passiva e de skill, o nível do monstro, o spawn de elite, o drop de loot,
-    o estoque da loja e o multiplicador de Essência saem todos de
-    `random.<função>` em `content/` e `mechanics/math_operations.py`.
-
-    Enquanto só o `rng` local era semeado, duas execuções com a mesma `--seed`
-    davam resultados diferentes — no scout, 7.0 contra 7.8 de andar médio nas
-    mesmas 20 runs. Essa oscilação é maior que quase todo delta que o scout
-    reporta, então achado nenhum era distinguível de ruído e nenhuma regressão
-    de balanceamento era bissetável.
-
-    O estado anterior é restaurado ao sair: a simulação não pode deixar o
-    gerador do processo preso numa sequência fixa para quem rodar depois, ou um
-    teste posterior passaria a esconder justamente a instabilidade que ele
-    existe para pegar.
-    """
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        estado = random.getstate()
-        try:
-            return func(*args, **kwargs)
-        finally:
-            random.setstate(estado)
-
-    return wrapper
 
 
 @_isolates_global_rng

@@ -152,6 +152,24 @@ EXTRACTION_MIN_FLOOR = 3
 EXTRACTION_SPAWN_CHANCE = 0.15
 EXTRACTION_PITY_INCREMENT = 0.10
 
+# --- Chave de Extração ---
+# A casa `E` deixou de ser suficiente por si. Antes desta regra, extrair era
+# grátis, repetível e nem sequer encerrava a run: o laço não tratava o desfecho,
+# a casa não era consumida, e ir até o `E` era estritamente dominante sempre que
+# ele aparecesse. Não havia decisão a tomar — só a sorte de o `E` nascer.
+#
+# A CHAVE é o que devolve a decisão ao jogador. Ela cai de monstro derrotado, e
+# só de lá: não se compra, não se vende, nenhum serviço a oferece. Quem quer a
+# saída de emergência precisa ter LUTADO por ela.
+#
+# Teto de UMA. Sem teto, a chave viraria estoque e a extração voltaria a ser
+# garantida para quem lutou bastante — exatamente o que esta regra remove.
+#
+# Os 15% são valor INICIAL, para a mecânica ser jogável. Não são balanceamento:
+# a medição vem na rodada global.
+EXTRACTION_KEY_DROP_CHANCE = 0.15
+EXTRACTION_KEY_MAX = 1
+
 # --- Ferreiro ---
 # Três serviços, três curvas, e todas ancoradas na renda do andar ou no preço da
 # peça. Nenhuma tem teto: o soft cap é o próprio custo.
@@ -601,3 +619,66 @@ FLOOR_CLEAR_RESTORE_PERCENT = 25
 # Subir de nível restaura parte dos recursos, não tudo. Cura completa a cada
 # nível era uma das cinco fontes de cura gratuita que zeravam o atrito da run.
 LEVEL_UP_RESTORE_PERCENT = 30
+
+# --- Arena: poder geral do personagem ---
+# `overall_power` responde uma pergunta só: contra um monstro de que nível este
+# personagem fica em equilíbrio? A resposta sai na unidade que o jogo já tem —
+# NÍVEL DE MONSTRO —, e por isso nenhum câmbio entre HP, dano, mana e status
+# precisa ser inventado: quem converte é o duelo.
+#
+# O boneco é FIXO e neutro, pelo mesmo motivo que `MONSTER_REFERENCE_LEVEL`
+# existe para as cartas: trocar a régua por caso faria dois personagens
+# incomparáveis. Medido, trocar o arquétipo move `relative_power` em até ~4%.
+ARENA_REFERENCE_ROLE = "bruiser"
+
+# Equilíbrio é meio a meio. Não é peso: é a definição de empate.
+ARENA_WIN_TARGET = 0.5
+
+# Duelos por sondagem. Medido em 5 blocos de seed independentes: com 100, o piso
+# de ruído fica em 0,0–1,6% do valor acima do nível 8 (4,7% no nível 5, onde o
+# personagem tem pouco com que decidir a luta). Com 60 o piso chegava a 5,4% —
+# do tamanho da banda de equivalência, o que tornaria o veredito ruído.
+ARENA_DUELS_PER_PROBE = 100
+
+# Precisão da bisseção, RELATIVA ao valor. Uma tolerância absoluta erraria por
+# escala: 0,15 nível vale 1% em L=15 e 2,5% em L=6, e a segunda sozinha comeria
+# metade da banda de equivalência.
+ARENA_LEVEL_TOLERANCE = 0.006
+
+# O piso da busca: o menor monstro que o jogo constrói. Abaixo dele não há curva
+# de orçamento para ler, então quem perde para ele lê 1,0 — resposta honesta, e
+# não teto, porque o jogo não tem monstro mais fraco para servir de régua.
+ARENA_LEVEL_FLOOR = 1.0
+
+# O PALPITE inicial do topo da busca, folgado de propósito: um personagem de
+# nível 20 com equipamento de topo já empata perto de 31.
+#
+# NÃO é teto do resultado. A dungeon é infinita, então um teto fixo faria dois
+# campeões diferentes saturarem no mesmo número, e `relative_power` entre eles
+# daria 1,000 sem que nenhum dos dois tivesse sido medido. Quando o personagem
+# ainda vence aqui, o bracket DOBRA e a busca continua — mecanismo de busca, não
+# balanceamento: fórmula, piloto, amostra e banda seguem intactos.
+ARENA_LEVEL_BRACKET = 60.0
+ARENA_BRACKET_GROWTH = 2.0
+
+# Trava técnica contra laço infinito, não resposta. Atingi-la levanta
+# `PoderForaDeEscalaError`: um limite que vira resultado calado é exatamente o
+# defeito que a expansão existe para corrigir. O valor é absurdo de propósito —
+# um monstro de nível 10 mil tem HP na casa dos 10^54 —, então chegar lá
+# significa bug, não campeão.
+ARENA_LEVEL_HARD_LIMIT = 10_000.0
+
+# Semente da medição. Fixa para que dois cálculos do mesmo personagem devolvam o
+# mesmo número — a decisão de extrair não pode oscilar por sorteio. O gerador
+# global é restaurado ao fim (`sim.rng_guard`), então a run não perde sorteio.
+ARENA_MEASURE_SEED = 20260919
+
+# Banda de equivalência: ±5%, decisão de design aprovada. Abaixo dela o
+# personagem está ABAIXO do alvo da Arena; acima, SUPEROU.
+#
+# LIMITAÇÃO CONHECIDA DA V1, registrada e aceita: o resíduo de pilotagem medido
+# na região de kit compatível tem mediana de 3,5% e MÁXIMO OBSERVADO DE 6,3% —
+# ou seja, o máximo NÃO cabe dentro desta banda. A banda permanece em 5% por
+# decisão de design. Fechar isso exige um segundo piloto competente de medição,
+# que o repositório ainda não tem.
+ARENA_EQUIVALENCE_BAND = 0.05

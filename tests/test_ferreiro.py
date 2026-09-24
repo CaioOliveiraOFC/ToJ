@@ -82,24 +82,25 @@ class TestGemaEntraNaRun:
 
     def test_a_vitoria_pode_largar_item_e_gema(self, heroi):
         """Rolagens independentes: uma não ocupa o lugar da outra."""
-        from src.engine import loop
+        from src.engine import encounter
 
         class SempreCai(random.Random):
             def random(self):
                 return 0.0
 
-        import src.engine.loop as loop_mod
-
-        original = loop_mod.get_loot
-        loop_mod.get_loot = lambda: get_all_items()["Espada Longa"].instance()
+        # `process_post_battle` mudou de casa: de `engine/loop.py` para
+        # `engine/encounter.py`, que é o core que o jogador e o bot dividem.
+        # O patch segue a função, não o módulo antigo.
+        original = encounter.get_loot
+        encounter.get_loot = lambda: get_all_items()["Espada Longa"].instance()
         try:
             antes_inv = len(heroi.inventory)
             forge.award_gem(heroi, 5, SempreCai(0))
-            loop.process_post_battle(heroi, [_monstro()], 1.0, 5)
+            encounter.process_post_battle(heroi, [_monstro()], 1.0, 5)
             assert len(heroi.inventory) > antes_inv
             assert heroi.gems
         finally:
-            loop_mod.get_loot = original
+            encounter.get_loot = original
 
 
 def _monstro():

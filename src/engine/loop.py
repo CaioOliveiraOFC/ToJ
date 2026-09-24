@@ -10,27 +10,21 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 from src.content.economy import interest_cap, pay_interest
+from src.content.extraction import finish_run, has_key
 from src.content.factories.dungeons import roll_random_event
 from src.content.factories.features import roll_features
-from src.content.factories.loot import get_loot
 from src.content.factories.monsters import (
     create_boss_for_level,
     generate_monsters_for_level,
 )
 from src.content.floor_exit import current_penalty, effective_essence, use_exit
-from src.content.forge import award_gem
-from src.content.passives import generate_passive_choices
 from src.content.shop import Shop
-from src.content.skills_loader import generate_skill_choices
+from src.engine.encounter import resolve_encounter
 from src.engine.events import EventBus
 from src.engine.map import EventTile, FeatureTile, MapOfGame
 from src.entities.monsters import Monster
 from src.mechanics import battle
 from src.mechanics.math_operations import (
-    calculate_mini_boss_coin_reward,
-    calculate_mini_boss_xp_reward,
-    calculate_monster_coin_reward,
-    calculate_monster_xp_reward,
     estimate_next_essence_multiplier,
     generate_essence_multiplier,
 )
@@ -44,8 +38,6 @@ from src.shared.constants import (
     MAP_WIDTH_INCREMENT_PER_5_LEVELS,
     MAX_WALL_PERCENT_CAP,
     MIN_WALL_PERCENT,
-    SKILL_OFFER_LEVEL_INTERVAL,
-    SKILL_OFFER_SIZE,
     WALL_PERCENT_PER_LEVEL,
 )
 from src.shared.types import GameEvent
@@ -269,72 +261,55 @@ def run_fight(
             bus.publish(topic, event)
 
     monsters = list(monster) if isinstance(monster, list) else [monster]
-    level_before = player.get_level()
+
+    def _mostrar(resultado) -> None:
+        _render_battle_results(
+            player,
+            monsters[0],
+            resultado.xp_gained,
+            resultado.hero_won,
+            resultado.dropped_item,
+            resultado.level_up_messages,
+            resultado.coins_gained,
+            essence_multiplier,
+        )
+
+    def _perguntar_nivel(jogador, oferta) -> None:
+        """A tela pergunta, o jogador responde. A oferta veio do core."""
+        publish(
+            topics.UI_OPEN_PASSIVES,
+            {"player": jogador, "choices": oferta.passives, "dungeon_level": dungeon_level},
+        )
+        if oferta.tem_skill:
+            publish(
+                topics.UI_OPEN_SKILLS,
+                {
+                    "player": jogador,
+                    "choices": oferta.skills,
+                    "dungeon_level": dungeon_level,
+                    "offer_level": oferta.level,
+                },
+            )
 
     try:
         screens.render_fight_intro(player, monsters[0])
         safe_get_key(allow_escape=False)
 
-        outcome = battle.run_battle(
+        # A REGRA do encontro mora em `engine/encounter.py`, compartilhada com o
+        # bot. Daqui para baixo esta função só desenha: intro, resultados e as
+        # telas de escolha.
+        resolve_encounter(
             player,
             monsters,
-            _human_decision,
+            combat_decision=_human_decision,
+            level_up_provider=_perguntar_nivel,
             rng=rng,
+            essence_multiplier=essence_multiplier,
+            dungeon_level=dungeon_level,
             publish=publish,
             on_turn_start=_on_turn_start,
+            on_results=_mostrar,
         )
-
-        if outcome.fled:
-            return
-
-        xp_gained, player_won, dropped_item, level_up_msgs, coins_gained, levels_gained = (
-            process_post_battle(player, monsters, essence_multiplier, dungeon_level)
-        )
-        _render_battle_results(
-            player,
-            monsters[0],
-            xp_gained,
-            player_won,
-            dropped_item,
-            level_up_msgs,
-            coins_gained,
-            essence_multiplier,
-        )
-
-        if player_won and levels_gained > 0:
-            # Para cada nível ganho, oferecer escolhas na ordem: passiva primeiro, depois skill
-            for lvl in range(level_before + 1, player.get_level() + 1):
-                # Escolha de passiva
-                choices = generate_passive_choices(count=3)
-                publish(
-                    topics.UI_OPEN_PASSIVES,
-                    {"player": player, "choices": choices, "dungeon_level": dungeon_level},
-                )
-
-                # Escolha de skill. A cadência é do herói (`is_skill_offer_level`),
-                # e não um `lvl % 2` escrito aqui: o simulador chamava a mesma
-                # regra por conta própria e as duas podiam divergir sem ninguém
-                # notar. O nível 1 não oferece — ele entrega a carta da classe.
-                if lvl > 1 and lvl % SKILL_OFFER_LEVEL_INTERVAL == 0:
-                    skill_choices = generate_skill_choices(
-                        player.get_classname(),
-                        lvl,
-                        player.active_skill_ids(),
-                        count=SKILL_OFFER_SIZE,
-                        seen_ids=player.seen_skill_ids,
-                    )
-                    # Ver a carta já conta como conhecê-la, mesmo que ele recuse:
-                    # sem isto a oferta seguinte devolveria as mesmas três.
-                    player.seen_skill_ids.update(c.id for c in skill_choices)
-                    publish(
-                        topics.UI_OPEN_SKILLS,
-                        {
-                            "player": player,
-                            "choices": skill_choices,
-                            "dungeon_level": dungeon_level,
-                            "offer_level": lvl,
-                        },
-                    )
     finally:
         cleanup_combat()
         cleanup_ui()
@@ -355,85 +330,6 @@ def fight(
         essence_multiplier=essence_multiplier,
         dungeon_level=dungeon_level,
     )
-
-
-def process_post_battle(
-    player: "Player",
-    monster: "Monster | list",
-    essence_multiplier: float = 1.0,
-    dungeon_level: int = 1,
-) -> tuple[int, bool, object | None, list[str], int, int]:
-    """
-    Processa a lógica de pós-combate (XP, loot, moedas, level up).
-
-    Esta função pertence à camada de engine - ela pode importar de
-    mechanics/ e content/, e pode mutar estado de entidades.
-
-    A batalha é 1x1, então a recompensa é a do monstro derrotado. A lista de um
-    elemento continua aceita porque o mapa e os saves ainda falam nessa forma.
-
-    Retorna tupla com:
-    - xp_gained: quantidade de XP ganha
-    - player_won: True se jogador venceu, False se foi derrotado
-    - dropped_item: item dropado ou None
-    - level_up_messages: lista de mensagens de level up (strings)
-    - coins_gained: quantidade de moedas ganhas
-    - levels_gained: quantidade de níveis ganhos
-    """
-    mob = battle.sole_monster(list(monster) if isinstance(monster, list) else [monster])
-
-    if getattr(mob, "is_boss", False):
-        xp_base_reward = calculate_mini_boss_xp_reward(mob.level)
-        coins_base_reward = calculate_mini_boss_coin_reward(mob.level)
-    else:
-        xp_base_reward = calculate_monster_xp_reward(mob.level)
-        coins_base_reward = calculate_monster_coin_reward(mob.level)
-
-    player_won = player.get_isalive()
-    dropped_item = None
-    coins_gained = 0
-
-    # Passivas de essência e de ouro eram lidas por ninguém: `essence_bonus`
-    # (4 cartas) e `gold_drop_bonus` (2 cartas) não apareciam em nenhum cálculo.
-    essence_passive = 1 + player.get_passive_bonus("essence_bonus") / 100
-    gold_passive = 1 + player.get_passive_bonus("gold_drop_bonus") / 100
-
-    if not player_won:
-        pity_xp = int((xp_base_reward // 10) * essence_multiplier * essence_passive)
-        pity_coins = int((coins_base_reward // 10) * gold_passive)
-        player.add_xp_points(pity_xp)
-        player.earn_coins(pity_coins)
-        xp_gained = pity_xp
-        coins_gained = pity_coins
-    else:
-        xp_gained = int(xp_base_reward * essence_multiplier * essence_passive)
-        player.add_xp_points(xp_gained)
-        coins_gained = int(coins_base_reward * gold_passive)
-        player.earn_coins(coins_gained)
-        dropped_item = get_loot()
-        if dropped_item:
-            player.add_item_to_inventory(dropped_item)
-            player.ledger["items_dropped"] = player.ledger.get("items_dropped", 0) + 1
-        # Rolagem SEPARADA da do item: a gema não ocupa o lugar dele, e a mesma
-        # vitória pode largar os dois.
-        award_gem(player, dungeon_level)
-
-    level_up_messages: list[str] = []
-    levels_gained = 0
-    if player_won:
-        # Processa um level up por vez para permitir escolhas apropriadas
-        while True:
-            msgs = player.level_up(show=True)
-            if not msgs:
-                break
-            level_up_messages.extend(msgs)
-            levels_gained += 1
-
-    # Sem `rest()`: curar por completo depois de cada vitória tornava todo
-    # combate independente do anterior e zerava o atrito do andar. Poções,
-    # skills de cura e a Fonte existem justamente para pagar esse custo.
-
-    return xp_gained, player_won, dropped_item, level_up_messages, coins_gained, levels_gained
 
 
 def _calculate_map_dimensions(dungeon_level: int) -> tuple[int, int]:
@@ -542,6 +438,13 @@ def _handle_feature(
         return None
 
     if tile.feature == "extraction":
+        # A casa NUNCA é consumida aqui, e isso é regra: sem chave ela continua
+        # esperando, e recusar a extração também a deixa de pé. O que faz a
+        # oportunidade acabar é AVANÇAR DE ANDAR — o próximo mapa é outro.
+        if not has_key(player):
+            screens.render_extraction_no_key(dungeon_level)
+            return None
+
         decision: dict[str, str | None] = {"choice": None}
         _get_game_publish()(
             topics.UI_EXTRACTION_PROMPT,
@@ -555,14 +458,38 @@ def _handle_feature(
             },
         )
         if decision.get("choice") == "extract":
-            # A Extração não custa nada e não olha a carteira. É a saída de
-            # emergência real da run: quem está sem ouro, acumulando saídas não
-            # pagas e com a Essência no piso ainda pode preservar o personagem.
-            # Não existe dívida nem bloqueio para ela ignorar — a punição por
+            # A Extração não olha a carteira. É a saída de emergência real da
+            # run: quem está sem ouro, acumulando saídas não pagas e com a
+            # Essência no piso ainda pode preservar o personagem. A punição por
             # não pagar a saída é só Essência, e o jogador sobe de qualquer
-            # jeito. O que a Extração faz é encerrar a run antes que a run
-            # encerre o personagem.
-            save_game(player, dungeon_level + 1, None, slot=slot)
+            # jeito.
+            #
+            # O preço dela é a CHAVE, e ela é cobrada aqui — depois do "sim" e
+            # antes do save, para que o estado gravado já seja o de quem gastou.
+            # Antes da chave a extração não cobrava nada, não gastava a casa e
+            # nem sequer encerrava a run: ir até o `E` era estritamente
+            # dominante sempre que ele aparecesse, e não havia decisão nenhuma.
+            # A extração só está concluída quando o personagem foi REALMENTE
+            # preservado. Ignorar o resultado da gravação era o pior desfecho
+            # possível do jogo: chave gasta, run marcada, tela de sucesso, saída
+            # da dungeon — e nada no disco.
+            #
+            # `finish_run` cobra a chave e marca o fim ANTES de gravar, porque é
+            # o personagem que vai para o arquivo, e desfaz tudo se o disco
+            # falhar. O ANDAR gravado é aquele em que a run acabou, e não
+            # `andar + 1`: o `+1` era um ponto de RETOMADA, e o loop é de mão
+            # única — dungeon -> extração -> personagem preservado -> camada
+            # pós-dungeon.
+            if not finish_run(
+                player,
+                dungeon_level,
+                lambda: save_game(player, dungeon_level, None, slot=slot),
+            ):
+                # Nada foi cobrado e nada foi marcado. A casa continua de pé, a
+                # chave continua no bolso, e a run segue viva — o jogador decide
+                # o que fazer com a informação.
+                screens.render_extraction_failed(dungeon_level)
+                return None
             screens.render_extraction_success(dungeon_level)
             return "extracted"
     return None
@@ -746,5 +673,13 @@ def start_game(
                 dungeon_level += 1
                 initial_map_state = None
                 break
+            elif result == "extracted":
+                # A EXTRAÇÃO ENCERRA A DUNGEON. Este ramo faltava: `"extracted"`
+                # subia de `_handle_feature` e caía no vazio, então o laço
+                # continuava, o herói seguia em pé sobre o `E` no mesmo andar, e
+                # o save recém-gravado era apagado por `delete_save` se ele
+                # morresse em seguida. Extrair gravava um checkpoint e não
+                # encerrava nada.
+                return
             elif result == "player_died":
                 return
