@@ -6,6 +6,7 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING, NamedTuple
 
+from src.content.factories.archetypes import get_archetype
 from src.content.factories.monsters import create_monster
 from src.shared.constants import DEFAULT_WALL_PERCENTAGE, MAP_BORDER_OFFSET
 
@@ -53,8 +54,24 @@ def _um_monstro(enemy_obj: object):
 
 
 def _monstro_de(dado: dict):
-    """Reconstrói um monstro a partir do que o save guardou."""
-    return create_monster(dado["nick_name"], dado["level"], dado.get("role", "bruiser"))
+    """Reconstrói um monstro a partir do que o save guardou.
+
+    O deck do monstro é sorteado quando o kit passa do teto, então nome, nível e
+    papel não bastam para refazê-lo: recarregar o save sortearia de novo, e o
+    monstro que o jogador deixou no mapa voltaria com outras cartas. Por isso o
+    save grava os ids das cartas ativas, e aqui elas são restauradas exatamente.
+
+    Save sem o campo — anterior a ele — segue o comportamento normal. Se algum id
+    gravado não existir mais no kit do arquétipo, também: um deck pela metade
+    seria um monstro que nenhuma regra do jogo produz.
+    """
+    monstro = create_monster(dado["nick_name"], dado["level"], dado.get("role", "bruiser"))
+    ids = dado.get("skills")
+    if isinstance(ids, list):
+        kit = {carta.id: carta for carta in get_archetype(monstro.role).skills}
+        if all(i in kit for i in ids):
+            monstro.skills = [kit[i] for i in ids]
+    return monstro
 
 
 class MapOfGame:
@@ -316,7 +333,7 @@ class MapOfGame:
 
     def get_map_state(self) -> dict:
         """Retorna um dicionário com o estado atual do mapa para salvamento."""
-        # Serializar enemies_pos para salvar. (y, x) -> {nick_name, level}
+        # Serializar enemies_pos para salvar. (y, x) -> {nick_name, level, role, skills}
         # Um objeto por casa, nunca um array: o array era a representação do
         # encontro em grupo, e gravá-lo de novo reabriria a porta.
         enemies_serializable = {
@@ -324,6 +341,7 @@ class MapOfGame:
                 "nick_name": mob.nick_name,
                 "level": mob.level,
                 "role": getattr(mob, "role", "bruiser"),
+                "skills": [carta.id for carta in getattr(mob, "skills", [])],
             }
             for (y, x), mob in self.enemies_pos.items()
         }

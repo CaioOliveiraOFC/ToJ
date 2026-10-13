@@ -257,16 +257,95 @@ class TestDeckDoMonstro:
             assert vistas == {c.id for c in arquetipo.skills}, papel
 
     def test_o_spawn_entrega_o_deck_do_nivel(self):
+        import random
+
         from src.content.factories.archetypes import deck_for_level
 
         for papel, arquetipo in all_archetypes().items():
             for nivel in self.NIVEIS:
-                ids = [c.id for c in spawn_by_role(papel, nivel).skills]
-                assert ids == [c.id for c in deck_for_level(arquetipo, nivel)], (papel, nivel)
+                ids = [c.id for c in spawn_by_role(papel, nivel, rng=random.Random(7)).skills]
+                esperado = deck_for_level(arquetipo, nivel, random.Random(7))
+                assert ids == [c.id for c in esperado], (papel, nivel)
+
+    def test_kit_grande_cresce_sem_manutencao(self):
+        """A regra de troca não conhece carta nenhuma: vale para um kit de 30.
+
+        A carta recém-liberada sempre entra, a assinatura nunca sai, e o deck não
+        repete carta nem carrega carta acima do nível. Mesma semente, mesmo deck.
+        """
+        import random
+        from dataclasses import replace
+
+        from src.content.factories.archetypes import deck_for_level
+        from src.shared.constants import MAX_ACTIVE_SKILLS
+
+        base = all_archetypes()["controller"]
+        modelo = base.skills[0]
+        kit = tuple(
+            replace(modelo, id=f"sint_{i}", name=f"Sintética {i}", level_required=max(1, 3 * i))
+            for i in range(30)
+        )
+        grande = replace(base, skills=kit)
+        for nivel in range(1, 91):
+            deck = deck_for_level(grande, nivel, random.Random(nivel))
+            liberadas = [c for c in kit if c.level_required <= nivel]
+            assert len(deck) == min(MAX_ACTIVE_SKILLS, len(liberadas)), nivel
+            assert deck[0] is kit[0], nivel
+            assert liberadas[-1] in deck, f"a carta liberada no Nv.{nivel} não entrou"
+            assert len({c.id for c in deck}) == len(deck), nivel
+            assert all(c.level_required <= nivel for c in deck), nivel
+        um = [c.id for c in deck_for_level(grande, 90, random.Random(11))]
+        outro = [c.id for c in deck_for_level(grande, 90, random.Random(11))]
+        assert um == outro
+
+    def test_o_save_preserva_o_deck_e_cai_na_regra_quando_nao_pode(self):
+        """Recarregar não sorteia de novo; save sem o campo ou com carta extinta
+        refaz o deck pela regra normal — nunca um deck pela metade."""
+        import copy
+        import random
+
+        from src.content.factories.archetypes import deck_for_level, get_archetype
+        from src.engine.map import MapOfGame
+
+        papel, nivel = "controller", 18  # kit de 7: o deck do Nv.18 é sorteado
+        original = spawn_by_role(papel, nivel, name="Alvo", rng=random.Random(3))
+        ids_originais = [c.id for c in original.skills]
+        # Uma semente global que sortearia OUTRO deck: se o load sorteasse, apareceria.
+        outra = next(
+            n
+            for n in range(1000)
+            if [c.id for c in deck_for_level(get_archetype(papel), nivel, random.Random(n))]
+            != ids_originais
+        )
+
+        mapa = MapOfGame(height=5, width=5)
+        mapa.enemies_pos[(1, 1)] = original
+        estado = mapa.get_map_state()
+
+        def recarregar(dados):
+            random.seed(outra)
+            novo = MapOfGame(height=5, width=5)
+            novo.load_map_state(dados)
+            return [c.id for c in novo.enemies_pos[(1, 1)].skills]
+
+        assert recarregar(estado) == ids_originais
+
+        antigo = copy.deepcopy(estado)
+        del antigo["enemies_pos"]["1,1"]["skills"]
+        refeito = recarregar(antigo)
+        assert len(refeito) == len(ids_originais) and refeito[0] == ids_originais[0]
+
+        extinta = copy.deepcopy(estado)
+        extinta["enemies_pos"]["1,1"]["skills"][1] = "carta_que_saiu_do_jogo"
+        refeito = recarregar(extinta)
+        assert "carta_que_saiu_do_jogo" not in refeito
+        assert len(refeito) == len(ids_originais) and refeito[0] == ids_originais[0]
 
     def test_toda_lei_tem_um_deck_real_que_a_monta(self):
-        """O deck menor não pode matar uma lei: cada uma precisa de ao menos uma
-        janela de nível em que um arquétipo a monta sozinho com o próprio deck."""
+        """O deck menor não pode matar uma lei: cada uma precisa de ao menos um
+        deck sorteável em que um arquétipo a monta sozinho com as próprias cartas."""
+        import random
+
         sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
         from audit_interactions import PECAS, _pecas_da_carta
 
@@ -275,9 +354,14 @@ class TestDeckDoMonstro:
         for lei, pecas in PECAS.items():
             montada = any(
                 set(pecas)
-                <= {p for c in deck_for_level(arquetipo, nivel) for p in _pecas_da_carta(c)}
+                <= {
+                    p
+                    for c in deck_for_level(arquetipo, nivel, random.Random(semente))
+                    for p in _pecas_da_carta(c)
+                }
                 for arquetipo in all_archetypes().values()
                 for nivel in range(1, 21)
+                for semente in range(20)
             )
             assert montada, f"{lei}: nenhum deck real de monstro monta a lei"
 

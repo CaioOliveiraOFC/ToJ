@@ -316,9 +316,16 @@ do herói).
 - A **ordem de aquisição é a ordem do kit no JSON**, e a primeira carta é a assinatura
   do papel: a cura do suporte, a carapaça do tank, a rajada do glass cannon.
 - Kits de 5 a 7 cartas continuam ganhando carta nos níveis 12, 15 e 18. Com o deck
-  cheio, **a assinatura fica e as outras três são as mais recentes**: é o análogo
-  determinístico do herói, que mantém a assinatura e troca uma carta quando o deck
-  enche. Nenhuma carta do kit fica morta — todas entram em algum nível.
+  cheio, **a carta nova entra no lugar de uma das outras três, sorteada; a assinatura
+  nunca sai**. É o análogo do herói, que troca uma carta quando o deck está cheio — onde
+  ele escolhe, o monstro sorteia. Não existe regra de troca por carta: uma interação que
+  aparece ou some pela composição sorteada é variabilidade do monstro, e o kit pode
+  crescer sem manutenção. O sorteio usa o gerador que a run já semeia, então a mesma
+  semente dá o mesmo deck.
+- O **save grava as cartas ativas** de cada monstro do mapa e o carregamento as
+  restaura exatamente: recarregar não sorteia de novo. Save antigo, sem o campo, ou com
+  uma carta que não existe mais no kit, refaz o deck pela regra normal — nunca um deck
+  pela metade.
 - Os níveis iniciais são **calibração inicial**, não derivação: a lei do herói aplicada
   à ordem que o kit já tinha.
 

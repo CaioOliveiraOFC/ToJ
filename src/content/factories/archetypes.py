@@ -18,6 +18,7 @@ manda a regra 5 da arquitetura: dados em JSON, sem hardcoded.
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 
 from src.content.skills_loader import MONSTER_SKILL_CLASS, SkillCard, card_from_json
@@ -181,22 +182,34 @@ def _kit_from_json(role: str, data: dict) -> tuple[SkillCard, ...]:
     return tuple(_skill_from_json(s) for s in brutos)
 
 
-def deck_for_level(archetype: Archetype, level: float) -> list[SkillCard]:
+def deck_for_level(archetype: Archetype, level: float, rng=None) -> list[SkillCard]:
     """As cartas que um monstro deste papel carrega neste nível.
 
     A mesma lei do herói: a carta entra no nível que ela declara, e o deck tem
     teto `MAX_ACTIVE_SKILLS`. A primeira carta é a assinatura do papel e nunca
-    sai. Com o deck cheio, ficam a assinatura e as três cartas mais RECENTES já
-    liberadas — o análogo determinístico do herói, que mantém a assinatura e
-    troca uma carta quando o deck enche. Assim nenhuma carta do kit fica morta:
-    todas entram em algum nível.
+    sai.
+
+    Com o deck cheio, a carta nova entra no lugar de uma das OUTRAS três,
+    sorteada. É o análogo do herói, que troca uma carta quando o deck enche —
+    onde ele escolhe, o monstro sorteia. Não existe regra de troca por carta: a
+    composição que aparece ou some é variabilidade do monstro, e um kit pode
+    crescer para qualquer tamanho sem que ninguém mantenha uma tabela.
+
+    `rng` é o gerador do sorteio. Sem ele, o `random` global — o que a run já
+    semeia —, então a mesma semente dá o mesmo deck.
 
     `level` pode ser fracionário: a bisseção da arena mede níveis como 16,5.
     """
-    liberadas = [c for c in archetype.skills if c.level_required <= level]
-    if len(liberadas) <= MAX_ACTIVE_SKILLS:
-        return liberadas
-    return [liberadas[0], *liberadas[-(MAX_ACTIVE_SKILLS - 1) :]]
+    sorteio = rng if rng is not None else random
+    deck: list[SkillCard] = []
+    for carta in archetype.skills:
+        if carta.level_required > level:
+            break
+        if len(deck) < MAX_ACTIVE_SKILLS:
+            deck.append(carta)
+        else:
+            deck[sorteio.randrange(1, MAX_ACTIVE_SKILLS)] = carta
+    return deck
 
 
 def _archetype_from_json(role: str, data: dict) -> Archetype:
@@ -264,7 +277,7 @@ def get_archetype(role: str) -> Archetype:
     return archetypes[role]
 
 
-def spawn_by_role(role: str, level: int, name: str | None = None) -> Monster:
+def spawn_by_role(role: str, level: int, name: str | None = None, rng=None) -> Monster:
     """Cria um monstro do papel pedido, com o orçamento do nível.
 
     Cada eixo é resolvido pelo seu próprio caminho — orçamento × multiplicador do
@@ -281,6 +294,8 @@ def spawn_by_role(role: str, level: int, name: str | None = None) -> Monster:
         role: Papel do arquétipo.
         level: Nível do monstro.
         name: Nome de exibição. Sem ele, usa o rótulo do papel.
+        rng: Gerador do sorteio de substituição do deck. Sem ele, o `random`
+            global que a run semeia.
 
     Returns:
         Instância de `Monster` já configurada com papel, skills e comportamento.
@@ -299,7 +314,7 @@ def spawn_by_role(role: str, level: int, name: str | None = None) -> Monster:
         offensive_weights=archetype.offensive_weights,
     )
     monster.role = archetype.role
-    monster.skills = deck_for_level(archetype, level)
+    monster.skills = deck_for_level(archetype, level, rng)
     monster.skill_use_chance = archetype.skill_use_chance
     if archetype.role in MILESTONE_ROLES:
         monster.is_boss = True
