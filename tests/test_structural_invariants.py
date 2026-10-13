@@ -216,6 +216,72 @@ class TestAtrito:
         assert heroi.get_hp() < heroi.base_hp
 
 
+class TestDeckDoMonstro:
+    """O monstro ganha deck por nível, pela mesma lei do herói.
+
+    Paridade ESTRUTURAL herói/monstro: antes o monstro nascia com o kit inteiro
+    no nível 1 e nenhum teste de paridade cobria progressão — por isso a
+    divergência sobreviveu verde.
+    """
+
+    NIVEIS = (1, 3, 6, 9, 12, 15, 18, 20)
+
+    def test_a_cadencia_e_a_do_heroi(self):
+        from src.content.factories.archetypes import deck_for_level
+
+        for papel, arquetipo in all_archetypes().items():
+            for nivel, esperado in ((1, 1), (3, 2), (6, 3), (9, 4)):
+                tamanho = len(deck_for_level(arquetipo, nivel))
+                assert tamanho == min(esperado, len(arquetipo.skills)), (papel, nivel)
+
+    def test_o_deck_nunca_passa_do_teto(self):
+        from src.content.factories.archetypes import deck_for_level
+        from src.shared.constants import MAX_ACTIVE_SKILLS
+
+        for papel, arquetipo in all_archetypes().items():
+            for nivel in range(1, 41):
+                assert len(deck_for_level(arquetipo, nivel)) <= MAX_ACTIVE_SKILLS, papel
+
+    def test_a_assinatura_esta_em_todo_nivel(self):
+        from src.content.factories.archetypes import deck_for_level
+
+        for papel, arquetipo in all_archetypes().items():
+            for nivel in self.NIVEIS:
+                assert deck_for_level(arquetipo, nivel)[0] is arquetipo.skills[0], (papel, nivel)
+
+    def test_nenhuma_carta_do_kit_fica_morta(self):
+        from src.content.factories.archetypes import deck_for_level
+
+        for papel, arquetipo in all_archetypes().items():
+            vistas = {c.id for nivel in range(1, 21) for c in deck_for_level(arquetipo, nivel)}
+            assert vistas == {c.id for c in arquetipo.skills}, papel
+
+    def test_o_spawn_entrega_o_deck_do_nivel(self):
+        from src.content.factories.archetypes import deck_for_level
+
+        for papel, arquetipo in all_archetypes().items():
+            for nivel in self.NIVEIS:
+                ids = [c.id for c in spawn_by_role(papel, nivel).skills]
+                assert ids == [c.id for c in deck_for_level(arquetipo, nivel)], (papel, nivel)
+
+    def test_toda_lei_tem_um_deck_real_que_a_monta(self):
+        """O deck menor não pode matar uma lei: cada uma precisa de ao menos uma
+        janela de nível em que um arquétipo a monta sozinho com o próprio deck."""
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+        from audit_interactions import PECAS, _pecas_da_carta
+
+        from src.content.factories.archetypes import deck_for_level
+
+        for lei, pecas in PECAS.items():
+            montada = any(
+                set(pecas)
+                <= {p for c in deck_for_level(arquetipo, nivel) for p in _pecas_da_carta(c)}
+                for arquetipo in all_archetypes().values()
+                for nivel in range(1, 21)
+            )
+            assert montada, f"{lei}: nenhum deck real de monstro monta a lei"
+
+
 class TestArquetipos:
     """Cada papel precisa distribuir o orçamento de um jeito diferente."""
 

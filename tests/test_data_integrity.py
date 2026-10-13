@@ -244,6 +244,30 @@ class TestDadosVemDoJSON:
                 f"{role} não declara ameaça e counterplay no JSON."
             )
 
+    def test_toda_carta_de_monstro_declara_o_nivel_em_que_entra(self):
+        dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))
+        for role, payload in dados["archetypes"].items():
+            for carta in payload["skills"]:
+                nivel = carta.get("level_required")
+                assert isinstance(nivel, int) and nivel >= 1, (role, carta["id"])
+
+    @pytest.mark.parametrize(
+        "niveis",
+        [(None, 3), (0, 3), (3, 6), (1, 6, 3)],
+        ids=["sem_nivel", "nivel_zero", "assinatura_fora_do_1", "sequencia_desce"],
+    )
+    def test_kit_mal_declarado_e_recusado(self, niveis):
+        from src.content.factories.archetypes import _kit_from_json
+
+        cartas = []
+        for i, nivel in enumerate(niveis):
+            carta = {"id": f"c{i}", "name": f"C{i}", "effect_type": "buff", "effect_value": 10}
+            if nivel is not None:
+                carta["level_required"] = nivel
+            cartas.append(carta)
+        with pytest.raises(ValueError):
+            _kit_from_json("teste", {"skills": cartas})
+
     def test_todo_vetor_ofensivo_soma_um_e_usa_eixos_permitidos(self):
         """Σpesos = 1: o vetor escolhe a composição do básico, nunca a magnitude."""
         from src.content.factories.archetypes import OFFENSIVE_AXES, all_archetypes

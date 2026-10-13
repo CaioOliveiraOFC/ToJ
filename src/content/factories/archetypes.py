@@ -24,6 +24,7 @@ from src.content.skills_loader import MONSTER_SKILL_CLASS, SkillCard, card_from_
 from src.data.loader import load_monsters_data
 from src.entities.monsters import Monster
 from src.shared.constants import (
+    MAX_ACTIVE_SKILLS,
     MONSTER_BUDGET_AGILITY,
     MONSTER_BUDGET_DEFENSE,
     MONSTER_BUDGET_HP,
@@ -62,6 +63,9 @@ class Archetype:
 
     A escala das SKILLS continua declarada em cada carta, e ela pode ler `df`,
     `hp` ou `mp` legitimamente. O vetor ofensivo não: o básico nasce de ST/MG/AG.
+
+    `skills` é o KIT COMPLETO, na ordem de aquisição. O que um monstro carrega num
+    nível é `deck_for_level` — o validador e a forge continuam lendo o kit todo.
     """
 
     role: str
@@ -81,10 +85,15 @@ class Archetype:
 
 # O que o JSON de monstro não precisa repetir em toda carta. São os campos que
 # a carta do herói traz do catálogo dele e que, para um monstro, têm sempre o
-# mesmo valor: não há nível de aquisição, não há assinatura de classe.
+# mesmo valor: não há assinatura de classe.
+#
+# `level_required` SAIU daqui. Ele era `1` para as 54 cartas e nada do lado do
+# monstro o lia: o monstro nascia com o kit inteiro no nível 1, enquanto o herói
+# nasce com uma carta. Agora cada carta declara o nível em que entra no deck, e
+# um default aqui esconderia exatamente a carta que esqueceu de declarar —
+# `card_from_json` trocaria a ausência por 0 sem avisar.
 PADROES_DE_MONSTRO = {
     "skill_class": MONSTER_SKILL_CLASS,
-    "level_required": 1,
     "is_initial": False,
     "rarity": "Common",
     "target": "enemy",
@@ -136,6 +145,60 @@ def _offensive_weights_from_json(role: str, data: dict) -> tuple[tuple[str, floa
     return pesos
 
 
+def _kit_from_json(role: str, data: dict) -> tuple[SkillCard, ...]:
+    """Lê o kit do arquétipo, na ordem de aquisição, e RECUSA um mal declarado.
+
+    A ordem do JSON É a ordem em que o monstro ganha as cartas, e `level_required`
+    é o nível em que cada uma entra. Três regras, todas de estrutura:
+
+    - toda carta declara `level_required` inteiro >= 1 — `card_from_json` trocaria
+      a ausência por 0, e uma carta de nível 0 entraria no deck de todo mundo;
+    - a primeira carta entra no nível 1: é a assinatura do papel, e um monstro de
+      nível 1 sem carta nenhuma é outro arquétipo, não este;
+    - a sequência não desce: uma carta declarada depois não pode chegar antes.
+    """
+    brutos = data.get("skills", [])
+    anterior = 0
+    for posicao, bruto in enumerate(brutos):
+        nivel = bruto.get("level_required")
+        carta = bruto.get("id", f"#{posicao}")
+        if not isinstance(nivel, int) or isinstance(nivel, bool) or nivel < 1:
+            raise ValueError(
+                f"Arquétipo {role!r}: a carta {carta!r} não declara `level_required` inteiro >= 1."
+            )
+        if posicao == 0 and nivel != 1:
+            raise ValueError(
+                f"Arquétipo {role!r}: a primeira carta ({carta!r}) é a assinatura e "
+                f"entra no nível 1, não no {nivel}."
+            )
+        if nivel < anterior:
+            raise ValueError(
+                f"Arquétipo {role!r}: {carta!r} entra no nível {nivel}, antes da carta "
+                f"declarada antes dela (nível {anterior}). A ordem do JSON é a ordem "
+                "de aquisição."
+            )
+        anterior = nivel
+    return tuple(_skill_from_json(s) for s in brutos)
+
+
+def deck_for_level(archetype: Archetype, level: float) -> list[SkillCard]:
+    """As cartas que um monstro deste papel carrega neste nível.
+
+    A mesma lei do herói: a carta entra no nível que ela declara, e o deck tem
+    teto `MAX_ACTIVE_SKILLS`. A primeira carta é a assinatura do papel e nunca
+    sai. Com o deck cheio, ficam a assinatura e as três cartas mais RECENTES já
+    liberadas — o análogo determinístico do herói, que mantém a assinatura e
+    troca uma carta quando o deck enche. Assim nenhuma carta do kit fica morta:
+    todas entram em algum nível.
+
+    `level` pode ser fracionário: a bisseção da arena mede níveis como 16,5.
+    """
+    liberadas = [c for c in archetype.skills if c.level_required <= level]
+    if len(liberadas) <= MAX_ACTIVE_SKILLS:
+        return liberadas
+    return [liberadas[0], *liberadas[-(MAX_ACTIVE_SKILLS - 1) :]]
+
+
 def _archetype_from_json(role: str, data: dict) -> Archetype:
     budget = data.get("budget", {})
     return Archetype(
@@ -148,7 +211,7 @@ def _archetype_from_json(role: str, data: dict) -> Archetype:
         agility=float(budget.get("agility", 1.0)),
         offensive_weights=_offensive_weights_from_json(role, data),
         skill_use_chance=int(data.get("skill_use_chance", 0)),
-        skills=tuple(_skill_from_json(s) for s in data.get("skills", [])),
+        skills=_kit_from_json(role, data),
         threat=data.get("threat", ""),
         counterplay=data.get("counterplay", ""),
         names=tuple(data.get("names", ())),
@@ -209,6 +272,11 @@ def spawn_by_role(role: str, level: int, name: str | None = None) -> Monster:
     existe mais um passo de conversão no meio: o que o arquétipo declara é o que
     o monstro tem.
 
+    O deck também é do nível: `deck_for_level`, não o kit inteiro. Antes todo
+    monstro nascia com as 3 a 7 cartas do arquétipo no nível 1, enquanto o herói
+    nasce com uma — e o documento já registrava, do lado do herói, que entregar o
+    deck cheio de graça era defeito.
+
     Args:
         role: Papel do arquétipo.
         level: Nível do monstro.
@@ -231,7 +299,7 @@ def spawn_by_role(role: str, level: int, name: str | None = None) -> Monster:
         offensive_weights=archetype.offensive_weights,
     )
     monster.role = archetype.role
-    monster.skills = list(archetype.skills)
+    monster.skills = deck_for_level(archetype, level)
     monster.skill_use_chance = archetype.skill_use_chance
     if archetype.role in MILESTONE_ROLES:
         monster.is_boss = True

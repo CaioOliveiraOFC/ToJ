@@ -307,6 +307,21 @@ recusa a nova**. O motor nunca decide por ele.
 - o pool é **classe + Neutral**. Skill exclusiva continua exclusiva: um Guerreiro nunca
   vê uma carta de Mago.
 
+**`[implementado]`** **O monstro segue a mesma cadência, sem a escolha.** Ele nascia com
+o kit inteiro do arquétipo — 3 a 7 cartas no nível 1 — enquanto o herói nasce com uma.
+Agora cada carta de monstro declara `level_required`, e o deck cresce pela mesma lei:
+**1 carta no nível 1, 2 no 3, 3 no 6, 4 no 9**, teto de 4 (`MAX_ACTIVE_SKILLS`, o mesmo
+do herói).
+
+- A **ordem de aquisição é a ordem do kit no JSON**, e a primeira carta é a assinatura
+  do papel: a cura do suporte, a carapaça do tank, a rajada do glass cannon.
+- Kits de 5 a 7 cartas continuam ganhando carta nos níveis 12, 15 e 18. Com o deck
+  cheio, **a assinatura fica e as outras três são as mais recentes**: é o análogo
+  determinístico do herói, que mantém a assinatura e troca uma carta quando o deck
+  enche. Nenhuma carta do kit fica morta — todas entram em algum nível.
+- Os níveis iniciais são **calibração inicial**, não derivação: a lei do herói aplicada
+  à ordem que o kit já tinha.
+
 ### O catálogo
 
 **`[implementado]`** **150 cartas de herói. Catálogo congelado.** Distribuídas

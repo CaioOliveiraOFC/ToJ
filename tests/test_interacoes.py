@@ -21,7 +21,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.content.factories.archetypes import spawn_by_role  # noqa: E402
+from src.content.factories.archetypes import get_archetype, spawn_by_role  # noqa: E402
 from src.mechanics import combat  # noqa: E402
 from src.shared import effect_core as core  # noqa: E402
 from src.shared import interactions as ix  # noqa: E402
@@ -310,12 +310,24 @@ class TestParidadeHeroiEMonstro:
 
 class TestOMonstroPercebeAOportunidade:
     @staticmethod
+    def _controller():
+        """Controlador Nv.12 com o KIT COMPLETO.
+
+        Estes testes são sobre a lei e a escolha entre cartas do papel, não sobre
+        a composição do deck num nível: no Nv.12 a janela do deck já tirou a
+        Queima de Mana. O nível do spawn não muda — nenhuma magnitude se move.
+        """
+        monstro = spawn_by_role("controller", 12)
+        monstro.skills = list(get_archetype("controller").skills)
+        return monstro
+
+    @staticmethod
     def _queima_de_mana(monstro):
         return [s for s in monstro.skills if "mana_burn" in ix.applicable_effects(s)]
 
     def test_a_lei_so_conta_com_o_estado_realmente_no_alvo(self):
         """Nada de conhecimento mágico: sem Mente Turva, queima é só queima."""
-        monstro = spawn_by_role("controller", 12)
+        monstro = self._controller()
         [carta, *_] = self._queima_de_mana(monstro)
 
         assert ix.opportunities(monstro, _heroi(), carta) == ()
@@ -325,7 +337,7 @@ class TestOMonstroPercebeAOportunidade:
         assert ix.opportunities(monstro, turvo, carta) == ("colapso_mental",)
 
     def test_sem_oportunidade_o_peso_nao_muda_nada(self):
-        monstro = spawn_by_role("controller", 12)
+        monstro = self._controller()
         [carta, *_] = self._queima_de_mana(monstro)
         assert ix.opportunity_weight(monstro, _heroi(), carta) == 1.0
 
@@ -343,7 +355,7 @@ class TestOMonstroPercebeAOportunidade:
         """
         from src.mechanics import monster_ai
 
-        monstro = spawn_by_role("controller", 12)
+        monstro = self._controller()
         par = [self._carta(monstro, "Presságio"), self._carta(monstro, "Queima de Mana")]
 
         assert monster_ai._maior(par, monstro, _heroi()).name == "Presságio"
@@ -356,7 +368,7 @@ class TestOMonstroPercebeAOportunidade:
         """Sem execução, sobrevivência ou desespero acima dela."""
         from src.mechanics import monster_ai
 
-        monstro = spawn_by_role("controller", 12)
+        monstro = self._controller()
         monstro._mp = monstro.base_mp
         par = [self._carta(monstro, "Presságio"), self._carta(monstro, "Queima de Mana")]
 
@@ -372,7 +384,7 @@ class TestOMonstroPercebeAOportunidade:
         """Perseguir combo com o herói a um golpe da morte é jogar pior."""
         from src.mechanics import monster_ai
 
-        monstro = spawn_by_role("controller", 12)
+        monstro = self._controller()
         monstro._mp = monstro.base_mp
         alvo = _heroi()
         core.apply_effect(alvo, "clouded")
@@ -404,7 +416,14 @@ class TestCoberturaDeMonstro:
 
     @staticmethod
     def _mob(role, nivel=20):
+        """Monstro com o KIT COMPLETO do papel.
+
+        A pergunta aqui é se o papel tem as peças, e não se o deck de um nível as
+        carrega juntas — no Nv.20 a janela do deck já tirou a Esquiva Felina do
+        skirmisher e a Maldição do suporte. O nível do spawn não muda.
+        """
         mob = spawn_by_role(role, nivel)
+        mob.skills = list(get_archetype(role).skills)
         mob._mp = 10**6
         return mob
 

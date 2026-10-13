@@ -58,6 +58,7 @@
         {
           "id": "mob_mordida_suja",
           "name": "Mordida Suja",
+          "level_required": 1,
           "mana_cost": 8,
           "effect_type": "damage",
           "effect_value": 0,
@@ -86,6 +87,7 @@
         {
           "id": "mob_guincho",
           "name": "Guincho",
+          "level_required": 3,
           "mana_cost": 10,
           "effect_type": "status",
           "effect_value": "slowed",
@@ -100,6 +102,7 @@
         {
           "id": "mob_encolher",
           "name": "Encolher",
+          "level_required": 6,
           "mana_cost": 12,
           "effect_type": "damage_reduction",
           "effect_value": 18,
@@ -141,6 +144,7 @@
         {
           "id": "mob_golpe_pesado",
           "name": "Golpe Pesado",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 15,
@@ -160,6 +164,7 @@
         {
           "id": "mob_furia",
           "name": "Fúria",
+          "level_required": 3,
           "effect_type": "buff",
           "effect_value": 45,
           "effect_stat": "st",
@@ -173,6 +178,7 @@
         {
           "id": "mob_cabecada",
           "name": "Cabeçada",
+          "level_required": 6,
           "mana_cost": 18,
           "effect_type": "damage",
           "effect_value": 0,
@@ -201,6 +207,7 @@
         {
           "id": "mob_urro_de_caca",
           "name": "Urro de Caça",
+          "level_required": 9,
           "mana_cost": 15,
           "effect_type": "status",
           "effect_value": "weakened",
@@ -215,6 +222,7 @@
         {
           "id": "mob_couro_de_batalha",
           "name": "Couro de Batalha",
+          "level_required": 12,
           "mana_cost": 20,
           "effect_type": "damage_reduction",
           "effect_value": 25,
@@ -229,6 +237,7 @@
         {
           "id": "mob_sangue_quente",
           "name": "Sangue Quente",
+          "level_required": 15,
           "mana_cost": 18,
           "effect_type": "buff",
           "effect_value": 20,
@@ -269,6 +278,7 @@
         {
           "id": "mob_carapaca",
           "name": "Carapaça",
+          "level_required": 1,
           "effect_type": "damage_reduction",
           "effect_value": 35,
           "mana_cost": 20,
@@ -280,6 +290,7 @@
         {
           "id": "mob_muralha",
           "name": "Muralha",
+          "level_required": 3,
           "effect_type": "buff",
           "effect_value": 55,
           "effect_stat": "df",
@@ -293,6 +304,7 @@
         {
           "id": "mob_impacto",
           "name": "Impacto de Escudo",
+          "level_required": 6,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 20,
@@ -317,6 +329,7 @@
         {
           "id": "mob_agarrao",
           "name": "Agarrão",
+          "level_required": 9,
           "mana_cost": 20,
           "effect_type": "status",
           "effect_value": "slowed",
@@ -336,6 +349,7 @@
         {
           "id": "mob_raizes_fundas",
           "name": "Raízes Fundas",
+          "level_required": 12,
           "mana_cost": 22,
           "effect_type": "buff",
           "effect_value": 35,
@@ -350,6 +364,7 @@
         {
           "id": "mob_pisao",
           "name": "Pisão",
+          "level_required": 15,
           "mana_cost": 22,
           "effect_type": "damage",
           "effect_value": 0,
@@ -408,6 +423,7 @@
         {
           "id": "mob_rajada",
           "name": "Rajada Arcana",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 25,
@@ -427,6 +443,7 @@
         {
           "id": "mob_detonacao",
           "name": "Detonação Arcana",
+          "level_required": 3,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 40,
@@ -452,6 +469,7 @@
         {
           "id": "mob_lanca_de_ozonio",
           "name": "Lança de Ozônio",
+          "level_required": 6,
           "mana_cost": 28,
           "effect_type": "damage",
           "effect_value": 0,
@@ -480,6 +498,7 @@
         {
           "id": "mob_sobrecarga",
           "name": "Sobrecarga",
+          "level_required": 9,
           "mana_cost": 30,
           "effect_type": "buff",
           "effect_value": 45,
@@ -494,6 +513,7 @@
         {
           "id": "mob_praga_ardente",
           "name": "Praga Ardente",
+          "level_required": 12,
           "mana_cost": 24,
           "effect_type": "status",
           "effect_value": "poison",
@@ -508,6 +528,7 @@
         {
           "id": "mob_fenda_de_eter",
           "name": "Fenda de Éter",
+          "level_required": 15,
           "mana_cost": 35,
           "effect_type": "damage",
           "effect_value": 0,
@@ -558,6 +579,7 @@
         {
           "id": "mob_corte_rapido",
           "name": "Corte Rápido",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 12,
@@ -581,6 +603,7 @@
         {
           "id": "mob_evasao_mob",
           "name": "Esquiva Felina",
+          "level_required": 3,
           "effect_type": "status",
           "effect_value": "invisible",
           "effect_stat": "",
@@ -594,6 +617,7 @@
         {
           "id": "mob_ferida",
           "name": "Ferida Aberta",
+          "level_required": 6,
           "effect_type": "status",
           "effect_value": "bleed",
           "mana_cost": 15,
@@ -606,6 +630,7 @@
         {
           "id": "mob_finta",
           "name": "Finta",
+          "level_required": 9,
           "mana_cost": 14,
           "effect_type": "damage",
           "effect_value": 0,
@@ -634,6 +659,7 @@
         {
           "id": "mob_bote",
           "name": "Bote",
+          "level_required": 12,
           "mana_cost": 18,
           "effect_type": "damage",
           "effect_value": 0,
@@ -662,6 +688,7 @@
         {
           "id": "mob_rasteira",
           "name": "Rasteira",
+          "level_required": 15,
           "mana_cost": 20,
           "effect_type": "status",
           "effect_value": "stun",
@@ -702,6 +729,7 @@
         {
           "id": "mob_torpor",
           "name": "Torpor",
+          "level_required": 1,
           "effect_type": "status",
           "effect_value": "stun",
           "mana_cost": 25,
@@ -713,6 +741,7 @@
         {
           "id": "mob_queima_mana",
           "name": "Queima de Mana",
+          "level_required": 3,
           "effect_type": "status",
           "effect_value": "mana_burn",
           "mana_cost": 20,
@@ -729,6 +758,7 @@
         {
           "id": "mob_medo",
           "name": "Presságio",
+          "level_required": 6,
           "effect_type": "status",
           "effect_value": "fear",
           "mana_cost": 18,
@@ -741,6 +771,7 @@
         {
           "id": "mob_teia_de_gelo",
           "name": "Teia de Gelo",
+          "level_required": 9,
           "mana_cost": 26,
           "effect_type": "status",
           "effect_value": "frozen",
@@ -760,6 +791,7 @@
         {
           "id": "mob_letargia",
           "name": "Letargia",
+          "level_required": 12,
           "mana_cost": 28,
           "effect_type": "status",
           "effect_value": "sleep",
@@ -774,6 +806,7 @@
         {
           "id": "mob_ferrugem_da_alma",
           "name": "Ferrugem da Alma",
+          "level_required": 15,
           "mana_cost": 22,
           "effect_type": "status",
           "effect_value": "vulnerable",
@@ -793,6 +826,7 @@
         {
           "id": "mob_agulhada_mental",
           "name": "Agulhada Mental",
+          "level_required": 18,
           "mana_cost": 20,
           "effect_type": "damage",
           "effect_value": 0,
@@ -845,6 +879,7 @@
         {
           "id": "mob_regenerar",
           "name": "Regenerar",
+          "level_required": 1,
           "effect_type": "heal",
           "effect_value": 30,
           "mana_cost": 25,
@@ -856,6 +891,7 @@
         {
           "id": "mob_bencao",
           "name": "Bênção Sombria",
+          "level_required": 3,
           "effect_type": "buff",
           "effect_value": 25,
           "mana_cost": 20,
@@ -868,6 +904,7 @@
         {
           "id": "mob_maldicao",
           "name": "Maldição",
+          "level_required": 6,
           "effect_type": "status",
           "effect_value": "weakened",
           "mana_cost": 20,
@@ -885,6 +922,7 @@
         {
           "id": "mob_canto_de_ossos",
           "name": "Canto de Ossos",
+          "level_required": 9,
           "mana_cost": 22,
           "effect_type": "buff",
           "effect_value": 35,
@@ -899,6 +937,7 @@
         {
           "id": "mob_veu_protetor",
           "name": "Véu Protetor",
+          "level_required": 12,
           "mana_cost": 24,
           "effect_type": "damage_reduction",
           "effect_value": 30,
@@ -913,6 +952,7 @@
         {
           "id": "mob_praga_lenta",
           "name": "Praga Lenta",
+          "level_required": 15,
           "mana_cost": 22,
           "effect_type": "status",
           "effect_value": "poison",
@@ -932,6 +972,7 @@
         {
           "id": "mob_folego_emprestado",
           "name": "Fôlego Emprestado",
+          "level_required": 18,
           "mana_cost": 25,
           "effect_type": "buff",
           "effect_value": 30,
@@ -973,6 +1014,7 @@
         {
           "id": "mob_investida_brutal",
           "name": "Investida Brutal",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 25,
@@ -996,6 +1038,7 @@
         {
           "id": "mob_rugido",
           "name": "Rugido",
+          "level_required": 3,
           "effect_type": "status",
           "effect_value": "weakened",
           "mana_cost": 20,
@@ -1007,6 +1050,7 @@
         {
           "id": "mob_couraca_elite",
           "name": "Pele de Ferro",
+          "level_required": 6,
           "effect_type": "damage_reduction",
           "effect_value": 25,
           "mana_cost": 22,
@@ -1019,6 +1063,7 @@
         {
           "id": "mob_golpe_de_arauto",
           "name": "Golpe de Arauto",
+          "level_required": 9,
           "mana_cost": 26,
           "effect_type": "damage",
           "effect_value": 0,
@@ -1051,6 +1096,7 @@
         {
           "id": "mob_grito_de_comando",
           "name": "Grito de Comando",
+          "level_required": 12,
           "mana_cost": 24,
           "effect_type": "buff",
           "effect_value": 25,
@@ -1065,6 +1111,7 @@
         {
           "id": "mob_lamina_negra",
           "name": "Lâmina Negra",
+          "level_required": 15,
           "mana_cost": 24,
           "effect_type": "damage",
           "effect_value": 0,
@@ -1120,6 +1167,7 @@
         {
           "id": "boss_devastar",
           "name": "Devastar",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 30,
@@ -1143,6 +1191,7 @@
         {
           "id": "boss_esmagar",
           "name": "Esmagar",
+          "level_required": 3,
           "effect_type": "status",
           "effect_value": "stun",
           "mana_cost": 30,
@@ -1154,6 +1203,7 @@
         {
           "id": "boss_couraca",
           "name": "Couraça Ancestral",
+          "level_required": 6,
           "effect_type": "damage_reduction",
           "effect_value": 30,
           "mana_cost": 25,
@@ -1165,6 +1215,7 @@
         {
           "id": "boss_ira",
           "name": "Ira Final",
+          "level_required": 9,
           "effect_type": "buff",
           "effect_value": 50,
           "effect_stat": "st",
@@ -1178,6 +1229,7 @@
         {
           "id": "boss_juizo",
           "name": "Juízo",
+          "level_required": 12,
           "mana_cost": 32,
           "effect_type": "damage",
           "effect_value": 0,
@@ -1205,6 +1257,7 @@
         {
           "id": "boss_sentenca",
           "name": "Sentença",
+          "level_required": 15,
           "mana_cost": 30,
           "effect_type": "status",
           "effect_value": "fear",
@@ -1224,6 +1277,7 @@
         {
           "id": "boss_carne_antiga",
           "name": "Carne Antiga",
+          "level_required": 18,
           "mana_cost": 35,
           "effect_type": "heal",
           "effect_value": 20,
