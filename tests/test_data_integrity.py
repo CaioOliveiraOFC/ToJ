@@ -239,10 +239,39 @@ class TestDadosVemDoJSON:
     def test_todo_arquetipo_declara_orcamento_e_papel_no_json(self):
         dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))
         for role, payload in dados["archetypes"].items():
-            assert set(payload["budget"]) == {"hp", "attack", "defense", "agility"}, role
+            assert set(payload["budget"]) == {"hp", "st", "mg", "defense", "agility"}, role
             assert payload["threat"] and payload["counterplay"], (
                 f"{role} não declara ameaça e counterplay no JSON."
             )
+
+    def test_todo_vetor_ofensivo_soma_um_e_usa_eixos_permitidos(self):
+        """Σpesos = 1: o vetor escolhe a composição do básico, nunca a magnitude."""
+        from src.content.factories.archetypes import OFFENSIVE_AXES, all_archetypes
+
+        for role, arquetipo in all_archetypes().items():
+            pesos = dict(arquetipo.offensive_weights)
+            assert pesos, f"{role} sem vetor ofensivo"
+            assert set(pesos) <= set(OFFENSIVE_AXES), (role, pesos)
+            assert abs(sum(pesos.values()) - 1.0) < 1e-9, (role, pesos)
+
+    @pytest.mark.parametrize(
+        "vetor",
+        [{}, {"st": 0.7, "mg": 0.7}, {"st": 0.5, "df": 0.5}],
+        ids=["vazio", "soma_1_4", "eixo_proibido"],
+    )
+    def test_vetor_ofensivo_mal_declarado_e_recusado(self, vetor):
+        from src.content.factories.archetypes import _offensive_weights_from_json
+
+        with pytest.raises(ValueError):
+            _offensive_weights_from_json("teste", {"offensive_weights": vetor})
+
+    def test_o_atributo_ofensivo_nao_e_mais_fabricado(self):
+        """ST e MG são eixos próprios: o `glass_cannon` não carrega Força de enfeite."""
+        from src.content.factories.archetypes import spawn_by_role
+
+        canhao = spawn_by_role("glass_cannon", 12)
+        assert canhao.get_mg() > 3 * canhao.get_st()
+        assert canhao.get_avg_damage() == canhao.get_mg()
 
     def test_geracao_de_andar_vem_do_json(self):
         dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))

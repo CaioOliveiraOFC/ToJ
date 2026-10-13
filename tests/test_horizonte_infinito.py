@@ -31,7 +31,10 @@ CHECKPOINTS = [1, 10, 20, 50, 100, 500, 1000, 5000]
 # `base * 1.12**(nível-1)`, e o expoente sai do alcance do `double` por volta
 # daqui. É limite conhecido, não regressão — e o teste o fixa para que ele não
 # caia sem ninguém ver.
-PRIMEIRO_ANDAR_INVALIDO = 6159
+#
+# Subiu um andar (6159 -> 6160) quando o multiplicador ×1,5 que fabricava o ST e
+# o MG do monstro saiu: era ele que empurrava o atributo para fora do `double`.
+PRIMEIRO_ANDAR_INVALIDO = 6160
 
 
 def _falhas_em(ponto: int, completo: bool = True) -> Falhas:

@@ -33,9 +33,13 @@
       "label": "Trash",
       "budget": {
         "hp": 0.5,
-        "attack": 0.7,
+        "st": 0.7,
+        "mg": 0.25,
         "defense": 0.85,
         "agility": 0.95
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 0,
       "threat": "Atrito. Mata devagar e cobra recurso que valia para a luta seguinte.",
@@ -113,9 +117,13 @@
       "label": "Bruiser",
       "budget": {
         "hp": 1.0,
-        "attack": 1.0,
+        "st": 1.0,
+        "mg": 0.3,
         "defense": 1.0,
         "agility": 1.0
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 25,
       "threat": "Pressão constante. O combate padrão.",
@@ -238,9 +246,13 @@
       "label": "Tank",
       "budget": {
         "hp": 1.35,
-        "attack": 0.7,
+        "st": 0.7,
+        "mg": 0.25,
         "defense": 1.45,
         "agility": 0.6
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 35,
       "threat": "Duração. Alonga o combate e força atrito.",
@@ -373,9 +385,13 @@
       "label": "Glass cannon",
       "budget": {
         "hp": 0.55,
-        "attack": 1.9,
+        "st": 0.35,
+        "mg": 1.9,
         "defense": 0.5,
         "agility": 1.1
+      },
+      "offensive_weights": {
+        "mg": 1.0
       },
       "skill_use_chance": 45,
       "threat": "Pico de dano. Pune quem erra a ordem de foco.",
@@ -518,9 +534,14 @@
       "label": "Skirmisher",
       "budget": {
         "hp": 0.75,
-        "attack": 0.95,
+        "st": 0.95,
+        "mg": 0.3,
         "defense": 0.7,
-        "agility": 2.6
+        "agility": 4.0
+      },
+      "offensive_weights": {
+        "st": 0.75,
+        "ag": 0.25
       },
       "skill_use_chance": 30,
       "threat": "Acerta quem esquiva e age primeiro.",
@@ -658,9 +679,13 @@
       "label": "Controlador",
       "budget": {
         "hp": 0.9,
-        "attack": 0.8,
+        "st": 0.3,
+        "mg": 0.8,
         "defense": 0.9,
         "agility": 1.3
+      },
+      "offensive_weights": {
+        "mg": 1.0
       },
       "skill_use_chance": 55,
       "threat": "Nega turnos e recurso.",
@@ -799,9 +824,13 @@
       "label": "Suporte",
       "budget": {
         "hp": 0.8,
-        "attack": 0.6,
+        "st": 0.25,
+        "mg": 0.6,
         "defense": 1.0,
         "agility": 1.0
+      },
+      "offensive_weights": {
+        "mg": 1.0
       },
       "skill_use_chance": 60,
       "threat": "Sustain. Cura-se, se prepara e enfraquece quem está na frente dele.",
@@ -920,9 +949,13 @@
       "label": "Elite",
       "budget": {
         "hp": 1.4,
-        "attack": 1.25,
+        "st": 1.25,
+        "mg": 0.45,
         "defense": 1.15,
         "agility": 1.1
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 45,
       "threat": "Marco do andar. Testa se a build funciona.",
@@ -1063,9 +1096,13 @@
       "label": "Boss",
       "budget": {
         "hp": 1.8,
-        "attack": 1.35,
+        "st": 1.35,
+        "mg": 0.6,
         "defense": 1.2,
         "agility": 1.15
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 55,
       "threat": "Portão a cada 5 andares. Exige execução por muitos turnos.",

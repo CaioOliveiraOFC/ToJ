@@ -831,7 +831,9 @@ Onde:
 O ataque básico é, literalmente, a skill de pesos fixos: mesma função, mesma conta,
 mesma arma. Uma skill de Ladino pode nascer de `0.6 AG + 0.4 ST` e uma de Tanque de
 `0.6 ST + 0.4 DF` — a carta escolhe **de onde** o golpe vem, nunca **quanto** ele vale.
-Vale igual para monstro: os arquétipos usam a mesma gramática.
+Vale igual para monstro: os arquétipos usam a mesma gramática, e desde a reforma de
+fundação o ataque básico dele também nasce de um vetor de pesos — antes a afirmação era
+falsa para o básico, que era `(ST + MG) // 3` para os nove papéis.
 
 ### Matriz de Pesos por Classe (ataque básico)
 
@@ -840,6 +842,29 @@ Vale igual para monstro: os arquétipos usam a mesma gramática.
 | Warrior | 1.6  | 0.4  | 0.0  |
 | Mage    | 0.3  | 1.9  | 0.0  |
 | Rogue   | 0.8  | 0.4  | 1.7  |
+
+### Matriz de Pesos por Arquétipo de Monstro (ataque básico)
+
+O vetor do monstro tem uma regra que o do herói não tem: **Σpesos = 1**. Ele escolhe só a
+COMPOSIÇÃO do golpe, e a magnitude vem exclusivamente dos atributos — um `skirmisher` que
+troca Força por Agilidade muda de identidade sem mudar de tamanho. Os pesos vivem em
+`data/monsters.json`, por arquétipo, e o carregador recusa um vetor que não some 1.
+
+| Papel | w_ST | w_MG | w_AG |
+|---|---|---|---|
+| trash | 1.00 | — | — |
+| bruiser | 1.00 | — | — |
+| tank | 1.00 | — | — |
+| glass_cannon | — | 1.00 | — |
+| skirmisher | 0.75 | — | 0.25 |
+| controller | — | 1.00 | — |
+| support | — | 1.00 | — |
+| elite | 1.00 | — | — |
+| boss | 1.00 | — | — |
+
+> A soma diferente dos dois lados (herói 2.0/2.2/2.9, monstro 1.0) é assimetria **conhecida
+> e registrada**: o vetor do herói gera magnitude, o do monstro não. Compensá-la mudando
+> `CLASS_WEIGHTS` seria rebalancear o herói, e não é o que esta reforma se propôs a fazer.
 
 > **Nota:** Warrior e Mage não usam AG no **ataque básico**.
 > AG para essas classes alimenta Speed (ordem de turno) e hit_chance — e pode alimentar

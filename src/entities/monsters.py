@@ -3,13 +3,13 @@ from __future__ import annotations
 from src.entities.base import Entity
 from src.shared import effect_core as core
 from src.shared.constants import (
-    DAMAGE_FORMULA_DIVISOR,
     MONSTER_BASE_AG,
     MONSTER_BASE_DF,
     MONSTER_BASE_HP,
     MONSTER_BASE_MG,
     MONSTER_BASE_MP,
     MONSTER_BASE_ST,
+    MONSTER_DEFAULT_OFFENSIVE_WEIGHTS,
 )
 from src.shared.effects import sum_buffs
 
@@ -35,6 +35,11 @@ class Monster(Entity):
     base_mg: int = MONSTER_BASE_MG
     base_df: int = MONSTER_BASE_DF
 
+    # Vetor de onde o ataque básico nasce, com Σpesos = 1. O arquétipo declara o
+    # dele em `data/monsters.json`; este default vale para um monstro construído
+    # sem arquétipo.
+    offensive_weights: tuple[tuple[str, float], ...] = MONSTER_DEFAULT_OFFENSIVE_WEIGHTS
+
     def __init__(
         self,
         nick_name: str,
@@ -46,6 +51,7 @@ class Monster(Entity):
         ag: int | None = None,
         mg: int | None = None,
         df: int | None = None,
+        offensive_weights: tuple[tuple[str, float], ...] | None = None,
     ) -> None:
         """Inicializa um monstro.
 
@@ -58,6 +64,8 @@ class Monster(Entity):
             ag: Agilidade personalizada (opcional).
             mg: Magia personalizada (opcional).
             df: Defesa personalizada (opcional).
+            offensive_weights: Vetor `(atributo, peso)` de onde nasce o ataque
+                básico, com Σpesos = 1. Sem ele, vale o default da classe.
         """
         self.nick_name: str = nick_name
         self.level: int = max(1, mob_level)
@@ -77,9 +85,18 @@ class Monster(Entity):
         self._df: int = int(df if df is not None else self.base_df)
         self.base_df: int = int(df if df is not None else self.base_df)
 
-        self.avg_damage: int = (self._st + self._mg) // DAMAGE_FORMULA_DIVISOR
+        if offensive_weights is not None:
+            self.offensive_weights = tuple(
+                (str(eixo), float(peso)) for eixo, peso in offensive_weights
+            )
+
         self.active_effects: dict[str, object] = {}
         self.active_buffs: dict[str, object] = {}
+
+        # Instantâneo do básico no spawn, para quem quiser o número sem buffs.
+        # Sai do MESMO vetor que `get_avg_damage` usa: dois caminhos para o mesmo
+        # valor é como o campo antigo virou mentira quando o modelo mudou.
+        self.avg_damage: int = max(1, int(self.weighted_power(self.offensive_weights)))
 
         # Papel no encontro (ver content/factories/archetypes.py). O default
         # mantém o monstro histórico: bruiser sem skills, só ataque básico.
@@ -138,8 +155,15 @@ class Monster(Entity):
 
         Deriva em vez de devolver `self.avg_damage` congelado no spawn, para
         que um buff de força valha dano — como já vale no herói.
+
+        E usa `weighted_power`, a MESMA função do herói: o monstro passou a ter um
+        vetor ofensivo por arquétipo em vez de `(ST + MG) // 3`. A conta antiga
+        era um vetor implícito de soma 0.667 que lia Força e Magia sempre em
+        partes iguais — então a Agilidade 2.6× do `skirmisher` contribuía ZERO de
+        dano básico, e o `GAME_DESIGN` afirmava que os dois lados usavam a mesma
+        gramática enquanto só o herói usava.
         """
-        return max(1, (self.get_st() + self.get_mg()) // DAMAGE_FORMULA_DIVISOR)
+        return max(1, int(self.weighted_power(self.offensive_weights)))
 
     def get_passive_bonus(self, effect_type: str) -> float:
         """Modificadores de combate vindos de passivas. O monstro ainda não tem.

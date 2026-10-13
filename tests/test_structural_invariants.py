@@ -221,7 +221,7 @@ class TestArquetipos:
 
     def test_todo_arquetipo_tem_uma_forca_e_uma_fraqueza(self):
         for papel, arquetipo in all_archetypes().items():
-            eixos = (arquetipo.hp, arquetipo.attack, arquetipo.defense, arquetipo.agility)
+            eixos = (arquetipo.hp, arquetipo.st, arquetipo.mg, arquetipo.defense, arquetipo.agility)
             if papel in ("bruiser", "elite", "boss"):
                 continue  # referência e marcos: custam mais orçamento, não o redistribuem
             redistribui = max(eixos) > 1.05 and min(eixos) < 0.95

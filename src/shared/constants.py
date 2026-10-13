@@ -519,15 +519,24 @@ GROWTH_RATE = 1.12
 
 # --- Orçamento do monstro (perfil "bruiser" no nível 1) ---
 # Os arquétipos em content/factories/archetypes.py multiplicam estes valores.
+#
+# `MONSTER_BUDGET_OFFENSE` é a base de Força e de Magia, cada uma pelo seu
+# multiplicador de arquétipo. Era `MONSTER_BUDGET_ATTACK`, e havia um passo de
+# conversão no meio: `st = mg = attack × 1,5`, só para que a conta antiga do
+# básico, `(1,5a + 1,5a) // 3 == a`, devolvesse o orçamento de volta. O número
+# saía certo no ataque básico e errado em todo o resto — a skill lê o atributo
+# cru, e todo monstro era igualmente físico e mágico. O valor não mudou: se o
+# dano das skills de monstro sair do ponto depois de os atributos virarem
+# reais, esta é a alavanca — um número só.
 MONSTER_BUDGET_HP = 420
-MONSTER_BUDGET_ATTACK = 88
+MONSTER_BUDGET_OFFENSE = 88
 MONSTER_BUDGET_DEFENSE = 20
 MONSTER_BUDGET_AGILITY = 8
 MONSTER_BUDGET_MP = 60
-# `Monster.avg_damage` é derivado de (st + mg) // DAMAGE_FORMULA_DIVISOR. Para
-# que o ataque do orçamento apareça exatamente nesse valor, st e mg recebem
-# metade do divisor cada: 1.5 = DAMAGE_FORMULA_DIVISOR / 2.
-MONSTER_ATTACK_TO_STAT_RATIO = 1.5
+# Vetor ofensivo de um monstro construído SEM arquétipo. Todo monstro do jogo
+# nasce de `spawn_by_role` e traz o vetor do papel dele; este é o default da
+# classe, e é a tradução de soma 1 do antigo `(ST + MG) // 3`: meio a meio.
+MONSTER_DEFAULT_OFFENSIVE_WEIGHTS = (("st", 0.5), ("mg", 0.5))
 # Abaixo desta fração da vida, um monstro com cura prioriza se curar.
 MONSTER_HEAL_HP_RATIO = 0.5
 # Abaixo desta fração da vida, o monstro entra em desespero: gasta o que tiver

@@ -330,6 +330,24 @@ def validate(skill, reference: dict | None = None) -> Veredito:
 # de 100% Força que só diferem em mana e recarga continuam sendo uma ideia só.
 
 
+def _monster_primary_stats() -> frozenset[str]:
+    """Eixos dominantes dos vetores ofensivos dos arquétipos, em união.
+
+    Import local pelo mesmo motivo de `monster_reference`: `archetypes` chega aqui
+    pela via do carregador de skills, e resolver no uso evita o ciclo.
+    """
+    from src.content.factories.archetypes import all_archetypes
+
+    dominantes: set[str] = set()
+    for arquetipo in all_archetypes().values():
+        pesos = arquetipo.offensive_weights
+        if not pesos:
+            continue
+        maior = max(peso for _, peso in pesos)
+        dominantes.update(eixo for eixo, peso in pesos if peso == maior)
+    return frozenset(dominantes)
+
+
 def primary_stat(skill_class: str) -> frozenset[str]:
     """O atributo de onde o dano daquela classe nasce por padrão.
 
@@ -337,14 +355,15 @@ def primary_stat(skill_class: str) -> frozenset[str]:
     ofensiva de cada classe e é o que o ataque básico usa. Se um dia o Guerreiro
     deixar de ser uma classe de Força, esta regra acompanha sozinha.
 
-    - Monster devolve `{st, mg}` porque o ataque básico do monstro é
-      literalmente `(st + mg) / 2`: escalar em qualquer um dos dois é escalar no
-      ataque básico dele.
+    - Monster sai dos VETORES OFENSIVOS dos arquétipos, pelo mesmo critério: o
+      eixo dominante de cada papel. Antes era a dupla `{st, mg}` chapada, e a
+      justificativa escrita era que o básico do monstro é `(st + mg) / 2` — o que
+      deixou de ser verdade quando cada papel ganhou o próprio vetor.
     - Neutral devolve vazio: o pool universal não tem atributo natural, e é por
       isso que `df` ou `hp` ali já são uma escolha de design, não o caminho óbvio.
     """
     if skill_class == MONSTER_SKILL_CLASS:
-        return frozenset({"st", "mg"})
+        return _monster_primary_stats()
     pesos = CLASS_WEIGHTS.get(skill_class)
     if not pesos:
         return frozenset()

@@ -24,18 +24,22 @@ from src.content.skills_loader import MONSTER_SKILL_CLASS, SkillCard, card_from_
 from src.data.loader import load_monsters_data
 from src.entities.monsters import Monster
 from src.shared.constants import (
-    MONSTER_ATTACK_TO_STAT_RATIO,
     MONSTER_BUDGET_AGILITY,
-    MONSTER_BUDGET_ATTACK,
     MONSTER_BUDGET_DEFENSE,
     MONSTER_BUDGET_HP,
     MONSTER_BUDGET_MP,
+    MONSTER_BUDGET_OFFENSE,
 )
 from src.shared.formulas import geometric
 
 # Papéis que ganham a marcação de chefe: entram sozinhos no encontro e pagam
 # recompensa de chefe.
 MILESTONE_ROLES = ("elite", "boss")
+
+# Eixos de onde o ATAQUE BÁSICO do monstro pode nascer. `df`, `hp` e `mp` são
+# legítimos na escala de uma carta, não no básico.
+OFFENSIVE_AXES = ("st", "mg", "ag")
+_WEIGHT_SUM_TOLERANCE = 1e-9
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,14 +48,30 @@ class Archetype:
 
     Os multiplicadores incidem sobre o orçamento do nível. Um arquétipo que ganha
     em um eixo deve perder em outro — é isso que dá a ele uma fraqueza explorável.
+
+    `st` e `mg` são eixos independentes. Antes existia um `attack` só, convertido
+    em `st == mg` no spawn: todo monstro era igualmente físico e mágico, e o
+    `glass_cannon` carregava 250 de Força que nenhuma carta dele usava só para
+    que a conta do ataque básico fechasse.
+
+    `offensive_weights` é o vetor de onde o ATAQUE BÁSICO nasce — o equivalente de
+    `CLASS_WEIGHTS` para o monstro, e resolvido pela mesma `weighted_power`. Ele
+    tem uma regra dura: **Σpesos = 1**. Com a soma travada, o vetor decide apenas
+    a COMPOSIÇÃO do golpe e nunca a magnitude dele, que vem só dos atributos. É o
+    que permite a um `skirmisher` trocar Força por Agilidade sem mudar de tamanho.
+
+    A escala das SKILLS continua declarada em cada carta, e ela pode ler `df`,
+    `hp` ou `mp` legitimamente. O vetor ofensivo não: o básico nasce de ST/MG/AG.
     """
 
     role: str
     label: str
     hp: float
-    attack: float
+    st: float
+    mg: float
     defense: float
     agility: float
+    offensive_weights: tuple[tuple[str, float], ...]
     skill_use_chance: int
     skills: tuple[SkillCard, ...]
     threat: str
@@ -88,15 +108,45 @@ def _skill_from_json(data: dict) -> SkillCard:
     return card_from_json({**PADROES_DE_MONSTRO, **data})
 
 
+def _offensive_weights_from_json(role: str, data: dict) -> tuple[tuple[str, float], ...]:
+    """Lê o vetor ofensivo do arquétipo e RECUSA um que não some 1.
+
+    A validação é dura porque Σpesos = 1 não é convenção de estilo: é o que
+    garante que o vetor escolha composição e não magnitude. Um vetor que soma 1.4
+    daria 40% de dano de graça a um arquétipo sem que nenhum atributo dele
+    tivesse subido, e o erro apareceria como "o skirmisher está forte" três
+    etapas de balanceamento depois.
+    """
+    bruto = data.get("offensive_weights") or {}
+    if not bruto:
+        raise ValueError(f"Arquétipo {role!r} não declara `offensive_weights`.")
+    desconhecidos = sorted(set(bruto) - set(OFFENSIVE_AXES))
+    if desconhecidos:
+        raise ValueError(
+            f"Arquétipo {role!r} pesa o ataque básico em {desconhecidos}; "
+            f"os eixos permitidos são {list(OFFENSIVE_AXES)}."
+        )
+    pesos = tuple((eixo, float(bruto[eixo])) for eixo in OFFENSIVE_AXES if eixo in bruto)
+    soma = sum(peso for _, peso in pesos)
+    if abs(soma - 1.0) > _WEIGHT_SUM_TOLERANCE:
+        raise ValueError(
+            f"Arquétipo {role!r}: os pesos do ataque básico somam {soma:g}, não 1. "
+            "O vetor define a composição do golpe; a magnitude vem dos atributos."
+        )
+    return pesos
+
+
 def _archetype_from_json(role: str, data: dict) -> Archetype:
     budget = data.get("budget", {})
     return Archetype(
         role=role,
         label=data.get("label", role),
         hp=float(budget.get("hp", 1.0)),
-        attack=float(budget.get("attack", 1.0)),
+        st=float(budget.get("st", 1.0)),
+        mg=float(budget.get("mg", 1.0)),
         defense=float(budget.get("defense", 1.0)),
         agility=float(budget.get("agility", 1.0)),
+        offensive_weights=_offensive_weights_from_json(role, data),
         skill_use_chance=int(data.get("skill_use_chance", 0)),
         skills=tuple(_skill_from_json(s) for s in data.get("skills", [])),
         threat=data.get("threat", ""),
@@ -154,9 +204,10 @@ def get_archetype(role: str) -> Archetype:
 def spawn_by_role(role: str, level: int, name: str | None = None) -> Monster:
     """Cria um monstro do papel pedido, com o orçamento do nível.
 
-    O ataque é fixado através de `st` e `mg` porque `Monster` deriva
-    `avg_damage = (st + mg) // DAMAGE_FORMULA_DIVISOR` — manter essa derivação
-    preserva os valores que a tela de status já mostra.
+    Cada eixo é resolvido pelo seu próprio caminho — orçamento × multiplicador do
+    arquétipo × `geometric` — exatamente como HP, defesa e agilidade já eram. Não
+    existe mais um passo de conversão no meio: o que o arquétipo declara é o que
+    o monstro tem.
 
     Args:
         role: Papel do arquétipo.
@@ -168,18 +219,16 @@ def spawn_by_role(role: str, level: int, name: str | None = None) -> Monster:
     """
     archetype = get_archetype(role)
 
-    attack = geometric(MONSTER_BUDGET_ATTACK * archetype.attack, level)
-    stat_for_attack = int(attack * MONSTER_ATTACK_TO_STAT_RATIO)
-
     monster = Monster(
         name or f"{archetype.label} Nv.{level}",
         level,
         hp=geometric(MONSTER_BUDGET_HP * archetype.hp, level),
         mp=geometric(MONSTER_BUDGET_MP, level),
-        st=stat_for_attack,
-        mg=stat_for_attack,
+        st=geometric(MONSTER_BUDGET_OFFENSE * archetype.st, level),
+        mg=geometric(MONSTER_BUDGET_OFFENSE * archetype.mg, level),
         df=geometric(MONSTER_BUDGET_DEFENSE * archetype.defense, level),
         ag=geometric(MONSTER_BUDGET_AGILITY * archetype.agility, level),
+        offensive_weights=archetype.offensive_weights,
     )
     monster.role = archetype.role
     monster.skills = list(archetype.skills)
