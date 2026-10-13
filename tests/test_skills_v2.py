@@ -585,10 +585,9 @@ class TestMonstroUsaAMesmaGramatica:
         carta_mob = next(c for c in m.skills if c.effect_type == "damage")
 
         base = cmb.skill_damage_base(m, carta_mob, alvo)
-        baldes = cmb.damage_modifiers(m, alvo, is_critical=False)
+        baldes = cmb.damage_modifiers(m, alvo, is_critical=False, skill=carta_mob)
         esperado = cmb._calculate_damage(
             base,
-            baldes.flat,
             baldes.mult,
             baldes.xmult,
             alvo.get_df(),

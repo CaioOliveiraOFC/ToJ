@@ -88,7 +88,7 @@ class TestQuebraGelida:
         core.apply_effect(alvo, "frozen")
         com = combat.damage_modifiers(heroi, alvo, is_critical=True)
         assert com.xmult == [*sem.xmult, ix.SHATTER_XMULT]
-        assert (com.flat, com.mult, com.mitigation) == (sem.flat, sem.mult, sem.mitigation)
+        assert (com.mult, com.mitigation) == (sem.mult, sem.mitigation)
 
     def test_o_golpe_sai_maior_pelo_funil(self):
         alvo = _alvo()
@@ -254,7 +254,7 @@ class TestEmboscada:
         core.apply_effect(heroi, "invisible")
         com = combat.damage_modifiers(heroi, alvo, is_critical=False)
         assert com.xmult == [*sem.xmult, ix.AMBUSH_XMULT]
-        assert (com.flat, com.mult, com.mitigation) == (sem.flat, sem.mult, sem.mitigation)
+        assert (com.mult, com.mitigation) == (sem.mult, sem.mitigation)
 
     def test_a_invisibilidade_sai_no_golpe_que_acerta(self):
         heroi = _heroi()
@@ -398,7 +398,6 @@ class TestOMonstroPercebeAOportunidade:
 
 def _baldes(mods) -> dict:
     return {
-        "flat_mods": mods.flat,
         "mult_mods": mods.mult,
         "xmult_mods": mods.xmult,
         "mitigation": mods.mitigation,

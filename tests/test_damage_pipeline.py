@@ -73,9 +73,11 @@ def _skill(nome: str):
     return next(s for s in load_skills() if s.name == nome)
 
 
-def _golpe(atacante, defensor, base: int, nome: str, rolagem) -> int:
+def _golpe(atacante, defensor, base: int, nome: str, rolagem, skill=None) -> int:
     hp = defensor.get_hp()
-    cmb.resolve_physical_attack(atacante, defensor, base, nome, rng=RngRoteirizado(*rolagem))
+    cmb.resolve_physical_attack(
+        atacante, defensor, base, nome, rng=RngRoteirizado(*rolagem), skill=skill
+    )
     return hp - defensor.get_hp()
 
 
@@ -95,7 +97,7 @@ def basico_com_crit() -> int:
 def skill_de_dano() -> int:
     h, m = make_hero("Mage", 8, "expected"), spawn_by_role("tank", 8)
     sk = _skill("Bola de Fogo")
-    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT, skill=sk)
 
 
 def skill_com_condicao() -> int:
@@ -108,7 +110,7 @@ def skill_com_condicao() -> int:
         and s.skill_class == "Rogue"
     )
     m._hp = max(1, int(m.base_hp * 0.10))
-    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT, skill=sk)
 
 
 def atacante_com_fear() -> int:

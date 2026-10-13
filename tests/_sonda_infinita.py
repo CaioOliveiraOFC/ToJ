@@ -213,7 +213,6 @@ def valida_golpe(f: Falhas, atacante, defensor, ponto, quem):
     for crit in (False, True):
         mods = cmb.damage_modifiers(atacante, defensor, is_critical=crit)
         for nome, lista in (
-            ("flat", mods.flat),
             ("mult", mods.mult),
             ("xmult", mods.xmult),
             ("mitigation", mods.mitigation),
@@ -222,7 +221,6 @@ def valida_golpe(f: Falhas, atacante, defensor, ponto, quem):
                 f.checar(finito(v), "damage/modifiers", ponto, quem, f"{nome} finito", v)
         d = cmb._calculate_damage(
             base_power=float(cmb.basic_attack_power(atacante)),
-            flat_mods=mods.flat,
             mult_mods=mods.mult,
             xmult_mods=mods.xmult,
             defense_target=defensor.get_df(),

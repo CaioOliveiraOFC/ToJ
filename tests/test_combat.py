@@ -109,16 +109,15 @@ class EventRecorder:
 # ------------------------------------------------------- helpers
 
 
-def expected_damage(base_power, *, flat=None, mult=None, xmult=None, defense=0):
+def expected_damage(base_power, *, mult=None, xmult=None, defense=0):
     """Réplica literal do pipeline de combat.py p/ calcular o valor esperado."""
-    flat_total = sum(flat) if flat else 0
     mult_total = 1.0 + sum(mult) if mult else 1.0
     xraw = 1.0
     for v in xmult or []:
         xraw *= v
     xcap = min(xraw, XMULT_CAP)
     dmod = DEFENSE_K / (DEFENSE_K + max(0, defense))
-    return max(1, int((base_power + flat_total) * mult_total * xcap * dmod))
+    return max(1, int(base_power * mult_total * xcap * dmod))
 
 
 def predict_attack_rolls(seed, hit_chance, crit_chance):
@@ -189,18 +188,14 @@ class TestCalculateDamageBasico:
         # 100 ATK vs DEF 0 => 100
         assert cmb._calculate_damage(100) == 100
 
-    def test_pipeline_completo_flat_mult_xmult_defesa(self):
-        # (50+25)*(1.5)*(1.0)*(0.5) = 56.25 -> 56
-        got = cmb._calculate_damage(
-            50, flat_mods=[10, 15], mult_mods=[0.5], xmult_mods=[1.0], defense_target=100
-        )
+    def test_pipeline_completo_mult_xmult_defesa(self):
+        # 75*(1.5)*(1.0)*(0.5) = 56.25 -> 56
+        got = cmb._calculate_damage(75, mult_mods=[0.5], xmult_mods=[1.0], defense_target=100)
         assert got == 56
 
     def test_esperado_bate_com_replica_manual(self):
-        got = cmb._calculate_damage(
-            80, flat_mods=[7], mult_mods=[0.2, -0.1], xmult_mods=[1.3], defense_target=30
-        )
-        assert got == expected_damage(80, flat=[7], mult=[0.2, -0.1], xmult=[1.3], defense=30)
+        got = cmb._calculate_damage(87, mult_mods=[0.2, -0.1], xmult_mods=[1.3], defense_target=30)
+        assert got == expected_damage(87, mult=[0.2, -0.1], xmult=[1.3], defense=30)
 
     def test_atk_zero_produz_dano_minimo_1(self):
         assert cmb._calculate_damage(0) == 1

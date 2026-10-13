@@ -127,7 +127,7 @@ def _chance_de_critico(atacante, nome_da_skill: str = "") -> float:
     return min(base, CRIT_CHANCE_CAP) / 100
 
 
-def _dano_do_funil(atacante, defensor, base_power: int, *, critico: bool) -> int:
+def _dano_do_funil(atacante, defensor, base_power: int, *, critico: bool, skill=None) -> int:
     """O dano que SAI DO FUNIL, para um golpe que acerta.
 
     DEPENDÊNCIA DE API PRIVADA, deliberada: `combat._calculate_damage` é o funil
@@ -137,13 +137,15 @@ def _dano_do_funil(atacante, defensor, base_power: int, *, critico: bool) -> int
     O uso fica encapsulado NESTE módulo, e o teste de paridade falha se o
     comportamento divergir.
 
-    Estágio: BASE + flat, ×(1+Σmult), ×Πxmult capado, × defesa, × mitigação.
+    Estágio: BASE, ×(1+Σmult), ×Πxmult capado, × defesa, × mitigação.
     ANTES de Égide, procs on-hit, roubo de vida e interações de golpe.
+
+    `skill` é a carta do golpe, quando houver: é por ela que o bônus condicional
+    entra no `+MULT`, exatamente como no motor.
     """
-    mods = combat_mech.damage_modifiers(atacante, defensor, is_critical=critico)
+    mods = combat_mech.damage_modifiers(atacante, defensor, is_critical=critico, skill=skill)
     return combat_mech._calculate_damage(
         base_power=float(base_power),
-        flat_mods=list(getattr(mods, "flat", ()) or ()),
         mult_mods=list(mods.mult),
         xmult_mods=list(mods.xmult),
         defense_target=defensor.get_df(),
@@ -598,8 +600,8 @@ def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
         # `_golpe_esperado` já embute acerto; o view separa os dois, então aqui
         # entra o golpe POR ACERTO e a chance viaja no seu próprio campo.
         p_crit = _chance_de_critico(hero, nome)
-        normal = _dano_do_funil(hero, monstro, base, critico=False)
-        critico = _dano_do_funil(hero, monstro, base, critico=True)
+        normal = _dano_do_funil(hero, monstro, base, critico=False, skill=skill)
+        critico = _dano_do_funil(hero, monstro, base, critico=True, skill=skill)
         campos["expected_strike_damage"] = max(1, int(normal * (1 - p_crit) + critico * p_crit))
         # As duas pontas, sem a média: é o que separa "mata" de "deve matar".
         campos["strike_damage_no_crit"] = max(1, int(normal))

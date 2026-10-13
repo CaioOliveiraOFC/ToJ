@@ -116,7 +116,6 @@ class TestDamageReduction:
         mods = cmb.damage_modifiers(atacante, defensor, is_critical=False)
         return cmb._calculate_damage(
             base_power=float(base),
-            flat_mods=mods.flat,
             mult_mods=mods.mult,
             xmult_mods=mods.xmult,
             defense_target=defensor.get_df(),
@@ -205,7 +204,7 @@ class TestCritico:
         m = spawn_by_role("bruiser", 8)
         mods = cmb.damage_modifiers(com_anel, m, is_critical=True)
         assert mods.xmult == [pytest.approx(cmb.CRIT_DAMAGE_BASE + 0.40)]
-        assert mods.flat == [] and mods.mult == []
+        assert mods.mult == []
 
     def test_o_cap_de_chance_critica_continua_valendo(self):
         h = _heroi()

@@ -251,6 +251,24 @@ class TestCondicaoSituacionalDaSkill:
             # A única cuja ausência é o alvo ferido, não o alvo intacto.
             alvo._hp = max(1, int(alvo.base_hp * 0.5))
 
+    @staticmethod
+    def _golpe(heroi, skill, alvo) -> int:
+        """O golpe que SAI DO FUNIL, sem crítico: BASE da carta × baldes.
+
+        A condição não mora mais no BASE — ela entra no `+MULT` de
+        `damage_modifiers`, contra este alvo. Medir só o BASE mediria o lugar
+        onde o bônus não está.
+        """
+        base = combat.skill_damage_base(heroi, skill, alvo)
+        mods = combat.damage_modifiers(heroi, alvo, is_critical=False, skill=skill)
+        return combat._calculate_damage(
+            base_power=float(base),
+            mult_mods=mods.mult,
+            xmult_mods=mods.xmult,
+            defense_target=alvo.get_df(),
+            mitigation=mods.mitigation,
+        )
+
     @pytest.mark.parametrize(
         "skill",
         [s for s in SKILLS.values() if getattr(s, "bonus_condition", "")],
@@ -265,7 +283,7 @@ class TestCondicaoSituacionalDaSkill:
         heroi = make_hero(classe, 20, "naked")
         alvo = _alvo_imortal()
         self._quebrar_situacao(alvo, heroi, condicao)
-        sem = combat.skill_damage_base(heroi, skill, alvo)
+        sem = self._golpe(heroi, skill, alvo)
 
         heroi = make_hero(classe, 20, "naked")
         alvo = _alvo_imortal()
@@ -273,7 +291,7 @@ class TestCondicaoSituacionalDaSkill:
         self._criar_situacao(alvo, heroi, condicao)
         if condicao == "target_healthy":
             alvo._hp = alvo.base_hp
-        com = combat.skill_damage_base(heroi, skill, alvo)
+        com = self._golpe(heroi, skill, alvo)
 
         assert com > sem, (
             f"{skill.id} declara bônus de {skill.bonus_percent}% com "
@@ -368,7 +386,7 @@ class TestMecanicasQueAsPassivasNovasUsam:
         com = combat.damage_modifiers(self._com("damage_percent", 30), alvo, is_critical=False)
         assert sem.mult == [] and com.mult == [0.3]
         # E não vaza para os outros baldes.
-        assert (com.flat, com.xmult, com.mitigation) == (sem.flat, sem.xmult, sem.mitigation)
+        assert (com.xmult, com.mitigation) == (sem.xmult, sem.mitigation)
 
     def test_crit_damage_so_muda_o_golpe_critico(self):
         """`×MULT` só existe quando o golpe crita — fora disso, nada muda."""
@@ -479,8 +497,7 @@ class TestPrecisionEStatusResistance:
         alvo = _alvo_imortal()
         sem = combat.damage_modifiers(make_hero("Warrior", 20, "naked"), alvo, is_critical=False)
         com = combat.damage_modifiers(self._com("precision", 40), alvo, is_critical=False)
-        assert (com.flat, com.mult, com.xmult, com.mitigation) == (
-            sem.flat,
+        assert (com.mult, com.xmult, com.mitigation) == (
             sem.mult,
             sem.xmult,
             sem.mitigation,

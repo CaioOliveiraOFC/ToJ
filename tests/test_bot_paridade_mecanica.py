@@ -160,7 +160,6 @@ class TestDanoDeclaradoEODoFunil:
         mods = combat_mech.damage_modifiers(hero, alvo, is_critical=False)
         canonico = combat_mech._calculate_damage(
             base_power=float(base),
-            flat_mods=list(getattr(mods, "flat", ()) or ()),
             mult_mods=list(mods.mult),
             xmult_mods=list(mods.xmult),
             defense_target=alvo.get_df(),
