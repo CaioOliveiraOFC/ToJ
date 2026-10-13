@@ -329,6 +329,21 @@ do herói).
 - Os níveis iniciais são **calibração inicial**, não derivação: a lei do herói aplicada
   à ordem que o kit já tinha.
 
+**`[implementado]`** **A mana do monstro é do papel, e escala com o nível.** O pool era
+o mesmo para os nove arquétipos, e o custo era um inteiro fixo: como o pool crescia pela
+`geometric` e o custo não, a mana deixava de restringir — um boss conjurava 2 vezes com o
+pool cheio no nível 1 e 17 no nível 20.
+
+- O pool é `geometric(60 × m_mp, nível)`, com o multiplicador do papel: trash 0,5;
+  bruiser e skirmisher 0,8; tank 1,0; elite 1,2; boss 1,4; controller, support e
+  glass_cannon 1,5. **Calibração inicial**, não derivação.
+- O custo é **percentual da mesma curva de referência do herói**
+  (`SKILL_COST_REFERENCE_MP`): `mana_cost_percent = teto_0,5(custo_antigo × m_mp / 97 ×
+  100)`. Pool e custo crescem pela mesma razão, então quantas vezes o monstro conjura com
+  o pool cheio fica constante do nível 1 ao 20. O `mana_cost` absoluto fica na carta, como
+  no herói; o motor só o lê quando o percentual é zero.
+- Nenhum caminho novo de cobrança: o monstro já herdava `skill_mana_cost()` do herói.
+
 ### O catálogo
 
 **`[implementado]`** **150 cartas de herói. Catálogo congelado.** Distribuídas

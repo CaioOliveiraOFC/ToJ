@@ -267,6 +267,23 @@ class TestDeckDoMonstro:
                 esperado = deck_for_level(arquetipo, nivel, random.Random(7))
                 assert ids == [c.id for c in esperado], (papel, nivel)
 
+    def test_a_mana_restringe_igual_em_todo_nivel(self):
+        """Paridade de MP: quantas conjurações cabem no pool não depende do nível.
+
+        Com custo absoluto e pool geométrico, o boss conjurava 2 vezes no Nv.1 e 17
+        no Nv.20 — a mana deixava de ser decisão. Custo percentual da mesma curva
+        mantém a razão; só o arredondamento dos pools pequenos a move um pouco.
+        """
+        import random
+
+        for papel, arquetipo in all_archetypes().items():
+            razoes = []
+            for nivel in (1, 20):
+                m = spawn_by_role(papel, nivel, rng=random.Random(0))
+                custos = [cmb.skill_mana_cost(m, c) for c in arquetipo.skills]
+                razoes.append(m.base_mp / (sum(custos) / len(custos)))
+            assert abs(razoes[1] / razoes[0] - 1) < 0.10, (papel, razoes)
+
     def test_kit_grande_cresce_sem_manutencao(self):
         """A regra de troca não conhece carta nenhuma: vale para um kit de 30.
 

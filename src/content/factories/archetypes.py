@@ -67,6 +67,10 @@ class Archetype:
 
     `skills` é o KIT COMPLETO, na ordem de aquisição. O que um monstro carrega num
     nível é `deck_for_level` — o validador e a forge continuam lendo o kit todo.
+
+    `mp` é o multiplicador do pool de mana, como os outros eixos. Antes o pool era
+    `MONSTER_BUDGET_MP` chapado para os nove papéis: o trash, que só conjura em
+    jogada decisiva, tinha a mesma reserva do suporte, que vive de cura.
     """
 
     role: str
@@ -74,6 +78,7 @@ class Archetype:
     hp: float
     st: float
     mg: float
+    mp: float
     defense: float
     agility: float
     offensive_weights: tuple[tuple[str, float], ...]
@@ -220,6 +225,7 @@ def _archetype_from_json(role: str, data: dict) -> Archetype:
         hp=float(budget.get("hp", 1.0)),
         st=float(budget.get("st", 1.0)),
         mg=float(budget.get("mg", 1.0)),
+        mp=float(budget.get("mp", 1.0)),
         defense=float(budget.get("defense", 1.0)),
         agility=float(budget.get("agility", 1.0)),
         offensive_weights=_offensive_weights_from_json(role, data),
@@ -306,7 +312,7 @@ def spawn_by_role(role: str, level: int, name: str | None = None, rng=None) -> M
         name or f"{archetype.label} Nv.{level}",
         level,
         hp=geometric(MONSTER_BUDGET_HP * archetype.hp, level),
-        mp=geometric(MONSTER_BUDGET_MP, level),
+        mp=geometric(MONSTER_BUDGET_MP * archetype.mp, level),
         st=geometric(MONSTER_BUDGET_OFFENSE * archetype.st, level),
         mg=geometric(MONSTER_BUDGET_OFFENSE * archetype.mg, level),
         df=geometric(MONSTER_BUDGET_DEFENSE * archetype.defense, level),
