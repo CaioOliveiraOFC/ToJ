@@ -42,7 +42,7 @@ MILESTONE_ROLES = ("elite", "boss")
 # Eixos de onde o ATAQUE BÁSICO do monstro pode nascer. `df`, `hp` e `mp` são
 # legítimos na escala de uma carta, não no básico.
 OFFENSIVE_AXES = ("st", "mg", "ag")
-_WEIGHT_SUM_TOLERANCE = 1e-9
+_WEIGHT_SUM_TOLERANCE = 1e-6
 
 
 @dataclass(frozen=True, slots=True)

@@ -383,6 +383,15 @@ class TestDeckDoMonstro:
             assert montada, f"{lei}: nenhum deck real de monstro monta a lei"
 
 
+class TestManaDoMonstro:
+    def test_o_pool_de_mana_e_do_papel(self):
+        """Nove papéis, e o pool de mana não é mais o mesmo para todos."""
+        import random
+
+        pools = {spawn_by_role(p, 1, rng=random.Random(0)).base_mp for p in all_archetypes()}
+        assert len(pools) > 1, "Todos os arquétipos voltaram a ter o mesmo MP."
+
+
 class TestArquetipos:
     """Cada papel precisa distribuir o orçamento de um jeito diferente."""
 
