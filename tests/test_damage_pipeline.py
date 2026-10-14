@@ -73,11 +73,9 @@ def _skill(nome: str):
     return next(s for s in load_skills() if s.name == nome)
 
 
-def _golpe(atacante, defensor, base: int, nome: str, rolagem, skill=None) -> int:
+def _golpe(atacante, defensor, base: int, rolagem, skill=None) -> int:
     hp = defensor.get_hp()
-    cmb.resolve_physical_attack(
-        atacante, defensor, base, nome, rng=RngRoteirizado(*rolagem), skill=skill
-    )
+    cmb.resolve_physical_attack(atacante, defensor, base, rng=RngRoteirizado(*rolagem), skill=skill)
     return hp - defensor.get_hp()
 
 
@@ -86,18 +84,18 @@ def _golpe(atacante, defensor, base: int, nome: str, rolagem, skill=None) -> int
 
 def basico_sem_crit() -> int:
     h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_SEM_CRIT)
 
 
 def basico_com_crit() -> int:
     h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_COM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_COM_CRIT)
 
 
 def skill_de_dano() -> int:
     h, m = make_hero("Mage", 8, "expected"), spawn_by_role("tank", 8)
     sk = _skill("Bola de Fogo")
-    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT, skill=sk)
+    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), ACERTA_SEM_CRIT, skill=sk)
 
 
 def skill_com_condicao() -> int:
@@ -110,13 +108,13 @@ def skill_com_condicao() -> int:
         and s.skill_class == "Rogue"
     )
     m._hp = max(1, int(m.base_hp * 0.10))
-    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT, skill=sk)
+    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), ACERTA_SEM_CRIT, skill=sk)
 
 
 def atacante_com_fear() -> int:
     h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
     h.active_effects["fear"] = {"duration": 3}
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_SEM_CRIT)
 
 
 def defensor_com_reducao() -> int:
@@ -126,7 +124,7 @@ def defensor_com_reducao() -> int:
         "value": 30,
         "duration": 3,
     }
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_SEM_CRIT)
 
 
 def dois_redutores() -> int:
@@ -137,12 +135,12 @@ def dois_redutores() -> int:
         "value": 30,
         "duration": 3,
     }
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_SEM_CRIT)
 
 
 def monstro_contra_mago_com_egide() -> int:
     m, h = spawn_by_role("bruiser", 8), make_hero("Mage", 8, "expected")
-    return _golpe(m, h, cmb.basic_attack_power(m), "", ACERTA_SEM_CRIT)
+    return _golpe(m, h, cmb.basic_attack_power(m), ACERTA_SEM_CRIT)
 
 
 CENARIOS = {
@@ -195,7 +193,7 @@ def test_o_cenario_da_egide_realmente_gasta_mana():
     """Sem isto, o cenário passaria mesmo que a égide parasse de existir."""
     m, h = spawn_by_role("bruiser", 8), make_hero("Mage", 8, "expected")
     mp = h.get_mp()
-    _golpe(m, h, cmb.basic_attack_power(m), "", ACERTA_SEM_CRIT)
+    _golpe(m, h, cmb.basic_attack_power(m), ACERTA_SEM_CRIT)
     assert h.get_mp() < mp
 
 
@@ -252,6 +250,6 @@ class TestLinguagemDePoder:
         monkeypatch.setattr(cmb, "_calculate_damage", espiao)
         h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
         cmb.resolve_physical_attack(
-            h, m, cmb.basic_attack_power(h), "", rng=RngRoteirizado(*ACERTA_SEM_CRIT)
+            h, m, cmb.basic_attack_power(h), rng=RngRoteirizado(*ACERTA_SEM_CRIT)
         )
         assert len(chamadas) == 1

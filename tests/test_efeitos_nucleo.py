@@ -242,7 +242,7 @@ class TestMedo:
             alvo = spawn_by_role("bruiser", 8)
             hp = alvo.get_hp()
             cmb.resolve_physical_attack(
-                h, alvo, cmb.skill_damage_base(h, skill, alvo), skill.name, rng=_Rng(rolagem, 100)
+                h, alvo, cmb.skill_damage_base(h, skill, alvo), rng=_Rng(rolagem, 100)
             )
             return alvo.get_hp() < hp
 
@@ -302,7 +302,7 @@ class TestFontesDiferentesMesmoResolver:
     def test_item_aplica_pelo_catalogo(self):
         h, m = _heroi(), spawn_by_role("bruiser", 8)
         h.equip(self._arma("bleed", 100))
-        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), "", rng=_Rng(1, 100))
+        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), rng=_Rng(1, 100))
         instancia = core.instances(m, core.FAMILY_DOT)[0]
         assert instancia.effect == "bleed"
         assert instancia.duration == core.definition("bleed").default_duration
@@ -312,14 +312,14 @@ class TestFontesDiferentesMesmoResolver:
         arma = self._arma(None, 0)
         arma.enchant(create_enchantment("poison_chance", 100))
         h.equip(arma)
-        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), "", rng=_Rng(1, 100))
+        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), rng=_Rng(1, 100))
         assert core.has_effect(m, "poison")
 
     def test_item_e_skill_produzem_a_mesma_instancia(self):
         por_item, por_skill = spawn_by_role("bruiser", 8), spawn_by_role("bruiser", 8)
         h = _heroi()
         h.equip(self._arma("bleed", 100))
-        cmb.resolve_physical_attack(h, por_item, cmb.basic_attack_power(h), "", rng=_Rng(1, 100))
+        cmb.resolve_physical_attack(h, por_item, cmb.basic_attack_power(h), rng=_Rng(1, 100))
         cmb.try_apply_status(por_skill, "bleed", 100, 2, _Rng(1), source_id="skill_corte")
 
         a = core.instances(por_item, core.FAMILY_DOT)[0]

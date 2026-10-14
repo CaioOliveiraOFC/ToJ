@@ -182,7 +182,7 @@ class TestCritico:
             m = spawn_by_role("bruiser", 8)
             hp = m.get_hp()
             cmb.resolve_physical_attack(
-                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(*rolagem)
+                h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(*rolagem)
             )
             danos.append(hp - m.get_hp())
         assert danos[1] > danos[0], "o anel não converteu a rolagem 30 em crítico"
@@ -198,9 +198,7 @@ class TestCritico:
         def golpe(h):
             m = spawn_by_role("bruiser", 8)
             hp = m.get_hp()
-            cmb.resolve_physical_attack(
-                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 1)
-            )
+            cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(1, 1))
             return hp - m.get_hp()
 
         assert golpe(com_anel) > golpe(nu)
@@ -231,7 +229,7 @@ class TestLifeSteal:
         for h in (nu, com_anel):
             m = spawn_by_role("bruiser", 8)
             cmb.resolve_physical_attack(
-                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 100)
+                h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(1, 100)
             )
         assert nu.get_hp() == antes[id(nu)], "sem item não devia curar"
         assert com_anel.get_hp() > antes[id(com_anel)]
@@ -243,7 +241,7 @@ class TestLifeSteal:
         h._hp = h.base_hp // 2
         antes = h.get_hp()
         m = spawn_by_role("bruiser", 8)
-        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(100))
+        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(100))
         assert h.get_hp() == antes
 
 
@@ -271,7 +269,7 @@ class TestDeathIgnore:
     def _golpe_letal(self, h, m):
         h._hp = 1
         cmb.resolve_physical_attack(
-            m, h, cmb.basic_attack_power(m) * 50, "", rng=_RngRoteirizado(1, 100)
+            m, h, cmb.basic_attack_power(m) * 50, rng=_RngRoteirizado(1, 100)
         )
 
     def test_item_sozinho_salva_uma_vez(self):
@@ -322,9 +320,7 @@ class TestAtivacaoControlada:
         """A arma declara a CHANCE; o catálogo global decide o resto."""
         h, m = _heroi(), spawn_by_role("bruiser", 8)
         h.equip(_item(efeito, 100, "Weapon"))
-        cmb.resolve_physical_attack(
-            h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 100)
-        )
+        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(1, 100))
         assert efeito in m.active_effects, efeito
 
     def test_a_lista_de_permissao_e_exatamente_esta(self):

@@ -2,56 +2,31 @@ from __future__ import annotations
 
 from src.entities.base import Entity
 from src.shared import effect_core as core
-from src.shared.constants import (
-    MONSTER_BASE_AG,
-    MONSTER_BASE_DF,
-    MONSTER_BASE_HP,
-    MONSTER_BASE_MG,
-    MONSTER_BASE_MP,
-    MONSTER_BASE_ST,
-    MONSTER_DEFAULT_OFFENSIVE_WEIGHTS,
-)
 from src.shared.effects import sum_buffs
 
 
 class Monster(Entity):
     """Classe para monstros do jogo (inimigos controlados pelo computador).
 
-    Attributes:
-        base_hp: HP base do monstro (constante de classe).
-        base_mp: MP base do monstro (constante de classe).
-        base_st: Força base do monstro (constante de classe).
-        base_ag: Agilidade base do monstro (constante de classe).
-        base_mg: Magia base do monstro (constante de classe).
-        base_df: Defesa base do monstro (constante de classe).
+    Todo monstro nasce de `spawn_by_role`, que resolve cada atributo pelo
+    orçamento do arquétipo. Por isso o construtor não tem default de atributo:
+    um monstro "sem arquétipo" não existe no jogo, e um default aqui seria um
+    segundo modelo de monstro — o `MONSTER_BASE_*` de antes, que não batia com o
+    orçamento e só servia a quem esquecesse de passar os números.
     """
-
-    # Defaults de classe. `hp`/`mp` guardam a base CRUA porque `base_hp` e
-    # `base_mp` são propriedades — o teto delas é derivado dos efeitos ativos.
-    _base_hp: int = MONSTER_BASE_HP
-    _base_mp: int = MONSTER_BASE_MP
-    base_st: int = MONSTER_BASE_ST
-    base_ag: int = MONSTER_BASE_AG
-    base_mg: int = MONSTER_BASE_MG
-    base_df: int = MONSTER_BASE_DF
-
-    # Vetor de onde o ataque básico nasce, com Σpesos = 1. O arquétipo declara o
-    # dele em `data/monsters.json`; este default vale para um monstro construído
-    # sem arquétipo.
-    offensive_weights: tuple[tuple[str, float], ...] = MONSTER_DEFAULT_OFFENSIVE_WEIGHTS
 
     def __init__(
         self,
         nick_name: str,
         mob_level: int = 1,
         *,
-        hp: int | None = None,
-        mp: int | None = None,
-        st: int | None = None,
-        ag: int | None = None,
-        mg: int | None = None,
-        df: int | None = None,
-        offensive_weights: tuple[tuple[str, float], ...] | None = None,
+        hp: int,
+        mp: int,
+        st: int,
+        ag: int,
+        mg: int,
+        df: int,
+        offensive_weights: tuple[tuple[str, float], ...],
         passives: tuple[tuple[str, float], ...] = (),
     ) -> None:
         """Inicializa um monstro.
@@ -59,14 +34,9 @@ class Monster(Entity):
         Args:
             nick_name: Nome do monstro.
             mob_level: Nível do monstro (default: 1).
-            hp: HP personalizado (opcional).
-            mp: MP personalizado (opcional).
-            st: Força personalizada (opcional).
-            ag: Agilidade personalizada (opcional).
-            mg: Magia personalizada (opcional).
-            df: Defesa personalizada (opcional).
+            hp, mp, st, ag, mg, df: Atributos já resolvidos pelo arquétipo.
             offensive_weights: Vetor `(atributo, peso)` de onde nasce o ataque
-                básico, com Σpesos = 1. Sem ele, vale o default da classe.
+                básico, com Σpesos = 1.
             passives: Modificadores de combate inatos `(tipo, valor)`, lidos por
                 `get_passive_bonus`. Sem eles, o monstro não tem nenhum.
         """
@@ -74,24 +44,21 @@ class Monster(Entity):
         self.level: int = max(1, mob_level)
         self.isalive: bool = True
 
-        self._base_hp: int = int(hp if hp is not None else self._base_hp)
+        # `hp`/`mp` guardam a base CRUA porque `base_hp` e `base_mp` são
+        # propriedades — o teto delas é derivado dos efeitos ativos.
+        self._base_hp: int = int(hp)
         self._hp: int = self._base_hp
-        self._base_mp: int = int(mp if mp is not None else self._base_mp)
+        self._base_mp: int = int(mp)
         self._mp: int = self._base_mp
 
-        self._st: int = int(st if st is not None else self.base_st)
-        self.base_st: int = int(st if st is not None else self.base_st)
-        self._ag: int = int(ag if ag is not None else self.base_ag)
-        self.base_ag: int = int(ag if ag is not None else self.base_ag)
-        self._mg: int = int(mg if mg is not None else self.base_mg)
-        self.base_mg: int = int(mg if mg is not None else self.base_mg)
-        self._df: int = int(df if df is not None else self.base_df)
-        self.base_df: int = int(df if df is not None else self.base_df)
+        self.base_st: int = int(st)
+        self.base_ag: int = int(ag)
+        self.base_mg: int = int(mg)
+        self.base_df: int = int(df)
 
-        if offensive_weights is not None:
-            self.offensive_weights = tuple(
-                (str(eixo), float(peso)) for eixo, peso in offensive_weights
-            )
+        self.offensive_weights: tuple[tuple[str, float], ...] = tuple(
+            (str(eixo), float(peso)) for eixo, peso in offensive_weights
+        )
         self.passive_bonuses: dict[str, float] = {
             str(tipo): float(valor) for tipo, valor in passives
         }
@@ -99,13 +66,8 @@ class Monster(Entity):
         self.active_effects: dict[str, object] = {}
         self.active_buffs: dict[str, object] = {}
 
-        # Instantâneo do básico no spawn, para quem quiser o número sem buffs.
-        # Sai do MESMO vetor que `get_avg_damage` usa: dois caminhos para o mesmo
-        # valor é como o campo antigo virou mentira quando o modelo mudou.
-        self.avg_damage: int = max(1, int(self.weighted_power(self.offensive_weights)))
-
-        # Papel no encontro (ver content/factories/archetypes.py). O default
-        # mantém o monstro histórico: bruiser sem skills, só ataque básico.
+        # Papel no encontro (ver content/factories/archetypes.py). É só a
+        # inicialização: `spawn_by_role` preenche papel, deck e chance de skill.
         self.role: str = "bruiser"
         self.skills: list = []
         self.skill_cooldowns: dict[str, int] = {}
@@ -159,8 +121,8 @@ class Monster(Entity):
     def get_avg_damage(self) -> int:
         """BASE_POWER do monstro, derivado dos atributos COM buffs.
 
-        Deriva em vez de devolver `self.avg_damage` congelado no spawn, para
-        que um buff de força valha dano — como já vale no herói.
+        Deriva dos atributos a cada chamada, para que um buff de força valha
+        dano — como já vale no herói.
 
         E usa `weighted_power`, a MESMA função do herói: o monstro passou a ter um
         vetor ofensivo por arquétipo em vez de `(ST + MG) // 3`. A conta antiga

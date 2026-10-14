@@ -10,20 +10,9 @@ MAP_WIDTH_INCREMENT_PER_5_LEVELS = 4
 
 # Configuração de paredes (geração de mapa)
 MIN_WALL_PERCENT = 0.05
-MAX_WALL_PERCENT = 0.20
 WALL_PERCENT_PER_LEVEL = 0.01
 MAX_WALL_PERCENT_CAP = 0.15  # Limite máximo de paredes por nível
 
-
-# --- Estatísticas de Monstros ---
-MONSTER_BASE_HP = 100
-
-# Stats base para instanciamento de monstros
-MONSTER_BASE_ST = 55
-MONSTER_BASE_MP = 40
-MONSTER_BASE_AG = 3
-MONSTER_BASE_MG = 50
-MONSTER_BASE_DF = 30
 
 # --- Sistema de XP e Moedas ---
 MONSTER_BASE_XP_REWARD = 45
@@ -259,9 +248,6 @@ RECOVERY_MP_STEP_INCOME_RATIO = 0.18
 # `crit_chance: 25` no JSON, como qualquer outra fonte.
 CRIT_CHANCE_DEFAULT = 0
 BASE_HIT_CHANCE = 85
-POISON_DAMAGE_PER_TICK = 5
-# Divisor da agilidade no dano de veneno: quem é mais ágil sangra mais rápido.
-POISON_AGILITY_DIVISOR = 5
 
 # Ranges e cálculos de combate
 PERCENTAGE_RANGE_MIN = 1
@@ -548,10 +534,6 @@ MONSTER_BUDGET_OFFENSE = 88
 MONSTER_BUDGET_DEFENSE = 20
 MONSTER_BUDGET_AGILITY = 8
 MONSTER_BUDGET_MP = 60
-# Vetor ofensivo de um monstro construído SEM arquétipo. Todo monstro do jogo
-# nasce de `spawn_by_role` e traz o vetor do papel dele; este é o default da
-# classe, e é a tradução de soma 1 do antigo `(ST + MG) // 3`: meio a meio.
-MONSTER_DEFAULT_OFFENSIVE_WEIGHTS = (("st", 0.5), ("mg", 0.5))
 # Abaixo desta fração da vida, um monstro com cura prioriza se curar.
 MONSTER_HEAL_HP_RATIO = 0.5
 # Abaixo desta fração da vida, o monstro entra em desespero: gasta o que tiver
@@ -561,9 +543,6 @@ MONSTER_DESPERATE_HP_RATIO = 0.35
 # qualquer arquétipo com dano guardado usa a maior skill que tiver, ignorando a
 # rolagem de `skill_use_chance`: um golpe que mata vale mais que a média.
 MONSTER_EXECUTE_HP_RATIO = 0.35
-# Limiares das condições de bônus das skills de dano. O mesmo 0.35 do execute
-# do monstro: a regra vale para os dois lados da luta, e o jogador que aprendeu
-# a ler o momento de execução do inimigo já sabe ler o seu.
 # Mana de referência no nível 1, usada para converter o custo percentual de uma
 # skill em pontos de MP. É a média das três classes (60, 140, 90).
 #
@@ -593,6 +572,9 @@ MAGIC_SHIELD_ABSORB_PERCENT = 15
 # decisão: mana gasta aguentando não lança skill.
 MAGIC_SHIELD_DAMAGE_PER_MP = 2.0
 
+# Limiares das condições de bônus das skills de dano. O mesmo 0.35 do execute
+# do monstro: a regra vale para os dois lados da luta, e o jogador que aprendeu
+# a ler o momento de execução do inimigo já sabe ler o seu.
 SKILL_BONUS_WOUNDED_RATIO = 0.35
 SKILL_BONUS_HEALTHY_RATIO = 0.80
 # Quantos turnos do início do combate contam como abertura. Um buff de defesa
@@ -610,11 +592,6 @@ DEFAULT_MONSTER_ROLE = "bruiser"
 HIT_AGILITY_SWING = 30  # pontos percentuais máximos que a agilidade move
 HIT_CHANCE_FLOOR = 20  # nenhum defensor fica imune
 HIT_CHANCE_CEIL = 95  # nenhum atacante fica infalível
-
-# --- Efeitos de status ---
-MANA_BURN_PER_TICK = 12  # MP drenado por turno por "mana_burn"
-BLEED_DAMAGE_PERCENT = 4  # % do HP máximo por turno por "bleed"
-INVISIBLE_HIT_PENALTY = 45  # pontos percentuais de acerto perdidos contra alvo invisível
 
 # Duração, em turnos, dos buffs vindos de consumíveis.
 POTION_BUFF_DURATION = 3

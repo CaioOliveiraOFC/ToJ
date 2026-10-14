@@ -289,15 +289,13 @@ class TestResolvePhysicalAttack:
         assert cmb.hit_chance(StubEntity(ag=3), StubEntity(ag=1000)) >= cmb.HIT_CHANCE_FLOOR
 
     @pytest.mark.parametrize("seed", range(12))
-    def test_rogue_ataque_furtivo_usa_crit_chance_high_e_cap_75(self, seed):
-        # cc efetivo = min(25 + 200 passivas, 75) = CAP
+    def test_chance_de_critico_acima_do_teto_fica_no_cap_75(self, seed):
+        # cc efetivo = min(200 de passivas, 75) = CAP
         rogue = StubEntity("Rog", classname="Rogue")
         rogue.passive_bonus["crit_chance"] = 200
         target = StubEntity(df=0)
         _, crit = predict_attack_rolls(seed, BASE_HIT_CHANCE, CRIT_CHANCE_CAP)
-        res = cmb.resolve_physical_attack(
-            rogue, target, 40, "Ataque Furtivo", rng=random.Random(seed)
-        )
+        res = cmb.resolve_physical_attack(rogue, target, 40, rng=random.Random(seed))
         assert res.was_critical is crit
 
     def test_evento_publicado_quando_publish_fornecido(self):

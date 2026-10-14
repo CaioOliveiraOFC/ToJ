@@ -369,7 +369,6 @@ def resolve_physical_attack(
     attacker,
     defender,
     base_damage: int,
-    skill_name: str = "",
     *,
     rng: random.Random | None = None,
     publish: PublishFn = None,
@@ -390,10 +389,6 @@ def resolve_physical_attack(
     caminhos: o `+MULT`, quando a condição de bônus dela está satisfeita, e a
     chance de crítico que ela declara (`crit_chance`). O ataque básico não passa
     nada.
-
-    `skill_name` não decide mais nada: era o que o `if` do Ataque Furtivo lia, e
-    esse `if` virou dado da carta. Fica na assinatura porque os chamadores o
-    passam; sai na limpeza de código morto.
     """
     r = _rng(rng)
 
@@ -817,7 +812,6 @@ def apply_skill(
             caster,
             target,
             total_base,
-            str(skill.name),
             rng=r,
             publish=None,
             accuracy_modifier=int(getattr(skill, "accuracy_modifier", 0) or 0),

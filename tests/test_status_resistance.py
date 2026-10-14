@@ -118,7 +118,6 @@ class TestDanoEStatusSaoSeparados:
                 atacante,
                 alvo,
                 cmb.basic_attack_power(atacante),
-                "",
                 rng=RngRoteirizado(*ACERTA_SEM_CRIT),
             )
             danos.append(hp - alvo.get_hp())
@@ -274,7 +273,6 @@ class TestDePontaAPonta:
                 atacante,
                 alvo,
                 cmb.basic_attack_power(atacante),
-                "",
                 rng=RngRoteirizado(*ACERTA_SEM_CRIT),
             )
             danos.append(hp - alvo.get_hp())

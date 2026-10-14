@@ -841,10 +841,15 @@ Inspirado na arquitetura do Balatro: matemática simples, profundidade emergente
 
 ### Fórmula Universal de Dano
 
-$$DAMAGE_{final} = \Big[\big(BASE\_POWER + \sum FLAT\big) \times \prod MULT \times \prod XMULT_{capped}\Big] \times DEFENSE\_MODIFIER$$
+$$DAMAGE_{final} = BASE\_POWER \times \Big(1 + \sum \Delta mult\Big) \times \prod XMULT_{capped} \times DEFENSE\_MODIFIER \times \prod MITIGATION$$
 
 Uma única fórmula para todas as classes, skills e situações.
 A identidade vem dos **pesos e modificadores**, não de equações separadas.
+
+São três baldes — `+MULT`, `×MULT` e mitigação — e a defesa é estágio próprio. Existia
+um quarto, `FLAT` (pontos somados ao BASE antes de qualquer percentual), e ele saiu na
+reforma de fundação: nenhuma fonte do jogo o preenchia, e um balde sem dono é convite a
+uso errado.
 
 ---
 
@@ -913,13 +918,14 @@ troca Força por Agilidade muda de identidade sem mudar de tamanho. Os pesos viv
 
 Os sistemas do jogo não geram dano — injetam operadores no pipeline.
 
-### 3.1 Modificadores Aditivos (FLAT e MULT)
+### 3.1 Modificadores Aditivos (+MULT)
 
-Bônus lineares. Acumulam-se de forma previsível.
+Bônus lineares. Acumulam-se de forma previsível: somam entre si, e só a soma multiplica.
 
-$$\prod MULT = 1 + \sum \Delta mult$$
+$$MULT = 1 + \sum \Delta mult$$
 
-**Fontes:** skills comuns, buffs de buff, equipamentos passivos, atributos secundários.
+**Fontes:** `damage_percent` (encantamento, passiva, buff) e o bônus situacional da carta
+(`bonus_condition` + `bonus_percent`) quando a condição está satisfeita.
 
 ### 3.2 Modificadores Multiplicativos (XMULT)
 
@@ -949,12 +955,22 @@ Se rand(0, 100) <= crit_chance:
     XMULT_raw *= crit_damage_multiplier
 ```
 
+**`[implementado]`** **Sem fonte, sem crítico.** A chance vem de fontes explícitas e de
+mais nada: passiva, item, encantamento, buff, poção, a própria carta (`crit_chance` no
+JSON — é assim que o Ataque Furtivo declara os 25% dele) e a passiva inata do arquétipo
+(`passives` em `monsters.json` — hoje só o controller, com 10%, e é ele quem congela).
+Antes todo atacante tinha 10% sem que nada dissesse de onde vinham, e o Ataque Furtivo
+era um `if` por nome de skill no motor. A leitura é uma função só, `combat.crit_chance`,
+chamada pelo motor, pelo bot e pela ficha do confronto — que mostra `Crítico: X%` do
+monstro que tem fonte.
+
 **Limites obrigatórios:**
 
 | Parâmetro          | Valor  |
 |--------------------|--------|
+| crit_chance sem fonte | 0% |
 | crit_chance máximo | 75%    |
-| crit_damage padrão | 1.5×   |
+| crit_damage base   | 1.5× — **pendente**: está decidido que existe um multiplicador-base único, não que ele vale 1.5 |
 
 ---
 
@@ -981,22 +997,25 @@ Onde `k = 100` (constante de calibração).
 ### Injeção por Sistema
 
 ### Skills
-Skill **não injeta** no pipeline: ela constrói o BASE e para. Era o desenho antigo, e
-manter os dois caminhos abertos daria à mesma carta dois jeitos de ficar mais forte —
-um deles fora do alcance do validador.
+Skill constrói o BASE e injeta no funil só o que é CIRCUNSTANCIAL: o bônus situacional
+vai para o `+MULT`, e a chance de crítico que a carta declara soma às fontes do
+atacante. Nenhuma carta multiplica o golpe por conta própria — a identidade dela (pesos
+e `power`) fica no BASE, e o que depende do momento passa pelo mesmo funil de todo mundo.
 
 | Skill            | O que ela declara                                             |
 |------------------|---------------------------------------------------------------|
 | Bola de Fogo     | `scaling: mg 1.0`, `power: 3.49`, custo em % da mana máxima    |
 | Assassinato      | `scaling: ag 0.6 + st 0.4`, `power: 5.59`, `bonus_condition`   |
 
-A condição situacional (`bonus_condition` + `bonus_percent`) multiplica o BASE **antes**
-do funil, e não depois — ela é parte da construção do golpe, não um XMULT escondido.
+A condição situacional (`bonus_condition` + `bonus_percent`) entra no `+MULT`, somada
+aos outros percentuais — não multiplica o BASE, e não é um XMULT escondido. Antes ela
+morava no BASE e compunha com todo `+MULT` do funil: +90% da carta sob +10% de
+encantamento rendia 2,09 em vez de 2,00.
 
 ### Equipamentos
 | Item          | Injeção                                              |
 |---------------|------------------------------------------------------|
-| Sword         | `FLAT += 25`                                         |
+| Sword         | `weapon% += 25` (no BASE)                            |
 | Ancient Staff | `ΔMULT += 0.20`                                      |
 | Cursed Dagger | `crit_chance += 15`, trigger: `hp_drain = 5/turno`   |
 
@@ -1033,8 +1052,9 @@ Se qualquer componente do vetor exceder o recurso disponível, a ação é bloqu
 |---------------------|-------|--------------------------------------|
 | `DEFENSE_K`         | 100   | Curva de mitigação                   |
 | `XMULT_CAP`         | 5.0   | Teto de multiplicadores puros        |
+| `CRIT_CHANCE_DEFAULT` | 0   | Chance de crítico sem fonte          |
 | `CRIT_CHANCE_CAP`   | 75    | % máximo de chance crítica           |
-| `CRIT_DAMAGE_BASE`  | 1.5   | Multiplicador padrão de crítico      |
+| `CRIT_DAMAGE_BASE`  | 1.5   | Multiplicador-base de crítico — valor **pendente** de calibração/design |
 
 > Estas constantes residem em `src/shared/constants.py` e são os únicos valores
 > a serem ajustados durante o balanceamento. Nunca hardcode esses valores inline.

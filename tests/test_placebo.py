@@ -155,7 +155,7 @@ class TestPassivaMudaOBoneco:
             heroi._death_ignore_used = False
             heroi._hp = 1
             combat.resolve_physical_attack(
-                _alvo_imortal(), heroi, 10**6, "ataque", rng=random.Random(0), publish=None
+                _alvo_imortal(), heroi, 10**6, rng=random.Random(0), publish=None
             )
             return heroi.get_hp() <= 0
 
@@ -407,7 +407,7 @@ class TestMecanicasQueAsPassivasNovasUsam:
         alvo = _alvo_imortal()
         hp_alvo = alvo.get_hp()
         golpe = combat.resolve_physical_attack(
-            heroi, alvo, 1000, "", rng=random.Random(3), publish=None
+            heroi, alvo, 1000, rng=random.Random(3), publish=None
         )
         causado = hp_alvo - alvo.get_hp()
         assert not golpe.was_evaded and causado > 0
@@ -430,7 +430,7 @@ class TestMecanicasQueAsPassivasNovasUsam:
         assert combat.ONHIT_PROCS[efeito] == modificador
         heroi = self._com(modificador, 100)
         alvo = _alvo_imortal()
-        combat.resolve_physical_attack(heroi, alvo, 500, "", rng=random.Random(1), publish=None)
+        combat.resolve_physical_attack(heroi, alvo, 500, rng=random.Random(1), publish=None)
         assert efeito in alvo.active_effects
         # Duração e stacks vêm do catálogo, não da passiva.
         definicao = core.definition(efeito)
@@ -441,7 +441,7 @@ class TestMecanicasQueAsPassivasNovasUsam:
         heroi = self._com("poison_chance", 100)
         alvo = _alvo_imortal()
         alvo.resistances = {"poison": 100}
-        combat.resolve_physical_attack(heroi, alvo, 500, "", rng=random.Random(1), publish=None)
+        combat.resolve_physical_attack(heroi, alvo, 500, rng=random.Random(1), publish=None)
         assert "poison" not in alvo.active_effects
 
 
@@ -556,9 +556,7 @@ class TestPrecisionEStatusResistance:
         com = self._com("status_resistance", 100)
         assert com.get_hp() == sem.get_hp()
         for alvo in (sem, com):
-            combat.resolve_physical_attack(
-                atacante, alvo, 400, "", rng=random.Random(7), publish=None
-            )
+            combat.resolve_physical_attack(atacante, alvo, 400, rng=random.Random(7), publish=None)
         assert sem.get_hp() == com.get_hp()
 
 

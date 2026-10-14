@@ -42,7 +42,7 @@ def _alvo(nivel: int = 20):
 
 def _golpe(atacante, alvo, base=300, semente=1):
     return combat.resolve_physical_attack(
-        atacante, alvo, base, "", rng=random.Random(semente), publish=None
+        atacante, alvo, base, rng=random.Random(semente), publish=None
     )
 
 
@@ -272,9 +272,7 @@ class TestEmboscada:
 
         heroi = _heroi()
         core.apply_effect(heroi, "invisible")
-        golpe = combat.resolve_physical_attack(
-            heroi, _alvo(), 300, "", rng=SempreErra(0), publish=None
-        )
+        golpe = combat.resolve_physical_attack(heroi, _alvo(), 300, rng=SempreErra(0), publish=None)
         assert golpe.was_evaded
         assert not core.has_effect(heroi, "invisible")
 

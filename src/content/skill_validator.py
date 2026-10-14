@@ -183,11 +183,11 @@ def _efeitos_da_carta(skill):
 def _custo_percentual(skill, ref: dict) -> float:
     """Quanto a carta cobra em % da mana máxima de quem a lança.
 
-    A carta do herói declara isso; a do monstro traz só o custo absoluto. Como
-    o crédito de orçamento é sobre o que se PAGA, e o que se paga é a fração da
-    barra, o absoluto é convertido contra a mana da referência. Sem isso toda
-    carta de monstro entraria com crédito de mana zero e pareceria mais cara do
-    que é — o validador puniria o monstro por um detalhe de formato.
+    Toda carta do jogo, de herói e de monstro, declara `mana_cost_percent`, e é
+    ele que vale. Uma carta sem o campo — mod, save antigo — tem o absoluto
+    convertido contra a mana da referência: o crédito de orçamento é sobre o que
+    se PAGA, e o que se paga é a fração da barra. Sem a conversão ela entraria
+    com crédito de mana zero e pareceria mais cara do que é.
     """
     declarado = float(getattr(skill, "mana_cost_percent", 0) or 0)
     if declarado:

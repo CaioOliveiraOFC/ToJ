@@ -62,18 +62,17 @@ class TestBuffDeMonstroTemEfeito:
         # Agilidade zerada dos dois lados: acerto garantido, sem ruído de esquiva.
         for alvo in (base, buffado):
             alvo.base_ag = 0
-            alvo._ag = 0
 
         rolagens = [random.Random(s) for s in range(40)]
         dano_base = sum(
             combat_mech.resolve_physical_attack(
-                atacante, base, atacante.get_avg_damage(), "", rng=r
+                atacante, base, atacante.get_avg_damage(), rng=r
             ).damage
             for r in rolagens
         )
         dano_buff = sum(
             combat_mech.resolve_physical_attack(
-                atacante, buffado, atacante.get_avg_damage(), "", rng=random.Random(s)
+                atacante, buffado, atacante.get_avg_damage(), rng=random.Random(s)
             ).damage
             for s in range(40)
         )
