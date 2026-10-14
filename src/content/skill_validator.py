@@ -22,6 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from src.content.skills_loader import MONSTER_SKILL_CLASS
+from src.mechanics.combat import additive_multiplier, expected_crit_factor
 from src.shared import effect_core as core
 from src.shared.constants import (
     CLASS_WEIGHTS,
@@ -142,11 +143,35 @@ def offensive_budget(skill, com_bonus: bool = True, reference: dict | None = Non
         return 0
     ref = reference or _referencia(skill.skill_class)
     base = sum(ref.get(t.stat, 0) * t.weight for t in escala) * float(skill.power)
+    base *= fator_de_critico_proprio(skill, ref)
     if com_bonus and getattr(skill, "bonus_percent", 0):
         # A condição não é garantida, mas o teto tem de contar o melhor caso:
         # é ele que decide se a carta pode quebrar o jogo quando alinha.
-        base *= 1 + skill.bonus_percent / 100
+        #
+        # O bônus entra no `+MULT`, como no motor: SOMA às outras fontes do
+        # balde em vez de multiplicar o BASE. A referência não carrega
+        # `damage_percent` próprio, então o balde aqui tem só o bônus da carta —
+        # e esse é o melhor caso de verdade, porque toda outra fonte de `+MULT`
+        # dilui o peso relativo do bônus.
+        base *= additive_multiplier([skill.bonus_percent / 100])
     return int(base / max(1, ref["avg"]) * 100)
+
+
+def fator_de_critico_proprio(skill, ref: dict) -> float:
+    """O crítico que a CARTA declara, em valor esperado, sobre o ataque básico.
+
+    `crit_chance` na carta é dano: o Ataque Furtivo, com 25% próprios, entrega em
+    média 12,5% acima do que o `power` sozinho diz. Fora do orçamento, a carta
+    pareceria no `bud` com o dano esperado acima dele.
+
+    As duas leituras são as canônicas do motor (`expected_crit_factor`). A
+    referência é um vetor de atributos, sem passiva, item nem buff: contra ela a
+    chance é só a da carta. E o básico da referência entra no denominador pela
+    mesma conta — o que se mede é o que a CARTA acrescenta, não o crítico que o
+    personagem teria com qualquer golpe. Valor esperado, e não melhor caso: o
+    crítico é rolagem, não condição que o jogador arma.
+    """
+    return expected_crit_factor(ref, skill) / expected_crit_factor(ref)
 
 
 def effect_budget(skill) -> int:

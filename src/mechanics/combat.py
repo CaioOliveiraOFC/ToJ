@@ -127,7 +127,7 @@ def damage_modifiers(attacker, defender, *, is_critical: bool, skill=None) -> Da
     """
     xmult: list[float] = []
     if is_critical:
-        xmult.append(CRIT_DAMAGE_BASE + fx.combat_modifier(attacker, "crit_damage") / 100)
+        xmult.append(crit_multiplier(attacker))
 
     # As leis globais que este golpe destrava — Quebra Gélida, Emboscada. Elas
     # entram como FATOR do bucket ×MULT, ao lado do crítico e sob o mesmo teto.
@@ -162,6 +162,16 @@ def damage_modifiers(attacker, defender, *, is_critical: bool, skill=None) -> Da
     )
 
 
+def additive_multiplier(mult_mods: list[float] | tuple[float, ...] | None) -> float:
+    """O balde `+MULT`: as fontes SOMAM entre si, e só a soma multiplica.
+
+    É a regra que o funil aplica e a que o validador e a forge usam para medir e
+    resolver uma carta. Uma função só, para que "o bônus condicional entra no
+    `+MULT`" não tenha uma versão no motor e outra na ferramenta de autoria.
+    """
+    return 1.0 + sum(mult_mods) if mult_mods else 1.0
+
+
 def _calculate_damage(
     base_power: float,
     mult_mods: list[float] | None = None,
@@ -176,7 +186,7 @@ def _calculate_damage(
     Amplificação e mitigação são produtos separados porque só o primeiro é
     capado — ver `DamageModifiers`.
     """
-    mult_total = 1.0 + sum(mult_mods) if mult_mods else 1.0
+    mult_total = additive_multiplier(mult_mods)
 
     xmult_raw = 1.0
     if xmult_mods:
@@ -271,6 +281,21 @@ def crit_chance(attacker, skill=None) -> int:
     chance += int(getattr(skill, "crit_chance", 0) or 0)
     chance += int(fx.combat_modifier(attacker, "crit_chance"))
     return max(0, min(chance, CRIT_CHANCE_CAP))
+
+
+def crit_multiplier(attacker) -> float:
+    """O fator que o golpe crítico põe no ×MULT: a base única mais as fontes."""
+    return CRIT_DAMAGE_BASE + fx.combat_modifier(attacker, "crit_damage") / 100
+
+
+def expected_crit_factor(attacker, skill=None) -> float:
+    """Quanto o crítico vale, em média, num golpe deste atacante com esta ação.
+
+    `1 + chance × (multiplicador − 1)`, com as duas leituras canônicas. É o que
+    o validador usa para pôr no orçamento o crítico que a PRÓPRIA carta declara:
+    uma carta com `crit_chance` entrega, em média, mais que o `power` diz.
+    """
+    return 1 + crit_chance(attacker, skill) / 100 * (crit_multiplier(attacker) - 1)
 
 
 def skill_mana_cost(caster, skill) -> int:

@@ -314,7 +314,12 @@ MAX_SCALING_STATS = 2
 SKILL_ACCURACY_RANGE = (-30, 20)
 
 # Personagem de REFERÊNCIA do validador: atributos resolvidos de cada classe no
-# nível 12 com o loadout `expected`, medidos uma vez.
+# nível 12 com o loadout `expected`. MEDIDOS, não escolhidos — o regenerador é
+# `tools/orcamento_de_cartas.medir_referencia_do_heroi`, e um teste compara esta
+# tabela com a medida. Ela ficou congelada desde a autoria do catálogo e derivou
+# (Mago avg 482 -> 491, MP de todas as classes ~-4%) até ser remedida na Etapa 7
+# da reforma de fundação. Toda mudança aqui exige rederivar o `power` das cartas
+# de herói (`orcamento_de_cartas.py --gravar`): a carta segue o `bud`, não a régua.
 #
 # Existe porque o orçamento precisa ser comparável entre classes, e `power`
 # sozinho não é: a Agilidade do Ladino vale 92 onde a Força do Guerreiro vale
@@ -323,9 +328,9 @@ SKILL_ACCURACY_RANGE = (-30, 20)
 #
 # São dados de calibração, não de gameplay: nada no combate lê isto.
 SKILL_REFERENCE_STATS: dict[str, dict[str, int]] = {
-    "Warrior": {"st": 191, "mg": 116, "ag": 38, "df": 144, "hp": 1586, "mp": 318, "avg": 411},
-    "Mage": {"st": 107, "mg": 202, "ag": 34, "df": 117, "hp": 1342, "mp": 674, "avg": 482},
-    "Rogue": {"st": 170, "mg": 111, "ag": 92, "df": 111, "hp": 1342, "mp": 451, "avg": 394},
+    "Warrior": {"st": 191, "mg": 119, "ag": 38, "df": 144, "hp": 1571, "mp": 305, "avg": 413},
+    "Mage": {"st": 107, "mg": 206, "ag": 34, "df": 117, "hp": 1327, "mp": 661, "avg": 491},
+    "Rogue": {"st": 170, "mg": 114, "ag": 92, "df": 111, "hp": 1327, "mp": 439, "avg": 395},
 }
 # Skill Neutral é avaliada contra a MÉDIA das classes: ela não pertence a
 # nenhuma, e medi-la contra a mais fraca seria dar-lhe teto de graça.
@@ -336,11 +341,17 @@ SKILL_REFERENCE_NEUTRAL = {
 
 # Teto de orçamento, medido em % do ataque básico da referência da classe.
 #
-# DERIVADO do catálogo, não escolhido: as cartas existentes vão de -60 (utilidade
-# pura) a 373, e as duas mais caras são as capstones Legendary — Morte Súbita e
-# Apocalipse. 400 acomoda o que o jogo já tem com ~7% de folga e ainda recusa o
-# absurdo, que é o serviço que um guardrail presta. Um teto que reprovasse as
-# capstones existentes seria balancear pelo validador, e isto não é balanceamento.
+# DERIVADO do catálogo, não escolhido: as cartas de herói vão de -60 (utilidade
+# pura) a 383, e as três mais caras são as capstones Legendary — Fortaleza Viva
+# (383), Morte Súbita (374) e Apocalipse (370). 400 acomoda o que o jogo já tem
+# com ~4% de folga e ainda recusa o absurdo, que é o serviço que um guardrail
+# presta. Um teto que reprovasse as capstones existentes seria balancear pelo
+# validador, e isto não é balanceamento. Remedido na Etapa 7 da reforma de
+# fundação, sobre a base nova: o número se sustenta.
+#
+# O monstro é medido contra o MESMO teto, e depois da base nova a carta mais cara
+# dele é 169 (antes, 285, contra atributos inflados). O teto não alcança mais o
+# monstro; um teto próprio de arquétipo é decisão em aberto, não desta medição.
 #
 # Neutral tem teto menor de propósito, e o número também sai do catálogo: 250
 # fica abaixo das seis cartas de classe mais caras, então uma ferramenta

@@ -47,7 +47,14 @@ ARQUIVO = Path(__file__).resolve().parents[1] / "src" / "data" / "arena_benchmar
 # O valor é a PRECISÃO REAL da medição, e não o "29,52" do relatório: a bisseção
 # devolve o meio do intervalo final, e arredondar aqui esconderia um
 # deslocamento de até meio centésimo na hora de conferir.
-PODER_ESPERADO = 29.5205078125
+#
+# REMEDIDO na Etapa 7 da reforma de fundação: 29,5205 -> 29,6357. O snapshot é
+# o mesmo; mudou o adversário da régua (`ARENA_REFERENCE_ROLE`, o bruiser), que
+# ganhou atributos reais, deck por nível, MP por papel, crítico só com fonte e,
+# por fim, cartas rederivadas do orçamento declarado (`mob_cabecada` volta a
+# entregar o `bud` 150). Medido duas vezes, idêntico. A tolerância do teste não
+# mudou: o número segue sendo um alarme de deslocamento, não um alvo.
+PODER_ESPERADO = 29.6357421875
 
 _FABRICA = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 

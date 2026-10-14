@@ -27,6 +27,12 @@ acerta, `atacante_com_fear` virou igual a `basico_sem_crit` (128 -> 160) e
 
 Os dois cenários ficam, mas hoje não exercitam nada que os outros já não
 exercitem — o medo é testado onde ele agora vive, em `test_efeitos_nucleo.py`.
+
+Regravado na reforma de fundação: `monstro_contra_mago_com_egide` 87 -> 88. O
+monstro ganhou atributos reais (Etapa 1). O básico do bruiser Nv.8 era
+`(ST + MG) // 3 = (292 + 292) // 3 = 194`, e o truncamento comia 0,67 ponto;
+agora é a Força dele, 195. O BASE sobe de 174 para 175 e o golpe que passa pela
+Égide, de 87 para 88. Mudança de MODELO do monstro, não do funil.
 """
 
 from __future__ import annotations
@@ -180,7 +186,7 @@ GOLDEN = {
     "atacante_com_fear": 160,
     "defensor_com_reducao": 112,
     "dois_redutores": 112,
-    "monstro_contra_mago_com_egide": 87,
+    "monstro_contra_mago_com_egide": 88,
 }
 
 
