@@ -232,10 +232,20 @@ class TestResolvePhysicalAttack:
         assert res.damage == 41  # int(50 * 100/120)
 
     def test_critico_seed_10_valor_pinned(self):
+        # O crítico precisa de fonte: este pin dá uma explícita, de 10 — a chance
+        # que antes era de todo atacante sem que nada a concedesse.
         a, d = self._pair()
+        a.active_buffs["fonte_de_critico"] = {"stat": "crit_chance", "value": 10, "duration": 3}
         res = cmb.resolve_physical_attack(a, d, self.BASE, rng=random.Random(10))
         assert res.was_critical is True
         assert res.damage == 62  # int(50 * 1.5 * 100/120)
+
+    def test_sem_fonte_nao_existe_critico(self):
+        # A mesma semente do pin acima, sem fonte nenhuma: a rolagem acontece,
+        # mas não há chance de crítico para ela cair dentro.
+        a, d = self._pair()
+        res = cmb.resolve_physical_attack(a, d, self.BASE, rng=random.Random(10))
+        assert res.was_critical is False
 
     def test_morte_do_defensor_marca_isalive_false(self):
         a, d = self._pair()

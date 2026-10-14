@@ -52,6 +52,7 @@ class Monster(Entity):
         mg: int | None = None,
         df: int | None = None,
         offensive_weights: tuple[tuple[str, float], ...] | None = None,
+        passives: tuple[tuple[str, float], ...] = (),
     ) -> None:
         """Inicializa um monstro.
 
@@ -66,6 +67,8 @@ class Monster(Entity):
             df: Defesa personalizada (opcional).
             offensive_weights: Vetor `(atributo, peso)` de onde nasce o ataque
                 básico, com Σpesos = 1. Sem ele, vale o default da classe.
+            passives: Modificadores de combate inatos `(tipo, valor)`, lidos por
+                `get_passive_bonus`. Sem eles, o monstro não tem nenhum.
         """
         self.nick_name: str = nick_name
         self.level: int = max(1, mob_level)
@@ -89,6 +92,9 @@ class Monster(Entity):
             self.offensive_weights = tuple(
                 (str(eixo), float(peso)) for eixo, peso in offensive_weights
             )
+        self.passive_bonuses: dict[str, float] = {
+            str(tipo): float(valor) for tipo, valor in passives
+        }
 
         self.active_effects: dict[str, object] = {}
         self.active_buffs: dict[str, object] = {}
@@ -166,16 +172,17 @@ class Monster(Entity):
         return max(1, int(self.weighted_power(self.offensive_weights)))
 
     def get_passive_bonus(self, effect_type: str) -> float:
-        """Modificadores de combate vindos de passivas. O monstro ainda não tem.
+        """Modificadores de combate vindos das passivas inatas do arquétipo.
 
         Existe explícito porque `shared/effects.combat_modifier` procura este
         método por duck typing: sem ele, o monstro entra no cálculo pela metade
-        e ninguém percebe. Devolver zero é a resposta correta hoje.
+        e ninguém percebe. O valor vem de `passives` no `monsters.json`, e o papel
+        que não declara nada devolve zero — sem fonte, sem modificador.
 
         Equipamento de monstro, quando existir, não entra por aqui: item não se
         disfarça de passiva. Ele terá o próprio caminho, como o herói tem.
         """
-        return 0.0
+        return self.passive_bonuses.get(effect_type, 0.0)
 
     @staticmethod
     def my_type() -> str:

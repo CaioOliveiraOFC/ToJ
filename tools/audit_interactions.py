@@ -55,9 +55,12 @@ ROLES = (
 )
 
 # As peças que cada lei nova precisa NO ALVO. Quebra Gélida e Hemorragia Fria
-# pedem também um crítico, que é universal — todo mundo crita, e ainda há 4
-# passivas e 8 itens de chance de crítico. Emboscada pede a peça no PRÓPRIO
-# atacante, e por isso é a única cuja fonte não é o alvo.
+# pedem também um crítico, e esta tabela NÃO o conta como peça. Isso era seguro
+# enquanto todo atacante tinha 10% de crítico sem fonte; desde que o crítico
+# passou a exigir fonte explícita, uma lei de crítico só é montável por quem tem
+# uma. Do lado do monstro: os buffs do bruiser e do elite, e a passiva inata do
+# controller (`crit_chance` 10) — que é quem congela. Emboscada
+# pede a peça no PRÓPRIO atacante, e por isso é a única cuja fonte não é o alvo.
 PECAS = {
     "Quebra Gélida": ("frozen",),
     "Emboscada": ("invisible",),

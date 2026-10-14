@@ -32,6 +32,7 @@ from src.shared.constants import (
     MONSTER_BUDGET_MP,
     MONSTER_BUDGET_OFFENSE,
 )
+from src.shared.effects import COMBAT_MODIFIERS
 from src.shared.formulas import geometric
 
 # Papéis que ganham a marcação de chefe: entram sozinhos no encontro e pagam
@@ -71,6 +72,10 @@ class Archetype:
     `mp` é o multiplicador do pool de mana, como os outros eixos. Antes o pool era
     `MONSTER_BUDGET_MP` chapado para os nove papéis: o trash, que só conjura em
     jogada decisiva, tinha a mesma reserva do suporte, que vive de cura.
+
+    `passives` são modificadores de combate inatos do papel (`crit_chance`, …),
+    lidos pelo mesmo `get_passive_bonus` que o herói usa. Vazio na maioria: o
+    papel que não declara fonte não tem o modificador.
     """
 
     role: str
@@ -82,6 +87,7 @@ class Archetype:
     defense: float
     agility: float
     offensive_weights: tuple[tuple[str, float], ...]
+    passives: tuple[tuple[str, float], ...]
     skill_use_chance: int
     skills: tuple[SkillCard, ...]
     threat: str
@@ -149,6 +155,28 @@ def _offensive_weights_from_json(role: str, data: dict) -> tuple[tuple[str, floa
             "O vetor define a composição do golpe; a magnitude vem dos atributos."
         )
     return pesos
+
+
+def _passives_from_json(role: str, data: dict) -> tuple[tuple[str, float], ...]:
+    """Lê as passivas inatas do arquétipo — modificadores de combate que o papel
+    carrega sempre, como o herói carrega as passivas que escolheu.
+
+    É FONTE, não regra: o valor entra em `get_passive_bonus` e dali no mesmo
+    `fx.combat_modifier` que soma buff, passiva e equipamento do herói. Nenhum
+    consumidor sabe que existe um arquétipo por trás. A ausência vale zero — o
+    papel que não declara nada não tem nada.
+
+    Só entram os modificadores de `COMBAT_MODIFIERS`: um nome fora dela é erro de
+    digitação que ninguém leria, e o papel ficaria sem a fonte sem avisar.
+    """
+    bruto = data.get("passives") or {}
+    desconhecidos = sorted(set(bruto) - set(COMBAT_MODIFIERS))
+    if desconhecidos:
+        raise ValueError(
+            f"Arquétipo {role!r} declara passivas {desconhecidos}; "
+            f"os modificadores válidos são {list(COMBAT_MODIFIERS)}."
+        )
+    return tuple((tipo, float(bruto[tipo])) for tipo in COMBAT_MODIFIERS if tipo in bruto)
 
 
 def _kit_from_json(role: str, data: dict) -> tuple[SkillCard, ...]:
@@ -229,6 +257,7 @@ def _archetype_from_json(role: str, data: dict) -> Archetype:
         defense=float(budget.get("defense", 1.0)),
         agility=float(budget.get("agility", 1.0)),
         offensive_weights=_offensive_weights_from_json(role, data),
+        passives=_passives_from_json(role, data),
         skill_use_chance=int(data.get("skill_use_chance", 0)),
         skills=_kit_from_json(role, data),
         threat=data.get("threat", ""),
@@ -318,6 +347,7 @@ def spawn_by_role(role: str, level: int, name: str | None = None, rng=None) -> M
         df=geometric(MONSTER_BUDGET_DEFENSE * archetype.defense, level),
         ag=geometric(MONSTER_BUDGET_AGILITY * archetype.agility, level),
         offensive_weights=archetype.offensive_weights,
+        passives=archetype.passives,
     )
     monster.role = archetype.role
     monster.skills = deck_for_level(archetype, level, rng)

@@ -134,6 +134,11 @@ class SkillCard:
     # valer o turno que custou, porque a skill seguinte cobra por isso.
     bonus_condition: str = ""
     bonus_percent: int = 0
+    # Chance de crítico que ESTA carta traz para o próprio golpe, somada às
+    # demais fontes do atacante em `combat.crit_chance`. É como o Ataque Furtivo
+    # declara o que antes era um `if` pelo nome dele dentro do motor. Zero na
+    # carta comum.
+    crit_chance: int = 0
 
     # --- gramática V2 ---
     # De quais atributos o golpe nasce. Até dois, somando 1.0. Vazio em skill

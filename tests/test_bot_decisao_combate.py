@@ -386,18 +386,54 @@ class TestFronteiraDeInformacao:
     """Nenhum canal escondido do monstro está ativo.
 
     O que a ficha do confronto mostra é Nível, HP, MP, Força, Agilidade, Magia e
-    Defesa. Tudo que o `CombatState` carrega do alvo reduz a isso mais regra
-    pública — mas isso é verdade por conteúdo, não por construção. Este teste é o
-    alarme: se um arquétipo ganhar passiva escondida ou resistência a status, o
-    bot passaria a decidir com informação que o jogador não tem.
+    Defesa — e o Crítico, quando o alvo tem fonte dele. Tudo que o `CombatState`
+    carrega do alvo reduz a isso mais regra pública — mas isso é verdade por
+    conteúdo, não por construção. Este teste é o alarme: se um arquétipo ganhar
+    passiva escondida ou resistência a status, o bot passaria a decidir com
+    informação que o jogador não tem. Modificador novo que o bot use entra na
+    ficha antes de entrar no jogo.
     """
 
+    # Os modificadores do alvo que entram no golpe esperado dele (`alvo_dano`).
+    # Cada um precisa de uma linha na ficha antes de poder ser diferente de zero.
+    MODIFICADORES_SEM_LINHA_NA_FICHA = ("crit_damage", "damage_percent", "precision")
+
     def test_nenhum_arquetipo_tem_modificador_de_combate_escondido(self):
+        # O bot lê o crítico do alvo — e a ficha mostra o mesmo número. Os demais
+        # modificadores não têm linha na ficha, então seguem obrigatoriamente zero.
+        from src.mechanics import combat as cmb
+        from src.ui.renderer import linha_de_critico
+
         for papel in all_archetypes():
             for nivel in (1, 10, 20):
                 monstro = create_monster("Alvo", nivel, papel)
-                for tipo in ("crit_chance", "crit_damage", "damage_percent", "precision"):
+                chance = cmb.crit_chance(monstro)
+                linha = linha_de_critico(chance)
+                if chance > 0:
+                    assert linha is not None and f"{chance}%" in linha, (papel, nivel)
+                else:
+                    assert linha is None, (papel, nivel)
+                for tipo in self.MODIFICADORES_SEM_LINHA_NA_FICHA:
                     assert fx.combat_modifier(monstro, tipo) == 0.0, (papel, nivel, tipo)
+
+    def test_a_ficha_mostra_o_critico_do_controller_e_so_dele(self):
+        # A ficha renderizada, não só a função da linha: é o que o jogador vê.
+        from src.mechanics import combat as cmb
+        from src.sim.harness import make_hero
+        from src.ui import renderer
+
+        heroi = make_hero("Warrior", 10, "naked")
+        for papel, esperado in (("controller", "Crítico: 10%"), ("bruiser", None)):
+            monstro = create_monster("Alvo", 10, papel)
+            with renderer.console.capture() as tela:
+                renderer.render_compare_opponents(
+                    heroi, monstro, crit_alvo=cmb.crit_chance(monstro)
+                )
+            texto = tela.get()
+            if esperado:
+                assert esperado in texto, papel
+            else:
+                assert "Crítico" not in texto, papel
 
     def test_nenhum_arquetipo_tem_resistencia_a_status(self):
         efeitos = ("stun", "frozen", "sleep", "poison", "bleed", "weakened", "mana_burn")

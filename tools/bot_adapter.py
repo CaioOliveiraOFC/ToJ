@@ -45,9 +45,6 @@ from src.shared import effect_core as core
 from src.shared import effects as fx
 from src.shared import interactions as ix
 from src.shared.constants import (
-    CRIT_CHANCE_CAP,
-    CRIT_CHANCE_DEFAULT,
-    CRIT_CHANCE_HIGH,
     FLEE_RANGE_MAX,
     MAGIC_SHIELD_DAMAGE_PER_MP,
     RANDOM_EVENT_ALTAR_HP_COST_PERCENT,
@@ -103,28 +100,15 @@ def _chance_de_acerto(atacante, defensor, accuracy_modifier: int = 0) -> float:
     return combat_mech.hit_chance(atacante, defensor, accuracy_modifier) / 100
 
 
-def _chance_de_critico(atacante, nome_da_skill: str = "") -> float:
-    """Mirror mínimo da regra de crit em `mechanics/combat.py:383-391`.
-    Protegido por teste de paridade.
+def _chance_de_critico(atacante, skill=None) -> float:
+    """A chance de crítico do motor, em fração. Não é mais um espelho.
 
-    Não existe função canônica: a regra é código inline dentro de
-    `resolve_physical_attack`. O mirror usa SÓ constantes e modificadores
-    canônicos e a condição que já está no motor, sem duplicar número nenhum.
-
-    DÍVIDA REGISTRADA: promover esta leitura a função pública do engine em
-    rodada estrutural própria. Enquanto isso, o teste de paridade é o contrato.
+    Era uma cópia da regra inline de `resolve_physical_attack`, com o `if` por
+    nome do Ataque Furtivo reescrito aqui e protegida só por teste de paridade —
+    a dívida registrada era promover a leitura a função pública do motor. Foi
+    feito: `combat.crit_chance` é a única conta, e motor e bot a chamam.
     """
-    base = (
-        CRIT_CHANCE_HIGH
-        if (
-            hasattr(atacante, "get_classname")
-            and atacante.get_classname() == "Rogue"
-            and nome_da_skill == "Ataque Furtivo"
-        )
-        else CRIT_CHANCE_DEFAULT
-    )
-    base += int(fx.combat_modifier(atacante, "crit_chance"))
-    return min(base, CRIT_CHANCE_CAP) / 100
+    return combat_mech.crit_chance(atacante, skill) / 100
 
 
 def _dano_do_funil(atacante, defensor, base_power: int, *, critico: bool, skill=None) -> int:
@@ -153,13 +137,13 @@ def _dano_do_funil(atacante, defensor, base_power: int, *, critico: bool, skill=
     )
 
 
-def _golpe_esperado(atacante, defensor, base_power: int, nome_da_skill: str = "") -> int:
+def _golpe_esperado(atacante, defensor, base_power: int, skill=None) -> int:
     """O golpe esperado: funil, com a expectativa do crítico e do acerto.
 
     Uma média sobre as duas rolagens que o motor faz — acerto e crítico. É o
     número que a policy compara, e é a MESMA unidade dos dois lados do combate.
     """
-    p_crit = _chance_de_critico(atacante, nome_da_skill)
+    p_crit = _chance_de_critico(atacante, skill)
     normal = _dano_do_funil(atacante, defensor, base_power, critico=False)
     critico = _dano_do_funil(atacante, defensor, base_power, critico=True)
     por_acerto = normal * (1 - p_crit) + critico * p_crit
@@ -590,7 +574,7 @@ def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
         "cooldown": int(getattr(skill, "cooldown", 0) or 0),
         "duration": duracao,
         "hit_chance": _chance_de_acerto(hero, monstro, mira),
-        "crit_chance": _chance_de_critico(hero, nome),
+        "crit_chance": _chance_de_critico(hero, skill),
         "acts_before_enemy": _age_antes(hero, monstro),
         "interactions": _interacoes_da_skill(hero, monstro, skill),
     }
@@ -599,7 +583,7 @@ def _mecanica_de_skill(hero, monstro, skill) -> ActionMechanicsView:
         base = combat_mech.skill_damage_base(hero, skill, monstro)
         # `_golpe_esperado` já embute acerto; o view separa os dois, então aqui
         # entra o golpe POR ACERTO e a chance viaja no seu próprio campo.
-        p_crit = _chance_de_critico(hero, nome)
+        p_crit = _chance_de_critico(hero, skill)
         normal = _dano_do_funil(hero, monstro, base, critico=False, skill=skill)
         critico = _dano_do_funil(hero, monstro, base, critico=True, skill=skill)
         campos["expected_strike_damage"] = max(1, int(normal * (1 - p_crit) + critico * p_crit))

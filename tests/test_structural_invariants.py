@@ -406,6 +406,76 @@ class TestArquetipos:
             )
 
 
+class TestCriticoDeFonte:
+    """Sem fonte explícita, não existe crítico.
+
+    Todo atacante tinha 10% de crítico sem que nada no jogo dissesse de onde
+    vinham. Agora o crítico é concedido — por passiva, item, encantamento, buff,
+    poção ou pela carta — e a chance de quem não tem nada disso é zero.
+    """
+
+    def test_o_critico_do_monstro_e_exatamente_a_fonte_declarada(self):
+        # Sem buff, a chance do monstro é a passiva inata do arquétipo e nada
+        # mais: zero para quem não declara, o valor do JSON para quem declara.
+        import random
+
+        for papel, arquetipo in all_archetypes().items():
+            declarada = dict(arquetipo.passives).get("crit_chance", 0)
+            for nivel in (1, 12, 20):
+                m = spawn_by_role(papel, nivel, rng=random.Random(0))
+                assert cmb.crit_chance(m) == declarada, (papel, nivel)
+                for carta in arquetipo.skills:
+                    esperado = declarada + carta.crit_chance
+                    assert cmb.crit_chance(m, carta) == esperado, (papel, carta.id)
+
+    def test_so_o_controller_declara_critico_inato(self):
+        # A fonte é do papel que congela, não um default disfarçado: os outros
+        # oito seguem sem crítico até um buff dar um.
+        com_fonte = {
+            papel: dict(a.passives)["crit_chance"]
+            for papel, a in all_archetypes().items()
+            if "crit_chance" in dict(a.passives)
+        }
+        assert com_fonte == {"controller": 10}
+
+    def test_quem_congela_consegue_critar(self):
+        # Quebra Gélida e Hemorragia Fria pedem alvo congelado E golpe crítico.
+        # Um arquétipo que congela sem nenhuma fonte de crítico tem as duas leis
+        # mortas no próprio kit — foi o que o crítico por fonte deixou para trás
+        # quando os 10% implícitos saíram.
+        import random
+
+        def congela(carta):
+            sec = carta.secondary
+            return carta.effect_value == "frozen" or (sec is not None and sec.effect == "frozen")
+
+        congeladores = [p for p, a in all_archetypes().items() if any(map(congela, a.skills))]
+        assert congeladores, "nenhum monstro congela: o teste perdeu o objeto"
+        for papel in congeladores:
+            m = spawn_by_role(papel, 12, rng=random.Random(0))
+            assert cmb.crit_chance(m) > 0, papel
+
+    def test_arquetipo_com_passiva_desconhecida_e_recusado(self):
+        from src.content.factories.archetypes import _passives_from_json
+
+        with pytest.raises(ValueError, match="crit_chanse"):
+            _passives_from_json("x", {"passives": {"crit_chanse": 10}})
+        assert _passives_from_json("x", {}) == ()
+
+    def test_heroi_sem_equipamento_nao_crita_no_basico(self):
+        for classe in ALL_CLASSES:
+            assert cmb.crit_chance(make_hero(classe, 1, "naked")) == 0, classe
+
+    def test_a_fonte_da_carta_soma_e_o_teto_segura(self):
+        from src.shared.constants import CRIT_CHANCE_CAP
+
+        furtivo = next(s for s in load_skills() if s.id == "ataque_furtivo")
+        heroi = make_hero("Rogue", 1, "naked")
+        assert cmb.crit_chance(heroi, furtivo) == furtivo.crit_chance
+        heroi.active_buffs["x"] = {"stat": "crit_chance", "value": 999, "duration": 1}
+        assert cmb.crit_chance(heroi, furtivo) == CRIT_CHANCE_CAP
+
+
 class TestGolpeLetal:
     """Matar vem antes de curar quando o alvo morre neste turno.
 

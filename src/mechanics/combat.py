@@ -16,7 +16,6 @@ from src.shared.constants import (
     BASIC_ATTACK_POWER_MULT,
     CRIT_CHANCE_CAP,
     CRIT_CHANCE_DEFAULT,
-    CRIT_CHANCE_HIGH,
     CRIT_DAMAGE_BASE,
     DAMAGE_REDUCTION_DEFAULT_PERCENT,
     DAMAGE_REDUCTION_DURATION,
@@ -255,6 +254,25 @@ def basic_attack_power(attacker) -> int:
     return max(1, int(attacker.get_avg_damage() * BASIC_ATTACK_POWER_MULT))
 
 
+def crit_chance(attacker, skill=None) -> int:
+    """Chance de crítico, em %, de ESTE atacante com ESTA ação. A única leitura.
+
+    Sem fonte, não existe crítico: a base é `CRIT_CHANCE_DEFAULT`, zero. Somam as
+    fontes do atacante — passiva, item, encantamento, buff, poção, tudo pela
+    mesma porta (`fx.combat_modifier`) — e a da carta, quando a ação é uma skill
+    que declara `crit_chance`. O teto é `CRIT_CHANCE_CAP`.
+
+    Existia inline dentro de `resolve_physical_attack`, com um `if` por NOME de
+    skill (Rogue + "Ataque Furtivo" valia 25 em vez de 10), e o bot mantinha uma
+    cópia protegida só por teste de paridade. Agora motor e bot chamam esta
+    função, e a paridade deixa de ser um contrato a vigiar: é a mesma conta.
+    """
+    chance = CRIT_CHANCE_DEFAULT
+    chance += int(getattr(skill, "crit_chance", 0) or 0)
+    chance += int(fx.combat_modifier(attacker, "crit_chance"))
+    return max(0, min(chance, CRIT_CHANCE_CAP))
+
+
 def skill_mana_cost(caster, skill) -> int:
     """Quanto de mana a skill custa para ESTE lançador.
 
@@ -368,8 +386,14 @@ def resolve_physical_attack(
     ataque básico não declara nada e passa 0, que é a definição de "mira
     neutra": ele é a régua contra a qual as skills se comparam.
 
-    `skill` é a carta que produziu o golpe: é por ela que a condição de bônus
-    entra no `+MULT`. O ataque básico não passa nada.
+    `skill` é a carta que produziu o golpe. Ela chega ao golpe por dois
+    caminhos: o `+MULT`, quando a condição de bônus dela está satisfeita, e a
+    chance de crítico que ela declara (`crit_chance`). O ataque básico não passa
+    nada.
+
+    `skill_name` não decide mais nada: era o que o `if` do Ataque Furtivo lia, e
+    esse `if` virou dado da carta. Fica na assinatura porque os chamadores o
+    passam; sai na limpeza de código morto.
     """
     r = _rng(rng)
 
@@ -397,17 +421,10 @@ def resolve_physical_attack(
         )
         return miss
 
-    crit_chance = (
-        CRIT_CHANCE_HIGH
-        if hasattr(attacker, "get_classname")
-        and attacker.get_classname() == "Rogue"
-        and skill_name == "Ataque Furtivo"
-        else CRIT_CHANCE_DEFAULT
-    )
-    crit_chance += int(fx.combat_modifier(attacker, "crit_chance"))
-    crit_chance = min(crit_chance, CRIT_CHANCE_CAP)
-
-    is_critical = r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= crit_chance
+    # A rolagem acontece mesmo com chance zero: pular o sorteio mudaria o
+    # consumo do gerador, e toda semente passaria a produzir outro combate.
+    chance_critica = crit_chance(attacker, skill)
+    is_critical = r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= chance_critica
 
     disparadas = ix.strike_interactions(attacker, defender, is_critical=is_critical)
     mods = damage_modifiers(attacker, defender, is_critical=is_critical, skill=skill)

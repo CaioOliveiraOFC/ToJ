@@ -190,6 +190,10 @@ class TestCritico:
     def test_item_de_crit_damage_engorda_o_critico_pelo_xmult(self):
         nu, com_anel = _heroi(), _heroi()
         com_anel.equip(_item("crit_damage", 40))
+        # A rolagem de crítico sai 1, mas sem fonte de chance nenhum golpe crita:
+        # os dois recebem a mesma fonte, e o anel é a única diferença.
+        for h in (nu, com_anel):
+            h.active_buffs["fonte_de_critico"] = {"stat": "crit_chance", "value": 10, "duration": 3}
 
         def golpe(h):
             m = spawn_by_role("bruiser", 8)

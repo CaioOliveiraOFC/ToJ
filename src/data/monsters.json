@@ -747,6 +747,9 @@
       "offensive_weights": {
         "mg": 1.0
       },
+      "passives": {
+        "crit_chance": 10
+      },
       "skill_use_chance": 55,
       "threat": "Nega turnos e recurso.",
       "counterplay": "Matar rápido, ou não depender de MP.",

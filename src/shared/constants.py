@@ -249,8 +249,15 @@ RECOVERY_HP_STEP_INCOME_RATIO = 0.22
 RECOVERY_MP_STEP_INCOME_RATIO = 0.18
 
 # --- Mecânicas de Combate ---
-CRIT_CHANCE_HIGH = 25  # Para Rogue com Ataque Furtivo
-CRIT_CHANCE_DEFAULT = 10
+# Chance de crítico de quem não tem FONTE nenhuma: zero. O crítico existe quando
+# alguma coisa o concede — passiva, item, encantamento, buff, poção ou a própria
+# carta (`SkillCard.crit_chance`) — e só então. Eram 10%, dados a todo atacante
+# sem que nada no jogo dissesse de onde vinham; o monstro critava porque sim.
+#
+# Era também o `CRIT_CHANCE_HIGH = 25`, um `if` por NOME de skill no motor
+# (Rogue + "Ataque Furtivo"). Virou dado da carta: o Ataque Furtivo declara
+# `crit_chance: 25` no JSON, como qualquer outra fonte.
+CRIT_CHANCE_DEFAULT = 0
 BASE_HIT_CHANCE = 85
 POISON_DAMAGE_PER_TICK = 5
 # Divisor da agilidade no dano de veneno: quem é mais ágil sangra mais rápido.
@@ -286,7 +293,15 @@ DEFENSE_K = 100  # Curva de mitigação: k/(k+defense)
 BASIC_ATTACK_POWER_MULT = 0.90
 XMULT_CAP = 5.0  # Teto de multiplicadores puros
 CRIT_CHANCE_CAP = 75  # % máximo de chance crítica
-CRIT_DAMAGE_BASE = 1.5  # Multiplicador padrão de crítico
+# NÚMERO ÓRFÃO — PENDENTE DE CALIBRAÇÃO/DESIGN.
+#
+# Está decidido que existe UM multiplicador-base de crítico no sistema, e que o
+# `crit_damage` das fontes soma sobre ele. NÃO está decidido que ele vale 1.5:
+# não há origem matemática demonstrada, nem alvo de calibração, nem axioma de
+# design declarado. O valor é o legado, preservado de propósito durante a
+# reforma para que ela não mude duas coisas ao mesmo tempo — e não recebe aqui
+# uma justificativa escrita depois do fato.
+CRIT_DAMAGE_BASE = 1.5
 
 # Matriz de pesos por classe (Fórmula Universal de Dano)
 # =====================================================================

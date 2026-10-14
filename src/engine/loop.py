@@ -23,7 +23,7 @@ from src.engine.encounter import resolve_encounter
 from src.engine.events import EventBus
 from src.engine.map import EventTile, FeatureTile, MapOfGame
 from src.entities.monsters import Monster
-from src.mechanics import battle
+from src.mechanics import battle, combat
 from src.mechanics.math_operations import (
     estimate_next_essence_multiplier,
     generate_essence_multiplier,
@@ -292,7 +292,9 @@ def run_fight(
             )
 
     try:
-        screens.render_fight_intro(player, monsters[0])
+        # A chance vem da MESMA função que o motor rola e o bot lê: a ficha só a
+        # mostra. `ui/` não enxerga `mechanics/`, então quem lê é o engine.
+        screens.render_fight_intro(player, monsters[0], crit_alvo=combat.crit_chance(monsters[0]))
         safe_get_key(allow_escape=False)
 
         # A REGRA do encontro mora em `engine/encounter.py`, compartilhada com o
