@@ -328,9 +328,9 @@ SKILL_ACCURACY_RANGE = (-30, 20)
 #
 # São dados de calibração, não de gameplay: nada no combate lê isto.
 SKILL_REFERENCE_STATS: dict[str, dict[str, int]] = {
-    "Warrior": {"st": 191, "mg": 119, "ag": 38, "df": 144, "hp": 1571, "mp": 305, "avg": 413},
+    "Warrior": {"st": 173, "mg": 119, "ag": 38, "df": 144, "hp": 1571, "mp": 305, "avg": 379},
     "Mage": {"st": 107, "mg": 206, "ag": 34, "df": 117, "hp": 1327, "mp": 661, "avg": 491},
-    "Rogue": {"st": 170, "mg": 114, "ag": 92, "df": 111, "hp": 1327, "mp": 439, "avg": 395},
+    "Rogue": {"st": 170, "mg": 114, "ag": 92, "df": 111, "hp": 1132, "mp": 439, "avg": 395},
 }
 # Skill Neutral é avaliada contra a MÉDIA das classes: ela não pertence a
 # nenhuma, e medi-la contra a mais fraca seria dar-lhe teto de graça.
@@ -402,7 +402,7 @@ MAP_BORDER_OFFSET = 1  # Offset para evitar bordas
 # uma vantagem grande demais nesse eixo não é identidade, é dominância.
 WARRIOR_BASE_HP = 440
 WARRIOR_BASE_MP = 60
-WARRIOR_BASE_ST = 54
+WARRIOR_BASE_ST = 49
 WARRIOR_BASE_AG = 10
 WARRIOR_BASE_MG = 30
 WARRIOR_BASE_DF = 32
@@ -414,7 +414,7 @@ MAGE_BASE_AG = 8
 MAGE_BASE_MG = 52
 MAGE_BASE_DF = 26
 
-ROGUE_BASE_HP = 370
+ROGUE_BASE_HP = 314
 ROGUE_BASE_MP = 90
 ROGUE_BASE_ST = 48
 ROGUE_BASE_AG = 26

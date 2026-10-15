@@ -9,12 +9,15 @@ import pytest
 
 from src.content.items import get_all_items
 from src.entities.heroes import Warrior
+from src.shared.constants import CLASS_WEIGHTS
 
 
 def test_equip_muda_atk_e_def():
     player = Warrior("Teste")
     base_atk = player.get_avg_damage()
     base_def = player.base_df
+    pesos = tuple((k, CLASS_WEIGHTS["Warrior"][k]) for k in ("st", "mg", "ag"))
+    poder_sem_arma = player.weighted_power(pesos)
     # Pega uma arma com dano e defesa conhecidos
     all_items = get_all_items()
     sword = all_items["Espada de Ferro"]  # dmg 5, def 0
@@ -22,7 +25,11 @@ def test_equip_muda_atk_e_def():
     player.inventory.append(sword)
     # Equipa
     player.equip(sword)
-    assert player.get_avg_damage() == base_atk + 5
+    # A arma é PERCENTUAL: `damage_bonus` 5 vale +5% sobre o poder ponderado, não
+    # +5 pontos de ATK. Afirmar "+5" só passava enquanto o ATK base ficava perto
+    # de 100 (98,4 x 1,05 -> +5); com a Força base 49, 90,4 x 1,05 -> +4.
+    assert player.get_avg_damage() == int(poder_sem_arma * (1 + sword.damage_bonus / 100))
+    assert player.get_avg_damage() > base_atk
     assert player.base_df == base_def
     # Desequipa
     player.unequip("Weapon1")

@@ -34,7 +34,7 @@
           "weight": 1.0
         }
       ],
-      "power": 2.823
+      "power": 2.86
     },
     {
       "id": "investida",
@@ -66,7 +66,7 @@
           "weight": 0.3
         }
       ],
-      "power": 3.756,
+      "power": 3.775,
       "secondary": {
         "effect": "stun",
         "chance": 15,
@@ -137,7 +137,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.743
+      "power": 3.793
     },
     {
       "id": "bola_fogo",
@@ -430,7 +430,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.251
+      "power": 3.294
     },
     {
       "id": "provocacao",
@@ -496,7 +496,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.571,
+      "power": 3.618,
       "secondary": {
         "effect": "frailty",
         "chance": 55,
@@ -574,7 +574,7 @@
           "weight": 0.2
         }
       ],
-      "power": 4.254,
+      "power": 4.24,
       "secondary": {
         "effect": "stun",
         "chance": 30,
@@ -1033,7 +1033,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.572,
+      "power": 3.619,
       "secondary": {
         "effect": "vulnerable",
         "chance": 45,
@@ -1069,7 +1069,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.114,
+      "power": 3.155,
       "secondary": {
         "effect": "slowed",
         "chance": 50,
@@ -1167,7 +1167,7 @@
           "weight": 1.0
         }
       ],
-      "power": 2.973,
+      "power": 3.012,
       "secondary": {
         "effect": "weakened",
         "chance": 35,
@@ -1200,7 +1200,7 @@
           "weight": 1.0
         }
       ],
-      "power": 2.96,
+      "power": 2.999,
       "secondary": {
         "effect": "bleed",
         "chance": 55,
@@ -1236,7 +1236,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.196,
+      "power": 3.239,
       "secondary": {
         "effect": "stun",
         "chance": 20,
@@ -1356,7 +1356,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.424,
+      "power": 3.469,
       "secondary": {
         "effect": "vulnerable",
         "chance": 55,
@@ -1418,7 +1418,7 @@
           "weight": 0.4
         }
       ],
-      "power": 4.196,
+      "power": 4.028,
       "secondary": {
         "effect": "weakened",
         "chance": 60,
@@ -1451,7 +1451,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.633,
+      "power": 3.68,
       "secondary": {
         "effect": "bleed",
         "chance": 65,
@@ -1487,7 +1487,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.463,
+      "power": 3.509,
       "secondary": {
         "effect": "stun",
         "chance": 25,
@@ -1591,7 +1591,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.979,
+      "power": 4.031,
       "secondary": {
         "effect": "bleed",
         "chance": 55,
@@ -1668,7 +1668,7 @@
           "weight": 1.0
         }
       ],
-      "power": 4.485,
+      "power": 4.544,
       "secondary": {
         "effect": "bleed",
         "chance": 70,
@@ -1704,7 +1704,7 @@
           "weight": 1.0
         }
       ],
-      "power": 0.526,
+      "power": 0.482,
       "secondary": {
         "effect": "fear",
         "chance": 60,
@@ -1765,7 +1765,7 @@
           "weight": 0.4
         }
       ],
-      "power": 6.659,
+      "power": 6.394,
       "secondary": {
         "effect": "stun",
         "chance": 40,
@@ -3118,7 +3118,7 @@
           "weight": 0.4
         }
       ],
-      "power": 1.353,
+      "power": 1.56,
       "secondary": {
         "effect": "poison",
         "chance": 70,
@@ -3238,7 +3238,7 @@
           "weight": 1.0
         }
       ],
-      "power": 6.619,
+      "power": 6.436,
       "secondary": {
         "effect": "vulnerable",
         "chance": 40,
@@ -3614,7 +3614,7 @@
           "weight": 0.5
         }
       ],
-      "power": 10.392,
+      "power": 10.104,
       "secondary": {
         "effect": "bleed",
         "chance": 60,
@@ -3780,7 +3780,7 @@
           "weight": 1.0
         }
       ],
-      "power": 0.49,
+      "power": 0.499,
       "secondary": {
         "effect": "fear",
         "chance": 55,

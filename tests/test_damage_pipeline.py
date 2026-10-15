@@ -33,6 +33,14 @@ monstro ganhou atributos reais (Etapa 1). O básico do bruiser Nv.8 era
 `(ST + MG) // 3 = (292 + 292) // 3 = 194`, e o truncamento comia 0,67 ponto;
 agora é a Força dele, 195. O BASE sobe de 174 para 175 e o golpe que passa pela
 Égide, de 87 para 88. Mudança de MODELO do monstro, não do funil.
+
+Regravado na Etapa 8 (calibração de classe): os cinco cenários do ataque
+básico do Guerreiro. A Força base dele caiu de 54 para 49; no Nv.8 com loadout
+`expected` a Força resolvida vai de 122 para 111 e o BASE do básico, de 231
+para 212. basico_sem_crit e atacante_com_fear 160 -> 147, basico_com_crit
+240 -> 220, defensor_com_reducao e dois_redutores 112 -> 102. Mudança de
+ATRIBUTO da classe, não do funil. Os cenários de skill não se movem: usam Mago
+e Ladino, e a carta do Ladino não escala com o HP que ele perdeu (370 -> 314).
 """
 
 from __future__ import annotations
@@ -179,13 +187,13 @@ CENARIOS = {
 # afetadas. É movimento de balanceamento REAL, registrado aqui e reportado, não
 # corrigido nesta rodada: mexer nos `bonus_percent` do JSON seria rebalancear.
 GOLDEN = {
-    "basico_sem_crit": 160,
-    "basico_com_crit": 240,
+    "basico_sem_crit": 147,
+    "basico_com_crit": 220,
     "skill_de_dano": 302,
     "skill_com_condicao": 596,
-    "atacante_com_fear": 160,
-    "defensor_com_reducao": 112,
-    "dois_redutores": 112,
+    "atacante_com_fear": 147,
+    "defensor_com_reducao": 102,
+    "dois_redutores": 102,
     "monstro_contra_mago_com_egide": 88,
 }
 

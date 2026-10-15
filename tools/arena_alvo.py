@@ -54,7 +54,13 @@ ARQUIVO = Path(__file__).resolve().parents[1] / "src" / "data" / "arena_benchmar
 # por fim, cartas rederivadas do orçamento declarado (`mob_cabecada` volta a
 # entregar o `bud` 150). Medido duas vezes, idêntico. A tolerância do teste não
 # mudou: o número segue sendo um alarme de deslocamento, não um alvo.
-PODER_ESPERADO = 29.6357421875
+#
+# REMEDIDO na Etapa 8: 29,6357 -> 29,1748. O arquivo do snapshot é o mesmo e a
+# régua também; mudou a CLASSE dele. O Ladino reidratado do save nasce com HP
+# base 314 em vez de 370 (calibração de classe), e o poder medido dele, em nível
+# equivalente, cai junto. A Força do Guerreiro (54 -> 49) não entra no snapshot
+# e não move este número. Medido sobre a árvore final, idêntico.
+PODER_ESPERADO = 29.1748046875
 
 _FABRICA = {"Warrior": Warrior, "Mage": Mage, "Rogue": Rogue}
 
