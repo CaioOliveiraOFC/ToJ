@@ -1,0 +1,16 @@
+{
+  "description": "Starter Kit: a peça Lv1 que toda nova jornada recebe. O sorteio é em duas etapas e uniforme nas duas: primeiro a CATEGORIA equipável (Weapon1/Weapon2 e Ring1/Ring2 são posições, não categorias), depois o item dentro dela. A pool é única para as três classes e separada do loot: nada aqui entra em drop, loja ou tabela de progressão. Itens por `id` canônico do catálogo.",
+  "version": 1,
+  "origin": "starter",
+  "categories": {
+    "Helmet": ["elmo_madeira", "elmo_couro", "capacete_couro"],
+    "Amulet": ["amuleto_madeira", "amuleto_pedra"],
+    "Weapon": ["adaga_madeira", "espada_treino", "bastão_cru", "clava_madeira"],
+    "Body": ["colete_pano", "túnica_tecido", "gibao_couro"],
+    "Legs": ["bermuda_couro", "perneiras_couro"],
+    "Hands": ["luvas_lã", "luvas_couro", "escudo_madeira"],
+    "Shoes": ["tamancos_madeira", "sapatos_couro"],
+    "Ring": ["anel_vegetal", "anel_bronze"],
+    "Accessory": ["talisma_viajante"]
+  }
+}

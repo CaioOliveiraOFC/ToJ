@@ -2912,6 +2912,25 @@
       "price": 140,
       "shop_min_floor": 8,
       "shop_max_floor": null
+    },
+    {
+      "id": "talisma_viajante",
+      "name": "Talismã do Viajante",
+      "description": "Um talismã de couro e osso que acompanha quem desce pela primeira vez.",
+      "slot": "Accessory",
+      "rarity": "Common",
+      "damage_bonus": 0,
+      "defense_bonus": 1,
+      "effect_type": "max_hp",
+      "effect_value": 5,
+      "classes": null,
+      "sold_in_shop": false,
+      "droppable": false,
+      "starter_only": true,
+      "price": 20,
+      "shop_min_floor": 1,
+      "shop_max_floor": null,
+      "consumable": false
     }
   ]
 }

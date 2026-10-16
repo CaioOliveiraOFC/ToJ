@@ -50,6 +50,11 @@ def _referencias() -> dict[tuple[str, bool], float]:
     if _REFERENCIA is None:
         grupos: dict[tuple[str, bool], list[float]] = {}
         for item in get_all_items().values():
+            # A peça só de starter não tem preço de mercado: não se compra nem
+            # cai de monstro. Entrar na mediana mudaria o preço de referência de
+            # todo Common por causa de um item que o comércio nunca vê.
+            if getattr(item, "starter_only", False):
+                continue
             chave = (
                 str(getattr(item, "rarity", "Common")),
                 bool(getattr(item, "consumable", False)),

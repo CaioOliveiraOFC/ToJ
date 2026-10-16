@@ -102,6 +102,11 @@ def _serializar(item) -> dict | None:
     encantos = [e for e in getattr(item, "enchantments", ()) or () if e is not None]
     if encantos:
         registro["enchantments"] = [enchantment_to_dict(e) for e in encantos]
+    # De onde o exemplar veio ("starter"). Só existe quando foi registrado:
+    # item comum continua salvando exatamente o que salvava.
+    origem = getattr(item, "origin", None)
+    if origem:
+        registro["origin"] = str(origem)
     return registro
 
 
@@ -124,6 +129,8 @@ def _desserializar(registro, item_registry):
     item = definicao.instance()
     if isinstance(registro, dict):
         item.enhancement_level = max(0, int(registro.get("enhancement_level", 0) or 0))
+        # Save anterior ao Starter Kit não tem o campo: a peça volta sem origem.
+        item.origin = registro.get("origin") or None
         sockets = registro.get("socket_count")
         if sockets is not None:
             item.socket_count = max(0, min(MAX_SOCKETS, int(sockets)))

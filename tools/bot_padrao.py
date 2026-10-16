@@ -11,7 +11,7 @@ Decide com o que a tela mostra.
 
 PARIDADE. Tudo que é REGRA vem do jogo:
 
-    criação do personagem   engine.game_logic.create_player_from_data
+    criação do personagem   engine.game_logic.create_player_for_new_run
     andar                   engine.loop._setup_dungeon_map
     combate                 mechanics.battle.run_battle
     pós-combate             engine.loop.process_post_battle
@@ -47,7 +47,7 @@ from src.content.factories.dungeons import (
 from src.content.floor_exit import effective_essence, unpaid_streak, use_exit
 from src.content.shop import Shop
 from src.engine.encounter import resolve_encounter
-from src.engine.game_logic import create_player_from_data
+from src.engine.game_logic import create_player_for_new_run
 from src.engine.loop import _setup_dungeon_map
 from src.engine.map import EventTile, FeatureTile
 from src.engine.map_analysis import campo_de_custo, rota_do_campo
@@ -316,9 +316,11 @@ class BotPadrao:
         self.seed = seed
         self.max_andar = max_andar
         self.perfil = perfil
-        # O CAMINHO REAL de criação de personagem. Sem loadout, sem presente:
-        # nível 1, sem ouro, sem inventário, sem equipamento, uma skill.
-        self.hero = create_player_from_data(classe, "Referencia")
+        # O CAMINHO REAL de nova jornada, o mesmo da tela do jogador: nível 1,
+        # sem ouro, uma skill e o Starter Kit — uma peça Lv1 sorteada com o
+        # gerador DESTA run, então a mesma seed dá o mesmo starter. Sem loadout:
+        # o resto do equipamento vem do jogo, como para o jogador.
+        self.hero = create_player_for_new_run(classe, "Referencia", rng=self.rng)
         self.decide = self._decidir_no_combate
         self.picker = get_pick_policy(DEFAULT_PICK_POLICY)
         self.toggles = Toggles()

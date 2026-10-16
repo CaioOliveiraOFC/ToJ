@@ -21,22 +21,41 @@ from tools import bot_padrao as bot
 
 
 class TestNasceComoNoJogo:
-    def test_usa_o_caminho_real_de_criacao(self):
-        assert bot.create_player_from_data is game_logic.create_player_from_data
+    def test_usa_o_caminho_real_de_nova_jornada(self):
+        # O mesmo caminho da tela do jogador: sem lógica de largada no bot.
+        assert bot.create_player_for_new_run is game_logic.create_player_for_new_run
 
     def test_o_estado_inicial_e_o_que_o_jogo_entrega(self):
-        # Sem loadout, sem presente: a auditoria anterior media um herói com 10
-        # peças equipadas e 3 poções que a criação real nunca dá.
+        # Sem loadout: a auditoria anterior media um herói com 10 peças equipadas
+        # e 3 poções que a criação real nunca dá. O que a jornada real dá é o
+        # Starter Kit — UMA peça Lv1 — e nada além dela.
         run = bot.BotPadrao("warrior", seed=1, max_andar=1)
         hero = run.hero
         assert hero.get_level() == 1
         assert hero.coins == 0
         assert list(hero.inventory) == []
-        assert all(peca is None for peca in hero.equipment.values())
+        equipadas = [peca for peca in hero.equipment.values() if peca is not None]
+        assert len(equipadas) == 1
+        assert equipadas[0].origin == "starter"
         assert len(hero.passives) == 0
         # Uma skill: a assinatura da classe, que a criação real entrega.
         assert len(hero.skills) == 1
         assert hero.get_hp() == hero.base_hp
+
+    def test_o_starter_sai_do_gerador_da_run(self):
+        # Mesma seed, mesmo starter — e o mesmo que a nova jornada do jogo daria
+        # com o gerador desta run. Prova que o bot não sorteia por conta própria.
+        import random
+
+        for seed in (1, 7, 1337):
+            a = bot.BotPadrao("rogue", seed=seed, max_andar=1).hero
+            b = bot.BotPadrao("rogue", seed=seed, max_andar=1).hero
+            jogo = game_logic.create_player_for_new_run("rogue", "X", rng=random.Random(seed))
+
+            def peca(h):
+                return [(p, i.id) for p, i in h.equipment.items() if i]
+
+            assert peca(a) == peca(b) == peca(jogo), seed
 
 
 class TestParidadeComAsRegrasDoJogo:
