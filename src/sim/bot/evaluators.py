@@ -483,7 +483,7 @@ def avaliar_mapa(opcao: ActionOption, mapa: MapState, prog: ProgressionState) ->
     """
     familia = opcao.family
     if familia == "lutar":
-        return _avaliar_luta(opcao, prog)
+        return _avaliar_luta(opcao, mapa, prog)
     if familia == "pocao":
         return _avaliar_pocao(opcao, prog)
     if familia == "extrair":
@@ -495,7 +495,7 @@ def avaliar_mapa(opcao: ActionOption, mapa: MapState, prog: ProgressionState) ->
     return _avaliar_servico(opcao, mapa, prog)
 
 
-def _avaliar_luta(opcao: ActionOption, prog: ProgressionState) -> Score:
+def _avaliar_luta(opcao: ActionOption, mapa: MapState, prog: ProgressionState) -> Score:
     """Lutar é o objetivo do andar, e ouro NÃO entra nesta conta.
 
     Ter a taxa da saída paga era o que desligava a principal fonte de combate do
@@ -524,6 +524,22 @@ def _avaliar_luta(opcao: ActionOption, prog: ProgressionState) -> Score:
     # melhor), não inventa constante, e devolve o veto para onde ele pertence: o
     # ponto de aposta, que é o único limiar de HP do cérebro.
     lutas = 1 + alvo.extras + (1 if alvo.chefe else 0)
+    if prog.hp_frac < HP_DE_APOSTA and _mergulho_sem_progresso(mapa, prog):
+        # Abaixo do ponto de aposta, sublevel e sem pagar a saída: medir contra a
+        # aposta mandaria descer de novo, e é assim que a espiral se repete. Aqui
+        # a capacidade é o fôlego OBSERVADO — o HP útil que sobra depois do custo
+        # médio das lutas que esta escolha obriga —, na mesma unidade: fração da
+        # barra, dividida pelas lutas. Um alvo que exige mais lutas do que o
+        # fôlego paga fica sem valor, e um livre, com valor.
+        sobra = (prog.hp_frac + prog.cura_garantida) - prog.dano_por_luta * lutas
+        return Score(
+            opcao.action_id,
+            Need.PROGREDIR,
+            sobra / lutas,
+            (("fôlego observado por luta", sobra / lutas),),
+            tiebreak=-float(alvo.passos),
+            note="sublevel e sem pagar a saída: lutar é o que devolve o progresso",
+        )
     componentes = [("capacidade por luta", (prog.hp_frac - HP_DE_APOSTA) / lutas)]
     return Score(
         opcao.action_id,
@@ -752,6 +768,39 @@ def _avaliar_evento(opcao: ActionOption, mapa: MapState, prog: ProgressionState)
     )
 
 
+def _lutas_que_absorvo(prog: ProgressionState) -> float | None:
+    """Quantas lutas médias o fôlego atual paga: HP útil sobre o custo de uma luta.
+
+    HP útil é a vida agora mais a cura que já está na mão; o custo é o dano REAL
+    que esta run recebeu por encontro. É história observada, e vale para o `&`
+    que ainda não encostou — não diz nada sobre qual monstro está lá. `None` sem
+    evidência: inventar uma média global seria trocar medição por chute.
+    """
+    if prog.combates_observados < 1 or prog.dano_por_luta <= 0:
+        return None
+    return (prog.hp_frac + prog.cura_garantida) / prog.dano_por_luta
+
+
+def _mergulho_sem_progresso(mapa: MapState, prog: ProgressionState) -> bool:
+    """Descer agora seria mais uma volta da espiral de mergulho (KI-003)?
+
+    Contornar o andar e sair sem pagar são regras do jogo, e continuam
+    possíveis. O que este teste reconhece é a estratégia patológica: o herói
+    está abaixo da progressão natural do andar (nível < andar), a saída NÃO vai
+    ser paga, há luta no mapa, e o fôlego observado ainda absorve pelo menos uma
+    luta média. Nesse estado, buscar o descanso do fim do andar deixa de ser
+    recuperação e passa a ser fugir do progresso.
+
+    Fronteiras naturais, nenhuma constante nova: pagar a saída zera a punição
+    (não é o mesmo problema); sem fôlego para uma luta média, não se força
+    combate; sem evidência de custo, não se inventa média.
+    """
+    if prog.ouro >= prog.taxa_de_saida or prog.nivel >= mapa.andar or not mapa.alvos:
+        return False
+    absorvo = _lutas_que_absorvo(prog)
+    return absorvo is not None and absorvo >= 1
+
+
 def _runway_em_andares(mapa: MapState, prog: ProgressionState) -> float | None:
     """Quantos ANDARES ADICIONAIS a run ainda sustenta.
 
@@ -783,13 +832,13 @@ def _runway_em_andares(mapa: MapState, prog: ProgressionState) -> float | None:
     trocar medição por chute. Quem trata esse caso é `_avaliar_extracao`, com
     regra separada e declarada.
     """
-    if prog.combates_observados < 1 or prog.andares_concluidos < 1:
+    if prog.andares_concluidos < 1 or prog.lutas_por_andar <= 0:
         return None
-    if prog.dano_por_luta <= 0 or prog.lutas_por_andar <= 0:
+    absorvo = _lutas_que_absorvo(prog)
+    if absorvo is None:
         return None
 
-    hp_util = prog.hp_frac + prog.cura_garantida
-    lutas = hp_util / prog.dano_por_luta - mapa.lutas_ate_extracao
+    lutas = absorvo - mapa.lutas_ate_extracao
     if lutas <= 0:
         # Nem o portal é alcançável com o fôlego que resta.
         return 0.0
@@ -947,11 +996,16 @@ def _score_da_extracao(opcao: ActionOption, preserva: bool, nota: str) -> Score:
 def _avaliar_saida(opcao: ActionOption, mapa: MapState, prog: ProgressionState) -> Score:
     """Encerrar o andar. A última necessidade, e por isso sempre disponível.
 
-    Com o HP abaixo do ponto de aposta ela sobe para SOBREVIVER: o descanso de
+    Com o HP abaixo do ponto de aposta ela sobe para RECUPERAR: o descanso de
     fim de andar é a única cura garantida do jogo, e buscá-lo deixa de ser
     encerrar o andar e passa a ser não morrer nele.
+
+    A exceção é a espiral de mergulho (`_mergulho_sem_progresso`): sublevel, sem
+    pagar a saída e ainda com fôlego para uma luta média, descer não recupera
+    nada — a saída fica em ENCERRAR, com o custo real de Essência que ela cobra,
+    e continua sempre disponível.
     """
-    if prog.hp_frac < HP_DE_APOSTA:
+    if prog.hp_frac < HP_DE_APOSTA and not _mergulho_sem_progresso(mapa, prog):
         valor = HP_DE_APOSTA - prog.hp_frac
         return Score(
             opcao.action_id,
