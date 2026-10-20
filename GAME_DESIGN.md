@@ -1,19 +1,33 @@
 # GAME DESIGN — Tales of the Journey
 
-> O estado **atual** do design. O que ainda está em redesign não é
-> descrito aqui como se existisse. **Nenhum sistema está em redesign hoje** —
-> o equipamento, que era a exceção, fechou: 11 posições, arma de duas mãos
-> ocupando as duas, e um canal declarado de `evasion` e `damage_reduction`
-> para o funil de dano.
+> O estado **implementado** do design, no código da árvore em que este arquivo
+> está. O que não existe não é descrito aqui como se existisse.
 
 > A bússola criativa. O resto é código, suor e tokens.
 
+> **Estado do checkpoint.**
+>
+> - **A fundação está fechada.** Nenhum sistema está em redesign estrutural. O
+>   histórico está em [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md).
+> - **O Combat/Class Balance está fechado**, na régua controlada
+>   `expected loadout`.
+> - **O Run/Progression Balance está `[em calibração]`.** A jornada real está
+>   implementada e medida, mas a calibração está aberta.
+> - **A Arena (PvP) `[não existe]`.**
+>
+> As decisões que não podem mudar de passagem estão em
+> [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md). As medições estão em
+> [`BASELINES.md`](BASELINES.md), e os problemas abertos em
+> [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md).
+
 > **Como ler este documento.** Toda afirmação carrega um estado verificado contra
-> o código em `master`:
+> o código desta mesma árvore. Ele não pressupõe que `master` tenha o
+> desenvolvimento mais recente.
 >
 > | Marca | Significado |
 > |---|---|
 > | **`[implementado]`** | Está no código e foi conferido |
+> | **`[em calibração]`** | Está no código e é estável, mas o balance ainda está aberto. Não é bug nem ausência |
 > | **`[divergiu]`** | Existe, mas diferente do que este documento pedia. A diferença está escrita |
 > | **`[não existe]`** | Especificado aqui e nunca construído |
 > | **`[bug]`** | Deveria funcionar assim, não funciona |
@@ -51,7 +65,7 @@ digno da **Arena (PvP)**.
 
 | Modo | Propósito | Risco | Estado |
 |---|---|---|---|
-| **Forge Run** | Criar e fortalecer personagens na masmorra | Morte permanente. Perde tudo. | **`[implementado]`** |
+| **Forge Run** | Criar e fortalecer personagens na masmorra | Morte permanente. Perde tudo. | **`[implementado]`** — progressão **`[em calibração]`** |
 | **Arena** | Provar o valor do personagem contra jogadores | Sem risco de morte. Ranking por Elo. | **`[não existe]`** |
 
 **`[não existe]`** O menu principal deveria ter Forge Run e Arena, com a Arena em
@@ -171,6 +185,27 @@ conta de quem não repôs o capital.
 ---
 
 ## Progressão na Forge Run
+
+**`[em calibração]`** Os sistemas desta seção e de **Itens, Loja e Economia**
+estão implementados e são estáveis. A calibração deles como jornada inteira
+(Run/Progression Balance) está aberta e é medida pela baseline de progressão
+(ver [`BASELINES.md`](BASELINES.md)). Os números aqui são o estado do código,
+não valores ratificados.
+
+### A largada
+
+**`[implementado]`** Toda nova jornada começa:
+
+- no **nível 1**, sem ouro;
+- com a skill de assinatura da classe;
+- com **exatamente uma peça do Starter Kit**, já equipada.
+
+A peça é Lv1 e sai de uma pool única para as três classes: primeiro se sorteia a
+categoria, depois o item. O caminho de nova jornada é `create_player_for_new_run`,
+o mesmo para a tela do jogador e para o BotPadrão. `create_player_from_data`
+continua sendo o herói neutro, sem starter, de testes e benchmarks. O contrato
+completo está em
+[`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#starter-kit).
 
 ### Essência (XP)
 
@@ -307,6 +342,43 @@ recusa a nova**. O motor nunca decide por ele.
 - o pool é **classe + Neutral**. Skill exclusiva continua exclusiva: um Guerreiro nunca
   vê uma carta de Mago.
 
+**`[implementado]`** **O monstro segue a mesma cadência, sem a escolha.** Ele nascia com
+o kit inteiro do arquétipo — 3 a 7 cartas no nível 1 — enquanto o herói nasce com uma.
+Agora cada carta de monstro declara `level_required`, e o deck cresce pela mesma lei:
+**1 carta no nível 1, 2 no 3, 3 no 6, 4 no 9**, teto de 4 (`MAX_ACTIVE_SKILLS`, o mesmo
+do herói).
+
+- A **ordem de aquisição é a ordem do kit no JSON**, e a primeira carta é a assinatura
+  do papel: a cura do suporte, a carapaça do tank, a rajada do glass cannon.
+- Kits de 5 a 7 cartas continuam ganhando carta nos níveis 12, 15 e 18. Com o deck
+  cheio, **a carta nova entra no lugar de uma das outras três, sorteada; a assinatura
+  nunca sai**. É o análogo do herói, que troca uma carta quando o deck está cheio — onde
+  ele escolhe, o monstro sorteia. Não existe regra de troca por carta: uma interação que
+  aparece ou some pela composição sorteada é variabilidade do monstro, e o kit pode
+  crescer sem manutenção. O sorteio usa o gerador que a run já semeia, então a mesma
+  semente dá o mesmo deck.
+- O **save grava as cartas ativas** de cada monstro do mapa e o carregamento as
+  restaura exatamente: recarregar não sorteia de novo. Save antigo, sem o campo, ou com
+  uma carta que não existe mais no kit, refaz o deck pela regra normal — nunca um deck
+  pela metade.
+- Os níveis iniciais são **calibração inicial**, não derivação: a lei do herói aplicada
+  à ordem que o kit já tinha.
+
+**`[implementado]`** **A mana do monstro é do papel, e escala com o nível.** O pool era
+o mesmo para os nove arquétipos, e o custo era um inteiro fixo: como o pool crescia pela
+`geometric` e o custo não, a mana deixava de restringir — um boss conjurava 2 vezes com o
+pool cheio no nível 1 e 17 no nível 20.
+
+- O pool é `geometric(60 × m_mp, nível)`, com o multiplicador do papel: trash 0,5;
+  bruiser e skirmisher 0,8; tank 1,0; elite 1,2; boss 1,4; controller, support e
+  glass_cannon 1,5. **Calibração inicial**, não derivação.
+- O custo é **percentual da mesma curva de referência do herói**
+  (`SKILL_COST_REFERENCE_MP`): `mana_cost_percent = teto_0,5(custo_antigo × m_mp / 97 ×
+  100)`. Pool e custo crescem pela mesma razão, então quantas vezes o monstro conjura com
+  o pool cheio fica constante do nível 1 ao 20. O `mana_cost` absoluto fica na carta, como
+  no herói; o motor só o lê quando o percentual é zero.
+- Nenhum caminho novo de cobrança: o monstro já herdava `skill_mana_cost()` do herói.
+
 ### O catálogo
 
 **`[implementado]`** **150 cartas de herói. Catálogo congelado.** Distribuídas
@@ -326,7 +398,8 @@ Tank 6, Glass Cannon 6, Skirmisher 6, Controller 7, Support 7, Elite 6, Boss 7.
 **`[implementado]`** **Legendary é jackpot, e é raro de verdade**: três no jogo
 inteiro, uma por classe, nenhuma Neutral. Elas não seguem a filosofia de "é
 diferente, não necessariamente melhor" — trabalham perto do topo do orçamento
-permitido (420–433% do ataque básico de referência) e existem para o jogador
+permitido (420–434% do ataque básico de referência, pelo livro-razão em
+`tools/orcamento_de_cartas.py`) e existem para o jogador
 pensar "eu dei muita sorte". O que elas não podem é inventar mecânica: passam
 pelo mesmo validador e pelo mesmo pipeline de dano de todas as outras.
 
@@ -410,8 +483,9 @@ atributos de quem a lança.
 estático** antes de entrar no jogo: escala válida, no máximo 2 atributos somando 1.0, MP
 e recarga obrigatórios, acerto dentro da faixa, efeito do catálogo global, orçamento não
 absurdo. O orçamento é medido contra um personagem de referência (a classe, para o herói;
-o arquétipo, para o monstro), porque a Agilidade 92 do Ladino e a Força 191 do Guerreiro
-não são o mesmo número.
+o arquétipo, para o monstro), porque a Agilidade de referência do Ladino e a Força de
+referência do Guerreiro (92 e 173 em `SKILL_REFERENCE_STATS`, tabela remedida a cada
+mudança de atributo base) não são o mesmo número.
 
 ### Custo
 
@@ -554,7 +628,9 @@ o herói a um golpe da morte está jogando pior, não melhor.
 
 ## Itens, Loja e Economia
 
-**`[implementado]`** 159 itens, uso livre de consumíveis no turno de combate.
+**`[implementado]`** 160 itens, uso livre de consumíveis no turno de combate. Um deles, o
+Talismã do Viajante, só existe como peça de Starter Kit (`starter_only`): não cai do
+monstro, não é vendido e fica fora das réguas sintéticas.
 
 **`[implementado]`** Poções curam **percentual** do máximo (25% / 40% / 60%), não
 valor fixo. Armas somam percentual sobre o poder base.
@@ -605,7 +681,7 @@ Lendário novo mudava a economia sem ninguém decidir isso.
 **`[implementado]`** Hoje o sorteio é **ponderado por raridade**, pelos pesos que já
 estavam declarados em `items.json` e nunca eram lidos:
 
-| Raridade | Peso | Itens no catálogo |
+| Raridade | Peso | Itens no loot |
 |---|---:|---:|
 | Comum | 60 | 71 |
 | Raro | 28 | 59 |
@@ -705,6 +781,10 @@ pertence ao ITEM (`classes`, proficiência, requisito), não à classe.
 
 **Uma arma de duas mãos ocupa as duas posições de mão.**
 
+**`[implementado]`** Além dos atributos, o equipamento alimenta o combate por canais
+declarados (`Player.EQUIP_COMBAT_EFFECTS`). Entre eles estão `evasion`, que entra no
+acerto, e `damage_reduction`, que entra na mitigação, e todos passam pelo funil de dano.
+
 Saves antigos, gravados quando existia uma posição `Weapon` e uma `Ring`, são
 mapeados na leitura para `Weapon1` e `Ring1`; `Weapon2`, `Ring2` e `Accessory`
 nascem vazios. Nenhum arquivo precisou ser migrado.
@@ -715,10 +795,12 @@ com nome, classe, nível, andar alcançado e causa.
 **`[não existe]`** O troféu não guarda Elo (não há Arena) nem nada que seja lido na
 run seguinte. É um registro de mortos, não uma progressão.
 
-**`[implementado]`** O save grava **HP e MP**, e a extração grava o **próximo**
-andar. Antes não gravava nenhum dos dois: o herói era reconstruído no nível salvo com
-os recursos no máximo, e a extração gravava o andar recém-concluído, que o jogador
-então refazia e cujas recompensas recebia de novo.
+**`[implementado]`** O save grava **HP e MP**. **Extrair encerra a run.** O save marca
+o andar em que o personagem foi extraído, e esse personagem não volta para a mesma
+dungeon: fica preservado para a camada pós-dungeon, a Arena, que ainda não existe. Ao
+carregá-lo, o jogo avisa isso. Antes, o save não gravava HP nem MP: o herói era
+reconstruído no nível salvo com os recursos no máximo. E a extração gravava o andar
+recém-concluído, que o jogador então refazia, recebendo as recompensas de novo.
 
 > Era a jogada ótima do jogo — cura total gratuita e um moedor infinito de XP e ouro.
 > Estratégia degenerada não é um defeito entre outros: ela anula todas as demais
@@ -743,14 +825,32 @@ Limitações que importam para qualquer decisão de design tirada dela:
   não sabe pular luta. Não consegue medir nada sobre "o jogador escolhe brigar ou
   contornar" — e, como consequência, o bot sempre tem ouro e paga 100% das saídas,
   então a punição de Essência **nunca dispara** numa run simulada padrão. Medir o
-  custo de contornar exige uma política que evite combate; hoje ela não existe.
+  custo de contornar exige uma política que evite combate, e ela não existe em
+  `src/sim/`. Quem mede isso é o BotPadrão, abaixo.
 - **Não modela a DECISÃO de extrair.** A casa de Extração é sorteada e contada, mas
-  o bot nunca extrai: a run vai do andar 1 ao 20 ou até morrer. O `max_floor = 20`
-  é a janela de medição, **não um teto do jogo**.
+  o bot do simulador nunca extrai: a run vai do andar 1 ao 20 ou até morrer. O
+  `max_floor = 20` é a janela de medição, **não um teto do jogo**.
 
-**`[implementado]`** CI em Python 3.10, 3.11 e 3.12, com três jobs bloqueantes:
-suíte rápida (**2.393 testes**), lint (`ruff check` + `ruff format --check`) e
-**111 invariantes de balanceamento**.
+É nesta camada que mora a régua de **Combat/Class Balance**: `simulate_run` com
+`loadout="expected"`, o equipamento esperado para o nível aplicado sem passar pela
+dungeon (`src/sim/loadouts.py`).
+
+**`[implementado]`** **BotPadrão** (`tools/bot_padrao.py`). Ele joga a run pelo mapa
+real:
+
+- anda, contorna, luta e foge;
+- usa os serviços e paga ou não paga a saída;
+- extrai.
+
+Toda REGRA vem do jogo, inclusive a criação da jornada por `create_player_for_new_run`,
+com o Starter Kit; a DECISÃO mora em `src/sim/bot/`. É a régua de **Run/Progression
+Balance**. Ele é instrumento de regressão e medição, não a definição de jogador ideal
+(ver [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#botpadrão)).
+
+**`[implementado]`** CI em Python 3.10, 3.11 e 3.12, com três jobs bloqueantes: a suíte
+padrão, lint (`ruff check` + `ruff format --check`) e as invariantes de balanceamento
+(`-m balance`). A CI roda em push para `master` e em PRs contra `master`. A contagem de
+testes muda a cada rodada, e por isso não é contrato.
 
 ---
 
@@ -804,10 +904,15 @@ Inspirado na arquitetura do Balatro: matemática simples, profundidade emergente
 
 ### Fórmula Universal de Dano
 
-$$DAMAGE_{final} = \Big[\big(BASE\_POWER + \sum FLAT\big) \times \prod MULT \times \prod XMULT_{capped}\Big] \times DEFENSE\_MODIFIER$$
+$$DAMAGE_{final} = BASE\_POWER \times \Big(1 + \sum \Delta mult\Big) \times \prod XMULT_{capped} \times DEFENSE\_MODIFIER \times \prod MITIGATION$$
 
 Uma única fórmula para todas as classes, skills e situações.
 A identidade vem dos **pesos e modificadores**, não de equações separadas.
+
+São três baldes — `+MULT`, `×MULT` e mitigação — e a defesa é estágio próprio. Existia
+um quarto, `FLAT` (pontos somados ao BASE antes de qualquer percentual), e ele saiu na
+reforma de fundação: nenhuma fonte do jogo o preenchia, e um balde sem dono é convite a
+uso errado.
 
 ---
 
@@ -831,7 +936,9 @@ Onde:
 O ataque básico é, literalmente, a skill de pesos fixos: mesma função, mesma conta,
 mesma arma. Uma skill de Ladino pode nascer de `0.6 AG + 0.4 ST` e uma de Tanque de
 `0.6 ST + 0.4 DF` — a carta escolhe **de onde** o golpe vem, nunca **quanto** ele vale.
-Vale igual para monstro: os arquétipos usam a mesma gramática.
+Vale igual para monstro: os arquétipos usam a mesma gramática, e desde a reforma de
+fundação o ataque básico dele também nasce de um vetor de pesos — antes a afirmação era
+falsa para o básico, que era `(ST + MG) // 3` para os nove papéis.
 
 ### Matriz de Pesos por Classe (ataque básico)
 
@@ -840,6 +947,29 @@ Vale igual para monstro: os arquétipos usam a mesma gramática.
 | Warrior | 1.6  | 0.4  | 0.0  |
 | Mage    | 0.3  | 1.9  | 0.0  |
 | Rogue   | 0.8  | 0.4  | 1.7  |
+
+### Matriz de Pesos por Arquétipo de Monstro (ataque básico)
+
+O vetor do monstro tem uma regra que o do herói não tem: **Σpesos = 1**. Ele escolhe só a
+COMPOSIÇÃO do golpe, e a magnitude vem exclusivamente dos atributos — um `skirmisher` que
+troca Força por Agilidade muda de identidade sem mudar de tamanho. Os pesos vivem em
+`data/monsters.json`, por arquétipo, e o carregador recusa um vetor que não some 1.
+
+| Papel | w_ST | w_MG | w_AG |
+|---|---|---|---|
+| trash | 1.00 | — | — |
+| bruiser | 1.00 | — | — |
+| tank | 1.00 | — | — |
+| glass_cannon | — | 1.00 | — |
+| skirmisher | 0.75 | — | 0.25 |
+| controller | — | 1.00 | — |
+| support | — | 1.00 | — |
+| elite | 1.00 | — | — |
+| boss | 1.00 | — | — |
+
+> A soma diferente dos dois lados (herói 2.0/2.2/2.9, monstro 1.0) é assimetria **conhecida
+> e registrada**: o vetor do herói gera magnitude, o do monstro não. Compensá-la mudando
+> `CLASS_WEIGHTS` seria rebalancear o herói, e não é o que esta reforma se propôs a fazer.
 
 > **Nota:** Warrior e Mage não usam AG no **ataque básico**.
 > AG para essas classes alimenta Speed (ordem de turno) e hit_chance — e pode alimentar
@@ -851,13 +981,14 @@ Vale igual para monstro: os arquétipos usam a mesma gramática.
 
 Os sistemas do jogo não geram dano — injetam operadores no pipeline.
 
-### 3.1 Modificadores Aditivos (FLAT e MULT)
+### 3.1 Modificadores Aditivos (+MULT)
 
-Bônus lineares. Acumulam-se de forma previsível.
+Bônus lineares. Acumulam-se de forma previsível: somam entre si, e só a soma multiplica.
 
-$$\prod MULT = 1 + \sum \Delta mult$$
+$$MULT = 1 + \sum \Delta mult$$
 
-**Fontes:** skills comuns, buffs de buff, equipamentos passivos, atributos secundários.
+**Fontes:** `damage_percent` (encantamento, passiva, buff) e o bônus situacional da carta
+(`bonus_condition` + `bonus_percent`) quando a condição está satisfeita.
 
 ### 3.2 Modificadores Multiplicativos (XMULT)
 
@@ -887,12 +1018,22 @@ Se rand(0, 100) <= crit_chance:
     XMULT_raw *= crit_damage_multiplier
 ```
 
+**`[implementado]`** **Sem fonte, sem crítico.** A chance vem de fontes explícitas e de
+mais nada: passiva, item, encantamento, buff, poção, a própria carta (`crit_chance` no
+JSON — é assim que o Ataque Furtivo declara os 25% dele) e a passiva inata do arquétipo
+(`passives` em `monsters.json` — hoje só o controller, com 10%, e é ele quem congela).
+Antes todo atacante tinha 10% sem que nada dissesse de onde vinham, e o Ataque Furtivo
+era um `if` por nome de skill no motor. A leitura é uma função só, `combat.crit_chance`,
+chamada pelo motor, pelo bot e pela ficha do confronto — que mostra `Crítico: X%` do
+monstro que tem fonte.
+
 **Limites obrigatórios:**
 
 | Parâmetro          | Valor  |
 |--------------------|--------|
+| crit_chance sem fonte | 0% |
 | crit_chance máximo | 75%    |
-| crit_damage padrão | 1.5×   |
+| crit_damage base   | 1.5× — **pendente**: está decidido que existe um multiplicador-base único, não que ele vale 1.5 |
 
 ---
 
@@ -919,22 +1060,29 @@ Onde `k = 100` (constante de calibração).
 ### Injeção por Sistema
 
 ### Skills
-Skill **não injeta** no pipeline: ela constrói o BASE e para. Era o desenho antigo, e
-manter os dois caminhos abertos daria à mesma carta dois jeitos de ficar mais forte —
-um deles fora do alcance do validador.
+Skill constrói o BASE e injeta no funil só o que é CIRCUNSTANCIAL: o bônus situacional
+vai para o `+MULT`, e a chance de crítico que a carta declara soma às fontes do
+atacante. Nenhuma carta multiplica o golpe por conta própria — a identidade dela (pesos
+e `power`) fica no BASE, e o que depende do momento passa pelo mesmo funil de todo mundo.
 
 | Skill            | O que ela declara                                             |
 |------------------|---------------------------------------------------------------|
-| Bola de Fogo     | `scaling: mg 1.0`, `power: 3.49`, custo em % da mana máxima    |
-| Assassinato      | `scaling: ag 0.6 + st 0.4`, `power: 5.59`, `bonus_condition`   |
+| Bola de Fogo     | `scaling: mg 1.0`, `power: 3.485`, custo em % da mana máxima   |
+| Assassinato      | `scaling: ag 1.0`, `power: 7.494`, `bonus_condition: target_wounded` |
 
-A condição situacional (`bonus_condition` + `bonus_percent`) multiplica o BASE **antes**
-do funil, e não depois — ela é parte da construção do golpe, não um XMULT escondido.
+O `power` não é número de autoria: ele é derivado do orçamento declarado da carta
+(`tools/orcamento_de_cartas.py`) e é rederivado quando a referência muda. Os valores
+acima são os do código atual.
+
+A condição situacional (`bonus_condition` + `bonus_percent`) entra no `+MULT`, somada
+aos outros percentuais — não multiplica o BASE, e não é um XMULT escondido. Antes ela
+morava no BASE e compunha com todo `+MULT` do funil: +90% da carta sob +10% de
+encantamento rendia 2,09 em vez de 2,00.
 
 ### Equipamentos
 | Item          | Injeção                                              |
 |---------------|------------------------------------------------------|
-| Sword         | `FLAT += 25`                                         |
+| Sword         | `weapon% += 25` (no BASE)                            |
 | Ancient Staff | `ΔMULT += 0.20`                                      |
 | Cursed Dagger | `crit_chance += 15`, trigger: `hp_drain = 5/turno`   |
 
@@ -971,8 +1119,9 @@ Se qualquer componente do vetor exceder o recurso disponível, a ação é bloqu
 |---------------------|-------|--------------------------------------|
 | `DEFENSE_K`         | 100   | Curva de mitigação                   |
 | `XMULT_CAP`         | 5.0   | Teto de multiplicadores puros        |
+| `CRIT_CHANCE_DEFAULT` | 0   | Chance de crítico sem fonte          |
 | `CRIT_CHANCE_CAP`   | 75    | % máximo de chance crítica           |
-| `CRIT_DAMAGE_BASE`  | 1.5   | Multiplicador padrão de crítico      |
+| `CRIT_DAMAGE_BASE`  | 1.5   | Multiplicador-base de crítico — valor **pendente** de calibração/design |
 
 > Estas constantes residem em `src/shared/constants.py` e são os únicos valores
 > a serem ajustados durante o balanceamento. Nunca hardcode esses valores inline.
@@ -1142,12 +1291,17 @@ O catálogo cresceu de 29 para **60 cartas** e de 13 para **23 famílias de
 efeito**. As três políticas deliberadas do simulador (`survival`, `offense`,
 `economy`) ordenam **as 13 famílias originais**. As 10 novas — `precision`,
 `status_resistance`, `poison_chance`, `bleed_chance`, `fear_chance`,
-`crit_damage`, `damage_percent`, `life_steal`, `mana_regen`, `magic` — caem no
-desempate por valor, então o ranking delas é ruído.
+`crit_damage`, `damage_percent`, `life_steal`, `mana_regen`, `magic` — estão
+declaradas **sem preferência** (`PASSIVE_SEM_PREFERENCIA`, em
+`src/sim/pick_policies.py`). Antes elas caíam num desempate pelo valor impresso,
+que comparava grandezas diferentes. Hoje a indiferença é regra escrita, mas
+continua não sendo intenção de build.
 
 Isso **não** é um defeito do jogo: é do instrumento. Mas invalida qualquer
-conclusão do tipo "esta passiva é fraca" sobre uma carta dessas famílias. Precisa
-ser resolvido **antes** do balanceamento global, não depois.
+conclusão do tipo "esta passiva é fraca" sobre uma carta dessas famílias.
+Atribuir intenção a elas é decisão de balanceamento que segue aberta, e pesa na
+calibração da progressão porque o BotPadrão monta a build por essas políticas
+(ver [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md), KI-006).
 
 ### D4 — O chefe é contornável
 
@@ -1164,7 +1318,9 @@ consertar sozinho.
 
 Metade do laço do jogo está especificada e não construída — ver **Os Dois
 Pilares**. Sem ela, extrair um personagem vivo não leva a lugar nenhum. É a maior
-lacuna aberta do design, e nada nas rodadas estruturais a endereçou.
+lacuna aberta do design, e nada nas rodadas estruturais a endereçou. O PvP é uma fase
+posterior à calibração da progressão PvE. O contrato de fronteira está em
+[`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 
 ### D6 — A Essência deveria multiplicar o ouro também?
 

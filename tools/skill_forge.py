@@ -28,10 +28,12 @@ lotes em `tools/skill_batches/`.
 from __future__ import annotations
 
 import json
+import math
 import sys
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
+from types import SimpleNamespace
 
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
@@ -39,12 +41,15 @@ sys.path.insert(0, str(RAIZ))
 from src.content.skill_validator import (  # noqa: E402
     _referencia,
     damage_identity,
+    fator_de_critico_proprio,
     monster_reference,
     offensive_budget,
     skill_signature,
     validate,
 )
 from src.content.skills_loader import card_from_json  # noqa: E402
+from src.mechanics.combat import additive_multiplier  # noqa: E402
+from src.shared.constants import SKILL_COST_REFERENCE_MP  # noqa: E402
 
 SKILLS_JSON = RAIZ / "src" / "data" / "skills.json"
 MONSTERS_JSON = RAIZ / "src" / "data" / "monsters.json"
@@ -58,6 +63,35 @@ TEXTO_DA_CONDICAO = {
     "target_controlled": "contra alvo sem ação",
     "caster_wounded": "quando você está ferido",
 }
+
+
+def resolver_power(bud: float, escala, bonus: float, ref: dict, crit_chance: int = 0) -> float:
+    """O `power` que faz a carta entregar `bud`% do ataque da referência.
+
+    É o inverso exato de `skill_validator.offensive_budget`: o bônus condicional
+    entra no `+MULT` pela mesma `additive_multiplier` do motor, no melhor caso, e
+    o crítico que a carta declara entra em valor esperado, pelo mesmo
+    `fator_de_critico_proprio` do validador. `escala` aceita termos da forge
+    (`{"stat", "weight"}`) ou da carta publicada (`ScalingTerm`).
+    """
+    pares = [
+        (t["stat"], t["weight"]) if isinstance(t, dict) else (t.stat, t.weight) for t in escala
+    ]
+    soma = sum(ref[stat] * peso for stat, peso in pares)
+    critico = fator_de_critico_proprio(SimpleNamespace(crit_chance=crit_chance), ref)
+    alvo = bud / 100 * ref["avg"] / additive_multiplier([bonus / 100]) / critico
+    return round(alvo / soma, 3)
+
+
+def custo_percentual_de_monstro(custo_absoluto: int, papel: str) -> float:
+    """O custo de uma carta de monstro em % da curva de referência.
+
+    A regra da migração das 54 cartas: `teto_0,5(custo × m_mp / referência × 100)`.
+    """
+    from src.content.factories.archetypes import get_archetype
+
+    bruto = custo_absoluto * get_archetype(papel).mp / SKILL_COST_REFERENCE_MP * 100
+    return math.ceil(bruto * 2) / 2
 
 
 @dataclass
@@ -111,10 +145,7 @@ class Carta:
         termos = self.escala()
         if not termos or not self.bud:
             return 0.0
-        ref = self.referencia()
-        soma = sum(ref[t["stat"]] * t["weight"] for t in termos)
-        alvo = self.bud / 100 * ref["avg"] * (1 + self.bonus / 100) ** -1
-        return round(alvo / soma, 3)
+        return resolver_power(self.bud, termos, self.bonus, self.referencia())
 
     def descricao(self) -> str:
         """A descrição do jogador, com o que a integridade de dados exige nela.
@@ -155,14 +186,12 @@ class Carta:
             # padrões vivem em `archetypes.PADROES_DE_MONSTRO`.
             for morto in ("level_required", "rarity"):
                 d.pop(morto, None)
-            # E paga em MANA ABSOLUTA, como as cartas de monstro que já existem.
-            # Misturar as duas formas dentro do mesmo arquétipo faria o bicho
-            # pagar 15 fixos por uma skill e 7% da referência por outra. Migrar
-            # o monstro para custo percentual é decisão de balanceamento, e não
-            # cabe num lote de conteúdo — o validador continua creditando certo,
-            # porque converte o absoluto contra a mana da referência.
-            d.pop("mana_cost_percent", None)
+            # O lote de monstro escreve `mp` como custo ABSOLUTO no pool do papel.
+            # O que o jogo cobra é o percentual da curva de referência, pela
+            # mesma regra que migrou as 54 cartas: o pool do papel escala com
+            # `m_mp`, e o custo acompanha. O absoluto fica na carta como no herói.
             d["mana_cost"] = int(self.mp)
+            d["mana_cost_percent"] = custo_percentual_de_monstro(int(self.mp), self.papel)
         else:
             d["skill_class"] = self.cls
             d["is_initial"] = self.inicial
@@ -398,7 +427,7 @@ def razoes_por_classe(c: Carta) -> dict:
     """
     from src.content.skills_loader import card_from_json
     from src.entities.heroes import Mage, Rogue, Warrior
-    from src.mechanics.combat import basic_attack_power, skill_damage_base
+    from src.mechanics.combat import basic_attack_power, expected_crit_factor, skill_damage_base
 
     if c.tipo != "damage":
         return {}
@@ -414,7 +443,9 @@ def razoes_por_classe(c: Carta) -> dict:
     for nome, fabrica in alvos.items():
         h = fabrica("Medida")
         h.set_level(max(1, c.lvl))
-        saida[nome] = skill_damage_base(h, carta) / basic_attack_power(h)
+        # Dano esperado, como o guardrail: o crítico da própria carta conta.
+        critico = expected_crit_factor(h, carta) / expected_crit_factor(h)
+        saida[nome] = skill_damage_base(h, carta) * critico / basic_attack_power(h)
     return saida
 
 

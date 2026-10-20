@@ -293,7 +293,7 @@ def decide_monster_action(monster, hero, *, rng: random.Random | None = None, pu
                     return
 
         combat_mech.resolve_physical_attack(
-            monster, hero, combat_mech.basic_attack_power(monster), "", rng=r, publish=publish
+            monster, hero, combat_mech.basic_attack_power(monster), rng=r, publish=publish
         )
     finally:
         # Contado no fim: durante a decisão, `turns_taken` é o número de turnos

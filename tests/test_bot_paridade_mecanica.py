@@ -20,6 +20,8 @@ from __future__ import annotations
 import json
 import random
 
+import pytest
+
 from src.content.factories.monsters import create_monster
 from src.content.skills_loader import get_skill_by_id
 from src.engine.game_logic import create_player_from_data
@@ -160,7 +162,6 @@ class TestDanoDeclaradoEODoFunil:
         mods = combat_mech.damage_modifiers(hero, alvo, is_critical=False)
         canonico = combat_mech._calculate_damage(
             base_power=float(base),
-            flat_mods=list(getattr(mods, "flat", ()) or ()),
             mult_mods=list(mods.mult),
             xmult_mods=list(mods.xmult),
             defense_target=alvo.get_df(),
@@ -186,42 +187,35 @@ class TestDanoDeclaradoEODoFunil:
 
 
 class TestChanceDeCriticoDeclarada:
-    """Mirror mínimo protegido por paridade contra a regra real do motor."""
+    """O bot lê o crítico pela MESMA função que o motor rola.
 
-    def _crit_real(self, atacante, nome_da_skill="") -> float:
-        from src.shared.constants import (
-            CRIT_CHANCE_CAP,
-            CRIT_CHANCE_DEFAULT,
-            CRIT_CHANCE_HIGH,
-        )
+    Era um espelho da regra inline de `resolve_physical_attack`, com o `if` por
+    nome do Ataque Furtivo copiado aqui. Agora `combat.crit_chance` é a única
+    conta, e este teste garante que o bot não volta a ter uma própria.
+    """
 
-        base = (
-            CRIT_CHANCE_HIGH
-            if (
-                hasattr(atacante, "get_classname")
-                and atacante.get_classname() == "Rogue"
-                and nome_da_skill == "Ataque Furtivo"
-            )
-            else CRIT_CHANCE_DEFAULT
-        )
-        base += int(fx.combat_modifier(atacante, "crit_chance"))
-        return min(base, CRIT_CHANCE_CAP) / 100
-
-    def test_bate_com_a_regra_do_motor_para_as_tres_classes(self):
+    def test_bate_com_o_motor_com_e_sem_a_carta(self):
+        furtivo = get_skill_by_id("ataque_furtivo")
         for classe in ("warrior", "mage", "rogue"):
             hero = _heroi(classe, 8)
-            assert ad._chance_de_critico(hero) == self._crit_real(hero)
+            assert ad._chance_de_critico(hero) == pytest.approx(combat_mech.crit_chance(hero) / 100)
+            assert ad._chance_de_critico(hero, furtivo) == pytest.approx(
+                combat_mech.crit_chance(hero, furtivo) / 100
+            )
 
-    def test_o_caso_do_ladino_com_ataque_furtivo_nao_se_perde(self):
+    def test_o_ataque_furtivo_declara_a_propria_chance(self):
         rogue = _heroi("rogue", 8)
-        assert ad._chance_de_critico(rogue, "Ataque Furtivo") > ad._chance_de_critico(rogue)
+        furtivo = get_skill_by_id("ataque_furtivo")
+        assert furtivo.crit_chance > 0
+        assert ad._chance_de_critico(rogue, furtivo) > ad._chance_de_critico(rogue)
 
     def test_o_teto_do_motor_e_respeitado(self):
         from src.shared.constants import CRIT_CHANCE_CAP
 
         hero = _heroi("rogue", 8)
         hero.active_buffs["__crit__"] = {"stat": "crit_chance", "value": 999, "duration": 1}
-        assert ad._chance_de_critico(hero, "Ataque Furtivo") == CRIT_CHANCE_CAP / 100
+        furtivo = get_skill_by_id("ataque_furtivo")
+        assert ad._chance_de_critico(hero, furtivo) == pytest.approx(CRIT_CHANCE_CAP / 100)
 
 
 class TestEgideDeclaraACapacidadeReal:

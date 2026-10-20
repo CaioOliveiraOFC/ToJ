@@ -55,7 +55,18 @@ def render_battle_start_prompt() -> None:
     console.print("\n[dim]Pressione ENTER para começar a batalha...[/dim]")
 
 
-def render_compare_opponents(ennt1, ennt2) -> None:
+def linha_de_critico(chance: int) -> str | None:
+    """A linha de crítico da ficha, ou nada.
+
+    Só aparece com chance explícita: um monstro sem fonte de crítico não crita,
+    e uma linha "Crítico: 0%" seria ruído em quase toda ficha. O número chega
+    pronto — ele é `combat.crit_chance`, a mesma leitura que o motor rola e que o
+    bot usa no golpe esperado do alvo. O que o bot enxerga, o jogador enxerga.
+    """
+    return f"Crítico: [red]{chance}%[/red]" if chance > 0 else None
+
+
+def render_compare_opponents(ennt1, ennt2, crit_alvo: int = 0) -> None:
     console.print(
         Panel(Text("CONFRONTO", justify="center", style="bold yellow"), border_style="yellow")
     )
@@ -94,6 +105,9 @@ def render_compare_opponents(ennt1, ennt2) -> None:
     table.add_row(
         f"Defesa: [white]{ennt1.get_df()}[/white]", "", f"Defesa: [white]{ennt2.get_df()}[/white]"
     )
+    critico = linha_de_critico(crit_alvo)
+    if critico is not None:
+        table.add_row("", "", critico)
 
     console.print(table)
     console.print("=" * console.width, style="dim white")

@@ -43,6 +43,7 @@ class Item:
         enhancement_level: int = 0,
         socket_count: int = 0,
         enchantments: list | None = None,
+        starter_only: bool = False,
     ) -> None:
         self.id: str = item_id
         self.name: str = name
@@ -60,6 +61,16 @@ class Item:
         self.shop_min_floor: int = shop_min_floor
         self.shop_max_floor: int | None = shop_max_floor
         self.consumable: bool = consumable
+        # Peça que só existe como STARTER de uma nova jornada (ver
+        # `content/starter_kit.py`). Fica fora de drop e loja pelos campos de
+        # sempre (`droppable`, `sold_in_shop`) e fora de toda varredura sintética
+        # do catálogo (loadout de medição, referência de preço) por este. É da
+        # DEFINIÇÃO: diz de onde a peça pode vir, não o que um exemplar viveu.
+        self.starter_only: bool = bool(starter_only)
+        # De onde ESTE exemplar veio. Hoje só "starter" é registrado, para
+        # telemetria e histórico; não muda nada no combate nem no comércio. É do
+        # EXEMPLAR, como o `+N`: a definição do catálogo nunca vira starter.
+        self.origin: str | None = None
         # Resistência a status negativo que o item concede, por nome canônico
         # (ver `shared/effects.negative_statuses`). Um dicionário, e não um campo
         # por status: um colar pode dar frio e atordoamento ao mesmo tempo, e
@@ -353,6 +364,7 @@ def create_item_from_json(item_data: dict) -> Item:
         socket_count=item_data.get("socket_count", 0),
         enchantments=item_data.get("enchantments"),
         hand_type=item_data.get("hand_type"),
+        starter_only=item_data.get("starter_only", False),
     )
 
 

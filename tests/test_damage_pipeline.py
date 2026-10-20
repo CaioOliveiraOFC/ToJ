@@ -27,6 +27,20 @@ acerta, `atacante_com_fear` virou igual a `basico_sem_crit` (128 -> 160) e
 
 Os dois cenários ficam, mas hoje não exercitam nada que os outros já não
 exercitem — o medo é testado onde ele agora vive, em `test_efeitos_nucleo.py`.
+
+Regravado na reforma de fundação: `monstro_contra_mago_com_egide` 87 -> 88. O
+monstro ganhou atributos reais (Etapa 1). O básico do bruiser Nv.8 era
+`(ST + MG) // 3 = (292 + 292) // 3 = 194`, e o truncamento comia 0,67 ponto;
+agora é a Força dele, 195. O BASE sobe de 174 para 175 e o golpe que passa pela
+Égide, de 87 para 88. Mudança de MODELO do monstro, não do funil.
+
+Regravado na Etapa 8 (calibração de classe): os cinco cenários do ataque
+básico do Guerreiro. A Força base dele caiu de 54 para 49; no Nv.8 com loadout
+`expected` a Força resolvida vai de 122 para 111 e o BASE do básico, de 231
+para 212. basico_sem_crit e atacante_com_fear 160 -> 147, basico_com_crit
+240 -> 220, defensor_com_reducao e dois_redutores 112 -> 102. Mudança de
+ATRIBUTO da classe, não do funil. Os cenários de skill não se movem: usam Mago
+e Ladino, e a carta do Ladino não escala com o HP que ele perdeu (370 -> 314).
 """
 
 from __future__ import annotations
@@ -73,9 +87,9 @@ def _skill(nome: str):
     return next(s for s in load_skills() if s.name == nome)
 
 
-def _golpe(atacante, defensor, base: int, nome: str, rolagem) -> int:
+def _golpe(atacante, defensor, base: int, rolagem, skill=None) -> int:
     hp = defensor.get_hp()
-    cmb.resolve_physical_attack(atacante, defensor, base, nome, rng=RngRoteirizado(*rolagem))
+    cmb.resolve_physical_attack(atacante, defensor, base, rng=RngRoteirizado(*rolagem), skill=skill)
     return hp - defensor.get_hp()
 
 
@@ -84,18 +98,18 @@ def _golpe(atacante, defensor, base: int, nome: str, rolagem) -> int:
 
 def basico_sem_crit() -> int:
     h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_SEM_CRIT)
 
 
 def basico_com_crit() -> int:
     h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_COM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_COM_CRIT)
 
 
 def skill_de_dano() -> int:
     h, m = make_hero("Mage", 8, "expected"), spawn_by_role("tank", 8)
     sk = _skill("Bola de Fogo")
-    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), ACERTA_SEM_CRIT, skill=sk)
 
 
 def skill_com_condicao() -> int:
@@ -108,13 +122,13 @@ def skill_com_condicao() -> int:
         and s.skill_class == "Rogue"
     )
     m._hp = max(1, int(m.base_hp * 0.10))
-    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), sk.name, ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.skill_damage_base(h, sk, m), ACERTA_SEM_CRIT, skill=sk)
 
 
 def atacante_com_fear() -> int:
     h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
     h.active_effects["fear"] = {"duration": 3}
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_SEM_CRIT)
 
 
 def defensor_com_reducao() -> int:
@@ -124,7 +138,7 @@ def defensor_com_reducao() -> int:
         "value": 30,
         "duration": 3,
     }
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_SEM_CRIT)
 
 
 def dois_redutores() -> int:
@@ -135,12 +149,12 @@ def dois_redutores() -> int:
         "value": 30,
         "duration": 3,
     }
-    return _golpe(h, m, cmb.basic_attack_power(h), "", ACERTA_SEM_CRIT)
+    return _golpe(h, m, cmb.basic_attack_power(h), ACERTA_SEM_CRIT)
 
 
 def monstro_contra_mago_com_egide() -> int:
     m, h = spawn_by_role("bruiser", 8), make_hero("Mage", 8, "expected")
-    return _golpe(m, h, cmb.basic_attack_power(m), "", ACERTA_SEM_CRIT)
+    return _golpe(m, h, cmb.basic_attack_power(m), ACERTA_SEM_CRIT)
 
 
 CENARIOS = {
@@ -173,14 +187,14 @@ CENARIOS = {
 # afetadas. É movimento de balanceamento REAL, registrado aqui e reportado, não
 # corrigido nesta rodada: mexer nos `bonus_percent` do JSON seria rebalancear.
 GOLDEN = {
-    "basico_sem_crit": 160,
-    "basico_com_crit": 240,
+    "basico_sem_crit": 147,
+    "basico_com_crit": 220,
     "skill_de_dano": 302,
     "skill_com_condicao": 596,
-    "atacante_com_fear": 160,
-    "defensor_com_reducao": 112,
-    "dois_redutores": 112,
-    "monstro_contra_mago_com_egide": 87,
+    "atacante_com_fear": 147,
+    "defensor_com_reducao": 102,
+    "dois_redutores": 102,
+    "monstro_contra_mago_com_egide": 88,
 }
 
 
@@ -193,7 +207,7 @@ def test_o_cenario_da_egide_realmente_gasta_mana():
     """Sem isto, o cenário passaria mesmo que a égide parasse de existir."""
     m, h = spawn_by_role("bruiser", 8), make_hero("Mage", 8, "expected")
     mp = h.get_mp()
-    _golpe(m, h, cmb.basic_attack_power(m), "", ACERTA_SEM_CRIT)
+    _golpe(m, h, cmb.basic_attack_power(m), ACERTA_SEM_CRIT)
     assert h.get_mp() < mp
 
 
@@ -250,6 +264,6 @@ class TestLinguagemDePoder:
         monkeypatch.setattr(cmb, "_calculate_damage", espiao)
         h, m = make_hero("Warrior", 8, "expected"), spawn_by_role("bruiser", 8)
         cmb.resolve_physical_attack(
-            h, m, cmb.basic_attack_power(h), "", rng=RngRoteirizado(*ACERTA_SEM_CRIT)
+            h, m, cmb.basic_attack_power(h), rng=RngRoteirizado(*ACERTA_SEM_CRIT)
         )
         assert len(chamadas) == 1

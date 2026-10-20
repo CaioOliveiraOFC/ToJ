@@ -216,12 +216,188 @@ class TestAtrito:
         assert heroi.get_hp() < heroi.base_hp
 
 
+class TestDeckDoMonstro:
+    """O monstro ganha deck por nível, pela mesma lei do herói.
+
+    Paridade ESTRUTURAL herói/monstro: antes o monstro nascia com o kit inteiro
+    no nível 1 e nenhum teste de paridade cobria progressão — por isso a
+    divergência sobreviveu verde.
+    """
+
+    NIVEIS = (1, 3, 6, 9, 12, 15, 18, 20)
+
+    def test_a_cadencia_e_a_do_heroi(self):
+        from src.content.factories.archetypes import deck_for_level
+
+        for papel, arquetipo in all_archetypes().items():
+            for nivel, esperado in ((1, 1), (3, 2), (6, 3), (9, 4)):
+                tamanho = len(deck_for_level(arquetipo, nivel))
+                assert tamanho == min(esperado, len(arquetipo.skills)), (papel, nivel)
+
+    def test_o_deck_nunca_passa_do_teto(self):
+        from src.content.factories.archetypes import deck_for_level
+        from src.shared.constants import MAX_ACTIVE_SKILLS
+
+        for papel, arquetipo in all_archetypes().items():
+            for nivel in range(1, 41):
+                assert len(deck_for_level(arquetipo, nivel)) <= MAX_ACTIVE_SKILLS, papel
+
+    def test_a_assinatura_esta_em_todo_nivel(self):
+        from src.content.factories.archetypes import deck_for_level
+
+        for papel, arquetipo in all_archetypes().items():
+            for nivel in self.NIVEIS:
+                assert deck_for_level(arquetipo, nivel)[0] is arquetipo.skills[0], (papel, nivel)
+
+    def test_nenhuma_carta_do_kit_fica_morta(self):
+        from src.content.factories.archetypes import deck_for_level
+
+        for papel, arquetipo in all_archetypes().items():
+            vistas = {c.id for nivel in range(1, 21) for c in deck_for_level(arquetipo, nivel)}
+            assert vistas == {c.id for c in arquetipo.skills}, papel
+
+    def test_o_spawn_entrega_o_deck_do_nivel(self):
+        import random
+
+        from src.content.factories.archetypes import deck_for_level
+
+        for papel, arquetipo in all_archetypes().items():
+            for nivel in self.NIVEIS:
+                ids = [c.id for c in spawn_by_role(papel, nivel, rng=random.Random(7)).skills]
+                esperado = deck_for_level(arquetipo, nivel, random.Random(7))
+                assert ids == [c.id for c in esperado], (papel, nivel)
+
+    def test_a_mana_restringe_igual_em_todo_nivel(self):
+        """Paridade de MP: quantas conjurações cabem no pool não depende do nível.
+
+        Com custo absoluto e pool geométrico, o boss conjurava 2 vezes no Nv.1 e 17
+        no Nv.20 — a mana deixava de ser decisão. Custo percentual da mesma curva
+        mantém a razão; só o arredondamento dos pools pequenos a move um pouco.
+        """
+        import random
+
+        for papel, arquetipo in all_archetypes().items():
+            razoes = []
+            for nivel in (1, 20):
+                m = spawn_by_role(papel, nivel, rng=random.Random(0))
+                custos = [cmb.skill_mana_cost(m, c) for c in arquetipo.skills]
+                razoes.append(m.base_mp / (sum(custos) / len(custos)))
+            assert abs(razoes[1] / razoes[0] - 1) < 0.10, (papel, razoes)
+
+    def test_kit_grande_cresce_sem_manutencao(self):
+        """A regra de troca não conhece carta nenhuma: vale para um kit de 30.
+
+        A carta recém-liberada sempre entra, a assinatura nunca sai, e o deck não
+        repete carta nem carrega carta acima do nível. Mesma semente, mesmo deck.
+        """
+        import random
+        from dataclasses import replace
+
+        from src.content.factories.archetypes import deck_for_level
+        from src.shared.constants import MAX_ACTIVE_SKILLS
+
+        base = all_archetypes()["controller"]
+        modelo = base.skills[0]
+        kit = tuple(
+            replace(modelo, id=f"sint_{i}", name=f"Sintética {i}", level_required=max(1, 3 * i))
+            for i in range(30)
+        )
+        grande = replace(base, skills=kit)
+        for nivel in range(1, 91):
+            deck = deck_for_level(grande, nivel, random.Random(nivel))
+            liberadas = [c for c in kit if c.level_required <= nivel]
+            assert len(deck) == min(MAX_ACTIVE_SKILLS, len(liberadas)), nivel
+            assert deck[0] is kit[0], nivel
+            assert liberadas[-1] in deck, f"a carta liberada no Nv.{nivel} não entrou"
+            assert len({c.id for c in deck}) == len(deck), nivel
+            assert all(c.level_required <= nivel for c in deck), nivel
+        um = [c.id for c in deck_for_level(grande, 90, random.Random(11))]
+        outro = [c.id for c in deck_for_level(grande, 90, random.Random(11))]
+        assert um == outro
+
+    def test_o_save_preserva_o_deck_e_cai_na_regra_quando_nao_pode(self):
+        """Recarregar não sorteia de novo; save sem o campo ou com carta extinta
+        refaz o deck pela regra normal — nunca um deck pela metade."""
+        import copy
+        import random
+
+        from src.content.factories.archetypes import deck_for_level, get_archetype
+        from src.engine.map import MapOfGame
+
+        papel, nivel = "controller", 18  # kit de 7: o deck do Nv.18 é sorteado
+        original = spawn_by_role(papel, nivel, name="Alvo", rng=random.Random(3))
+        ids_originais = [c.id for c in original.skills]
+        # Uma semente global que sortearia OUTRO deck: se o load sorteasse, apareceria.
+        outra = next(
+            n
+            for n in range(1000)
+            if [c.id for c in deck_for_level(get_archetype(papel), nivel, random.Random(n))]
+            != ids_originais
+        )
+
+        mapa = MapOfGame(height=5, width=5)
+        mapa.enemies_pos[(1, 1)] = original
+        estado = mapa.get_map_state()
+
+        def recarregar(dados):
+            random.seed(outra)
+            novo = MapOfGame(height=5, width=5)
+            novo.load_map_state(dados)
+            return [c.id for c in novo.enemies_pos[(1, 1)].skills]
+
+        assert recarregar(estado) == ids_originais
+
+        antigo = copy.deepcopy(estado)
+        del antigo["enemies_pos"]["1,1"]["skills"]
+        refeito = recarregar(antigo)
+        assert len(refeito) == len(ids_originais) and refeito[0] == ids_originais[0]
+
+        extinta = copy.deepcopy(estado)
+        extinta["enemies_pos"]["1,1"]["skills"][1] = "carta_que_saiu_do_jogo"
+        refeito = recarregar(extinta)
+        assert "carta_que_saiu_do_jogo" not in refeito
+        assert len(refeito) == len(ids_originais) and refeito[0] == ids_originais[0]
+
+    def test_toda_lei_tem_um_deck_real_que_a_monta(self):
+        """O deck menor não pode matar uma lei: cada uma precisa de ao menos um
+        deck sorteável em que um arquétipo a monta sozinho com as próprias cartas."""
+        import random
+
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+        from audit_interactions import PECAS, _pecas_da_carta
+
+        from src.content.factories.archetypes import deck_for_level
+
+        for lei, pecas in PECAS.items():
+            montada = any(
+                set(pecas)
+                <= {
+                    p
+                    for c in deck_for_level(arquetipo, nivel, random.Random(semente))
+                    for p in _pecas_da_carta(c)
+                }
+                for arquetipo in all_archetypes().values()
+                for nivel in range(1, 21)
+                for semente in range(20)
+            )
+            assert montada, f"{lei}: nenhum deck real de monstro monta a lei"
+
+
+class TestManaDoMonstro:
+    def test_o_pool_de_mana_e_do_papel(self):
+        """Nove papéis, e o pool de mana não é mais o mesmo para todos."""
+        import random
+
+        pools = {spawn_by_role(p, 1, rng=random.Random(0)).base_mp for p in all_archetypes()}
+        assert len(pools) > 1, "Todos os arquétipos voltaram a ter o mesmo MP."
+
+
 class TestArquetipos:
     """Cada papel precisa distribuir o orçamento de um jeito diferente."""
 
     def test_todo_arquetipo_tem_uma_forca_e_uma_fraqueza(self):
         for papel, arquetipo in all_archetypes().items():
-            eixos = (arquetipo.hp, arquetipo.attack, arquetipo.defense, arquetipo.agility)
+            eixos = (arquetipo.hp, arquetipo.st, arquetipo.mg, arquetipo.defense, arquetipo.agility)
             if papel in ("bruiser", "elite", "boss"):
                 continue  # referência e marcos: custam mais orçamento, não o redistribuem
             redistribui = max(eixos) > 1.05 and min(eixos) < 0.95
@@ -237,6 +413,76 @@ class TestArquetipos:
             assert arquetipo.threat and arquetipo.counterplay, (
                 f"{papel} não documenta o que ameaça nem como se responde a ele."
             )
+
+
+class TestCriticoDeFonte:
+    """Sem fonte explícita, não existe crítico.
+
+    Todo atacante tinha 10% de crítico sem que nada no jogo dissesse de onde
+    vinham. Agora o crítico é concedido — por passiva, item, encantamento, buff,
+    poção ou pela carta — e a chance de quem não tem nada disso é zero.
+    """
+
+    def test_o_critico_do_monstro_e_exatamente_a_fonte_declarada(self):
+        # Sem buff, a chance do monstro é a passiva inata do arquétipo e nada
+        # mais: zero para quem não declara, o valor do JSON para quem declara.
+        import random
+
+        for papel, arquetipo in all_archetypes().items():
+            declarada = dict(arquetipo.passives).get("crit_chance", 0)
+            for nivel in (1, 12, 20):
+                m = spawn_by_role(papel, nivel, rng=random.Random(0))
+                assert cmb.crit_chance(m) == declarada, (papel, nivel)
+                for carta in arquetipo.skills:
+                    esperado = declarada + carta.crit_chance
+                    assert cmb.crit_chance(m, carta) == esperado, (papel, carta.id)
+
+    def test_so_o_controller_declara_critico_inato(self):
+        # A fonte é do papel que congela, não um default disfarçado: os outros
+        # oito seguem sem crítico até um buff dar um.
+        com_fonte = {
+            papel: dict(a.passives)["crit_chance"]
+            for papel, a in all_archetypes().items()
+            if "crit_chance" in dict(a.passives)
+        }
+        assert com_fonte == {"controller": 10}
+
+    def test_quem_congela_consegue_critar(self):
+        # Quebra Gélida e Hemorragia Fria pedem alvo congelado E golpe crítico.
+        # Um arquétipo que congela sem nenhuma fonte de crítico tem as duas leis
+        # mortas no próprio kit — foi o que o crítico por fonte deixou para trás
+        # quando os 10% implícitos saíram.
+        import random
+
+        def congela(carta):
+            sec = carta.secondary
+            return carta.effect_value == "frozen" or (sec is not None and sec.effect == "frozen")
+
+        congeladores = [p for p, a in all_archetypes().items() if any(map(congela, a.skills))]
+        assert congeladores, "nenhum monstro congela: o teste perdeu o objeto"
+        for papel in congeladores:
+            m = spawn_by_role(papel, 12, rng=random.Random(0))
+            assert cmb.crit_chance(m) > 0, papel
+
+    def test_arquetipo_com_passiva_desconhecida_e_recusado(self):
+        from src.content.factories.archetypes import _passives_from_json
+
+        with pytest.raises(ValueError, match="crit_chanse"):
+            _passives_from_json("x", {"passives": {"crit_chanse": 10}})
+        assert _passives_from_json("x", {}) == ()
+
+    def test_heroi_sem_equipamento_nao_crita_no_basico(self):
+        for classe in ALL_CLASSES:
+            assert cmb.crit_chance(make_hero(classe, 1, "naked")) == 0, classe
+
+    def test_a_fonte_da_carta_soma_e_o_teto_segura(self):
+        from src.shared.constants import CRIT_CHANCE_CAP
+
+        furtivo = next(s for s in load_skills() if s.id == "ataque_furtivo")
+        heroi = make_hero("Rogue", 1, "naked")
+        assert cmb.crit_chance(heroi, furtivo) == furtivo.crit_chance
+        heroi.active_buffs["x"] = {"stat": "crit_chance", "value": 999, "duration": 1}
+        assert cmb.crit_chance(heroi, furtivo) == CRIT_CHANCE_CAP
 
 
 class TestGolpeLetal:

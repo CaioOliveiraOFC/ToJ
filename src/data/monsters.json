@@ -33,9 +33,14 @@
       "label": "Trash",
       "budget": {
         "hp": 0.5,
-        "attack": 0.7,
+        "st": 0.7,
+        "mg": 0.25,
+        "mp": 0.5,
         "defense": 0.85,
         "agility": 0.95
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 0,
       "threat": "Atrito. Mata devagar e cobra recurso que valia para a luta seguinte.",
@@ -54,7 +59,9 @@
         {
           "id": "mob_mordida_suja",
           "name": "Mordida Suja",
+          "level_required": 1,
           "mana_cost": 8,
+          "mana_cost_percent": 4.5,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "Dentes que não foram feitos para isso, e ainda assim funcionam +15% contra alvo ferido.",
@@ -72,7 +79,7 @@
               "weight": 1.0
             }
           ],
-          "power": 0.667,
+          "power": 1.0,
           "secondary": {
             "effect": "bleed",
             "chance": 30,
@@ -82,7 +89,9 @@
         {
           "id": "mob_guincho",
           "name": "Guincho",
+          "level_required": 3,
           "mana_cost": 10,
+          "mana_cost_percent": 5.5,
           "effect_type": "status",
           "effect_value": "slowed",
           "description": "Um som agudo e curto que atrapalha mais do que assusta.",
@@ -96,7 +105,9 @@
         {
           "id": "mob_encolher",
           "name": "Encolher",
+          "level_required": 6,
           "mana_cost": 12,
+          "mana_cost_percent": 6.5,
           "effect_type": "damage_reduction",
           "effect_value": 18,
           "description": "Se enrola no chão e espera o golpe passar por cima.",
@@ -113,9 +124,14 @@
       "label": "Bruiser",
       "budget": {
         "hp": 1.0,
-        "attack": 1.0,
+        "st": 1.0,
+        "mg": 0.3,
+        "mp": 0.8,
         "defense": 1.0,
         "agility": 1.0
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 25,
       "threat": "Pressão constante. O combate padrão.",
@@ -133,9 +149,11 @@
         {
           "id": "mob_golpe_pesado",
           "name": "Golpe Pesado",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 15,
+          "mana_cost_percent": 12.5,
           "cooldown": 3,
           "duration": 2,
           "chance": 100,
@@ -146,16 +164,18 @@
               "weight": 1.0
             }
           ],
-          "power": 0.933,
+          "power": 0.93,
           "accuracy_modifier": -5
         },
         {
           "id": "mob_furia",
           "name": "Fúria",
+          "level_required": 3,
           "effect_type": "buff",
           "effect_value": 45,
           "effect_stat": "st",
           "mana_cost": 18,
+          "mana_cost_percent": 15.0,
           "cooldown": 5,
           "duration": 3,
           "chance": 100,
@@ -165,7 +185,9 @@
         {
           "id": "mob_cabecada",
           "name": "Cabeçada",
+          "level_required": 6,
           "mana_cost": 18,
+          "mana_cost_percent": 15.0,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "Testa contra nariz. Ganha quem tiver o crânio mais grosso +20% contra alvo intacto.",
@@ -183,7 +205,7 @@
               "weight": 1.0
             }
           ],
-          "power": 0.833,
+          "power": 1.25,
           "secondary": {
             "effect": "stun",
             "chance": 25,
@@ -193,7 +215,9 @@
         {
           "id": "mob_urro_de_caca",
           "name": "Urro de Caça",
+          "level_required": 9,
           "mana_cost": 15,
+          "mana_cost_percent": 12.5,
           "effect_type": "status",
           "effect_value": "weakened",
           "description": "Anuncia que escolheu um alvo, e o alvo sente o braço pesar.",
@@ -207,7 +231,9 @@
         {
           "id": "mob_couro_de_batalha",
           "name": "Couro de Batalha",
+          "level_required": 12,
           "mana_cost": 20,
+          "mana_cost_percent": 16.5,
           "effect_type": "damage_reduction",
           "effect_value": 25,
           "description": "Cicatriz sobre cicatriz até virar armadura.",
@@ -221,7 +247,9 @@
         {
           "id": "mob_sangue_quente",
           "name": "Sangue Quente",
+          "level_required": 15,
           "mana_cost": 18,
+          "mana_cost_percent": 15.0,
           "effect_type": "buff",
           "effect_value": 20,
           "description": "Quanto mais tempo o combate dura, mais fundo ele acerta (20%).",
@@ -238,9 +266,14 @@
       "label": "Tank",
       "budget": {
         "hp": 1.35,
-        "attack": 0.7,
+        "st": 0.7,
+        "mg": 0.25,
+        "mp": 1.0,
         "defense": 1.45,
         "agility": 0.6
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 35,
       "threat": "Duração. Alonga o combate e força atrito.",
@@ -257,9 +290,11 @@
         {
           "id": "mob_carapaca",
           "name": "Carapaça",
+          "level_required": 1,
           "effect_type": "damage_reduction",
           "effect_value": 35,
           "mana_cost": 20,
+          "mana_cost_percent": 21.0,
           "cooldown": 4,
           "duration": 3,
           "chance": 100,
@@ -268,10 +303,12 @@
         {
           "id": "mob_muralha",
           "name": "Muralha",
+          "level_required": 3,
           "effect_type": "buff",
           "effect_value": 55,
           "effect_stat": "df",
           "mana_cost": 18,
+          "mana_cost_percent": 19.0,
           "cooldown": 5,
           "duration": 3,
           "chance": 100,
@@ -281,9 +318,11 @@
         {
           "id": "mob_impacto",
           "name": "Impacto de Escudo",
+          "level_required": 6,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 20,
+          "mana_cost_percent": 21.0,
           "cooldown": 4,
           "duration": 3,
           "chance": 100,
@@ -299,13 +338,15 @@
               "weight": 0.4
             }
           ],
-          "power": 1.332,
+          "power": 1.331,
           "accuracy_modifier": -10
         },
         {
           "id": "mob_agarrao",
           "name": "Agarrão",
+          "level_required": 9,
           "mana_cost": 20,
+          "mana_cost_percent": 21.0,
           "effect_type": "status",
           "effect_value": "slowed",
           "description": "Fecha a mão no braço do herói e o combate passa a ser no ritmo dele.",
@@ -324,7 +365,9 @@
         {
           "id": "mob_raizes_fundas",
           "name": "Raízes Fundas",
+          "level_required": 12,
           "mana_cost": 22,
+          "mana_cost_percent": 23.0,
           "effect_type": "buff",
           "effect_value": 35,
           "description": "Se ancora no chão e passa a aguentar o que antes o derrubava (35%).",
@@ -338,7 +381,9 @@
         {
           "id": "mob_pisao",
           "name": "Pisão",
+          "level_required": 15,
           "mana_cost": 22,
+          "mana_cost_percent": 23.0,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "Levanta a pata e deixa a massa fazer o trabalho +30% contra alvo ferido.",
@@ -360,7 +405,7 @@
               "weight": 0.4
             }
           ],
-          "power": 1.219,
+          "power": 1.576,
           "secondary": {
             "effect": "stun",
             "chance": 20,
@@ -373,9 +418,14 @@
       "label": "Glass cannon",
       "budget": {
         "hp": 0.55,
-        "attack": 1.9,
+        "st": 0.35,
+        "mg": 1.9,
+        "mp": 1.5,
         "defense": 0.5,
         "agility": 1.1
+      },
+      "offensive_weights": {
+        "mg": 1.0
       },
       "skill_use_chance": 45,
       "threat": "Pico de dano. Pune quem erra a ordem de foco.",
@@ -392,9 +442,11 @@
         {
           "id": "mob_rajada",
           "name": "Rajada Arcana",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 25,
+          "mana_cost_percent": 39.0,
           "cooldown": 2,
           "duration": 2,
           "chance": 100,
@@ -405,15 +457,17 @@
               "weight": 1.0
             }
           ],
-          "power": 1.133,
+          "power": 1.13,
           "accuracy_modifier": 0
         },
         {
           "id": "mob_detonacao",
           "name": "Detonação Arcana",
+          "level_required": 3,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 40,
+          "mana_cost_percent": 62.0,
           "cooldown": 5,
           "duration": 3,
           "chance": 100,
@@ -425,7 +479,7 @@
               "weight": 1.0
             }
           ],
-          "power": 1.533,
+          "power": 1.53,
           "accuracy_modifier": -10,
           "secondary": {
             "effect": "vulnerable",
@@ -436,7 +490,9 @@
         {
           "id": "mob_lanca_de_ozonio",
           "name": "Lança de Ozônio",
+          "level_required": 6,
           "mana_cost": 28,
+          "mana_cost_percent": 43.5,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "O ar racha antes do golpe chegar, e o cheiro fica +25% contra alvo intacto.",
@@ -454,7 +510,7 @@
               "weight": 1.0
             }
           ],
-          "power": 1.04,
+          "power": 1.56,
           "secondary": {
             "effect": "fear",
             "chance": 40,
@@ -464,7 +520,9 @@
         {
           "id": "mob_sobrecarga",
           "name": "Sobrecarga",
+          "level_required": 9,
           "mana_cost": 30,
+          "mana_cost_percent": 46.5,
           "effect_type": "buff",
           "effect_value": 45,
           "description": "Abre todas as comportas de uma vez e lida com as consequências depois (45%).",
@@ -478,7 +536,9 @@
         {
           "id": "mob_praga_ardente",
           "name": "Praga Ardente",
+          "level_required": 12,
           "mana_cost": 24,
+          "mana_cost_percent": 37.5,
           "effect_type": "status",
           "effect_value": "poison",
           "description": "Uma chama que não precisa de combustível e não tem pressa.",
@@ -492,7 +552,9 @@
         {
           "id": "mob_fenda_de_eter",
           "name": "Fenda de Éter",
+          "level_required": 15,
           "mana_cost": 35,
+          "mana_cost_percent": 54.5,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "Abre um talho no ar e cobra a conta da própria reserva +35% contra alvo sob efeito.",
@@ -510,7 +572,7 @@
               "weight": 1.0
             }
           ],
-          "power": 4.641
+          "power": 3.099
         }
       ]
     },
@@ -518,9 +580,15 @@
       "label": "Skirmisher",
       "budget": {
         "hp": 0.75,
-        "attack": 0.95,
+        "st": 0.95,
+        "mg": 0.3,
+        "mp": 0.8,
         "defense": 0.7,
-        "agility": 2.6
+        "agility": 4.0
+      },
+      "offensive_weights": {
+        "st": 0.75,
+        "ag": 0.25
       },
       "skill_use_chance": 30,
       "threat": "Acerta quem esquiva e age primeiro.",
@@ -537,9 +605,11 @@
         {
           "id": "mob_corte_rapido",
           "name": "Corte Rápido",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 12,
+          "mana_cost_percent": 10.0,
           "cooldown": 2,
           "duration": 2,
           "chance": 100,
@@ -554,16 +624,18 @@
               "weight": 0.4
             }
           ],
-          "power": 1.733,
+          "power": 1.734,
           "accuracy_modifier": 10
         },
         {
           "id": "mob_evasao_mob",
           "name": "Esquiva Felina",
+          "level_required": 3,
           "effect_type": "status",
           "effect_value": "invisible",
           "effect_stat": "",
           "mana_cost": 15,
+          "mana_cost_percent": 12.5,
           "cooldown": 5,
           "duration": 3,
           "chance": 100,
@@ -573,9 +645,11 @@
         {
           "id": "mob_ferida",
           "name": "Ferida Aberta",
+          "level_required": 6,
           "effect_type": "status",
           "effect_value": "bleed",
           "mana_cost": 15,
+          "mana_cost_percent": 12.5,
           "cooldown": 3,
           "duration": 3,
           "chance": 75,
@@ -585,7 +659,9 @@
         {
           "id": "mob_finta",
           "name": "Finta",
+          "level_required": 9,
           "mana_cost": 14,
+          "mana_cost_percent": 12.0,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "Mostra um lado, entra pelo outro +20% contra alvo intacto.",
@@ -603,7 +679,7 @@
               "weight": 1.0
             }
           ],
-          "power": 4.699,
+          "power": 2.586,
           "secondary": {
             "effect": "slowed",
             "chance": 45,
@@ -613,7 +689,9 @@
         {
           "id": "mob_bote",
           "name": "Bote",
+          "level_required": 12,
           "mana_cost": 18,
+          "mana_cost_percent": 15.0,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "Fica parado tempo demais e depois atravessa a distância inteira num salto +30% contra alvo ferido.",
@@ -631,7 +709,7 @@
               "weight": 1.0
             }
           ],
-          "power": 4.957,
+          "power": 2.728,
           "secondary": {
             "effect": "poison",
             "chance": 45,
@@ -641,7 +719,9 @@
         {
           "id": "mob_rasteira",
           "name": "Rasteira",
+          "level_required": 15,
           "mana_cost": 20,
+          "mana_cost_percent": 16.5,
           "effect_type": "status",
           "effect_value": "stun",
           "description": "Tira o chão de quem estava confiante nele.",
@@ -658,9 +738,17 @@
       "label": "Controlador",
       "budget": {
         "hp": 0.9,
-        "attack": 0.8,
+        "st": 0.3,
+        "mg": 0.8,
+        "mp": 1.5,
         "defense": 0.9,
         "agility": 1.3
+      },
+      "offensive_weights": {
+        "mg": 1.0
+      },
+      "passives": {
+        "crit_chance": 10
       },
       "skill_use_chance": 55,
       "threat": "Nega turnos e recurso.",
@@ -677,9 +765,11 @@
         {
           "id": "mob_torpor",
           "name": "Torpor",
+          "level_required": 1,
           "effect_type": "status",
           "effect_value": "stun",
           "mana_cost": 25,
+          "mana_cost_percent": 39.0,
           "cooldown": 3,
           "duration": 1,
           "chance": 55,
@@ -688,9 +778,11 @@
         {
           "id": "mob_queima_mana",
           "name": "Queima de Mana",
+          "level_required": 3,
           "effect_type": "status",
           "effect_value": "mana_burn",
           "mana_cost": 20,
+          "mana_cost_percent": 31.0,
           "cooldown": 3,
           "duration": 2,
           "chance": 75,
@@ -704,9 +796,11 @@
         {
           "id": "mob_medo",
           "name": "Presságio",
+          "level_required": 6,
           "effect_type": "status",
           "effect_value": "fear",
           "mana_cost": 18,
+          "mana_cost_percent": 28.0,
           "cooldown": 4,
           "duration": 3,
           "chance": 70,
@@ -716,7 +810,9 @@
         {
           "id": "mob_teia_de_gelo",
           "name": "Teia de Gelo",
+          "level_required": 9,
           "mana_cost": 26,
+          "mana_cost_percent": 40.5,
           "effect_type": "status",
           "effect_value": "frozen",
           "description": "O chão vira vidro e as pernas param de responder.",
@@ -735,7 +831,9 @@
         {
           "id": "mob_letargia",
           "name": "Letargia",
+          "level_required": 12,
           "mana_cost": 28,
+          "mana_cost_percent": 43.5,
           "effect_type": "status",
           "effect_value": "sleep",
           "description": "Uma nota grave e longa que faz as pálpebras pesarem.",
@@ -749,7 +847,9 @@
         {
           "id": "mob_ferrugem_da_alma",
           "name": "Ferrugem da Alma",
+          "level_required": 15,
           "mana_cost": 22,
+          "mana_cost_percent": 34.5,
           "effect_type": "status",
           "effect_value": "vulnerable",
           "description": "Corrói a guarda antes de corroer o corpo.",
@@ -768,7 +868,9 @@
         {
           "id": "mob_agulhada_mental",
           "name": "Agulhada Mental",
+          "level_required": 18,
           "mana_cost": 20,
+          "mana_cost_percent": 31.0,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "Pouco estrago, e exatamente em quem não podia perder a concentração +35% contra alvo sob efeito.",
@@ -786,7 +888,7 @@
               "weight": 1.0
             }
           ],
-          "power": 0.64,
+          "power": 0.963,
           "secondary": {
             "effect": "mana_burn",
             "chance": 50,
@@ -799,9 +901,14 @@
       "label": "Suporte",
       "budget": {
         "hp": 0.8,
-        "attack": 0.6,
+        "st": 0.25,
+        "mg": 0.6,
+        "mp": 1.5,
         "defense": 1.0,
         "agility": 1.0
+      },
+      "offensive_weights": {
+        "mg": 1.0
       },
       "skill_use_chance": 60,
       "threat": "Sustain. Cura-se, se prepara e enfraquece quem está na frente dele.",
@@ -816,9 +923,11 @@
         {
           "id": "mob_regenerar",
           "name": "Regenerar",
+          "level_required": 1,
           "effect_type": "heal",
           "effect_value": 30,
           "mana_cost": 25,
+          "mana_cost_percent": 39.0,
           "cooldown": 3,
           "duration": 2,
           "chance": 100,
@@ -827,9 +936,11 @@
         {
           "id": "mob_bencao",
           "name": "Bênção Sombria",
+          "level_required": 3,
           "effect_type": "buff",
           "effect_value": 25,
           "mana_cost": 20,
+          "mana_cost_percent": 31.0,
           "cooldown": 4,
           "duration": 3,
           "chance": 100,
@@ -839,9 +950,11 @@
         {
           "id": "mob_maldicao",
           "name": "Maldição",
+          "level_required": 6,
           "effect_type": "status",
           "effect_value": "weakened",
           "mana_cost": 20,
+          "mana_cost_percent": 31.0,
           "cooldown": 4,
           "duration": 3,
           "chance": 80,
@@ -856,7 +969,9 @@
         {
           "id": "mob_canto_de_ossos",
           "name": "Canto de Ossos",
+          "level_required": 9,
           "mana_cost": 22,
+          "mana_cost_percent": 34.5,
           "effect_type": "buff",
           "effect_value": 35,
           "description": "Uma reza rouca que endurece o braço de quem ainda está de pé (35%).",
@@ -870,7 +985,9 @@
         {
           "id": "mob_veu_protetor",
           "name": "Véu Protetor",
+          "level_required": 12,
           "mana_cost": 24,
+          "mana_cost_percent": 37.5,
           "effect_type": "damage_reduction",
           "effect_value": 30,
           "description": "Um tecido fino de nada que segura muita coisa.",
@@ -884,7 +1001,9 @@
         {
           "id": "mob_praga_lenta",
           "name": "Praga Lenta",
+          "level_required": 15,
           "mana_cost": 22,
+          "mana_cost_percent": 34.5,
           "effect_type": "status",
           "effect_value": "poison",
           "description": "Não é para matar. É para o outro chegar cansado no fim.",
@@ -903,7 +1022,9 @@
         {
           "id": "mob_folego_emprestado",
           "name": "Fôlego Emprestado",
+          "level_required": 18,
           "mana_cost": 25,
+          "mana_cost_percent": 39.0,
           "effect_type": "buff",
           "effect_value": 30,
           "description": "Tira de si e dá a quem ainda vai lutar (30%).",
@@ -920,9 +1041,14 @@
       "label": "Elite",
       "budget": {
         "hp": 1.4,
-        "attack": 1.25,
+        "st": 1.25,
+        "mg": 0.45,
+        "mp": 1.2,
         "defense": 1.15,
         "agility": 1.1
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 45,
       "threat": "Marco do andar. Testa se a build funciona.",
@@ -940,9 +1066,11 @@
         {
           "id": "mob_investida_brutal",
           "name": "Investida Brutal",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 25,
+          "mana_cost_percent": 31.0,
           "cooldown": 3,
           "duration": 2,
           "chance": 100,
@@ -957,15 +1085,17 @@
               "weight": 0.3
             }
           ],
-          "power": 1.44,
+          "power": 1.436,
           "accuracy_modifier": -5
         },
         {
           "id": "mob_rugido",
           "name": "Rugido",
+          "level_required": 3,
           "effect_type": "status",
           "effect_value": "weakened",
           "mana_cost": 20,
+          "mana_cost_percent": 25.0,
           "cooldown": 4,
           "duration": 3,
           "chance": 70,
@@ -974,9 +1104,11 @@
         {
           "id": "mob_couraca_elite",
           "name": "Pele de Ferro",
+          "level_required": 6,
           "effect_type": "damage_reduction",
           "effect_value": 25,
           "mana_cost": 22,
+          "mana_cost_percent": 27.5,
           "cooldown": 5,
           "duration": 3,
           "chance": 100,
@@ -986,7 +1118,9 @@
         {
           "id": "mob_golpe_de_arauto",
           "name": "Golpe de Arauto",
+          "level_required": 9,
           "mana_cost": 26,
+          "mana_cost_percent": 32.5,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "Um golpe treinado, com o peso do escudo atrás dele +25% contra alvo intacto.",
@@ -1008,7 +1142,7 @@
               "weight": 0.3
             }
           ],
-          "power": 1.328,
+          "power": 1.941,
           "secondary": {
             "effect": "vulnerable",
             "chance": 55,
@@ -1018,7 +1152,9 @@
         {
           "id": "mob_grito_de_comando",
           "name": "Grito de Comando",
+          "level_required": 12,
           "mana_cost": 24,
+          "mana_cost_percent": 30.0,
           "effect_type": "buff",
           "effect_value": 25,
           "description": "Não é raiva: é ordem. E o corpo obedece a ordens melhor do que a raiva (25%).",
@@ -1032,7 +1168,9 @@
         {
           "id": "mob_lamina_negra",
           "name": "Lâmina Negra",
+          "level_required": 15,
           "mana_cost": 24,
+          "mana_cost_percent": 30.0,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "A lâmina foi tratada com alguma coisa, e a ferida não fecha +30% contra alvo ferido.",
@@ -1050,7 +1188,7 @@
               "weight": 1.0
             }
           ],
-          "power": 0.896,
+          "power": 1.346,
           "secondary": {
             "effect": "bleed",
             "chance": 70,
@@ -1063,9 +1201,14 @@
       "label": "Boss",
       "budget": {
         "hp": 1.8,
-        "attack": 1.35,
+        "st": 1.35,
+        "mg": 0.6,
+        "mp": 1.4,
         "defense": 1.2,
         "agility": 1.15
+      },
+      "offensive_weights": {
+        "st": 1.0
       },
       "skill_use_chance": 55,
       "threat": "Portão a cada 5 andares. Exige execução por muitos turnos.",
@@ -1083,9 +1226,11 @@
         {
           "id": "boss_devastar",
           "name": "Devastar",
+          "level_required": 1,
           "effect_type": "damage",
           "effect_value": 0,
           "mana_cost": 30,
+          "mana_cost_percent": 43.5,
           "cooldown": 3,
           "duration": 2,
           "chance": 100,
@@ -1100,15 +1245,17 @@
               "weight": 0.2
             }
           ],
-          "power": 1.449,
+          "power": 1.452,
           "accuracy_modifier": -5
         },
         {
           "id": "boss_esmagar",
           "name": "Esmagar",
+          "level_required": 3,
           "effect_type": "status",
           "effect_value": "stun",
           "mana_cost": 30,
+          "mana_cost_percent": 43.5,
           "cooldown": 4,
           "duration": 1,
           "chance": 50,
@@ -1117,9 +1264,11 @@
         {
           "id": "boss_couraca",
           "name": "Couraça Ancestral",
+          "level_required": 6,
           "effect_type": "damage_reduction",
           "effect_value": 30,
           "mana_cost": 25,
+          "mana_cost_percent": 36.5,
           "cooldown": 5,
           "duration": 3,
           "chance": 100,
@@ -1128,10 +1277,12 @@
         {
           "id": "boss_ira",
           "name": "Ira Final",
+          "level_required": 9,
           "effect_type": "buff",
           "effect_value": 50,
           "effect_stat": "st",
           "mana_cost": 25,
+          "mana_cost_percent": 36.5,
           "cooldown": 6,
           "duration": 3,
           "chance": 100,
@@ -1141,7 +1292,9 @@
         {
           "id": "boss_juizo",
           "name": "Juízo",
+          "level_required": 12,
           "mana_cost": 32,
+          "mana_cost_percent": 46.5,
           "effect_type": "damage",
           "effect_value": 0,
           "description": "Quando a fera entende que pode perder, ela para de se conter +45% quando você está ferido.",
@@ -1163,12 +1316,14 @@
               "weight": 0.4
             }
           ],
-          "power": 0.459
+          "power": 0.504
         },
         {
           "id": "boss_sentenca",
           "name": "Sentença",
+          "level_required": 15,
           "mana_cost": 30,
+          "mana_cost_percent": 43.5,
           "effect_type": "status",
           "effect_value": "fear",
           "description": "Diz alguma coisa numa língua morta, e o herói entende assim mesmo.",
@@ -1187,7 +1342,9 @@
         {
           "id": "boss_carne_antiga",
           "name": "Carne Antiga",
+          "level_required": 18,
           "mana_cost": 35,
+          "mana_cost_percent": 51.0,
           "effect_type": "heal",
           "effect_value": 20,
           "description": "O corpo se lembra de como era antes do ferimento. Recupera 20% da vida máxima.",

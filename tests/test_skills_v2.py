@@ -170,10 +170,20 @@ class TestAGramaticaDaEscala:
 
 class TestCriticoEAcertoSaoDoMotor:
     def test_a_skill_usa_a_mesma_rolagem_de_critico_do_basico(self):
-        """Nenhuma carta declara crítico próprio; ele é do funil."""
+        """A carta pode declarar CHANCE de crítico; a rolagem e o dano são do funil.
+
+        `crit_chance` na carta é fonte, somada às do atacante pela mesma
+        `combat.crit_chance` que o básico usa — não existe uma segunda rolagem.
+        Dano de crítico próprio nenhuma carta declara.
+        """
+        from src.shared.constants import CRIT_CHANCE_CAP
+
         for skill in load_skills():
-            assert not hasattr(skill, "crit_chance")
             assert not hasattr(skill, "crit_damage")
+            assert skill.crit_chance >= 0, skill.id
+        rogue = heroi("Rogue", 10)
+        furtivo = get_skill_by_id("ataque_furtivo")
+        assert cmb.crit_chance(rogue, furtivo) == min(CRIT_CHANCE_CAP, cmb.crit_chance(rogue) + 25)
 
     def test_o_modificador_de_acerto_da_carta_entra_na_conta_do_motor(self):
         h, m = heroi(), heroi("Rogue", 10)
@@ -585,10 +595,9 @@ class TestMonstroUsaAMesmaGramatica:
         carta_mob = next(c for c in m.skills if c.effect_type == "damage")
 
         base = cmb.skill_damage_base(m, carta_mob, alvo)
-        baldes = cmb.damage_modifiers(m, alvo, is_critical=False)
+        baldes = cmb.damage_modifiers(m, alvo, is_critical=False, skill=carta_mob)
         esperado = cmb._calculate_damage(
             base,
-            baldes.flat,
             baldes.mult,
             baldes.xmult,
             alvo.get_df(),

@@ -16,7 +16,6 @@ from src.shared.constants import (
     BASIC_ATTACK_POWER_MULT,
     CRIT_CHANCE_CAP,
     CRIT_CHANCE_DEFAULT,
-    CRIT_CHANCE_HIGH,
     CRIT_DAMAGE_BASE,
     DAMAGE_REDUCTION_DEFAULT_PERCENT,
     DAMAGE_REDUCTION_DURATION,
@@ -74,9 +73,8 @@ def _apply_xmult_cap(xmult_raw: float) -> float:
 
 @dataclass(frozen=True)
 class DamageModifiers:
-    """Os quatro baldes de um golpe. Um recipiente, não um framework.
+    """Os três baldes de um golpe. Um recipiente, não um framework.
 
-    `flat`       soma antes de qualquer percentual, em pontos de dano.
     `mult`       percentuais ADITIVOS entre si: +10% e +20% resolvem ×1,30.
     `xmult`      amplificações MULTIPLICATIVAS: ×1,2 e ×1,5 resolvem ×1,8.
                  É este produto — e só ele — que `XMULT_CAP` limita.
@@ -90,9 +88,13 @@ class DamageModifiers:
     A defesa não é balde: `k/(k+df)` é função não-linear do atributo já
     resolvido do defensor, e é a única etapa com retorno decrescente por
     construção. Mistura-la aqui esconderia isso e diluiria o cap.
+
+    Eram quatro. O balde `flat` — pontos somados ao BASE antes de qualquer
+    percentual — nunca teve uma fonte sequer: nenhum item, passiva, efeito ou
+    carta o preenchia. Balde sem dono é convite a uso errado, e inventar uma
+    mecânica só para justificá-lo seria a arquitetura mandando no jogo.
     """
 
-    flat: list[int] = field(default_factory=list)
     mult: list[float] = field(default_factory=list)
     xmult: list[float] = field(default_factory=list)
     mitigation: list[float] = field(default_factory=list)
@@ -104,7 +106,7 @@ class DamageModifiers:
 MULT_MODIFIER = "damage_percent"
 
 
-def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifiers:
+def damage_modifiers(attacker, defender, *, is_critical: bool, skill=None) -> DamageModifiers:
     """Reúne tudo o que modifica ESTE golpe, dos dois lados.
 
     É o ponto único da CAMADA B — o golpe. Entra aqui o que modifica um ataque
@@ -117,10 +119,15 @@ def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifier
 
     Lê atacante e defensor pelo mesmo caminho (`fx.combat_modifier`), que já
     resolve herói e monstro por duck typing.
+
+    `skill` é a carta que produziu o golpe, quando houver. A condição situacional
+    dela (`bonus_condition`) é lida AQUI, contra este defensor, e o bônus entra no
+    `+MULT` ao lado do `damage_percent` — somando, não multiplicando. Antes ele
+    morava dentro do BASE e compunha com todo o `+MULT` do funil.
     """
     xmult: list[float] = []
     if is_critical:
-        xmult.append(CRIT_DAMAGE_BASE + fx.combat_modifier(attacker, "crit_damage") / 100)
+        xmult.append(crit_multiplier(attacker))
 
     # As leis globais que este golpe destrava — Quebra Gélida, Emboscada. Elas
     # entram como FATOR do bucket ×MULT, ao lado do crítico e sob o mesmo teto.
@@ -138,6 +145,10 @@ def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifier
     percentual = fx.combat_modifier(attacker, MULT_MODIFIER)
     if percentual:
         mult.append(percentual / 100)
+    if skill is not None and bonus_condition_met(attacker, skill, defender):
+        bonus = int(getattr(skill, "bonus_percent", 0) or 0)
+        if bonus:
+            mult.append(bonus / 100)
 
     return DamageModifiers(
         mult=mult,
@@ -151,9 +162,18 @@ def damage_modifiers(attacker, defender, *, is_critical: bool) -> DamageModifier
     )
 
 
+def additive_multiplier(mult_mods: list[float] | tuple[float, ...] | None) -> float:
+    """O balde `+MULT`: as fontes SOMAM entre si, e só a soma multiplica.
+
+    É a regra que o funil aplica e a que o validador e a forge usam para medir e
+    resolver uma carta. Uma função só, para que "o bônus condicional entra no
+    `+MULT`" não tenha uma versão no motor e outra na ferramenta de autoria.
+    """
+    return 1.0 + sum(mult_mods) if mult_mods else 1.0
+
+
 def _calculate_damage(
     base_power: float,
-    flat_mods: list[int] | None = None,
     mult_mods: list[float] | None = None,
     xmult_mods: list[float] | None = None,
     defense_target: int = 0,
@@ -161,13 +181,12 @@ def _calculate_damage(
 ) -> int:
     """O funil: todo dano de golpe sai daqui.
 
-        (BASE + ΣFLAT) × (1 + Σ+MULT) × Π×MULT_capado × DEFESA × Π_mitigação
+        BASE × (1 + Σ+MULT) × Π×MULT_capado × DEFESA × Π_mitigação
 
     Amplificação e mitigação são produtos separados porque só o primeiro é
     capado — ver `DamageModifiers`.
     """
-    flat_total = sum(flat_mods) if flat_mods else 0
-    mult_total = 1.0 + sum(mult_mods) if mult_mods else 1.0
+    mult_total = additive_multiplier(mult_mods)
 
     xmult_raw = 1.0
     if xmult_mods:
@@ -177,7 +196,7 @@ def _calculate_damage(
 
     def_mod = _defense_modifier(defense_target)
 
-    raw = (base_power + flat_total) * mult_total * xmult_capped * def_mod
+    raw = base_power * mult_total * xmult_capped * def_mod
     dano = max(1, int(raw))
 
     # Truncando a cada termo, e não no produto: é o que o motor já fazia quando
@@ -245,6 +264,40 @@ def basic_attack_power(attacker) -> int:
     return max(1, int(attacker.get_avg_damage() * BASIC_ATTACK_POWER_MULT))
 
 
+def crit_chance(attacker, skill=None) -> int:
+    """Chance de crítico, em %, de ESTE atacante com ESTA ação. A única leitura.
+
+    Sem fonte, não existe crítico: a base é `CRIT_CHANCE_DEFAULT`, zero. Somam as
+    fontes do atacante — passiva, item, encantamento, buff, poção, tudo pela
+    mesma porta (`fx.combat_modifier`) — e a da carta, quando a ação é uma skill
+    que declara `crit_chance`. O teto é `CRIT_CHANCE_CAP`.
+
+    Existia inline dentro de `resolve_physical_attack`, com um `if` por NOME de
+    skill (Rogue + "Ataque Furtivo" valia 25 em vez de 10), e o bot mantinha uma
+    cópia protegida só por teste de paridade. Agora motor e bot chamam esta
+    função, e a paridade deixa de ser um contrato a vigiar: é a mesma conta.
+    """
+    chance = CRIT_CHANCE_DEFAULT
+    chance += int(getattr(skill, "crit_chance", 0) or 0)
+    chance += int(fx.combat_modifier(attacker, "crit_chance"))
+    return max(0, min(chance, CRIT_CHANCE_CAP))
+
+
+def crit_multiplier(attacker) -> float:
+    """O fator que o golpe crítico põe no ×MULT: a base única mais as fontes."""
+    return CRIT_DAMAGE_BASE + fx.combat_modifier(attacker, "crit_damage") / 100
+
+
+def expected_crit_factor(attacker, skill=None) -> float:
+    """Quanto o crítico vale, em média, num golpe deste atacante com esta ação.
+
+    `1 + chance × (multiplicador − 1)`, com as duas leituras canônicas. É o que
+    o validador usa para pôr no orçamento o crítico que a PRÓPRIA carta declara:
+    uma carta com `crit_chance` entrega, em média, mais que o `power` diz.
+    """
+    return 1 + crit_chance(attacker, skill) / 100 * (crit_multiplier(attacker) - 1)
+
+
 def skill_mana_cost(caster, skill) -> int:
     """Quanto de mana a skill custa para ESTE lançador.
 
@@ -297,10 +350,16 @@ def _fracao_de_vida(entidade) -> float:
 def skill_damage_base(caster, skill, target=None) -> int:
     """BASE da ação: o único número que a skill produz.
 
-        BASE = Σ(atributo_resolvido × peso) × (1 + arma%) × power × (1 + bônus%)
+        BASE = Σ(atributo_resolvido × peso) × (1 + arma%) × power
 
     Daqui em diante quem resolve é o motor — crítico, encantamento, defesa e
     mitigação passam pelo funil de sempre. A carta constrói o BASE e para.
+
+    A condição situacional (`bonus_condition` + `bonus_percent`) NÃO entra aqui:
+    ela vai para o `+MULT` de `damage_modifiers`. É bônus circunstancial, e
+    dentro do BASE ele compunha multiplicativamente com todo `+MULT` do funil —
+    +90% da carta sob +10% de encantamento rendia 2,09 em vez de 2,00. `target`
+    fica na assinatura porque os chamadores o passam, mas não entra no BASE.
 
     Os atributos entram JÁ RESOLVIDOS, pela mão da própria entidade
     (`weighted_power`), então nível, equipamento, gemas, `+N` e efeitos ativos
@@ -328,9 +387,6 @@ def skill_damage_base(caster, skill, target=None) -> int:
     # que a arma entrou na conta sem o combate abrir o equipamento de ninguém.
     total = caster.weighted_power(tuple((t.stat, t.weight) for t in escala))
     total *= float(skill.power)
-
-    if bonus_condition_met(caster, skill, target):
-        total *= 1 + int(getattr(skill, "bonus_percent", 0) or 0) / 100
     return max(1, int(total))
 
 
@@ -338,11 +394,11 @@ def resolve_physical_attack(
     attacker,
     defender,
     base_damage: int,
-    skill_name: str = "",
     *,
     rng: random.Random | None = None,
     publish: PublishFn = None,
     accuracy_modifier: int = 0,
+    skill=None,
 ) -> CombatResult:
     """
     Resolve um golpe físico: acerto, crítico, pipeline de dano e aplica `take_damage`.
@@ -353,6 +409,11 @@ def resolve_physical_attack(
     de precisão, medo e evasão — não existe uma segunda rolagem de acerto. O
     ataque básico não declara nada e passa 0, que é a definição de "mira
     neutra": ele é a régua contra a qual as skills se comparam.
+
+    `skill` é a carta que produziu o golpe. Ela chega ao golpe por dois
+    caminhos: o `+MULT`, quando a condição de bônus dela está satisfeita, e a
+    chance de crítico que ela declara (`crit_chance`). O ataque básico não passa
+    nada.
     """
     r = _rng(rng)
 
@@ -380,23 +441,15 @@ def resolve_physical_attack(
         )
         return miss
 
-    crit_chance = (
-        CRIT_CHANCE_HIGH
-        if hasattr(attacker, "get_classname")
-        and attacker.get_classname() == "Rogue"
-        and skill_name == "Ataque Furtivo"
-        else CRIT_CHANCE_DEFAULT
-    )
-    crit_chance += int(fx.combat_modifier(attacker, "crit_chance"))
-    crit_chance = min(crit_chance, CRIT_CHANCE_CAP)
-
-    is_critical = r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= crit_chance
+    # A rolagem acontece mesmo com chance zero: pular o sorteio mudaria o
+    # consumo do gerador, e toda semente passaria a produzir outro combate.
+    chance_critica = crit_chance(attacker, skill)
+    is_critical = r.randrange(PERCENTAGE_RANGE_MIN, PERCENTAGE_RANGE_MAX) <= chance_critica
 
     disparadas = ix.strike_interactions(attacker, defender, is_critical=is_critical)
-    mods = damage_modifiers(attacker, defender, is_critical=is_critical)
+    mods = damage_modifiers(attacker, defender, is_critical=is_critical, skill=skill)
     damage = _calculate_damage(
         base_power=float(base_damage),
-        flat_mods=mods.flat,
         mult_mods=mods.mult,
         xmult_mods=mods.xmult,
         defense_target=defender.get_df(),
@@ -784,10 +837,10 @@ def apply_skill(
             caster,
             target,
             total_base,
-            str(skill.name),
             rng=r,
             publish=None,
             accuracy_modifier=int(getattr(skill, "accuracy_modifier", 0) or 0),
+            skill=skill,
         )
         # Stun que a skill carrega. Só rola se o golpe conectou: um ataque
         # esquivado não atordoa.

@@ -2,6 +2,7 @@
 """Lógica de criação de personagem e inicialização do jogo."""
 
 from src.content.skills_loader import get_initial_skills
+from src.content.starter_kit import grant_starter
 from src.entities.heroes import Mage, Rogue, Warrior
 
 CLASS_MAP = {
@@ -37,4 +38,27 @@ def create_player_from_data(class_key: str, player_name: str) -> Warrior | Mage 
     if initial_skills:
         player.skills[1] = initial_skills[0]
         player.initial_skills_learned = 1
+    return player
+
+
+def create_player_for_new_run(
+    class_key: str, player_name: str, rng=None
+) -> Warrior | Mage | Rogue | None:
+    """O personagem de uma NOVA JORNADA: o herói neutro mais o Starter Kit.
+
+    É o único caminho de largada real — a tela do jogador e o `BotPadrao` passam
+    por aqui. `create_player_from_data` continua sendo o herói puro, para quem
+    precisa medir sem a sorte da largada (testes, benchmark, paridade).
+
+    Ordem: cria o herói, entrega exatamente um starter e o equipa. O descanso no
+    fim é o da CONSTRUÇÃO do personagem: se o starter subir o teto de HP ou MP, a
+    jornada começa com o teto novo cheio, e não com um buraco que ninguém causou.
+
+    `rng` é o gerador da jornada; sem ele, o `random` global do jogo.
+    """
+    player = create_player_from_data(class_key, player_name)
+    if player is None:
+        return None
+    grant_starter(player, rng)
+    player.rest()
     return player

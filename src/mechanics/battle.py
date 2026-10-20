@@ -245,7 +245,7 @@ def _run_hero_turn(
         out.skill_damage[skill_id] = out.skill_damage.get(skill_id, 0) + dano
     else:
         combat_mech.resolve_physical_attack(
-            hero, target, combat_mech.basic_attack_power(hero), "", rng=rng, publish=publish
+            hero, target, combat_mech.basic_attack_power(hero), rng=rng, publish=publish
         )
         out.basic_damage += max(0, hp_before - target.get_hp())
 

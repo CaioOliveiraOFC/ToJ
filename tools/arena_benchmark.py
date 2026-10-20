@@ -319,7 +319,7 @@ def relatorio(pop: Populacao, quantos: int = 5) -> str:
         f"  a seed {escolhido.seed} ({escolhido.classe}) reproduz a MESMA build: "
         f"{'SIM' if reproduz(escolhido) else 'NÃO'}",
         "  origem de cada componente, toda pelo caminho do jogo:",
-        "    personagem      engine.game_logic.create_player_from_data",
+        "    personagem      engine.game_logic.create_player_for_new_run",
         "    andar           engine.loop._setup_dungeon_map",
         "    combate         mechanics.battle.run_battle",
         "    pós-combate     engine.loop.process_post_battle",

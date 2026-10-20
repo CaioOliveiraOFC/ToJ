@@ -34,7 +34,7 @@
           "weight": 1.0
         }
       ],
-      "power": 2.8
+      "power": 2.86
     },
     {
       "id": "investida",
@@ -66,7 +66,7 @@
           "weight": 0.3
         }
       ],
-      "power": 3.73,
+      "power": 3.775,
       "secondary": {
         "effect": "stun",
         "chance": 15,
@@ -137,7 +137,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.727
+      "power": 3.793
     },
     {
       "id": "bola_fogo",
@@ -165,7 +165,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.49
+      "power": 3.485
     },
     {
       "id": "missil_magico",
@@ -193,7 +193,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.19
+      "power": 3.192
     },
     {
       "id": "drenar_vida",
@@ -290,6 +290,7 @@
       "mana_cost_percent": 6.62,
       "bonus_condition": "target_healthy",
       "bonus_percent": 37,
+      "crit_chance": 25,
       "accuracy_modifier": 5,
       "scaling": [
         {
@@ -301,7 +302,7 @@
           "weight": 0.4
         }
       ],
-      "power": 4.18
+      "power": 3.724
     },
     {
       "id": "golpe_baixo",
@@ -429,7 +430,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.23
+      "power": 3.294
     },
     {
       "id": "provocacao",
@@ -495,7 +496,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.56,
+      "power": 3.618,
       "secondary": {
         "effect": "frailty",
         "chance": 55,
@@ -573,7 +574,7 @@
           "weight": 0.2
         }
       ],
-      "power": 4.23,
+      "power": 4.24,
       "secondary": {
         "effect": "stun",
         "chance": 30,
@@ -628,7 +629,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.84
+      "power": 3.829
     },
     {
       "id": "barreira_arcana",
@@ -679,7 +680,7 @@
           "weight": 0.25
         }
       ],
-      "power": 2.88
+      "power": 2.932
     },
     {
       "id": "dreno_mana",
@@ -745,7 +746,7 @@
           "weight": 1.0
         }
       ],
-      "power": 4.974,
+      "power": 4.976,
       "secondary": {
         "effect": "stun",
         "chance": 30,
@@ -804,7 +805,7 @@
           "weight": 0.2
         }
       ],
-      "power": 6.31
+      "power": 6.314
     },
     {
       "id": "golpe_sombras",
@@ -832,7 +833,7 @@
           "weight": 1.0
         }
       ],
-      "power": 6.83
+      "power": 6.84
     },
     {
       "id": "envenenar",
@@ -898,7 +899,7 @@
           "weight": 1.0
         }
       ],
-      "power": 7.486
+      "power": 7.494
     },
     {
       "id": "evasao_perfeita",
@@ -948,7 +949,7 @@
           "weight": 1.0
         }
       ],
-      "power": 8.241,
+      "power": 8.255,
       "secondary": {
         "effect": "weakened",
         "chance": 65,
@@ -1004,7 +1005,7 @@
           "weight": 0.3
         }
       ],
-      "power": 7.79
+      "power": 7.819
     },
     {
       "id": "quebra_guarda",
@@ -1032,7 +1033,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.554,
+      "power": 3.619,
       "secondary": {
         "effect": "vulnerable",
         "chance": 45,
@@ -1068,7 +1069,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.099,
+      "power": 3.155,
       "secondary": {
         "effect": "slowed",
         "chance": 50,
@@ -1166,7 +1167,7 @@
           "weight": 1.0
         }
       ],
-      "power": 2.959,
+      "power": 3.012,
       "secondary": {
         "effect": "weakened",
         "chance": 35,
@@ -1199,7 +1200,7 @@
           "weight": 1.0
         }
       ],
-      "power": 2.946,
+      "power": 2.999,
       "secondary": {
         "effect": "bleed",
         "chance": 55,
@@ -1235,7 +1236,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.181,
+      "power": 3.239,
       "secondary": {
         "effect": "stun",
         "chance": 20,
@@ -1355,7 +1356,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.407,
+      "power": 3.469,
       "secondary": {
         "effect": "vulnerable",
         "chance": 55,
@@ -1417,7 +1418,7 @@
           "weight": 0.4
         }
       ],
-      "power": 4.175,
+      "power": 4.028,
       "secondary": {
         "effect": "weakened",
         "chance": 60,
@@ -1450,7 +1451,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.615,
+      "power": 3.68,
       "secondary": {
         "effect": "bleed",
         "chance": 65,
@@ -1486,7 +1487,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.447,
+      "power": 3.509,
       "secondary": {
         "effect": "stun",
         "chance": 25,
@@ -1590,7 +1591,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.959,
+      "power": 4.031,
       "secondary": {
         "effect": "bleed",
         "chance": 55,
@@ -1667,7 +1668,7 @@
           "weight": 1.0
         }
       ],
-      "power": 4.463,
+      "power": 4.544,
       "secondary": {
         "effect": "bleed",
         "chance": 70,
@@ -1703,7 +1704,7 @@
           "weight": 1.0
         }
       ],
-      "power": 0.518,
+      "power": 0.482,
       "secondary": {
         "effect": "fear",
         "chance": 60,
@@ -1764,7 +1765,7 @@
           "weight": 0.4
         }
       ],
-      "power": 6.627,
+      "power": 6.394,
       "secondary": {
         "effect": "stun",
         "chance": 40,
@@ -1797,7 +1798,7 @@
           "weight": 1.0
         }
       ],
-      "power": 4.687,
+      "power": 4.682,
       "secondary": {
         "effect": "slowed",
         "chance": 45,
@@ -1830,7 +1831,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.337,
+      "power": 3.333,
       "secondary": {
         "effect": "fear",
         "chance": 35,
@@ -1863,7 +1864,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.36,
+      "power": 3.357,
       "secondary": {
         "effect": "poison",
         "chance": 55,
@@ -1896,7 +1897,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.423,
+      "power": 3.419,
       "secondary": {
         "effect": "slowed",
         "chance": 50,
@@ -2097,7 +2098,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.36,
+      "power": 3.356,
       "secondary": {
         "effect": "stun",
         "chance": 18,
@@ -2133,7 +2134,7 @@
           "weight": 1.0
         }
       ],
-      "power": 4.295,
+      "power": 4.29,
       "secondary": {
         "effect": "vulnerable",
         "chance": 55,
@@ -2169,7 +2170,7 @@
           "weight": 1.0
         }
       ],
-      "power": 3.763,
+      "power": 3.759,
       "secondary": {
         "effect": "poison",
         "chance": 70,
@@ -2206,7 +2207,7 @@
           "weight": 0.3
         }
       ],
-      "power": 1.575,
+      "power": 1.61,
       "secondary": {
         "effect": "frailty",
         "chance": 55,
@@ -2350,7 +2351,7 @@
           "weight": 1.0
         }
       ],
-      "power": 5.101,
+      "power": 5.096,
       "secondary": {
         "effect": "vulnerable",
         "chance": 70,
@@ -2386,7 +2387,7 @@
           "weight": 1.0
         }
       ],
-      "power": 1.788,
+      "power": 1.857,
       "secondary": {
         "effect": "mana_burn",
         "chance": 60,
@@ -2486,7 +2487,7 @@
           "weight": 1.0
         }
       ],
-      "power": 7.456,
+      "power": 7.475,
       "secondary": {
         "effect": "slowed",
         "chance": 55,
@@ -2519,7 +2520,7 @@
           "weight": 1.0
         }
       ],
-      "power": 5.921,
+      "power": 5.936,
       "secondary": {
         "effect": "bleed",
         "chance": 40,
@@ -2555,7 +2556,7 @@
           "weight": 1.0
         }
       ],
-      "power": 5.996,
+      "power": 6.011,
       "secondary": {
         "effect": "slowed",
         "chance": 50,
@@ -2591,7 +2592,7 @@
           "weight": 1.0
         }
       ],
-      "power": 5.924,
+      "power": 5.939,
       "secondary": {
         "effect": "poison",
         "chance": 60,
@@ -2778,7 +2779,7 @@
           "weight": 1.0
         }
       ],
-      "power": 6.714,
+      "power": 6.731,
       "secondary": {
         "effect": "bleed",
         "chance": 50,
@@ -2833,7 +2834,7 @@
           "weight": 1.0
         }
       ],
-      "power": 7.296,
+      "power": 7.315,
       "secondary": {
         "effect": "vulnerable",
         "chance": 60,
@@ -2869,7 +2870,7 @@
           "weight": 1.0
         }
       ],
-      "power": 7.193,
+      "power": 7.212,
       "secondary": {
         "effect": "vulnerable",
         "chance": 65,
@@ -2902,7 +2903,7 @@
           "weight": 1.0
         }
       ],
-      "power": 7.247,
+      "power": 7.266,
       "secondary": {
         "effect": "bleed",
         "chance": 70,
@@ -3044,7 +3045,7 @@
           "weight": 1.0
         }
       ],
-      "power": 9.177,
+      "power": 9.2,
       "secondary": {
         "effect": "bleed",
         "chance": 65,
@@ -3080,7 +3081,7 @@
           "weight": 1.0
         }
       ],
-      "power": 9.599,
+      "power": 9.623,
       "secondary": {
         "effect": "bleed",
         "chance": 80,
@@ -3117,7 +3118,7 @@
           "weight": 0.4
         }
       ],
-      "power": 1.336,
+      "power": 1.56,
       "secondary": {
         "effect": "poison",
         "chance": 70,
@@ -3237,7 +3238,7 @@
           "weight": 1.0
         }
       ],
-      "power": 6.558,
+      "power": 6.436,
       "secondary": {
         "effect": "vulnerable",
         "chance": 40,
@@ -3613,7 +3614,7 @@
           "weight": 0.5
         }
       ],
-      "power": 10.296,
+      "power": 10.104,
       "secondary": {
         "effect": "bleed",
         "chance": 60,
@@ -3779,7 +3780,7 @@
           "weight": 1.0
         }
       ],
-      "power": 0.48,
+      "power": 0.499,
       "secondary": {
         "effect": "fear",
         "chance": 55,

@@ -10,20 +10,9 @@ MAP_WIDTH_INCREMENT_PER_5_LEVELS = 4
 
 # Configuração de paredes (geração de mapa)
 MIN_WALL_PERCENT = 0.05
-MAX_WALL_PERCENT = 0.20
 WALL_PERCENT_PER_LEVEL = 0.01
 MAX_WALL_PERCENT_CAP = 0.15  # Limite máximo de paredes por nível
 
-
-# --- Estatísticas de Monstros ---
-MONSTER_BASE_HP = 100
-
-# Stats base para instanciamento de monstros
-MONSTER_BASE_ST = 55
-MONSTER_BASE_MP = 40
-MONSTER_BASE_AG = 3
-MONSTER_BASE_MG = 50
-MONSTER_BASE_DF = 30
 
 # --- Sistema de XP e Moedas ---
 MONSTER_BASE_XP_REWARD = 45
@@ -249,12 +238,16 @@ RECOVERY_HP_STEP_INCOME_RATIO = 0.22
 RECOVERY_MP_STEP_INCOME_RATIO = 0.18
 
 # --- Mecânicas de Combate ---
-CRIT_CHANCE_HIGH = 25  # Para Rogue com Ataque Furtivo
-CRIT_CHANCE_DEFAULT = 10
+# Chance de crítico de quem não tem FONTE nenhuma: zero. O crítico existe quando
+# alguma coisa o concede — passiva, item, encantamento, buff, poção ou a própria
+# carta (`SkillCard.crit_chance`) — e só então. Eram 10%, dados a todo atacante
+# sem que nada no jogo dissesse de onde vinham; o monstro critava porque sim.
+#
+# Era também o `CRIT_CHANCE_HIGH = 25`, um `if` por NOME de skill no motor
+# (Rogue + "Ataque Furtivo"). Virou dado da carta: o Ataque Furtivo declara
+# `crit_chance: 25` no JSON, como qualquer outra fonte.
+CRIT_CHANCE_DEFAULT = 0
 BASE_HIT_CHANCE = 85
-POISON_DAMAGE_PER_TICK = 5
-# Divisor da agilidade no dano de veneno: quem é mais ágil sangra mais rápido.
-POISON_AGILITY_DIVISOR = 5
 
 # Ranges e cálculos de combate
 PERCENTAGE_RANGE_MIN = 1
@@ -286,7 +279,15 @@ DEFENSE_K = 100  # Curva de mitigação: k/(k+defense)
 BASIC_ATTACK_POWER_MULT = 0.90
 XMULT_CAP = 5.0  # Teto de multiplicadores puros
 CRIT_CHANCE_CAP = 75  # % máximo de chance crítica
-CRIT_DAMAGE_BASE = 1.5  # Multiplicador padrão de crítico
+# NÚMERO ÓRFÃO — PENDENTE DE CALIBRAÇÃO/DESIGN.
+#
+# Está decidido que existe UM multiplicador-base de crítico no sistema, e que o
+# `crit_damage` das fontes soma sobre ele. NÃO está decidido que ele vale 1.5:
+# não há origem matemática demonstrada, nem alvo de calibração, nem axioma de
+# design declarado. O valor é o legado, preservado de propósito durante a
+# reforma para que ela não mude duas coisas ao mesmo tempo — e não recebe aqui
+# uma justificativa escrita depois do fato.
+CRIT_DAMAGE_BASE = 1.5
 
 # Matriz de pesos por classe (Fórmula Universal de Dano)
 # =====================================================================
@@ -313,7 +314,12 @@ MAX_SCALING_STATS = 2
 SKILL_ACCURACY_RANGE = (-30, 20)
 
 # Personagem de REFERÊNCIA do validador: atributos resolvidos de cada classe no
-# nível 12 com o loadout `expected`, medidos uma vez.
+# nível 12 com o loadout `expected`. MEDIDOS, não escolhidos — o regenerador é
+# `tools/orcamento_de_cartas.medir_referencia_do_heroi`, e um teste compara esta
+# tabela com a medida. Ela ficou congelada desde a autoria do catálogo e derivou
+# (Mago avg 482 -> 491, MP de todas as classes ~-4%) até ser remedida na Etapa 7
+# da reforma de fundação. Toda mudança aqui exige rederivar o `power` das cartas
+# de herói (`orcamento_de_cartas.py --gravar`): a carta segue o `bud`, não a régua.
 #
 # Existe porque o orçamento precisa ser comparável entre classes, e `power`
 # sozinho não é: a Agilidade do Ladino vale 92 onde a Força do Guerreiro vale
@@ -322,9 +328,9 @@ SKILL_ACCURACY_RANGE = (-30, 20)
 #
 # São dados de calibração, não de gameplay: nada no combate lê isto.
 SKILL_REFERENCE_STATS: dict[str, dict[str, int]] = {
-    "Warrior": {"st": 191, "mg": 116, "ag": 38, "df": 144, "hp": 1586, "mp": 318, "avg": 411},
-    "Mage": {"st": 107, "mg": 202, "ag": 34, "df": 117, "hp": 1342, "mp": 674, "avg": 482},
-    "Rogue": {"st": 170, "mg": 111, "ag": 92, "df": 111, "hp": 1342, "mp": 451, "avg": 394},
+    "Warrior": {"st": 173, "mg": 119, "ag": 38, "df": 144, "hp": 1571, "mp": 305, "avg": 379},
+    "Mage": {"st": 107, "mg": 206, "ag": 34, "df": 117, "hp": 1327, "mp": 661, "avg": 491},
+    "Rogue": {"st": 170, "mg": 114, "ag": 92, "df": 111, "hp": 1132, "mp": 439, "avg": 395},
 }
 # Skill Neutral é avaliada contra a MÉDIA das classes: ela não pertence a
 # nenhuma, e medi-la contra a mais fraca seria dar-lhe teto de graça.
@@ -335,11 +341,17 @@ SKILL_REFERENCE_NEUTRAL = {
 
 # Teto de orçamento, medido em % do ataque básico da referência da classe.
 #
-# DERIVADO do catálogo, não escolhido: as cartas existentes vão de -60 (utilidade
-# pura) a 373, e as duas mais caras são as capstones Legendary — Morte Súbita e
-# Apocalipse. 400 acomoda o que o jogo já tem com ~7% de folga e ainda recusa o
-# absurdo, que é o serviço que um guardrail presta. Um teto que reprovasse as
-# capstones existentes seria balancear pelo validador, e isto não é balanceamento.
+# DERIVADO do catálogo, não escolhido: as cartas de herói vão de -60 (utilidade
+# pura) a 383, e as três mais caras são as capstones Legendary — Fortaleza Viva
+# (383), Morte Súbita (374) e Apocalipse (370). 400 acomoda o que o jogo já tem
+# com ~4% de folga e ainda recusa o absurdo, que é o serviço que um guardrail
+# presta. Um teto que reprovasse as capstones existentes seria balancear pelo
+# validador, e isto não é balanceamento. Remedido na Etapa 7 da reforma de
+# fundação, sobre a base nova: o número se sustenta.
+#
+# O monstro é medido contra o MESMO teto, e depois da base nova a carta mais cara
+# dele é 169 (antes, 285, contra atributos inflados). O teto não alcança mais o
+# monstro; um teto próprio de arquétipo é decisão em aberto, não desta medição.
 #
 # Neutral tem teto menor de propósito, e o número também sai do catálogo: 250
 # fica abaixo das seis cartas de classe mais caras, então uma ferramenta
@@ -390,7 +402,7 @@ MAP_BORDER_OFFSET = 1  # Offset para evitar bordas
 # uma vantagem grande demais nesse eixo não é identidade, é dominância.
 WARRIOR_BASE_HP = 440
 WARRIOR_BASE_MP = 60
-WARRIOR_BASE_ST = 54
+WARRIOR_BASE_ST = 49
 WARRIOR_BASE_AG = 10
 WARRIOR_BASE_MG = 30
 WARRIOR_BASE_DF = 32
@@ -402,7 +414,7 @@ MAGE_BASE_AG = 8
 MAGE_BASE_MG = 52
 MAGE_BASE_DF = 26
 
-ROGUE_BASE_HP = 370
+ROGUE_BASE_HP = 314
 ROGUE_BASE_MP = 90
 ROGUE_BASE_ST = 48
 ROGUE_BASE_AG = 26
@@ -519,15 +531,20 @@ GROWTH_RATE = 1.12
 
 # --- Orçamento do monstro (perfil "bruiser" no nível 1) ---
 # Os arquétipos em content/factories/archetypes.py multiplicam estes valores.
+#
+# `MONSTER_BUDGET_OFFENSE` é a base de Força e de Magia, cada uma pelo seu
+# multiplicador de arquétipo. Era `MONSTER_BUDGET_ATTACK`, e havia um passo de
+# conversão no meio: `st = mg = attack × 1,5`, só para que a conta antiga do
+# básico, `(1,5a + 1,5a) // 3 == a`, devolvesse o orçamento de volta. O número
+# saía certo no ataque básico e errado em todo o resto — a skill lê o atributo
+# cru, e todo monstro era igualmente físico e mágico. O valor não mudou: se o
+# dano das skills de monstro sair do ponto depois de os atributos virarem
+# reais, esta é a alavanca — um número só.
 MONSTER_BUDGET_HP = 420
-MONSTER_BUDGET_ATTACK = 88
+MONSTER_BUDGET_OFFENSE = 88
 MONSTER_BUDGET_DEFENSE = 20
 MONSTER_BUDGET_AGILITY = 8
 MONSTER_BUDGET_MP = 60
-# `Monster.avg_damage` é derivado de (st + mg) // DAMAGE_FORMULA_DIVISOR. Para
-# que o ataque do orçamento apareça exatamente nesse valor, st e mg recebem
-# metade do divisor cada: 1.5 = DAMAGE_FORMULA_DIVISOR / 2.
-MONSTER_ATTACK_TO_STAT_RATIO = 1.5
 # Abaixo desta fração da vida, um monstro com cura prioriza se curar.
 MONSTER_HEAL_HP_RATIO = 0.5
 # Abaixo desta fração da vida, o monstro entra em desespero: gasta o que tiver
@@ -537,9 +554,6 @@ MONSTER_DESPERATE_HP_RATIO = 0.35
 # qualquer arquétipo com dano guardado usa a maior skill que tiver, ignorando a
 # rolagem de `skill_use_chance`: um golpe que mata vale mais que a média.
 MONSTER_EXECUTE_HP_RATIO = 0.35
-# Limiares das condições de bônus das skills de dano. O mesmo 0.35 do execute
-# do monstro: a regra vale para os dois lados da luta, e o jogador que aprendeu
-# a ler o momento de execução do inimigo já sabe ler o seu.
 # Mana de referência no nível 1, usada para converter o custo percentual de uma
 # skill em pontos de MP. É a média das três classes (60, 140, 90).
 #
@@ -569,6 +583,9 @@ MAGIC_SHIELD_ABSORB_PERCENT = 15
 # decisão: mana gasta aguentando não lança skill.
 MAGIC_SHIELD_DAMAGE_PER_MP = 2.0
 
+# Limiares das condições de bônus das skills de dano. O mesmo 0.35 do execute
+# do monstro: a regra vale para os dois lados da luta, e o jogador que aprendeu
+# a ler o momento de execução do inimigo já sabe ler o seu.
 SKILL_BONUS_WOUNDED_RATIO = 0.35
 SKILL_BONUS_HEALTHY_RATIO = 0.80
 # Quantos turnos do início do combate contam como abertura. Um buff de defesa
@@ -586,11 +603,6 @@ DEFAULT_MONSTER_ROLE = "bruiser"
 HIT_AGILITY_SWING = 30  # pontos percentuais máximos que a agilidade move
 HIT_CHANCE_FLOOR = 20  # nenhum defensor fica imune
 HIT_CHANCE_CEIL = 95  # nenhum atacante fica infalível
-
-# --- Efeitos de status ---
-MANA_BURN_PER_TICK = 12  # MP drenado por turno por "mana_burn"
-BLEED_DAMAGE_PERCENT = 4  # % do HP máximo por turno por "bleed"
-INVISIBLE_HIT_PENALTY = 45  # pontos percentuais de acerto perdidos contra alvo invisível
 
 # Duração, em turnos, dos buffs vindos de consumíveis.
 POTION_BUFF_DURATION = 3

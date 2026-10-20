@@ -52,7 +52,7 @@ def menu(options: tuple[str, ...] | list[str], prompt: str) -> None:
     renderer.render_menu(options, prompt)
 
 
-def render_fight_intro(player: "Player", monster: "Monster") -> None:
+def render_fight_intro(player: "Player", monster: "Monster", crit_alvo: int = 0) -> None:
     renderer.console.clear()
     renderer.console.print(
         Panel(
@@ -60,7 +60,7 @@ def render_fight_intro(player: "Player", monster: "Monster") -> None:
             border_style="green",
         )
     )
-    renderer.render_compare_opponents(player, monster)
+    renderer.render_compare_opponents(player, monster, crit_alvo=crit_alvo)
     renderer.render_battle_start_prompt()
 
 

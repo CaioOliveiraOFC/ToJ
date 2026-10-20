@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from src.content.extraction import extracted_floor, was_extracted
 from src.content.items import ALL_ITEMS, get_all_items
 from src.engine.events import EventBus
-from src.engine.game_logic import create_player_from_data
+from src.engine.game_logic import create_player_for_new_run
 from src.engine.loop import start_game
 from src.entities.heroes import Mage, Rogue, Warrior
 from src.storage.save_manager import load_game
@@ -110,7 +110,8 @@ def run_main_loop() -> None:
                 result = call_character_creation()
                 if result:
                     class_key, player_name = result
-                    player = create_player_from_data(class_key, player_name)
+                    # Nova jornada: herói + Starter Kit, pelo mesmo caminho do bot.
+                    player = create_player_for_new_run(class_key, player_name)
                     if player:
                         start_game(player, 1, None, slot=slot)
             elif choice == "load_game":

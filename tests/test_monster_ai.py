@@ -96,8 +96,15 @@ class TestPesoDoAtaqueBasico:
         for nome in classes:
             heroi = CLASSES[nome](f"Teste{nome}")
             heroi.set_level(max(1, carta.level_required))
-            razao = combat_mech.skill_damage_base(heroi, carta) / combat_mech.basic_attack_power(
-                heroi
+            # Dano ESPERADO: o crítico que a própria carta declara é dano dela,
+            # e o do herói vale para os dois golpes — então só a razão conta.
+            critico = combat_mech.expected_crit_factor(
+                heroi, carta
+            ) / combat_mech.expected_crit_factor(heroi)
+            razao = (
+                combat_mech.skill_damage_base(heroi, carta)
+                * critico
+                / combat_mech.basic_attack_power(heroi)
             )
             assert razao >= MIN_SKILL_TO_BASIC_RATIO, (
                 f"{carta.name} vale {razao:.2f} ataque básico para o {nome}: "
@@ -135,7 +142,12 @@ class TestJogadasDecisivas:
         _ferir(heroi, 0.10)
         escolha, decisiva = _pick_skill(monstro, heroi, monstro.skills, random.Random(1))
         assert decisiva is True
-        assert escolha.name == "Detonação Arcana", "a execução tem de buscar o maior dano"
+        # A maior pelo DANO DO MONSTRO, não por nome: qual carta é a maior é
+        # dado de orçamento, e muda quando o orçamento muda. A regra é a busca.
+        danos = [s for s in monstro.skills if s.effect_type == "damage"]
+        maior = max(danos, key=lambda s: combat_mech.skill_damage_base(monstro, s))
+        assert len(danos) > 1, "premissa: o deck tem mais de uma carta de dano"
+        assert escolha is maior, "a execução tem de buscar o maior dano"
 
     def test_a_execucao_vem_antes_da_cura(self):
         """Ordem das intenções: fechar a conta ganha de se curar.

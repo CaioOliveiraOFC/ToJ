@@ -179,7 +179,7 @@ def valida_chances(f: Falhas, atacante, defensor, ponto, quem):
         alvo = spawn_by_role("bruiser", 1)
         alvo._hp = 10**9
         hp = alvo.get_hp()
-        cmb.resolve_physical_attack(atacante, alvo, 1000, "", rng=Rng(1, rolagem))
+        cmb.resolve_physical_attack(atacante, alvo, 1000, rng=Rng(1, rolagem))
         return hp - alvo.get_hp()
 
     f.checar(
@@ -213,7 +213,6 @@ def valida_golpe(f: Falhas, atacante, defensor, ponto, quem):
     for crit in (False, True):
         mods = cmb.damage_modifiers(atacante, defensor, is_critical=crit)
         for nome, lista in (
-            ("flat", mods.flat),
             ("mult", mods.mult),
             ("xmult", mods.xmult),
             ("mitigation", mods.mitigation),
@@ -222,7 +221,6 @@ def valida_golpe(f: Falhas, atacante, defensor, ponto, quem):
                 f.checar(finito(v), "damage/modifiers", ponto, quem, f"{nome} finito", v)
         d = cmb._calculate_damage(
             base_power=float(cmb.basic_attack_power(atacante)),
-            flat_mods=mods.flat,
             mult_mods=mods.mult,
             xmult_mods=mods.xmult,
             defense_target=defensor.get_df(),
@@ -234,7 +232,7 @@ def valida_golpe(f: Falhas, atacante, defensor, ponto, quem):
 def valida_combate_real(f: Falhas, atacante, defensor, ponto, quem):
     hp = defensor.get_hp()
     r = cmb.resolve_physical_attack(
-        atacante, defensor, cmb.basic_attack_power(atacante), "", rng=Rng(1, 100)
+        atacante, defensor, cmb.basic_attack_power(atacante), rng=Rng(1, 100)
     )
     f.checar(finito(r.damage) and r.damage >= 1, "damage/real", ponto, quem, ">=1", r.damage)
     f.checar(

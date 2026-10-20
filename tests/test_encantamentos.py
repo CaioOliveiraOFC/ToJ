@@ -162,7 +162,6 @@ class TestChegaAoMotor:
             mods = cmb.damage_modifiers(h, m, is_critical=False)
             dano = cmb._calculate_damage(
                 base_power=float(cmb.basic_attack_power(h)),
-                flat_mods=mods.flat,
                 mult_mods=mods.mult,
                 xmult_mods=mods.xmult,
                 defense_target=m.get_df(),
@@ -176,7 +175,7 @@ class TestChegaAoMotor:
         peca.enchant(create_enchantment("damage_percent", 25))
         depois, mods_depois = golpe()
         assert mods_depois.mult == [0.25]
-        assert mods_depois.xmult == [] and mods_depois.flat == []
+        assert mods_depois.xmult == []
         assert depois > antes
 
     def test_damage_percent_e_aditivo_entre_fontes(self):

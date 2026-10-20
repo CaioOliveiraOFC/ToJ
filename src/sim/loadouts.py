@@ -19,10 +19,14 @@ def expected_passive_count(level: int) -> int:
 
 
 def _equippable(items, slot: str, hero_class: str):
+    # Peça exclusiva de starter não é "o que um jogador daquele nível teria": ela
+    # só existe na largada de uma jornada real. Fica fora do loadout de medição
+    # para que a régua de combate não mude porque a largada ganhou um item.
     return [
         item
         for item in items
         if getattr(item, "slot", None) == slot
+        and not getattr(item, "starter_only", False)
         and (not getattr(item, "classes", None) or hero_class in item.classes)
     ]
 

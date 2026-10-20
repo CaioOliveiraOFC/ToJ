@@ -48,7 +48,7 @@ class TestAEgideFunciona:
 
         for heroi in (com, sem):
             combat.resolve_physical_attack(
-                Warrior("atacante"), heroi, golpe, "", rng=random.Random(0), publish=None
+                Warrior("atacante"), heroi, golpe, rng=random.Random(0), publish=None
             )
         assert com.get_hp() > sem.get_hp()
 

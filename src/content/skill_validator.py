@@ -22,6 +22,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from src.content.skills_loader import MONSTER_SKILL_CLASS
+from src.mechanics.combat import additive_multiplier, expected_crit_factor
 from src.shared import effect_core as core
 from src.shared.constants import (
     CLASS_WEIGHTS,
@@ -142,11 +143,35 @@ def offensive_budget(skill, com_bonus: bool = True, reference: dict | None = Non
         return 0
     ref = reference or _referencia(skill.skill_class)
     base = sum(ref.get(t.stat, 0) * t.weight for t in escala) * float(skill.power)
+    base *= fator_de_critico_proprio(skill, ref)
     if com_bonus and getattr(skill, "bonus_percent", 0):
         # A condição não é garantida, mas o teto tem de contar o melhor caso:
         # é ele que decide se a carta pode quebrar o jogo quando alinha.
-        base *= 1 + skill.bonus_percent / 100
+        #
+        # O bônus entra no `+MULT`, como no motor: SOMA às outras fontes do
+        # balde em vez de multiplicar o BASE. A referência não carrega
+        # `damage_percent` próprio, então o balde aqui tem só o bônus da carta —
+        # e esse é o melhor caso de verdade, porque toda outra fonte de `+MULT`
+        # dilui o peso relativo do bônus.
+        base *= additive_multiplier([skill.bonus_percent / 100])
     return int(base / max(1, ref["avg"]) * 100)
+
+
+def fator_de_critico_proprio(skill, ref: dict) -> float:
+    """O crítico que a CARTA declara, em valor esperado, sobre o ataque básico.
+
+    `crit_chance` na carta é dano: o Ataque Furtivo, com 25% próprios, entrega em
+    média 12,5% acima do que o `power` sozinho diz. Fora do orçamento, a carta
+    pareceria no `bud` com o dano esperado acima dele.
+
+    As duas leituras são as canônicas do motor (`expected_crit_factor`). A
+    referência é um vetor de atributos, sem passiva, item nem buff: contra ela a
+    chance é só a da carta. E o básico da referência entra no denominador pela
+    mesma conta — o que se mede é o que a CARTA acrescenta, não o crítico que o
+    personagem teria com qualquer golpe. Valor esperado, e não melhor caso: o
+    crítico é rolagem, não condição que o jogador arma.
+    """
+    return expected_crit_factor(ref, skill) / expected_crit_factor(ref)
 
 
 def effect_budget(skill) -> int:
@@ -183,11 +208,11 @@ def _efeitos_da_carta(skill):
 def _custo_percentual(skill, ref: dict) -> float:
     """Quanto a carta cobra em % da mana máxima de quem a lança.
 
-    A carta do herói declara isso; a do monstro traz só o custo absoluto. Como
-    o crédito de orçamento é sobre o que se PAGA, e o que se paga é a fração da
-    barra, o absoluto é convertido contra a mana da referência. Sem isso toda
-    carta de monstro entraria com crédito de mana zero e pareceria mais cara do
-    que é — o validador puniria o monstro por um detalhe de formato.
+    Toda carta do jogo, de herói e de monstro, declara `mana_cost_percent`, e é
+    ele que vale. Uma carta sem o campo — mod, save antigo — tem o absoluto
+    convertido contra a mana da referência: o crédito de orçamento é sobre o que
+    se PAGA, e o que se paga é a fração da barra. Sem a conversão ela entraria
+    com crédito de mana zero e pareceria mais cara do que é.
     """
     declarado = float(getattr(skill, "mana_cost_percent", 0) or 0)
     if declarado:
@@ -330,6 +355,24 @@ def validate(skill, reference: dict | None = None) -> Veredito:
 # de 100% Força que só diferem em mana e recarga continuam sendo uma ideia só.
 
 
+def _monster_primary_stats() -> frozenset[str]:
+    """Eixos dominantes dos vetores ofensivos dos arquétipos, em união.
+
+    Import local pelo mesmo motivo de `monster_reference`: `archetypes` chega aqui
+    pela via do carregador de skills, e resolver no uso evita o ciclo.
+    """
+    from src.content.factories.archetypes import all_archetypes
+
+    dominantes: set[str] = set()
+    for arquetipo in all_archetypes().values():
+        pesos = arquetipo.offensive_weights
+        if not pesos:
+            continue
+        maior = max(peso for _, peso in pesos)
+        dominantes.update(eixo for eixo, peso in pesos if peso == maior)
+    return frozenset(dominantes)
+
+
 def primary_stat(skill_class: str) -> frozenset[str]:
     """O atributo de onde o dano daquela classe nasce por padrão.
 
@@ -337,14 +380,15 @@ def primary_stat(skill_class: str) -> frozenset[str]:
     ofensiva de cada classe e é o que o ataque básico usa. Se um dia o Guerreiro
     deixar de ser uma classe de Força, esta regra acompanha sozinha.
 
-    - Monster devolve `{st, mg}` porque o ataque básico do monstro é
-      literalmente `(st + mg) / 2`: escalar em qualquer um dos dois é escalar no
-      ataque básico dele.
+    - Monster sai dos VETORES OFENSIVOS dos arquétipos, pelo mesmo critério: o
+      eixo dominante de cada papel. Antes era a dupla `{st, mg}` chapada, e a
+      justificativa escrita era que o básico do monstro é `(st + mg) / 2` — o que
+      deixou de ser verdade quando cada papel ganhou o próprio vetor.
     - Neutral devolve vazio: o pool universal não tem atributo natural, e é por
       isso que `df` ou `hp` ali já são uma escolha de design, não o caminho óbvio.
     """
     if skill_class == MONSTER_SKILL_CLASS:
-        return frozenset({"st", "mg"})
+        return _monster_primary_stats()
     pesos = CLASS_WEIGHTS.get(skill_class)
     if not pesos:
         return frozenset()

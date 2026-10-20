@@ -50,8 +50,8 @@ vivem em `src/shared/combat_topics.py`.
 
 ```python
 bus = EventBus()
-register_ui_handlers(bus)                 # ui/ assina
-bus.publish(topics.UI_OPEN_SHOP, {...})   # engine/ publica
+register_ui_handlers(bus)  # ui/ assina
+bus.publish(topics.UI_OPEN_SHOP, {...})  # engine/ publica
 ```
 
 ### Exceções à regra 2
@@ -79,9 +79,10 @@ Os módulos onde a responsabilidade não é óbvia pelo nome da camada:
 | `content/factories/features.py` | sorteio dos serviços do andar com pity (`roll_features`). Muta os contadores de seca do jogador, que pertencem à run |
 | `content/floor_exit.py` | a saída: cobra a taxa (`use_exit`), mantém o `unpaid_exit_streak` e converte o roll em Essência efetiva (`effective_essence`). Não existe dívida |
 | `content/forge.py` | o Ferreiro: cobra e delega. `+N`, gemas e encantamentos continuam implementados em `content/items.py` |
+| `content/starter_kit.py` | a pool do Starter Kit (`data/starter_kit.json`), validada contra o catálogo, e o sorteio categoria → item. Quem entrega o starter na nova jornada é `engine/game_logic.create_player_for_new_run`; `create_player_from_data` segue neutro |
 | `engine/map.py` | a grade do andar: casas de monstro, evento, serviço e saída, e a serialização delas no save |
 | `engine/map_analysis.py` | medição da geometria do andar (Dijkstra por `(combates, passos)`). Ferramenta de auditoria, não regra de jogo |
-| `sim/` | simulação headless. Roda o mesmo `mechanics/battle.py`, lê as mesmas fontes de população e de serviços, e nunca importa `engine/` nem `ui/` |
+| `sim/` | simulação headless. Roda o mesmo `mechanics/battle.py`, lê as mesmas fontes de população e de serviços, e nunca importa `engine/` nem `ui/`. `sim/loadouts.py` é o `expected loadout`, a régua sintética do Combat/Class Balance |
 
 **Fonte única é regra, não estilo.** Renda do andar, população do andar, custo de
 reroll, preços do Ferreiro e penalidade de Essência vivem cada um em exatamente
@@ -96,7 +97,10 @@ produziu um simulador medindo um andar que o jogo não gera.
 | valores de balanceamento | `src/shared/constants.py` e `src/data/*.json` |
 | arquitetura | este arquivo |
 | design do jogo | `GAME_DESIGN.md` |
+| decisões que não mudam de passagem | `GAMEPLAY_CONTRACTS.md` |
 | comportamento | a suíte padrão, `python -m pytest -q` |
-| balanceamento | `python -m pytest -q -m balance` e `src/sim/` |
+| balanceamento de combate e classe | `python -m pytest -q -m balance` e `src/sim/` |
+| medições de referência | `BASELINES.md`, que aponta para cada uma (ex.: `baselines/progression/`) |
+| problemas abertos | `KNOWN_ISSUES.md` |
 
 Nada além disso deve tentar ser uma segunda fonte de verdade.

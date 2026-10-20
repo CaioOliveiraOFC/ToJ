@@ -9,7 +9,11 @@ Por isso as cartas novas de dano declaram condição situacional: um Brutamontes
 que bate mais forte em quem já está ferido é legível, e legibilidade é o que
 transforma um encontro em decisão em vez de rolagem.
 
-Custo em mana ABSOLUTA, como as cartas de monstro que já existiam.
+`mp` aqui é o custo ABSOLUTO no pool do papel; a forge grava junto o percentual
+da curva de referência, que é o que o jogo cobra.
+
+O `bud` destas cartas é a intenção de design. O `power` publicado é rederivado
+dele contra a referência atual do arquétipo — ver `tools/orcamento_de_cartas.py`.
 """
 
 from skill_forge import Carta as C  # noqa: N817 — `C` mantém 150 cartas legíveis

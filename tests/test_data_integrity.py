@@ -239,10 +239,80 @@ class TestDadosVemDoJSON:
     def test_todo_arquetipo_declara_orcamento_e_papel_no_json(self):
         dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))
         for role, payload in dados["archetypes"].items():
-            assert set(payload["budget"]) == {"hp", "attack", "defense", "agility"}, role
+            assert set(payload["budget"]) == {"hp", "st", "mg", "mp", "defense", "agility"}, role
             assert payload["threat"] and payload["counterplay"], (
                 f"{role} não declara ameaça e counterplay no JSON."
             )
+
+    def test_toda_carta_de_monstro_declara_o_nivel_em_que_entra(self):
+        dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))
+        for role, payload in dados["archetypes"].items():
+            for carta in payload["skills"]:
+                nivel = carta.get("level_required")
+                assert isinstance(nivel, int) and nivel >= 1, (role, carta["id"])
+
+    @pytest.mark.parametrize(
+        "niveis",
+        [(None, 3), (0, 3), (3, 6), (1, 6, 3)],
+        ids=["sem_nivel", "nivel_zero", "assinatura_fora_do_1", "sequencia_desce"],
+    )
+    def test_kit_mal_declarado_e_recusado(self, niveis):
+        from src.content.factories.archetypes import _kit_from_json
+
+        cartas = []
+        for i, nivel in enumerate(niveis):
+            carta = {"id": f"c{i}", "name": f"C{i}", "effect_type": "buff", "effect_value": 10}
+            if nivel is not None:
+                carta["level_required"] = nivel
+            cartas.append(carta)
+        with pytest.raises(ValueError):
+            _kit_from_json("teste", {"skills": cartas})
+
+    def test_toda_carta_de_monstro_paga_em_percentual_da_curva(self):
+        """Custo e pool crescem juntos: o custo é % da curva de referência do herói.
+
+        A conversão das 54 cartas foi `teto_0,5(custo_antigo × m_mp / 97 × 100)`, e
+        o absoluto ficou na carta como proveniência — como no herói.
+        """
+        import math
+
+        from src.shared.constants import SKILL_COST_REFERENCE_MP
+
+        dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))
+        for role, payload in dados["archetypes"].items():
+            m_mp = payload["budget"]["mp"]
+            for carta in payload["skills"]:
+                esperado = math.ceil(carta["mana_cost"] * m_mp / SKILL_COST_REFERENCE_MP * 200) / 2
+                assert carta["mana_cost_percent"] == esperado, (role, carta["id"])
+
+    def test_todo_vetor_ofensivo_soma_um_e_usa_eixos_permitidos(self):
+        """Σpesos = 1: o vetor escolhe a composição do básico, nunca a magnitude."""
+        from src.content.factories.archetypes import OFFENSIVE_AXES, all_archetypes
+
+        for role, arquetipo in all_archetypes().items():
+            pesos = dict(arquetipo.offensive_weights)
+            assert pesos, f"{role} sem vetor ofensivo"
+            assert set(pesos) <= set(OFFENSIVE_AXES), (role, pesos)
+            assert abs(sum(pesos.values()) - 1.0) < 1e-9, (role, pesos)
+
+    @pytest.mark.parametrize(
+        "vetor",
+        [{}, {"st": 0.7, "mg": 0.7}, {"st": 0.5, "df": 0.5}],
+        ids=["vazio", "soma_1_4", "eixo_proibido"],
+    )
+    def test_vetor_ofensivo_mal_declarado_e_recusado(self, vetor):
+        from src.content.factories.archetypes import _offensive_weights_from_json
+
+        with pytest.raises(ValueError):
+            _offensive_weights_from_json("teste", {"offensive_weights": vetor})
+
+    def test_o_atributo_ofensivo_nao_e_mais_fabricado(self):
+        """ST e MG são eixos próprios: o `glass_cannon` não carrega Força de enfeite."""
+        from src.content.factories.archetypes import spawn_by_role
+
+        canhao = spawn_by_role("glass_cannon", 12)
+        assert canhao.get_mg() > 3 * canhao.get_st()
+        assert canhao.get_avg_damage() == canhao.get_mg()
 
     def test_geracao_de_andar_vem_do_json(self):
         dados = json.loads((RAIZ / "src" / "data" / "monsters.json").read_text(encoding="utf-8"))

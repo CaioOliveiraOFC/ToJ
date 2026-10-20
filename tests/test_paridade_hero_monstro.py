@@ -122,9 +122,7 @@ class TestHeroiAplicaNoMonstro:
                 effect_value=100,
             )
         )
-        cmb.resolve_physical_attack(
-            heroi, monstro, cmb.basic_attack_power(heroi), "", rng=_Rng(1, 100)
-        )
+        cmb.resolve_physical_attack(heroi, monstro, cmb.basic_attack_power(heroi), rng=_Rng(1, 100))
         assert core.has_effect(monstro, "poison")
 
 
@@ -235,7 +233,7 @@ class TestMedoNosDois:
             alvo = _heroi()
             hp = alvo.get_hp()
             cmb.resolve_physical_attack(
-                monstro, alvo, cmb.basic_attack_power(monstro), "", rng=_Rng(limite, 100)
+                monstro, alvo, cmb.basic_attack_power(monstro), rng=_Rng(limite, 100)
             )
             return alvo.get_hp() < hp
 

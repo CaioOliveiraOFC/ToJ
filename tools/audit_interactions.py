@@ -32,7 +32,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.content.factories.archetypes import spawn_by_role  # noqa: E402
+from src.content.factories.archetypes import get_archetype, spawn_by_role  # noqa: E402
 from src.content.items import get_all_items  # noqa: E402
 from src.content.passives import load_passives  # noqa: E402
 from src.content.skills_loader import load_skills  # noqa: E402
@@ -55,9 +55,12 @@ ROLES = (
 )
 
 # As peças que cada lei nova precisa NO ALVO. Quebra Gélida e Hemorragia Fria
-# pedem também um crítico, que é universal — todo mundo crita, e ainda há 4
-# passivas e 8 itens de chance de crítico. Emboscada pede a peça no PRÓPRIO
-# atacante, e por isso é a única cuja fonte não é o alvo.
+# pedem também um crítico, e esta tabela NÃO o conta como peça. Isso era seguro
+# enquanto todo atacante tinha 10% de crítico sem fonte; desde que o crítico
+# passou a exigir fonte explícita, uma lei de crítico só é montável por quem tem
+# uma. Do lado do monstro: os buffs do bruiser e do elite, e a passiva inata do
+# controller (`crit_chance` 10) — que é quem congela. Emboscada
+# pede a peça no PRÓPRIO atacante, e por isso é a única cuja fonte não é o alvo.
 PECAS = {
     "Quebra Gélida": ("frozen",),
     "Emboscada": ("invisible",),
@@ -208,12 +211,12 @@ def relatorio_smoke() -> None:
     def quebra_gelida():
         h, m = _heroi("Mage"), _alvo()
         lancar(h, m, "raio_congelante")
-        combat.resolve_physical_attack(h, m, 400, "", rng=_Certeiro(0), publish=publicar)
+        combat.resolve_physical_attack(h, m, 400, rng=_Certeiro(0), publish=publicar)
 
     def emboscada():
         h, m = _heroi("Rogue"), _alvo()
         lancar(h, h, "fantasma")
-        combat.resolve_physical_attack(h, m, 400, "", rng=_Certeiro(0), publish=publicar)
+        combat.resolve_physical_attack(h, m, 400, rng=_Certeiro(0), publish=publicar)
 
     def ferida_aberta():
         h, m = _heroi("Warrior"), _alvo()
@@ -232,14 +235,14 @@ def relatorio_smoke() -> None:
     def hemorragia_fria():
         h, m = _heroi("Mage", ["Agulha no Osso"]), _alvo()  # a passiva dá o sangramento
         lancar(h, m, "raio_congelante")
-        combat.resolve_physical_attack(h, m, 400, "", rng=_Certeiro(0), publish=publicar)
+        combat.resolve_physical_attack(h, m, 400, rng=_Certeiro(0), publish=publicar)
 
     def ferida_septica():
         h, m = _heroi("Rogue", ["Fio Serrilhado"]), _alvo()
         lancar(h, m, "envenenar")
         for _ in range(3):
             combat.process_turn_start_effects(m, rng=random.Random(0), publish=None)
-        combat.resolve_physical_attack(h, m, 200, "", rng=_Certeiro(0), publish=publicar)
+        combat.resolve_physical_attack(h, m, 200, rng=_Certeiro(0), publish=publicar)
 
     def colapso_mental():
         h, m = _heroi("Rogue"), _alvo()
@@ -261,7 +264,7 @@ def relatorio_smoke() -> None:
     print("\n=== SMOKE — MONSTRO, sequência dirigida com as cartas dele ===")
 
     def _mob(role):
-        mob = spawn_by_role(role, 20)
+        mob = spawn_by_role(role, 20, rng=random.Random(0))
         mob._mp = 10**6
         return mob
 
@@ -272,20 +275,29 @@ def relatorio_smoke() -> None:
         return h
 
     def _lancar_mob(mob, alvo, sid):
-        """Lança a carta REAL do monstro. `self` vai no monstro, como no jogo."""
-        carta = next(s for s in mob.skills if s.id == sid)
+        """Lança a carta REAL do monstro. `self` vai no monstro, como no jogo.
+
+        A carta vem do KIT do arquétipo, não do deck deste spawn: com o kit
+        acima do teto, o deck do Lv20 é uma janela sorteada, e o smoke dependia
+        de a sorte ter deixado a carta nele. O que se testa é a lei montada com
+        as cartas do papel, não a composição de um deck.
+        """
+        kit = {s.id: s for s in get_archetype(mob.role).skills}
+        if sid not in kit:
+            raise KeyError(f"{sid!r} não está no kit de {mob.role!r}")
+        carta = kit[sid]
         destino = mob if getattr(carta, "target", "enemy") == "self" else alvo
         combat.apply_skill(mob, destino, carta, rng=_Certeiro(0), publish=publicar)
 
     def emboscada_skirmisher():
         mob, h = _mob("skirmisher"), _vitima()
         _lancar_mob(mob, h, "mob_evasao_mob")  # some de vista
-        combat.resolve_physical_attack(mob, h, 300, "", rng=_Certeiro(0), publish=publicar)
+        combat.resolve_physical_attack(mob, h, 300, rng=_Certeiro(0), publish=publicar)
 
     def gelo_controller():
         mob, h = _mob("controller"), _vitima()
         _lancar_mob(mob, h, "mob_teia_de_gelo")  # frozen + secundário bleed
-        combat.resolve_physical_attack(mob, h, 300, "", rng=_Certeiro(0), publish=publicar)
+        combat.resolve_physical_attack(mob, h, 300, rng=_Certeiro(0), publish=publicar)
 
     def panico_controller():
         mob, h = _mob("controller"), _vitima()

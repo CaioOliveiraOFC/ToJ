@@ -116,7 +116,6 @@ class TestDamageReduction:
         mods = cmb.damage_modifiers(atacante, defensor, is_critical=False)
         return cmb._calculate_damage(
             base_power=float(base),
-            flat_mods=mods.flat,
             mult_mods=mods.mult,
             xmult_mods=mods.xmult,
             defense_target=defensor.get_df(),
@@ -183,7 +182,7 @@ class TestCritico:
             m = spawn_by_role("bruiser", 8)
             hp = m.get_hp()
             cmb.resolve_physical_attack(
-                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(*rolagem)
+                h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(*rolagem)
             )
             danos.append(hp - m.get_hp())
         assert danos[1] > danos[0], "o anel não converteu a rolagem 30 em crítico"
@@ -191,13 +190,15 @@ class TestCritico:
     def test_item_de_crit_damage_engorda_o_critico_pelo_xmult(self):
         nu, com_anel = _heroi(), _heroi()
         com_anel.equip(_item("crit_damage", 40))
+        # A rolagem de crítico sai 1, mas sem fonte de chance nenhum golpe crita:
+        # os dois recebem a mesma fonte, e o anel é a única diferença.
+        for h in (nu, com_anel):
+            h.active_buffs["fonte_de_critico"] = {"stat": "crit_chance", "value": 10, "duration": 3}
 
         def golpe(h):
             m = spawn_by_role("bruiser", 8)
             hp = m.get_hp()
-            cmb.resolve_physical_attack(
-                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 1)
-            )
+            cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(1, 1))
             return hp - m.get_hp()
 
         assert golpe(com_anel) > golpe(nu)
@@ -205,7 +206,7 @@ class TestCritico:
         m = spawn_by_role("bruiser", 8)
         mods = cmb.damage_modifiers(com_anel, m, is_critical=True)
         assert mods.xmult == [pytest.approx(cmb.CRIT_DAMAGE_BASE + 0.40)]
-        assert mods.flat == [] and mods.mult == []
+        assert mods.mult == []
 
     def test_o_cap_de_chance_critica_continua_valendo(self):
         h = _heroi()
@@ -228,7 +229,7 @@ class TestLifeSteal:
         for h in (nu, com_anel):
             m = spawn_by_role("bruiser", 8)
             cmb.resolve_physical_attack(
-                h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 100)
+                h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(1, 100)
             )
         assert nu.get_hp() == antes[id(nu)], "sem item não devia curar"
         assert com_anel.get_hp() > antes[id(com_anel)]
@@ -240,7 +241,7 @@ class TestLifeSteal:
         h._hp = h.base_hp // 2
         antes = h.get_hp()
         m = spawn_by_role("bruiser", 8)
-        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(100))
+        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(100))
         assert h.get_hp() == antes
 
 
@@ -268,7 +269,7 @@ class TestDeathIgnore:
     def _golpe_letal(self, h, m):
         h._hp = 1
         cmb.resolve_physical_attack(
-            m, h, cmb.basic_attack_power(m) * 50, "", rng=_RngRoteirizado(1, 100)
+            m, h, cmb.basic_attack_power(m) * 50, rng=_RngRoteirizado(1, 100)
         )
 
     def test_item_sozinho_salva_uma_vez(self):
@@ -319,9 +320,7 @@ class TestAtivacaoControlada:
         """A arma declara a CHANCE; o catálogo global decide o resto."""
         h, m = _heroi(), spawn_by_role("bruiser", 8)
         h.equip(_item(efeito, 100, "Weapon"))
-        cmb.resolve_physical_attack(
-            h, m, cmb.basic_attack_power(h), "", rng=_RngRoteirizado(1, 100)
-        )
+        cmb.resolve_physical_attack(h, m, cmb.basic_attack_power(h), rng=_RngRoteirizado(1, 100))
         assert efeito in m.active_effects, efeito
 
     def test_a_lista_de_permissao_e_exatamente_esta(self):

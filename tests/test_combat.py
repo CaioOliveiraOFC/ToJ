@@ -109,16 +109,15 @@ class EventRecorder:
 # ------------------------------------------------------- helpers
 
 
-def expected_damage(base_power, *, flat=None, mult=None, xmult=None, defense=0):
+def expected_damage(base_power, *, mult=None, xmult=None, defense=0):
     """Réplica literal do pipeline de combat.py p/ calcular o valor esperado."""
-    flat_total = sum(flat) if flat else 0
     mult_total = 1.0 + sum(mult) if mult else 1.0
     xraw = 1.0
     for v in xmult or []:
         xraw *= v
     xcap = min(xraw, XMULT_CAP)
     dmod = DEFENSE_K / (DEFENSE_K + max(0, defense))
-    return max(1, int((base_power + flat_total) * mult_total * xcap * dmod))
+    return max(1, int(base_power * mult_total * xcap * dmod))
 
 
 def predict_attack_rolls(seed, hit_chance, crit_chance):
@@ -189,18 +188,14 @@ class TestCalculateDamageBasico:
         # 100 ATK vs DEF 0 => 100
         assert cmb._calculate_damage(100) == 100
 
-    def test_pipeline_completo_flat_mult_xmult_defesa(self):
-        # (50+25)*(1.5)*(1.0)*(0.5) = 56.25 -> 56
-        got = cmb._calculate_damage(
-            50, flat_mods=[10, 15], mult_mods=[0.5], xmult_mods=[1.0], defense_target=100
-        )
+    def test_pipeline_completo_mult_xmult_defesa(self):
+        # 75*(1.5)*(1.0)*(0.5) = 56.25 -> 56
+        got = cmb._calculate_damage(75, mult_mods=[0.5], xmult_mods=[1.0], defense_target=100)
         assert got == 56
 
     def test_esperado_bate_com_replica_manual(self):
-        got = cmb._calculate_damage(
-            80, flat_mods=[7], mult_mods=[0.2, -0.1], xmult_mods=[1.3], defense_target=30
-        )
-        assert got == expected_damage(80, flat=[7], mult=[0.2, -0.1], xmult=[1.3], defense=30)
+        got = cmb._calculate_damage(87, mult_mods=[0.2, -0.1], xmult_mods=[1.3], defense_target=30)
+        assert got == expected_damage(87, mult=[0.2, -0.1], xmult=[1.3], defense=30)
 
     def test_atk_zero_produz_dano_minimo_1(self):
         assert cmb._calculate_damage(0) == 1
@@ -237,10 +232,20 @@ class TestResolvePhysicalAttack:
         assert res.damage == 41  # int(50 * 100/120)
 
     def test_critico_seed_10_valor_pinned(self):
+        # O crítico precisa de fonte: este pin dá uma explícita, de 10 — a chance
+        # que antes era de todo atacante sem que nada a concedesse.
         a, d = self._pair()
+        a.active_buffs["fonte_de_critico"] = {"stat": "crit_chance", "value": 10, "duration": 3}
         res = cmb.resolve_physical_attack(a, d, self.BASE, rng=random.Random(10))
         assert res.was_critical is True
         assert res.damage == 62  # int(50 * 1.5 * 100/120)
+
+    def test_sem_fonte_nao_existe_critico(self):
+        # A mesma semente do pin acima, sem fonte nenhuma: a rolagem acontece,
+        # mas não há chance de crítico para ela cair dentro.
+        a, d = self._pair()
+        res = cmb.resolve_physical_attack(a, d, self.BASE, rng=random.Random(10))
+        assert res.was_critical is False
 
     def test_morte_do_defensor_marca_isalive_false(self):
         a, d = self._pair()
@@ -284,15 +289,13 @@ class TestResolvePhysicalAttack:
         assert cmb.hit_chance(StubEntity(ag=3), StubEntity(ag=1000)) >= cmb.HIT_CHANCE_FLOOR
 
     @pytest.mark.parametrize("seed", range(12))
-    def test_rogue_ataque_furtivo_usa_crit_chance_high_e_cap_75(self, seed):
-        # cc efetivo = min(25 + 200 passivas, 75) = CAP
+    def test_chance_de_critico_acima_do_teto_fica_no_cap_75(self, seed):
+        # cc efetivo = min(200 de passivas, 75) = CAP
         rogue = StubEntity("Rog", classname="Rogue")
         rogue.passive_bonus["crit_chance"] = 200
         target = StubEntity(df=0)
         _, crit = predict_attack_rolls(seed, BASE_HIT_CHANCE, CRIT_CHANCE_CAP)
-        res = cmb.resolve_physical_attack(
-            rogue, target, 40, "Ataque Furtivo", rng=random.Random(seed)
-        )
+        res = cmb.resolve_physical_attack(rogue, target, 40, rng=random.Random(seed))
         assert res.was_critical is crit
 
     def test_evento_publicado_quando_publish_fornecido(self):
