@@ -226,6 +226,11 @@ class ServiceView:
     tipo: str
     desvio: int
     lutas_no_desvio: int = 0
+    # FATO da Loja, e só dela: quanto HP, em fração do teto, o primeiro passo de
+    # recuperação devolve SE ele cabe no orçamento que o jogador realmente leva.
+    # Zero quando não cabe. Antes a policy deduzia isso de `ouro > taxa`, e a Loja
+    # prometia uma cura que a compra não conseguia pagar.
+    cura_hp: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)

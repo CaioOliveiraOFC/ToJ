@@ -52,6 +52,7 @@ from src.shared.constants import (
 )
 from src.shared.economy import essence_after_penalty
 from src.shared.effects import TURN_SKIPPING_STATUSES
+from src.sim import progression
 from src.sim.bot import (
     ActionMechanicsView,
     ActionOption,
@@ -962,6 +963,23 @@ def _cura_garantida(hero) -> float:
     return min(total, falta)
 
 
+def _cura_hp_pagavel(bot) -> float:
+    """O HP, em fração do teto, que a Loja devolve de verdade nesta visita.
+
+    Mesmo orçamento com que o driver entra na Loja (`bot._orcamento`, que guarda
+    a reserva da saída) e mesma regra de compra (`progression.primeiro_reparo_de_hp`,
+    a primeira volta de `_repair` sobre a oferta `hp` de `recovery_offers`). Zero
+    quando a visita não compraria recuperação de HP. O que a mochila talvez
+    venda lá dentro não entra: é o que está GARANTIDO, não o que pode sobrar.
+    """
+    hero = bot.hero
+    orcamento = bot._orcamento()[0]
+    oferta = progression.primeiro_reparo_de_hp(hero, bot.andar, orcamento)
+    if oferta is None:
+        return 0.0
+    return int(oferta["amount"]) / max(1, int(hero.base_hp))
+
+
 def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
     """O andar e a run, como o jogador os vê.
 
@@ -992,7 +1010,14 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
     for casa, tipo in bot.mapa.features.items():
         desvio = bot._desvio(casa)
         if desvio is not None:
-            servicos.append(ServiceView(tipo=tipo, desvio=desvio[0], lutas_no_desvio=desvio[1]))
+            servicos.append(
+                ServiceView(
+                    tipo=tipo,
+                    desvio=desvio[0],
+                    lutas_no_desvio=desvio[1],
+                    cura_hp=_cura_hp_pagavel(bot) if tipo == feat.SHOP else 0.0,
+                )
+            )
 
     evento_casa = bot.mapa.event_pos
     desvio_evento = bot._desvio(evento_casa) if evento_casa is not None else None

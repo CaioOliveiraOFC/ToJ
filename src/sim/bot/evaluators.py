@@ -552,8 +552,24 @@ def _necessidade_de_cura(prog: ProgressionState) -> Need:
 
     O ponto de aposta é o MESMO das outras duas leituras: é o único limiar de HP
     do cérebro, e as três decisões giram em torno dele.
+
+    Entre os dois fica RECUPERAR, e ele não é arranhão: é quando a PRÓXIMA luta,
+    pelo dano real que esta run já recebeu por encontro, me derrubaria abaixo do
+    ponto de aposta. Aí uma cura que existe de verdade — poção na mochila, ou a
+    Loja com recuperação que cabe no orçamento — vem antes de encostar no próximo
+    `&`. É história observada, não ficha do monstro: qual monstro está na casa
+    continua desconhecido até a colisão. Sem combate observado, vale a regra de
+    antes.
     """
-    return Need.SOBREVIVER if prog.hp_frac < HP_DE_APOSTA else Need.INVESTIR
+    if prog.hp_frac < HP_DE_APOSTA:
+        return Need.SOBREVIVER
+    if (
+        prog.combates_observados >= 1
+        and prog.dano_por_luta > 0
+        and prog.hp_frac - prog.dano_por_luta < HP_DE_APOSTA
+    ):
+        return Need.RECUPERAR
+    return Need.INVESTIR
 
 
 def _avaliar_pocao(opcao: ActionOption, prog: ProgressionState) -> Score:
@@ -594,7 +610,13 @@ def _avaliar_servico(opcao: ActionOption, mapa: MapState, prog: ProgressionState
     por_encontro = 1 + lutas
 
     if opcao.family == "shop":
-        if falta > 0 and prog.ouro > prog.taxa_de_saida:
+        # A cura que a Loja promete é FATO do serviço (`ServiceView.cura_hp`): o
+        # passo de recuperação que cabe no orçamento com que o jogador entra.
+        # Deduzi-la de `ouro > taxa` prometia cura que a compra não pagava, e a
+        # Loja era consumida sem curar — foi o que o Warrior seed 24 da baseline
+        # `fb321d4e` fez com 30 de ouro contra uma saída de 27.
+        cura_pagavel = servico.cura_hp if servico else 0.0
+        if falta > 0 and cura_pagavel > 0:
             componentes = [
                 ("HP a recuperar", falta),
                 # A reserva da saída é o que mantém a run sustentável.

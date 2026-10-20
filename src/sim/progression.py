@@ -21,6 +21,7 @@ from src.content.economy import (
     buy_recovery,
     enchant_cost,
     enhancement_cost,
+    recovery_offers,
     reroll_cost,
     socket_cost,
 )
@@ -508,6 +509,26 @@ def _descartavel(hero, item) -> bool:
         # então chegar aqui significa que ele recusou — não vender por precaução.
         return False
     return _peso_do_item(item) <= _peso_do_item(atual)
+
+
+def primeiro_reparo_de_hp(hero, dungeon_level: int, ouro: int) -> dict | None:
+    """O passo de recuperação de HP que `_repair` compraria primeiro com `ouro`.
+
+    Leitura pura da PRIMEIRA volta do laço de `_repair`, sem comprar nada: as
+    mesmas três condições (vida abaixo do alvo, orçamento de recuperação maior
+    que zero, ouro que cobre a oferta) sobre a mesma oferta `hp` de
+    `recovery_offers`. Existe para quem precisa saber, antes de entrar na Loja,
+    se ela vai curar — o adaptador do bot. `None` quando a visita não compraria
+    recuperação de HP.
+    """
+    if int(ouro * RECOVERY_BUDGET_RATIO) <= 0:
+        return None
+    if hero.get_hp() * 100 / max(1, hero.base_hp) >= RECOVERY_TARGET_HP_PERCENT:
+        return None
+    oferta = next((o for o in recovery_offers(hero, dungeon_level) if o["resource"] == "hp"), None)
+    if oferta is None or int(oferta["price"]) > ouro:
+        return None
+    return oferta
 
 
 def _repair(hero, dungeon_level: int, telemetry=None) -> None:
