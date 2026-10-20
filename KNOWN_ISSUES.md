@@ -9,28 +9,18 @@ progressão/dificuldade, comportamento do bot, starter ou inconclusivo. Nenhum
 item aqui afirma qual mudança resolve o problema; isso é trabalho de
 [`NEXT_PHASE.md`](NEXT_PHASE.md).
 
-A evidência numérica completa está em
-[`baselines/progression/fb321d4e/README.md`](baselines/progression/fb321d4e/README.md).
+A evidência numérica está em dois lugares:
+
+- [`baselines/progression/fb321d4e/README.md`](baselines/progression/fb321d4e/README.md):
+  a primeira baseline real, medida com o instrumento antigo;
+- [`baselines/progression/0ab837b9/README.md`](baselines/progression/0ab837b9/README.md):
+  a auditoria do instrumento corrigido, que é o retrato atual.
+
+> **KI-001 e KI-006 foram fechados** pela auditoria do instrumento. A resolução
+> está em [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md#bloco-do-instrumento--botpadrão-corrigido-e-auditado).
+> A numeração não é reaproveitada.
 
 ---
-
-## KI-001 — decisão de engajamento do BotPadrão
-
-**Classificação:** `BotPadrão / política`. Não é bug do motor.
-
-A decisão de lutar no mapa não considera adequadamente a força do oponente.
-
-- A nota da luta depende do HP do herói e de quantas lutas o alvo custa
-  (`src/sim/bot/evaluators.py`), não da força do monstro.
-- A escada de necessidades (`src/sim/bot/decision.py`) põe progredir acima de
-  investir. Acima do ponto de aposta de HP, curar na Loja perde para qualquer
-  luta com nota positiva.
-- O bot entra em lutas que o próprio avaliador de combate, no turno 0, já estima
-  como perdidas.
-
-**Evidência (baseline `fb321d4e`):**
-- 62% das mortes começaram o combate fatal abaixo de 55% de HP.
-- Exemplo rastreável: Warrior seed 24, andar 1.
 
 ## KI-002 — letalidade do early game
 
@@ -39,18 +29,26 @@ A decisão de lutar no mapa não considera adequadamente a força do oponente.
 Há mortes na primeira luta do andar 1, com HP cheio, contra monstros de nível 1
 a 3.
 
-**Evidência (baseline `fb321d4e`):**
-- 6 runs morreram na primeira luta do andar 1 com 100% de HP.
-- 15,3% das runs morrem no andar 1, e 64,3% até o andar 5.
-- Parte dessas mortes se explica pelo KI-001; as 6 mortes com HP cheio, não.
+**Evidência:**
+- Baseline `fb321d4e`:
+  - 6 runs morreram na primeira luta do andar 1 com 100% de HP;
+  - 15,3% das runs morreram no andar 1, e 64,3% até o andar 5.
+- Auditoria do instrumento `0ab837b9`:
+  - as **mesmas 6 runs** (Mage seeds 16, 62 e 93; Rogue seeds 4, 16 e 98)
+    morrem na mesma primeira luta, com HP cheio;
+  - 15,0% morrem no andar 1 (46 → 45), e 61,7% até o andar 5 (193 → 185).
+
+Com o instrumento corrigido, a letalidade do começo quase não se moveu. Ela não
+era, no essencial, política do bot.
 
 **Ainda não concluído:** qual sistema ou constante é responsável. A suspeita pode
-recair sobre a curva do monstro, a população do andar 1, a largada do herói ou a
-política do bot, e nada disso está decidido.
+recair sobre a curva do monstro, a população do andar 1 ou a largada do herói, e
+nada disso está decidido.
 
 ## KI-003 — espiral de mergulho
 
-**Classificação:** `progressão + BotPadrão`.
+**Classificação:** `Run/Progression Balance`. A parte do BotPadrão foi corrigida
+em `7b9734c3`.
 
 Uma run com pouca vida pode entrar numa espiral:
 
@@ -61,10 +59,35 @@ Uma run com pouca vida pode entrar numa espiral:
 5. fica abaixo do nível do andar;
 6. continua descendo até morrer.
 
-**Evidência (baseline `fb321d4e`):**
-- 26 runs chegaram ao andar 10 no nível 5 ou menos.
-- Nenhuma delas extraiu.
-- O caso extremo é o Mage seed 59: andar 23 no nível 3.
+**O que o bot deixou de fazer.** Ele não trata mais a descida sem pagar como
+estratégia quando está abaixo do nível do andar, a saída não seria paga, há luta
+no mapa e o fôlego observado paga pelo menos uma luta média. Nesse estado, ele
+luta. Fora dele, a regra de antes continua: sem fôlego, sem evidência ou com a
+saída pagável, sair abaixo do ponto de aposta continua sendo recuperação, e a
+sobrevivência continua acima.
+
+**O que sobreviveu (auditoria `0ab837b9` contra `fb321d4e`):**
+- Runs que chegam ao andar 10 no nível 5 ou menos: 26 → **14**, e **nenhuma
+  extrai**, antes ou depois. Das 14, 6 já mergulhavam antes e 8 são novas.
+- Elas ainda somam em média 6,9 saídas não pagas por run.
+- Saídas não pagas por run caíram de 1,23 para 0,89. A maior sequência caiu de
+  18 para 9.
+- O Mage seed 59 não mergulha mais: morre no andar 6, nível 3, com 2 saídas não
+  pagas, contra o andar 23 e 19 saídas não pagas antes.
+
+O que resta é a espiral que o bot não tem como evitar: sem fôlego para uma luta
+média, a saída é a recuperação que existe. A interação continua sendo a do
+diagnóstico original:
+- o descanso de fim de andar é parcial de propósito;
+- a saída não paga reduz a Essência;
+- cada andar sublevel é mais difícil que o anterior.
+
+**Efeito colateral, a ser lido no bloco da dungeon.** Mortes cujo combate fatal
+começou abaixo de 35% de HP subiram de 1 para 30. 29 delas são sublevel, e são
+as lutas que a nova regra manda aceitar. As 29 runs também morriam no
+`fb321d4e`; nenhuma era extração. 15 morrem mais raso, 3 no mesmo andar e 11
+mais fundo. A regra usa a luta média observada, e a luta que as mata custa mais
+que a média.
 
 **Não se afirma** que alguma regra individual esteja errada. Cada peça se comporta
 como foi escrita:
@@ -72,19 +95,37 @@ como foi escrita:
 - a saída não paga não bloqueia ninguém;
 - o descanso de fim de andar é parcial de propósito.
 
-O problema é a interação entre elas, somada à política do bot.
-
 Relacionado, mas separado: a decisão de design ainda aberta sobre o chefe ser
 contornável ([`GAME_DESIGN.md`](GAME_DESIGN.md), D4).
 
 ## KI-004 — baixo uso de poções
 
-**Classificação:** `inconclusivo — economia ou política do bot`.
+**Classificação:** `economia / aquisição`. A parte do BotPadrão foi corrigida em
+`9ef74639` e `7c08bdec`.
 
-76% das runs da baseline (228/300) não consumiram nenhuma poção.
+**O que o bot deixou de fazer:**
+- beber uma poção só porque a tem, com HP alto ou com a cura quase toda
+  transbordando;
+- prometer a si mesmo uma cura ou uma poção que o orçamento real da Loja não
+  paga.
 
-Não está separado se isso vem de a poção não caber no orçamento, de não aparecer,
-ou de o bot não a comprar ou usar. Nenhuma solução é proposta ainda.
+Agora a poção do mapa atende uma necessidade observada: emergência abaixo do
+ponto de aposta, ou uma próxima luta média que derrubaria o herói abaixo dele.
+
+**O que sobreviveu (auditoria `0ab837b9` contra `fb321d4e`):**
+- Runs sem nenhuma poção bebida no mapa: 228 → **240 de 300 (80%)**.
+- Poções bebidas no mapa: 314 → 129. Pela regra nova, nenhuma é bebida quando
+  mais da metade da cura transbordaria.
+- Poções compradas na Loja: 338 → 212. A regra de compra (`visit_shop`) não
+  mudou: ela repõe a mochila até 3, então quem bebe menos compra menos.
+- Itens usados dentro do combate: 64 → 64.
+- Mortes com poção de cura na mochila: 8 → 10. Nenhuma das 10 começou o
+  combate fatal abaixo de 55% de HP; no `fb321d4e`, 5 das 8 tinham começado.
+
+O uso continua baixo com a política corrigida. Ainda não se sabe se a poção
+chega ao herói quando ele precisa: drop, estoque, preço contra o orçamento e
+desbloqueio da Loja são economia, não política do bot. Nenhuma solução é
+proposta ainda.
 
 ## KI-005 — calibração global de progressão pendente
 
@@ -92,25 +133,9 @@ ou de o bot não a comprar ou usar. Nenhuma solução é proposta ainda.
 
 > **`Run/Progression Balance — pendente de calibração.`**
 
-A jornada real está implementada e medida (baseline `fb321d4e`), e a calibração
-dela está aberta. KI-001 a KI-004 e KI-006 são partes conhecidas desse trabalho,
-não a lista inteira.
-
-## KI-006 — o bot não tem intenção sobre 10 das 23 famílias de passiva
-
-**Classificação:** `BotPadrão / política`.
-
-- As políticas de escolha do simulador, inclusive a `survival`, que o BotPadrão
-  usa por padrão, ordenam 13 famílias de passiva.
-- As outras 10 estão declaradas sem preferência (`PASSIVE_SEM_PREFERENCIA`, em
-  `src/sim/pick_policies.py`). Quando a oferta é só dessas, a escolha não tem
-  intenção de build.
-- Atribuir intenção a essas famílias é decisão de balanceamento, registrada como
-  pendente em [`GAME_DESIGN.md`](GAME_DESIGN.md), D3.
-
-Por que importa nesta fase: a build que o bot monta é parte do que a régua de
-progressão mede. Não dá para concluir que uma passiva dessas famílias é fraca a
-partir do que o bot escolhe.
+A jornada real está implementada e medida com o instrumento corrigido (auditoria
+`0ab837b9`), e a calibração dela está aberta. KI-002 a KI-004 são as partes
+conhecidas que sobreviveram à auditoria, não a lista inteira.
 
 ---
 
@@ -134,6 +159,8 @@ Registrados onde vivem, e listados aqui só para não se perderem:
   atual.
 - **O Warrior ir mais fundo na baseline real.** Isolado, isso não é problema, e
   não reabre o Combat/Class Balance.
+- **A incerteza sobre qual monstro está num `&`.** É design: o mapa não revela o
+  monstro antes da colisão, nem ao jogador nem ao bot.
 - **A ausência de CI remota na branch de fase.** A CI só roda para `master` e
   para PRs contra ela.
 - **Arquivos experimentais fora do repositório.**

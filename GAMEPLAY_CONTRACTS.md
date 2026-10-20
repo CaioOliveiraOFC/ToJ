@@ -156,7 +156,10 @@ medições está em [`BASELINES.md`](BASELINES.md).
 
 - **A nova jornada real** com Starter Kit, mapa, loot, economia, serviços, fuga e
   extração, jogada pelo BotPadrão.
-- A referência é [`baselines/progression/fb321d4e/`](baselines/progression/fb321d4e/README.md).
+- A referência atual é a auditoria do instrumento,
+  [`baselines/progression/0ab837b9/`](baselines/progression/0ab837b9/README.md).
+  A primeira baseline real, medida com o instrumento antigo, é
+  [`baselines/progression/fb321d4e/`](baselines/progression/fb321d4e/README.md).
 - **Estado: PENDENTE DE CALIBRAÇÃO.**
 
 > **Um resultado ruim de progressão não reabre automaticamente o balance de
@@ -181,6 +184,16 @@ Mudar uma classe exige mostrar a causa na régua de combate, e mantê-la verde.
   - inconclusivo.
 - **Mudar o bot é mudar o instrumento.** Medições de progressão de antes e de
   depois de uma mudança no bot não se comparam sem remedir a baseline.
+- **O mapa não revela o monstro ao bot.** O bot sabe o que o jogador sabe.
+  - Antes da colisão, um `&` é só casa, distância e caminho (`TargetView`). Não
+    há nome, nível, HP, atributos nem dano.
+  - Alvos visualmente iguais valem igual para a policy.
+  - O estado exato do monstro (`CombatState`) só existe depois da colisão.
+  - Protegido por `tests/test_bot_observation.py` e
+    `tests/test_bot_decisao_mapa.py`. Esses testes não mudam para acomodar uma
+    implementação.
+  - Uma decisão melhor antes da luta vem do que o jogador sabe: o histórico
+    observado e os recursos que de fato pode pagar.
 
 ## Arena
 

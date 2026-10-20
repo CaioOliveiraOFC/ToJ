@@ -8,7 +8,8 @@ que cada uma mede e quando ela pode ser comparada**.
 |---|---|---|---|---|
 | Pre-balance | `88190c5f` | BotPadrão da época, largada nua (`create_player_from_data`), `max_andar` 20, seeds 20260000–20260999, 3.000 runs | **histórica** | [`reports/BASELINE_PRE_BALANCE.md`](reports/BASELINE_PRE_BALANCE.md) |
 | Combat/Class E8 | `bc815fcd` | `expected loadout` (`simulate_run`, política `smart`) | **fechada** | `tests/balance/` (`pytest -m balance`) e [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md#etapa-8--class-balance) |
-| Progression real | `fb321d4e` | jornada real: BotPadrão conservador + Starter Kit, seeds 1–100 × 3 classes, teto técnico 200 | **pendente de calibração** — referência atual | [`baselines/progression/fb321d4e/README.md`](baselines/progression/fb321d4e/README.md) |
+| Progression real | `fb321d4e` | jornada real: BotPadrão conservador + Starter Kit, seeds 1–100 × 3 classes, teto técnico 200 | **histórica** — o "antes" do instrumento | [`baselines/progression/fb321d4e/README.md`](baselines/progression/fb321d4e/README.md) |
+| Auditoria do instrumento | `0ab837b9` | o mesmo protocolo da `fb321d4e`, com o BotPadrão corrigido | **pendente de calibração** — referência atual | [`baselines/progression/0ab837b9/README.md`](baselines/progression/0ab837b9/README.md) |
 | Alvo de extração | remedido em `bc815fcd` | `overall_power` do snapshot de um Rogue real, `PODER_ESPERADO` | **instrumento** — alarme de deslocamento | `tools/arena_alvo.py`, `src/data/arena_benchmark_v1.json`, `tests/test_arena_alvo.py` |
 
 ---
@@ -37,6 +38,14 @@ de fundação.
 É a régua de Run/Progression Balance. O protocolo, os 300 resultados e a
 classificação dos achados estão no README dela.
 
+**Auditoria do instrumento.** É a mesma régua depois do bloco que corrigiu o
+BotPadrão (`9ef74639`…`0ab837b9`). O jogo é o mesmo; só o piloto mudou.
+- Guarda as duas coletas, pelo mesmo coletor: o "antes" (`fb321d4e`) e o
+  "depois" (`0ab837b9`).
+- Nos campos que a `fb321d4e` já tinha, o "antes" reproduz as 300 runs dela
+  registro a registro. Por isso a comparação mede só a mudança do instrumento.
+- Separa o que era política do bot do que sobrou para a dungeon.
+
 **Alvo de extração.** É o poder de referência contra o qual o BotPadrão decide
 se a build "superou a Arena" e vale extrair.
 - Não é baseline de balance, e não é a Arena como modo de jogo.
@@ -46,11 +55,16 @@ se a build "superou a Arena" e vale extrair.
 
 ## Quando comparar
 
-- **A `fb321d4e` é a referência atual para qualquer mudança de progressão.**
+- **A auditoria `0ab837b9` é a referência atual para qualquer mudança de
+  progressão.**
   - Uma mudança se compara rodando o mesmo protocolo no commit novo e agregando
-    com o mesmo script: `run_baseline.py` e `agrega.py` do diretório dela.
+    com o mesmo script: `run_auditoria.py` e `agrega_auditoria.py` do diretório
+    dela, com o `depois.jsonl` como o novo "antes".
   - Mudou o protocolo (seeds, teto, perfil ou versão do bot)? Então é outra
     baseline, e não uma comparação.
+- **A `fb321d4e` não se compara com uma mudança de dungeon.** Ela foi medida com
+  o instrumento antigo. Comparar contra ela misturaria a correção do bot com a
+  mudança do jogo. Ela continua sendo o registro do "antes" do instrumento.
 - **A largada nua antiga não é mais baseline oficial de progressão.**
   - Desde o `fb321d4e`, toda nova jornada começa com uma peça de Starter Kit.
   - O `loadout="naked"` do `src/sim/harness` continua existindo como opção de
@@ -59,7 +73,8 @@ se a build "superou a Arena" e vale extrair.
   comparar classes, nunca para medir progressão real. A progressão real não serve
   para fechar ou reabrir balance de classe sem isolar a causa (ver
   [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#duas-réguas-de-balanceamento)).
-- **A Pre-balance não se compara com a `fb321d4e` número a número.** É outro
+- **A Pre-balance não se compara com a `fb321d4e` nem com a auditoria número a
+  número.** É outro
   jogo: antes da reforma, sem Starter Kit, com outra janela, outras seeds e outra
   versão do bot. Dá para usar a direção das tendências como contexto, não como
   delta.

@@ -29,6 +29,7 @@ As outras fontes ficam onde estão:
 | 8 | `bc815fcd` | Combat/Class Balance |
 | — | `fb321d4e` | Starter Kit |
 | — | `24430155` | Primeira baseline real de progressão |
+| — | `9ef74639`…`0ab837b9` | Bloco do instrumento: BotPadrão corrigido e auditado |
 
 ---
 
@@ -223,3 +224,103 @@ O protocolo, os números e a classificação dos achados vivem lá.
 Resultado: nenhum bug mecânico encontrado, e **`Run/Progression Balance —
 pendente de calibração`**. Os problemas abertos estão em
 [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md).
+
+## Bloco do instrumento — BotPadrão corrigido e auditado
+
+Quatro correções do BotPadrão, uma por commit, e uma auditoria única de 300 runs
+depois delas. **Corrigiu-se o piloto, não a pista:** nenhuma regra do jogo mudou.
+Classes, monstros, atributos, dano, HP, Starter Kit, loot, mapa, preços,
+economia, Essência, saída, extração e expected loadout ficaram como estavam.
+
+A fronteira de informação do mapa também ficou intacta:
+- `TargetView` continua sem a identidade do monstro;
+- `CombatState` só existe depois da colisão;
+- alvos visualmente iguais continuam empatando;
+- os testes dessa fronteira, em `tests/test_bot_observation.py` e
+  `tests/test_bot_decisao_mapa.py`, não foram alterados.
+  - O único teste alterado nesses arquivos é o da poção que cura mais que o HP
+    faltante, em `test_bot_decisao_mapa.py`. Ele passou a provar a regra nova
+    do `7c08bdec`.
+
+| Commit | Correção |
+|---|---|
+| `9ef74639` | KI-001: a Loja só promete a cura de HP que o orçamento real paga |
+| `7c08bdec` | KI-004, parte do bot: poção por necessidade observada |
+| `7b9734c3` | KI-003, parte do bot: a descida sem pagar deixa de ser estratégia |
+| `0ab837b9` | KI-006: intenção explícita para as 23 famílias de passiva (D3 encerrada) |
+
+**`9ef74639` — a Loja deixa de prometer cura impagável.**
+- O defeito: a policy prometia "HP a recuperar" sempre que `ouro > taxa_de_saida`,
+  mas o driver entra na Loja com o orçamento real de `_orcamento()`, que guarda a
+  reserva da saída. No Warrior seed 24 da `fb321d4e`, a visita não comprou nada e
+  a Loja se perdeu.
+- `ServiceView.cura_hp` é um fato da Loja: a fração do HP que o primeiro passo de
+  recuperação de HP devolve com aquele orçamento, ou zero.
+  - Vem de `progression.primeiro_reparo_de_hp`, uma leitura pura da primeira
+    volta de `_repair` sobre `content.economy.recovery_offers`.
+  - Não compra nada, não muda `_repair` e não replica preço.
+- Com combate observado e `hp_frac − dano_por_luta < HP_DE_APOSTA`, uma cura que
+  existe de verdade atende `RECUPERAR`. Abaixo do ponto de aposta continua
+  `SOBREVIVER`. Sem combate observado, nenhum risco é inventado. Nenhuma
+  constante nova.
+
+**`7c08bdec` — recuperação com intenção.**
+- A poção no mapa vale só com necessidade: `SOBREVIVER`, ou `RECUPERAR` pela mesma
+  regra do commit anterior. Sem necessidade observada, ela fica na mochila. E
+  nunca vale quando mais da metade da cura transbordaria.
+- `ServiceView.pocao_pagavel` é outro fato da Loja: ela vende poção de cura neste
+  andar por um preço (`price_of`) que cabe no orçamento depois do reparo.
+  - Os desbloqueios são lidos dos campos do próprio item, sem montar vitrine,
+    porque a Loja real consome RNG ao montar o estoque.
+  - Um teste confere a paridade contra `Shop.get_available_items`.
+- Preço, estoque, disponibilidade, `visit_shop` e `TARGET_HEALING_POTIONS` não
+  mudaram.
+
+**`7b9734c3` — a espiral de saídas não pagas deixa de ser estratégia.**
+- O estado tem só fronteiras naturais: nível abaixo do andar, saída que não seria
+  paga, luta no mapa e fôlego observado (`(HP + cura na mão) / dano_por_luta`)
+  para pelo menos uma luta média.
+- Nesse estado e abaixo do ponto de aposta:
+  - a saída fica em `ENCERRAR`, com o custo real de `perda_de_essencia`, e
+    continua sempre disponível;
+  - a luta vale o fôlego que sobra por luta.
+- Fora dele vale a regra de antes, e a sobrevivência continua acima.
+- Nenhum contador de saídas e nenhuma constante nova. O Mage seed 59 é testado
+  como caso histórico, sem seed no código.
+
+**`0ab837b9` — as 23 famílias de passiva têm intenção.**
+- `survival`, `offense` e `economy` ordenam as 23 famílias. As 13 originais
+  mantêm a ordem relativa que tinham.
+- `PASSIVE_SEM_PREFERENCIA` e o estado `NEUTRA` saíram. Sem família da intenção
+  na oferta, o desempate é só raridade: nenhum `effect_value` se compara entre
+  famílias.
+- Essas políticas também são as do `simulate_run`, a régua do Combat/Class
+  Balance. Por isso o `-m balance` rodou como portão: 118 passed.
+- D3 foi encerrada em [`GAME_DESIGN.md`](GAME_DESIGN.md).
+
+### KI-001 — como foi fechado
+
+**O mapa não aprende a força do monstro escondido.** O que foi corrigido foi a
+política de risco antes do engajamento:
+
+> usando apenas histórico observado e recursos realmente disponíveis, o
+> BotPadrão deixa de ignorar uma recuperação viável antes de entrar na próxima
+> luta.
+
+A incerteza sobre qual monstro existe num `&` permanece **por design**.
+
+### A auditoria
+
+Mesmo protocolo da `fb321d4e`, sobre o código do `0ab837b9`. O "antes" é o
+próprio `fb321d4e`, remedido com o mesmo coletor; nos campos que a baseline já
+tinha, ele reproduz as 300 runs registro a registro. Protocolo, números e
+leitura estão em
+[`baselines/progression/0ab837b9/`](baselines/progression/0ab837b9/README.md).
+
+Resultado:
+- KI-001 e KI-006 fechados;
+- as partes do bot de KI-003 e KI-004 corrigidas;
+- KI-002, KI-003, KI-004 e KI-005 abertos como problemas da dungeon e da
+  economia ([`KNOWN_ISSUES.md`](KNOWN_ISSUES.md)).
+
+**`Run/Progression Balance — pendente de calibração`.**

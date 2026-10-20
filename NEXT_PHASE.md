@@ -1,29 +1,49 @@
-# Próxima etapa — Calibração da Progressão PvE
+# Próxima etapa — Dungeon / Run Progression
 
-Continuação da fase atual. A fundação está fechada e o Combat/Class Balance
-também (ver [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md)). O que falta na
-fase PvE é a progressão.
+Continuação da fase atual. A fundação está fechada, o Combat/Class Balance
+também, e o instrumento de medição foi corrigido e auditado (ver
+[`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md)). O que falta na fase PvE é
+a progressão da dungeon.
 
 ## Objetivo
 
 Fechar **`Run/Progression Balance`**: a jornada real, do nível 1 com o Starter
-Kit até a morte ou a extração. A referência atual é
-[`baselines/progression/fb321d4e/`](baselines/progression/fb321d4e/README.md), e
-os problemas conhecidos estão em [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md).
+Kit até a morte ou a extração.
 
-## Ordem inicial de investigação
+- A referência atual é a auditoria do instrumento corrigido,
+  [`baselines/progression/0ab837b9/`](baselines/progression/0ab837b9/README.md).
+- A `fb321d4e` fica como o "antes" do instrumento.
+- Os problemas conhecidos estão em [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md).
 
-1. **Comportamento de engajamento do BotPadrão** (KI-001). Vem primeiro porque o
-   bot é o instrumento: enquanto ele aceita lutas perdidas, a régua mistura
-   política com dificuldade.
-2. **Letalidade real do early game** (KI-002).
-3. **Espiral de mergulho** (KI-003).
-4. **Recuperação, uso de poções e economia** (KI-004).
-5. **Nova baseline de progressão**, pelo mesmo protocolo da `fb321d4e`.
+## O que este bloco trata
+
+**Só os sintomas que sobreviveram à auditoria do instrumento.** O que era
+política do BotPadrão já foi separado e corrigido no bloco anterior: engajamento
+e recuperação (KI-001), a parte do bot da espiral (KI-003) e do uso de poções
+(KI-004), e a intenção das passivas (KI-006). Aqui, o bot é a régua, e não o
+objeto.
+
+Ordem inicial de investigação:
+
+1. **Letalidade real do early game** (KI-002).
+   - As mesmas 6 runs morrem na primeira luta do andar 1, com HP cheio.
+   - 15,0% das runs morrem no andar 1, e 61,7% até o andar 5.
+2. **A espiral de mergulho que sobrou** (KI-003).
+   - 14 runs chegam ao andar 10 no nível 5 ou menos, e nenhuma extrai.
+   - Entram aqui as 29 mortes sublevel cujo combate fatal começou abaixo de 35%
+     de HP.
+3. **Economia de recuperação e poções** (KI-004).
+   - 80% das runs não bebem nenhuma poção no mapa, com a política já corrigida.
+4. **Calibração global** (KI-005) e **nova baseline de progressão**, pelo mesmo
+   protocolo.
 
 Isso **não** significa que cada ponto vai exigir mudança. Primeiro se
 diagnostica, depois se decide. "Medido e aceito como está" é um desfecho válido,
 desde que registrado.
+
+**O instrumento fica congelado durante o bloco.** Se o BotPadrão precisar mudar
+de novo, isso é outra rodada de instrumento, com remedição antes de qualquer
+conclusão sobre a dungeon.
 
 ## Regra de trabalho
 
