@@ -76,3 +76,11 @@ isso por AST — a regra está em [`ARCHITECTURE.md`](ARCHITECTURE.md).
   do combate e as decisões ainda em aberto.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — as camadas, a responsabilidade de cada
   módulo e as regras que os testes verificam.
+- [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md) — as decisões que não podem
+  mudar de passagem.
+- [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md) — o histórico da reforma de
+  fundação, desde `v0.2-prebalance`.
+- [`BASELINES.md`](BASELINES.md) — o índice das medições de referência.
+- [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) — os problemas abertos.
+- [`NEXT_PHASE.md`](NEXT_PHASE.md) — o trabalho atual: a calibração da
+  progressão PvE.

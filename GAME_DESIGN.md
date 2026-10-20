@@ -1,19 +1,33 @@
 # GAME DESIGN — Tales of the Journey
 
-> O estado **atual** do design. O que ainda está em redesign não é
-> descrito aqui como se existisse. **Nenhum sistema está em redesign hoje** —
-> o equipamento, que era a exceção, fechou: 11 posições, arma de duas mãos
-> ocupando as duas, e um canal declarado de `evasion` e `damage_reduction`
-> para o funil de dano.
+> O estado **implementado** do design, no código da árvore em que este arquivo
+> está. O que não existe não é descrito aqui como se existisse.
 
 > A bússola criativa. O resto é código, suor e tokens.
 
+> **Estado do checkpoint.**
+>
+> - **A fundação está fechada.** Nenhum sistema está em redesign estrutural. O
+>   histórico está em [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md).
+> - **O Combat/Class Balance está fechado**, na régua controlada
+>   `expected loadout`.
+> - **O Run/Progression Balance está `[em calibração]`.** A jornada real está
+>   implementada e medida, mas a calibração está aberta.
+> - **A Arena (PvP) `[não existe]`.**
+>
+> As decisões que não podem mudar de passagem estão em
+> [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md). As medições estão em
+> [`BASELINES.md`](BASELINES.md), e os problemas abertos em
+> [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md).
+
 > **Como ler este documento.** Toda afirmação carrega um estado verificado contra
-> o código em `master`:
+> o código desta mesma árvore. Ele não pressupõe que `master` tenha o
+> desenvolvimento mais recente.
 >
 > | Marca | Significado |
 > |---|---|
 > | **`[implementado]`** | Está no código e foi conferido |
+> | **`[em calibração]`** | Está no código e é estável, mas o balance ainda está aberto. Não é bug nem ausência |
 > | **`[divergiu]`** | Existe, mas diferente do que este documento pedia. A diferença está escrita |
 > | **`[não existe]`** | Especificado aqui e nunca construído |
 > | **`[bug]`** | Deveria funcionar assim, não funciona |
@@ -51,7 +65,7 @@ digno da **Arena (PvP)**.
 
 | Modo | Propósito | Risco | Estado |
 |---|---|---|---|
-| **Forge Run** | Criar e fortalecer personagens na masmorra | Morte permanente. Perde tudo. | **`[implementado]`** |
+| **Forge Run** | Criar e fortalecer personagens na masmorra | Morte permanente. Perde tudo. | **`[implementado]`** — progressão **`[em calibração]`** |
 | **Arena** | Provar o valor do personagem contra jogadores | Sem risco de morte. Ranking por Elo. | **`[não existe]`** |
 
 **`[não existe]`** O menu principal deveria ter Forge Run e Arena, com a Arena em
@@ -171,6 +185,27 @@ conta de quem não repôs o capital.
 ---
 
 ## Progressão na Forge Run
+
+**`[em calibração]`** Os sistemas desta seção e de **Itens, Loja e Economia**
+estão implementados e são estáveis. A calibração deles como jornada inteira
+(Run/Progression Balance) está aberta e é medida pela baseline de progressão
+(ver [`BASELINES.md`](BASELINES.md)). Os números aqui são o estado do código,
+não valores ratificados.
+
+### A largada
+
+**`[implementado]`** Toda nova jornada começa:
+
+- no **nível 1**, sem ouro;
+- com a skill de assinatura da classe;
+- com **exatamente uma peça do Starter Kit**, já equipada.
+
+A peça é Lv1 e sai de uma pool única para as três classes: primeiro se sorteia a
+categoria, depois o item. O caminho de nova jornada é `create_player_for_new_run`,
+o mesmo para a tela do jogador e para o BotPadrão. `create_player_from_data`
+continua sendo o herói neutro, sem starter, de testes e benchmarks. O contrato
+completo está em
+[`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#starter-kit).
 
 ### Essência (XP)
 
@@ -363,7 +398,8 @@ Tank 6, Glass Cannon 6, Skirmisher 6, Controller 7, Support 7, Elite 6, Boss 7.
 **`[implementado]`** **Legendary é jackpot, e é raro de verdade**: três no jogo
 inteiro, uma por classe, nenhuma Neutral. Elas não seguem a filosofia de "é
 diferente, não necessariamente melhor" — trabalham perto do topo do orçamento
-permitido (420–433% do ataque básico de referência) e existem para o jogador
+permitido (420–434% do ataque básico de referência, pelo livro-razão em
+`tools/orcamento_de_cartas.py`) e existem para o jogador
 pensar "eu dei muita sorte". O que elas não podem é inventar mecânica: passam
 pelo mesmo validador e pelo mesmo pipeline de dano de todas as outras.
 
@@ -447,8 +483,9 @@ atributos de quem a lança.
 estático** antes de entrar no jogo: escala válida, no máximo 2 atributos somando 1.0, MP
 e recarga obrigatórios, acerto dentro da faixa, efeito do catálogo global, orçamento não
 absurdo. O orçamento é medido contra um personagem de referência (a classe, para o herói;
-o arquétipo, para o monstro), porque a Agilidade 92 do Ladino e a Força 191 do Guerreiro
-não são o mesmo número.
+o arquétipo, para o monstro), porque a Agilidade de referência do Ladino e a Força de
+referência do Guerreiro (92 e 173 em `SKILL_REFERENCE_STATS`, tabela remedida a cada
+mudança de atributo base) não são o mesmo número.
 
 ### Custo
 
@@ -591,7 +628,9 @@ o herói a um golpe da morte está jogando pior, não melhor.
 
 ## Itens, Loja e Economia
 
-**`[implementado]`** 159 itens, uso livre de consumíveis no turno de combate.
+**`[implementado]`** 160 itens, uso livre de consumíveis no turno de combate. Um deles, o
+Talismã do Viajante, só existe como peça de Starter Kit (`starter_only`): não cai do
+monstro, não é vendido e fica fora das réguas sintéticas.
 
 **`[implementado]`** Poções curam **percentual** do máximo (25% / 40% / 60%), não
 valor fixo. Armas somam percentual sobre o poder base.
@@ -642,7 +681,7 @@ Lendário novo mudava a economia sem ninguém decidir isso.
 **`[implementado]`** Hoje o sorteio é **ponderado por raridade**, pelos pesos que já
 estavam declarados em `items.json` e nunca eram lidos:
 
-| Raridade | Peso | Itens no catálogo |
+| Raridade | Peso | Itens no loot |
 |---|---:|---:|
 | Comum | 60 | 71 |
 | Raro | 28 | 59 |
@@ -742,6 +781,10 @@ pertence ao ITEM (`classes`, proficiência, requisito), não à classe.
 
 **Uma arma de duas mãos ocupa as duas posições de mão.**
 
+**`[implementado]`** Além dos atributos, o equipamento alimenta o combate por canais
+declarados (`Player.EQUIP_COMBAT_EFFECTS`). Entre eles estão `evasion`, que entra no
+acerto, e `damage_reduction`, que entra na mitigação, e todos passam pelo funil de dano.
+
 Saves antigos, gravados quando existia uma posição `Weapon` e uma `Ring`, são
 mapeados na leitura para `Weapon1` e `Ring1`; `Weapon2`, `Ring2` e `Accessory`
 nascem vazios. Nenhum arquivo precisou ser migrado.
@@ -752,10 +795,12 @@ com nome, classe, nível, andar alcançado e causa.
 **`[não existe]`** O troféu não guarda Elo (não há Arena) nem nada que seja lido na
 run seguinte. É um registro de mortos, não uma progressão.
 
-**`[implementado]`** O save grava **HP e MP**, e a extração grava o **próximo**
-andar. Antes não gravava nenhum dos dois: o herói era reconstruído no nível salvo com
-os recursos no máximo, e a extração gravava o andar recém-concluído, que o jogador
-então refazia e cujas recompensas recebia de novo.
+**`[implementado]`** O save grava **HP e MP**. **Extrair encerra a run.** O save marca
+o andar em que o personagem foi extraído, e esse personagem não volta para a mesma
+dungeon: fica preservado para a camada pós-dungeon, a Arena, que ainda não existe. Ao
+carregá-lo, o jogo avisa isso. Antes, o save não gravava HP nem MP: o herói era
+reconstruído no nível salvo com os recursos no máximo. E a extração gravava o andar
+recém-concluído, que o jogador então refazia, recebendo as recompensas de novo.
 
 > Era a jogada ótima do jogo — cura total gratuita e um moedor infinito de XP e ouro.
 > Estratégia degenerada não é um defeito entre outros: ela anula todas as demais
@@ -780,14 +825,32 @@ Limitações que importam para qualquer decisão de design tirada dela:
   não sabe pular luta. Não consegue medir nada sobre "o jogador escolhe brigar ou
   contornar" — e, como consequência, o bot sempre tem ouro e paga 100% das saídas,
   então a punição de Essência **nunca dispara** numa run simulada padrão. Medir o
-  custo de contornar exige uma política que evite combate; hoje ela não existe.
+  custo de contornar exige uma política que evite combate, e ela não existe em
+  `src/sim/`. Quem mede isso é o BotPadrão, abaixo.
 - **Não modela a DECISÃO de extrair.** A casa de Extração é sorteada e contada, mas
-  o bot nunca extrai: a run vai do andar 1 ao 20 ou até morrer. O `max_floor = 20`
-  é a janela de medição, **não um teto do jogo**.
+  o bot do simulador nunca extrai: a run vai do andar 1 ao 20 ou até morrer. O
+  `max_floor = 20` é a janela de medição, **não um teto do jogo**.
 
-**`[implementado]`** CI em Python 3.10, 3.11 e 3.12, com três jobs bloqueantes:
-suíte rápida (**2.393 testes**), lint (`ruff check` + `ruff format --check`) e
-**111 invariantes de balanceamento**.
+É nesta camada que mora a régua de **Combat/Class Balance**: `simulate_run` com
+`loadout="expected"`, o equipamento esperado para o nível aplicado sem passar pela
+dungeon (`src/sim/loadouts.py`).
+
+**`[implementado]`** **BotPadrão** (`tools/bot_padrao.py`). Ele joga a run pelo mapa
+real:
+
+- anda, contorna, luta e foge;
+- usa os serviços e paga ou não paga a saída;
+- extrai.
+
+Toda REGRA vem do jogo, inclusive a criação da jornada por `create_player_for_new_run`,
+com o Starter Kit; a DECISÃO mora em `src/sim/bot/`. É a régua de **Run/Progression
+Balance**. Ele é instrumento de regressão e medição, não a definição de jogador ideal
+(ver [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#botpadrão)).
+
+**`[implementado]`** CI em Python 3.10, 3.11 e 3.12, com três jobs bloqueantes: a suíte
+padrão, lint (`ruff check` + `ruff format --check`) e as invariantes de balanceamento
+(`-m balance`). A CI roda em push para `master` e em PRs contra `master`. A contagem de
+testes muda a cada rodada, e por isso não é contrato.
 
 ---
 
@@ -1004,8 +1067,12 @@ e `power`) fica no BASE, e o que depende do momento passa pelo mesmo funil de to
 
 | Skill            | O que ela declara                                             |
 |------------------|---------------------------------------------------------------|
-| Bola de Fogo     | `scaling: mg 1.0`, `power: 3.49`, custo em % da mana máxima    |
-| Assassinato      | `scaling: ag 0.6 + st 0.4`, `power: 5.59`, `bonus_condition`   |
+| Bola de Fogo     | `scaling: mg 1.0`, `power: 3.485`, custo em % da mana máxima   |
+| Assassinato      | `scaling: ag 1.0`, `power: 7.494`, `bonus_condition: target_wounded` |
+
+O `power` não é número de autoria: ele é derivado do orçamento declarado da carta
+(`tools/orcamento_de_cartas.py`) e é rederivado quando a referência muda. Os valores
+acima são os do código atual.
 
 A condição situacional (`bonus_condition` + `bonus_percent`) entra no `+MULT`, somada
 aos outros percentuais — não multiplica o BASE, e não é um XMULT escondido. Antes ela
@@ -1224,12 +1291,17 @@ O catálogo cresceu de 29 para **60 cartas** e de 13 para **23 famílias de
 efeito**. As três políticas deliberadas do simulador (`survival`, `offense`,
 `economy`) ordenam **as 13 famílias originais**. As 10 novas — `precision`,
 `status_resistance`, `poison_chance`, `bleed_chance`, `fear_chance`,
-`crit_damage`, `damage_percent`, `life_steal`, `mana_regen`, `magic` — caem no
-desempate por valor, então o ranking delas é ruído.
+`crit_damage`, `damage_percent`, `life_steal`, `mana_regen`, `magic` — estão
+declaradas **sem preferência** (`PASSIVE_SEM_PREFERENCIA`, em
+`src/sim/pick_policies.py`). Antes elas caíam num desempate pelo valor impresso,
+que comparava grandezas diferentes. Hoje a indiferença é regra escrita, mas
+continua não sendo intenção de build.
 
 Isso **não** é um defeito do jogo: é do instrumento. Mas invalida qualquer
-conclusão do tipo "esta passiva é fraca" sobre uma carta dessas famílias. Precisa
-ser resolvido **antes** do balanceamento global, não depois.
+conclusão do tipo "esta passiva é fraca" sobre uma carta dessas famílias.
+Atribuir intenção a elas é decisão de balanceamento que segue aberta, e pesa na
+calibração da progressão porque o BotPadrão monta a build por essas políticas
+(ver [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md), KI-006).
 
 ### D4 — O chefe é contornável
 
@@ -1246,7 +1318,9 @@ consertar sozinho.
 
 Metade do laço do jogo está especificada e não construída — ver **Os Dois
 Pilares**. Sem ela, extrair um personagem vivo não leva a lugar nenhum. É a maior
-lacuna aberta do design, e nada nas rodadas estruturais a endereçou.
+lacuna aberta do design, e nada nas rodadas estruturais a endereçou. O PvP é uma fase
+posterior à calibração da progressão PvE. O contrato de fronteira está em
+[`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 
 ### D6 — A Essência deveria multiplicar o ouro também?
 
