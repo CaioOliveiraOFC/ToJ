@@ -573,15 +573,40 @@ def _necessidade_de_cura(prog: ProgressionState) -> Need:
 
 
 def _avaliar_pocao(opcao: ActionOption, prog: ProgressionState) -> Score:
-    """Beber é de graça em passos e em ouro. Poção parada não cura ninguém."""
-    util = min(opcao.mechanics.healing, prog.hp_max - prog.hp)
+    """Beber é de graça em passos e em ouro — e a poção é finita.
+
+    Ela vale quando há NECESSIDADE: abaixo do ponto de aposta (SOBREVIVER) ou
+    quando a próxima luta, pelo custo que a run já observou, me derrubaria abaixo
+    dele (RECUPERAR). Sem necessidade, ela fica na mochila: beber "porque tem"
+    queimava a cura antes do descanso do fim do andar, que é de graça, e deixava
+    o bot sem nada quando a luta cara chegasse. E nunca vale quando a maior parte
+    da cura transbordaria — gastar um frasco para aproveitar menos da metade
+    dele é desperdício, não recuperação.
+    """
+    cura = opcao.mechanics.healing
+    util = min(cura, prog.hp_max - prog.hp)
+    necessidade = _necessidade_de_cura(prog)
     componentes = [("HP recuperável", util / max(1, prog.hp_max))]
-    nota = ""
-    if util < opcao.mechanics.healing:
-        nota = f"cura {opcao.mechanics.healing} com só {util} aproveitável"
+    nota = f"cura {cura} com só {util} aproveitável" if util < cura else ""
+    if necessidade is Need.INVESTIR:
+        return Score(
+            opcao.action_id,
+            necessidade,
+            0.0,
+            (("sem necessidade observada", 0.0),),
+            note="nada indica que a próxima luta me derrube: a poção fica para quando indicar",
+        )
+    if util < cura - util:
+        return Score(
+            opcao.action_id,
+            necessidade,
+            0.0,
+            (("cura que transbordaria", 0.0),),
+            note=f"cura {cura} com só {util} aproveitável: mais da metade se perderia",
+        )
     return Score(
         opcao.action_id,
-        _necessidade_de_cura(prog),
+        necessidade,
         sum(v for _n, v in componentes),
         tuple(componentes),
         note=nota,
@@ -632,12 +657,16 @@ def _avaliar_servico(opcao: ActionOption, mapa: MapState, prog: ProgressionState
                 tuple(componentes),
                 tiebreak=-float(desvio),
             )
+        # Repor cura também é FATO da Loja (`ServiceView.pocao_pagavel`): sem
+        # orçamento para uma poção, "falta de cura" prometia uma compra que a
+        # visita não faz, e a Loja era consumida à toa.
+        pocao_pagavel = servico.pocao_pagavel if servico else False
         componentes = [
             (
                 "folga de ouro",
                 max(0.0, (prog.ouro - prog.taxa_de_saida) / max(1, prog.taxa_de_saida)),
             ),
-            ("falta de cura", 1.0 if prog.pocoes_de_cura == 0 else 0.0),
+            ("falta de cura", 1.0 if prog.pocoes_de_cura == 0 and pocao_pagavel else 0.0),
         ]
         return Score(
             opcao.action_id,

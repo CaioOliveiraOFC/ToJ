@@ -33,10 +33,11 @@ from dataclasses import replace
 from typing import Any
 
 from src.content import extraction, forge
-from src.content.economy import exit_fee
+from src.content.economy import exit_fee, price_of
 from src.content.factories import features as feat
 from src.content.factories.dungeons import RANDOM_EVENT_TYPES, altar_hp_cost
 from src.content.floor_exit import unpaid_streak
+from src.content.items import get_all_items
 from src.engine.map_analysis import campo_de_custo, rota_do_campo
 from src.entities.heroes import POTION_BUFFS
 from src.mechanics import combat as combat_mech
@@ -980,6 +981,54 @@ def _cura_hp_pagavel(bot) -> float:
     return int(oferta["amount"]) / max(1, int(hero.base_hp))
 
 
+def _pocoes_de_cura_a_venda(andar: int, classe: str) -> list:
+    """As poções de cura que a Loja PODE ter neste andar — definições do catálogo.
+
+    Os mesmos desbloqueios de `Shop.get_available_items`, lidos dos campos que o
+    próprio item declara (`sold_in_shop`, andar mínimo e máximo, raridade, classe).
+    Sem sortear estoque e sem `spawn()`: a Loja real consome RNG ao montar a
+    vitrine, e o adaptador não pode. A paridade com a Loja tem teste.
+    """
+    pocoes = []
+    for item in get_all_items().values():
+        if not (getattr(item, "consumable", False) and item.effect_type == "max_hp"):
+            continue
+        if not getattr(item, "sold_in_shop", False):
+            continue
+        if andar < getattr(item, "shop_min_floor", 1):
+            continue
+        teto = getattr(item, "shop_max_floor", None)
+        if teto is not None and andar > teto:
+            continue
+        raridade = getattr(item, "rarity", "Common")
+        if raridade == "Legendary" or (raridade == "Epic" and andar < 10):
+            continue
+        classes = getattr(item, "classes", None)
+        if classes is not None and classe not in classes:
+            continue
+        pocoes.append(item)
+    return pocoes
+
+
+def _pocao_de_cura_pagavel(bot) -> bool:
+    """A Loja vende poção de cura que o orçamento real paga, depois do reparo.
+
+    A compra (`progression.visit_shop`) repara a vida ANTES de repor cura, com o
+    mesmo orçamento. Então o que sobra para a poção é o orçamento menos o passo
+    de reparo que a visita vai comprar. Preço pela fonte canônica (`price_of`).
+    """
+    hero = bot.hero
+    orcamento = bot._orcamento()[0]
+    reparo = progression.primeiro_reparo_de_hp(hero, bot.andar, orcamento)
+    if reparo is not None:
+        orcamento -= int(reparo["price"])
+    precos = [
+        price_of(item, bot.andar)
+        for item in _pocoes_de_cura_a_venda(bot.andar, hero.get_classname())
+    ]
+    return bool(precos) and min(precos) <= orcamento
+
+
 def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
     """O andar e a run, como o jogador os vê.
 
@@ -1016,6 +1065,7 @@ def estado_do_mapa(bot) -> tuple[MapState, ProgressionState]:
                     desvio=desvio[0],
                     lutas_no_desvio=desvio[1],
                     cura_hp=_cura_hp_pagavel(bot) if tipo == feat.SHOP else 0.0,
+                    pocao_pagavel=_pocao_de_cura_pagavel(bot) if tipo == feat.SHOP else False,
                 )
             )
 

@@ -269,3 +269,109 @@ class TestRegressaoWarriorSeed24:
         assert len(visitas) == 1
         antes, depois = (int(x) for x in visitas[0].split("| HP ")[1].split(" -> "))
         assert depois > antes
+
+
+# --- KI-004, parte do bot: poção e reposição com intenção -------------------
+
+
+class TestPocaoComIntencao:
+    """A poção vale quando a run precisa dela, e nunca para transbordar."""
+
+    def test_sem_necessidade_observada_a_pocao_fica_na_mochila(self):
+        """Vida boa, nenhum atrito medido: beber "porque tem" não é recuperação."""
+        prog = _prog(hp=350, pocoes_de_cura=1)
+        score = avaliar_mapa(POCAO, _mapa(), prog)
+        assert score.need is Need.INVESTIR and score.utility == 0.0
+        mapa = _mapa(alvos=())
+        assert decidir_no_mapa(mapa, prog, (POCAO, SAIDA)).action_id == "saida"
+
+    def test_e_usada_quando_o_historico_mostra_necessidade(self):
+        prog = _prog(hp=250, combates=4, dano_por_luta=0.3, pocoes_de_cura=1)
+        score = avaliar_mapa(POCAO, _mapa(), prog)
+        assert score.need is Need.RECUPERAR and score.utility == 150 / 500
+        assert decidir_no_mapa(_mapa(), prog, (LUTAR, POCAO, SAIDA)).action_id == "pocao"
+
+    def test_cura_majoritariamente_desperdicada_nao_e_bebida(self):
+        """Faltam 200; um frasco de 450 perderia 250. Nem com necessidade."""
+        grande = ActionOption(
+            "pocao", "pocao", label="poção", mechanics=ActionMechanicsView(healing=450)
+        )
+        prog = _prog(hp=300, combates=4, dano_por_luta=0.3, pocoes_de_cura=1)
+        assert prog.hp_frac - prog.dano_por_luta < HP_DE_APOSTA
+        score = avaliar_mapa(grande, _mapa(), prog)
+        assert score.utility == 0.0
+        assert decidir_no_mapa(_mapa(), prog, (LUTAR, grande, SAIDA)).action_id == "lutar:3,3"
+
+    def test_com_a_vida_no_fim_a_emergencia_continua(self):
+        prog = _prog(hp=100, pocoes_de_cura=1)
+        score = avaliar_mapa(POCAO, _mapa(), prog)
+        assert score.need is Need.SOBREVIVER and score.utility > 0
+
+
+class TestReposicaoDeCuraNaLoja:
+    def _loja_sem_reparo(self, pocao_pagavel: bool) -> MapState:
+        servico = ServiceView("shop", desvio=6, cura_hp=0.0, pocao_pagavel=pocao_pagavel)
+        return _mapa(servicos=(servico,))
+
+    def test_sem_orcamento_para_pocao_a_loja_nao_promete_reposicao(self):
+        prog = _prog(hp=450, ouro=40, taxa_de_saida=40, pocoes_de_cura=0)
+        loja = _loja(self._loja_sem_reparo(False), prog)
+        assert dict(loja.components)["falta de cura"] == 0.0
+        assert loja.utility == 0.0
+
+    def test_com_orcamento_a_reposicao_conta(self):
+        prog = _prog(hp=450, ouro=80, taxa_de_saida=40, pocoes_de_cura=0)
+        loja = _loja(self._loja_sem_reparo(True), prog)
+        assert dict(loja.components)["falta de cura"] == 1.0
+
+
+class TestOFatoDaPocaoNoAdaptador:
+    def _bot(self, hp_frac: float, ouro: int, andar: int = 1) -> BotPadrao:
+        random.seed(11)
+        bot = BotPadrao("mage", 11)
+        bot.andar = andar
+        bot.hero.coins = ouro
+        bot.hero.take_damage(int(bot.hero.base_hp * (1 - hp_frac)))
+        return bot
+
+    def _menor_preco(self, bot) -> int:
+        from src.content.economy import price_of
+
+        return min(
+            price_of(i, bot.andar)
+            for i in ad._pocoes_de_cura_a_venda(bot.andar, bot.hero.get_classname())
+        )
+
+    def test_orcamento_vazio_nao_paga_pocao(self):
+        bot = self._bot(1.0, ouro=0)
+        assert ad._pocao_de_cura_pagavel(bot) is False
+
+    def test_o_reparo_da_visita_sai_antes_da_pocao(self):
+        """Ouro que cobre o reparo mas não o reparo + a poção: não paga a poção."""
+        bot = self._bot(0.4, ouro=0)
+        reserva = bot._orcamento()[1]
+        passo = next(o for o in recovery_offers(bot.hero, bot.andar) if o["resource"] == "hp")
+        bot.hero.coins = reserva + int(passo["price"]) + self._menor_preco(bot) - 1
+        assert ad._cura_hp_pagavel(bot) > 0
+        assert ad._pocao_de_cura_pagavel(bot) is False
+        bot.hero.coins += 1
+        assert ad._pocao_de_cura_pagavel(bot) is True
+
+    @pytest.mark.parametrize("andar", [1, 9, 10])
+    def test_as_pocoes_a_venda_sao_as_da_loja_real(self, andar):
+        """Paridade com `Shop.get_available_items`, sorteando muitas vitrines."""
+        from src.content.shop import Shop
+
+        declaradas = {i.id for i in ad._pocoes_de_cura_a_venda(andar, "Mage")}
+        vistas = set()
+        estado = random.getstate()
+        try:
+            for semente in range(60):
+                random.seed(semente)
+                for oferta in Shop().get_available_items(andar, "Mage"):
+                    item = oferta["item"]
+                    if getattr(item, "consumable", False) and item.effect_type == "max_hp":
+                        vistas.add(item.id)
+        finally:
+            random.setstate(estado)
+        assert vistas == declaradas
