@@ -304,9 +304,9 @@ automática** e **uma única carta fraca de verdade** (`Reflexos Rápidos`). Vin
 são cartas de identidade — alta numa intenção, baixa noutra. É exatamente o que um
 sistema de cartas deve produzir. *(Medição feita sobre as 29 primeiras
 cartas, quando o catálogo tinha 13 famílias de efeito. O catálogo hoje tem **60
-cartas e 23 famílias**, e as políticas de escolha do simulador ainda ordenam
-apenas as 13 originais — ver **Decisões pendentes, D3**. As cartas das 10 famílias
-novas não foram medidas.)*
+cartas e 23 famílias**, e as políticas de escolha do simulador passaram a ordenar
+as 23 — ver **Decisões pendentes, D3**, encerrada. As cartas das 10 famílias
+novas ainda não foram medidas por esse scout.)*
 
 **`[implementado]`** Se o personagem for extraído vivo, as passivas vão com ele —
 para a Arena, quando ela existir.
@@ -1285,23 +1285,33 @@ gastar. **Só a medição do novo loop responde.** Os números atuais são
 calibração V1 — existem para a fase de balanceamento ter o que medir, e **não
 são uma afirmação de que estão balanceados**.
 
-### D3 — As políticas do simulador não ordenam o catálogo inteiro de passivas
+### D3 — As políticas do simulador ordenam o catálogo inteiro de passivas
 
-O catálogo cresceu de 29 para **60 cartas** e de 13 para **23 famílias de
-efeito**. As três políticas deliberadas do simulador (`survival`, `offense`,
-`economy`) ordenam **as 13 famílias originais**. As 10 novas — `precision`,
-`status_resistance`, `poison_chance`, `bleed_chance`, `fear_chance`,
-`crit_damage`, `damage_percent`, `life_steal`, `mana_regen`, `magic` — estão
-declaradas **sem preferência** (`PASSIVE_SEM_PREFERENCIA`, em
-`src/sim/pick_policies.py`). Antes elas caíam num desempate pelo valor impresso,
-que comparava grandezas diferentes. Hoje a indiferença é regra escrita, mas
-continua não sendo intenção de build.
+**Encerrada.** O catálogo cresceu de 29 para **60 cartas** e de 13 para **23
+famílias de efeito**, e por um tempo as três políticas deliberadas do simulador
+(`survival`, `offense`, `economy`) ordenavam só as 13 originais. As 10 novas —
+`precision`, `status_resistance`, `poison_chance`, `bleed_chance`,
+`fear_chance`, `crit_damage`, `damage_percent`, `life_steal`, `mana_regen`,
+`magic` — caíam primeiro num desempate pelo valor impresso, que comparava
+grandezas diferentes, e depois num tier declarado sem preferência.
 
-Isso **não** é um defeito do jogo: é do instrumento. Mas invalida qualquer
-conclusão do tipo "esta passiva é fraca" sobre uma carta dessas famílias.
-Atribuir intenção a elas é decisão de balanceamento que segue aberta, e pesa na
-calibração da progressão porque o BotPadrão monta a build por essas políticas
-(ver [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md), KI-006).
+Hoje cada uma das três políticas ordena as 23 famílias (`PASSIVE_PRIORITIES`, em
+`src/sim/pick_policies.py`), e o tier sem preferência saiu. As 13 originais
+mantêm a ordem relativa que tinham; as 10 novas entraram onde a intenção de cada
+política pede:
+
+- `survival`: roubo de vida e resistência a status logo depois das defesas,
+  Precisão e regeneração de mana ao lado dos pares, dano puro e pressão por
+  status abaixo;
+- `offense`: dano % e dano crítico ao lado de Força e crítico, Precisão e Magia
+  em seguida, sustain e resistência no fim;
+- `economy`: Essência e ouro no topo, sustain de recurso e de vida antes de dano
+  puro.
+
+O valor numérico só desempata DENTRO da mesma família, e nenhuma escolha compara
+`effect_value` entre famílias. Isso é do instrumento, não do jogo, e afeta tanto o
+BotPadrão quanto o `simulate_run`, porque os dois escolhem passiva por estas
+políticas.
 
 ### D4 — O chefe é contornável
 

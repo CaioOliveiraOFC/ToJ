@@ -17,9 +17,7 @@ from src.sim.harness import simulate_run
 from src.sim.pick_policies import (
     DESCONHECIDA,
     FORA_DA_INTENCAO,
-    NEUTRA,
     PASSIVE_PRIORITIES,
-    PASSIVE_SEM_PREFERENCIA,
     POLICIES,
     PREFERIDA,
     intent_fit,
@@ -34,37 +32,32 @@ def _familias_do_catalogo() -> set[str]:
 class TestPoliticaCobreOCatalogo:
     """B1 — nenhuma família de passiva chega ao bot sem tratamento declarado."""
 
-    def test_toda_familia_e_preferida_ou_declarada_indiferente(self):
+    def test_toda_familia_tem_intencao_explicita_em_cada_politica(self):
         # Este é o teste que falha quando alguém acrescenta um `effect_type` novo
         # ao catálogo. A carta nova não pode simplesmente não existir para as
-        # políticas: ou entra numa ordem de preferência, ou entra no tier
-        # indiferente — e as duas coisas são decisão de alguém, não omissão.
+        # políticas: ela entra na ordem de CADA política deliberada, e isso é
+        # decisão de alguém, não omissão. Havia um tier indiferente para as 10
+        # famílias sem decisão; a decisão D3 o encerrou.
         catalogo = _familias_do_catalogo()
         for nome, ordem in PASSIVE_PRIORITIES.items():
-            sem_tratamento = catalogo - set(ordem) - PASSIVE_SEM_PREFERENCIA
-            assert not sem_tratamento, (
-                f"a política {nome} não sabe o que fazer com {sorted(sem_tratamento)}: "
-                "declare a preferência ou acrescente a família a PASSIVE_SEM_PREFERENCIA."
+            assert set(ordem) == catalogo, (
+                f"a política {nome} não decide sobre {sorted(catalogo - set(ordem))}: "
+                "declare o lugar da família na ordem."
             )
+            assert len(ordem) == len(set(ordem)), f"{nome} cita uma família duas vezes"
 
-    def test_preferida_e_indiferente_sao_exclusivas_e_existem(self):
+    def test_as_ordens_so_citam_familias_do_catalogo(self):
         catalogo = _familias_do_catalogo()
-        orfas = PASSIVE_SEM_PREFERENCIA - catalogo
-        assert not orfas, f"PASSIVE_SEM_PREFERENCIA cita famílias que não existem: {sorted(orfas)}"
         for nome, ordem in PASSIVE_PRIORITIES.items():
-            conflito = set(ordem) & PASSIVE_SEM_PREFERENCIA
-            assert not conflito, (
-                f"{nome} declara preferência por {sorted(conflito)} e ao mesmo tempo "
-                "as trata como indiferentes."
-            )
             mortas = set(ordem) - catalogo
             assert not mortas, f"{nome} ordena famílias que saíram do catálogo: {sorted(mortas)}"
 
-    def test_no_tier_indiferente_o_desempate_e_raridade_e_nao_valor(self):
+    def test_sem_familia_da_intencao_o_desempate_e_raridade_e_nao_valor(self):
         # O defeito original: sem preferência declarada, a escolha caía num
         # `max(effect_value)` que compara grandezas diferentes. +200 de HP e +5%
         # de dano crítico não são o mesmo eixo, e o bot levava o número maior.
-        indiferente = sorted(PASSIVE_SEM_PREFERENCIA)[0]
+        # Com as 23 famílias ordenadas, isso só acontece com família desconhecida.
+        indiferente = "familia_sem_decisao"
         comum_gorda = PassiveCard(
             id="teste_comum",
             name="Comum de número grande",
@@ -158,13 +151,14 @@ class TestAblacaoIsolaOSistema:
             assert nome in rotulo, f"desligar {nome} não aparece em label(): {rotulo!r}"
 
 
-class TestNeutraNaoEOffIntent:
-    """Sem preferência definida não é o mesmo que contra a intenção.
+class TestSemDecisaoNaoEOffIntent:
+    """Família sem decisão não é o mesmo que família contra a intenção.
 
     Enquanto os dois estados eram um só, a ausência de classificação virava
-    veredito: o bot pagava reroll para fugir de uma oferta neutra e o scout
+    veredito: o bot pagava reroll para fugir de uma oferta sem decisão e o scout
     contava essa recusa como prova de carta fraca. A carta era fraca porque
-    ninguém tinha classificado a família dela — circular.
+    ninguém tinha classificado a família dela — circular. Com as 23 famílias
+    ordenadas, o caso só existe com família desconhecida, e a garantia continua.
     """
 
     def _carta(self, effect_type: str, rarity: str = "Common") -> PassiveCard:
@@ -180,7 +174,7 @@ class TestNeutraNaoEOffIntent:
 
     def test_familia_classificada_fora_da_intencao_continua_off_intent(self):
         # A regra, provada sobre uma política construída aqui. Com o catálogo de
-        # hoje as três políticas ordenam o MESMO conjunto de 13 famílias, em
+        # hoje as três políticas ordenam o MESMO conjunto de 23 famílias, em
         # ordens diferentes, então FORA_DA_INTENCAO está vazio na prática e não
         # existe oferta real que dispare a recusa. Testar a regra com dado
         # sintético é o que mantém a garantia viva para o dia em que uma política
@@ -204,40 +198,45 @@ class TestNeutraNaoEOffIntent:
         finally:
             del PASSIVE_PRIORITIES["magra"]
 
-    def test_familia_neutra_nao_e_off_intent(self):
-        neutra = sorted(PASSIVE_SEM_PREFERENCIA)[0]
-        oferta = [self._carta(neutra) for _ in range(3)]
+    def test_familia_desconhecida_nao_e_off_intent(self):
+        desconhecida = "familia_sem_decisao"
+        oferta = [self._carta(desconhecida) for _ in range(3)]
         for nome, politica in POLICIES.items():
             if not politica.deliberate:
                 continue
-            assert intent_fit(nome, neutra) == NEUTRA
+            assert intent_fit(nome, desconhecida) == DESCONHECIDA
             assert politica.passive_off_intent(oferta) is False, (
                 f"{nome} tratou uma oferta sem classificação como oferta ruim: "
                 "a ausência de decisão virou veredito."
             )
 
-    def test_nenhuma_familia_do_catalogo_fica_em_estado_implicito(self):
-        # DESCONHECIDA é erro de dados, não um quarto comportamento: uma família
-        # entrou no catálogo sem ninguém decidir nada sobre ela.
+    def test_toda_familia_do_catalogo_e_preferida_por_toda_politica(self):
+        # DESCONHECIDA é erro de dados, não um terceiro comportamento: uma
+        # família entrou no catálogo sem ninguém decidir nada sobre ela. E com a
+        # D3 encerrada, nenhuma família fica fora da intenção de ninguém.
         for familia in _familias_do_catalogo():
             for nome, politica in POLICIES.items():
                 if not politica.deliberate:
                     continue
-                estado = intent_fit(nome, familia)
-                assert estado != DESCONHECIDA, (
-                    f"{familia} não está classificada nem declarada neutra para {nome}."
+                assert intent_fit(nome, familia) == PREFERIDA, (
+                    f"{familia} não tem lugar na ordem de {nome}."
                 )
-                assert estado in (PREFERIDA, NEUTRA, FORA_DA_INTENCAO)
 
-    def test_o_scout_nao_chama_carta_neutra_de_fraca(self):
-        # O caminho completo: taxa de escolha baixa numa família neutra não pode
-        # sair do relatório com o veredito de carta morta.
+    def test_o_scout_nao_chama_carta_sem_classificacao_de_fraca(self, monkeypatch):
+        # O caminho completo: taxa de escolha baixa numa família sem decisão não
+        # pode sair do relatório com o veredito de carta morta. Hoje nenhuma
+        # família está sem decisão, então uma é tirada do conjunto classificado
+        # só durante o teste — é a garantia para a próxima família nova.
         from src.content.passives import load_passives
+        from src.sim import pick_policies
         from src.sim.scout import _analyse_cards
 
-        neutras = [p for p in load_passives() if p.effect_type in PASSIVE_SEM_PREFERENCIA]
-        assert neutras, "o tier neutro ficou vazio; este teste perdeu o objeto"
-        alvo = neutras[0]
+        alvo = load_passives()[0]
+        monkeypatch.setattr(
+            pick_policies,
+            "FAMILIAS_CLASSIFICADAS",
+            pick_policies.FAMILIAS_CLASSIFICADAS - {alvo.effect_type},
+        )
         taxas = {nome: {alvo.id: 0.0} for nome in ("survival", "offense", "economy")}
 
         achados = _analyse_cards(taxas, "passivas")
