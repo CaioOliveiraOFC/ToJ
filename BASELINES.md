@@ -9,7 +9,8 @@ que cada uma mede e quando ela pode ser comparada**.
 | Pre-balance | `88190c5f` | BotPadrão da época, largada nua (`create_player_from_data`), `max_andar` 20, seeds 20260000–20260999, 3.000 runs | **histórica** | [`reports/BASELINE_PRE_BALANCE.md`](reports/BASELINE_PRE_BALANCE.md) |
 | Combat/Class E8 | `bc815fcd` | `expected loadout` (`simulate_run`, política `smart`) | **fechada** | `tests/balance/` (`pytest -m balance`) e [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md#etapa-8--class-balance) |
 | Progression real | `fb321d4e` | jornada real: BotPadrão conservador + Starter Kit, seeds 1–100 × 3 classes, teto técnico 200 | **histórica** — o "antes" do instrumento | [`baselines/progression/fb321d4e/README.md`](baselines/progression/fb321d4e/README.md) |
-| Auditoria do instrumento | `0ab837b9` | o mesmo protocolo da `fb321d4e`, com o BotPadrão corrigido | **pendente de calibração** — referência atual | [`baselines/progression/0ab837b9/README.md`](baselines/progression/0ab837b9/README.md) |
+| Auditoria do instrumento | `0ab837b9` | o mesmo protocolo da `fb321d4e`, com o BotPadrão corrigido | **histórica** — o "antes" da dungeon | [`baselines/progression/0ab837b9/README.md`](baselines/progression/0ab837b9/README.md) |
+| Auditoria da dungeon | `4d0a9a0a` | o mesmo protocolo, com o BotPadrão congelado e a dungeon alterada | **pendente de calibração** — referência atual | [`baselines/progression/4d0a9a0a/README.md`](baselines/progression/4d0a9a0a/README.md) |
 | Alvo de extração | remedido em `bc815fcd` | `overall_power` do snapshot de um Rogue real, `PODER_ESPERADO` | **instrumento** — alarme de deslocamento | `tools/arena_alvo.py`, `src/data/arena_benchmark_v1.json`, `tests/test_arena_alvo.py` |
 
 ---
@@ -46,6 +47,17 @@ BotPadrão (`9ef74639`…`0ab837b9`). O jogo é o mesmo; só o piloto mudou.
   registro a registro. Por isso a comparação mede só a mudança do instrumento.
 - Separa o que era política do bot do que sobrou para a dungeon.
 
+**Auditoria da dungeon.** É a mesma régua depois do bloco Dungeon / Run
+Progression (`dfa1ebcc`…`4d0a9a0a`). O bot é o mesmo; só o jogo mudou.
+- Guarda as duas coletas, pelo mesmo coletor: o "antes" (`0ab837b9`) e o
+  "depois" (`4d0a9a0a`).
+- O coletor ganhou sondas passivas para:
+  - poções do loot e da Fonte;
+  - Essência por andar;
+  - taxa por andar.
+- Nos campos que a auditoria do instrumento já tinha, o "antes" reproduz as 300
+  runs dela registro a registro.
+
 **Alvo de extração.** É o poder de referência contra o qual o BotPadrão decide
 se a build "superou a Arena" e vale extrair.
 - Não é baseline de balance, e não é a Arena como modo de jogo.
@@ -55,11 +67,13 @@ se a build "superou a Arena" e vale extrair.
 
 ## Quando comparar
 
-- **A auditoria `0ab837b9` é a referência atual para qualquer mudança de
+- **A auditoria `4d0a9a0a` é a referência atual para qualquer mudança de
   progressão.**
   - Uma mudança se compara rodando o mesmo protocolo no commit novo e agregando
     com o mesmo script: `run_auditoria.py` e `agrega_auditoria.py` do diretório
     dela, com o `depois.jsonl` como o novo "antes".
+  - A `0ab837b9` mede o jogo de antes do bloco da dungeon. Ela só se compara com
+    a `4d0a9a0a`, e isso já está feito.
   - Mudou o protocolo (seeds, teto, perfil ou versão do bot)? Então é outra
     baseline, e não uma comparação.
 - **A `fb321d4e` não se compara com uma mudança de dungeon.** Ela foi medida com

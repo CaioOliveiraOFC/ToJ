@@ -104,6 +104,29 @@ o jogador não escolhia, recebia. Era decisão nenhuma.
 **`[implementado]`** Boss a cada 5 andares. Elite a partir do andar 4, com 12% de
 chance.
 
+**`[implementado]`** **Os andares 1-3 são de aprendizado.** Os papéis avançados
+(`generation.advanced_roles`: controller, support e glass cannon) só entram a
+partir do andar 4, junto com o elite. O glass cannon entrou na lista no bloco
+Dungeon / Run Progression (KI-002). O duelo dele é a corrida para matar antes de
+morrer, e o contra-jogo é atordoar ou explodir primeiro: o herói de nível 1, com
+uma skill e nada na mochila, não tem nenhum dos dois. O arquétipo é o mesmo; só
+mudou quando ele entra no andar.
+
+**`[implementado]`** **Nível do monstro.** Cada monstro comum sorteia andar +0,
++1 ou +2 (pesos 70/25/5) e passa por três tetos:
+- no máximo `max_above_floor` acima do andar;
+- no andar 1, no máximo `first_floor_max_level`;
+- **o teto do herói** (`hero_level_ceiling`). Até o nível 3, o monstro fica no
+  máximo 2 níveis acima dele; depois, a folga cresce um nível por nível do
+  herói. A partir do nível 3, o teto é 2L − 1.
+
+O teto do herói afrouxava de uma vez: no nível 4 ele sumia, e um herói que tinha
+ficado para trás era premiado com monstros 5 a 10 níveis acima. Agora ele
+afrouxa aos poucos (KI-003). Quem está no ritmo do andar não o sente. Quem caiu
+para trás continua enfrentando monstro acima dele, e a XP é a do nível do
+monstro: cada vitória rende mais a quem está atrasado. O chefe fica fora dos
+tetos, no andar + 1.
+
 **`[implementado]`** **Toda batalha é 1x1: um herói contra um monstro.** O andar
 pode ter dez inimigos; cada um ocupa a própria casa, e encontrar o segundo
 significa OUTRA batalha, não um inimigo a mais na primeira. Elite e chefe também
@@ -650,7 +673,10 @@ raridades — a loja do andar 80 é a mesma do andar 16. As regras vigentes:
 - **Lendário nunca é vendido** em loja;
 - item com `classes` declarado só aparece para a classe certa;
 - o tamanho da vitrine cresce por faixa de andar, de 8-10 itens (andar 1-3) a
-  22-25 (andar 15+).
+  22-25 (andar 15+);
+- **a cura básica é linha fixa**: a Poção de Cura Pequena (a poção de cura
+  Common) está em toda vitrine, fora do sorteio e com o preço de sempre. As
+  poções maiores continuam sorteadas com o resto (KI-004).
 
 O campo `shop_max_floor` continua sendo lido, para o caso de alguém querer um
 item genuinamente limitado no tempo. Hoje **nenhum item o declara**, e quem

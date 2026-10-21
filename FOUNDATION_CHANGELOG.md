@@ -30,6 +30,7 @@ As outras fontes ficam onde estão:
 | — | `fb321d4e` | Starter Kit |
 | — | `24430155` | Primeira baseline real de progressão |
 | — | `9ef74639`…`0ab837b9` | Bloco do instrumento: BotPadrão corrigido e auditado |
+| — | `dfa1ebcc`…`eb52b105` | Bloco da dungeon: Run Progression |
 
 ---
 
@@ -322,5 +323,95 @@ Resultado:
 - as partes do bot de KI-003 e KI-004 corrigidas;
 - KI-002, KI-003, KI-004 e KI-005 abertos como problemas da dungeon e da
   economia ([`KNOWN_ISSUES.md`](KNOWN_ISSUES.md)).
+
+**`Run/Progression Balance — pendente de calibração`.**
+
+## Bloco da dungeon — Run Progression
+
+Três mudanças no jogo, uma por commit, e uma auditoria única de 300 runs depois
+delas. **O BotPadrão ficou congelado** desde `0ab837b9`: nenhum avaliador,
+observação, política de compra ou uso, fronteira de informação ou intenção de
+passiva mudou. Também não mudaram:
+- as classes, as fórmulas de dano, o expected loadout e os budgets de skill;
+- o Starter Kit, os preços, o loot, a Essência, a taxa de saída e a extração.
+
+| Commit | KI | Mudança |
+|---|---|---|
+| `dfa1ebcc` | KI-002 | O glass cannon entra com os papéis avançados (andar 4+) |
+| `0d0c91bc` | KI-003 | O teto de nível do monstro relativo ao herói afrouxa em vez de sumir |
+| `4d0a9a0a` | KI-004 | A cura básica é linha fixa da vitrine da Loja |
+| `eb52b105` | — | Remedição das três bandas de dificuldade global do `-m balance` |
+
+**`dfa1ebcc` — a largada sem condenação sorteada.**
+- O defeito:
+  - num duelo de nível 1, todo monstro Nv1 mata no máximo 7%;
+  - mas o Mago perde para o glass cannon Nv2 em 56% das lutas com HP cheio;
+  - o glass cannon, um em cada dez monstros, matava quase metade das runs dos
+    andares 1-3.
+- A mudança: `glass_cannon` entra em `generation.advanced_roles`, o mecanismo do
+  "andar de aprendizado" que já valia para o controller e o support.
+- O arquétipo, o peso e o deck são os mesmos. Muda só quando ele entra no andar.
+
+**`0d0c91bc` — o atraso não é mais um precipício.**
+- O defeito:
+  - até o nível 3, o monstro comum ficava no máximo 2 níveis acima do herói;
+  - no nível 4 esse teto sumia de uma vez;
+  - na auditoria `0ab837b9`, nenhuma das 87 runs que caíram 3 ou mais níveis
+    atrás voltou a ficar a no máximo 1.
+- A mudança:
+  - `hero_level_ceiling` dá ao teto uma folga que cresce um nível por nível do
+    herói depois da largada (no nível L, 2L − 1);
+  - quem está no ritmo do andar não o sente;
+  - a volta é paga pela regra que já existia, a XP pelo nível do monstro.
+- Nada de bônus por estar atrás.
+- O atalho do `xp_model` passou a ler o mesmo teto.
+
+**`4d0a9a0a` — a cura aparece.**
+- O defeito: com a política de poção já corrigida, 231 de 300 runs nunca tiveram
+  uma poção.
+  - A Pequena aparecia em 16% das vitrines dos andares 1-3.
+  - No drop, cura sai em cerca de 0,5% das vitórias.
+- A mudança: a Poção de Cura Pequena sai do sorteio e vira linha fixa da
+  vitrine, com o preço e o desbloqueio de sempre.
+- As maiores continuam sorteadas.
+
+### O `-m balance`
+
+`monsters.json`, o gerador de monstros e a Loja são compartilhados com o
+`simulate_run`. Três bandas mediam a dificuldade global da dungeon sob expected
+loadout e se moveram com o bloco:
+- `MAX_SMART_REACH_20`: 0,45 → 0,72;
+- `MIN_TOTAL_ATTRITION`: 0,50 → 0,25;
+- `MAX_CLASS_MEAN_FLOOR`: 14 → 16.
+
+Por decisão do usuário, elas foram remedidas no fim do bloco (`eb52b105`). O
+valor antigo, o valor medido e o protocolo estão em `tests/balance/thresholds.py`.
+Depois da remedição, o `-m balance` fica verde por inteiro: 118 passed.
+
+A paridade não se moveu: o spread entre classes ficou em 2,04 andares, contra o
+limite de 4,0. Nenhuma outra banda foi tocada.
+
+### KI-004 — como foi fechado
+
+O problema que sobrou depois do instrumento era a oferta, não o uso. Com a cura
+básica sempre à venda:
+- poções compradas: 212 → 862;
+- bebidas no mapa: 129 → 523;
+- runs que nunca tiveram uma: 207 → 133;
+- das 75 runs sem nenhum acesso a cura, 53 morrem nos andares 1-2, antes de
+  achar uma Loja.
+
+### A auditoria
+
+Mesmo protocolo das réguas anteriores, sobre o `4d0a9a0a`. O "antes" é o
+`0ab837b9`, remedido com o coletor novo; nos campos que a auditoria do
+instrumento já tinha, ele reproduz as 300 runs registro a registro. Protocolo,
+números e leitura estão em
+[`baselines/progression/4d0a9a0a/`](baselines/progression/4d0a9a0a/README.md).
+
+Resultado:
+- KI-004 fechado;
+- KI-002 e KI-003 abertos, mais estreitos;
+- KI-005 aberto ([`KNOWN_ISSUES.md`](KNOWN_ISSUES.md)).
 
 **`Run/Progression Balance — pendente de calibração`.**

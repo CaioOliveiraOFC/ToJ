@@ -1,67 +1,63 @@
-# Próxima etapa — Dungeon / Run Progression
+# Próxima etapa — decisão de release da fase PvE
 
-Continuação da fase atual. A fundação está fechada, o Combat/Class Balance
-também, e o instrumento de medição foi corrigido e auditado (ver
-[`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md)). O que falta na fase PvE é
-a progressão da dungeon.
+A fundação está fechada, e o Combat/Class Balance também. O instrumento foi
+corrigido e auditado (`0ab837b9`), e o bloco Dungeon / Run Progression terminou
+com uma auditoria de 300 runs (`4d0a9a0a`). Ver
+[`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md).
 
-## Objetivo
+## Onde a fase está
 
-Fechar **`Run/Progression Balance`**: a jornada real, do nível 1 com o Starter
-Kit até a morte ou a extração.
+- A referência atual é a auditoria da dungeon,
+  [`baselines/progression/4d0a9a0a/`](baselines/progression/4d0a9a0a/README.md).
+- O BotPadrão está congelado desde `0ab837b9`. Ele só muda por bug mecânico
+  comprovado, e mudá-lo é outra rodada de instrumento, com remedição.
+- `Run/Progression Balance` continua **pendente de calibração**
+  ([`KNOWN_ISSUES.md`](KNOWN_ISSUES.md)).
+  - **KI-004 fechou.**
+  - **KI-002 está aberto**, mais estreito: a condenação sorteada saiu, mas 2/3 das
+    mortes ainda acontecem até o andar 5, e 2/3 das runs entram no andar 2 no
+    nível 1.
+  - **KI-003 está aberto**, mais estreito: agora existe volta para quem caiu para
+    trás, mas ela é rara, e nenhum mergulho extrai.
+  - **KI-005** fecha quando KI-002 e KI-003 forem tratados ou explicitamente
+    aceitos.
 
-- A referência atual é a auditoria do instrumento corrigido,
-  [`baselines/progression/0ab837b9/`](baselines/progression/0ab837b9/README.md).
-- A `fb321d4e` fica como o "antes" do instrumento.
-- Os problemas conhecidos estão em [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md).
+## O que decidir
 
-## O que este bloco trata
+O critério de release abaixo pede que os problemas estruturais conhecidos tenham
+sido "tratados ou explicitamente aceitos". Para KI-002 e KI-003, as saídas são:
 
-**Só os sintomas que sobreviveram à auditoria do instrumento.** O que era
-política do BotPadrão já foi separado e corrigido no bloco anterior: engajamento
-e recuperação (KI-001), a parte do bot da espiral (KI-003) e do uso de poções
-(KI-004), e a intenção das passivas (KI-006). Aqui, o bot é a régua, e não o
-objeto.
+1. **Aceitar como característica do jogo**, registrando a decisão. Exemplos: a
+   largada concentra as mortes de propósito; voltar de muito atrás é raro de
+   propósito. Aí KI-005 fecha e a fase vai para o release.
+2. **Outra rodada da dungeon**, só sobre o que sobrou. Os candidatos já
+   levantados, sem decisão:
+   - o começo da curva de XP contra a população do andar 1;
+   - a largada real contra o expected loadout;
+   - quanto de volta o jogo deve oferecer a quem caiu para trás.
 
-Ordem inicial de investigação:
-
-1. **Letalidade real do early game** (KI-002).
-   - As mesmas 6 runs morrem na primeira luta do andar 1, com HP cheio.
-   - 15,0% das runs morrem no andar 1, e 61,7% até o andar 5.
-2. **A espiral de mergulho que sobrou** (KI-003).
-   - 14 runs chegam ao andar 10 no nível 5 ou menos, e nenhuma extrai.
-   - Entram aqui as 29 mortes sublevel cujo combate fatal começou abaixo de 35%
-     de HP.
-3. **Economia de recuperação e poções** (KI-004).
-   - 80% das runs não bebem nenhuma poção no mapa, com a política já corrigida.
-4. **Calibração global** (KI-005) e **nova baseline de progressão**, pelo mesmo
-   protocolo.
-
-Isso **não** significa que cada ponto vai exigir mudança. Primeiro se
-diagnostica, depois se decide. "Medido e aceito como está" é um desfecho válido,
-desde que registrado.
-
-**O instrumento fica congelado durante o bloco.** Se o BotPadrão precisar mudar
-de novo, isso é outra rodada de instrumento, com remedição antes de qualquer
-conclusão sobre a dungeon.
+Nenhuma das duas está decidida.
 
 ## Regra de trabalho
 
-Cada problema segue o mesmo ciclo:
+**Se já se sabe que o sistema está errado e a direção da correção é clara, não é
+preciso experimento populacional para pedir permissão para corrigir.** Decisão
+do usuário no bloco da dungeon.
 
-```
-hipótese → mudança isolada → testes → medição → decisão
-```
-
-- Uma variável por vez, em mudança isolada. Não se alteram vários sistemas para
-  perseguir uma média.
-- Medir pela régua certa:
-  - progressão pela baseline de progressão;
-  - classe pelo `-m balance`.
+- Corrigir em sequência, com commits pequenos por mudança lógica, testes
+  específicos curtos e fixtures entre os commits.
+- Uma única medição populacional grande no fim do bloco, pelo protocolo da
+  régua.
 - Classificar cada achado antes de mexer: bug/mecânica, progressão/dificuldade,
   comportamento do bot, starter ou inconclusivo.
+- Medir pela régua certa:
+  - progressão pela auditoria de progressão;
+  - classe pelo `-m balance`.
 - Uma mudança no BotPadrão é uma mudança de instrumento: a medição de antes e a
   de depois não se comparam sem remedir.
+- Das bandas do `-m balance`, só as três de dificuldade global da dungeon se
+  movem com a dungeon, e com remedição registrada. As demais continuam
+  congeladas ([`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#combatclass-balance)).
 - Respeitar [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md). Um contrato só
   muda por decisão explícita, registrada lá.
 

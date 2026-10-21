@@ -9,123 +9,75 @@ progressão/dificuldade, comportamento do bot, starter ou inconclusivo. Nenhum
 item aqui afirma qual mudança resolve o problema; isso é trabalho de
 [`NEXT_PHASE.md`](NEXT_PHASE.md).
 
-A evidência numérica está em dois lugares:
+A evidência numérica está em três lugares:
 
 - [`baselines/progression/fb321d4e/README.md`](baselines/progression/fb321d4e/README.md):
   a primeira baseline real, medida com o instrumento antigo;
 - [`baselines/progression/0ab837b9/README.md`](baselines/progression/0ab837b9/README.md):
-  a auditoria do instrumento corrigido, que é o retrato atual.
+  a auditoria do instrumento corrigido;
+- [`baselines/progression/4d0a9a0a/README.md`](baselines/progression/4d0a9a0a/README.md):
+  a auditoria da dungeon, que é o retrato atual.
 
-> **KI-001 e KI-006 foram fechados** pela auditoria do instrumento. A resolução
-> está em [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md#bloco-do-instrumento--botpadrão-corrigido-e-auditado).
+> **Fechados:** KI-001 e KI-006 pela auditoria do instrumento
+> ([changelog](FOUNDATION_CHANGELOG.md#bloco-do-instrumento--botpadrão-corrigido-e-auditado)),
+> e KI-004 pela auditoria da dungeon
+> ([changelog](FOUNDATION_CHANGELOG.md#bloco-da-dungeon--run-progression)).
 > A numeração não é reaproveitada.
 
 ---
 
-## KI-002 — letalidade do early game
+## KI-002 — a largada concentra as mortes
+
+**Classificação:** `Run/Progression Balance`. A parte da condenação sorteada foi
+corrigida em `dfa1ebcc`.
+
+**O que saiu.** Um encontro comum sorteado no começo não é mais condenação antes
+de qualquer decisão. O glass cannon, que matava quase metade das runs dos
+andares 1-3, entra com os papéis avançados a partir do andar 4.
+- Mortes na primeira luta do andar 1 com HP cheio: 6 → 4.
+- As 4 que sobram são duelos comuns (bruiser, skirmisher) que, repetidos com
+  outras seeds, matam de 2% a 16%.
+- Das 6 runs históricas, 4 deixaram de morrer nessa luta.
+
+**O que sobreviveu (auditoria `4d0a9a0a` contra `0ab837b9`):**
+- A largada mata menos runs: andar 1 45 → 34, até o 3 137 → 93, até o 5
+  185 → 165.
+- **Mas a forma não mudou:** 67% das mortes acontecem até o andar 5, antes e
+  depois. 55% das runs morrem até ali.
+- **A armadilha do nível 1:** 178 de 266 runs entram no andar 2 ainda no nível 1.
+  - O nível 2 custa 140 de XP.
+  - O andar 1 tem 3 monstros, que pagam cerca de 54 cada com a Essência média.
+  - Subir no andar 1 exige limpá-lo inteiro no nível 1, sem cura.
+
+**Ainda não concluído:** o que responde por essa forma. Os candidatos são o
+começo da curva de XP, a largada real contra o expected loadout (uma peça contra
+um kit) e o atrito dos papéis que ficaram nos andares 1-3. Nada disso está
+decidido.
+
+## KI-003 — espiral de mergulho, parte de progressão
 
 **Classificação:** `Run/Progression Balance`.
+- A parte do BotPadrão foi corrigida em `7b9734c3`.
+- O degrau do teto de nível do monstro foi corrigido em `0d0c91bc`.
 
-Há mortes na primeira luta do andar 1, com HP cheio, contra monstros de nível 1
-a 3.
+**O que saiu.** O teto de nível do monstro relativo ao herói não some mais no
+nível 4. A folga cresce um nível por nível, e quem estava atrasado e subia de
+nível não é mais premiado com monstros 5 a 10 níveis acima.
 
-**Evidência:**
-- Baseline `fb321d4e`:
-  - 6 runs morreram na primeira luta do andar 1 com 100% de HP;
-  - 15,3% das runs morreram no andar 1, e 64,3% até o andar 5.
-- Auditoria do instrumento `0ab837b9`:
-  - as **mesmas 6 runs** (Mage seeds 16, 62 e 93; Rogue seeds 4, 16 e 98)
-    morrem na mesma primeira luta, com HP cheio;
-  - 15,0% morrem no andar 1 (46 → 45), e 61,7% até o andar 5 (193 → 185).
+**O que sobreviveu (auditoria `4d0a9a0a` contra `0ab837b9`):**
+- Voltar de 3 ou mais níveis atrás para no máximo 1: 0 de 87 → 3 de 79.
+- De 2 ou mais: 11 de 128 → 19 de 139.
+- Agora existe volta, mas ela é rara.
+- Runs que chegam ao andar 10 no nível 5 ou menos: 14 → 7, e **nenhuma extrai**.
+- Maior atraso da run: P90 de 4 e máximo de 11, sem mudança.
+- Andares com a Essência no piso de 0,5: 51 → 21.
 
-Com o instrumento corrigido, a letalidade do começo quase não se moveu. Ela não
-era, no essencial, política do bot.
-
-**Ainda não concluído:** qual sistema ou constante é responsável. A suspeita pode
-recair sobre a curva do monstro, a população do andar 1 ou a largada do herói, e
-nada disso está decidido.
-
-## KI-003 — espiral de mergulho
-
-**Classificação:** `Run/Progression Balance`. A parte do BotPadrão foi corrigida
-em `7b9734c3`.
-
-Uma run com pouca vida pode entrar numa espiral:
-
-1. evita o combate;
-2. desce;
-3. acumula saídas não pagas;
-4. ganha pouca Essência;
-5. fica abaixo do nível do andar;
-6. continua descendo até morrer.
-
-**O que o bot deixou de fazer.** Ele não trata mais a descida sem pagar como
-estratégia quando está abaixo do nível do andar, a saída não seria paga, há luta
-no mapa e o fôlego observado paga pelo menos uma luta média. Nesse estado, ele
-luta. Fora dele, a regra de antes continua: sem fôlego, sem evidência ou com a
-saída pagável, sair abaixo do ponto de aposta continua sendo recuperação, e a
-sobrevivência continua acima.
-
-**O que sobreviveu (auditoria `0ab837b9` contra `fb321d4e`):**
-- Runs que chegam ao andar 10 no nível 5 ou menos: 26 → **14**, e **nenhuma
-  extrai**, antes ou depois. Das 14, 6 já mergulhavam antes e 8 são novas.
-- Elas ainda somam em média 6,9 saídas não pagas por run.
-- Saídas não pagas por run caíram de 1,23 para 0,89. A maior sequência caiu de
-  18 para 9.
-- O Mage seed 59 não mergulha mais: morre no andar 6, nível 3, com 2 saídas não
-  pagas, contra o andar 23 e 19 saídas não pagas antes.
-
-O que resta é a espiral que o bot não tem como evitar: sem fôlego para uma luta
-média, a saída é a recuperação que existe. A interação continua sendo a do
-diagnóstico original:
-- o descanso de fim de andar é parcial de propósito;
-- a saída não paga reduz a Essência;
-- cada andar sublevel é mais difícil que o anterior.
-
-**Efeito colateral, a ser lido no bloco da dungeon.** Mortes cujo combate fatal
-começou abaixo de 35% de HP subiram de 1 para 30. 29 delas são sublevel, e são
-as lutas que a nova regra manda aceitar. As 29 runs também morriam no
-`fb321d4e`; nenhuma era extração. 15 morrem mais raso, 3 no mesmo andar e 11
-mais fundo. A regra usa a luta média observada, e a luta que as mata custa mais
-que a média.
-
-**Não se afirma** que alguma regra individual esteja errada. Cada peça se comporta
-como foi escrita:
-- contornar monstro é design declarado;
-- a saída não paga não bloqueia ninguém;
-- o descanso de fim de andar é parcial de propósito.
+Cair para trás continua caro, e é de propósito: o monstro continua acima do
+herói, contornar e a saída não paga custam o que custavam. O que fica aberto é
+quanto de volta o jogo deve oferecer. Hoje ela existe e é rara.
 
 Relacionado, mas separado: a decisão de design ainda aberta sobre o chefe ser
 contornável ([`GAME_DESIGN.md`](GAME_DESIGN.md), D4).
-
-## KI-004 — baixo uso de poções
-
-**Classificação:** `economia / aquisição`. A parte do BotPadrão foi corrigida em
-`9ef74639` e `7c08bdec`.
-
-**O que o bot deixou de fazer:**
-- beber uma poção só porque a tem, com HP alto ou com a cura quase toda
-  transbordando;
-- prometer a si mesmo uma cura ou uma poção que o orçamento real da Loja não
-  paga.
-
-Agora a poção do mapa atende uma necessidade observada: emergência abaixo do
-ponto de aposta, ou uma próxima luta média que derrubaria o herói abaixo dele.
-
-**O que sobreviveu (auditoria `0ab837b9` contra `fb321d4e`):**
-- Runs sem nenhuma poção bebida no mapa: 228 → **240 de 300 (80%)**.
-- Poções bebidas no mapa: 314 → 129. Pela regra nova, nenhuma é bebida quando
-  mais da metade da cura transbordaria.
-- Poções compradas na Loja: 338 → 212. A regra de compra (`visit_shop`) não
-  mudou: ela repõe a mochila até 3, então quem bebe menos compra menos.
-- Itens usados dentro do combate: 64 → 64.
-- Mortes com poção de cura na mochila: 8 → 10. Nenhuma das 10 começou o
-  combate fatal abaixo de 55% de HP; no `fb321d4e`, 5 das 8 tinham começado.
-
-O uso continua baixo com a política corrigida. Ainda não se sabe se a poção
-chega ao herói quando ele precisa: drop, estoque, preço contra o orçamento e
-desbloqueio da Loja são economia, não política do bot. Nenhuma solução é
-proposta ainda.
 
 ## KI-005 — calibração global de progressão pendente
 
@@ -133,9 +85,18 @@ proposta ainda.
 
 > **`Run/Progression Balance — pendente de calibração.`**
 
-A jornada real está implementada e medida com o instrumento corrigido (auditoria
-`0ab837b9`), e a calibração dela está aberta. KI-002 a KI-004 são as partes
-conhecidas que sobreviveram à auditoria, não a lista inteira.
+A jornada real foi medida depois do bloco da dungeon (auditoria `4d0a9a0a`):
+- 17% das runs extraem (eram 8%);
+- o andar médio é 7,7;
+- a cauda vai até o andar 26.
+
+A calibração continua aberta enquanto KI-002 e KI-003 estiverem. Eles são as
+partes conhecidas, não a lista inteira.
+
+**As bandas de dificuldade global do `-m balance`** — `MAX_SMART_REACH_20`,
+`MIN_TOTAL_ATTRITION` e `MAX_CLASS_MEAN_FLOOR`, medidas sob expected loadout —
+foram remedidas no fim do bloco, por decisão do usuário, porque a dungeon mudou
+de propósito. A paridade entre classes ficou congelada e verde.
 
 ---
 
