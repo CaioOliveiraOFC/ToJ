@@ -140,9 +140,33 @@ class TestAsFronteirasNaturais:
         assert com == fora
 
 
+# Os mergulhadores históricos: o Mage seed 59 da `fb321d4e` e as 14 runs que
+# chegaram ao andar 10 no nível 5 ou menos na auditoria `0ab837b9`. A dungeon muda
+# entre rodadas e a mesma seed deixa de passar pelo mesmo andar — o veículo do
+# teste é "uma run real que entra no estado da espiral", não uma seed específica.
+MERGULHADORES = (
+    ("mage", 59),
+    ("warrior", 21),
+    ("warrior", 46),
+    ("warrior", 70),
+    ("warrior", 85),
+    ("warrior", 95),
+    ("warrior", 51),
+    ("warrior", 59),
+    ("warrior", 68),
+    ("rogue", 37),
+    ("mage", 2),
+    ("mage", 44),
+    ("mage", 80),
+    ("mage", 94),
+    ("warrior", 62),
+)
+RUNS_NO_ESTADO = 2
+
+
 class TestARunReal:
-    def test_o_mage_seed_59_nao_desce_sem_pagar_quando_ainda_pode_lutar(self, monkeypatch):
-        """Em nenhuma decisão da run ele escolhe a saída no estado da espiral."""
+    def test_mergulhador_real_nao_desce_sem_pagar_quando_ainda_pode_lutar(self, monkeypatch):
+        """Em nenhuma decisão de runs reais ele escolhe a saída no estado da espiral."""
         import tools.bot_padrao as bp
 
         original = bp.decidir_no_mapa
@@ -151,19 +175,27 @@ class TestARunReal:
         def espiao(mapa, prog, opcoes):
             decisao = original(mapa, prog, opcoes)
             if _mergulho_sem_progresso(mapa, prog):
-                estados.append(mapa.andar)
+                estados.append((corrente, mapa.andar))
                 luta_util = any(
                     s.utility > 0 for s in decisao.scores if s.action_id.startswith("lutar")
                 )
                 if decisao.action_id == "saida" and luta_util:
-                    violacoes.append((mapa.andar, prog.hp_frac))
+                    violacoes.append((corrente, mapa.andar, prog.hp_frac))
             return decisao
 
         monkeypatch.setattr(bp, "decidir_no_mapa", espiao)
-        bot = bp.BotPadrao("mage", 59, 12)
-        with contextlib.redirect_stdout(io.StringIO()):
-            bot.jogar()
-        assert estados, "a run não passou pelo estado da espiral: o teste não verificou nada"
+        runs_no_estado = 0
+        for corrente in MERGULHADORES:
+            antes = len(estados)
+            bot = bp.BotPadrao(*corrente, 12)
+            with contextlib.redirect_stdout(io.StringIO()):
+                bot.jogar()
+            runs_no_estado += len(estados) > antes
+            if runs_no_estado >= RUNS_NO_ESTADO:
+                break
+        assert runs_no_estado >= RUNS_NO_ESTADO, (
+            "nenhuma run passou pelo estado da espiral: o teste não verificou nada"
+        )
         assert violacoes == []
 
 

@@ -76,9 +76,18 @@ def generation_rules() -> dict[str, Any]:
 def _pick_role(dungeon_level: int, rng=None) -> str:
     """Sorteia um papel para o andar, respeitando a profundidade mínima.
 
-    Papéis de controle e suporte exigem que o jogador reordene alvos, então só
-    entram a partir do andar configurado em `generation.advanced_role_min_floor`.
-    Antes disso o andar é de aprendizado.
+    Papéis avançados exigem do jogador uma resposta que o herói da largada ainda
+    não tem, então só entram a partir do andar configurado em
+    `generation.advanced_role_min_floor`. Antes disso o andar é de aprendizado.
+
+    O glass cannon está entre eles. O duelo dele é a corrida para matar antes de
+    morrer, e o contra-jogo é atordoar ou explodir primeiro: o herói de nível 1,
+    com uma skill, sem consumível e sem passiva, não tem nenhum dos dois. Nos
+    andares 1-3 ele era o monstro que mais matava — metade das mortes, sendo um
+    em cada dez monstros —, e um Mago de nível 1 perdia a corrida contra um
+    glass cannon de nível 2 em mais da metade das lutas, com a vida cheia, antes
+    de qualquer decisão. A luta da largada continua perigosa pelo atrito do
+    bruiser, do skirmisher e do tank; o que sai é a condenação sorteada.
     """
     r = rng if rng is not None else random
     generation = _get_monsters_data()["generation"]
