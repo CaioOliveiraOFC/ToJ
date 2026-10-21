@@ -31,6 +31,7 @@ As outras fontes ficam onde estão:
 | — | `24430155` | Primeira baseline real de progressão |
 | — | `9ef74639`…`0ab837b9` | Bloco do instrumento: BotPadrão corrigido e auditado |
 | — | `dfa1ebcc`…`eb52b105` | Bloco da dungeon: Run Progression |
+| — | `32a0a5d9`…`be032157` | O primeiro level-up |
 
 ---
 
@@ -415,3 +416,89 @@ Resultado:
 - KI-005 aberto ([`KNOWN_ISSUES.md`](KNOWN_ISSUES.md)).
 
 **`Run/Progression Balance — pendente de calibração`.**
+
+## O primeiro level-up
+
+A última correção localizada antes da decisão de release. O resíduo estrutural
+do KI-002 era a armadilha do nível 1: na auditoria `4d0a9a0a`, 178 de 266 runs
+entravam no andar 2 ainda no nível 1.
+
+A causa era aritmética:
+- a fórmula pedia 140 de XP no nível 1;
+- o andar 1 tem 3 monstros, e cada vitória Nv1 paga 45 × a Essência do andar
+  (média 1,2);
+- só o andar inteiro, com Essência média, fechava a conta, e duas vitórias nunca
+  fechavam.
+
+| Commit | O que fez |
+|---|---|
+| `32a0a5d9` | Baixou o nível 1 mexendo na fórmula. **Desfeito.** |
+| `d3105edc` | Desfaz a fórmula e dá ao primeiro level-up um custo próprio |
+| `be032157` | Segunda remedição das três bandas de dificuldade global, sem rodar o `-m balance` de novo |
+| o seguinte | A auditoria de 300 runs (`baselines/progression/d3105edc/`) e a documentação |
+
+**`32a0a5d9` — a tentativa desfeita.**
+- A mudança: `XP_BASE_COST` 140 → 100 e `XP_LEVEL_SOFTENER` 6 → 4, mantendo a
+  inclinação funda.
+- O problema: a fórmula tem dois parâmetros, e os níveis 2-20 ficaram de 8% a
+  25% mais baratos junto.
+- A auditoria de 300 runs mostrou regressão estrutural:
+  - o herói passou à frente do andar (atraso médio no andar 10: +1,0 → −0,8);
+  - as extrações foram de 52 para 141;
+  - o `-m balance` estourou, inclusive `MAX_GREEDY_REACH_20`, que não estava
+    liberada.
+
+**`d3105edc` — custo próprio só para o primeiro nível.**
+- `XP_BASE_COST` e `XP_LEVEL_SOFTENER` voltam a 140 e 6. A curva do nível 2 em
+  diante é exatamente a de `eba37d01`.
+- `FIRST_LEVEL_XP_COST = 100`: `xp_for_level(1)` devolve a constante.
+- O custo acumulado de qualquer nível posterior fica exatamente 40 abaixo do de
+  antes.
+- Limpar o andar 1 sobe de nível com Essência a partir de 0,8, e duas vitórias
+  sobem com a Essência média.
+- O teste do contrato "o custo do nível 1 é a base" virou "o primeiro level-up
+  tem custo próprio" e confere que o nível 2 sai da fórmula de sempre.
+- O teste do early game passou a fixar a curva histórica (140) como referência.
+  A trajetória fica a no máximo 1 nível dela.
+
+### A auditoria
+
+Mesmo protocolo, 300 runs, contra `4d0a9a0a`
+([`baselines/progression/d3105edc/`](baselines/progression/d3105edc/README.md)):
+- **Nível 1 ao entrar no andar 2: 178/266 → 103/268.**
+- Mortes até o andar 5: 165 → 145.
+- Fração das mortes até o andar 5: 67% → 64%. Fica como característica.
+- Extrações: 52 → 73.
+- Chegou ao 20: 46 → 67.
+- **O fundo é o de antes:** quem chega aos andares 15 e 20 chega no mesmo nível,
+  e o herói continua atrás do andar nos andares 5 e 10.
+- Determinismo: 17 runs reexecutadas, idênticas.
+
+### O `-m balance` e as bandas
+
+O `-m balance` do `d3105edc` deu 114 passed e 4 falhas, todas nas três bandas
+de dificuldade global já liberadas. Nenhuma outra falhou. Elas foram remedidas
+com os valores observados nesse `-m balance`:
+- `MAX_SMART_REACH_20`: 0,72 → 0,85;
+- `MIN_TOTAL_ATTRITION`: 0,25 → 0,15;
+- `MAX_CLASS_MEAN_FLOOR`: 16 → 17,5.
+
+O registro completo está em `tests/balance/thresholds.py`. O `-m balance` não
+foi rodado de novo, por regra do usuário: nenhuma simulação grande sem uma
+pergunta nova que exija estatística.
+
+**Fica pendente uma única verificação:** a asserção de spread entre classes. Ela
+fica no mesmo teste e não rodou no `d3105edc`.
+
+### Como KI-002 e KI-003 foram fechados
+
+- **KI-002.** Foram corrigidas a condenação sorteada da primeira luta e a
+  armadilha do nível 1. A concentração das mortes até o andar 5 fica como
+  característica da dificuldade, por decisão do usuário.
+- **KI-003.** O degrau do teto de nível do monstro foi corrigido. Voltar de muito
+  atrás continua raro (0 de 63 runs que caíram 3+ níveis), e isso foi aceito
+  como característica de alto risco: não há catch-up garantido, por decisão do
+  usuário.
+
+**`Run/Progression Balance` calibrado na jornada real.** KI-005 fecha quando o
+spread for verificado.

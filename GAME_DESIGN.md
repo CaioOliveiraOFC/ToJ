@@ -127,6 +127,11 @@ para trás continua enfrentando monstro acima dele, e a XP é a do nível do
 monstro: cada vitória rende mais a quem está atrasado. O chefe fica fora dos
 tetos, no andar + 1.
 
+Voltar de muito atrás continua raro, e isso é de propósito: é o alto risco da
+progressão. Na auditoria `d3105edc`, nenhuma das 63 runs que caíram 3 ou mais
+níveis atrás voltou a ficar a até 1 nível do andar. Por decisão do usuário, o
+jogo não ganha catch-up além do teto gradual.
+
 **`[implementado]`** **Toda batalha é 1x1: um herói contra um monstro.** O andar
 pode ter dez inimigos; cada um ocupa a própria casa, e encontrar o segundo
 significa OUTRA batalha, não um inimigo a mais na primeira. Elite e chefe também
@@ -279,6 +284,23 @@ e da classe.
 Não existe — e este é o **único ralo de ouro que o documento nomeia**. É a causa
 direta de o ouro não ter destino no jogo: o sistema que ia consumi-lo nunca foi
 construído. Ver **Decisões pendentes, D2**.
+
+**`[implementado]`** **O custo de XP de cada nível** é
+`XP_BASE_COST × (L + XP_LEVEL_SOFTENER) / (1 + XP_LEVEL_SOFTENER) × GROWTH_RATE^(L-1)`
+(`src/shared/formulas.xp_for_level`), com 140, 6 e 1,12. A forma `L × 1,12^L` é a
+mesma da XP que um andar produz, e é isso que impede o herói de ficar cada vez
+mais atrás com a profundidade (`tests/test_progression_contract.py`).
+
+**`[implementado]`** **O primeiro level-up tem custo próprio**:
+`FIRST_LEVEL_XP_COST = 100`, contra os 140 da fórmula. O andar 1 tem 3 monstros
+de nível 1, e a 140 só o andar inteiro, com Essência média, pagava o nível 2: 2/3
+das runs entravam no andar 2 ainda no nível 1 (KI-002). A 100, duas vitórias com
+Essência média bastam, e uma nunca basta.
+- Do nível 2 em diante a curva é exatamente a de antes. O acumulado de qualquer
+  nível posterior fica 40 abaixo, e nada mais muda (`tests/test_primeiro_nivel.py`).
+- Baixar o nível 1 pela própria fórmula foi tentado e desfeito (`32a0a5d9`): os
+  dois parâmetros barateavam junto os níveis 2-20, e o herói passava à frente do
+  andar.
 
 **`[implementado]`** Ao subir de nível, o jogador escolhe **1 entre 3 passivas**
 exibidas como cartas.

@@ -157,8 +157,8 @@ medições está em [`BASELINES.md`](BASELINES.md).
   - Elas se movem quando a dungeon muda de propósito.
   - Toda remedição registra o valor antigo, o novo, o protocolo e o motivo em
     `tests/balance/thresholds.py`.
-  - Foram remedidas uma vez, no bloco Dungeon / Run Progression, por decisão do
-    usuário.
+  - Foram remedidas duas vezes, por decisão do usuário: no bloco Dungeon / Run
+    Progression e no primeiro level-up (`d3105edc`).
 - **Todas as outras bandas continuam congeladas**: o spread entre classes (a
   paridade), o TTK, o skill gap, o peso da sorte, os arquétipos e os encontros.
   Uma falha nelas não se resolve mexendo no limite.
@@ -167,13 +167,17 @@ medições está em [`BASELINES.md`](BASELINES.md).
 
 - **A nova jornada real** com Starter Kit, mapa, loot, economia, serviços, fuga e
   extração, jogada pelo BotPadrão.
-- A referência atual é a auditoria da dungeon,
-  [`baselines/progression/4d0a9a0a/`](baselines/progression/4d0a9a0a/README.md).
-  As anteriores são a auditoria do instrumento,
+- A referência atual é a auditoria do primeiro level-up,
+  [`baselines/progression/d3105edc/`](baselines/progression/d3105edc/README.md).
+  As anteriores são a auditoria da dungeon,
+  [`baselines/progression/4d0a9a0a/`](baselines/progression/4d0a9a0a/README.md),
+  a auditoria do instrumento,
   [`baselines/progression/0ab837b9/`](baselines/progression/0ab837b9/README.md),
   e a primeira baseline real, medida com o instrumento antigo,
   [`baselines/progression/fb321d4e/`](baselines/progression/fb321d4e/README.md).
-- **Estado: PENDENTE DE CALIBRAÇÃO.**
+- **Estado: CALIBRADO, PENDENTE DE UMA VERIFICAÇÃO.** Os problemas estruturais
+  conhecidos foram tratados ou aceitos. Falta rodar o `-m balance` uma vez para
+  avaliar o spread entre classes no `d3105edc` (KI-005).
 
 > **Um resultado ruim de progressão não reabre automaticamente o balance de
 > classe.**

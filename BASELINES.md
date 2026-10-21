@@ -10,7 +10,8 @@ que cada uma mede e quando ela pode ser comparada**.
 | Combat/Class E8 | `bc815fcd` | `expected loadout` (`simulate_run`, política `smart`) | **fechada** | `tests/balance/` (`pytest -m balance`) e [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md#etapa-8--class-balance) |
 | Progression real | `fb321d4e` | jornada real: BotPadrão conservador + Starter Kit, seeds 1–100 × 3 classes, teto técnico 200 | **histórica** — o "antes" do instrumento | [`baselines/progression/fb321d4e/README.md`](baselines/progression/fb321d4e/README.md) |
 | Auditoria do instrumento | `0ab837b9` | o mesmo protocolo da `fb321d4e`, com o BotPadrão corrigido | **histórica** — o "antes" da dungeon | [`baselines/progression/0ab837b9/README.md`](baselines/progression/0ab837b9/README.md) |
-| Auditoria da dungeon | `4d0a9a0a` | o mesmo protocolo, com o BotPadrão congelado e a dungeon alterada | **pendente de calibração** — referência atual | [`baselines/progression/4d0a9a0a/README.md`](baselines/progression/4d0a9a0a/README.md) |
+| Auditoria da dungeon | `4d0a9a0a` | o mesmo protocolo, com o BotPadrão congelado e a dungeon alterada | **histórica** — o "antes" do primeiro level-up | [`baselines/progression/4d0a9a0a/README.md`](baselines/progression/4d0a9a0a/README.md) |
+| Auditoria do primeiro level-up | `d3105edc` | o mesmo protocolo, com o BotPadrão congelado e só o custo do primeiro level-up alterado | **referência atual** — falta só a verificação do spread no `-m balance` (KI-005) | [`baselines/progression/d3105edc/README.md`](baselines/progression/d3105edc/README.md) |
 | Alvo de extração | remedido em `bc815fcd` | `overall_power` do snapshot de um Rogue real, `PODER_ESPERADO` | **instrumento** — alarme de deslocamento | `tools/arena_alvo.py`, `src/data/arena_benchmark_v1.json`, `tests/test_arena_alvo.py` |
 
 ---
@@ -58,6 +59,14 @@ Progression (`dfa1ebcc`…`4d0a9a0a`). O bot é o mesmo; só o jogo mudou.
 - Nos campos que a auditoria do instrumento já tinha, o "antes" reproduz as 300
   runs dela registro a registro.
 
+**Auditoria do primeiro level-up.** É a mesma régua depois da última correção
+antes da decisão de release (`d3105edc`). O bot é o mesmo; só o custo do
+primeiro level-up mudou.
+- Guarda as duas coletas, pelo mesmo coletor: o "antes" (`4d0a9a0a`) e o
+  "depois" (`d3105edc`).
+- O "antes" é cópia byte a byte do `depois.jsonl` da auditoria da dungeon.
+- O agregador ganhou o nível ao entrar em cada andar.
+
 **Alvo de extração.** É o poder de referência contra o qual o BotPadrão decide
 se a build "superou a Arena" e vale extrair.
 - Não é baseline de balance, e não é a Arena como modo de jogo.
@@ -67,13 +76,15 @@ se a build "superou a Arena" e vale extrair.
 
 ## Quando comparar
 
-- **A auditoria `4d0a9a0a` é a referência atual para qualquer mudança de
+- **A auditoria `d3105edc` é a referência atual para qualquer mudança de
   progressão.**
   - Uma mudança se compara rodando o mesmo protocolo no commit novo e agregando
     com o mesmo script: `run_auditoria.py` e `agrega_auditoria.py` do diretório
     dela, com o `depois.jsonl` como o novo "antes".
   - A `0ab837b9` mede o jogo de antes do bloco da dungeon. Ela só se compara com
     a `4d0a9a0a`, e isso já está feito.
+  - A `4d0a9a0a` mede o jogo de antes do primeiro level-up. Ela só se compara
+    com a `d3105edc`, e isso já está feito.
   - Mudou o protocolo (seeds, teto, perfil ou versão do bot)? Então é outra
     baseline, e não uma comparação.
 - **A `fb321d4e` não se compara com uma mudança de dungeon.** Ela foi medida com

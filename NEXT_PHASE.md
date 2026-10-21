@@ -1,42 +1,39 @@
 # Próxima etapa — decisão de release da fase PvE
 
 A fundação está fechada, e o Combat/Class Balance também. O instrumento foi
-corrigido e auditado (`0ab837b9`), e o bloco Dungeon / Run Progression terminou
-com uma auditoria de 300 runs (`4d0a9a0a`). Ver
+corrigido e auditado (`0ab837b9`). O bloco Dungeon / Run Progression terminou
+com uma auditoria de 300 runs (`4d0a9a0a`), e a última correção antes do release,
+o custo do primeiro level-up, com outra (`d3105edc`). Ver
 [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md).
 
 ## Onde a fase está
 
-- A referência atual é a auditoria da dungeon,
-  [`baselines/progression/4d0a9a0a/`](baselines/progression/4d0a9a0a/README.md).
+- A referência atual é a auditoria do primeiro level-up,
+  [`baselines/progression/d3105edc/`](baselines/progression/d3105edc/README.md).
 - O BotPadrão está congelado desde `0ab837b9`. Ele só muda por bug mecânico
   comprovado, e mudá-lo é outra rodada de instrumento, com remedição.
-- `Run/Progression Balance` continua **pendente de calibração**
-  ([`KNOWN_ISSUES.md`](KNOWN_ISSUES.md)).
-  - **KI-004 fechou.**
-  - **KI-002 está aberto**, mais estreito: a condenação sorteada saiu, mas 2/3 das
-    mortes ainda acontecem até o andar 5, e 2/3 das runs entram no andar 2 no
-    nível 1.
-  - **KI-003 está aberto**, mais estreito: agora existe volta para quem caiu para
-    trás, mas ela é rara, e nenhum mergulho extrai.
-  - **KI-005** fecha quando KI-002 e KI-003 forem tratados ou explicitamente
-    aceitos.
+- Os problemas estruturais conhecidos da progressão foram tratados ou
+  explicitamente aceitos ([`KNOWN_ISSUES.md`](KNOWN_ISSUES.md)):
+  - **KI-004 fechou** na auditoria da dungeon.
+  - **KI-002 fechou**: entrar no andar 2 ainda no nível 1 caiu de 178/266 para
+    103/268, sem mudar o comportamento profundo. A fração das mortes até o
+    andar 5 (64%) fica como característica da dificuldade.
+  - **KI-003 fechou como característica**: voltar de 3+ níveis atrás é raro de
+    propósito, o alto risco da progressão.
+- **KI-005 está aberto por uma verificação só.** As três bandas de dificuldade
+  global do `-m balance` foram remedidas com os valores observados no
+  `d3105edc`. A asserção de spread entre classes (a paridade) ainda não foi
+  avaliada nesse commit.
 
-## O que decidir
+## O que falta para a decisão de release
 
-O critério de release abaixo pede que os problemas estruturais conhecidos tenham
-sido "tratados ou explicitamente aceitos". Para KI-002 e KI-003, as saídas são:
+1. **Rodar o `-m balance` uma vez.** Se tudo passar, inclusive o spread, KI-005
+   fecha.
+   - Se o spread falhar, é paridade de classe, uma banda congelada: para, e a
+     decisão volta para o usuário.
+2. **Decidir o release.** O critério abaixo já está atendido em tudo o mais.
 
-1. **Aceitar como característica do jogo**, registrando a decisão. Exemplos: a
-   largada concentra as mortes de propósito; voltar de muito atrás é raro de
-   propósito. Aí KI-005 fecha e a fase vai para o release.
-2. **Outra rodada da dungeon**, só sobre o que sobrou. Os candidatos já
-   levantados, sem decisão:
-   - o começo da curva de XP contra a população do andar 1;
-   - a largada real contra o expected loadout;
-   - quanto de volta o jogo deve oferecer a quem caiu para trás.
-
-Nenhuma das duas está decidida.
+Nenhuma outra rodada da dungeon está planejada.
 
 ## Regra de trabalho
 
@@ -48,6 +45,8 @@ do usuário no bloco da dungeon.
   específicos curtos e fixtures entre os commits.
 - Uma única medição populacional grande no fim do bloco, pelo protocolo da
   régua.
+- Nenhuma simulação com mais de ~20 runs sem uma pergunta nova que realmente
+  exija estatística. Decisão do usuário no primeiro level-up.
 - Classificar cada achado antes de mexer: bug/mecânica, progressão/dificuldade,
   comportamento do bot, starter ou inconclusivo.
 - Medir pela régua certa:
