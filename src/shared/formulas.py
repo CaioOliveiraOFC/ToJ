@@ -15,6 +15,7 @@ import math
 
 from src.shared.constants import (
     ENHANCEMENT_RATE,
+    FIRST_LEVEL_XP_COST,
     GEM_RATE,
     GROWTH_RATE,
     XP_BASE_COST,
@@ -52,6 +53,9 @@ def xp_for_level(level: int) -> int:
     O número de combates por nível continua subindo, agora linearmente:
     `custo/recompensa` é proporcional a `nível + XP_LEVEL_SOFTENER`.
 
+    A exceção é o primeiro level-up, que custa `FIRST_LEVEL_XP_COST`: o que o
+    andar 1 paga. Do nível 2 em diante, a fórmula é a de sempre.
+
     Args:
         level: Nível atual.
 
@@ -59,6 +63,8 @@ def xp_for_level(level: int) -> int:
         XP total necessária para o próximo nível.
     """
     nivel = max(1, level)
+    if nivel == 1:
+        return FIRST_LEVEL_XP_COST
     amortecedor = (nivel + XP_LEVEL_SOFTENER) / (1 + XP_LEVEL_SOFTENER)
     return int(XP_BASE_COST * amortecedor * GROWTH_RATE ** (nivel - 1))
 

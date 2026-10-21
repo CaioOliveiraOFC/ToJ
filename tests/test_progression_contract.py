@@ -18,6 +18,7 @@ import pytest
 
 from src.shared.constants import (
     BOSS_FLOOR_INTERVAL,
+    FIRST_LEVEL_XP_COST,
     GROWTH_RATE,
     XP_BASE_COST,
     XP_LEVEL_SOFTENER,
@@ -72,9 +73,15 @@ class TestFormaDaCurva:
         # E converge por cima, monotonicamente: o resíduo é o amortecedor sumindo.
         assert razao(100) > razao(500) > razao(2000) > limite
 
-    def test_o_custo_do_nivel_1_e_a_base(self):
-        """O amortecedor existe para isto: não mexer no começo do jogo."""
-        assert xp_for_level(1) == XP_BASE_COST
+    def test_o_primeiro_level_up_tem_custo_proprio(self):
+        """O nível 1 sai da fórmula; o amortecedor continua ancorado em XP_BASE_COST.
+
+        O primeiro level-up custa `FIRST_LEVEL_XP_COST`, o que o andar 1 paga. A
+        fórmula do nível 2 em diante não mudou, e é ela que este contrato vigia.
+        """
+        assert xp_for_level(1) == FIRST_LEVEL_XP_COST
+        amortecedor_no_2 = (2 + XP_LEVEL_SOFTENER) / (1 + XP_LEVEL_SOFTENER)
+        assert xp_for_level(2) == int(XP_BASE_COST * amortecedor_no_2 * GROWTH_RATE)
 
     def test_combates_por_nivel_continuam_subindo(self):
         """Subir de nível continua custando mais fundo — linearmente, não o impossível.
