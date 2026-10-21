@@ -426,12 +426,20 @@ ROGUE_BASE_DF = 25
 
 # Fórmulas
 DAMAGE_FORMULA_DIVISOR = 3  # (ST + MG) // 3
-# Custo de XP do nível 1 e razão de crescimento do custo. A razão é maior que
-# GROWTH_RATE de propósito: o número de combates por nível sobe ao longo da run
-# (cerca de 3 no nível 1, cerca de 14 no nível 19), então o herói fica
-# progressivamente atrás do andar. É essa defasagem que cria dificuldade
-# crescente, em vez de inflar os números do monstro.
-XP_BASE_COST = 140
+# Custo de XP do nível 1. O número de combates por nível sobe ao longo da run, e
+# o herói fica progressivamente atrás do andar: é essa defasagem que cria
+# dificuldade crescente, em vez de inflar os números do monstro.
+#
+# O nível 1 custa o que o andar 1 paga. O andar tem 3 monstros, e a vitória Nv1
+# vale 45 × a Essência do andar (média 1,2). Com 100, limpar o andar sobe de
+# nível com qualquer Essência a partir de 0,8, e duas vitórias sobem com a
+# Essência média ou acima; com menos que isso, não sobe — o primeiro nível não
+# é garantido.
+#
+# Era 140, e o custo do nível 1 pedia o andar inteiro: com duas vitórias, que é
+# como uma largada ferida costuma sair do andar 1, nunca dava. Na auditoria
+# `4d0a9a0a`, 178 de 266 runs entravam no andar 2 ainda no nível 1.
+XP_BASE_COST = 100
 # Amortecedor do começo da curva de XP, não constante de balanceamento.
 #
 # O custo de nível tem a mesma forma da produção de XP de um andar —
@@ -441,7 +449,12 @@ XP_BASE_COST = 140
 # O amortecedor só faz o custo do nível 1 continuar valendo XP_BASE_COST. Ele
 # desloca onde a defasagem se estabiliza; que ela se estabilize vem da forma.
 # Ver `tests/test_progression_contract.py`.
-XP_LEVEL_SOFTENER = 6
+#
+# A inclinação funda da curva é `XP_BASE_COST / (1 + XP_LEVEL_SOFTENER)`, e as
+# duas constantes andam juntas para mantê-la: 140/(1+6) = 100/(1+4) = 20. Baixar
+# o custo do nível 1 mexendo só aqui deixa a curva posterior convergir para a de
+# antes — o desvio é 2/(nível+6): -25% no nível 2, -12,5% no 10, -6% no 30.
+XP_LEVEL_SOFTENER = 4
 
 # O mini-chefe aparece a cada N andares. Lido por `engine/loop.py`,
 # `sim/harness.py` e `sim/xp_model.py`, para os três concordarem.

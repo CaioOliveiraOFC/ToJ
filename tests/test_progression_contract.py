@@ -34,6 +34,10 @@ FUNDO = 1000
 # A razão exponencial que existia antes. Fica aqui, e só aqui, como referência
 # histórica: é contra ela que se mede se o early game foi preservado.
 RAZAO_ANTIGA = 1.195
+# E o custo do nível 1 daquela curva. A curva antiga é `140 × 1,195^(nível-1)`;
+# medi-la com o `XP_BASE_COST` de hoje compararia contra uma curva que nunca
+# existiu, e se mexeria junto com o que o teste quer vigiar.
+CUSTO_ANTIGO = 140
 
 
 @pytest.fixture(scope="module")
@@ -151,7 +155,7 @@ class TestEarlyGamePreservado:
         """
 
         def custo_antigo(nivel):
-            return int(XP_BASE_COST * RAZAO_ANTIGA ** (nivel - 1))
+            return int(CUSTO_ANTIGO * RAZAO_ANTIGA ** (nivel - 1))
 
         antiga = _trajetoria_com_custo(custo_antigo, 25)
         nova = trajetorias[("normal", "expected")]
