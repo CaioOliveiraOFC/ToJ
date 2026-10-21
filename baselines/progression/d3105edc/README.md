@@ -150,11 +150,10 @@ Nenhuma outra banda falhou, inclusive `MAX_GREEDY_REACH_20`.
 As três foram atualizadas em `tests/balance/thresholds.py` com os valores
 observados nesse `-m balance`.
 
-**O `-m balance` não foi rodado de novo depois da atualização.** Por regra do
-usuário, nenhuma simulação grande roda sem uma pergunta nova que exija
-estatística.
-- Os 4 testes acima são determinísticos (seed 1337, código de jogo inalterado) e
-  passam com os valores novos por construção.
-- O que **não** foi verificado é a asserção de spread entre classes (≤ 4,0, a
-  paridade). Ela fica no mesmo teste da primeira linha e não chegou a rodar,
-  porque a asserção anterior falhou.
+**O gate final.** O `-m balance` completo rodou uma vez depois da atualização,
+no `82ff73ea`: **118 passed, 0 falhas** (44 min).
+- Passaram os 4 testes acima, com os valores novos.
+- Passou a asserção de spread entre classes (≤ 4,0, a paridade). Ela fica no
+  mesmo teste da primeira linha e não tinha chegado a rodar antes, porque a
+  asserção anterior falhava.
+- O teste não imprime o valor do spread quando passa.

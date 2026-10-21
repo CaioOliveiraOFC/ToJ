@@ -175,9 +175,8 @@ medições está em [`BASELINES.md`](BASELINES.md).
   [`baselines/progression/0ab837b9/`](baselines/progression/0ab837b9/README.md),
   e a primeira baseline real, medida com o instrumento antigo,
   [`baselines/progression/fb321d4e/`](baselines/progression/fb321d4e/README.md).
-- **Estado: CALIBRADO, PENDENTE DE UMA VERIFICAÇÃO.** Os problemas estruturais
-  conhecidos foram tratados ou aceitos. Falta rodar o `-m balance` uma vez para
-  avaliar o spread entre classes no `d3105edc` (KI-005).
+- **Estado: CALIBRADO.** Os problemas estruturais conhecidos foram tratados ou
+  aceitos, e o `-m balance` completo passou no `82ff73ea` (118 passed).
 
 > **Um resultado ruim de progressão não reabre automaticamente o balance de
 > classe.**

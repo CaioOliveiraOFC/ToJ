@@ -173,6 +173,6 @@ FAST_RUN_ITERATIONS = 250
 # Mesma regra de folga: cerca de 2,5 desvios sobre o valor medido, e 1,5 andar
 # no teto absoluto, como na primeira remedição.
 #
-# O spread entre classes (4,0, a paridade) não mudou e AINDA NÃO FOI AVALIADO no
-# `d3105edc`: ele fica no mesmo teste do teto absoluto, depois da asserção que
-# falhou. O `-m balance` não rodou de novo depois desta remedição (KI-005).
+# O spread entre classes (4,0, a paridade) não mudou. Ele fica no mesmo teste do
+# teto absoluto, depois da asserção que falhava, e só foi avaliado no gate final:
+# o `-m balance` completo no `82ff73ea` deu 118 passed, inclusive o spread.

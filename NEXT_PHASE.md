@@ -20,18 +20,12 @@ o custo do primeiro level-up, com outra (`d3105edc`). Ver
     andar 5 (64%) fica como característica da dificuldade.
   - **KI-003 fechou como característica**: voltar de 3+ níveis atrás é raro de
     propósito, o alto risco da progressão.
-- **KI-005 está aberto por uma verificação só.** As três bandas de dificuldade
-  global do `-m balance` foram remedidas com os valores observados no
-  `d3105edc`. A asserção de spread entre classes (a paridade) ainda não foi
-  avaliada nesse commit.
+- **KI-005 fechou.** O `-m balance` completo rodou uma vez no `82ff73ea`, como
+  gate final: 118 passed, inclusive o spread entre classes ≤ 4,0.
 
 ## O que falta para a decisão de release
 
-1. **Rodar o `-m balance` uma vez.** Se tudo passar, inclusive o spread, KI-005
-   fecha.
-   - Se o spread falhar, é paridade de classe, uma banda congelada: para, e a
-     decisão volta para o usuário.
-2. **Decidir o release.** O critério abaixo já está atendido em tudo o mais.
+Só a decisão. O critério abaixo está atendido.
 
 Nenhuma outra rodada da dungeon está planejada.
 

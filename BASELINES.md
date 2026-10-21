@@ -11,7 +11,7 @@ que cada uma mede e quando ela pode ser comparada**.
 | Progression real | `fb321d4e` | jornada real: BotPadrão conservador + Starter Kit, seeds 1–100 × 3 classes, teto técnico 200 | **histórica** — o "antes" do instrumento | [`baselines/progression/fb321d4e/README.md`](baselines/progression/fb321d4e/README.md) |
 | Auditoria do instrumento | `0ab837b9` | o mesmo protocolo da `fb321d4e`, com o BotPadrão corrigido | **histórica** — o "antes" da dungeon | [`baselines/progression/0ab837b9/README.md`](baselines/progression/0ab837b9/README.md) |
 | Auditoria da dungeon | `4d0a9a0a` | o mesmo protocolo, com o BotPadrão congelado e a dungeon alterada | **histórica** — o "antes" do primeiro level-up | [`baselines/progression/4d0a9a0a/README.md`](baselines/progression/4d0a9a0a/README.md) |
-| Auditoria do primeiro level-up | `d3105edc` | o mesmo protocolo, com o BotPadrão congelado e só o custo do primeiro level-up alterado | **referência atual** — falta só a verificação do spread no `-m balance` (KI-005) | [`baselines/progression/d3105edc/README.md`](baselines/progression/d3105edc/README.md) |
+| Auditoria do primeiro level-up | `d3105edc` | o mesmo protocolo, com o BotPadrão congelado e só o custo do primeiro level-up alterado | **referência atual** — `-m balance` verde no `82ff73ea` | [`baselines/progression/d3105edc/README.md`](baselines/progression/d3105edc/README.md) |
 | Alvo de extração | remedido em `bc815fcd` | `overall_power` do snapshot de um Rogue real, `PODER_ESPERADO` | **instrumento** — alarme de deslocamento | `tools/arena_alvo.py`, `src/data/arena_benchmark_v1.json`, `tests/test_arena_alvo.py` |
 
 ---

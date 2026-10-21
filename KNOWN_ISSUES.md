@@ -29,29 +29,10 @@ A evidência numérica está nas auditorias de progressão, em ordem:
 > - KI-002 e KI-003, pela auditoria do primeiro level-up
 >   ([changelog](FOUNDATION_CHANGELOG.md#o-primeiro-level-up)). O KI-003 foi
 >   aceito como característica de alto risco.
-
----
-
-## KI-005 — calibração global de progressão: falta uma verificação
-
-**Classificação:** `Run/Progression Balance`.
-
-A jornada real foi medida depois da última correção (auditoria `d3105edc`).
-- Extraem 24% das runs.
-- O andar médio é 9,2.
-- A cauda vai até o andar 28.
-- Os problemas conhecidos foram tratados ou aceitos.
-
-As três bandas de dificuldade global do `-m balance` foram remedidas com os
-valores que o próprio `-m balance` do `d3105edc` observou.
-
-**Falta só uma verificação.** O `-m balance` não foi rodado de novo depois da
-remedição.
-- Os 4 testes das três bandas são determinísticos e passam por construção.
-- A asserção de **spread entre classes** (≤ 4,0, a paridade) ainda não foi
-  avaliada no `d3105edc`, porque fica no mesmo teste da banda que falhou antes
-  dela.
-- Uma rodada do `-m balance` fecha a questão. Se o spread passar, KI-005 fecha.
+> - KI-005, pelo gate final do `-m balance` no `82ff73ea`: 118 passed, inclusive
+>   o spread entre classes ([changelog](FOUNDATION_CHANGELOG.md#o-gate-final)).
+>
+> **Nenhum problema de progressão PvE está aberto.**
 
 ---
 

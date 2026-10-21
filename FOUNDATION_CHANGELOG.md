@@ -435,7 +435,8 @@ A causa era aritmética:
 | `32a0a5d9` | Baixou o nível 1 mexendo na fórmula. **Desfeito.** |
 | `d3105edc` | Desfaz a fórmula e dá ao primeiro level-up um custo próprio |
 | `be032157` | Segunda remedição das três bandas de dificuldade global, sem rodar o `-m balance` de novo |
-| o seguinte | A auditoria de 300 runs (`baselines/progression/d3105edc/`) e a documentação |
+| `82ff73ea` | A auditoria de 300 runs (`baselines/progression/d3105edc/`) e a documentação |
+| o seguinte | O gate final do `-m balance`, verde; KI-005 fechado |
 
 **`32a0a5d9` — a tentativa desfeita.**
 - A mudança: `XP_BASE_COST` 140 → 100 e `XP_LEVEL_SOFTENER` 6 → 4, mantendo a
@@ -483,12 +484,7 @@ com os valores observados nesse `-m balance`:
 - `MIN_TOTAL_ATTRITION`: 0,25 → 0,15;
 - `MAX_CLASS_MEAN_FLOOR`: 16 → 17,5.
 
-O registro completo está em `tests/balance/thresholds.py`. O `-m balance` não
-foi rodado de novo, por regra do usuário: nenhuma simulação grande sem uma
-pergunta nova que exija estatística.
-
-**Fica pendente uma única verificação:** a asserção de spread entre classes. Ela
-fica no mesmo teste e não rodou no `d3105edc`.
+O registro completo está em `tests/balance/thresholds.py`.
 
 ### Como KI-002 e KI-003 foram fechados
 
@@ -500,5 +496,16 @@ fica no mesmo teste e não rodou no `d3105edc`.
   como característica de alto risco: não há catch-up garantido, por decisão do
   usuário.
 
-**`Run/Progression Balance` calibrado na jornada real.** KI-005 fecha quando o
-spread for verificado.
+### O gate final
+
+O `-m balance` completo rodou uma única vez no `82ff73ea`, como gate canônico
+de release: **118 passed, 0 falhas**.
+- Passaram as três bandas remedidas.
+- Passou o spread entre classes ≤ 4,0, a paridade, que não tinha chegado a
+  rodar no `d3105edc`.
+- Nenhum contrato congelado foi tocado.
+
+KI-005 fechou.
+
+**`Run/Progression Balance` calibrado na jornada real.** Nenhum problema de
+progressão PvE está aberto, e a fase está pronta para a decisão de release.
