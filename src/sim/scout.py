@@ -302,21 +302,21 @@ def _analyse_cards(taxas_por_politica: dict[str, dict[str, float]], sistema: str
     """
     from src.content.passives import load_passives
     from src.content.skills_loader import load_skills
-    from src.sim.pick_policies import PASSIVE_SEM_PREFERENCIA
+    from src.sim.pick_policies import FAMILIAS_CLASSIFICADAS
 
     catalogo = (
         {p.id: p.name for p in load_passives()}
         if sistema == "passivas"
         else {s.id: s.name for s in load_skills()}
     )
-    # Cartas cuja família nenhuma política classificou. A taxa de escolha delas é
-    # baixa por CONSTRUÇÃO: o laço de `pick_passive` sempre encontra antes uma
-    # família preferida, então a carta neutra só é levada quando a oferta inteira
-    # é neutra. Chamar isso de "carta fraca" seria ler o silêncio do instrumento
-    # como veredito sobre o conteúdo — e foi exatamente esse circuito fechado que
-    # esta separação existe para cortar.
+    # Cartas cuja família nenhuma política classificou — hoje, nenhuma: as três
+    # ordenam as 23 famílias (D3 encerrada). Se uma família nova entrar sem
+    # decisão, a taxa de escolha dela é baixa por CONSTRUÇÃO: o laço de
+    # `pick_passive` sempre encontra antes uma família da intenção. Chamar isso de
+    # "carta fraca" seria ler o silêncio do instrumento como veredito sobre o
+    # conteúdo — e é esse circuito fechado que esta separação existe para cortar.
     neutras = (
-        {p.id for p in load_passives() if p.effect_type in PASSIVE_SEM_PREFERENCIA}
+        {p.id for p in load_passives() if p.effect_type not in FAMILIAS_CLASSIFICADAS}
         if sistema == "passivas"
         else set()
     )

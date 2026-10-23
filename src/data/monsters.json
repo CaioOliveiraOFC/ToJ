@@ -8,7 +8,8 @@
     "advanced_role_min_floor": 4,
     "advanced_roles": [
       "controller",
-      "support"
+      "support",
+      "glass_cannon"
     ],
     "elite_spawn_chance": 0.12,
     "level_variation": {

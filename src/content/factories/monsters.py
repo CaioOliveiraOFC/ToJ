@@ -49,12 +49,45 @@ def calculate_scaled_monster_level(dungeon_level: int, player_level: int) -> int
     )[0]
 
     monster_level = min(monster_level, dungeon_level + int(variation["max_above_floor"]))
-    if player_level <= int(variation["early_player_level"]):
-        monster_level = min(monster_level, player_level + int(variation["early_max_above_player"]))
+    monster_level = min(monster_level, _teto_do_heroi(variation, player_level))
     if dungeon_level == 1:
         monster_level = min(monster_level, int(variation["first_floor_max_level"]))
 
     return max(1, monster_level)
+
+
+def hero_level_ceiling(player_level: int) -> int:
+    """O nível mais alto que um monstro comum pode ter contra este herói.
+
+    Nos níveis da largada (`early_player_level`) a folga é fixa: o monstro fica
+    no máximo `early_max_above_player` acima. Depois dela, a folga cresce um
+    nível por nível do herói — o teto AFROUXA, em vez de sumir.
+
+    Ele sumia. Até o nível 3 o herói enfrentava no máximo monstro de nível 5, em
+    qualquer andar; no nível 4 o teto acabava e o andar inteiro voltava de uma
+    vez. Um herói que tinha ficado para trás e conseguia subir um nível era
+    premiado com monstros 5 a 10 níveis acima: na auditoria `0ab837b9`, nenhuma
+    das 87 runs que caíram 3 ou mais níveis atrás do andar voltou a ficar a no
+    máximo 1, e os mergulhadores morriam exatamente nesse degrau (Nv4 contra
+    Nv11, Nv4 contra Nv14).
+
+    Com a folga crescente, quem está no ritmo do andar não sente o teto — no
+    nível L ele só morde monstro acima de 2L-1, e o andar dá no máximo +2. Quem
+    caiu muito para trás continua enfrentando monstro ACIMA dele, e cada vez mais
+    acima conforme sobe; a XP por nível do monstro (`calculate_monster_xp_reward`)
+    é o que paga a volta. Contornar e a saída não paga continuam custando o que
+    custavam.
+    """
+    return _teto_do_heroi(_get_monsters_data()["generation"]["level_variation"], player_level)
+
+
+def _teto_do_heroi(variation: dict[str, Any], player_level: int) -> int:
+    """A conta de `hero_level_ceiling`, sobre a `level_variation` já carregada."""
+    nivel = max(1, int(player_level))
+    folga = int(variation["early_max_above_player"]) + max(
+        0, nivel - int(variation["early_player_level"])
+    )
+    return nivel + folga
 
 
 def _get_monsters_data() -> dict[str, Any]:
@@ -76,9 +109,18 @@ def generation_rules() -> dict[str, Any]:
 def _pick_role(dungeon_level: int, rng=None) -> str:
     """Sorteia um papel para o andar, respeitando a profundidade mínima.
 
-    Papéis de controle e suporte exigem que o jogador reordene alvos, então só
-    entram a partir do andar configurado em `generation.advanced_role_min_floor`.
-    Antes disso o andar é de aprendizado.
+    Papéis avançados exigem do jogador uma resposta que o herói da largada ainda
+    não tem, então só entram a partir do andar configurado em
+    `generation.advanced_role_min_floor`. Antes disso o andar é de aprendizado.
+
+    O glass cannon está entre eles. O duelo dele é a corrida para matar antes de
+    morrer, e o contra-jogo é atordoar ou explodir primeiro: o herói de nível 1,
+    com uma skill, sem consumível e sem passiva, não tem nenhum dos dois. Nos
+    andares 1-3 ele era o monstro que mais matava — metade das mortes, sendo um
+    em cada dez monstros —, e um Mago de nível 1 perdia a corrida contra um
+    glass cannon de nível 2 em mais da metade das lutas, com a vida cheia, antes
+    de qualquer decisão. A luta da largada continua perigosa pelo atrito do
+    bruiser, do skirmisher e do tank; o que sai é a condenação sorteada.
     """
     r = rng if rng is not None else random
     generation = _get_monsters_data()["generation"]

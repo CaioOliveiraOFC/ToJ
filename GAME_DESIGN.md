@@ -104,6 +104,34 @@ o jogador não escolhia, recebia. Era decisão nenhuma.
 **`[implementado]`** Boss a cada 5 andares. Elite a partir do andar 4, com 12% de
 chance.
 
+**`[implementado]`** **Os andares 1-3 são de aprendizado.** Os papéis avançados
+(`generation.advanced_roles`: controller, support e glass cannon) só entram a
+partir do andar 4, junto com o elite. O glass cannon entrou na lista no bloco
+Dungeon / Run Progression (KI-002). O duelo dele é a corrida para matar antes de
+morrer, e o contra-jogo é atordoar ou explodir primeiro: o herói de nível 1, com
+uma skill e nada na mochila, não tem nenhum dos dois. O arquétipo é o mesmo; só
+mudou quando ele entra no andar.
+
+**`[implementado]`** **Nível do monstro.** Cada monstro comum sorteia andar +0,
++1 ou +2 (pesos 70/25/5) e passa por três tetos:
+- no máximo `max_above_floor` acima do andar;
+- no andar 1, no máximo `first_floor_max_level`;
+- **o teto do herói** (`hero_level_ceiling`). Até o nível 3, o monstro fica no
+  máximo 2 níveis acima dele; depois, a folga cresce um nível por nível do
+  herói. A partir do nível 3, o teto é 2L − 1.
+
+O teto do herói afrouxava de uma vez: no nível 4 ele sumia, e um herói que tinha
+ficado para trás era premiado com monstros 5 a 10 níveis acima. Agora ele
+afrouxa aos poucos (KI-003). Quem está no ritmo do andar não o sente. Quem caiu
+para trás continua enfrentando monstro acima dele, e a XP é a do nível do
+monstro: cada vitória rende mais a quem está atrasado. O chefe fica fora dos
+tetos, no andar + 1.
+
+Voltar de muito atrás continua raro, e isso é de propósito: é o alto risco da
+progressão. Na auditoria `d3105edc`, nenhuma das 63 runs que caíram 3 ou mais
+níveis atrás voltou a ficar a até 1 nível do andar. Por decisão do usuário, o
+jogo não ganha catch-up além do teto gradual.
+
 **`[implementado]`** **Toda batalha é 1x1: um herói contra um monstro.** O andar
 pode ter dez inimigos; cada um ocupa a própria casa, e encontrar o segundo
 significa OUTRA batalha, não um inimigo a mais na primeira. Elite e chefe também
@@ -257,6 +285,23 @@ Não existe — e este é o **único ralo de ouro que o documento nomeia**. É a
 direta de o ouro não ter destino no jogo: o sistema que ia consumi-lo nunca foi
 construído. Ver **Decisões pendentes, D2**.
 
+**`[implementado]`** **O custo de XP de cada nível** é
+`XP_BASE_COST × (L + XP_LEVEL_SOFTENER) / (1 + XP_LEVEL_SOFTENER) × GROWTH_RATE^(L-1)`
+(`src/shared/formulas.xp_for_level`), com 140, 6 e 1,12. A forma `L × 1,12^L` é a
+mesma da XP que um andar produz, e é isso que impede o herói de ficar cada vez
+mais atrás com a profundidade (`tests/test_progression_contract.py`).
+
+**`[implementado]`** **O primeiro level-up tem custo próprio**:
+`FIRST_LEVEL_XP_COST = 100`, contra os 140 da fórmula. O andar 1 tem 3 monstros
+de nível 1, e a 140 só o andar inteiro, com Essência média, pagava o nível 2: 2/3
+das runs entravam no andar 2 ainda no nível 1 (KI-002). A 100, duas vitórias com
+Essência média bastam, e uma nunca basta.
+- Do nível 2 em diante a curva é exatamente a de antes. O acumulado de qualquer
+  nível posterior fica 40 abaixo, e nada mais muda (`tests/test_primeiro_nivel.py`).
+- Baixar o nível 1 pela própria fórmula foi tentado e desfeito (`32a0a5d9`): os
+  dois parâmetros barateavam junto os níveis 2-20, e o herói passava à frente do
+  andar.
+
 **`[implementado]`** Ao subir de nível, o jogador escolhe **1 entre 3 passivas**
 exibidas como cartas.
 
@@ -304,9 +349,9 @@ automática** e **uma única carta fraca de verdade** (`Reflexos Rápidos`). Vin
 são cartas de identidade — alta numa intenção, baixa noutra. É exatamente o que um
 sistema de cartas deve produzir. *(Medição feita sobre as 29 primeiras
 cartas, quando o catálogo tinha 13 famílias de efeito. O catálogo hoje tem **60
-cartas e 23 famílias**, e as políticas de escolha do simulador ainda ordenam
-apenas as 13 originais — ver **Decisões pendentes, D3**. As cartas das 10 famílias
-novas não foram medidas.)*
+cartas e 23 famílias**, e as políticas de escolha do simulador passaram a ordenar
+as 23 — ver **Decisões pendentes, D3**, encerrada. As cartas das 10 famílias
+novas ainda não foram medidas por esse scout.)*
 
 **`[implementado]`** Se o personagem for extraído vivo, as passivas vão com ele —
 para a Arena, quando ela existir.
@@ -650,7 +695,10 @@ raridades — a loja do andar 80 é a mesma do andar 16. As regras vigentes:
 - **Lendário nunca é vendido** em loja;
 - item com `classes` declarado só aparece para a classe certa;
 - o tamanho da vitrine cresce por faixa de andar, de 8-10 itens (andar 1-3) a
-  22-25 (andar 15+).
+  22-25 (andar 15+);
+- **a cura básica é linha fixa**: a Poção de Cura Pequena (a poção de cura
+  Common) está em toda vitrine, fora do sorteio e com o preço de sempre. As
+  poções maiores continuam sorteadas com o resto (KI-004).
 
 O campo `shop_max_floor` continua sendo lido, para o caso de alguém querer um
 item genuinamente limitado no tempo. Hoje **nenhum item o declara**, e quem
@@ -1285,23 +1333,33 @@ gastar. **Só a medição do novo loop responde.** Os números atuais são
 calibração V1 — existem para a fase de balanceamento ter o que medir, e **não
 são uma afirmação de que estão balanceados**.
 
-### D3 — As políticas do simulador não ordenam o catálogo inteiro de passivas
+### D3 — As políticas do simulador ordenam o catálogo inteiro de passivas
 
-O catálogo cresceu de 29 para **60 cartas** e de 13 para **23 famílias de
-efeito**. As três políticas deliberadas do simulador (`survival`, `offense`,
-`economy`) ordenam **as 13 famílias originais**. As 10 novas — `precision`,
-`status_resistance`, `poison_chance`, `bleed_chance`, `fear_chance`,
-`crit_damage`, `damage_percent`, `life_steal`, `mana_regen`, `magic` — estão
-declaradas **sem preferência** (`PASSIVE_SEM_PREFERENCIA`, em
-`src/sim/pick_policies.py`). Antes elas caíam num desempate pelo valor impresso,
-que comparava grandezas diferentes. Hoje a indiferença é regra escrita, mas
-continua não sendo intenção de build.
+**Encerrada.** O catálogo cresceu de 29 para **60 cartas** e de 13 para **23
+famílias de efeito**, e por um tempo as três políticas deliberadas do simulador
+(`survival`, `offense`, `economy`) ordenavam só as 13 originais. As 10 novas —
+`precision`, `status_resistance`, `poison_chance`, `bleed_chance`,
+`fear_chance`, `crit_damage`, `damage_percent`, `life_steal`, `mana_regen`,
+`magic` — caíam primeiro num desempate pelo valor impresso, que comparava
+grandezas diferentes, e depois num tier declarado sem preferência.
 
-Isso **não** é um defeito do jogo: é do instrumento. Mas invalida qualquer
-conclusão do tipo "esta passiva é fraca" sobre uma carta dessas famílias.
-Atribuir intenção a elas é decisão de balanceamento que segue aberta, e pesa na
-calibração da progressão porque o BotPadrão monta a build por essas políticas
-(ver [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md), KI-006).
+Hoje cada uma das três políticas ordena as 23 famílias (`PASSIVE_PRIORITIES`, em
+`src/sim/pick_policies.py`), e o tier sem preferência saiu. As 13 originais
+mantêm a ordem relativa que tinham; as 10 novas entraram onde a intenção de cada
+política pede:
+
+- `survival`: roubo de vida e resistência a status logo depois das defesas,
+  Precisão e regeneração de mana ao lado dos pares, dano puro e pressão por
+  status abaixo;
+- `offense`: dano % e dano crítico ao lado de Força e crítico, Precisão e Magia
+  em seguida, sustain e resistência no fim;
+- `economy`: Essência e ouro no topo, sustain de recurso e de vida antes de dano
+  puro.
+
+O valor numérico só desempata DENTRO da mesma família, e nenhuma escolha compara
+`effect_value` entre famílias. Isso é do instrumento, não do jogo, e afeta tanto o
+BotPadrão quanto o `simulate_run`, porque os dois escolhem passiva por estas
+políticas.
 
 ### D4 — O chefe é contornável
 

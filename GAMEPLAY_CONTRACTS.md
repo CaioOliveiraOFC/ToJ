@@ -151,13 +151,32 @@ medições está em [`BASELINES.md`](BASELINES.md).
   passar pela dungeon.
 - As bandas estão em `tests/balance/` e rodam com `pytest -m balance`.
 - **Estado: FECHADO** no checkpoint atual (`bc815fcd`).
+- **Três bandas medem a dungeon, não as classes.** `MAX_SMART_REACH_20`,
+  `MIN_TOTAL_ATTRITION` e `MAX_CLASS_MEAN_FLOOR` medem dificuldade global sob
+  expected loadout.
+  - Elas se movem quando a dungeon muda de propósito.
+  - Toda remedição registra o valor antigo, o novo, o protocolo e o motivo em
+    `tests/balance/thresholds.py`.
+  - Foram remedidas duas vezes, por decisão do usuário: no bloco Dungeon / Run
+    Progression e no primeiro level-up (`d3105edc`).
+- **Todas as outras bandas continuam congeladas**: o spread entre classes (a
+  paridade), o TTK, o skill gap, o peso da sorte, os arquétipos e os encontros.
+  Uma falha nelas não se resolve mexendo no limite.
 
 ### Run/Progression Balance
 
 - **A nova jornada real** com Starter Kit, mapa, loot, economia, serviços, fuga e
   extração, jogada pelo BotPadrão.
-- A referência é [`baselines/progression/fb321d4e/`](baselines/progression/fb321d4e/README.md).
-- **Estado: PENDENTE DE CALIBRAÇÃO.**
+- A referência atual é a auditoria do primeiro level-up,
+  [`baselines/progression/d3105edc/`](baselines/progression/d3105edc/README.md).
+  As anteriores são a auditoria da dungeon,
+  [`baselines/progression/4d0a9a0a/`](baselines/progression/4d0a9a0a/README.md),
+  a auditoria do instrumento,
+  [`baselines/progression/0ab837b9/`](baselines/progression/0ab837b9/README.md),
+  e a primeira baseline real, medida com o instrumento antigo,
+  [`baselines/progression/fb321d4e/`](baselines/progression/fb321d4e/README.md).
+- **Estado: CALIBRADO.** Os problemas estruturais conhecidos foram tratados ou
+  aceitos, e o `-m balance` completo passou no `82ff73ea` (118 passed).
 
 > **Um resultado ruim de progressão não reabre automaticamente o balance de
 > classe.**
@@ -181,6 +200,16 @@ Mudar uma classe exige mostrar a causa na régua de combate, e mantê-la verde.
   - inconclusivo.
 - **Mudar o bot é mudar o instrumento.** Medições de progressão de antes e de
   depois de uma mudança no bot não se comparam sem remedir a baseline.
+- **O mapa não revela o monstro ao bot.** O bot sabe o que o jogador sabe.
+  - Antes da colisão, um `&` é só casa, distância e caminho (`TargetView`). Não
+    há nome, nível, HP, atributos nem dano.
+  - Alvos visualmente iguais valem igual para a policy.
+  - O estado exato do monstro (`CombatState`) só existe depois da colisão.
+  - Protegido por `tests/test_bot_observation.py` e
+    `tests/test_bot_decisao_mapa.py`. Esses testes não mudam para acomodar uma
+    implementação.
+  - Uma decisão melhor antes da luta vem do que o jogador sabe: o histórico
+    observado e os recursos que de fato pode pagar.
 
 ## Arena
 

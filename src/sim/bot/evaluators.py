@@ -483,7 +483,7 @@ def avaliar_mapa(opcao: ActionOption, mapa: MapState, prog: ProgressionState) ->
     """
     familia = opcao.family
     if familia == "lutar":
-        return _avaliar_luta(opcao, prog)
+        return _avaliar_luta(opcao, mapa, prog)
     if familia == "pocao":
         return _avaliar_pocao(opcao, prog)
     if familia == "extrair":
@@ -495,7 +495,7 @@ def avaliar_mapa(opcao: ActionOption, mapa: MapState, prog: ProgressionState) ->
     return _avaliar_servico(opcao, mapa, prog)
 
 
-def _avaliar_luta(opcao: ActionOption, prog: ProgressionState) -> Score:
+def _avaliar_luta(opcao: ActionOption, mapa: MapState, prog: ProgressionState) -> Score:
     """Lutar é o objetivo do andar, e ouro NÃO entra nesta conta.
 
     Ter a taxa da saída paga era o que desligava a principal fonte de combate do
@@ -524,6 +524,22 @@ def _avaliar_luta(opcao: ActionOption, prog: ProgressionState) -> Score:
     # melhor), não inventa constante, e devolve o veto para onde ele pertence: o
     # ponto de aposta, que é o único limiar de HP do cérebro.
     lutas = 1 + alvo.extras + (1 if alvo.chefe else 0)
+    if prog.hp_frac < HP_DE_APOSTA and _mergulho_sem_progresso(mapa, prog):
+        # Abaixo do ponto de aposta, sublevel e sem pagar a saída: medir contra a
+        # aposta mandaria descer de novo, e é assim que a espiral se repete. Aqui
+        # a capacidade é o fôlego OBSERVADO — o HP útil que sobra depois do custo
+        # médio das lutas que esta escolha obriga —, na mesma unidade: fração da
+        # barra, dividida pelas lutas. Um alvo que exige mais lutas do que o
+        # fôlego paga fica sem valor, e um livre, com valor.
+        sobra = (prog.hp_frac + prog.cura_garantida) - prog.dano_por_luta * lutas
+        return Score(
+            opcao.action_id,
+            Need.PROGREDIR,
+            sobra / lutas,
+            (("fôlego observado por luta", sobra / lutas),),
+            tiebreak=-float(alvo.passos),
+            note="sublevel e sem pagar a saída: lutar é o que devolve o progresso",
+        )
     componentes = [("capacidade por luta", (prog.hp_frac - HP_DE_APOSTA) / lutas)]
     return Score(
         opcao.action_id,
@@ -552,20 +568,61 @@ def _necessidade_de_cura(prog: ProgressionState) -> Need:
 
     O ponto de aposta é o MESMO das outras duas leituras: é o único limiar de HP
     do cérebro, e as três decisões giram em torno dele.
+
+    Entre os dois fica RECUPERAR, e ele não é arranhão: é quando a PRÓXIMA luta,
+    pelo dano real que esta run já recebeu por encontro, me derrubaria abaixo do
+    ponto de aposta. Aí uma cura que existe de verdade — poção na mochila, ou a
+    Loja com recuperação que cabe no orçamento — vem antes de encostar no próximo
+    `&`. É história observada, não ficha do monstro: qual monstro está na casa
+    continua desconhecido até a colisão. Sem combate observado, vale a regra de
+    antes.
     """
-    return Need.SOBREVIVER if prog.hp_frac < HP_DE_APOSTA else Need.INVESTIR
+    if prog.hp_frac < HP_DE_APOSTA:
+        return Need.SOBREVIVER
+    if (
+        prog.combates_observados >= 1
+        and prog.dano_por_luta > 0
+        and prog.hp_frac - prog.dano_por_luta < HP_DE_APOSTA
+    ):
+        return Need.RECUPERAR
+    return Need.INVESTIR
 
 
 def _avaliar_pocao(opcao: ActionOption, prog: ProgressionState) -> Score:
-    """Beber é de graça em passos e em ouro. Poção parada não cura ninguém."""
-    util = min(opcao.mechanics.healing, prog.hp_max - prog.hp)
+    """Beber é de graça em passos e em ouro — e a poção é finita.
+
+    Ela vale quando há NECESSIDADE: abaixo do ponto de aposta (SOBREVIVER) ou
+    quando a próxima luta, pelo custo que a run já observou, me derrubaria abaixo
+    dele (RECUPERAR). Sem necessidade, ela fica na mochila: beber "porque tem"
+    queimava a cura antes do descanso do fim do andar, que é de graça, e deixava
+    o bot sem nada quando a luta cara chegasse. E nunca vale quando a maior parte
+    da cura transbordaria — gastar um frasco para aproveitar menos da metade
+    dele é desperdício, não recuperação.
+    """
+    cura = opcao.mechanics.healing
+    util = min(cura, prog.hp_max - prog.hp)
+    necessidade = _necessidade_de_cura(prog)
     componentes = [("HP recuperável", util / max(1, prog.hp_max))]
-    nota = ""
-    if util < opcao.mechanics.healing:
-        nota = f"cura {opcao.mechanics.healing} com só {util} aproveitável"
+    nota = f"cura {cura} com só {util} aproveitável" if util < cura else ""
+    if necessidade is Need.INVESTIR:
+        return Score(
+            opcao.action_id,
+            necessidade,
+            0.0,
+            (("sem necessidade observada", 0.0),),
+            note="nada indica que a próxima luta me derrube: a poção fica para quando indicar",
+        )
+    if util < cura - util:
+        return Score(
+            opcao.action_id,
+            necessidade,
+            0.0,
+            (("cura que transbordaria", 0.0),),
+            note=f"cura {cura} com só {util} aproveitável: mais da metade se perderia",
+        )
     return Score(
         opcao.action_id,
-        _necessidade_de_cura(prog),
+        necessidade,
         sum(v for _n, v in componentes),
         tuple(componentes),
         note=nota,
@@ -594,7 +651,13 @@ def _avaliar_servico(opcao: ActionOption, mapa: MapState, prog: ProgressionState
     por_encontro = 1 + lutas
 
     if opcao.family == "shop":
-        if falta > 0 and prog.ouro > prog.taxa_de_saida:
+        # A cura que a Loja promete é FATO do serviço (`ServiceView.cura_hp`): o
+        # passo de recuperação que cabe no orçamento com que o jogador entra.
+        # Deduzi-la de `ouro > taxa` prometia cura que a compra não pagava, e a
+        # Loja era consumida sem curar — foi o que o Warrior seed 24 da baseline
+        # `fb321d4e` fez com 30 de ouro contra uma saída de 27.
+        cura_pagavel = servico.cura_hp if servico else 0.0
+        if falta > 0 and cura_pagavel > 0:
             componentes = [
                 ("HP a recuperar", falta),
                 # A reserva da saída é o que mantém a run sustentável.
@@ -610,12 +673,16 @@ def _avaliar_servico(opcao: ActionOption, mapa: MapState, prog: ProgressionState
                 tuple(componentes),
                 tiebreak=-float(desvio),
             )
+        # Repor cura também é FATO da Loja (`ServiceView.pocao_pagavel`): sem
+        # orçamento para uma poção, "falta de cura" prometia uma compra que a
+        # visita não faz, e a Loja era consumida à toa.
+        pocao_pagavel = servico.pocao_pagavel if servico else False
         componentes = [
             (
                 "folga de ouro",
                 max(0.0, (prog.ouro - prog.taxa_de_saida) / max(1, prog.taxa_de_saida)),
             ),
-            ("falta de cura", 1.0 if prog.pocoes_de_cura == 0 else 0.0),
+            ("falta de cura", 1.0 if prog.pocoes_de_cura == 0 and pocao_pagavel else 0.0),
         ]
         return Score(
             opcao.action_id,
@@ -701,6 +768,39 @@ def _avaliar_evento(opcao: ActionOption, mapa: MapState, prog: ProgressionState)
     )
 
 
+def _lutas_que_absorvo(prog: ProgressionState) -> float | None:
+    """Quantas lutas médias o fôlego atual paga: HP útil sobre o custo de uma luta.
+
+    HP útil é a vida agora mais a cura que já está na mão; o custo é o dano REAL
+    que esta run recebeu por encontro. É história observada, e vale para o `&`
+    que ainda não encostou — não diz nada sobre qual monstro está lá. `None` sem
+    evidência: inventar uma média global seria trocar medição por chute.
+    """
+    if prog.combates_observados < 1 or prog.dano_por_luta <= 0:
+        return None
+    return (prog.hp_frac + prog.cura_garantida) / prog.dano_por_luta
+
+
+def _mergulho_sem_progresso(mapa: MapState, prog: ProgressionState) -> bool:
+    """Descer agora seria mais uma volta da espiral de mergulho (KI-003)?
+
+    Contornar o andar e sair sem pagar são regras do jogo, e continuam
+    possíveis. O que este teste reconhece é a estratégia patológica: o herói
+    está abaixo da progressão natural do andar (nível < andar), a saída NÃO vai
+    ser paga, há luta no mapa, e o fôlego observado ainda absorve pelo menos uma
+    luta média. Nesse estado, buscar o descanso do fim do andar deixa de ser
+    recuperação e passa a ser fugir do progresso.
+
+    Fronteiras naturais, nenhuma constante nova: pagar a saída zera a punição
+    (não é o mesmo problema); sem fôlego para uma luta média, não se força
+    combate; sem evidência de custo, não se inventa média.
+    """
+    if prog.ouro >= prog.taxa_de_saida or prog.nivel >= mapa.andar or not mapa.alvos:
+        return False
+    absorvo = _lutas_que_absorvo(prog)
+    return absorvo is not None and absorvo >= 1
+
+
 def _runway_em_andares(mapa: MapState, prog: ProgressionState) -> float | None:
     """Quantos ANDARES ADICIONAIS a run ainda sustenta.
 
@@ -732,13 +832,13 @@ def _runway_em_andares(mapa: MapState, prog: ProgressionState) -> float | None:
     trocar medição por chute. Quem trata esse caso é `_avaliar_extracao`, com
     regra separada e declarada.
     """
-    if prog.combates_observados < 1 or prog.andares_concluidos < 1:
+    if prog.andares_concluidos < 1 or prog.lutas_por_andar <= 0:
         return None
-    if prog.dano_por_luta <= 0 or prog.lutas_por_andar <= 0:
+    absorvo = _lutas_que_absorvo(prog)
+    if absorvo is None:
         return None
 
-    hp_util = prog.hp_frac + prog.cura_garantida
-    lutas = hp_util / prog.dano_por_luta - mapa.lutas_ate_extracao
+    lutas = absorvo - mapa.lutas_ate_extracao
     if lutas <= 0:
         # Nem o portal é alcançável com o fôlego que resta.
         return 0.0
@@ -896,11 +996,16 @@ def _score_da_extracao(opcao: ActionOption, preserva: bool, nota: str) -> Score:
 def _avaliar_saida(opcao: ActionOption, mapa: MapState, prog: ProgressionState) -> Score:
     """Encerrar o andar. A última necessidade, e por isso sempre disponível.
 
-    Com o HP abaixo do ponto de aposta ela sobe para SOBREVIVER: o descanso de
+    Com o HP abaixo do ponto de aposta ela sobe para RECUPERAR: o descanso de
     fim de andar é a única cura garantida do jogo, e buscá-lo deixa de ser
     encerrar o andar e passa a ser não morrer nele.
+
+    A exceção é a espiral de mergulho (`_mergulho_sem_progresso`): sublevel, sem
+    pagar a saída e ainda com fôlego para uma luta média, descer não recupera
+    nada — a saída fica em ENCERRAR, com o custo real de Essência que ela cobra,
+    e continua sempre disponível.
     """
-    if prog.hp_frac < HP_DE_APOSTA:
+    if prog.hp_frac < HP_DE_APOSTA and not _mergulho_sem_progresso(mapa, prog):
         valor = HP_DE_APOSTA - prog.hp_frac
         return Score(
             opcao.action_id,

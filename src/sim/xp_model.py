@@ -35,6 +35,7 @@ from functools import lru_cache
 from src.content.factories.monsters import (
     calculate_scaled_monster_level,
     generation_rules,
+    hero_level_ceiling,
     routine_monster_count,
 )
 from src.mechanics.math_operations import (
@@ -59,26 +60,43 @@ LEVEL_SAMPLES = 96
 LEVEL_SEED = 20260912
 
 
-def _balde_do_heroi(hero_level: int) -> int:
+def _balde_do_heroi(floor: int, hero_level: int) -> int:
     """Colapsa o nível do herói nas faixas que o gerador real distingue.
 
-    `calculate_scaled_monster_level` só olha o nível do herói em um lugar —
-    `if player_level <= early_player_level` — então acima desse limiar todos os
-    níveis produzem a mesma distribuição. Colapsar aqui faz os seis perfis de
-    diagnóstico compartilharem o mesmo cache em vez de reamostrar tudo seis vezes.
+    `calculate_scaled_monster_level` só olha o nível do herói por
+    `hero_level_ceiling`, e o teto cresce com o nível. A partir do primeiro nível
+    cujo teto já cobre o monstro mais alto que o andar pode sortear, o teto não
+    morde mais, e todos os níveis acima produzem a mesma distribuição. Colapsar
+    aqui faz os seis perfis de diagnóstico compartilharem o mesmo cache em vez de
+    reamostrar tudo seis vezes.
 
-    O limiar vem do JSON, não de um literal: se ele mudar, o balde muda junto. E
+    A conta lê o teto e os deslocamentos da mesma fonte do gerador. E
     `tests/test_progression_contract.py` confere o resultado contra a função de
     verdade, incluindo os níveis baixos, para que o atalho não passe a mentir em
     silêncio.
     """
-    limiar = int(generation_rules()["level_variation"]["early_player_level"])
-    return min(max(1, hero_level), limiar + 1)
+    variacao = generation_rules()["level_variation"]
+    mais_alto = min(
+        floor + max(int(o) for o in variacao["offsets"]),
+        floor + int(variacao["max_above_floor"]),
+    )
+    nivel = max(1, hero_level)
+    if hero_level_ceiling(nivel) < mais_alto:
+        return nivel
+    # O teto cresce com o nível: o primeiro nível que cobre o andar sai por bisseção.
+    baixo, alto = 1, nivel
+    while baixo < alto:
+        meio = (baixo + alto) // 2
+        if hero_level_ceiling(meio) >= mais_alto:
+            alto = meio
+        else:
+            baixo = meio + 1
+    return baixo
 
 
 def _amostra_do_encontro(floor: int, hero_level: int) -> tuple[float, float]:
     """Nível médio e XP média de um monstro comum deste andar."""
-    return _amostra_por_balde(floor, _balde_do_heroi(hero_level))
+    return _amostra_por_balde(floor, _balde_do_heroi(floor, hero_level))
 
 
 @lru_cache(maxsize=None)

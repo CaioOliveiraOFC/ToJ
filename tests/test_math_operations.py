@@ -8,7 +8,8 @@ do herói. O que resta aqui é recompensa e progressão.
   Mini-chefe: mesma forma, nível efetivo = andar + MINI_BOSS_LEVEL_BONUS
   Custo de nível: XP_BASE_COST * (nível + amortecedor)/(1 + amortecedor) *
                   GROWTH_RATE^(nível-1) — a mesma forma da produção de XP de
-                  um andar, que é o que impede as duas curvas de divergirem
+                  um andar, que é o que impede as duas curvas de divergirem.
+                  O primeiro level-up custa FIRST_LEVEL_XP_COST.
   Essência: gauss truncada em [0.5, 3.0], arredondada a 1 casa.
 """
 
@@ -23,10 +24,10 @@ import pytest  # noqa: E402
 from src.mechanics import math_operations as mo  # noqa: E402
 from src.shared import constants  # noqa: E402
 from src.shared.constants import (  # noqa: E402
+    FIRST_LEVEL_XP_COST,
     GROWTH_RATE,
     MONSTER_BASE_COIN_REWARD,
     MONSTER_BASE_XP_REWARD,
-    XP_BASE_COST,
 )
 from src.shared.formulas import geometric, xp_for_level  # noqa: E402
 
@@ -86,8 +87,8 @@ class TestEscalonamentoCompartilhado:
 
 
 class TestXpForNextLevel:
-    def test_nivel_1_e_o_custo_base(self):
-        assert mo.calculate_xp_for_next_level(1) == XP_BASE_COST
+    def test_nivel_1_tem_custo_proprio(self):
+        assert mo.calculate_xp_for_next_level(1) == FIRST_LEVEL_XP_COST
 
     @pytest.mark.parametrize("level", [2, 5, 10, 19])
     def test_formula_geometrica(self, level):

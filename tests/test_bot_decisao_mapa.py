@@ -200,10 +200,16 @@ class TestRecuperacao:
         assert _nota(_pocao(), mapa, prog) == 0.0
 
     def test_cura_que_excede_o_hp_faltante_so_conta_o_aproveitavel(self):
-        mapa, prog = _mapa(), _prog(hp=480, hp_max=500)
-        score = avaliar_mapa(_pocao(cura=300), mapa, prog)
-        assert "aproveitável" in score.note
-        assert score.utility == 20 / 500
+        """Na necessidade, só o HP que falta conta. Com a vida quase cheia, nada.
+
+        Beber 300 para aproveitar 20 era nota +0,04: a poção queimava antes do
+        descanso do fim do andar, que é de graça (KI-004).
+        """
+        mapa = _mapa()
+        ferido = avaliar_mapa(_pocao(cura=400), mapa, _prog(hp=160, hp_max=500))
+        assert "aproveitável" in ferido.note
+        assert ferido.utility == 340 / 500
+        assert avaliar_mapa(_pocao(cura=300), mapa, _prog(hp=480, hp_max=500)).utility == 0.0
 
 
 # --- F, M: o `?` é desconhecido ---------------------------------------------

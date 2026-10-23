@@ -426,7 +426,8 @@ ROGUE_BASE_DF = 25
 
 # Fórmulas
 DAMAGE_FORMULA_DIVISOR = 3  # (ST + MG) // 3
-# Custo de XP do nível 1 e razão de crescimento do custo. A razão é maior que
+# Custo de XP do nível 1 NA FÓRMULA — a âncora da curva. O primeiro level-up de
+# verdade custa FIRST_LEVEL_XP_COST, logo abaixo. A razão é maior que
 # GROWTH_RATE de propósito: o número de combates por nível sobe ao longo da run
 # (cerca de 3 no nível 1, cerca de 14 no nível 19), então o herói fica
 # progressivamente atrás do andar. É essa defasagem que cria dificuldade
@@ -442,6 +443,24 @@ XP_BASE_COST = 140
 # desloca onde a defasagem se estabiliza; que ela se estabilize vem da forma.
 # Ver `tests/test_progression_contract.py`.
 XP_LEVEL_SOFTENER = 6
+
+# O custo do primeiro level-up (nível 1 -> 2), e só dele. Do nível 2 em diante a
+# curva é a de sempre, pela fórmula acima, sem nenhum parâmetro mexido.
+#
+# A fórmula pedia 140 no nível 1: o andar 1 inteiro. O andar tem 3 monstros, e a
+# vitória Nv1 paga 45 × a Essência do andar (média 1,2). Com duas vitórias — como
+# uma largada ferida costuma sair do andar 1 — 140 nunca fecha. Na auditoria
+# `4d0a9a0a`, 178 de 266 runs entravam no andar 2 ainda no nível 1.
+#
+# Com 100, limpar o andar sobe de nível com qualquer Essência a partir de 0,8, e
+# duas vitórias sobem com a Essência média; abaixo disso, não sobem.
+#
+# Baixar o nível 1 MEXENDO NA FÓRMULA (XP_BASE_COST 100 e amortecedor 4) foi
+# tentado e desfeito: deixava os níveis 2-20 de 8% a 25% mais baratos, o herói
+# passava à frente do andar e quase metade das runs extraía. Uma constante só
+# do primeiro nível deixa o custo acumulado de qualquer nível posterior
+# exatamente 40 abaixo do de antes, e nada mais.
+FIRST_LEVEL_XP_COST = 100
 
 # O mini-chefe aparece a cada N andares. Lido por `engine/loop.py`,
 # `sim/harness.py` e `sim/xp_model.py`, para os três concordarem.

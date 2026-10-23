@@ -10,6 +10,15 @@ if TYPE_CHECKING:
     from src.entities.heroes import Player
 
 
+def _cura_basica(item: Item) -> bool:
+    """A poção de cura Common: consumível que devolve HP, a que existe desde o andar 1."""
+    return (
+        bool(getattr(item, "consumable", False))
+        and getattr(item, "effect_type", None) == "max_hp"
+        and getattr(item, "rarity", "Common") == "Common"
+    )
+
+
 class Shop:
     """Representa a loja do jogo onde o jogador pode comprar itens."""
 
@@ -80,6 +89,15 @@ class Shop:
             price = self.get_price(item, dungeon_level)
             available_items.append({"item": item.spawn(), "price": price})
 
+        # A cura básica não é sorteada: é linha fixa da vitrine. Sorteada junto
+        # com o resto, a Poção de Cura Pequena aparecia em 16% das Lojas dos
+        # andares 1-3, e o drop dava cura em cerca de 0,5% das vitórias; na
+        # auditoria `0ab837b9`, 231 de 300 runs nunca tiveram uma poção. Ela
+        # continua com o mesmo preço e o mesmo desbloqueio. As poções maiores
+        # continuam sendo achado, sorteadas com o resto.
+        basicas = [o for o in available_items if _cura_basica(o["item"])]
+        available_items = [o for o in available_items if not _cura_basica(o["item"])]
+
         # Define quantos itens mostrar conforme o andar
         if dungeon_level <= 3:
             max_items = random.randint(8, 10)
@@ -94,7 +112,7 @@ class Shop:
 
         # Embaralha 100% e pega os primeiros N
         random.shuffle(available_items)
-        return available_items[:max_items]
+        return available_items[:max_items] + basicas
 
     def visit(self, dungeon_level: int, player_class: str) -> "ShopVisit":
         """Abre uma visita: o estoque é sorteado uma vez e passa a ser o desta ida.

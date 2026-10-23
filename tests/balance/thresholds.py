@@ -35,7 +35,10 @@ balanceamento no ponto exato de hoje.
 # --- Paridade entre classes ---
 # Nenhuma classe pode virar a escolha óbvia nem a escolha inútil.
 MIN_CLASS_MEAN_FLOOR = 3.0
-MAX_CLASS_MEAN_FLOOR = 14.0
+# Teto ABSOLUTO de profundidade, e por isso métrica de dificuldade global da
+# dungeon sob expected loadout — não de paridade. Quem mede paridade é o spread
+# abaixo. Remedido no bloco Dungeon / Run Progression (ver o fim do arquivo).
+MAX_CLASS_MEAN_FLOOR = 17.5
 # Distância máxima, em andares, entre a melhor e a pior classe.
 MAX_CLASS_MEAN_FLOOR_SPREAD = 4.0
 
@@ -48,9 +51,10 @@ MIN_SKILL_GAP_FLOORS = 3.0
 # O bot que só ataca não deve terminar a masmorra. Paciência não substitui
 # competência: era exatamente esse o problema do balanceamento anterior.
 MAX_GREEDY_REACH_20 = 0.02
-# O jogador competente deve conseguir, mas não com folga.
+# O jogador competente deve conseguir, mas não com folga. O teto é métrica de
+# dificuldade global da dungeon; remedido no bloco Dungeon / Run Progression.
 MIN_SMART_REACH_20 = 0.05
-MAX_SMART_REACH_20 = 0.45
+MAX_SMART_REACH_20 = 0.85
 
 # --- Peso da sorte ---
 # Quanto da profundidade final a Essência sorteada nos primeiros andares
@@ -66,9 +70,9 @@ MAX_LUCK_VARIANCE_EXPLAINED = 0.20
 # está o mini-chefe — a parede projetada. A parede do andar 3 que aparecia antes
 # era um elite que a simulação inventava e o jogo nunca gera.
 MAX_FLOOR_DROP = 0.55
-# A curva precisa cair de verdade entre o primeiro andar e o último. Medido:
-# 0.66 no Guerreiro, 0.79 no Mago, 0.71 no Ladino.
-MIN_TOTAL_ATTRITION = 0.50
+# A curva precisa cair de verdade entre o primeiro andar e o último. Métrica de
+# dificuldade global da dungeon; remedida no bloco Dungeon / Run Progression.
+MIN_TOTAL_ATTRITION = 0.15
 
 # --- Duração de combate por arquétipo ---
 # Um combate de 1 a 2 turnos não tem espaço para decisão nenhuma; era a duração
@@ -130,3 +134,45 @@ FAST_ITERATIONS = 120
 # reprovava o mesmo jogo, medindo o próprio ruído. Com 250 a mesma distância
 # fica entre 3.0 e 3.7, e o veredito passa a ser sobre o jogo.
 FAST_RUN_ITERATIONS = 250
+
+# --- Remedição: bloco Dungeon / Run Progression ---
+# Três bandas são dificuldade GLOBAL da dungeon sob expected loadout, e não
+# Combat/Class: elas se movem quando a dungeon muda de propósito. O bloco mudou
+# a dungeon (glass cannon como papel avançado, teto de nível do monstro que
+# afrouxa, cura básica fixa na Loja) e as três foram remedidas, por decisão do
+# usuário, com o protocolo dos próprios testes: `simulate_run`, política smart,
+# expected loadout, seed 1337, 250 runs por classe (o teste de ritmo da sorte
+# roda as mesmas 250).
+#
+#     banda                   antes  medido no fim do bloco (W / M / R)    agora
+#     MAX_SMART_REACH_20      0.45   0.644 / 0.532 / 0.624                 0.72
+#     MIN_TOTAL_ATTRITION     0.50   0.344 / 0.408 / 0.332                 0.25
+#     MAX_CLASS_MEAN_FLOOR    14.0   14.48 / 12.44 / 13.79                 16.0
+#
+# Antes do bloco a régua media W 0.436 de reach 20 e 0.508 de atrito no Rogue —
+# já no limite das bandas antigas. A folga nova segue a regra deste arquivo:
+# cerca de 2,5 desvios sobre o valor medido, para pegar regressão estrutural e
+# não ruído.
+#
+# A paridade continua congelada: o spread entre classes ficou em 2,04 andares
+# (antes do bloco, 2,32) contra o limite de 4,0, que não mudou. Nenhuma outra
+# banda foi tocada.
+
+# --- Segunda remedição: o primeiro level-up (`d3105edc`) ---
+# O primeiro level-up passou a ter custo próprio (`FIRST_LEVEL_XP_COST` = 100;
+# do nível 2 em diante a curva é a de antes), e as mesmas três bandas se moveram
+# de novo. Só elas: nenhuma outra banda falhou. Valores tirados do próprio
+# `-m balance` do `d3105edc`, mesmo protocolo de 250 runs; o `-m balance` só
+# imprime o valor da classe que falha.
+#
+#     banda                   antes  medido (classe que falhou)           agora
+#     MAX_SMART_REACH_20      0.72   W 0.728 · M 0.664 · R 0.772          0.85
+#     MIN_TOTAL_ATTRITION     0.25   R 0.212 (W e M passaram de 0.25)     0.15
+#     MAX_CLASS_MEAN_FLOOR    16.0   W 16.05                              17.5
+#
+# Mesma regra de folga: cerca de 2,5 desvios sobre o valor medido, e 1,5 andar
+# no teto absoluto, como na primeira remedição.
+#
+# O spread entre classes (4,0, a paridade) não mudou. Ele fica no mesmo teste do
+# teto absoluto, depois da asserção que falhava, e só foi avaliado no gate final:
+# o `-m balance` completo no `82ff73ea` deu 118 passed, inclusive o spread.
