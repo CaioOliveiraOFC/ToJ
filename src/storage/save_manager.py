@@ -418,6 +418,50 @@ def load_game(
     return player_from_save_data(save_data, item_registry, player_factory)
 
 
+def load_save_data(slot: int) -> dict | None:
+    """O dicionário salvo no slot, como está em disco. `None` sem save legível.
+
+    É a mesma leitura de `load_game`, sem a reconstrução: a Arena precisa do
+    snapshot cru, porque o gladiador nasce dele por uma cópia, e o arquivo nunca
+    deve ser regravado inteiro só para mudar o equipamento.
+    """
+    filepath = get_slot_file(slot)
+    if not os.path.exists(filepath):
+        return None
+    try:
+        with open(filepath, "r") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+# Os únicos campos que a preparação da Arena pode regravar: o que está vestido e
+# o que está na mochila. Mover uma peça entre os dois é tudo o que ela faz.
+CAMPOS_DE_EQUIPAMENTO = ("equipment", "inventory")
+
+
+def save_loadout(slot: int, player: "Player") -> SaveResult:
+    """Grava o equipamento do gladiador, e só ele, no save do slot.
+
+    Lê o arquivo, troca `equipment` e `inventory` pela serialização canônica do
+    personagem e devolve o resto como estava: HP, MP, nível, deck, passivas,
+    livro-caixa e a marca de extração continuam os do arquivo. Regravar o save
+    inteiro a partir do personagem carregado passaria cada campo por uma ida e
+    volta que a Arena não tem motivo para fazer.
+    """
+    dados = load_save_data(slot)
+    if dados is None:
+        return {"success": False, "message": f"Slot {slot} sem save legível."}
+    dados["equipment"] = {posicao: _serializar(item) for posicao, item in player.equipment.items()}
+    dados["inventory"] = [_serializar(item) for item in player.inventory]
+    try:
+        with open(get_slot_file(slot), "w") as f:
+            json.dump(dados, f, indent=4)
+        return {"success": True, "message": "Equipamento gravado."}
+    except OSError as e:
+        return {"success": False, "message": f"Ocorreu um erro ao salvar: {e}"}
+
+
 def check_save_file(slot: int = 1) -> bool:
     """Verifica se o ficheiro de save existe."""
     return os.path.exists(get_slot_file(slot))
