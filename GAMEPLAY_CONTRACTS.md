@@ -213,18 +213,114 @@ Mudar uma classe exige mostrar a causa na régua de combate, e mantê-la verde.
 
 ## Arena
 
-Só o contrato de fronteira. Nenhuma regra de Arena foi aprovada até aqui.
+Fase 1 do PvP, na branch `phase/pvp-arena`, sobre a fundação congelada em
+`v0.3-pve`. **O motor do duelo existe e é headless**: dois gladiadores, decisões
+simultâneas, resolução sequencial. **A Arena ainda não é modo de jogo**: não há
+entrada no menu, fila, MMR, UI nem rede, e carregar um personagem extraído
+continua avisando que a Arena não está aberta.
 
-- **A Arena ainda não existe como sistema de gameplay.**
-  - Não há modo nem entrada no menu.
-  - Carregar um personagem extraído avisa que a Arena ainda não está aberta.
-  - O nome aparece só em instrumentos de medição, e eles não são o modo de jogo:
-    - `src/sim/arena.py` mede o poder geral;
-    - `tools/arena_alvo.py` guarda o poder de referência;
-    - a política de extração do bot compara a build contra esse alvo.
-- **O PvP é uma fase posterior** à calibração da progressão PvE.
+Verificado em `tests/test_pvp_duel.py` e `tests/test_pvp_initiative.py`.
+
+### Fronteira com o PvE
+
+- **O PvP não muda o PvE.** `run_battle` continua herói contra monstro, com a
+  ordem por AG e o teto `MAX_BATTLE_TURNS`, e não é tocado.
+- **O duelo é uma orquestração própria** (`src/mechanics/pvp_duel.py`) sobre as
+  MESMAS regras: `apply_skill`, `resolve_physical_attack` e
+  `process_turn_start_effects`. Não existe segundo resolvedor de dano, efeito,
+  recarga ou mana. Dano físico e mágico, crítico, evasão, defesa, mitigação,
+  resistência, cura, roubo de vida, Égide, regeneração de 2% do MP, recargas,
+  efeitos, leis de interação e bônus de equipamento valem no duelo porque são o
+  mesmo código.
 - **O que for descoberto no PvP não altera em silêncio a fundação PvE.** Uma
   mudança em classe, dano, skill ou progressão continua sujeita aos contratos
   acima e às duas réguas.
-- Regras específicas de PvP podem existir quando a fase começar, e entram aqui
-  quando forem aprovadas.
+- `overall_power` (`src/sim/arena.py`) e `tools/arena_alvo.py` continuam sendo
+  instrumentos de medição do PvE. Não são o modo de jogo, e `overall_power` não
+  é iniciativa.
+
+### Regras aprovadas e implementadas
+
+- **Gladiador.**
+  - Só entra um personagem cuja run terminou pela **Extração**.
+  - Ele nasce do snapshot de save pelo caminho canônico de reconstrução
+    (`src/engine/arena_setup.py`), e a preparação (`src/content/gladiator.py`)
+    trabalha numa **cópia**: o snapshot e o personagem salvo não mudam.
+  - Na entrada: HP e MP a 100%, buffs, efeitos e recargas da dungeon removidos,
+    `death_ignore` rearmado, **todo consumível fora**.
+  - **Sem risco de morte**, como diz o pilar da Arena em
+    [`GAME_DESIGN.md`](GAME_DESIGN.md): perder o duelo derruba a instância do
+    duelo, e não o personagem salvo.
+  - Classe, nível, atributos, equipamento, deck e passivas são os do
+    personagem. O duelo não tem ação de equipar nem de trocar skill, passiva ou
+    atributo: reorganizar equipamento é coisa de antes da fila.
+- **Ações:** ataque básico, skill do deck e rendição. Consumível e fuga não
+  existem no duelo. **Rendição é derrota imediata**, resolvida no lock, antes de
+  qualquer golpe, inclusive sob controle.
+- **Rodada.** Os dois escolhem sem ver a escolha do outro → validação das duas
+  → reserva de MP → lock → iniciativa → ordem travada → as oportunidades, na
+  ordem. A ação ilegal é recusada sem mudar nada.
+- **Iniciativa.**
+  - `média(sqrt(atributo / REF_atributo(nível)))` sobre HP máx., MP máx., ST, MG,
+    AG e DF **efetivos**, com peso igual, vezes o modificador de nível
+    `1 + clamp(Δnível × 0,005, −0,10, +0,10)`.
+  - Recalculada no início de cada resolução, sobre o estado atual. HP e MP
+    atuais não entram. Nenhum arredondamento antes da comparação.
+  - Desempate: maior score, depois maior AG relativa ao nível, depois a política
+    injetada.
+  - A ordem travada não muda dentro da rodada. A iniciativa não aparece na
+    visão do controlador.
+- **Ação comprometida.** Depois do lock ela resolve contra o estado ATUAL da
+  batalha: o escudo lançado por quem age primeiro protege do golpe de quem age
+  depois. Buff, debuff e mudança de MP não a invalidam. Só **morte do ator** ou
+  **controle** a cancelam.
+- **MP reservado.** No lock o custo da skill sai do MP livre e fica reservado.
+  Tudo que drena ou consome mana no meio da rodada (`mana_burn`, Égide) só
+  alcança o MP livre. A skill paga **uma vez**, pelo caminho de sempre. A
+  regeneração não enche o caixa acima de `teto − reserva`.
+- **Controle.**
+  - `stun`, `frozen` e `sleep` consomem oportunidades: duração N = exatamente N
+    oportunidades perdidas.
+  - Aplicado antes da ação pendente, ele a cancela e conta como a primeira.
+    Aplicado depois que o alvo agiu, pega a próxima.
+  - As durações contam as oportunidades do PORTADOR, como no PvE. A iniciativa
+    não causa perda dupla nem prolonga efeito.
+  - `fear`, `poison`, `bleed`, `mana_burn`, `slowed`, `weakened`, `hexed`,
+    `vulnerable` e buffs defensivos não interrompem ação comprometida.
+- **Fim.** MD1. Termina na primeira morte, sem ação póstuma e sem empate, na
+  rendição, ou por timeout ou desconexão vindos de fora do motor (`forfeit`).
+  **Não há teto de rodadas**: `MAX_BATTLE_TURNS` não se aplica, e o motor resolve
+  uma rodada por vez, conduzido pela camada de cima. O resultado traz vencedor,
+  perdedor, motivo e o histórico das rodadas.
+
+### Pendências de decisão
+
+Cada uma tem um ponto de extensão no código, e nenhuma regra foi inventada para
+fechá-la.
+
+- **Referências globais de iniciativa por nível.** O motor exige um provedor
+  (`InitiativeReferences`) e não traz tabela. `ReferenceTable` recusa nível sem
+  referência em vez de completar.
+- **Desempate absoluto** (score e AG relativa iguais). Política injetada
+  (`TieBreakPolicy`). `SeededCoinTieBreak` é o fallback técnico, reproduzível
+  pela semente, e não regra competitiva.
+- **Rendição simultânea.** Hoje perde quem está à frente da ordem travada, para o
+  motor ser total. É provisório.
+- **Penalidade por interrupção.** Não existe. A ação cancelada por controle ou
+  morte devolve a reserva e não aplica recarga.
+- **Efeito "explicitamente interruptivo"** além do controle. O catálogo não tem
+  nenhum, e hoje a interrupção é a família `control` do núcleo.
+
+### Contratos futuros, ainda não implementados
+
+A arquitetura não os impede, mas nenhum existe ainda.
+
+- A fila prioriza humanos por 30 segundos e depois aceita bots. Partida contra
+  bot conta normalmente no MMR.
+- 45 segundos por decisão, e o primeiro timeout é derrota. A desconexão dá 60
+  segundos para voltar e pausa o cronômetro. O motor não tem relógio: os dois
+  chegam por `forfeit`.
+- MMR individual por gladiador.
+- As builds adversárias (equipamento, skills e passivas) ficam visíveis antes do
+  duelo.
+- A população artificial sai só de heróis extraídos de runs PvE reais.

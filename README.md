@@ -82,5 +82,5 @@ isso por AST — a regra está em [`ARCHITECTURE.md`](ARCHITECTURE.md).
   fundação, desde `v0.2-prebalance`.
 - [`BASELINES.md`](BASELINES.md) — o índice das medições de referência.
 - [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) — os problemas abertos.
-- [`NEXT_PHASE.md`](NEXT_PHASE.md) — o trabalho atual: a decisão de release
-  da fase PvE.
+- [`NEXT_PHASE.md`](NEXT_PHASE.md) — o trabalho atual: a Arena PvP depois do
+  motor do duelo (Fase 1).

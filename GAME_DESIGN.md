@@ -13,7 +13,10 @@
 >   `expected loadout`.
 > - **O Run/Progression Balance está `[em calibração]`.** A jornada real está
 >   implementada e medida, mas a calibração está aberta.
-> - **A Arena (PvP) `[não existe]`.**
+> - **A Arena (PvP) `[não existe]` como modo de jogo.** O motor headless do
+>   duelo está implementado (Fase 1, `phase/pvp-arena`). Fila, MMR, UI e rede
+>   não existem. As regras estão em
+>   [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 >
 > As decisões que não podem mudar de passagem estão em
 > [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md). As medições estão em

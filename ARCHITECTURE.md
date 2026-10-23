@@ -83,6 +83,11 @@ Os módulos onde a responsabilidade não é óbvia pelo nome da camada:
 | `engine/map.py` | a grade do andar: casas de monstro, evento, serviço e saída, e a serialização delas no save |
 | `engine/map_analysis.py` | medição da geometria do andar (Dijkstra por `(combates, passos)`). Ferramenta de auditoria, não regra de jogo |
 | `sim/` | simulação headless. Roda o mesmo `mechanics/battle.py`, lê as mesmas fontes de população e de serviços, e nunca importa `engine/` nem `ui/`. `sim/loadouts.py` é o `expected loadout`, a régua sintética do Combat/Class Balance |
+| `mechanics/pvp_duel.py` | o **duelo da Arena**: rodada de decisões simultâneas, reserva de MP, ordem travada, cancelamento por controle ou morte, resultado MD1. É orquestração própria sobre `combat.py`, sem laço interno nem teto de rodadas. `run_battle` continua sendo só o PvE |
+| `mechanics/pvp_initiative.py` | a iniciativa do duelo: a fórmula aprovada, as referências por nível **injetadas** e a política de desempate injetável |
+| `content/gladiator.py` | a preparação do gladiador: só personagem extraído, cópia normalizada, sem consumível |
+| `engine/arena_setup.py` | o gladiador a partir do snapshot do save, pelo caminho canônico de reconstrução (`player_from_save_data`) |
+| `sim/pvp_controllers.py` | controladores de referência do duelo (roteiro, primeira skill legal). Provam a interface; não são o bot de PvP |
 
 **Fonte única é regra, não estilo.** Renda do andar, população do andar, custo de
 reroll, preços do Ferreiro e penalidade de Essência vivem cada um em exatamente
