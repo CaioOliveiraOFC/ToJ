@@ -50,9 +50,11 @@ from typing import Any, Literal, Protocol
 
 from src.mechanics import combat as combat_mech
 from src.mechanics.pvp_initiative import (
+    FOUNDATION_REFERENCES,
     InitiativeOrder,
     InitiativeReading,
     InitiativeReferences,
+    SeededCoinTieBreak,
     TieBreakPolicy,
     order_by_initiative,
     read_initiative,
@@ -257,12 +259,13 @@ def _fighter_view(hero) -> FighterView:
 class Duel:
     """Um duelo MD1 entre dois gladiadores preparados.
 
-    `references` e `tie_break` são obrigatórios e injetados: os valores das
-    referências de iniciativa e a regra do empate absoluto ainda não foram
-    aprovados, e o motor não escolhe nenhum dos dois por conta própria.
+    Sem nada injetado, a iniciativa usa as referências canônicas
+    (`FOUNDATION_REFERENCES`) e o desempate definitivo (`SeededCoinTieBreak`).
+    Os dois continuam injetáveis para teste.
 
     `rng` é o gerador do duelo inteiro — acerto, crítico, status e desempate.
-    Passe `random.Random(seed)` para reproduzir um duelo.
+    Passe `random.Random(seed)`, com a semente da partida, para reproduzir um
+    duelo; sem ele o gerador não é semeado.
     """
 
     def __init__(
@@ -270,8 +273,8 @@ class Duel:
         p1: Gladiator,
         p2: Gladiator,
         *,
-        references: InitiativeReferences,
-        tie_break: TieBreakPolicy,
+        references: InitiativeReferences = FOUNDATION_REFERENCES,
+        tie_break: TieBreakPolicy | None = None,
         rng: random.Random | None = None,
         publish: Callable | None = None,
     ) -> None:
@@ -285,7 +288,7 @@ class Duel:
 
         self._heroes = {SIDES[0]: p1.hero, SIDES[1]: p2.hero}
         self._references = references
-        self._tie_break = tie_break
+        self._tie_break = tie_break if tie_break is not None else SeededCoinTieBreak()
         self._rng = rng if rng is not None else random.Random()
         self._publish = publish
         self._round = 1

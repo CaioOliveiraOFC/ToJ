@@ -721,8 +721,8 @@ ARENA_EQUIVALENCE_BAND = 0.05
 #
 # Atua sobre o Initiative Score, nunca sobre os atributos: quem tem nível a mais
 # tende a agir antes, e o golpe dele continua valendo o que vale. As
-# REFERÊNCIAS globais por nível que normalizam a build NÃO moram aqui: os
-# valores delas ainda não foram aprovados, e o motor as recebe injetadas
-# (`mechanics/pvp_initiative.py`).
+# REFERÊNCIAS globais por nível que normalizam a build não moram aqui porque não
+# têm número próprio: saem dos atributos-base das classes e de `GROWTH_RATE`
+# (`mechanics/pvp_initiative.foundation_reference`).
 PVP_INITIATIVE_LEVEL_STEP = 0.005
 PVP_INITIATIVE_LEVEL_CAP = 0.10

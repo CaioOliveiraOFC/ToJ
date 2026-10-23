@@ -1,8 +1,9 @@
 """Iniciativa da Arena: a fórmula aprovada, o desempate e o que fica injetado.
 
 A estrutura é contrato: seis atributos efetivos, peso igual, raiz da razão
-contra a referência do nível, modificador de nível limitado. Os VALORES das
-referências não são — por isso todo teste aqui monta a própria tabela.
+contra a referência do nível, modificador de nível limitado. Aqui a fórmula é
+testada com tabelas injetadas, para que cada conta seja conferível à mão; as
+referências canônicas da fundação estão em `test_pvp_references.py`.
 """
 
 from __future__ import annotations

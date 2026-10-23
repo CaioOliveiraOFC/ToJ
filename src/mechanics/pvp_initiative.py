@@ -12,15 +12,17 @@ A raiz é o retorno decrescente: dobrar um atributo não dobra a contribuição
 dele. Os seis pesam igual. HP e MP ATUAIS não entram — quem está ferido não
 fica mais lento —, só os tetos.
 
-O que é aprovado e o que não é:
+Tudo aqui é contrato fechado:
 
-- a ESTRUTURA da fórmula, o modificador de nível e a ordem de desempate são
-  aprovados e vivem aqui;
-- os VALORES das referências globais por nível NÃO foram aprovados. O motor
-  recebe um provedor (`InitiativeReferences`) e não traz tabela própria;
-- o desempate residual, depois de score e de AG relativa iguais, é política
-  injetável (`TieBreakPolicy`). `SeededCoinTieBreak` é só o fallback TÉCNICO
-  que torna o motor total e reproduzível — não é regra competitiva.
+- a fórmula, o modificador de nível e a ordem de desempate — score, depois AG
+  relativa, depois `SeededCoinTieBreak`, o sorteio pela semente da partida;
+- a referência global de cada nível, `foundation_reference`: a MÉDIA das três
+  classes jogáveis no nível, pelos atributos-base delas (`CLASS_BASE`) e pelo
+  crescimento canônico (`formulas.geometric`). É a mesma conta que o jogo faz
+  para um herói sem equipamento, então a referência não tem número próprio.
+
+Referências e desempate continuam injetáveis (`InitiativeReferences`,
+`TieBreakPolicy`): é o que deixa um teste fixar a ordem que quer provar.
 
 O poder geral contra o boneco (`overall_power`) é outra métrica e não entra
 aqui.
@@ -28,16 +30,24 @@ aqui.
 
 from __future__ import annotations
 
+import functools
 import math
 import random
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Literal, Protocol
 
+from src.entities.heroes import Mage, Rogue, Warrior
 from src.shared.constants import PVP_INITIATIVE_LEVEL_CAP, PVP_INITIATIVE_LEVEL_STEP
+from src.shared.formulas import geometric
 
 # Os seis atributos da build, na ordem da fórmula. HP e MP entram pelo TETO.
 INITIATIVE_STATS = ("hp", "mp", "st", "mg", "ag", "df")
+
+# As classes cujos atributos-base formam a referência: as três jogáveis, as
+# mesmas da criação de personagem (`engine/game_logic.CLASS_MAP`, conferido por
+# teste). Uma referência por nível, comum às três.
+REFERENCE_CLASSES = (Warrior, Mage, Rogue)
 
 
 class MissingInitiativeReferenceError(LookupError):
@@ -72,12 +82,55 @@ class InitiativeReferences(Protocol):
     def at_level(self, level: int) -> InitiativeReference: ...
 
 
+@functools.lru_cache(maxsize=None)
+def foundation_reference(level: int) -> InitiativeReference:
+    """A referência global do nível, derivada da fundação do jogo.
+
+        REF_s(nível) = média, sobre Warrior, Mage e Rogue,
+                       de geometric(CLASS_BASE[s], nível)
+
+    É exatamente a média dos três heróis sem equipamento, passiva nem efeito
+    naquele nível, calculada pela mesma função que dá ao herói os atributos
+    dele — sem construir herói e sem simulação. Duas consequências, as duas
+    verificadas por teste:
+
+    - é NEUTRA: para cada atributo, a média das razões `classe / REF` das três
+      classes nuas é 1;
+    - não favorece nível: herói e referência crescem pela mesma razão, então a
+      build nua de cada classe lê o mesmo número em qualquer nível. Quem leva o
+      nível para a ordem é só o modificador de nível.
+
+    Não tem teto próprio: vale em todo nível em que o crescimento do herói
+    existe.
+    """
+    nivel = int(level)
+    if nivel != level or nivel < 1:
+        raise ValueError(f"Nível inválido para a referência de iniciativa: {level!r}")
+
+    def media(stat: str) -> float:
+        valores = (geometric(classe.CLASS_BASE[stat], nivel) for classe in REFERENCE_CLASSES)
+        return math.fsum(valores) / len(REFERENCE_CLASSES)
+
+    return InitiativeReference(**{stat: media(stat) for stat in INITIATIVE_STATS})
+
+
+class FoundationReferences:
+    """O provedor canônico: `foundation_reference`, calculada sob demanda."""
+
+    def at_level(self, level: int) -> InitiativeReference:
+        return foundation_reference(level)
+
+
+# O provedor que o duelo usa quando ninguém injeta outro.
+FOUNDATION_REFERENCES = FoundationReferences()
+
+
 class ReferenceTable:
-    """Provedor por tabela explícita, nível a nível.
+    """Provedor por tabela explícita, nível a nível. Para teste.
 
     Não tem valor próprio nem interpola: o nível que não está na tabela levanta
-    `MissingInitiativeReferenceError`. Quem monta a tabela é quem decide os
-    números — hoje, o teste ou a ferramenta de demonstração.
+    `MissingInitiativeReferenceError`. Existe para um teste fixar uma ordem que
+    as referências canônicas não fixariam.
     """
 
     def __init__(self, table: Mapping[int, InitiativeReference]) -> None:
@@ -164,11 +217,11 @@ class TieBreakPolicy(Protocol):
 
 
 class SeededCoinTieBreak:
-    """Fallback TÉCNICO: uma moeda do gerador do duelo.
+    """O desempate definitivo: uma moeda do gerador da partida.
 
-    Existe para que o motor nunca fique sem resposta e para que a mesma semente
-    dê sempre a mesma ordem. Só consome sorteio no empate absoluto. A regra
-    competitiva definitiva para esse caso é decisão pendente.
+    A mesma semente dá sempre a mesma ordem. Só é consultada no empate
+    absoluto — score e AG relativa exatamente iguais —, e não há alternância
+    nem prioridade fixa por lado.
     """
 
     def first(self, a: InitiativeReading, b: InitiativeReading, rng: random.Random) -> str:

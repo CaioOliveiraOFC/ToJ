@@ -3,10 +3,11 @@
 Fixtures pequenas e sementes fixas. Nenhum teste aqui mede balanceamento: cada
 um prova uma regra do motor com um ou poucos duelos determinísticos.
 
-As referências de iniciativa são as de TESTE (uma tabela constante): os valores
-globais ainda não foram aprovados. Com ela, dois níveis de diferença bastam para
-fixar quem age primeiro, e cada teste que depende da ordem confere a ordem antes
-de conferir a regra.
+As referências de iniciativa daqui são uma tabela constante INJETADA, e não as
+canônicas da fundação: com ela, dois níveis de diferença bastam para fixar quem
+age primeiro entre classes diferentes, e cada teste que depende da ordem confere
+a ordem antes de conferir a regra. O duelo pelo caminho normal, com as
+referências canônicas, está em `test_pvp_references.py`.
 """
 
 from __future__ import annotations
