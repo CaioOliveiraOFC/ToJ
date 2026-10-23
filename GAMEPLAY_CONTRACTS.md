@@ -213,13 +213,14 @@ Mudar uma classe exige mostrar a causa na régua de combate, e mantê-la verde.
 
 ## Arena
 
-Fase 1 do PvP, na branch `phase/pvp-arena`, sobre a fundação congelada em
-`v0.3-pve`. **O motor do duelo existe e é headless**: dois gladiadores, decisões
-simultâneas, resolução sequencial. **A Arena ainda não é modo de jogo**: não há
-entrada no menu, fila, MMR, UI nem rede, e carregar um personagem extraído
-continua avisando que a Arena não está aberta.
+Branch `phase/pvp-arena`, sobre a fundação congelada em `v0.3-pve`. **O motor do
+duelo é headless** (Fases 1 e 1.1): dois gladiadores, decisões simultâneas,
+resolução sequencial. **O modo local é jogável no terminal** (Fase 2): opção 3
+do menu principal, o jogador contra um controlador automático. Fila, MMR, rede e
+relógio de decisão ainda não existem.
 
-Verificado em `tests/test_pvp_duel.py` e `tests/test_pvp_initiative.py`.
+Verificado em `tests/test_pvp_duel.py`, `tests/test_pvp_initiative.py`,
+`tests/test_pvp_references.py` e `tests/test_arena_mode.py`.
 
 ### Fronteira com o PvE
 
@@ -321,6 +322,36 @@ Verificado em `tests/test_pvp_duel.py` e `tests/test_pvp_initiative.py`.
 O desempate, as referências globais e as consequências da interrupção, que
 apareciam aqui na Fase 1, estão fechados acima.
 
+### Modo local jogável
+
+`src/engine/arena_mode.py`, desenhado por `src/ui/arena_screens.py`. É uma
+experiência local de validação do duelo, não a ranked.
+
+- **Quem luta.** Só personagens salvos com extração registrada aparecem. Nenhum
+  gladiador é gerado para completar a lista. Com menos de dois, a Arena explica
+  que faltam extrações e volta ao menu. O adversário é outro slot.
+- **Preparação.** Ficha do gladiador (atributos, equipamento, skills e
+  passivas) e o inventário de sempre, com as regras de sempre: classe, posição e
+  mãos.
+  - Só equipar e desequipar, e só com a mochila do próprio gladiador. Não há
+    loja nem transferência.
+  - Consumível aparece e não se usa. Deck, passivas e atributos não mudam.
+  - A configuração é confirmada antes do duelo. Gravá-la é escolha explícita, e
+    regrava só `equipment` e `inventory` no save do próprio slot
+    (`save_loadout`). O resto do save fica como estava.
+- **Adversário.** Antes de confirmar, a ficha pública dele: nome, classe, nível,
+  equipamento, skills e passivas.
+- **Duelo.** O jogador decide pela visão do motor (`HumanDuelController`), e o
+  adversário por `FirstLegalSkillController`, só pela visão dele. A cada rodada
+  `run_round` monta as duas visões antes de qualquer escolha e chama
+  `play_round`.
+  - A tela mostra os dois gladiadores, HP, MP, efeitos ativos, skills com custo
+    e recarga, e as três ações: ataque básico, skill e rendição.
+  - Depois do lock, a rodada aparece na ordem em que o motor a resolveu, com
+    cancelamentos por controle ou morte. O Initiative Score não aparece.
+- **Fim.** Vitória, derrota ou rendição, e volta à Arena. O duelo roda sobre
+  cópias: ninguém morre, o save não muda e não há XP, ouro, recompensa nem MMR.
+
 ### Contratos futuros, ainda não implementados
 
 A arquitetura não os impede, mas nenhum existe ainda.
@@ -331,6 +362,4 @@ A arquitetura não os impede, mas nenhum existe ainda.
   segundos para voltar e pausa o cronômetro. O motor não tem relógio: os dois
   chegam por `forfeit`.
 - MMR individual por gladiador.
-- As builds adversárias (equipamento, skills e passivas) ficam visíveis antes do
-  duelo.
 - A população artificial sai só de heróis extraídos de runs PvE reais.

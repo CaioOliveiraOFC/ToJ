@@ -1,4 +1,4 @@
-# Próxima etapa — Arena PvP depois da Fase 1
+# Próxima etapa — Arena PvP depois do modo local
 
 A fase PvE está fechada e publicada em `v0.3-pve` (`97965ae7`). O histórico dela
 está em [`FOUNDATION_CHANGELOG.md`](FOUNDATION_CHANGELOG.md), e a fundação
@@ -16,20 +16,24 @@ A Fase 1.1 fechou a parte técnica da iniciativa:
 - o **desempate pela semente** é o contrato definitivo;
 - o duelo usa os dois por padrão.
 
+A Fase 2 entregou o **modo local jogável** no terminal: a opção 3 do menu
+principal, a escolha do gladiador extraído e do adversário, a preparação do
+equipamento, a ficha do adversário, o duelo contra o controlador automático e o
+resultado, sem tocar no save.
+
 As regras e o que ainda é futuro estão em
 [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 
 ## Decisão pendente
 
 - **Rendição simultânea.** Hoje perde quem está à frente da ordem travada, de
-  forma provisória.
+  forma provisória. Não bloqueia o modo local, porque o controlador automático
+  nunca se rende.
 
-## O que vem depois do motor
+## O que vem depois do modo local
 
 Nenhum destes itens foi iniciado.
 
-- A entrada da Arena no jogo: menu, escolha do gladiador extraído e reorganizar
-  o equipamento antes da fila.
 - O relógio de decisão (45 s), a desconexão (60 s, com pausa) e a ligação deles
   ao `forfeit` do motor.
 - Fila com prioridade humana por 30 s e bots depois.

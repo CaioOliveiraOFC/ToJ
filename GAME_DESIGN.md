@@ -13,10 +13,10 @@
 >   `expected loadout`.
 > - **O Run/Progression Balance está `[em calibração]`.** A jornada real está
 >   implementada e medida, mas a calibração está aberta.
-> - **A Arena (PvP) `[não existe]` como modo de jogo.** O motor headless do
->   duelo está implementado (Fase 1, `phase/pvp-arena`). Fila, MMR, UI e rede
->   não existem. As regras estão em
->   [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
+> - **A Arena (PvP) `[em construção]`.** O motor do duelo e um modo local
+>   jogável no terminal estão implementados (`phase/pvp-arena`): o jogador
+>   contra um controlador automático. Fila, MMR e rede não existem. As regras
+>   estão em [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 >
 > As decisões que não podem mudar de passagem estão em
 > [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md). As medições estão em
@@ -69,10 +69,12 @@ digno da **Arena (PvP)**.
 | Modo | Propósito | Risco | Estado |
 |---|---|---|---|
 | **Forge Run** | Criar e fortalecer personagens na masmorra | Morte permanente. Perde tudo. | **`[implementado]`** — progressão **`[em calibração]`** |
-| **Arena** | Provar o valor do personagem contra jogadores | Sem risco de morte. Ranking por Elo. | **`[não existe]`** |
+| **Arena** | Provar o valor do personagem contra jogadores | Sem risco de morte. Ranking por Elo. | **`[em construção]`** — modo local |
 
-**`[não existe]`** O menu principal deveria ter Forge Run e Arena, com a Arena em
-branco. Hoje não há nenhuma menção à Arena no menu — nem como opção desabilitada.
+**`[em construção]`** O menu principal tem a Arena, na opção 3. Hoje ela é um modo
+LOCAL: o jogador escolhe um gladiador extraído e duela contra outro, controlado
+automaticamente, sem fila, ranking nem rede. As regras estão em
+[`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 
 > **A consequência disso é maior do que parece.** A Arena é a resposta do jogo à
 > pergunta "por que o jogador recomeça depois de morrer". Sem ela, extrair um
@@ -356,8 +358,8 @@ cartas e 23 famílias**, e as políticas de escolha do simulador passaram a orde
 as 23 — ver **Decisões pendentes, D3**, encerrada. As cartas das 10 famílias
 novas ainda não foram medidas por esse scout.)*
 
-**`[implementado]`** Se o personagem for extraído vivo, as passivas vão com ele —
-para a Arena, quando ela existir.
+**`[implementado]`** Se o personagem for extraído vivo, as passivas vão com ele
+para a Arena, e lá não mudam.
 
 ---
 
@@ -848,8 +850,8 @@ run seguinte. É um registro de mortos, não uma progressão.
 
 **`[implementado]`** O save grava **HP e MP**. **Extrair encerra a run.** O save marca
 o andar em que o personagem foi extraído, e esse personagem não volta para a mesma
-dungeon: fica preservado para a camada pós-dungeon, a Arena, que ainda não existe. Ao
-carregá-lo, o jogo avisa isso. Antes, o save não gravava HP nem MP: o herói era
+dungeon: fica preservado para a camada pós-dungeon, a Arena (modo local, opção 3 do
+menu principal). Ao carregá-lo, o jogo avisa isso. Antes, o save não gravava HP nem MP: o herói era
 reconstruído no nível salvo com os recursos no máximo. E a extração gravava o andar
 recém-concluído, que o jogador então refazia, recebendo as recompensas de novo.
 
@@ -1377,10 +1379,10 @@ consertar sozinho.
 
 ### D5 — A Arena
 
-Metade do laço do jogo está especificada e não construída — ver **Os Dois
-Pilares**. Sem ela, extrair um personagem vivo não leva a lugar nenhum. É a maior
-lacuna aberta do design, e nada nas rodadas estruturais a endereçou. O PvP é uma fase
-posterior à calibração da progressão PvE. O contrato de fronteira está em
+**Em construção** na branch `phase/pvp-arena`, depois do release PvE `v0.3-pve`. O
+duelo existe e é jogável localmente: o personagem extraído enfrenta outro,
+controlado automaticamente. Falta o que torna a Arena competitiva: fila, relógio
+de decisão, MMR e rede. As regras implementadas e as futuras estão em
 [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 
 ### D6 — A Essência deveria multiplicar o ouro também?

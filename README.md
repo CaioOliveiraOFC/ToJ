@@ -10,11 +10,13 @@ forma de uma run terminar bem é **extrair** o personagem vivo. Toda batalha é
 ## Rodar
 
 ```bash
-python -m src.ui.toj_menu
+python main.py
 ```
 
-Requer Python 3.10+ e `rich`. Não há `src/main.py` nem console script declarado:
-o ponto de entrada é o menu. Instalação de desenvolvimento:
+Requer Python 3.10+, `rich` e `pyfiglet`. `main.py` sobe o menu principal e
+encaminha cada escolha (`engine/bootstrap.run_main_loop`). A **Arena** é a opção 3:
+duelo local de um gladiador extraído contra outro, controlado automaticamente.
+Instalação de desenvolvimento:
 
 ```bash
 pip install -e ".[dev]"
@@ -83,4 +85,4 @@ isso por AST — a regra está em [`ARCHITECTURE.md`](ARCHITECTURE.md).
 - [`BASELINES.md`](BASELINES.md) — o índice das medições de referência.
 - [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) — os problemas abertos.
 - [`NEXT_PHASE.md`](NEXT_PHASE.md) — o trabalho atual: a Arena PvP depois do
-  motor do duelo (Fase 1).
+  modo local.
