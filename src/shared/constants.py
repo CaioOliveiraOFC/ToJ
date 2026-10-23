@@ -713,3 +713,16 @@ ARENA_MEASURE_SEED = 20260919
 # decisão de design. Fechar isso exige um segundo piloto competente de medição,
 # que o repositório ainda não tem.
 ARENA_EQUIVALENCE_BAND = 0.05
+
+# --- Arena PvP: iniciativa do duelo ---
+# O modificador de nível da iniciativa, aprovado na Fase 1 do PvP:
+#
+#     1 + clamp((nível próprio − nível adversário) × STEP, −CAP, +CAP)
+#
+# Atua sobre o Initiative Score, nunca sobre os atributos: quem tem nível a mais
+# tende a agir antes, e o golpe dele continua valendo o que vale. As
+# REFERÊNCIAS globais por nível que normalizam a build NÃO moram aqui: os
+# valores delas ainda não foram aprovados, e o motor as recebe injetadas
+# (`mechanics/pvp_initiative.py`).
+PVP_INITIATIVE_LEVEL_STEP = 0.005
+PVP_INITIATIVE_LEVEL_CAP = 0.10
