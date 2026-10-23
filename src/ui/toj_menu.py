@@ -506,14 +506,17 @@ def main_menu():
         slots = list_slots()
         occupied_count = sum(1 for s in slots if s["occupied"])
 
+        extracted_count = sum(1 for s in slots if s.get("extracted"))
+
         menu_options = {
             "1": f"Nova Jornada ({10 - occupied_count} slots disponíveis)",
             "2": f"Carregar Aventura ({occupied_count} slots ocupados)",
-            "3": "Livro de Troféus",
-            "4": "Opções do Jogo",
-            "5": "Sair do Jogo",
-            "6": "MODO DE AUTO-TESTE (BOT)",
-            "7": "MODO DE TESTE (Herói Nível 50)",
+            "3": f"Arena ({extracted_count} gladiadores extraídos)",
+            "4": "Livro de Troféus",
+            "5": "Opções do Jogo",
+            "6": "Sair do Jogo",
+            "7": "MODO DE AUTO-TESTE (BOT)",
+            "8": "MODO DE TESTE (Herói Nível 50)",
         }
 
         table = Table(show_header=False, expand=True, highlight=True, row_styles=["none", "dim"])
@@ -526,7 +529,7 @@ def main_menu():
         console.print(table)
         console.print("\n")
 
-        choice = safe_get_key(valid_keys=["1", "2", "3", "4", "5", "6", "7"])
+        choice = safe_get_key(valid_keys=["1", "2", "3", "4", "5", "6", "7", "8"])
 
         if choice == "1":
             slot = select_new_slot()
@@ -560,10 +563,12 @@ def main_menu():
                 sleep(0.4)
                 return ("load_game", slot)
         elif choice == "3":
-            show_trophies()
+            return "arena"
         elif choice == "4":
-            options_menu()
+            show_trophies()
         elif choice == "5":
+            options_menu()
+        elif choice == "6":
             console.print(
                 Panel(
                     Text(
@@ -576,7 +581,7 @@ def main_menu():
             )
             sleep(0.4)
             return "quit"
-        elif choice == "6":
+        elif choice == "7":
             console.print(
                 Panel(
                     Text("Iniciando a simulação...", justify="center", style="magenta"),
@@ -585,7 +590,7 @@ def main_menu():
             )
             sleep(0.4)
             return "auto_test"
-        elif choice == "7":
+        elif choice == "8":
             console.print(
                 Panel(
                     Text(

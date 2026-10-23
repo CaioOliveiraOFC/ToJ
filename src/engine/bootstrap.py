@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 from src.content.extraction import extracted_floor, was_extracted
 from src.content.items import ALL_ITEMS, get_all_items
+from src.engine.arena_mode import run_arena
 from src.engine.events import EventBus
 from src.engine.game_logic import create_player_for_new_run
 from src.engine.loop import start_game
@@ -93,6 +94,8 @@ def run_main_loop() -> None:
 
         if menu_result == "quit":
             break
+        elif menu_result == "arena":
+            run_arena()
         elif menu_result == "auto_test":
             if AutoTester is None:
                 screens.render_game_saved("AutoTester não disponível.")
@@ -122,13 +125,14 @@ def run_main_loop() -> None:
                 )
                 if player and was_extracted(player):
                     # Run já encerrada pela Extração. O personagem está
-                    # preservado, e o caminho dele agora é a camada pós-dungeon
-                    # — que ainda não existe. O que NÃO pode acontecer é ele
-                    # voltar para a mesma dungeon como se a run continuasse.
+                    # preservado, e o caminho dele agora é a Arena. O que NÃO
+                    # pode acontecer é ele voltar para a mesma dungeon como se
+                    # a run continuasse.
                     screens.render_game_saved(
                         f"{player.get_nick_name()} extraiu no andar "
                         f"{extracted_floor(player)} e está preservado. "
-                        "A dungeon desta run foi encerrada — a Arena ainda não está aberta."
+                        "A dungeon desta run foi encerrada — ele agora luta na Arena, "
+                        "pelo menu principal."
                     )
                 elif player:
                     start_game(player, dungeon_level, map_state, slot=slot)
