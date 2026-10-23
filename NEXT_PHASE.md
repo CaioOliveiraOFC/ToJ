@@ -7,22 +7,22 @@ continua congelada.
 A Fase 1 do PvP, na branch `phase/pvp-arena`, entregou o **motor headless do
 duelo**: preparação do gladiador a partir da extração, rodada de decisões
 simultâneas com lock, iniciativa, MP reservado, controle, morte, rendição e
-resultado MD1. As regras e o que ainda é futuro estão em
+resultado MD1.
+
+A Fase 1.1 fechou a parte técnica da iniciativa:
+
+- as **referências globais** saem da fundação, como a média das três classes
+  pelo crescimento canônico;
+- o **desempate pela semente** é o contrato definitivo;
+- o duelo usa os dois por padrão.
+
+As regras e o que ainda é futuro estão em
 [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 
-## Decisões pendentes
+## Decisão pendente
 
-Cada uma já tem um ponto de extensão no motor. Nenhuma foi fechada por conta
-própria.
-
-- **Referências globais de iniciativa por nível.** O motor exige o provedor
-  injetado. Não há tabela aprovada no código, e `tools/arena_duelo.py` usa uma
-  de demonstração.
-- **Desempate absoluto da iniciativa.** Hoje vale o fallback técnico,
-  `SeededCoinTieBreak`.
-- **Rendição simultânea.** Hoje perde quem está à frente da ordem travada.
-- **Penalidade por interrupção.** Hoje não há: a reserva volta.
-- **Efeitos explicitamente interruptivos** além de `stun`, `frozen` e `sleep`.
+- **Rendição simultânea.** Hoje perde quem está à frente da ordem travada, de
+  forma provisória.
 
 ## O que vem depois do motor
 

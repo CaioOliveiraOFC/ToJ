@@ -266,14 +266,34 @@ Verificado em `tests/test_pvp_duel.py` e `tests/test_pvp_initiative.py`.
     `1 + clamp(Δnível × 0,005, −0,10, +0,10)`.
   - Recalculada no início de cada resolução, sobre o estado atual. HP e MP
     atuais não entram. Nenhum arredondamento antes da comparação.
-  - Desempate: maior score, depois maior AG relativa ao nível, depois a política
-    injetada.
+  - **Referência global (`REF`)**: uma por nível, comum às três classes, vinda
+    da fundação e sem número próprio:
+
+        REF_s(nível) = média, sobre Warrior, Mage e Rogue, de
+                       geometric(CLASS_BASE[s], nível)
+
+    É exatamente a média dos três heróis sem equipamento, passiva nem efeito
+    naquele nível (`foundation_reference`, em
+    `src/mechanics/pvp_initiative.py`). Ela é neutra (em cada atributo, a média
+    das razões das três classes é 1) e não favorece nível: a build sem
+    equipamento de cada classe lê o mesmo em todo nível, então quem leva o
+    nível para a ordem é só o modificador. Não tem teto próprio. Equipamento,
+    buff e passiva mudam o score do gladiador, nunca a referência.
+  - **Desempate, definitivo:** maior score, depois maior AG relativa ao nível,
+    depois o sorteio pela semente da partida (`SeededCoinTieBreak`). O sorteio só
+    acontece quando score e AG relativa são exatamente iguais. Não há
+    alternância nem prioridade fixa por lado.
+  - É o padrão do duelo: `Duel(p1, p2, rng=random.Random(semente))` já usa as
+    referências canônicas e o sorteio. Os dois continuam injetáveis para teste.
   - A ordem travada não muda dentro da rodada. A iniciativa não aparece na
     visão do controlador.
 - **Ação comprometida.** Depois do lock ela resolve contra o estado ATUAL da
   batalha: o escudo lançado por quem age primeiro protege do golpe de quem age
   depois. Buff, debuff e mudança de MP não a invalidam. Só **morte do ator** ou
-  **controle** a cancelam.
+  **controle** a cancelam. Um efeito fora da família `control` só interrompe se
+  o contrato o declarar explicitamente interruptivo, e hoje nenhum declara.
+- **Interrupção não tem penalidade.** A ação cancelada por controle ou morte
+  devolve o MP reservado e não aplica recarga à skill que não saiu.
 - **MP reservado.** No lock o custo da skill sai do MP livre e fica reservado.
   Tudo que drena ou consome mana no meio da rodada (`mana_burn`, Égide) só
   alcança o MP livre. A skill paga **uma vez**, pelo caminho de sempre. A
@@ -293,23 +313,13 @@ Verificado em `tests/test_pvp_duel.py` e `tests/test_pvp_initiative.py`.
   uma rodada por vez, conduzido pela camada de cima. O resultado traz vencedor,
   perdedor, motivo e o histórico das rodadas.
 
-### Pendências de decisão
+### Pendência de decisão
 
-Cada uma tem um ponto de extensão no código, e nenhuma regra foi inventada para
-fechá-la.
-
-- **Referências globais de iniciativa por nível.** O motor exige um provedor
-  (`InitiativeReferences`) e não traz tabela. `ReferenceTable` recusa nível sem
-  referência em vez de completar.
-- **Desempate absoluto** (score e AG relativa iguais). Política injetada
-  (`TieBreakPolicy`). `SeededCoinTieBreak` é o fallback técnico, reproduzível
-  pela semente, e não regra competitiva.
 - **Rendição simultânea.** Hoje perde quem está à frente da ordem travada, para o
   motor ser total. É provisório.
-- **Penalidade por interrupção.** Não existe. A ação cancelada por controle ou
-  morte devolve a reserva e não aplica recarga.
-- **Efeito "explicitamente interruptivo"** além do controle. O catálogo não tem
-  nenhum, e hoje a interrupção é a família `control` do núcleo.
+
+O desempate, as referências globais e as consequências da interrupção, que
+apareciam aqui na Fase 1, estão fechados acima.
 
 ### Contratos futuros, ainda não implementados
 
