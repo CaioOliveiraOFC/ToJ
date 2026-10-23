@@ -25,3 +25,5 @@ UI_GAME_OVER = "ui.game_over"
 UI_SAVE_SUCCESS = "ui.save_success"
 UI_MAIN_MENU = "ui.main_menu"
 UI_CHARACTER_CREATION = "ui.character_creation"
+# Equipamento do gladiador antes do duelo: a mochila dele, sem usar consumível.
+UI_OPEN_ARENA_LOADOUT = "ui.open_arena_loadout"

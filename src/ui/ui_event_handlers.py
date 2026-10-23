@@ -12,7 +12,7 @@ from src.ui import screens
 from src.ui.character_status_flow import run_character_status_flow
 from src.ui.extraction_flow import run_extraction_prompt
 from src.ui.forge_flow import run_forge_flow
-from src.ui.inventory_flow import run_inventory_flow_v2
+from src.ui.inventory_flow import run_arena_loadout_flow, run_inventory_flow_v2
 from src.ui.passive_flow import run_passive_selection_flow
 from src.ui.random_event_flow import run_random_event
 from src.ui.shop_flow import run_shop_flow
@@ -50,6 +50,12 @@ def _on_open_inventory(ev: GameEvent) -> None:
     player = ev.payload.get("player")
     if player:
         run_inventory_flow_v2(player)
+
+
+def _on_open_arena_loadout(ev: GameEvent) -> None:
+    player = ev.payload.get("player")
+    if player:
+        run_arena_loadout_flow(player)
 
 
 def _on_open_shop(ev: GameEvent) -> None:
@@ -139,6 +145,7 @@ def _on_open_skills(ev: GameEvent) -> None:
 def register_ui_handlers(sink: EventSink) -> Callable[[], None]:
     unsubs = [
         sink.subscribe(topics.UI_OPEN_INVENTORY, _on_open_inventory),
+        sink.subscribe(topics.UI_OPEN_ARENA_LOADOUT, _on_open_arena_loadout),
         sink.subscribe(topics.UI_OPEN_SHOP, _on_open_shop),
         sink.subscribe(topics.UI_OPEN_FORGE, _on_open_forge),
         sink.subscribe(topics.UI_OPEN_PASSIVES, _on_open_passives),

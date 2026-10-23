@@ -26,14 +26,21 @@ def hp_exibido(entt) -> int:
 
 
 def get_hp_bar(entt) -> str:
-    if getattr(entt, "base_hp", 0) == 0:
-        percent_of_bar = 0
-    else:
-        percent_of_bar = int((hp_exibido(entt) / entt.base_hp) * 10)
+    return barra_de_hp(hp_exibido(entt), getattr(entt, "base_hp", 0))
+
+
+def barra_de_hp(atual: int, maximo: int) -> str:
+    """A barra de HP a partir dos números. Quem tem uma entidade usa `get_hp_bar`.
+
+    A Arena desenha a partir da visão do duelo, que traz números e não a
+    entidade; os dois caminhos desenham a mesma barra.
+    """
+    atual = max(0, int(atual))
+    percent_of_bar = 0 if maximo == 0 else int((atual / maximo) * 10)
     percent_of_bar = min(percent_of_bar, 10)
     hp_bar_fill = "[#]" * percent_of_bar
     hp_bar_empty = "[ ]" * (10 - percent_of_bar)
-    return f"|{hp_bar_fill}{hp_bar_empty}| {hp_exibido(entt)}/{entt.base_hp} HP"
+    return f"|{hp_bar_fill}{hp_bar_empty}| {atual}/{maximo} HP"
 
 
 def render_menu(options: tuple[str, ...] | list[str], prompt: str) -> None:

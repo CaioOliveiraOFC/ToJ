@@ -24,3 +24,13 @@ def run_inventory_flow_v2(player: "Player") -> None:
         if result is None:
             # Action was performed (equip/use), inventory changed - continue loop to refresh
             continue
+
+
+def run_arena_loadout_flow(player: "Player") -> None:
+    """O mesmo inventário, na preparação da Arena: só equipar e desequipar.
+
+    A mochila é a do próprio gladiador — a Arena não tem loja nem transferência
+    —, e consumível continua listado mas não se usa.
+    """
+    while navigate_inventory(player.inventory, player, [], allow_use=False) is not False:
+        continue

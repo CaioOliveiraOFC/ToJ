@@ -432,6 +432,8 @@ def navigate_inventory(
     inventory: list,
     player,
     equipped_indices: list[int],
+    *,
+    allow_use: bool = True,
 ) -> int | bool:
     """Menu navegável para selecionar item do inventário com 3 painéis.
 
@@ -439,6 +441,8 @@ def navigate_inventory(
         inventory: Lista de itens no inventário (original, não ordenada).
         player: Objeto do jogador (para status e equipamentos).
         equipped_indices: Parâmetro legado (não usado mais).
+        allow_use: `False` deixa só equipar e desequipar. É a preparação da
+            Arena, onde consumível não se usa; os itens continuam listados.
 
     Returns:
         int: índice selecionado (para detalhes).
@@ -533,7 +537,7 @@ def navigate_inventory(
         sell_price = int(price * 0.5) if price else 0
 
         is_equippable = slot_name != "Unknown"
-        is_usable = getattr(item, "is_usable", False)
+        is_usable = allow_use and getattr(item, "is_usable", False)
 
         # Preço sempre visível no inventário
         if price:
@@ -863,7 +867,7 @@ def navigate_inventory(
         else:
             selected_item = sorted_inventory[current_index]
             is_equippable = hasattr(selected_item, "slot")
-            is_usable = getattr(selected_item, "is_usable", False)
+            is_usable = allow_use and getattr(selected_item, "is_usable", False)
             is_epic = getattr(selected_item, "rarity", "Common") in ("Epic", "Legendary")
 
             if is_equippable:
@@ -938,7 +942,7 @@ def navigate_inventory(
                 # next iteration handles the single-item -> empty case
                 continue
 
-        elif key in ("u", "U") and total_items > 0:
+        elif key in ("u", "U") and total_items > 0 and allow_use:
             selected_item = sorted_inventory[current_index]
             is_usable = getattr(selected_item, "is_usable", False)
             rarity = getattr(selected_item, "rarity", "Common")
