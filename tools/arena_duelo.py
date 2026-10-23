@@ -8,10 +8,9 @@ snapshot de save (`to_save_data`), reconstrução e preparação
 (`gladiator_from_snapshot`) — e os dois lados são controlados pela política de
 referência mais simples (`FirstLegalSkillController`).
 
-As referências de iniciativa daqui são de DEMONSTRAÇÃO: a média das três classes
-sem equipamento, nível a nível. NÃO são as referências globais da Arena, que
-ainda não foram aprovadas. A ferramenta mostra a iniciativa porque é ferramenta
-de desenvolvimento; a UI normal não a mostra.
+O duelo é criado pelo caminho normal: referências canônicas de iniciativa e
+desempate pela semente, sem nada injetado. A ferramenta mostra a iniciativa
+porque é ferramenta de desenvolvimento; a UI normal não a mostra.
 """
 
 from __future__ import annotations
@@ -26,12 +25,6 @@ from src.content.extraction import mark_extracted  # noqa: E402
 from src.content.skills_loader import get_skill_by_id  # noqa: E402
 from src.engine.arena_setup import gladiator_from_snapshot  # noqa: E402
 from src.mechanics.pvp_duel import SIDES, Duel, run_round  # noqa: E402
-from src.mechanics.pvp_initiative import (  # noqa: E402
-    InitiativeReference,
-    ReferenceTable,
-    SeededCoinTieBreak,
-    build_vector,
-)
 from src.sim.harness import make_hero  # noqa: E402
 from src.sim.pvp_controllers import FirstLegalSkillController  # noqa: E402
 from src.storage.save_manager import to_save_data  # noqa: E402
@@ -45,17 +38,6 @@ GLADIADORES = (
 # Teto do LAÇO desta ferramenta, contra um duelo que não acaba. O motor não tem
 # teto: quem conduz o duelo decide quando parar.
 LIMITE_DA_DEMO = 1000
-
-
-def referencias_de_demonstracao(niveis) -> ReferenceTable:
-    """Média das três classes nuas por nível. Só para esta demonstração."""
-    tabela = {}
-    for nivel in niveis:
-        vetores = [build_vector(make_hero(c, nivel, "naked")) for c in ("Warrior", "Mage", "Rogue")]
-        tabela[nivel] = InitiativeReference(
-            **{k: sum(v[k] for v in vetores) / len(vetores) for k in vetores[0]}
-        )
-    return ReferenceTable(tabela)
 
 
 def snapshot_extraido(classe: str, nome: str, deck) -> dict:
@@ -82,8 +64,6 @@ def _acao(passo, duelo: Duel) -> str:
 def main(semente: int) -> None:
     duelo = Duel(
         *(gladiator_from_snapshot(snapshot_extraido(*g)) for g in GLADIADORES),
-        references=referencias_de_demonstracao([NIVEL]),
-        tie_break=SeededCoinTieBreak(),
         rng=random.Random(semente),
     )
     nomes = {lado: duelo.hero(lado).nick_name for lado in SIDES}
