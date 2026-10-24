@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Copa Arena 03</title>
+<style>
+@@estilo@@
+header{max-width:1280px;margin:0 auto;padding:20px 16px 8px}
+nav{position:sticky;top:0;z-index:5;background:var(--page);border-bottom:1px solid var(--grid)}
+nav .in{max-width:1280px;margin:0 auto;padding:6px 16px;display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+nav button{background:none;border:0;color:var(--t2);font:inherit;padding:8px 12px;border-radius:8px;cursor:pointer}
+nav button[aria-selected=true]{background:var(--surface);color:var(--t1);font-weight:600;box-shadow:0 0 0 1px var(--border)}
+nav .tema{margin-left:auto}
+main{max-width:1280px;margin:0 auto;padding:16px}
+section{display:none}
+section.ativa{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi .kv{font-size:26px;font-weight:650;margin:2px 0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px}
+.card{margin-bottom:16px}
+.rolagem{overflow-x:auto}
+.filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filtros select,.filtros input[type=search]{font:inherit;padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--t1)}
+tbody tr.clicavel{cursor:pointer}
+tbody tr.clicavel:hover{background:var(--grid)}
+th.ord{cursor:pointer}
+#dica{position:fixed;pointer-events:none;background:var(--surface);color:var(--t1);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:12px;max-width:320px;box-shadow:0 4px 14px rgba(0,0,0,.12);display:none;z-index:40}
+.jogo{cursor:pointer}
+.jogo:hover .caixa,.jogo:focus .caixa,.jogo.sel .caixa{stroke:var(--acento);stroke-width:2}
+.ponto{cursor:pointer}
+.chave-wrap{overflow:auto;max-height:82vh;border:1px solid var(--grid);border-radius:8px}
+#detalhe{position:fixed;right:0;top:0;bottom:0;width:min(600px,100%);background:var(--surface);border-left:1px solid var(--border);transform:translateX(105%);transition:transform .18s;overflow:auto;z-index:30;padding:16px}
+#detalhe.aberto{transform:none}
+#detalhe .fechar{float:right;font:inherit;background:none;border:1px solid var(--border);border-radius:8px;padding:4px 10px;color:var(--t1);cursor:pointer}
+.aviso{font-size:12.5px;color:var(--t2);max-width:980px}
+code{font-size:12px}
+</style></head>
+<body>
+<header>
+ <h1>Copa Arena 03 — 64 Guerreiros extraídos do PvE real</h1>
+ <p class="aviso">@@aviso@@</p>
+</header>
+<nav><div class="in" role="tablist">
+ <button role="tab" data-aba="visao" aria-selected="true">Visão geral</button>
+ <button role="tab" data-aba="geracao" aria-selected="false">Geração</button>
+ <button role="tab" data-aba="chave" aria-selected="false">Chave</button>
+ <button role="tab" data-aba="confrontos" aria-selected="false">Confrontos</button>
+ <button role="tab" data-aba="participantes" aria-selected="false">Participantes</button>
+ <button role="tab" data-aba="estatisticas" aria-selected="false">Estatísticas</button>
+ <button role="tab" data-aba="rng" aria-selected="false">RNG do duelo</button>
+ <button role="tab" data-aba="final" aria-selected="false">Final</button>
+ <button class="tema" id="tema" aria-label="Alternar tema claro e escuro">Tema claro/escuro</button>
+</div></nav>
+<main>
+<section id="visao" class="ativa">
+ <div class="kpis">@@kpis@@</div>
+ <div class="grid2">
+  <div class="card"><h3>OP do vencedor × OP do perdedor, 63 partidas</h3>@@svg_dispersao@@
+   <p class="muted">Cor = perfil do vencedor: @@legenda_perfis@@. Clique num ponto para abrir a partida.</p></div>
+  <div class="card"><h3>OP de quem entrou em cada fase (média, mínimo e máximo)</h3>@@svg_op_por_fase@@
+   <p class="muted">Barra vertical: do menor ao maior OP entre os que chegaram à fase.</p></div>
+ </div>
+ <div class="grid2">
+  <div class="card"><h3>Taxa de vitória na Arena por perfil (%)</h3>@@svg_perfis@@
+   <p class="muted">O perfil decide a jornada PvE; no duelo os 64 usam a mesma política.</p></div>
+  <div class="card"><h3>Trajetória do campeão</h3><div id="trajetoria" class="rolagem"></div></div>
+ </div>
+ <div class="card"><h3>Curiosidades</h3><ul>@@curiosidades@@</ul></div>
+</section>
+<section id="geracao">
+ <div class="card"><h3>Como os 64 foram obtidos</h3><p>@@resumo_geracao@@</p>
+  <p class="muted">Detalhe completo em <a href="geracao.md">geracao.md</a>; cada tentativa em <a href="runs.jsonl">runs.jsonl</a>.</p></div>
+ <div class="grid2">
+  <div class="card"><h3>Desfecho das runs por grupo</h3>@@svg_desfechos@@</div>
+  <div class="card"><h3>Runs que entraram vivas em cada andar (%)</h3>@@svg_sobrevivencia@@
+   <p class="muted">Cor = perfil: @@legenda_perfis@@.</p></div>
+ </div>
+ <div class="grid2">
+  <div class="card"><h3>Overall Power de todas as extrações</h3>@@svg_histograma@@
+   <p class="muted">A regra canônica de extração mira o benchmark da Arena (OP 29,17): com fôlego saudável o bot só preserva acima de 30,6.</p></div>
+  <div class="card"><h3>Decisões de mapa que a agenda de risco mudou (por 100)</h3>@@svg_divergencia@@
+   <p class="muted">Comparação com a decisão que o cérebro canônico tomaria no mesmo estado, por faixa de andares.</p></div>
+ </div>
+ <div class="grid2">
+  <div class="card"><h3>Os 64 aceitos: OP × andar de extração</h3>@@svg_aceitos@@</div>
+  <div class="card"><h3>Canais das builds dos 64</h3>@@svg_arquetipos@@
+   <h3 style="margin-top:12px">Famílias de passiva mais frequentes</h3>@@svg_familias@@</div>
+ </div>
+ <div class="card rolagem"><h3>Por perfil</h3>
+  <table><thead><tr><th>Perfil</th><th class=n>Runs</th><th class=n>Mortes</th><th class=n>Mortes até o 5</th><th class=n>HP na luta fatal</th><th class=n>Extrações</th><th class=n>OP das extrações</th><th class=n>Decisões mudadas</th></tr></thead><tbody>@@linhas_geracao_perfil@@</tbody></table></div>
+ <div class="card rolagem"><h3>Por grupo</h3>
+  <table><thead><tr><th>Grupo</th><th class=n>Runs</th><th class=n>Mortes</th><th class=n>Extrações</th><th class=n>Na faixa</th><th class=n>OP &gt; 30</th><th class=n>Quota</th><th class=n>Última aceita</th></tr></thead><tbody>@@linhas_geracao_grupo@@</tbody></table></div>
+</section>
+<section id="chave">
+ <div class="card"><h3>Chave completa</h3>
+  <p class="muted">Clique (ou Enter) numa partida para o detalhe. Nome em negrito: quem venceu. Número: OP. Cor: perfil. Borda amarela: zebra, venceu o OP menor.</p>
+  <div class="chave-wrap">@@svg_chave@@</div></div>
+</section>
+<section id="confrontos">
+ <div class="filtros">
+  <select id="f-fase" aria-label="Fase"><option value="">Todas as fases</option>@@opcoes_fase@@</select>
+  <select id="f-perfil" aria-label="Perfil"><option value="">Qualquer perfil</option>@@opcoes_perfil@@</select>
+  <label class="sec"><input type="checkbox" id="f-zebra"> só zebras</label>
+  <input type="search" id="f-busca" placeholder="Buscar gladiador" aria-label="Buscar gladiador">
+ </div>
+ <div class="card rolagem"><table id="t-confrontos"><thead><tr><th>Fase</th><th>Lado 1</th><th class=n>OP</th><th>Lado 2</th><th class=n>OP</th><th>Vencedor</th><th class=n>Rodadas</th><th class=n>HP final</th><th class=n>ΔOP</th></tr></thead><tbody></tbody></table></div>
+</section>
+<section id="participantes">
+ <div class="filtros">
+  <select id="p-perfil" aria-label="Perfil"><option value="">Qualquer perfil</option>@@opcoes_perfil@@</select>
+  <select id="p-politica" aria-label="Política"><option value="">Qualquer política</option>@@opcoes_politica@@</select>
+  <input type="search" id="p-busca" placeholder="Buscar nome, canal ou skill" aria-label="Buscar">
+ </div>
+ <div class="card rolagem"><table id="t-participantes"><thead><tr>
+  <th class="ord" data-k="id">ID</th><th class="ord" data-k="nome">Gladiador</th><th class="ord" data-k="perfil">Perfil/política</th>
+  <th class="ord n" data-k="andar">Andar</th><th class="ord n" data-k="nivel">Nível</th><th class="ord n" data-k="op">OP</th><th class="ord n" data-k="hp">HP</th><th class="ord n" data-k="mp">MP</th>
+  <th class="ord n" data-k="st">ST</th><th class="ord n" data-k="ag">AG</th><th class="ord n" data-k="df">DF</th>
+  <th>Build</th><th class="ord n" data-k="vitorias">Vitórias</th><th>Resultado</th></tr></thead><tbody></tbody></table></div>
+</section>
+<section id="estatisticas">
+ <div class="card rolagem"><h3>Por perfil</h3>
+  <table><thead><tr><th>Perfil</th><th class=n>Participantes</th><th class=n>OP médio</th><th class=n>Vitórias</th><th class=n>Derrotas</th><th class=n>Taxa</th><th class=n>Dano por partida</th><th class=n>Acerto</th><th class=n>Críticos</th><th class=n>Nas oitavas</th><th class=n>Nas quartas</th></tr></thead><tbody>@@linhas_perfil@@</tbody></table>
+  <h3 style="margin-top:14px">Por política de escolha</h3>
+  <table><thead><tr><th>Política</th><th class=n>Participantes</th><th class=n>OP médio</th><th class=n>Vitórias</th><th class=n>Derrotas</th><th class=n>Taxa</th><th class=n>Dano por partida</th><th class=n>Acerto</th><th class=n>Críticos</th><th class=n>Nas oitavas</th><th class=n>Nas quartas</th></tr></thead><tbody>@@linhas_politica@@</tbody></table>
+  <h3 style="margin-top:14px">Por canal da build (uma build pode ter vários)</h3>
+  <table><thead><tr><th>Canal</th><th class=n>Participantes</th><th class=n>OP médio</th><th class=n>Vitórias</th><th class=n>Derrotas</th><th class=n>Taxa</th><th class=n>Dano por partida</th><th class=n>Acerto</th><th class=n>Críticos</th><th class=n>Nas oitavas</th><th class=n>Nas quartas</th></tr></thead><tbody>@@linhas_arquetipo@@</tbody></table>
+  <h3 style="margin-top:14px">Vitórias do perfil da linha sobre o da coluna</h3>
+  <table style="max-width:460px"><thead><tr><th></th>@@cabecalho_matriz@@</tr></thead><tbody>@@linhas_matriz@@</tbody></table>
+  <p class="muted">@@aviso_estatistica@@</p></div>
+ <div class="grid2">
+  <div class="card"><h3>Maiores golpes</h3>@@svg_golpes@@</div>
+  <div class="card"><h3>Skills mais usadas</h3>@@svg_skills@@</div>
+ </div>
+ <div class="grid2">
+  <div class="card"><h3>Rodadas por partida</h3>@@svg_rodadas@@</div>
+  <div class="card"><h3>Quem mais eliminou</h3><table><thead><tr><th>Gladiador</th><th class=n>OP</th><th class=n>Vitórias</th><th>Resultado</th></tr></thead><tbody>@@linhas_eliminacoes@@</tbody></table></div>
+ </div>
+ <div class="card"><h3>Status, buffs, controle e cura</h3>@@resumo_efeitos@@</div>
+ <div class="card"><h3>Zebras: vitórias de quem tinha o OP menor</h3><div id="zebras" class="rolagem"></div></div>
+</section>
+<section id="rng">
+ <div class="card"><h3>Os mesmos dois gladiadores, outras seeds</h3><p>@@texto_rng@@</p>
+  @@svg_rng@@
+  <p class="muted">Barra: % de vitórias do vencedor oficial. Amarelo: o confronto oficial foi zebra.</p></div>
+ <div class="card rolagem"><table><thead><tr><th>Confronto</th><th>Vencedor oficial</th><th>Perdedor oficial</th><th class=n>Vitórias</th><th class=n>Taxa</th><th class=n>IC 95%</th></tr></thead><tbody>@@linhas_rng@@</tbody></table>
+  <p class="muted">A build vem do RNG da jornada e das decisões do perfil, juntos; aqui ela fica fixa e só o RNG do duelo varia. O experimento não separa o que, dentro da build, veio de cada um.</p></div>
+</section>
+<section id="final">@@final@@</section>
+</main>
+<aside id="detalhe" aria-live="polite"><button class="fechar" id="fechar">Fechar</button><div id="detalhe-corpo"></div></aside>
+<div id="dica" role="tooltip"></div>
+<script id="dados" type="application/json">@@dados@@</script>
+<script>
+@@js@@
+</script>
+</body></html>

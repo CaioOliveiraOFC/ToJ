@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Copa Arena 03 — relatório visual</title>
+<style>
+@@estilo@@
+@page{size:297mm 210mm;margin:11mm}
+@page chave{size:594mm 420mm;margin:10mm}
+html,body{background:#fff}
+body{font-size:11px}
+.pagina{break-after:page}
+.pagina:last-child{break-after:auto}
+.chave-pagina{page:chave}
+.chave-pagina svg{width:100%;height:auto}
+h1{font-size:26px}
+h2{font-size:16px;margin:0 0 6px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:10px 0}
+.kpi{border:1px solid var(--border);border-radius:8px;padding:9px}
+.kpi .kv{font-size:19px;font-weight:650}
+.duas{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.capa svg{max-height:84mm}
+.media svg{max-height:96mm}
+table{font-size:9.5px}
+th,td{padding:3px 5px}
+.aviso{font-size:10px;color:var(--t2)}
+.fonte{font-size:9px;color:var(--t3);margin-top:8px}
+li{margin-bottom:3px}
+.compacto table{font-size:8.6px}
+.compacto th,.compacto td{padding:1.6px 4px}
+.compacto .tag{padding:0 4px;font-size:8px;line-height:1.2}
+.destaques svg{max-height:74mm}
+.perfis svg{max-height:58mm}
+.perfis table{font-size:8.6px}
+.perfis th,.perfis td{padding:1.6px 4px}
+.perfis .tag{padding:0 4px;font-size:8px;line-height:1.2}
+.diag li{font-size:9px;margin-bottom:1px}
+</style></head><body>
+<div class="pagina capa">
+ <h1>Copa Arena 03 — 64 Guerreiros extraídos do PvE real</h1>
+ <p class="sec">@@subtitulo@@</p>
+ <div class="kpis">@@kpis@@</div>
+ <div class="duas">
+  <div><h2>Runs que entraram vivas em cada andar (%)</h2>@@svg_sobrevivencia@@<p class="muted">Cor = perfil: @@legenda_perfis@@.</p></div>
+  <div><h2>Desfecho das runs por grupo</h2>@@svg_desfechos@@</div>
+ </div>
+ <p class="aviso">@@aviso@@</p>
+</div>
+<div class="pagina media">
+ <h2>A geração: Overall Power e o efeito da agenda de risco</h2>
+ <div class="duas">
+  <div><h2>OP de todas as extrações</h2>@@svg_histograma@@
+   <p class="muted">A regra canônica de extração mira o benchmark da Arena (OP 29,17): com fôlego saudável o bot só preserva acima de 30,6, e essas extrações ficam de fora.</p></div>
+  <div><h2>Decisões de mapa que a agenda mudou (por 100)</h2>@@svg_divergencia@@
+   <p class="muted">Contra a decisão do cérebro canônico no mesmo estado, por faixa de andares.</p></div>
+ </div>
+ <h2 style="margin-top:8px">Por perfil</h2>
+ <table><thead><tr><th>Perfil</th><th class=n>Runs</th><th class=n>Mortes</th><th class=n>Mortes até o 5</th><th class=n>HP na luta fatal</th><th class=n>Extrações</th><th class=n>OP das extrações</th><th class=n>Decisões mudadas</th></tr></thead><tbody>@@linhas_geracao_perfil@@</tbody></table>
+ <h2 style="margin-top:8px">Por grupo</h2>
+ <table><thead><tr><th>Grupo</th><th class=n>Runs</th><th class=n>Mortes</th><th class=n>Extrações</th><th class=n>Na faixa</th><th class=n>OP &gt; 30</th><th class=n>Quota</th><th class=n>Última aceita</th></tr></thead><tbody>@@linhas_geracao_grupo@@</tbody></table>
+</div>
+<div class="pagina media">
+ <h2>Os 64: onde saíram e o que carregam</h2>
+ <div class="duas">
+  <div><h2>OP × andar de extração</h2>@@svg_aceitos@@</div>
+  <div><h2>Canais das builds</h2>@@svg_arquetipos@@<h2 style="margin-top:8px">Famílias de passiva mais frequentes</h2>@@svg_familias@@</div>
+ </div>
+ <p class="aviso">@@aviso_causal@@</p>
+</div>
+<div class="pagina chave-pagina"><h2>Chave eliminatória completa</h2><p class="muted">Nome em negrito: quem venceu o confronto. Número: OP. Cor: perfil (@@legenda_perfis@@). Borda amarela: zebra.</p>@@svg_chave@@</div>
+<div class="pagina"><h2>Participantes (1/2), por OP</h2><table>@@cabecalho_participantes@@<tbody>@@participantes_1@@</tbody></table></div>
+<div class="pagina"><h2>Participantes (2/2)</h2><table>@@cabecalho_participantes@@<tbody>@@participantes_2@@</tbody></table></div>
+<div class="pagina compacto"><h2>Resultados das 63 partidas</h2><div class="duas">
+ <table>@@cabecalho_resultados@@<tbody>@@resultados_1@@</tbody></table>
+ <table>@@cabecalho_resultados@@<tbody>@@resultados_2@@</tbody></table></div></div>
+<div class="pagina destaques"><h2>Destaques dos confrontos</h2><div class="duas">
+ <div><h2>OP do vencedor × OP do perdedor</h2>@@svg_dispersao@@<h2 style="margin-top:10px">Maiores golpes</h2>@@svg_golpes@@</div>
+ <div><h2>Zebras: venceu o OP menor</h2><table><thead><tr><th>Fase</th><th>Vencedor</th><th>Perdedor</th><th class=n>ΔOP</th><th class=n>Rod.</th></tr></thead><tbody>@@zebras@@</tbody></table>
+  <h2 style="margin-top:10px">Rodadas por partida</h2>@@svg_rodadas@@</div></div></div>
+<div class="pagina perfis"><h2>Perfis e políticas na Arena</h2><div class="duas">
+ <div><h2>Taxa de vitória por perfil (%)</h2>@@svg_perfis@@
+  <table><thead><tr><th>Perfil</th><th class=n>Part.</th><th class=n>OP médio</th><th class=n>V</th><th class=n>D</th><th class=n>Taxa</th><th class=n>Dano/partida</th><th class=n>Acerto</th><th class=n>Críticos</th></tr></thead><tbody>@@linhas_perfil@@</tbody></table>
+  <h2 style="margin-top:8px">Por política de escolha</h2>
+  <table><thead><tr><th>Política</th><th class=n>Part.</th><th class=n>OP médio</th><th class=n>V</th><th class=n>D</th><th class=n>Taxa</th><th class=n>Dano/partida</th><th class=n>Acerto</th><th class=n>Críticos</th></tr></thead><tbody>@@linhas_politica@@</tbody></table>
+  <h2 style="margin-top:8px">Skills mais usadas</h2>@@svg_skills@@</div>
+ <div><h2>RNG do duelo: os mesmos dois, outras seeds</h2>@@svg_rng@@
+  <table><thead><tr><th>Confronto</th><th>Vencedor oficial</th><th>Perdedor oficial</th><th class=n>Vitórias</th><th class=n>Taxa</th><th class=n>IC 95%</th></tr></thead><tbody>@@linhas_rng@@</tbody></table>
+  <p class="aviso">@@aviso_causal@@</p></div></div></div>
+<div class="pagina"><h2>Curiosidades</h2><ul>@@curiosidades@@</ul>
+ <h2 style="margin-top:12px">Trajetória do campeão</h2>
+ <table><thead><tr><th>Fase</th><th>Adversário</th><th class=n>Rodadas</th><th class=n>Dano causado</th><th class=n>Recebido</th><th class=n>Cura</th><th class=n>Acertos/erros</th><th class=n>Críticos</th><th class=n>HP final</th></tr></thead><tbody>@@trajetoria@@</tbody></table></div>
+<div class="pagina"><h2>A final</h2><div class="duas"><div><h2>Initiative Score por rodada</h2>@@svg_final_iniciativa@@</div><div><h2>HP ao fim de cada rodada (0 = início)</h2>@@svg_final_hp@@</div></div>
+ <h2 style="margin-top:10px">Golpe decisivo</h2><p>@@decisivo@@</p></div>
+<div class="pagina diag"><h2>A final: diagnóstico (interpretação, separada dos fatos)</h2><ul>@@diagnostico@@</ul>
+ <p class="fonte">Auditoria integral em final_detalhada.md; trace em final_trace.json; dados de cada partida em relatorio.md e dashboard.html; a geração em geracao.md e runs.jsonl.</p></div>
+</body></html>
