@@ -371,6 +371,8 @@ class Partida:
     auditado: DueloAuditado
     fidelidade: list
     coerencia: list
+    # Nome da fase para exibição; sem ele, o da Copa 01 (`NOME_DA_FASE`).
+    nome_da_fase: str | None = None
 
     @property
     def inconclusiva(self) -> bool:
@@ -388,13 +390,21 @@ class Partida:
 
     @property
     def titulo(self) -> str:
-        fase = NOME_DA_FASE[self.fase]
+        fase = self.nome_da_fase or NOME_DA_FASE[self.fase]
         rotulo = fase if self.fase == "final" else f"{fase} {self.indice}"
         return f"{rotulo} — {self.lados['p1'].nome} × {self.lados['p2'].nome}"
 
 
-def jogar_partida(fase: str, indice: int, p1: Participante, p2: Participante) -> Partida:
-    semente = semente_da_partida(fase, indice)
+def jogar_partida(
+    fase: str,
+    indice: int,
+    p1: Participante,
+    p2: Participante,
+    *,
+    semente_principal: int = SEMENTE_PRINCIPAL,
+    nome_da_fase: str | None = None,
+) -> Partida:
+    semente = semente_da_partida(fase, indice, semente_principal)
 
     def duelo(auditar: bool) -> DueloAuditado:
         # Preparação nova a cada duelo: nada atravessa de uma partida para outra.
@@ -418,6 +428,7 @@ def jogar_partida(fase: str, indice: int, p1: Participante, p2: Participante) ->
         auditado,
         verificar_fidelidade(puro, auditado),
         conferir_trace(auditado),
+        nome_da_fase,
     )
 
 
@@ -2117,7 +2128,7 @@ def _leitura_da_iniciativa(partida: Partida, nomes: dict) -> list[str]:
     return linhas
 
 
-def relatorio_final(partida: Partida) -> str:
+def relatorio_final(partida: Partida, *, copa: str = "Copa Arena de Testes 01") -> str:
     trace = partida.auditado.trace
     fichas = trace.de("fichas")[0]
     resultado = trace.de("resultado")[0]
@@ -2125,7 +2136,7 @@ def relatorio_final(partida: Partida) -> str:
     nomes = {lado: partida.lados[lado].nome for lado in SIDES}
     nivel_ref = sorted({partida.lados[lado].espec.nivel for lado in SIDES})
     linhas = [
-        f"# Copa Arena de Testes 01 — Final detalhada: {nomes['p1']} × {nomes['p2']}",
+        f"# {copa} — Final detalhada: {nomes['p1']} × {nomes['p2']}",
         "",
         "Transcrição da final a partir do trace da auditoria (`tools/arena_auditoria.py`), na "
         "ordem em "
@@ -2224,12 +2235,17 @@ def relatorio_final(partida: Partida) -> str:
     return "\n".join(linhas)
 
 
-def trace_json(partida: Partida) -> dict:
+def trace_json(
+    partida: Partida,
+    *,
+    copa: str = "Copa Arena de Testes 01",
+    semente_principal: int = SEMENTE_PRINCIPAL,
+) -> dict:
     return {
-        "copa": "Copa Arena de Testes 01",
+        "copa": copa,
         "partida": partida.titulo,
         "fase": partida.fase,
-        "seed_principal": SEMENTE_PRINCIPAL,
+        "seed_principal": semente_principal,
         "seed_da_partida": partida.semente,
         "lados": {
             lado: {
