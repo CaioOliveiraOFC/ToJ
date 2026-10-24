@@ -1,0 +1,1023 @@
+{
+ "copa": "Copa Arena 02",
+ "semente_principal": 20261024,
+ "max_tentativas": 4,
+ "faixas": [
+  [
+   20.0,
+   22.5
+  ],
+  [
+   22.5,
+   25.0
+  ],
+  [
+   25.0,
+   27.5
+  ],
+  [
+   27.5,
+   30.0
+  ]
+ ],
+ "realocacoes": [
+  {
+   "build": "Colhedor",
+   "faixa_pedida": 3,
+   "faixa_final": 4,
+   "motivo": "O nível legal mais baixo é 18 (Colheita de Ferro pede oferta no 15, Juramento da Muralha e Mão Dupla pedem ofertas no 12 ou acima), e ali a build já mede OP 27,56, acima do teto da faixa 3 (27,5)."
+  },
+  {
+   "build": "Postura impecável",
+   "faixa_pedida": 4,
+   "faixa_final": 3,
+   "motivo": "Movida para a faixa 3 para manter 16 por faixa; nenhuma carta dela trava o nível."
+  }
+ ],
+ "participantes": {
+  "G01": {
+   "nivel": 16,
+   "op": 21.3388671875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 21.3388671875
+    }
+   ],
+   "rotulo": "Muralha de maça",
+   "classe": "Warrior",
+   "faixa": 1
+  },
+  "G02": {
+   "nivel": 13,
+   "op": 20.5322265625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 25.2568359375
+    },
+    {
+     "nivel": 13,
+     "op": 20.5322265625
+    }
+   ],
+   "rotulo": "Açougueiro",
+   "classe": "Warrior",
+   "faixa": 1
+  },
+  "G03": {
+   "nivel": 16,
+   "op": 22.3759765625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 22.3759765625
+    }
+   ],
+   "rotulo": "Duelista",
+   "classe": "Warrior",
+   "faixa": 1
+  },
+  "G04": {
+   "nivel": 16,
+   "op": 21.6845703125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 21.6845703125
+    }
+   ],
+   "rotulo": "Berserker",
+   "classe": "Warrior",
+   "faixa": 1
+  },
+  "G05": {
+   "nivel": 16,
+   "op": 21.3388671875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 21.3388671875
+    }
+   ],
+   "rotulo": "Carcereiro",
+   "classe": "Warrior",
+   "faixa": 1
+  },
+  "G06": {
+   "nivel": 16,
+   "op": 22.4912109375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 22.4912109375
+    }
+   ],
+   "rotulo": "Escudeiro de forja",
+   "classe": "Warrior",
+   "faixa": 1
+  },
+  "G07": {
+   "nivel": 18,
+   "op": 24.5654296875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 24.5654296875
+    }
+   ],
+   "rotulo": "Regenerador",
+   "classe": "Warrior",
+   "faixa": 2
+  },
+  "G08": {
+   "nivel": 18,
+   "op": 24.1044921875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 24.1044921875
+    }
+   ],
+   "rotulo": "Ariete",
+   "classe": "Warrior",
+   "faixa": 2
+  },
+  "G09": {
+   "nivel": 18,
+   "op": 23.1826171875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 23.1826171875
+    }
+   ],
+   "rotulo": "Muralha pesada",
+   "classe": "Warrior",
+   "faixa": 2
+  },
+  "G10": {
+   "nivel": 18,
+   "op": 24.6806640625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 24.6806640625
+    }
+   ],
+   "rotulo": "Lenhador",
+   "classe": "Warrior",
+   "faixa": 2
+  },
+  "G11": {
+   "nivel": 18,
+   "op": 24.1044921875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 24.1044921875
+    }
+   ],
+   "rotulo": "Rompe-guarda",
+   "classe": "Warrior",
+   "faixa": 2
+  },
+  "G12": {
+   "nivel": 20,
+   "op": 25.9482421875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 25.9482421875
+    }
+   ],
+   "rotulo": "Fúria",
+   "classe": "Warrior",
+   "faixa": 3
+  },
+  "G13": {
+   "nivel": 19,
+   "op": 29.5205078125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 22,
+     "op": 36.0888671875
+    },
+    {
+     "nivel": 19,
+     "op": 29.5205078125
+    }
+   ],
+   "rotulo": "Colhedor",
+   "classe": "Warrior",
+   "faixa": 4
+  },
+  "G14": {
+   "nivel": 20,
+   "op": 27.1005859375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 27.1005859375
+    }
+   ],
+   "rotulo": "Veterano",
+   "classe": "Warrior",
+   "faixa": 3
+  },
+  "G15": {
+   "nivel": 20,
+   "op": 25.7177734375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 25.7177734375
+    }
+   ],
+   "rotulo": "Bigorna",
+   "classe": "Warrior",
+   "faixa": 3
+  },
+  "G16": {
+   "nivel": 20,
+   "op": 25.2568359375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 25.2568359375
+    }
+   ],
+   "rotulo": "Sentinela de ferro",
+   "classe": "Warrior",
+   "faixa": 3
+  },
+  "G17": {
+   "nivel": 18,
+   "op": 26.2939453125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 30.3271484375
+    },
+    {
+     "nivel": 17,
+     "erro": "Machado pesado nível 17: a mesma peça em duas posições"
+    },
+    {
+     "nivel": 18,
+     "op": 26.2939453125
+    }
+   ],
+   "rotulo": "Machado pesado",
+   "classe": "Warrior",
+   "faixa": 3
+  },
+  "G18": {
+   "nivel": 22,
+   "op": 28.7138671875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 22,
+     "op": 28.7138671875
+    }
+   ],
+   "rotulo": "Fortaleza",
+   "classe": "Warrior",
+   "faixa": 4
+  },
+  "G19": {
+   "nivel": 22,
+   "op": 28.3681640625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 22,
+     "op": 28.3681640625
+    }
+   ],
+   "rotulo": "Imortal",
+   "classe": "Warrior",
+   "faixa": 4
+  },
+  "G20": {
+   "nivel": 22,
+   "op": 28.4833984375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 22,
+     "op": 28.4833984375
+    }
+   ],
+   "rotulo": "Condenado",
+   "classe": "Warrior",
+   "faixa": 4
+  },
+  "G21": {
+   "nivel": 20,
+   "op": 26.7548828125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 26.7548828125
+    }
+   ],
+   "rotulo": "Postura impecável",
+   "classe": "Warrior",
+   "faixa": 3
+  },
+  "G22": {
+   "nivel": 22,
+   "op": 28.7138671875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 22,
+     "op": 28.7138671875
+    }
+   ],
+   "rotulo": "Pacto de ferro",
+   "classe": "Warrior",
+   "faixa": 4
+  },
+  "G23": {
+   "nivel": 14,
+   "op": 20.0712890625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 23.0673828125
+    },
+    {
+     "nivel": 14,
+     "op": 20.0712890625
+    }
+   ],
+   "rotulo": "Piromante",
+   "classe": "Mage",
+   "faixa": 1
+  },
+  "G24": {
+   "nivel": 15,
+   "op": 21.7998046875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 22.8369140625
+    },
+    {
+     "nivel": 15,
+     "op": 21.7998046875
+    }
+   ],
+   "rotulo": "Geomante",
+   "classe": "Mage",
+   "faixa": 1
+  },
+  "G25": {
+   "nivel": 16,
+   "op": 21.5693359375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 21.5693359375
+    }
+   ],
+   "rotulo": "Criomante",
+   "classe": "Mage",
+   "faixa": 1
+  },
+  "G26": {
+   "nivel": 16,
+   "op": 22.3759765625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 22.3759765625
+    }
+   ],
+   "rotulo": "Curandeira",
+   "classe": "Mage",
+   "faixa": 1
+  },
+  "G27": {
+   "nivel": 16,
+   "op": 21.9150390625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 16,
+     "op": 21.9150390625
+    }
+   ],
+   "rotulo": "Sonhador",
+   "classe": "Mage",
+   "faixa": 1
+  },
+  "G28": {
+   "nivel": 18,
+   "op": 24.1044921875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 24.1044921875
+    }
+   ],
+   "rotulo": "Arcanista crítico",
+   "classe": "Mage",
+   "faixa": 2
+  },
+  "G29": {
+   "nivel": 18,
+   "op": 23.0673828125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 23.0673828125
+    }
+   ],
+   "rotulo": "Égide rúnica",
+   "classe": "Mage",
+   "faixa": 2
+  },
+  "G30": {
+   "nivel": 18,
+   "op": 24.4501953125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 24.4501953125
+    }
+   ],
+   "rotulo": "Tempestuoso",
+   "classe": "Mage",
+   "faixa": 2
+  },
+  "G31": {
+   "nivel": 18,
+   "op": 24.6806640625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 24.6806640625
+    }
+   ],
+   "rotulo": "Prisma",
+   "classe": "Mage",
+   "faixa": 2
+  },
+  "G32": {
+   "nivel": 18,
+   "op": 23.9892578125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 23.9892578125
+    }
+   ],
+   "rotulo": "Grilhões",
+   "classe": "Mage",
+   "faixa": 2
+  },
+  "G33": {
+   "nivel": 18,
+   "op": 24.6806640625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 18,
+     "op": 24.6806640625
+    }
+   ],
+   "rotulo": "Dreno",
+   "classe": "Mage",
+   "faixa": 2
+  },
+  "G34": {
+   "nivel": 19,
+   "op": 26.6396484375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 27.7919921875
+    },
+    {
+     "nivel": 19,
+     "op": 26.6396484375
+    }
+   ],
+   "rotulo": "Ressurgente",
+   "classe": "Mage",
+   "faixa": 3
+  },
+  "G35": {
+   "nivel": 20,
+   "op": 25.8330078125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 25.8330078125
+    }
+   ],
+   "rotulo": "Hora parada",
+   "classe": "Mage",
+   "faixa": 3
+  },
+  "G36": {
+   "nivel": 20,
+   "op": 25.6025390625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 25.6025390625
+    }
+   ],
+   "rotulo": "Pacto do vazio",
+   "classe": "Mage",
+   "faixa": 3
+  },
+  "G37": {
+   "nivel": 21,
+   "op": 25.4873046875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 24.5654296875
+    },
+    {
+     "nivel": 21,
+     "op": 25.4873046875
+    }
+   ],
+   "rotulo": "Escudo e fogo",
+   "classe": "Mage",
+   "faixa": 3
+  },
+  "G38": {
+   "nivel": 20,
+   "op": 26.9853515625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 20,
+     "op": 26.9853515625
+    }
+   ],
+   "rotulo": "Coveiro arcano",
+   "classe": "Mage",
+   "faixa": 3
+  },
+  "G39": {
+   "nivel": 23,
+   "op": 28.7138671875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 23,
+     "op": 28.7138671875
+    }
+   ],
+   "rotulo": "Apocalipse",
+   "classe": "Mage",
+   "faixa": 4
+  },
+  "G40": {
+   "nivel": 24,
+   "op": 28.1376953125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 23,
+     "op": 27.2158203125
+    },
+    {
+     "nivel": 24,
+     "op": 28.1376953125
+    }
+   ],
+   "rotulo": "Dividendo",
+   "classe": "Mage",
+   "faixa": 4
+  },
+  "G41": {
+   "nivel": 23,
+   "op": 29.2900390625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 23,
+     "op": 29.2900390625
+    }
+   ],
+   "rotulo": "Mestre do gelo",
+   "classe": "Mage",
+   "faixa": 4
+  },
+  "G42": {
+   "nivel": 20,
+   "op": 29.1748046875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 23,
+     "op": 32.4013671875
+    },
+    {
+     "nivel": 20,
+     "op": 29.1748046875
+    }
+   ],
+   "rotulo": "Sanguessuga",
+   "classe": "Mage",
+   "faixa": 4
+  },
+  "G43": {
+   "nivel": 23,
+   "op": 29.5205078125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 23,
+     "op": 29.5205078125
+    }
+   ],
+   "rotulo": "Prisma do arauto",
+   "classe": "Mage",
+   "faixa": 4
+  },
+  "G44": {
+   "nivel": 14,
+   "op": 21.1083984375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 15,
+     "op": 22.6064453125
+    },
+    {
+     "nivel": 14,
+     "op": 21.1083984375
+    }
+   ],
+   "rotulo": "Assassino de adaga",
+   "classe": "Rogue",
+   "faixa": 1
+  },
+  "G45": {
+   "nivel": 15,
+   "op": 21.2236328125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 15,
+     "op": 21.2236328125
+    }
+   ],
+   "rotulo": "Arqueiro",
+   "classe": "Rogue",
+   "faixa": 1
+  },
+  "G46": {
+   "nivel": 14,
+   "op": 22.0302734375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 15,
+     "op": 22.9521484375
+    },
+    {
+     "nivel": 14,
+     "op": 22.0302734375
+    }
+   ],
+   "rotulo": "Envenenador",
+   "classe": "Rogue",
+   "faixa": 1
+  },
+  "G47": {
+   "nivel": 15,
+   "op": 21.9150390625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 15,
+     "op": 21.9150390625
+    }
+   ],
+   "rotulo": "Esquivo",
+   "classe": "Rogue",
+   "faixa": 1
+  },
+  "G48": {
+   "nivel": 15,
+   "op": 20.5322265625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 15,
+     "op": 20.5322265625
+    }
+   ],
+   "rotulo": "Trapaceiro",
+   "classe": "Rogue",
+   "faixa": 1
+  },
+  "G49": {
+   "nivel": 16,
+   "op": 24.5654296875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 17,
+     "op": 26.8701171875
+    },
+    {
+     "nivel": 14,
+     "op": 21.3388671875
+    },
+    {
+     "nivel": 16,
+     "op": 24.5654296875
+    }
+   ],
+   "rotulo": "Sangrador",
+   "classe": "Rogue",
+   "faixa": 2
+  },
+  "G50": {
+   "nivel": 17,
+   "op": 24.5654296875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 17,
+     "op": 24.5654296875
+    }
+   ],
+   "rotulo": "Duas lâminas",
+   "classe": "Rogue",
+   "faixa": 2
+  },
+  "G51": {
+   "nivel": 17,
+   "op": 23.9892578125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 17,
+     "op": 23.9892578125
+    }
+   ],
+   "rotulo": "Caçador",
+   "classe": "Rogue",
+   "faixa": 2
+  },
+  "G52": {
+   "nivel": 17,
+   "op": 24.9111328125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 17,
+     "op": 24.9111328125
+    }
+   ],
+   "rotulo": "Ladrão de mana",
+   "classe": "Rogue",
+   "faixa": 2
+  },
+  "G53": {
+   "nivel": 17,
+   "op": 23.4130859375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 17,
+     "op": 23.4130859375
+    }
+   ],
+   "rotulo": "Couro endurecido",
+   "classe": "Rogue",
+   "faixa": 2
+  },
+  "G54": {
+   "nivel": 16,
+   "op": 25.6025390625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 19,
+     "op": 28.7138671875
+    },
+    {
+     "nivel": 17,
+     "op": 28.0224609375
+    },
+    {
+     "nivel": 16,
+     "op": 25.6025390625
+    }
+   ],
+   "rotulo": "Lobo",
+   "classe": "Rogue",
+   "faixa": 3
+  },
+  "G55": {
+   "nivel": 19,
+   "op": 27.1005859375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 19,
+     "op": 27.1005859375
+    }
+   ],
+   "rotulo": "Dançarino",
+   "classe": "Rogue",
+   "faixa": 3
+  },
+  "G56": {
+   "nivel": 20,
+   "op": 25.6025390625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 19,
+     "op": 24.9111328125
+    },
+    {
+     "nivel": 20,
+     "op": 25.6025390625
+    }
+   ],
+   "rotulo": "Silêncio",
+   "classe": "Rogue",
+   "faixa": 3
+  },
+  "G57": {
+   "nivel": 18,
+   "op": 27.4462890625,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 19,
+     "op": 27.7919921875
+    },
+    {
+     "nivel": 18,
+     "op": 27.4462890625
+    }
+   ],
+   "rotulo": "Testamento",
+   "classe": "Rogue",
+   "faixa": 3
+  },
+  "G58": {
+   "nivel": 20,
+   "op": 25.9482421875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 19,
+     "op": 24.9111328125
+    },
+    {
+     "nivel": 20,
+     "op": 25.9482421875
+    }
+   ],
+   "rotulo": "Gancho",
+   "classe": "Rogue",
+   "faixa": 3
+  },
+  "G59": {
+   "nivel": 21,
+   "op": 28.4833984375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 21,
+     "op": 28.4833984375
+    }
+   ],
+   "rotulo": "Morte súbita",
+   "classe": "Rogue",
+   "faixa": 4
+  },
+  "G60": {
+   "nivel": 19,
+   "op": 28.1376953125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 21,
+     "op": 31.0185546875
+    },
+    {
+     "nivel": 19,
+     "op": 28.1376953125
+    }
+   ],
+   "rotulo": "Cobrador",
+   "classe": "Rogue",
+   "faixa": 4
+  },
+  "G61": {
+   "nivel": 21,
+   "op": 28.5986328125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 21,
+     "op": 28.5986328125
+    }
+   ],
+   "rotulo": "Evasão perfeita",
+   "classe": "Rogue",
+   "faixa": 4
+  },
+  "G62": {
+   "nivel": 21,
+   "op": 29.5205078125,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 21,
+     "op": 29.5205078125
+    }
+   ],
+   "rotulo": "Chuva de ferrões",
+   "classe": "Rogue",
+   "faixa": 4
+  },
+  "G63": {
+   "nivel": 23,
+   "op": 28.4833984375,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 21,
+     "op": 26.2939453125
+    },
+    {
+     "nivel": 23,
+     "op": 28.4833984375
+    }
+   ],
+   "rotulo": "Arauto",
+   "classe": "Rogue",
+   "faixa": 4
+  },
+  "G64": {
+   "nivel": 22,
+   "op": 28.2529296875,
+   "dentro": true,
+   "tentativas": [
+    {
+     "nivel": 21,
+     "op": 27.3310546875
+    },
+    {
+     "nivel": 22,
+     "op": 28.2529296875
+    }
+   ],
+   "rotulo": "Sombra mortal",
+   "classe": "Rogue",
+   "faixa": 4
+  }
+ }
+}
