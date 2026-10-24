@@ -1,0 +1,6979 @@
+{
+ "copa": "Copa Arena de Testes 01",
+ "partida": "Final — Geada × Carrasco",
+ "fase": "final",
+ "seed_principal": 20261023,
+ "seed_da_partida": 14556157636677633696,
+ "lados": {
+  "p1": {
+   "id": "G6",
+   "nome": "Geada",
+   "overall_power": 9.78662109375
+  },
+  "p2": {
+   "id": "G2",
+   "nome": "Carrasco",
+   "overall_power": 10.53564453125
+  }
+ },
+ "limite_tecnico": 500,
+ "fidelidade": [
+  {
+   "verificacao": "ações escolhidas",
+   "ok": true
+  },
+  {
+   "verificacao": "ordem de cada rodada",
+   "ok": true
+  },
+  {
+   "verificacao": "leituras de iniciativa (floats exatos)",
+   "ok": true
+  },
+  {
+   "verificacao": "passos: desfecho, MP reservado, MP gasto e dano",
+   "ok": true
+  },
+  {
+   "verificacao": "HP e MP ao fim de cada rodada",
+   "ok": true
+  },
+  {
+   "verificacao": "estado completo ao fim de cada rodada (efeitos, buffs, recargas)",
+   "ok": true
+  },
+  {
+   "verificacao": "eventos do motor",
+   "ok": true
+  },
+  {
+   "verificacao": "vencedor, motivo e número de rodadas",
+   "ok": true
+  },
+  {
+   "verificacao": "conclusividade",
+   "ok": true
+  },
+  {
+   "verificacao": "posição final do gerador (nenhum sorteio extra)",
+   "ok": true
+  }
+ ],
+ "coerencia": [
+  {
+   "verificacao": "toda chamada ao gerador foi classificada",
+   "ok": true
+  },
+  {
+   "verificacao": "rolagens registradas = chamadas ao gerador",
+   "ok": true
+  },
+  {
+   "verificacao": "toda rolagem de acerto recebeu a chance do motor",
+   "ok": true
+  },
+  {
+   "verificacao": "toda rolagem pertence ao intervalo do motor",
+   "ok": true
+  },
+  {
+   "verificacao": "dano de cada passo = soma do HP retirado pelos golpes registrados",
+   "ok": true
+  },
+  {
+   "verificacao": "MP gasto de cada passo = débito registrado da skill",
+   "ok": true
+  },
+  {
+   "verificacao": "ações executadas = eventos `action_executed`",
+   "ok": true
+  }
+ ],
+ "chamadas_ao_rng": 13,
+ "registros": [
+  {
+   "seq": 1,
+   "rodada": 0,
+   "ator": null,
+   "golpe": null,
+   "kind": "fichas",
+   "p1": {
+    "nome": "Geada",
+    "classe": "Mage",
+    "nivel": 6,
+    "equipamento": {
+     "Helmet": "Elmo de Madeira",
+     "Amulet": "Amuleto de Concha",
+     "Weapon1": "Lâmina Veloz",
+     "Weapon2": "Pá de Batalha",
+     "Body": "Jaqueta de Couro",
+     "Legs": "Bermuda de Couro",
+     "Hands": "Escudo de Madeira",
+     "Shoes": "Tamancos de Madeira",
+     "Ring1": "Anel de Ouro",
+     "Ring2": "Anel de Bronze",
+     "Accessory": null
+    },
+    "arma_percent": 13.0,
+    "skills": [
+     {
+      "id": "bola_fogo",
+      "nome": "Bola de Fogo",
+      "tipo": "damage",
+      "valor": 0,
+      "stat": "",
+      "custo_mp": 9,
+      "recarga": 1,
+      "alvo": "enemy",
+      "chance": 100,
+      "duracao": 0,
+      "power": 3.485,
+      "escala": [
+       [
+        "mg",
+        1.0
+       ]
+      ],
+      "modificador_de_acerto": 0,
+      "critico_da_carta": 0,
+      "secundario": null,
+      "requisito": null,
+      "usavel": true
+     },
+     {
+      "id": "lasca_de_gelo",
+      "nome": "Lasca de Gelo",
+      "tipo": "damage",
+      "valor": 0,
+      "stat": "",
+      "custo_mp": 10,
+      "recarga": 2,
+      "alvo": "enemy",
+      "chance": 100,
+      "duracao": 0,
+      "power": 4.682,
+      "escala": [
+       [
+        "mg",
+        1.0
+       ]
+      ],
+      "modificador_de_acerto": 0,
+      "critico_da_carta": 0,
+      "secundario": {
+       "effect": "slowed",
+       "chance": 45,
+       "duration": 3,
+       "intensity": 0.0
+      },
+      "requisito": null,
+      "usavel": true
+     },
+     {
+      "id": "palavra_de_torpor",
+      "nome": "Palavra de Torpor",
+      "tipo": "status",
+      "valor": "slowed",
+      "stat": "",
+      "custo_mp": 9,
+      "recarga": 2,
+      "alvo": "enemy",
+      "chance": 75,
+      "duracao": 3,
+      "power": 0.0,
+      "escala": [],
+      "modificador_de_acerto": 0,
+      "critico_da_carta": 0,
+      "secundario": {
+       "effect": "clouded",
+       "chance": 50,
+       "duration": 3,
+       "intensity": 0.0
+      },
+      "requisito": null,
+      "usavel": true
+     }
+    ],
+    "passivas": [
+     {
+      "id": "mente_serena",
+      "nome": "Mente Serena",
+      "efeito": "max_mp",
+      "valor": 10
+     },
+     {
+      "id": "pele_de_sal",
+      "nome": "Pele de Sal",
+      "efeito": "status_resistance",
+      "valor": 8
+     },
+     {
+      "id": "sangue_de_vidente",
+      "nome": "Sangue de Vidente",
+      "efeito": "magic",
+      "valor": 3
+     },
+     {
+      "id": "olho_de_cacador",
+      "nome": "Olho de Caçador",
+      "efeito": "precision",
+      "valor": 5
+     },
+     {
+      "id": "mente_serena",
+      "nome": "Mente Serena",
+      "efeito": "max_mp",
+      "valor": 10
+     }
+    ],
+    "modificadores": {
+     "crit_chance": 2.0,
+     "crit_damage": 0.0,
+     "damage_percent": 0.0,
+     "damage_reduction": 0.0,
+     "evasion": 0.0,
+     "precision": 5.0,
+     "life_steal": 0.0,
+     "mana_regen": 0.0,
+     "status_resistance": 8.0,
+     "stun_chance": 0.0,
+     "bleed_chance": 0.0,
+     "poison_chance": 0.0,
+     "fear_chance": 0.0,
+     "death_ignore": 0.0,
+     "potion_heal_bonus": 0.0
+    },
+    "egide_percent": 15,
+    "estado": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 280,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {},
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   },
+   "p2": {
+    "nome": "Carrasco",
+    "classe": "Warrior",
+    "nivel": 7,
+    "equipamento": {
+     "Helmet": "Capacete de Couro",
+     "Amulet": "Amuleto de Concha",
+     "Weapon1": "Clava Pesada",
+     "Weapon2": "Espada Longa",
+     "Body": "Placa Pesada",
+     "Legs": "Bermuda de Couro",
+     "Hands": "Escudo de Madeira",
+     "Shoes": "Tamancos de Madeira",
+     "Ring1": "Anel de Ouro",
+     "Ring2": "Anel de Aço",
+     "Accessory": null
+    },
+    "arma_percent": 13.0,
+    "skills": [
+     {
+      "id": "golpe_poderoso",
+      "nome": "Golpe Poderoso",
+      "tipo": "damage",
+      "valor": 0,
+      "stat": "",
+      "custo_mp": 8,
+      "recarga": 1,
+      "alvo": "enemy",
+      "chance": 100,
+      "duracao": 0,
+      "power": 2.86,
+      "escala": [
+       [
+        "st",
+        1.0
+       ]
+      ],
+      "modificador_de_acerto": 0,
+      "critico_da_carta": 0,
+      "secundario": null,
+      "requisito": null,
+      "usavel": true
+     },
+     {
+      "id": "grito_guerra",
+      "nome": "Grito de Guerra",
+      "tipo": "buff",
+      "valor": 35,
+      "stat": "st",
+      "custo_mp": 16,
+      "recarga": 2,
+      "alvo": "self",
+      "chance": 100,
+      "duracao": 3,
+      "power": 0.0,
+      "escala": [],
+      "modificador_de_acerto": 0,
+      "critico_da_carta": 0,
+      "secundario": null,
+      "requisito": null,
+      "usavel": true
+     },
+     {
+      "id": "cutelada",
+      "nome": "Cutelada",
+      "tipo": "damage",
+      "valor": 0,
+      "stat": "",
+      "custo_mp": 13,
+      "recarga": 2,
+      "alvo": "enemy",
+      "chance": 100,
+      "duracao": 0,
+      "power": 3.294,
+      "escala": [
+       [
+        "st",
+        1.0
+       ]
+      ],
+      "modificador_de_acerto": 0,
+      "critico_da_carta": 0,
+      "secundario": null,
+      "requisito": null,
+      "usavel": true
+     }
+    ],
+    "passivas": [
+     {
+      "id": "musculos_aco",
+      "nome": "Músculos de Aço",
+      "efeito": "strength",
+      "valor": 3
+     },
+     {
+      "id": "odio_baixo",
+      "nome": "Ódio Baixo",
+      "efeito": "damage_percent",
+      "valor": 4
+     },
+     {
+      "id": "pulso_certeiro",
+      "nome": "Pulso Certeiro",
+      "efeito": "crit_damage",
+      "valor": 15
+     },
+     {
+      "id": "olho_aguia",
+      "nome": "Olho de Águia",
+      "efeito": "crit_chance",
+      "valor": 5
+     },
+     {
+      "id": "musculos_aco",
+      "nome": "Músculos de Aço",
+      "efeito": "strength",
+      "valor": 3
+     },
+     {
+      "id": "odio_baixo",
+      "nome": "Ódio Baixo",
+      "efeito": "damage_percent",
+      "valor": 4
+     }
+    ],
+    "modificadores": {
+     "crit_chance": 7.0,
+     "crit_damage": 15.0,
+     "damage_percent": 8.0,
+     "damage_reduction": 0.0,
+     "evasion": 0.0,
+     "precision": 0.0,
+     "life_steal": 0.0,
+     "mana_regen": 0.0,
+     "status_resistance": 0.0,
+     "stun_chance": 0.0,
+     "bleed_chance": 0.0,
+     "poison_chance": 0.0,
+     "fear_chance": 0.0,
+     "death_ignore": 0.0,
+     "potion_heal_bonus": 0.0
+    },
+    "egide_percent": 0,
+    "estado": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 123,
+     "mp_max": 123,
+     "st": 103,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {},
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   },
+   "seed": 14556157636677633696
+  },
+  {
+   "seq": 2,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "rodada_inicio",
+   "estado": {
+    "p1": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 280,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {},
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "p2": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 123,
+     "mp_max": 123,
+     "st": 103,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {},
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 3,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "escolha",
+   "lado": "p1",
+   "visao": {
+    "round_number": 1,
+    "side": "p1",
+    "me": {
+     "name": "Geada",
+     "class_name": "Mage",
+     "level": 6,
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 280,
+     "mp_max": 280,
+     "effects": [],
+     "buffs": []
+    },
+    "opponent": {
+     "name": "Carrasco",
+     "class_name": "Warrior",
+     "level": 7,
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 123,
+     "mp_max": 123,
+     "effects": [],
+     "buffs": []
+    },
+    "legal_actions": [
+     {
+      "kind": "attack",
+      "skill_id": null
+     },
+     {
+      "kind": "skill",
+      "skill_id": "bola_fogo"
+     },
+     {
+      "kind": "skill",
+      "skill_id": "lasca_de_gelo"
+     },
+     {
+      "kind": "skill",
+      "skill_id": "palavra_de_torpor"
+     },
+     {
+      "kind": "surrender",
+      "skill_id": null
+     }
+    ],
+    "cooldowns": [
+     [
+      "bola_fogo",
+      0
+     ],
+     [
+      "lasca_de_gelo",
+      0
+     ],
+     [
+      "palavra_de_torpor",
+      0
+     ]
+    ]
+   },
+   "acoes_legais": [
+    {
+     "kind": "attack",
+     "skill_id": null
+    },
+    {
+     "kind": "skill",
+     "skill_id": "bola_fogo"
+    },
+    {
+     "kind": "skill",
+     "skill_id": "lasca_de_gelo"
+    },
+    {
+     "kind": "skill",
+     "skill_id": "palavra_de_torpor"
+    },
+    {
+     "kind": "surrender",
+     "skill_id": null
+    }
+   ],
+   "acao": {
+    "kind": "skill",
+    "skill_id": "palavra_de_torpor"
+   },
+   "justificativa": "Palavra de Torpor aplica slowed, que o adversário não carrega (efeitos visíveis: [])",
+   "legal": true,
+   "custo_mp": 9,
+   "recargas_no_lock": {
+    "bola_fogo": 0,
+    "lasca_de_gelo": 0,
+    "palavra_de_torpor": 0
+   }
+  },
+  {
+   "seq": 4,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "escolha",
+   "lado": "p2",
+   "visao": {
+    "round_number": 1,
+    "side": "p2",
+    "me": {
+     "name": "Carrasco",
+     "class_name": "Warrior",
+     "level": 7,
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 123,
+     "mp_max": 123,
+     "effects": [],
+     "buffs": []
+    },
+    "opponent": {
+     "name": "Geada",
+     "class_name": "Mage",
+     "level": 6,
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 280,
+     "mp_max": 280,
+     "effects": [],
+     "buffs": []
+    },
+    "legal_actions": [
+     {
+      "kind": "attack",
+      "skill_id": null
+     },
+     {
+      "kind": "skill",
+      "skill_id": "golpe_poderoso"
+     },
+     {
+      "kind": "skill",
+      "skill_id": "grito_guerra"
+     },
+     {
+      "kind": "skill",
+      "skill_id": "cutelada"
+     },
+     {
+      "kind": "surrender",
+      "skill_id": null
+     }
+    ],
+    "cooldowns": [
+     [
+      "golpe_poderoso",
+      0
+     ],
+     [
+      "grito_guerra",
+      0
+     ],
+     [
+      "cutelada",
+      0
+     ]
+    ]
+   },
+   "acoes_legais": [
+    {
+     "kind": "attack",
+     "skill_id": null
+    },
+    {
+     "kind": "skill",
+     "skill_id": "golpe_poderoso"
+    },
+    {
+     "kind": "skill",
+     "skill_id": "grito_guerra"
+    },
+    {
+     "kind": "skill",
+     "skill_id": "cutelada"
+    },
+    {
+     "kind": "surrender",
+     "skill_id": null
+    }
+   ],
+   "acao": {
+    "kind": "skill",
+    "skill_id": "grito_guerra"
+   },
+   "justificativa": "Grito de Guerra é legal e não está ativo (buffs visíveis: [])",
+   "legal": true,
+   "custo_mp": 16,
+   "recargas_no_lock": {
+    "golpe_poderoso": 0,
+    "grito_guerra": 0,
+    "cutelada": 0
+   }
+  },
+  {
+   "seq": 5,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "mp_reserved",
+   "lado": "p1",
+   "detalhe": {
+    "amount": 9
+   }
+  },
+  {
+   "seq": 6,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "mp_reserved",
+   "lado": "p2",
+   "detalhe": {
+    "amount": 16
+   }
+  },
+  {
+   "seq": 7,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "actions_locked",
+   "lado": null,
+   "detalhe": {
+    "p1": {
+     "kind": "skill",
+     "skill_id": "palavra_de_torpor"
+    },
+    "p2": {
+     "kind": "skill",
+     "skill_id": "grito_guerra"
+    }
+   }
+  },
+  {
+   "seq": 8,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "iniciativa",
+   "lado": "p1",
+   "nivel": 6,
+   "nivel_oponente": 7,
+   "parcelas": [
+    {
+     "stat": "hp",
+     "valor": 652.0,
+     "ref": 660.0,
+     "razao": 0.9878787878787879,
+     "raiz": 0.9939209163101398
+    },
+    {
+     "stat": "mp",
+     "valor": 280.0,
+     "ref": 170.66666666666666,
+     "razao": 1.640625,
+     "raiz": 1.2808688457449497
+    },
+    {
+     "stat": "st",
+     "valor": 53.0,
+     "ref": 74.66666666666667,
+     "razao": 0.7098214285714285,
+     "raiz": 0.8425090080061034
+    },
+    {
+     "stat": "mg",
+     "valor": 95.0,
+     "ref": 67.0,
+     "razao": 1.4179104477611941,
+     "raiz": 1.190760449360489
+    },
+    {
+     "stat": "ag",
+     "valor": 14.0,
+     "ref": 26.0,
+     "razao": 0.5384615384615384,
+     "raiz": 0.7337993857053428
+    },
+    {
+     "stat": "df",
+     "valor": 51.0,
+     "ref": 48.666666666666664,
+     "razao": 1.047945205479452,
+     "raiz": 1.0236919485272178
+    }
+   ],
+   "soma_raizes": 6.0655505536542424,
+   "build": 1.0109250922757071,
+   "delta_nivel": -1,
+   "delta_x_step": -0.005,
+   "teto_do_modificador": 0.1,
+   "modificador": 0.995,
+   "score": 1.0058704668143286,
+   "ag": 14.0,
+   "ref_ag": 26.0,
+   "ag_relativa": 0.5384615384615384
+  },
+  {
+   "seq": 9,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "iniciativa",
+   "lado": "p2",
+   "nivel": 7,
+   "nivel_oponente": 6,
+   "parcelas": [
+    {
+     "stat": "hp",
+     "valor": 868.0,
+     "ref": 739.3333333333334,
+     "razao": 1.1740306582506763,
+     "raiz": 1.083526953172221
+    },
+    {
+     "stat": "mp",
+     "valor": 123.0,
+     "ref": 190.66666666666666,
+     "razao": 0.6451048951048951,
+     "raiz": 0.8031842223953949
+    },
+    {
+     "stat": "st",
+     "valor": 103.0,
+     "ref": 83.66666666666667,
+     "razao": 1.2310756972111554,
+     "raiz": 1.1095385064120828
+    },
+    {
+     "stat": "mg",
+     "valor": 59.0,
+     "ref": 75.0,
+     "razao": 0.7866666666666666,
+     "raiz": 0.886942313043338
+    },
+    {
+     "stat": "ag",
+     "valor": 19.0,
+     "ref": 29.0,
+     "razao": 0.6551724137931034,
+     "raiz": 0.8094272134003795
+    },
+    {
+     "stat": "df",
+     "valor": 74.0,
+     "ref": 54.333333333333336,
+     "razao": 1.361963190184049,
+     "raiz": 1.1670317862783555
+    }
+   ],
+   "soma_raizes": 5.859650994701772,
+   "build": 0.976608499116962,
+   "delta_nivel": 1,
+   "delta_x_step": 0.005,
+   "teto_do_modificador": 0.1,
+   "modificador": 1.005,
+   "score": 0.9814915416125467,
+   "ag": 19.0,
+   "ref_ag": 29.0,
+   "ag_relativa": 0.6551724137931034
+  },
+  {
+   "seq": 10,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "ordem",
+   "score": {
+    "p1": 1.0058704668143286,
+    "p2": 0.9814915416125467
+   },
+   "scores_iguais": false,
+   "ag_relativa": {
+    "p1": 0.5384615384615384,
+    "p2": 0.6551724137931034
+   },
+   "ag_relativa_igual": false,
+   "decidido_por": "score",
+   "primeiro": "p1",
+   "segundo": "p2"
+  },
+  {
+   "seq": 11,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "order_locked",
+   "lado": null,
+   "detalhe": {
+    "order": [
+     "p1",
+     "p2"
+    ],
+    "by": "score"
+   }
+  },
+  {
+   "seq": 12,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "inicio_oportunidade",
+   "antes": {
+    "hp": 652,
+    "hp_max": 652,
+    "mp": 271,
+    "mp_max": 280,
+    "st": 53,
+    "mg": 95,
+    "ag": 14,
+    "df": 51,
+    "recargas": {},
+    "buffs": {},
+    "efeitos": [],
+    "death_ignore_usado": false,
+    "vivo": true
+   },
+   "regeneracao": {
+    "mp_max": 280,
+    "percentual": 2,
+    "base": 5.6,
+    "base_formula": "max(1, 280 × 2 / 100)",
+    "modificador_mana_regen": 0.0,
+    "total_int": 5,
+    "total_formula": "int(0 + 5.6)",
+    "teto": 280,
+    "mp_antes": 271,
+    "mp_depois_da_regeneracao": 276
+   }
+  },
+  {
+   "seq": 13,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "tick_de_efeitos",
+   "relatorio": {
+    "dot": {},
+    "drain": {},
+    "expired": [],
+    "skip_turn": false,
+    "laws": []
+   }
+  },
+  {
+   "seq": 14,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "fim_inicio_oportunidade",
+   "perde_a_oportunidade": false,
+   "depois": {
+    "hp": 652,
+    "hp_max": 652,
+    "mp": 276,
+    "mp_max": 280,
+    "st": 53,
+    "mg": 95,
+    "ag": 14,
+    "df": 51,
+    "recargas": {},
+    "buffs": {},
+    "efeitos": [],
+    "death_ignore_usado": false,
+    "vivo": true
+   }
+  },
+  {
+   "seq": 15,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "corte_de_mp_livre",
+   "reservado": 9,
+   "teto_livre": 271,
+   "mp_antes": 276,
+   "mp_depois": 271
+  },
+  {
+   "seq": 16,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "skill_inicio",
+   "skill": "palavra_de_torpor",
+   "nome": "Palavra de Torpor",
+   "tipo": "status",
+   "valor": "slowed",
+   "stat": "",
+   "alvo_declarado": "enemy",
+   "receptor": "p2",
+   "custo_mp": 9,
+   "recarga_declarada": 2,
+   "recarga_antes": 0,
+   "requisito": null,
+   "requisito_atendido": true,
+   "mp_disponivel": 280,
+   "chance_declarada": 75,
+   "duracao_declarada": 3,
+   "antes": {
+    "caster": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 280,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {},
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 107,
+     "mp_max": 123,
+     "st": 103,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {},
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 17,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_cast",
+   "tipo": "skill_cast",
+   "payload": {
+    "caster": "p1",
+    "skill": "palavra_de_torpor"
+   }
+  },
+  {
+   "seq": 18,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "rolagem",
+   "mecanica": "aplicação de status (slowed)",
+   "status": "slowed",
+   "alvo": "p2",
+   "chance_base": 75.0,
+   "chance": 75.0,
+   "teste": "11 > 75.0",
+   "teste_verdadeiro": false,
+   "operador": ">",
+   "aprovado": true,
+   "resultado": "passou na rolagem",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 11,
+   "chamada": 1,
+   "chamador": "mechanics/combat.py:582 try_apply_status",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))"
+  },
+  {
+   "seq": 19,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "status",
+   "origem": "apply_skill",
+   "alvo": "p2",
+   "status": "slowed",
+   "fonte": "palavra_de_torpor",
+   "chance_base": 75,
+   "resistencia_do_alvo": 0.0,
+   "chance_efetiva": 75.0,
+   "chance_formula": "75 × (1 − 0/100)",
+   "rolou": true,
+   "rolagem_seq": 18,
+   "rolagem_valor": 11,
+   "rolagem_aprovada": true,
+   "atacante": "p1",
+   "duracao_pedida": 3,
+   "duracao_apos_leis": 3,
+   "leis_de_duracao": [],
+   "pegou": true,
+   "instancia_antes": [],
+   "instancia_depois": [
+    {
+     "effect": "slowed",
+     "source_id": "palavra_de_torpor",
+     "intensity": 20.0,
+     "value": 20.0,
+     "duration": 3,
+     "stacks": 1
+    }
+   ]
+  },
+  {
+   "seq": 20,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "rolagem",
+   "mecanica": "aplicação de status (clouded)",
+   "status": "clouded",
+   "alvo": "p2",
+   "chance_base": 50.0,
+   "chance": 50.0,
+   "teste": "24 > 50.0",
+   "teste_verdadeiro": false,
+   "operador": ">",
+   "aprovado": true,
+   "resultado": "passou na rolagem",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 24,
+   "chamada": 2,
+   "chamador": "mechanics/combat.py:582 try_apply_status",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))"
+  },
+  {
+   "seq": 21,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.turn_effect",
+   "tipo": "turn_effect",
+   "payload": {
+    "entity": "p2",
+    "kind": "clouded_applied"
+   }
+  },
+  {
+   "seq": 22,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "status",
+   "origem": "_aplicar_secundario",
+   "alvo": "p2",
+   "status": "clouded",
+   "fonte": "palavra_de_torpor",
+   "chance_base": 50,
+   "resistencia_do_alvo": 0.0,
+   "chance_efetiva": 50.0,
+   "chance_formula": "50 × (1 − 0/100)",
+   "rolou": true,
+   "rolagem_seq": 20,
+   "rolagem_valor": 24,
+   "rolagem_aprovada": true,
+   "atacante": "p1",
+   "duracao_pedida": 3,
+   "duracao_apos_leis": 3,
+   "leis_de_duracao": [],
+   "pegou": true,
+   "instancia_antes": [],
+   "instancia_depois": [
+    {
+     "effect": "clouded",
+     "source_id": "palavra_de_torpor",
+     "intensity": 20.0,
+     "value": 20.0,
+     "duration": 3,
+     "stacks": 1
+    }
+   ]
+  },
+  {
+   "seq": 23,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_outcome",
+   "tipo": "skill_outcome",
+   "payload": {
+    "caster": "p1",
+    "target": "p2",
+    "result": {
+     "kind": "status",
+     "mp_spent": 9,
+     "strike": null,
+     "heal_amount": 0,
+     "status_effect": "slowed",
+     "status_success": true,
+     "buff_name": null
+    }
+   }
+  },
+  {
+   "seq": 24,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "skill_fim",
+   "skill": "palavra_de_torpor",
+   "resultado": {
+    "kind": "status",
+    "mp_spent": 9,
+    "strike": null,
+    "heal_amount": 0,
+    "status_effect": "slowed",
+    "status_success": true,
+    "buff_name": null
+   },
+   "mp_debitado": 9,
+   "recarga_depois": 3,
+   "buff_gravado": null,
+   "depois": {
+    "caster": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 271,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 107,
+     "mp_max": 99,
+     "st": 103,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {},
+     "buffs": {},
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 3,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 3,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 25,
+   "rodada": 1,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "action_executed",
+   "lado": "p1",
+   "detalhe": {
+    "action": {
+     "kind": "skill",
+     "skill_id": "palavra_de_torpor"
+    },
+    "mp_spent": 9,
+    "damage": 0
+   }
+  },
+  {
+   "seq": 26,
+   "rodada": 1,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "inicio_oportunidade",
+   "antes": {
+    "hp": 868,
+    "hp_max": 868,
+    "mp": 107,
+    "mp_max": 99,
+    "st": 103,
+    "mg": 59,
+    "ag": 15,
+    "df": 74,
+    "recargas": {},
+    "buffs": {},
+    "efeitos": [
+     {
+      "efeito": "slowed",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 3,
+      "stacks": 1
+     },
+     {
+      "efeito": "clouded",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 3,
+      "stacks": 1
+     }
+    ],
+    "death_ignore_usado": false,
+    "vivo": true
+   },
+   "regeneracao": {
+    "mp_max": 99,
+    "percentual": 2,
+    "base": 1.98,
+    "base_formula": "max(1, 99 × 2 / 100)",
+    "modificador_mana_regen": 0.0,
+    "total_int": 1,
+    "total_formula": "int(0 + 1.98)",
+    "teto": 99,
+    "mp_antes": 107,
+    "mp_depois_da_regeneracao": 99
+   }
+  },
+  {
+   "seq": 27,
+   "rodada": 1,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "tick_de_efeitos",
+   "relatorio": {
+    "dot": {},
+    "drain": {},
+    "expired": [],
+    "skip_turn": false,
+    "laws": []
+   }
+  },
+  {
+   "seq": 28,
+   "rodada": 1,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "fim_inicio_oportunidade",
+   "perde_a_oportunidade": false,
+   "depois": {
+    "hp": 868,
+    "hp_max": 868,
+    "mp": 99,
+    "mp_max": 99,
+    "st": 103,
+    "mg": 59,
+    "ag": 15,
+    "df": 74,
+    "recargas": {},
+    "buffs": {},
+    "efeitos": [
+     {
+      "efeito": "slowed",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 2,
+      "stacks": 1
+     },
+     {
+      "efeito": "clouded",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 2,
+      "stacks": 1
+     }
+    ],
+    "death_ignore_usado": false,
+    "vivo": true
+   }
+  },
+  {
+   "seq": 29,
+   "rodada": 1,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "corte_de_mp_livre",
+   "reservado": 16,
+   "teto_livre": 83,
+   "mp_antes": 99,
+   "mp_depois": 83
+  },
+  {
+   "seq": 30,
+   "rodada": 1,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "skill_inicio",
+   "skill": "grito_guerra",
+   "nome": "Grito de Guerra",
+   "tipo": "buff",
+   "valor": 35,
+   "stat": "st",
+   "alvo_declarado": "self",
+   "receptor": "p2",
+   "custo_mp": 16,
+   "recarga_declarada": 2,
+   "recarga_antes": 0,
+   "requisito": null,
+   "requisito_atendido": true,
+   "mp_disponivel": 99,
+   "chance_declarada": 100,
+   "duracao_declarada": 3,
+   "buff_calculo": {
+    "stat": "st",
+    "declarado": 35,
+    "valor": 36,
+    "regra": "percentual de base_st: max(1, int(base × 35/100))"
+   },
+   "antes": {
+    "caster": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 99,
+     "mp_max": 99,
+     "st": 103,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {},
+     "buffs": {},
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 271,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 31,
+   "rodada": 1,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_cast",
+   "tipo": "skill_cast",
+   "payload": {
+    "caster": "p2",
+    "skill": "grito_guerra"
+   }
+  },
+  {
+   "seq": 32,
+   "rodada": 1,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_outcome",
+   "tipo": "skill_outcome",
+   "payload": {
+    "caster": "p2",
+    "target": "p1",
+    "result": {
+     "kind": "buff",
+     "mp_spent": 16,
+     "strike": null,
+     "heal_amount": 0,
+     "status_effect": null,
+     "status_success": null,
+     "buff_name": "Grito de Guerra"
+    }
+   }
+  },
+  {
+   "seq": 33,
+   "rodada": 1,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "skill_fim",
+   "skill": "grito_guerra",
+   "resultado": {
+    "kind": "buff",
+    "mp_spent": 16,
+    "strike": null,
+    "heal_amount": 0,
+    "status_effect": null,
+    "status_success": null,
+    "buff_name": "Grito de Guerra"
+   },
+   "mp_debitado": 16,
+   "recarga_depois": 3,
+   "buff_gravado": {
+    "stat": "st",
+    "value": 36,
+    "duration": 3
+   },
+   "depois": {
+    "caster": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 83,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 3
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 271,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 34,
+   "rodada": 1,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "action_executed",
+   "lado": "p2",
+   "detalhe": {
+    "action": {
+     "kind": "skill",
+     "skill_id": "grito_guerra"
+    },
+    "mp_spent": 16,
+    "damage": 0
+   }
+  },
+  {
+   "seq": 35,
+   "rodada": 1,
+   "ator": null,
+   "golpe": null,
+   "kind": "rodada_fim",
+   "registro": {
+    "number": 1,
+    "actions": [
+     [
+      "p1",
+      {
+       "kind": "skill",
+       "skill_id": "palavra_de_torpor"
+      }
+     ],
+     [
+      "p2",
+      {
+       "kind": "skill",
+       "skill_id": "grito_guerra"
+      }
+     ]
+    ],
+    "initiative": [
+     {
+      "side": "p1",
+      "level": 6,
+      "build": 1.0109250922757071,
+      "level_modifier": 0.995,
+      "score": 1.0058704668143286,
+      "relative_ag": 0.5384615384615384
+     },
+     {
+      "side": "p2",
+      "level": 7,
+      "build": 0.976608499116962,
+      "level_modifier": 1.005,
+      "score": 0.9814915416125467,
+      "relative_ag": 0.6551724137931034
+     }
+    ],
+    "order": {
+     "first": "p1",
+     "second": "p2",
+     "decided_by": "score"
+    },
+    "steps": [
+     {
+      "side": "p1",
+      "action": {
+       "kind": "skill",
+       "skill_id": "palavra_de_torpor"
+      },
+      "outcome": "executed",
+      "mp_reserved": 9,
+      "mp_spent": 9,
+      "damage_to_opponent": 0
+     },
+     {
+      "side": "p2",
+      "action": {
+       "kind": "skill",
+       "skill_id": "grito_guerra"
+      },
+      "outcome": "executed",
+      "mp_reserved": 16,
+      "mp_spent": 16,
+      "damage_to_opponent": 0
+     }
+    ],
+    "hp_end": [
+     [
+      "p1",
+      652
+     ],
+     [
+      "p2",
+      868
+     ]
+    ],
+    "mp_end": [
+     [
+      "p1",
+      271
+     ],
+     [
+      "p2",
+      83
+     ]
+    ]
+   },
+   "estado": {
+    "p1": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 271,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "p2": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 83,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 3
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 36,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "rodada_inicio",
+   "estado": {
+    "p1": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 271,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "p2": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 83,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 3
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 37,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "escolha",
+   "lado": "p1",
+   "visao": {
+    "round_number": 2,
+    "side": "p1",
+    "me": {
+     "name": "Geada",
+     "class_name": "Mage",
+     "level": 6,
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 271,
+     "mp_max": 280,
+     "effects": [],
+     "buffs": []
+    },
+    "opponent": {
+     "name": "Carrasco",
+     "class_name": "Warrior",
+     "level": 7,
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 83,
+     "mp_max": 99,
+     "effects": [
+      "clouded",
+      "slowed"
+     ],
+     "buffs": [
+      "Grito de Guerra"
+     ]
+    },
+    "legal_actions": [
+     {
+      "kind": "attack",
+      "skill_id": null
+     },
+     {
+      "kind": "skill",
+      "skill_id": "bola_fogo"
+     },
+     {
+      "kind": "skill",
+      "skill_id": "lasca_de_gelo"
+     },
+     {
+      "kind": "surrender",
+      "skill_id": null
+     }
+    ],
+    "cooldowns": [
+     [
+      "bola_fogo",
+      0
+     ],
+     [
+      "lasca_de_gelo",
+      0
+     ],
+     [
+      "palavra_de_torpor",
+      2
+     ]
+    ]
+   },
+   "acoes_legais": [
+    {
+     "kind": "attack",
+     "skill_id": null
+    },
+    {
+     "kind": "skill",
+     "skill_id": "bola_fogo"
+    },
+    {
+     "kind": "skill",
+     "skill_id": "lasca_de_gelo"
+    },
+    {
+     "kind": "surrender",
+     "skill_id": null
+    }
+   ],
+   "acao": {
+    "kind": "skill",
+    "skill_id": "bola_fogo"
+   },
+   "justificativa": "primeira skill de dano legal do deck: Bola de Fogo",
+   "legal": true,
+   "custo_mp": 9,
+   "recargas_no_lock": {
+    "bola_fogo": 0,
+    "lasca_de_gelo": 0,
+    "palavra_de_torpor": 2
+   }
+  },
+  {
+   "seq": 38,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "escolha",
+   "lado": "p2",
+   "visao": {
+    "round_number": 2,
+    "side": "p2",
+    "me": {
+     "name": "Carrasco",
+     "class_name": "Warrior",
+     "level": 7,
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 83,
+     "mp_max": 99,
+     "effects": [
+      "clouded",
+      "slowed"
+     ],
+     "buffs": [
+      "Grito de Guerra"
+     ]
+    },
+    "opponent": {
+     "name": "Geada",
+     "class_name": "Mage",
+     "level": 6,
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 271,
+     "mp_max": 280,
+     "effects": [],
+     "buffs": []
+    },
+    "legal_actions": [
+     {
+      "kind": "attack",
+      "skill_id": null
+     },
+     {
+      "kind": "skill",
+      "skill_id": "golpe_poderoso"
+     },
+     {
+      "kind": "skill",
+      "skill_id": "cutelada"
+     },
+     {
+      "kind": "surrender",
+      "skill_id": null
+     }
+    ],
+    "cooldowns": [
+     [
+      "golpe_poderoso",
+      0
+     ],
+     [
+      "grito_guerra",
+      2
+     ],
+     [
+      "cutelada",
+      0
+     ]
+    ]
+   },
+   "acoes_legais": [
+    {
+     "kind": "attack",
+     "skill_id": null
+    },
+    {
+     "kind": "skill",
+     "skill_id": "golpe_poderoso"
+    },
+    {
+     "kind": "skill",
+     "skill_id": "cutelada"
+    },
+    {
+     "kind": "surrender",
+     "skill_id": null
+    }
+   ],
+   "acao": {
+    "kind": "skill",
+    "skill_id": "golpe_poderoso"
+   },
+   "justificativa": "primeira skill de dano legal do deck: Golpe Poderoso",
+   "legal": true,
+   "custo_mp": 8,
+   "recargas_no_lock": {
+    "golpe_poderoso": 0,
+    "grito_guerra": 2,
+    "cutelada": 0
+   }
+  },
+  {
+   "seq": 39,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "mp_reserved",
+   "lado": "p1",
+   "detalhe": {
+    "amount": 9
+   }
+  },
+  {
+   "seq": 40,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "mp_reserved",
+   "lado": "p2",
+   "detalhe": {
+    "amount": 8
+   }
+  },
+  {
+   "seq": 41,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "actions_locked",
+   "lado": null,
+   "detalhe": {
+    "p1": {
+     "kind": "skill",
+     "skill_id": "bola_fogo"
+    },
+    "p2": {
+     "kind": "skill",
+     "skill_id": "golpe_poderoso"
+    }
+   }
+  },
+  {
+   "seq": 42,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "iniciativa",
+   "lado": "p1",
+   "nivel": 6,
+   "nivel_oponente": 7,
+   "parcelas": [
+    {
+     "stat": "hp",
+     "valor": 652.0,
+     "ref": 660.0,
+     "razao": 0.9878787878787879,
+     "raiz": 0.9939209163101398
+    },
+    {
+     "stat": "mp",
+     "valor": 280.0,
+     "ref": 170.66666666666666,
+     "razao": 1.640625,
+     "raiz": 1.2808688457449497
+    },
+    {
+     "stat": "st",
+     "valor": 53.0,
+     "ref": 74.66666666666667,
+     "razao": 0.7098214285714285,
+     "raiz": 0.8425090080061034
+    },
+    {
+     "stat": "mg",
+     "valor": 95.0,
+     "ref": 67.0,
+     "razao": 1.4179104477611941,
+     "raiz": 1.190760449360489
+    },
+    {
+     "stat": "ag",
+     "valor": 14.0,
+     "ref": 26.0,
+     "razao": 0.5384615384615384,
+     "raiz": 0.7337993857053428
+    },
+    {
+     "stat": "df",
+     "valor": 51.0,
+     "ref": 48.666666666666664,
+     "razao": 1.047945205479452,
+     "raiz": 1.0236919485272178
+    }
+   ],
+   "soma_raizes": 6.0655505536542424,
+   "build": 1.0109250922757071,
+   "delta_nivel": -1,
+   "delta_x_step": -0.005,
+   "teto_do_modificador": 0.1,
+   "modificador": 0.995,
+   "score": 1.0058704668143286,
+   "ag": 14.0,
+   "ref_ag": 26.0,
+   "ag_relativa": 0.5384615384615384
+  },
+  {
+   "seq": 43,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "iniciativa",
+   "lado": "p2",
+   "nivel": 7,
+   "nivel_oponente": 6,
+   "parcelas": [
+    {
+     "stat": "hp",
+     "valor": 868.0,
+     "ref": 739.3333333333334,
+     "razao": 1.1740306582506763,
+     "raiz": 1.083526953172221
+    },
+    {
+     "stat": "mp",
+     "valor": 99.0,
+     "ref": 190.66666666666666,
+     "razao": 0.5192307692307693,
+     "raiz": 0.7205766921228921
+    },
+    {
+     "stat": "st",
+     "valor": 139.0,
+     "ref": 83.66666666666667,
+     "razao": 1.6613545816733066,
+     "raiz": 1.2889354451148074
+    },
+    {
+     "stat": "mg",
+     "valor": 59.0,
+     "ref": 75.0,
+     "razao": 0.7866666666666666,
+     "raiz": 0.886942313043338
+    },
+    {
+     "stat": "ag",
+     "valor": 15.0,
+     "ref": 29.0,
+     "razao": 0.5172413793103449,
+     "raiz": 0.7191949522280763
+    },
+    {
+     "stat": "df",
+     "valor": 74.0,
+     "ref": 54.333333333333336,
+     "razao": 1.361963190184049,
+     "raiz": 1.1670317862783555
+    }
+   ],
+   "soma_raizes": 5.8662081419596905,
+   "build": 0.9777013569932818,
+   "delta_nivel": 1,
+   "delta_x_step": 0.005,
+   "teto_do_modificador": 0.1,
+   "modificador": 1.005,
+   "score": 0.9825898637782481,
+   "ag": 15.0,
+   "ref_ag": 29.0,
+   "ag_relativa": 0.5172413793103449
+  },
+  {
+   "seq": 44,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "ordem",
+   "score": {
+    "p1": 1.0058704668143286,
+    "p2": 0.9825898637782481
+   },
+   "scores_iguais": false,
+   "ag_relativa": {
+    "p1": 0.5384615384615384,
+    "p2": 0.5172413793103449
+   },
+   "ag_relativa_igual": false,
+   "decidido_por": "score",
+   "primeiro": "p1",
+   "segundo": "p2"
+  },
+  {
+   "seq": 45,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "order_locked",
+   "lado": null,
+   "detalhe": {
+    "order": [
+     "p1",
+     "p2"
+    ],
+    "by": "score"
+   }
+  },
+  {
+   "seq": 46,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "inicio_oportunidade",
+   "antes": {
+    "hp": 652,
+    "hp_max": 652,
+    "mp": 262,
+    "mp_max": 280,
+    "st": 53,
+    "mg": 95,
+    "ag": 14,
+    "df": 51,
+    "recargas": {
+     "palavra_de_torpor": 3
+    },
+    "buffs": {},
+    "efeitos": [],
+    "death_ignore_usado": false,
+    "vivo": true
+   },
+   "regeneracao": {
+    "mp_max": 280,
+    "percentual": 2,
+    "base": 5.6,
+    "base_formula": "max(1, 280 × 2 / 100)",
+    "modificador_mana_regen": 0.0,
+    "total_int": 5,
+    "total_formula": "int(0 + 5.6)",
+    "teto": 280,
+    "mp_antes": 262,
+    "mp_depois_da_regeneracao": 267
+   }
+  },
+  {
+   "seq": 47,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "tick_de_efeitos",
+   "relatorio": {
+    "dot": {},
+    "drain": {},
+    "expired": [],
+    "skip_turn": false,
+    "laws": []
+   }
+  },
+  {
+   "seq": 48,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "fim_inicio_oportunidade",
+   "perde_a_oportunidade": false,
+   "depois": {
+    "hp": 652,
+    "hp_max": 652,
+    "mp": 267,
+    "mp_max": 280,
+    "st": 53,
+    "mg": 95,
+    "ag": 14,
+    "df": 51,
+    "recargas": {
+     "palavra_de_torpor": 2
+    },
+    "buffs": {},
+    "efeitos": [],
+    "death_ignore_usado": false,
+    "vivo": true
+   }
+  },
+  {
+   "seq": 49,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "corte_de_mp_livre",
+   "reservado": 9,
+   "teto_livre": 271,
+   "mp_antes": 267,
+   "mp_depois": 267
+  },
+  {
+   "seq": 50,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "skill_inicio",
+   "skill": "bola_fogo",
+   "nome": "Bola de Fogo",
+   "tipo": "damage",
+   "valor": 0,
+   "stat": "",
+   "alvo_declarado": "enemy",
+   "receptor": "p2",
+   "custo_mp": 9,
+   "recarga_declarada": 1,
+   "recarga_antes": 0,
+   "requisito": null,
+   "requisito_atendido": true,
+   "mp_disponivel": 276,
+   "chance_declarada": 100,
+   "duracao_declarada": 0,
+   "antes": {
+    "caster": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 276,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 75,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 3
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 51,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_cast",
+   "tipo": "skill_cast",
+   "payload": {
+    "caster": "p1",
+    "skill": "bola_fogo"
+   }
+  },
+  {
+   "seq": 52,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "base_skill",
+   "skill": "bola_fogo",
+   "termos": [
+    {
+     "stat": "mg",
+     "valor": 95.0,
+     "peso": 1.0,
+     "produto": 95.0
+    }
+   ],
+   "soma_ponderada": 95.0,
+   "arma_percent": 13.0,
+   "com_arma": 107.35,
+   "power": 3.485,
+   "total": 374.11474999999996,
+   "poder": 374,
+   "poder_formula": "max(1, int(95.0 × (1 + 13/100) × 3.485))"
+  },
+  {
+   "seq": 53,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": 1,
+   "kind": "golpe_inicio",
+   "atacante": "p1",
+   "defensor": "p2",
+   "base": 374,
+   "skill": "bola_fogo",
+   "modificador_da_acao": 0,
+   "publish_ligado": false,
+   "antes": {
+    "atacante": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 267,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2,
+      "bola_fogo": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": 868,
+     "hp_max": 868,
+     "mp": 75,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 3
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 54,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": 1,
+   "kind": "rolagem",
+   "mecanica": "acerto",
+   "operador": ">",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 33,
+   "chamada": 3,
+   "chamador": "mechanics/combat.py:420 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))",
+   "chance": 88,
+   "teste": "33 > 88",
+   "teste_verdadeiro": false,
+   "aprovado": true,
+   "resultado": "ACERTOU",
+   "detalhe_chance": {
+    "base": 85,
+    "ag_atacante": 14,
+    "ag_defensor": 15,
+    "swing": -1.0344827586206897,
+    "swing_formula": "30 × (14 − 15) / 29",
+    "evasao_defensor": 0.0,
+    "medo_precisao_temporarios": 0,
+    "precisao_permanente": 5.0,
+    "modificador_da_acao": 0,
+    "ocultacao_defensor": 0,
+    "bruto": 88.96551724137932,
+    "piso": 20,
+    "teto": 95,
+    "final": 88
+   }
+  },
+  {
+   "seq": 55,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": 1,
+   "kind": "chance_de_critico",
+   "padrao": 0,
+   "da_carta": 0,
+   "fontes_do_atacante": 2,
+   "bruto": 2,
+   "teto": 75,
+   "final": 2
+  },
+  {
+   "seq": 56,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": 1,
+   "kind": "rolagem",
+   "mecanica": "crítico",
+   "chance": 2,
+   "teste": "87 <= 2",
+   "teste_verdadeiro": false,
+   "operador": "<=",
+   "aprovado": false,
+   "resultado": "sem crítico",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 87,
+   "chamada": 4,
+   "chamador": "mechanics/combat.py:447 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))"
+  },
+  {
+   "seq": 57,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": 1,
+   "kind": "modificadores",
+   "critico": false,
+   "mult": [
+    {
+     "fonte": "condição da carta (target_afflicted)",
+     "parcela": 0.45
+    }
+   ],
+   "xmult": [],
+   "mitigacao": [
+    {
+     "fonte": "saída do atacante (outgoing_damage_multiplier)",
+     "fator": 1.0
+    },
+    {
+     "fonte": "entrada do defensor (incoming_damage_multiplier)",
+     "fator": 1.0,
+     "damage_reduction": 0.0,
+     "formula": "max(0.1, 1 − min(80, damage_reduction) / 100)"
+    }
+   ],
+   "condicao_da_carta": "target_afflicted",
+   "condicao_satisfeita": true
+  },
+  {
+   "seq": 58,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": 1,
+   "kind": "funil",
+   "base": 374.0,
+   "mult_total": 1.45,
+   "mult_formula": "1 + Σ[0.45]",
+   "xmult_bruto": 1.0,
+   "xmult_teto": 5.0,
+   "xmult_aplicado": 1.0,
+   "defesa_alvo": 74,
+   "fator_defesa": 0.5747126436781609,
+   "fator_defesa_formula": "100 / (100 + 74)",
+   "bruto": 311.66666666666663,
+   "bruto_formula": "374.0 × 1.45 × 1.0 × 0.5747126436781609",
+   "passos": [
+    {
+     "etapa": "max(1, int(bruto))",
+     "valor": 311
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 311
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 311
+    }
+   ],
+   "final": 311
+  },
+  {
+   "seq": 59,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": 1,
+   "kind": "egide",
+   "defensor": "p2",
+   "fracao": 0,
+   "mp_livre": 75,
+   "dano_entrada": 311,
+   "inaplicavel": true,
+   "dano_saida": 311
+  },
+  {
+   "seq": 60,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": 1,
+   "kind": "golpe_fim",
+   "atacante": "p1",
+   "defensor": "p2",
+   "resultado": {
+    "attacker_id": "Geada",
+    "defender_id": "Carrasco",
+    "damage": 311,
+    "was_critical": false,
+    "was_evaded": false,
+    "did_defender_die": false,
+    "notes": [
+     "hit"
+    ]
+   },
+   "hp_defensor": [
+    868,
+    557
+   ],
+   "hp_aplicado": 311,
+   "mp_defensor": [
+    75,
+    75
+   ],
+   "roubo_de_vida": null,
+   "death_ignore_disparou": false,
+   "defensor_morreu": false,
+   "depois": {
+    "atacante": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 267,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2,
+      "bola_fogo": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 75,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 3
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 61,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_outcome",
+   "tipo": "skill_outcome",
+   "payload": {
+    "caster": "p1",
+    "target": "p2",
+    "result": {
+     "kind": "damage",
+     "mp_spent": 9,
+     "strike": {
+      "attacker_id": "Geada",
+      "defender_id": "Carrasco",
+      "damage": 311,
+      "was_critical": false,
+      "was_evaded": false,
+      "did_defender_die": false,
+      "notes": [
+       "hit"
+      ]
+     },
+     "heal_amount": 0,
+     "status_effect": null,
+     "status_success": null,
+     "buff_name": null
+    }
+   }
+  },
+  {
+   "seq": 62,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "skill_fim",
+   "skill": "bola_fogo",
+   "resultado": {
+    "kind": "damage",
+    "mp_spent": 9,
+    "strike": {
+     "attacker_id": "Geada",
+     "defender_id": "Carrasco",
+     "damage": 311,
+     "was_critical": false,
+     "was_evaded": false,
+     "did_defender_die": false,
+     "notes": [
+      "hit"
+     ]
+    },
+    "heal_amount": 0,
+    "status_effect": null,
+    "status_success": null,
+    "buff_name": null
+   },
+   "mp_debitado": 9,
+   "recarga_depois": 2,
+   "buff_gravado": null,
+   "depois": {
+    "caster": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 267,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2,
+      "bola_fogo": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 75,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 3
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 2,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 63,
+   "rodada": 2,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "action_executed",
+   "lado": "p1",
+   "detalhe": {
+    "action": {
+     "kind": "skill",
+     "skill_id": "bola_fogo"
+    },
+    "mp_spent": 9,
+    "damage": 311
+   }
+  },
+  {
+   "seq": 64,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "inicio_oportunidade",
+   "antes": {
+    "hp": 557,
+    "hp_max": 868,
+    "mp": 75,
+    "mp_max": 99,
+    "st": 139,
+    "mg": 59,
+    "ag": 15,
+    "df": 74,
+    "recargas": {
+     "grito_guerra": 3
+    },
+    "buffs": {
+     "Grito de Guerra": {
+      "stat": "st",
+      "valor": 36,
+      "duracao": 3
+     }
+    },
+    "efeitos": [
+     {
+      "efeito": "slowed",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 2,
+      "stacks": 1
+     },
+     {
+      "efeito": "clouded",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 2,
+      "stacks": 1
+     }
+    ],
+    "death_ignore_usado": false,
+    "vivo": true
+   },
+   "regeneracao": {
+    "mp_max": 99,
+    "percentual": 2,
+    "base": 1.98,
+    "base_formula": "max(1, 99 × 2 / 100)",
+    "modificador_mana_regen": 0.0,
+    "total_int": 1,
+    "total_formula": "int(0 + 1.98)",
+    "teto": 99,
+    "mp_antes": 75,
+    "mp_depois_da_regeneracao": 76
+   }
+  },
+  {
+   "seq": 65,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "tick_de_efeitos",
+   "relatorio": {
+    "dot": {},
+    "drain": {},
+    "expired": [],
+    "skip_turn": false,
+    "laws": []
+   }
+  },
+  {
+   "seq": 66,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "fim_inicio_oportunidade",
+   "perde_a_oportunidade": false,
+   "depois": {
+    "hp": 557,
+    "hp_max": 868,
+    "mp": 76,
+    "mp_max": 99,
+    "st": 139,
+    "mg": 59,
+    "ag": 15,
+    "df": 74,
+    "recargas": {
+     "grito_guerra": 2
+    },
+    "buffs": {
+     "Grito de Guerra": {
+      "stat": "st",
+      "valor": 36,
+      "duracao": 2
+     }
+    },
+    "efeitos": [
+     {
+      "efeito": "slowed",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 1,
+      "stacks": 1
+     },
+     {
+      "efeito": "clouded",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 1,
+      "stacks": 1
+     }
+    ],
+    "death_ignore_usado": false,
+    "vivo": true
+   }
+  },
+  {
+   "seq": 67,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "corte_de_mp_livre",
+   "reservado": 8,
+   "teto_livre": 91,
+   "mp_antes": 76,
+   "mp_depois": 76
+  },
+  {
+   "seq": 68,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "skill_inicio",
+   "skill": "golpe_poderoso",
+   "nome": "Golpe Poderoso",
+   "tipo": "damage",
+   "valor": 0,
+   "stat": "",
+   "alvo_declarado": "enemy",
+   "receptor": "p1",
+   "custo_mp": 8,
+   "recarga_declarada": 1,
+   "recarga_antes": 0,
+   "requisito": null,
+   "requisito_atendido": true,
+   "mp_disponivel": 84,
+   "chance_declarada": 100,
+   "duracao_declarada": 0,
+   "antes": {
+    "caster": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 84,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 267,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2,
+      "bola_fogo": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 69,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_cast",
+   "tipo": "skill_cast",
+   "payload": {
+    "caster": "p2",
+    "skill": "golpe_poderoso"
+   }
+  },
+  {
+   "seq": 70,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "base_skill",
+   "skill": "golpe_poderoso",
+   "termos": [
+    {
+     "stat": "st",
+     "valor": 139.0,
+     "peso": 1.0,
+     "produto": 139.0
+    }
+   ],
+   "soma_ponderada": 139.0,
+   "arma_percent": 13.0,
+   "com_arma": 157.07,
+   "power": 2.86,
+   "total": 449.2202,
+   "poder": 449,
+   "poder_formula": "max(1, int(139.0 × (1 + 13/100) × 2.86))"
+  },
+  {
+   "seq": 71,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": 2,
+   "kind": "golpe_inicio",
+   "atacante": "p2",
+   "defensor": "p1",
+   "base": 449,
+   "skill": "golpe_poderoso",
+   "modificador_da_acao": 0,
+   "publish_ligado": false,
+   "antes": {
+    "atacante": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 76,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": 652,
+     "hp_max": 652,
+     "mp": 267,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2,
+      "bola_fogo": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 72,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": 2,
+   "kind": "rolagem",
+   "mecanica": "acerto",
+   "operador": ">",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 13,
+   "chamada": 5,
+   "chamador": "mechanics/combat.py:420 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))",
+   "chance": 86,
+   "teste": "13 > 86",
+   "teste_verdadeiro": false,
+   "aprovado": true,
+   "resultado": "ACERTOU",
+   "detalhe_chance": {
+    "base": 85,
+    "ag_atacante": 15,
+    "ag_defensor": 14,
+    "swing": 1.0344827586206897,
+    "swing_formula": "30 × (15 − 14) / 29",
+    "evasao_defensor": 0.0,
+    "medo_precisao_temporarios": 0,
+    "precisao_permanente": 0.0,
+    "modificador_da_acao": 0,
+    "ocultacao_defensor": 0,
+    "bruto": 86.03448275862068,
+    "piso": 20,
+    "teto": 95,
+    "final": 86
+   }
+  },
+  {
+   "seq": 73,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": 2,
+   "kind": "chance_de_critico",
+   "padrao": 0,
+   "da_carta": 0,
+   "fontes_do_atacante": 7,
+   "bruto": 7,
+   "teto": 75,
+   "final": 7
+  },
+  {
+   "seq": 74,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": 2,
+   "kind": "rolagem",
+   "mecanica": "crítico",
+   "chance": 7,
+   "teste": "75 <= 7",
+   "teste_verdadeiro": false,
+   "operador": "<=",
+   "aprovado": false,
+   "resultado": "sem crítico",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 75,
+   "chamada": 6,
+   "chamador": "mechanics/combat.py:447 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))"
+  },
+  {
+   "seq": 75,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": 2,
+   "kind": "modificadores",
+   "critico": false,
+   "mult": [
+    {
+     "fonte": "damage_percent (passiva, equipamento ou buff)",
+     "parcela": 0.08
+    },
+    {
+     "fonte": "condição da carta (target_healthy)",
+     "parcela": 0.08
+    }
+   ],
+   "xmult": [],
+   "mitigacao": [
+    {
+     "fonte": "saída do atacante (outgoing_damage_multiplier)",
+     "fator": 1.0
+    },
+    {
+     "fonte": "entrada do defensor (incoming_damage_multiplier)",
+     "fator": 1.0,
+     "damage_reduction": 0.0,
+     "formula": "max(0.1, 1 − min(80, damage_reduction) / 100)"
+    }
+   ],
+   "condicao_da_carta": "target_healthy",
+   "condicao_satisfeita": true
+  },
+  {
+   "seq": 76,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": 2,
+   "kind": "funil",
+   "base": 449.0,
+   "mult_total": 1.16,
+   "mult_formula": "1 + Σ[0.08, 0.08]",
+   "xmult_bruto": 1.0,
+   "xmult_teto": 5.0,
+   "xmult_aplicado": 1.0,
+   "defesa_alvo": 51,
+   "fator_defesa": 0.6622516556291391,
+   "fator_defesa_formula": "100 / (100 + 51)",
+   "bruto": 344.92715231788077,
+   "bruto_formula": "449.0 × 1.16 × 1.0 × 0.6622516556291391",
+   "passos": [
+    {
+     "etapa": "max(1, int(bruto))",
+     "valor": 344
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 344
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 344
+    }
+   ],
+   "final": 344
+  },
+  {
+   "seq": 77,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": 2,
+   "kind": "egide",
+   "defensor": "p1",
+   "fracao": 15,
+   "mp_livre": 267,
+   "dano_entrada": 344,
+   "desejado": 51,
+   "desejado_formula": "int(344 × 15 / 100)",
+   "possivel": 51,
+   "possivel_formula": "min(51, int(267 × 2.0))",
+   "custo_mp": 25,
+   "custo_formula": "max(1, int(51 / 2.0))",
+   "dano_saida": 293
+  },
+  {
+   "seq": 78,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": 2,
+   "kind": "golpe_fim",
+   "atacante": "p2",
+   "defensor": "p1",
+   "resultado": {
+    "attacker_id": "Carrasco",
+    "defender_id": "Geada",
+    "damage": 293,
+    "was_critical": false,
+    "was_evaded": false,
+    "did_defender_die": false,
+    "notes": [
+     "hit"
+    ]
+   },
+   "hp_defensor": [
+    652,
+    359
+   ],
+   "hp_aplicado": 293,
+   "mp_defensor": [
+    267,
+    242
+   ],
+   "roubo_de_vida": null,
+   "death_ignore_disparou": false,
+   "defensor_morreu": false,
+   "depois": {
+    "atacante": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 76,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 242,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2,
+      "bola_fogo": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 79,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_outcome",
+   "tipo": "skill_outcome",
+   "payload": {
+    "caster": "p2",
+    "target": "p1",
+    "result": {
+     "kind": "damage",
+     "mp_spent": 8,
+     "strike": {
+      "attacker_id": "Carrasco",
+      "defender_id": "Geada",
+      "damage": 293,
+      "was_critical": false,
+      "was_evaded": false,
+      "did_defender_die": false,
+      "notes": [
+       "hit"
+      ]
+     },
+     "heal_amount": 0,
+     "status_effect": null,
+     "status_success": null,
+     "buff_name": null
+    }
+   }
+  },
+  {
+   "seq": 80,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "skill_fim",
+   "skill": "golpe_poderoso",
+   "resultado": {
+    "kind": "damage",
+    "mp_spent": 8,
+    "strike": {
+     "attacker_id": "Carrasco",
+     "defender_id": "Geada",
+     "damage": 293,
+     "was_critical": false,
+     "was_evaded": false,
+     "did_defender_die": false,
+     "notes": [
+      "hit"
+     ]
+    },
+    "heal_amount": 0,
+    "status_effect": null,
+    "status_success": null,
+    "buff_name": null
+   },
+   "mp_debitado": 8,
+   "recarga_depois": 2,
+   "buff_gravado": null,
+   "depois": {
+    "caster": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 76,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 242,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2,
+      "bola_fogo": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 81,
+   "rodada": 2,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "action_executed",
+   "lado": "p2",
+   "detalhe": {
+    "action": {
+     "kind": "skill",
+     "skill_id": "golpe_poderoso"
+    },
+    "mp_spent": 8,
+    "damage": 293
+   }
+  },
+  {
+   "seq": 82,
+   "rodada": 2,
+   "ator": null,
+   "golpe": null,
+   "kind": "rodada_fim",
+   "registro": {
+    "number": 2,
+    "actions": [
+     [
+      "p1",
+      {
+       "kind": "skill",
+       "skill_id": "bola_fogo"
+      }
+     ],
+     [
+      "p2",
+      {
+       "kind": "skill",
+       "skill_id": "golpe_poderoso"
+      }
+     ]
+    ],
+    "initiative": [
+     {
+      "side": "p1",
+      "level": 6,
+      "build": 1.0109250922757071,
+      "level_modifier": 0.995,
+      "score": 1.0058704668143286,
+      "relative_ag": 0.5384615384615384
+     },
+     {
+      "side": "p2",
+      "level": 7,
+      "build": 0.9777013569932818,
+      "level_modifier": 1.005,
+      "score": 0.9825898637782481,
+      "relative_ag": 0.5172413793103449
+     }
+    ],
+    "order": {
+     "first": "p1",
+     "second": "p2",
+     "decided_by": "score"
+    },
+    "steps": [
+     {
+      "side": "p1",
+      "action": {
+       "kind": "skill",
+       "skill_id": "bola_fogo"
+      },
+      "outcome": "executed",
+      "mp_reserved": 9,
+      "mp_spent": 9,
+      "damage_to_opponent": 311
+     },
+     {
+      "side": "p2",
+      "action": {
+       "kind": "skill",
+       "skill_id": "golpe_poderoso"
+      },
+      "outcome": "executed",
+      "mp_reserved": 8,
+      "mp_spent": 8,
+      "damage_to_opponent": 293
+     }
+    ],
+    "hp_end": [
+     [
+      "p1",
+      359
+     ],
+     [
+      "p2",
+      557
+     ]
+    ],
+    "mp_end": [
+     [
+      "p1",
+      242
+     ],
+     [
+      "p2",
+      76
+     ]
+    ]
+   },
+   "estado": {
+    "p1": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 242,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2,
+      "bola_fogo": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "p2": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 76,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 83,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "rodada_inicio",
+   "estado": {
+    "p1": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 242,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 2,
+      "bola_fogo": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "p2": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 76,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 84,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "escolha",
+   "lado": "p1",
+   "visao": {
+    "round_number": 3,
+    "side": "p1",
+    "me": {
+     "name": "Geada",
+     "class_name": "Mage",
+     "level": 6,
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 242,
+     "mp_max": 280,
+     "effects": [],
+     "buffs": []
+    },
+    "opponent": {
+     "name": "Carrasco",
+     "class_name": "Warrior",
+     "level": 7,
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 76,
+     "mp_max": 99,
+     "effects": [
+      "clouded",
+      "slowed"
+     ],
+     "buffs": [
+      "Grito de Guerra"
+     ]
+    },
+    "legal_actions": [
+     {
+      "kind": "attack",
+      "skill_id": null
+     },
+     {
+      "kind": "skill",
+      "skill_id": "lasca_de_gelo"
+     },
+     {
+      "kind": "surrender",
+      "skill_id": null
+     }
+    ],
+    "cooldowns": [
+     [
+      "bola_fogo",
+      1
+     ],
+     [
+      "lasca_de_gelo",
+      0
+     ],
+     [
+      "palavra_de_torpor",
+      1
+     ]
+    ]
+   },
+   "acoes_legais": [
+    {
+     "kind": "attack",
+     "skill_id": null
+    },
+    {
+     "kind": "skill",
+     "skill_id": "lasca_de_gelo"
+    },
+    {
+     "kind": "surrender",
+     "skill_id": null
+    }
+   ],
+   "acao": {
+    "kind": "skill",
+    "skill_id": "lasca_de_gelo"
+   },
+   "justificativa": "primeira skill de dano legal do deck: Lasca de Gelo",
+   "legal": true,
+   "custo_mp": 10,
+   "recargas_no_lock": {
+    "bola_fogo": 1,
+    "lasca_de_gelo": 0,
+    "palavra_de_torpor": 1
+   }
+  },
+  {
+   "seq": 85,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "escolha",
+   "lado": "p2",
+   "visao": {
+    "round_number": 3,
+    "side": "p2",
+    "me": {
+     "name": "Carrasco",
+     "class_name": "Warrior",
+     "level": 7,
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 76,
+     "mp_max": 99,
+     "effects": [
+      "clouded",
+      "slowed"
+     ],
+     "buffs": [
+      "Grito de Guerra"
+     ]
+    },
+    "opponent": {
+     "name": "Geada",
+     "class_name": "Mage",
+     "level": 6,
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 242,
+     "mp_max": 280,
+     "effects": [],
+     "buffs": []
+    },
+    "legal_actions": [
+     {
+      "kind": "attack",
+      "skill_id": null
+     },
+     {
+      "kind": "skill",
+      "skill_id": "cutelada"
+     },
+     {
+      "kind": "surrender",
+      "skill_id": null
+     }
+    ],
+    "cooldowns": [
+     [
+      "golpe_poderoso",
+      1
+     ],
+     [
+      "grito_guerra",
+      1
+     ],
+     [
+      "cutelada",
+      0
+     ]
+    ]
+   },
+   "acoes_legais": [
+    {
+     "kind": "attack",
+     "skill_id": null
+    },
+    {
+     "kind": "skill",
+     "skill_id": "cutelada"
+    },
+    {
+     "kind": "surrender",
+     "skill_id": null
+    }
+   ],
+   "acao": {
+    "kind": "skill",
+    "skill_id": "cutelada"
+   },
+   "justificativa": "primeira skill de dano legal do deck: Cutelada",
+   "legal": true,
+   "custo_mp": 13,
+   "recargas_no_lock": {
+    "golpe_poderoso": 1,
+    "grito_guerra": 1,
+    "cutelada": 0
+   }
+  },
+  {
+   "seq": 86,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "mp_reserved",
+   "lado": "p1",
+   "detalhe": {
+    "amount": 10
+   }
+  },
+  {
+   "seq": 87,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "mp_reserved",
+   "lado": "p2",
+   "detalhe": {
+    "amount": 13
+   }
+  },
+  {
+   "seq": 88,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "actions_locked",
+   "lado": null,
+   "detalhe": {
+    "p1": {
+     "kind": "skill",
+     "skill_id": "lasca_de_gelo"
+    },
+    "p2": {
+     "kind": "skill",
+     "skill_id": "cutelada"
+    }
+   }
+  },
+  {
+   "seq": 89,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "iniciativa",
+   "lado": "p1",
+   "nivel": 6,
+   "nivel_oponente": 7,
+   "parcelas": [
+    {
+     "stat": "hp",
+     "valor": 652.0,
+     "ref": 660.0,
+     "razao": 0.9878787878787879,
+     "raiz": 0.9939209163101398
+    },
+    {
+     "stat": "mp",
+     "valor": 280.0,
+     "ref": 170.66666666666666,
+     "razao": 1.640625,
+     "raiz": 1.2808688457449497
+    },
+    {
+     "stat": "st",
+     "valor": 53.0,
+     "ref": 74.66666666666667,
+     "razao": 0.7098214285714285,
+     "raiz": 0.8425090080061034
+    },
+    {
+     "stat": "mg",
+     "valor": 95.0,
+     "ref": 67.0,
+     "razao": 1.4179104477611941,
+     "raiz": 1.190760449360489
+    },
+    {
+     "stat": "ag",
+     "valor": 14.0,
+     "ref": 26.0,
+     "razao": 0.5384615384615384,
+     "raiz": 0.7337993857053428
+    },
+    {
+     "stat": "df",
+     "valor": 51.0,
+     "ref": 48.666666666666664,
+     "razao": 1.047945205479452,
+     "raiz": 1.0236919485272178
+    }
+   ],
+   "soma_raizes": 6.0655505536542424,
+   "build": 1.0109250922757071,
+   "delta_nivel": -1,
+   "delta_x_step": -0.005,
+   "teto_do_modificador": 0.1,
+   "modificador": 0.995,
+   "score": 1.0058704668143286,
+   "ag": 14.0,
+   "ref_ag": 26.0,
+   "ag_relativa": 0.5384615384615384
+  },
+  {
+   "seq": 90,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "iniciativa",
+   "lado": "p2",
+   "nivel": 7,
+   "nivel_oponente": 6,
+   "parcelas": [
+    {
+     "stat": "hp",
+     "valor": 868.0,
+     "ref": 739.3333333333334,
+     "razao": 1.1740306582506763,
+     "raiz": 1.083526953172221
+    },
+    {
+     "stat": "mp",
+     "valor": 99.0,
+     "ref": 190.66666666666666,
+     "razao": 0.5192307692307693,
+     "raiz": 0.7205766921228921
+    },
+    {
+     "stat": "st",
+     "valor": 139.0,
+     "ref": 83.66666666666667,
+     "razao": 1.6613545816733066,
+     "raiz": 1.2889354451148074
+    },
+    {
+     "stat": "mg",
+     "valor": 59.0,
+     "ref": 75.0,
+     "razao": 0.7866666666666666,
+     "raiz": 0.886942313043338
+    },
+    {
+     "stat": "ag",
+     "valor": 15.0,
+     "ref": 29.0,
+     "razao": 0.5172413793103449,
+     "raiz": 0.7191949522280763
+    },
+    {
+     "stat": "df",
+     "valor": 74.0,
+     "ref": 54.333333333333336,
+     "razao": 1.361963190184049,
+     "raiz": 1.1670317862783555
+    }
+   ],
+   "soma_raizes": 5.8662081419596905,
+   "build": 0.9777013569932818,
+   "delta_nivel": 1,
+   "delta_x_step": 0.005,
+   "teto_do_modificador": 0.1,
+   "modificador": 1.005,
+   "score": 0.9825898637782481,
+   "ag": 15.0,
+   "ref_ag": 29.0,
+   "ag_relativa": 0.5172413793103449
+  },
+  {
+   "seq": 91,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "ordem",
+   "score": {
+    "p1": 1.0058704668143286,
+    "p2": 0.9825898637782481
+   },
+   "scores_iguais": false,
+   "ag_relativa": {
+    "p1": 0.5384615384615384,
+    "p2": 0.5172413793103449
+   },
+   "ag_relativa_igual": false,
+   "decidido_por": "score",
+   "primeiro": "p1",
+   "segundo": "p2"
+  },
+  {
+   "seq": 92,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "order_locked",
+   "lado": null,
+   "detalhe": {
+    "order": [
+     "p1",
+     "p2"
+    ],
+    "by": "score"
+   }
+  },
+  {
+   "seq": 93,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "inicio_oportunidade",
+   "antes": {
+    "hp": 359,
+    "hp_max": 652,
+    "mp": 232,
+    "mp_max": 280,
+    "st": 53,
+    "mg": 95,
+    "ag": 14,
+    "df": 51,
+    "recargas": {
+     "palavra_de_torpor": 2,
+     "bola_fogo": 2
+    },
+    "buffs": {},
+    "efeitos": [],
+    "death_ignore_usado": false,
+    "vivo": true
+   },
+   "regeneracao": {
+    "mp_max": 280,
+    "percentual": 2,
+    "base": 5.6,
+    "base_formula": "max(1, 280 × 2 / 100)",
+    "modificador_mana_regen": 0.0,
+    "total_int": 5,
+    "total_formula": "int(0 + 5.6)",
+    "teto": 280,
+    "mp_antes": 232,
+    "mp_depois_da_regeneracao": 237
+   }
+  },
+  {
+   "seq": 94,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "tick_de_efeitos",
+   "relatorio": {
+    "dot": {},
+    "drain": {},
+    "expired": [],
+    "skip_turn": false,
+    "laws": []
+   }
+  },
+  {
+   "seq": 95,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "fim_inicio_oportunidade",
+   "perde_a_oportunidade": false,
+   "depois": {
+    "hp": 359,
+    "hp_max": 652,
+    "mp": 237,
+    "mp_max": 280,
+    "st": 53,
+    "mg": 95,
+    "ag": 14,
+    "df": 51,
+    "recargas": {
+     "palavra_de_torpor": 1,
+     "bola_fogo": 1
+    },
+    "buffs": {},
+    "efeitos": [],
+    "death_ignore_usado": false,
+    "vivo": true
+   }
+  },
+  {
+   "seq": 96,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "corte_de_mp_livre",
+   "reservado": 10,
+   "teto_livre": 270,
+   "mp_antes": 237,
+   "mp_depois": 237
+  },
+  {
+   "seq": 97,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "skill_inicio",
+   "skill": "lasca_de_gelo",
+   "nome": "Lasca de Gelo",
+   "tipo": "damage",
+   "valor": 0,
+   "stat": "",
+   "alvo_declarado": "enemy",
+   "receptor": "p2",
+   "custo_mp": 10,
+   "recarga_declarada": 2,
+   "recarga_antes": 0,
+   "requisito": null,
+   "requisito_atendido": true,
+   "mp_disponivel": 247,
+   "chance_declarada": 100,
+   "duracao_declarada": 0,
+   "antes": {
+    "caster": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 247,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 63,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 98,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_cast",
+   "tipo": "skill_cast",
+   "payload": {
+    "caster": "p1",
+    "skill": "lasca_de_gelo"
+   }
+  },
+  {
+   "seq": 99,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "base_skill",
+   "skill": "lasca_de_gelo",
+   "termos": [
+    {
+     "stat": "mg",
+     "valor": 95.0,
+     "peso": 1.0,
+     "produto": 95.0
+    }
+   ],
+   "soma_ponderada": 95.0,
+   "arma_percent": 13.0,
+   "com_arma": 107.35,
+   "power": 4.682,
+   "total": 502.6127,
+   "poder": 502,
+   "poder_formula": "max(1, int(95.0 × (1 + 13/100) × 4.682))"
+  },
+  {
+   "seq": 100,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": 3,
+   "kind": "golpe_inicio",
+   "atacante": "p1",
+   "defensor": "p2",
+   "base": 502,
+   "skill": "lasca_de_gelo",
+   "modificador_da_acao": 0,
+   "publish_ligado": false,
+   "antes": {
+    "atacante": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 237,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": 557,
+     "hp_max": 868,
+     "mp": 63,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 101,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": 3,
+   "kind": "rolagem",
+   "mecanica": "acerto",
+   "operador": ">",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 65,
+   "chamada": 7,
+   "chamador": "mechanics/combat.py:420 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))",
+   "chance": 88,
+   "teste": "65 > 88",
+   "teste_verdadeiro": false,
+   "aprovado": true,
+   "resultado": "ACERTOU",
+   "detalhe_chance": {
+    "base": 85,
+    "ag_atacante": 14,
+    "ag_defensor": 15,
+    "swing": -1.0344827586206897,
+    "swing_formula": "30 × (14 − 15) / 29",
+    "evasao_defensor": 0.0,
+    "medo_precisao_temporarios": 0,
+    "precisao_permanente": 5.0,
+    "modificador_da_acao": 0,
+    "ocultacao_defensor": 0,
+    "bruto": 88.96551724137932,
+    "piso": 20,
+    "teto": 95,
+    "final": 88
+   }
+  },
+  {
+   "seq": 102,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": 3,
+   "kind": "chance_de_critico",
+   "padrao": 0,
+   "da_carta": 0,
+   "fontes_do_atacante": 2,
+   "bruto": 2,
+   "teto": 75,
+   "final": 2
+  },
+  {
+   "seq": 103,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": 3,
+   "kind": "rolagem",
+   "mecanica": "crítico",
+   "chance": 2,
+   "teste": "78 <= 2",
+   "teste_verdadeiro": false,
+   "operador": "<=",
+   "aprovado": false,
+   "resultado": "sem crítico",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 78,
+   "chamada": 8,
+   "chamador": "mechanics/combat.py:447 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))"
+  },
+  {
+   "seq": 104,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": 3,
+   "kind": "modificadores",
+   "critico": false,
+   "mult": [],
+   "xmult": [],
+   "mitigacao": [
+    {
+     "fonte": "saída do atacante (outgoing_damage_multiplier)",
+     "fator": 1.0
+    },
+    {
+     "fonte": "entrada do defensor (incoming_damage_multiplier)",
+     "fator": 1.0,
+     "damage_reduction": 0.0,
+     "formula": "max(0.1, 1 − min(80, damage_reduction) / 100)"
+    }
+   ],
+   "condicao_da_carta": "target_healthy",
+   "condicao_satisfeita": false
+  },
+  {
+   "seq": 105,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": 3,
+   "kind": "funil",
+   "base": 502.0,
+   "mult_total": 1.0,
+   "mult_formula": "1 + Σ[]",
+   "xmult_bruto": 1.0,
+   "xmult_teto": 5.0,
+   "xmult_aplicado": 1.0,
+   "defesa_alvo": 74,
+   "fator_defesa": 0.5747126436781609,
+   "fator_defesa_formula": "100 / (100 + 74)",
+   "bruto": 288.50574712643675,
+   "bruto_formula": "502.0 × 1.0 × 1.0 × 0.5747126436781609",
+   "passos": [
+    {
+     "etapa": "max(1, int(bruto))",
+     "valor": 288
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 288
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 288
+    }
+   ],
+   "final": 288
+  },
+  {
+   "seq": 106,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": 3,
+   "kind": "egide",
+   "defensor": "p2",
+   "fracao": 0,
+   "mp_livre": 63,
+   "dano_entrada": 288,
+   "inaplicavel": true,
+   "dano_saida": 288
+  },
+  {
+   "seq": 107,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": 3,
+   "kind": "golpe_fim",
+   "atacante": "p1",
+   "defensor": "p2",
+   "resultado": {
+    "attacker_id": "Geada",
+    "defender_id": "Carrasco",
+    "damage": 288,
+    "was_critical": false,
+    "was_evaded": false,
+    "did_defender_die": false,
+    "notes": [
+     "hit"
+    ]
+   },
+   "hp_defensor": [
+    557,
+    269
+   ],
+   "hp_aplicado": 288,
+   "mp_defensor": [
+    63,
+    63
+   ],
+   "roubo_de_vida": null,
+   "death_ignore_disparou": false,
+   "defensor_morreu": false,
+   "depois": {
+    "atacante": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 237,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 63,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 108,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "rolagem",
+   "mecanica": "aplicação de status (slowed)",
+   "status": "slowed",
+   "alvo": "p2",
+   "chance_base": 45.0,
+   "chance": 45.0,
+   "teste": "98 > 45.0",
+   "teste_verdadeiro": true,
+   "operador": ">",
+   "aprovado": false,
+   "resultado": "falhou na rolagem",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 98,
+   "chamada": 9,
+   "chamador": "mechanics/combat.py:582 try_apply_status",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))"
+  },
+  {
+   "seq": 109,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "status",
+   "origem": "_aplicar_secundario",
+   "alvo": "p2",
+   "status": "slowed",
+   "fonte": "lasca_de_gelo",
+   "chance_base": 45,
+   "resistencia_do_alvo": 0.0,
+   "chance_efetiva": 45.0,
+   "chance_formula": "45 × (1 − 0/100)",
+   "rolou": true,
+   "rolagem_seq": 108,
+   "rolagem_valor": 98,
+   "rolagem_aprovada": false,
+   "atacante": "p1",
+   "duracao_pedida": 3,
+   "duracao_apos_leis": 3,
+   "leis_de_duracao": [],
+   "pegou": false,
+   "instancia_antes": [
+    {
+     "effect": "slowed",
+     "source_id": "palavra_de_torpor",
+     "intensity": 20.0,
+     "value": 20.0,
+     "duration": 1,
+     "stacks": 1
+    }
+   ],
+   "instancia_depois": [
+    {
+     "effect": "slowed",
+     "source_id": "palavra_de_torpor",
+     "intensity": 20.0,
+     "value": 20.0,
+     "duration": 1,
+     "stacks": 1
+    }
+   ]
+  },
+  {
+   "seq": 110,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_outcome",
+   "tipo": "skill_outcome",
+   "payload": {
+    "caster": "p1",
+    "target": "p2",
+    "result": {
+     "kind": "damage",
+     "mp_spent": 10,
+     "strike": {
+      "attacker_id": "Geada",
+      "defender_id": "Carrasco",
+      "damage": 288,
+      "was_critical": false,
+      "was_evaded": false,
+      "did_defender_die": false,
+      "notes": [
+       "hit"
+      ]
+     },
+     "heal_amount": 0,
+     "status_effect": null,
+     "status_success": null,
+     "buff_name": null
+    }
+   }
+  },
+  {
+   "seq": 111,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "skill_fim",
+   "skill": "lasca_de_gelo",
+   "resultado": {
+    "kind": "damage",
+    "mp_spent": 10,
+    "strike": {
+     "attacker_id": "Geada",
+     "defender_id": "Carrasco",
+     "damage": 288,
+     "was_critical": false,
+     "was_evaded": false,
+     "did_defender_die": false,
+     "notes": [
+      "hit"
+     ]
+    },
+    "heal_amount": 0,
+    "status_effect": null,
+    "status_success": null,
+    "buff_name": null
+   },
+   "mp_debitado": 10,
+   "recarga_depois": 3,
+   "buff_gravado": null,
+   "depois": {
+    "caster": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 237,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 63,
+     "mp_max": 99,
+     "st": 139,
+     "mg": 59,
+     "ag": 15,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 2
+      }
+     },
+     "efeitos": [
+      {
+       "efeito": "slowed",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      },
+      {
+       "efeito": "clouded",
+       "fonte": "palavra_de_torpor",
+       "intensidade": 20.0,
+       "duracao": 1,
+       "stacks": 1
+      }
+     ],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 112,
+   "rodada": 3,
+   "ator": "p1",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "action_executed",
+   "lado": "p1",
+   "detalhe": {
+    "action": {
+     "kind": "skill",
+     "skill_id": "lasca_de_gelo"
+    },
+    "mp_spent": 10,
+    "damage": 288
+   }
+  },
+  {
+   "seq": 113,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "inicio_oportunidade",
+   "antes": {
+    "hp": 269,
+    "hp_max": 868,
+    "mp": 63,
+    "mp_max": 99,
+    "st": 139,
+    "mg": 59,
+    "ag": 15,
+    "df": 74,
+    "recargas": {
+     "grito_guerra": 2,
+     "golpe_poderoso": 2
+    },
+    "buffs": {
+     "Grito de Guerra": {
+      "stat": "st",
+      "valor": 36,
+      "duracao": 2
+     }
+    },
+    "efeitos": [
+     {
+      "efeito": "slowed",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 1,
+      "stacks": 1
+     },
+     {
+      "efeito": "clouded",
+      "fonte": "palavra_de_torpor",
+      "intensidade": 20.0,
+      "duracao": 1,
+      "stacks": 1
+     }
+    ],
+    "death_ignore_usado": false,
+    "vivo": true
+   },
+   "regeneracao": {
+    "mp_max": 99,
+    "percentual": 2,
+    "base": 1.98,
+    "base_formula": "max(1, 99 × 2 / 100)",
+    "modificador_mana_regen": 0.0,
+    "total_int": 1,
+    "total_formula": "int(0 + 1.98)",
+    "teto": 99,
+    "mp_antes": 63,
+    "mp_depois_da_regeneracao": 64
+   }
+  },
+  {
+   "seq": 114,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "tick_de_efeitos",
+   "relatorio": {
+    "dot": {},
+    "drain": {},
+    "expired": [
+     "slowed",
+     "clouded"
+    ],
+    "skip_turn": false,
+    "laws": []
+   }
+  },
+  {
+   "seq": 115,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.turn_effect",
+   "tipo": "turn_effect",
+   "payload": {
+    "entity": "p2",
+    "kind": "effect_expired",
+    "name": "slowed"
+   }
+  },
+  {
+   "seq": 116,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.turn_effect",
+   "tipo": "turn_effect",
+   "payload": {
+    "entity": "p2",
+    "kind": "effect_expired",
+    "name": "clouded"
+   }
+  },
+  {
+   "seq": 117,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "fim_inicio_oportunidade",
+   "perde_a_oportunidade": false,
+   "depois": {
+    "hp": 269,
+    "hp_max": 868,
+    "mp": 64,
+    "mp_max": 123,
+    "st": 139,
+    "mg": 59,
+    "ag": 19,
+    "df": 74,
+    "recargas": {
+     "grito_guerra": 1,
+     "golpe_poderoso": 1
+    },
+    "buffs": {
+     "Grito de Guerra": {
+      "stat": "st",
+      "valor": 36,
+      "duracao": 1
+     }
+    },
+    "efeitos": [],
+    "death_ignore_usado": false,
+    "vivo": true
+   }
+  },
+  {
+   "seq": 118,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "corte_de_mp_livre",
+   "reservado": 13,
+   "teto_livre": 110,
+   "mp_antes": 64,
+   "mp_depois": 64
+  },
+  {
+   "seq": 119,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "skill_inicio",
+   "skill": "cutelada",
+   "nome": "Cutelada",
+   "tipo": "damage",
+   "valor": 0,
+   "stat": "",
+   "alvo_declarado": "enemy",
+   "receptor": "p1",
+   "custo_mp": 13,
+   "recarga_declarada": 2,
+   "recarga_antes": 0,
+   "requisito": null,
+   "requisito_atendido": true,
+   "mp_disponivel": 77,
+   "chance_declarada": 100,
+   "duracao_declarada": 0,
+   "antes": {
+    "caster": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 77,
+     "mp_max": 123,
+     "st": 139,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 1,
+      "golpe_poderoso": 1
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 1
+      }
+     },
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 237,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 120,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_cast",
+   "tipo": "skill_cast",
+   "payload": {
+    "caster": "p2",
+    "skill": "cutelada"
+   }
+  },
+  {
+   "seq": 121,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "base_skill",
+   "skill": "cutelada",
+   "termos": [
+    {
+     "stat": "st",
+     "valor": 139.0,
+     "peso": 1.0,
+     "produto": 139.0
+    }
+   ],
+   "soma_ponderada": 139.0,
+   "arma_percent": 13.0,
+   "com_arma": 157.07,
+   "power": 3.294,
+   "total": 517.3885799999999,
+   "poder": 517,
+   "poder_formula": "max(1, int(139.0 × (1 + 13/100) × 3.294))"
+  },
+  {
+   "seq": 122,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": 4,
+   "kind": "golpe_inicio",
+   "atacante": "p2",
+   "defensor": "p1",
+   "base": 517,
+   "skill": "cutelada",
+   "modificador_da_acao": 0,
+   "publish_ligado": false,
+   "antes": {
+    "atacante": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 64,
+     "mp_max": 123,
+     "st": 139,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 1,
+      "golpe_poderoso": 1,
+      "cutelada": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 1
+      }
+     },
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": 359,
+     "hp_max": 652,
+     "mp": 237,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 123,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": 4,
+   "kind": "rolagem",
+   "mecanica": "acerto",
+   "operador": ">",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 69,
+   "chamada": 10,
+   "chamador": "mechanics/combat.py:420 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))",
+   "chance": 89,
+   "teste": "69 > 89",
+   "teste_verdadeiro": false,
+   "aprovado": true,
+   "resultado": "ACERTOU",
+   "detalhe_chance": {
+    "base": 85,
+    "ag_atacante": 19,
+    "ag_defensor": 14,
+    "swing": 4.545454545454546,
+    "swing_formula": "30 × (19 − 14) / 33",
+    "evasao_defensor": 0.0,
+    "medo_precisao_temporarios": 0,
+    "precisao_permanente": 0.0,
+    "modificador_da_acao": 0,
+    "ocultacao_defensor": 0,
+    "bruto": 89.54545454545455,
+    "piso": 20,
+    "teto": 95,
+    "final": 89
+   }
+  },
+  {
+   "seq": 124,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": 4,
+   "kind": "chance_de_critico",
+   "padrao": 0,
+   "da_carta": 0,
+   "fontes_do_atacante": 7,
+   "bruto": 7,
+   "teto": 75,
+   "final": 7
+  },
+  {
+   "seq": 125,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": 4,
+   "kind": "rolagem",
+   "mecanica": "crítico",
+   "chance": 7,
+   "teste": "61 <= 7",
+   "teste_verdadeiro": false,
+   "operador": "<=",
+   "aprovado": false,
+   "resultado": "sem crítico",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 61,
+   "chamada": 11,
+   "chamador": "mechanics/combat.py:447 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))"
+  },
+  {
+   "seq": 126,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": 4,
+   "kind": "modificadores",
+   "critico": false,
+   "mult": [
+    {
+     "fonte": "damage_percent (passiva, equipamento ou buff)",
+     "parcela": 0.08
+    }
+   ],
+   "xmult": [],
+   "mitigacao": [
+    {
+     "fonte": "saída do atacante (outgoing_damage_multiplier)",
+     "fator": 1.0
+    },
+    {
+     "fonte": "entrada do defensor (incoming_damage_multiplier)",
+     "fator": 1.0,
+     "damage_reduction": 0.0,
+     "formula": "max(0.1, 1 − min(80, damage_reduction) / 100)"
+    }
+   ],
+   "condicao_da_carta": "target_afflicted",
+   "condicao_satisfeita": false
+  },
+  {
+   "seq": 127,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": 4,
+   "kind": "funil",
+   "base": 517.0,
+   "mult_total": 1.08,
+   "mult_formula": "1 + Σ[0.08]",
+   "xmult_bruto": 1.0,
+   "xmult_teto": 5.0,
+   "xmult_aplicado": 1.0,
+   "defesa_alvo": 51,
+   "fator_defesa": 0.6622516556291391,
+   "fator_defesa_formula": "100 / (100 + 51)",
+   "bruto": 369.77483443708616,
+   "bruto_formula": "517.0 × 1.08 × 1.0 × 0.6622516556291391",
+   "passos": [
+    {
+     "etapa": "max(1, int(bruto))",
+     "valor": 369
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 369
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 369
+    }
+   ],
+   "final": 369
+  },
+  {
+   "seq": 128,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": 4,
+   "kind": "egide",
+   "defensor": "p1",
+   "fracao": 15,
+   "mp_livre": 237,
+   "dano_entrada": 369,
+   "desejado": 55,
+   "desejado_formula": "int(369 × 15 / 100)",
+   "possivel": 55,
+   "possivel_formula": "min(55, int(237 × 2.0))",
+   "custo_mp": 27,
+   "custo_formula": "max(1, int(55 / 2.0))",
+   "dano_saida": 314
+  },
+  {
+   "seq": 129,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": 4,
+   "kind": "golpe_fim",
+   "atacante": "p2",
+   "defensor": "p1",
+   "resultado": {
+    "attacker_id": "Carrasco",
+    "defender_id": "Geada",
+    "damage": 314,
+    "was_critical": false,
+    "was_evaded": false,
+    "did_defender_die": false,
+    "notes": [
+     "hit"
+    ]
+   },
+   "hp_defensor": [
+    359,
+    45
+   ],
+   "hp_aplicado": 314,
+   "mp_defensor": [
+    237,
+    210
+   ],
+   "roubo_de_vida": null,
+   "death_ignore_disparou": false,
+   "defensor_morreu": false,
+   "depois": {
+    "atacante": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 64,
+     "mp_max": 123,
+     "st": 139,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 1,
+      "golpe_poderoso": 1,
+      "cutelada": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 1
+      }
+     },
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": 45,
+     "hp_max": 652,
+     "mp": 210,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 130,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_outcome",
+   "tipo": "skill_outcome",
+   "payload": {
+    "caster": "p2",
+    "target": "p1",
+    "result": {
+     "kind": "damage",
+     "mp_spent": 13,
+     "strike": {
+      "attacker_id": "Carrasco",
+      "defender_id": "Geada",
+      "damage": 314,
+      "was_critical": false,
+      "was_evaded": false,
+      "did_defender_die": false,
+      "notes": [
+       "hit"
+      ]
+     },
+     "heal_amount": 0,
+     "status_effect": null,
+     "status_success": null,
+     "buff_name": null
+    }
+   }
+  },
+  {
+   "seq": 131,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "skill_fim",
+   "skill": "cutelada",
+   "resultado": {
+    "kind": "damage",
+    "mp_spent": 13,
+    "strike": {
+     "attacker_id": "Carrasco",
+     "defender_id": "Geada",
+     "damage": 314,
+     "was_critical": false,
+     "was_evaded": false,
+     "did_defender_die": false,
+     "notes": [
+      "hit"
+     ]
+    },
+    "heal_amount": 0,
+    "status_effect": null,
+    "status_success": null,
+    "buff_name": null
+   },
+   "mp_debitado": 13,
+   "recarga_depois": 3,
+   "buff_gravado": null,
+   "depois": {
+    "caster": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 64,
+     "mp_max": 123,
+     "st": 139,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 1,
+      "golpe_poderoso": 1,
+      "cutelada": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 1
+      }
+     },
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 45,
+     "hp_max": 652,
+     "mp": 210,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 132,
+   "rodada": 3,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "action_executed",
+   "lado": "p2",
+   "detalhe": {
+    "action": {
+     "kind": "skill",
+     "skill_id": "cutelada"
+    },
+    "mp_spent": 13,
+    "damage": 314
+   }
+  },
+  {
+   "seq": 133,
+   "rodada": 3,
+   "ator": null,
+   "golpe": null,
+   "kind": "rodada_fim",
+   "registro": {
+    "number": 3,
+    "actions": [
+     [
+      "p1",
+      {
+       "kind": "skill",
+       "skill_id": "lasca_de_gelo"
+      }
+     ],
+     [
+      "p2",
+      {
+       "kind": "skill",
+       "skill_id": "cutelada"
+      }
+     ]
+    ],
+    "initiative": [
+     {
+      "side": "p1",
+      "level": 6,
+      "build": 1.0109250922757071,
+      "level_modifier": 0.995,
+      "score": 1.0058704668143286,
+      "relative_ag": 0.5384615384615384
+     },
+     {
+      "side": "p2",
+      "level": 7,
+      "build": 0.9777013569932818,
+      "level_modifier": 1.005,
+      "score": 0.9825898637782481,
+      "relative_ag": 0.5172413793103449
+     }
+    ],
+    "order": {
+     "first": "p1",
+     "second": "p2",
+     "decided_by": "score"
+    },
+    "steps": [
+     {
+      "side": "p1",
+      "action": {
+       "kind": "skill",
+       "skill_id": "lasca_de_gelo"
+      },
+      "outcome": "executed",
+      "mp_reserved": 10,
+      "mp_spent": 10,
+      "damage_to_opponent": 288
+     },
+     {
+      "side": "p2",
+      "action": {
+       "kind": "skill",
+       "skill_id": "cutelada"
+      },
+      "outcome": "executed",
+      "mp_reserved": 13,
+      "mp_spent": 13,
+      "damage_to_opponent": 314
+     }
+    ],
+    "hp_end": [
+     [
+      "p1",
+      45
+     ],
+     [
+      "p2",
+      269
+     ]
+    ],
+    "mp_end": [
+     [
+      "p1",
+      210
+     ],
+     [
+      "p2",
+      64
+     ]
+    ]
+   },
+   "estado": {
+    "p1": {
+     "hp": 45,
+     "hp_max": 652,
+     "mp": 210,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "p2": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 64,
+     "mp_max": 123,
+     "st": 139,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 1,
+      "golpe_poderoso": 1,
+      "cutelada": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 1
+      }
+     },
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 134,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "rodada_inicio",
+   "estado": {
+    "p1": {
+     "hp": 45,
+     "hp_max": 652,
+     "mp": 210,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "p2": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 64,
+     "mp_max": 123,
+     "st": 139,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "grito_guerra": 1,
+      "golpe_poderoso": 1,
+      "cutelada": 3
+     },
+     "buffs": {
+      "Grito de Guerra": {
+       "stat": "st",
+       "valor": 36,
+       "duracao": 1
+      }
+     },
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 135,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "escolha",
+   "lado": "p1",
+   "visao": {
+    "round_number": 4,
+    "side": "p1",
+    "me": {
+     "name": "Geada",
+     "class_name": "Mage",
+     "level": 6,
+     "hp": 45,
+     "hp_max": 652,
+     "mp": 210,
+     "mp_max": 280,
+     "effects": [],
+     "buffs": []
+    },
+    "opponent": {
+     "name": "Carrasco",
+     "class_name": "Warrior",
+     "level": 7,
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 64,
+     "mp_max": 123,
+     "effects": [],
+     "buffs": [
+      "Grito de Guerra"
+     ]
+    },
+    "legal_actions": [
+     {
+      "kind": "attack",
+      "skill_id": null
+     },
+     {
+      "kind": "skill",
+      "skill_id": "bola_fogo"
+     },
+     {
+      "kind": "skill",
+      "skill_id": "palavra_de_torpor"
+     },
+     {
+      "kind": "surrender",
+      "skill_id": null
+     }
+    ],
+    "cooldowns": [
+     [
+      "bola_fogo",
+      0
+     ],
+     [
+      "lasca_de_gelo",
+      2
+     ],
+     [
+      "palavra_de_torpor",
+      0
+     ]
+    ]
+   },
+   "acoes_legais": [
+    {
+     "kind": "attack",
+     "skill_id": null
+    },
+    {
+     "kind": "skill",
+     "skill_id": "bola_fogo"
+    },
+    {
+     "kind": "skill",
+     "skill_id": "palavra_de_torpor"
+    },
+    {
+     "kind": "surrender",
+     "skill_id": null
+    }
+   ],
+   "acao": {
+    "kind": "skill",
+    "skill_id": "palavra_de_torpor"
+   },
+   "justificativa": "Palavra de Torpor aplica slowed, que o adversário não carrega (efeitos visíveis: [])",
+   "legal": true,
+   "custo_mp": 9,
+   "recargas_no_lock": {
+    "bola_fogo": 0,
+    "lasca_de_gelo": 2,
+    "palavra_de_torpor": 0
+   }
+  },
+  {
+   "seq": 136,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "escolha",
+   "lado": "p2",
+   "visao": {
+    "round_number": 4,
+    "side": "p2",
+    "me": {
+     "name": "Carrasco",
+     "class_name": "Warrior",
+     "level": 7,
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 64,
+     "mp_max": 123,
+     "effects": [],
+     "buffs": [
+      "Grito de Guerra"
+     ]
+    },
+    "opponent": {
+     "name": "Geada",
+     "class_name": "Mage",
+     "level": 6,
+     "hp": 45,
+     "hp_max": 652,
+     "mp": 210,
+     "mp_max": 280,
+     "effects": [],
+     "buffs": []
+    },
+    "legal_actions": [
+     {
+      "kind": "attack",
+      "skill_id": null
+     },
+     {
+      "kind": "skill",
+      "skill_id": "golpe_poderoso"
+     },
+     {
+      "kind": "skill",
+      "skill_id": "grito_guerra"
+     },
+     {
+      "kind": "surrender",
+      "skill_id": null
+     }
+    ],
+    "cooldowns": [
+     [
+      "golpe_poderoso",
+      0
+     ],
+     [
+      "grito_guerra",
+      0
+     ],
+     [
+      "cutelada",
+      2
+     ]
+    ]
+   },
+   "acoes_legais": [
+    {
+     "kind": "attack",
+     "skill_id": null
+    },
+    {
+     "kind": "skill",
+     "skill_id": "golpe_poderoso"
+    },
+    {
+     "kind": "skill",
+     "skill_id": "grito_guerra"
+    },
+    {
+     "kind": "surrender",
+     "skill_id": null
+    }
+   ],
+   "acao": {
+    "kind": "skill",
+    "skill_id": "golpe_poderoso"
+   },
+   "justificativa": "primeira skill de dano legal do deck: Golpe Poderoso",
+   "legal": true,
+   "custo_mp": 8,
+   "recargas_no_lock": {
+    "golpe_poderoso": 0,
+    "grito_guerra": 0,
+    "cutelada": 2
+   }
+  },
+  {
+   "seq": 137,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "mp_reserved",
+   "lado": "p1",
+   "detalhe": {
+    "amount": 9
+   }
+  },
+  {
+   "seq": 138,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "mp_reserved",
+   "lado": "p2",
+   "detalhe": {
+    "amount": 8
+   }
+  },
+  {
+   "seq": 139,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "actions_locked",
+   "lado": null,
+   "detalhe": {
+    "p1": {
+     "kind": "skill",
+     "skill_id": "palavra_de_torpor"
+    },
+    "p2": {
+     "kind": "skill",
+     "skill_id": "golpe_poderoso"
+    }
+   }
+  },
+  {
+   "seq": 140,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "iniciativa",
+   "lado": "p1",
+   "nivel": 6,
+   "nivel_oponente": 7,
+   "parcelas": [
+    {
+     "stat": "hp",
+     "valor": 652.0,
+     "ref": 660.0,
+     "razao": 0.9878787878787879,
+     "raiz": 0.9939209163101398
+    },
+    {
+     "stat": "mp",
+     "valor": 280.0,
+     "ref": 170.66666666666666,
+     "razao": 1.640625,
+     "raiz": 1.2808688457449497
+    },
+    {
+     "stat": "st",
+     "valor": 53.0,
+     "ref": 74.66666666666667,
+     "razao": 0.7098214285714285,
+     "raiz": 0.8425090080061034
+    },
+    {
+     "stat": "mg",
+     "valor": 95.0,
+     "ref": 67.0,
+     "razao": 1.4179104477611941,
+     "raiz": 1.190760449360489
+    },
+    {
+     "stat": "ag",
+     "valor": 14.0,
+     "ref": 26.0,
+     "razao": 0.5384615384615384,
+     "raiz": 0.7337993857053428
+    },
+    {
+     "stat": "df",
+     "valor": 51.0,
+     "ref": 48.666666666666664,
+     "razao": 1.047945205479452,
+     "raiz": 1.0236919485272178
+    }
+   ],
+   "soma_raizes": 6.0655505536542424,
+   "build": 1.0109250922757071,
+   "delta_nivel": -1,
+   "delta_x_step": -0.005,
+   "teto_do_modificador": 0.1,
+   "modificador": 0.995,
+   "score": 1.0058704668143286,
+   "ag": 14.0,
+   "ref_ag": 26.0,
+   "ag_relativa": 0.5384615384615384
+  },
+  {
+   "seq": 141,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "iniciativa",
+   "lado": "p2",
+   "nivel": 7,
+   "nivel_oponente": 6,
+   "parcelas": [
+    {
+     "stat": "hp",
+     "valor": 868.0,
+     "ref": 739.3333333333334,
+     "razao": 1.1740306582506763,
+     "raiz": 1.083526953172221
+    },
+    {
+     "stat": "mp",
+     "valor": 123.0,
+     "ref": 190.66666666666666,
+     "razao": 0.6451048951048951,
+     "raiz": 0.8031842223953949
+    },
+    {
+     "stat": "st",
+     "valor": 139.0,
+     "ref": 83.66666666666667,
+     "razao": 1.6613545816733066,
+     "raiz": 1.2889354451148074
+    },
+    {
+     "stat": "mg",
+     "valor": 59.0,
+     "ref": 75.0,
+     "razao": 0.7866666666666666,
+     "raiz": 0.886942313043338
+    },
+    {
+     "stat": "ag",
+     "valor": 19.0,
+     "ref": 29.0,
+     "razao": 0.6551724137931034,
+     "raiz": 0.8094272134003795
+    },
+    {
+     "stat": "df",
+     "valor": 74.0,
+     "ref": 54.333333333333336,
+     "razao": 1.361963190184049,
+     "raiz": 1.1670317862783555
+    }
+   ],
+   "soma_raizes": 6.039047933404496,
+   "build": 1.0065079889007493,
+   "delta_nivel": 1,
+   "delta_x_step": 0.005,
+   "teto_do_modificador": 0.1,
+   "modificador": 1.005,
+   "score": 1.011540528845253,
+   "ag": 19.0,
+   "ref_ag": 29.0,
+   "ag_relativa": 0.6551724137931034
+  },
+  {
+   "seq": 142,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "ordem",
+   "score": {
+    "p1": 1.0058704668143286,
+    "p2": 1.011540528845253
+   },
+   "scores_iguais": false,
+   "ag_relativa": {
+    "p1": 0.5384615384615384,
+    "p2": 0.6551724137931034
+   },
+   "ag_relativa_igual": false,
+   "decidido_por": "score",
+   "primeiro": "p2",
+   "segundo": "p1"
+  },
+  {
+   "seq": 143,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "order_locked",
+   "lado": null,
+   "detalhe": {
+    "order": [
+     "p2",
+     "p1"
+    ],
+    "by": "score"
+   }
+  },
+  {
+   "seq": 144,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "inicio_oportunidade",
+   "antes": {
+    "hp": 269,
+    "hp_max": 868,
+    "mp": 56,
+    "mp_max": 123,
+    "st": 139,
+    "mg": 59,
+    "ag": 19,
+    "df": 74,
+    "recargas": {
+     "grito_guerra": 1,
+     "golpe_poderoso": 1,
+     "cutelada": 3
+    },
+    "buffs": {
+     "Grito de Guerra": {
+      "stat": "st",
+      "valor": 36,
+      "duracao": 1
+     }
+    },
+    "efeitos": [],
+    "death_ignore_usado": false,
+    "vivo": true
+   },
+   "regeneracao": {
+    "mp_max": 123,
+    "percentual": 2,
+    "base": 2.46,
+    "base_formula": "max(1, 123 × 2 / 100)",
+    "modificador_mana_regen": 0.0,
+    "total_int": 2,
+    "total_formula": "int(0 + 2.46)",
+    "teto": 123,
+    "mp_antes": 56,
+    "mp_depois_da_regeneracao": 58
+   }
+  },
+  {
+   "seq": 145,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.turn_effect",
+   "tipo": "turn_effect",
+   "payload": {
+    "entity": "p2",
+    "kind": "cooldown_expired",
+    "skill_id": "grito_guerra"
+   }
+  },
+  {
+   "seq": 146,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.turn_effect",
+   "tipo": "turn_effect",
+   "payload": {
+    "entity": "p2",
+    "kind": "cooldown_expired",
+    "skill_id": "golpe_poderoso"
+   }
+  },
+  {
+   "seq": 147,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "tick_de_efeitos",
+   "relatorio": {
+    "dot": {},
+    "drain": {},
+    "expired": [],
+    "skip_turn": false,
+    "laws": []
+   }
+  },
+  {
+   "seq": 148,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.turn_effect",
+   "tipo": "turn_effect",
+   "payload": {
+    "entity": "p2",
+    "kind": "buff_expired",
+    "name": "Grito de Guerra"
+   }
+  },
+  {
+   "seq": 149,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "fim_inicio_oportunidade",
+   "perde_a_oportunidade": false,
+   "depois": {
+    "hp": 269,
+    "hp_max": 868,
+    "mp": 58,
+    "mp_max": 123,
+    "st": 103,
+    "mg": 59,
+    "ag": 19,
+    "df": 74,
+    "recargas": {
+     "cutelada": 2
+    },
+    "buffs": {},
+    "efeitos": [],
+    "death_ignore_usado": false,
+    "vivo": true
+   }
+  },
+  {
+   "seq": 150,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "corte_de_mp_livre",
+   "reservado": 8,
+   "teto_livre": 115,
+   "mp_antes": 58,
+   "mp_depois": 58
+  },
+  {
+   "seq": 151,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "skill_inicio",
+   "skill": "golpe_poderoso",
+   "nome": "Golpe Poderoso",
+   "tipo": "damage",
+   "valor": 0,
+   "stat": "",
+   "alvo_declarado": "enemy",
+   "receptor": "p1",
+   "custo_mp": 8,
+   "recarga_declarada": 1,
+   "recarga_antes": 0,
+   "requisito": null,
+   "requisito_atendido": true,
+   "mp_disponivel": 66,
+   "chance_declarada": 100,
+   "duracao_declarada": 0,
+   "antes": {
+    "caster": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 66,
+     "mp_max": 123,
+     "st": 103,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "cutelada": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": 45,
+     "hp_max": 652,
+     "mp": 201,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 152,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_cast",
+   "tipo": "skill_cast",
+   "payload": {
+    "caster": "p2",
+    "skill": "golpe_poderoso"
+   }
+  },
+  {
+   "seq": 153,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "base_skill",
+   "skill": "golpe_poderoso",
+   "termos": [
+    {
+     "stat": "st",
+     "valor": 103.0,
+     "peso": 1.0,
+     "produto": 103.0
+    }
+   ],
+   "soma_ponderada": 103.0,
+   "arma_percent": 13.0,
+   "com_arma": 116.38999999999999,
+   "power": 2.86,
+   "total": 332.87539999999996,
+   "poder": 332,
+   "poder_formula": "max(1, int(103.0 × (1 + 13/100) × 2.86))"
+  },
+  {
+   "seq": 154,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": 5,
+   "kind": "golpe_inicio",
+   "atacante": "p2",
+   "defensor": "p1",
+   "base": 332,
+   "skill": "golpe_poderoso",
+   "modificador_da_acao": 0,
+   "publish_ligado": false,
+   "antes": {
+    "atacante": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 58,
+     "mp_max": 123,
+     "st": 103,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "cutelada": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": 45,
+     "hp_max": 652,
+     "mp": 201,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 155,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": 5,
+   "kind": "rolagem",
+   "mecanica": "acerto",
+   "operador": ">",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 1,
+   "chamada": 12,
+   "chamador": "mechanics/combat.py:420 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))",
+   "chance": 89,
+   "teste": "1 > 89",
+   "teste_verdadeiro": false,
+   "aprovado": true,
+   "resultado": "ACERTOU",
+   "detalhe_chance": {
+    "base": 85,
+    "ag_atacante": 19,
+    "ag_defensor": 14,
+    "swing": 4.545454545454546,
+    "swing_formula": "30 × (19 − 14) / 33",
+    "evasao_defensor": 0.0,
+    "medo_precisao_temporarios": 0,
+    "precisao_permanente": 0.0,
+    "modificador_da_acao": 0,
+    "ocultacao_defensor": 0,
+    "bruto": 89.54545454545455,
+    "piso": 20,
+    "teto": 95,
+    "final": 89
+   }
+  },
+  {
+   "seq": 156,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": 5,
+   "kind": "chance_de_critico",
+   "padrao": 0,
+   "da_carta": 0,
+   "fontes_do_atacante": 7,
+   "bruto": 7,
+   "teto": 75,
+   "final": 7
+  },
+  {
+   "seq": 157,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": 5,
+   "kind": "rolagem",
+   "mecanica": "crítico",
+   "chance": 7,
+   "teste": "34 <= 7",
+   "teste_verdadeiro": false,
+   "operador": "<=",
+   "aprovado": false,
+   "resultado": "sem crítico",
+   "operacao": "randrange",
+   "argumentos": [
+    1,
+    101
+   ],
+   "valor": 34,
+   "chamada": 13,
+   "chamador": "mechanics/combat.py:447 resolve_physical_attack",
+   "limites": "inteiro uniforme em [1, 100] (randrange(1, 101))"
+  },
+  {
+   "seq": 158,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": 5,
+   "kind": "modificadores",
+   "critico": false,
+   "mult": [
+    {
+     "fonte": "damage_percent (passiva, equipamento ou buff)",
+     "parcela": 0.08
+    }
+   ],
+   "xmult": [],
+   "mitigacao": [
+    {
+     "fonte": "saída do atacante (outgoing_damage_multiplier)",
+     "fator": 1.0
+    },
+    {
+     "fonte": "entrada do defensor (incoming_damage_multiplier)",
+     "fator": 1.0,
+     "damage_reduction": 0.0,
+     "formula": "max(0.1, 1 − min(80, damage_reduction) / 100)"
+    }
+   ],
+   "condicao_da_carta": "target_healthy",
+   "condicao_satisfeita": false
+  },
+  {
+   "seq": 159,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": 5,
+   "kind": "funil",
+   "base": 332.0,
+   "mult_total": 1.08,
+   "mult_formula": "1 + Σ[0.08]",
+   "xmult_bruto": 1.0,
+   "xmult_teto": 5.0,
+   "xmult_aplicado": 1.0,
+   "defesa_alvo": 51,
+   "fator_defesa": 0.6622516556291391,
+   "fator_defesa_formula": "100 / (100 + 51)",
+   "bruto": 237.45695364238412,
+   "bruto_formula": "332.0 × 1.08 × 1.0 × 0.6622516556291391",
+   "passos": [
+    {
+     "etapa": "max(1, int(bruto))",
+     "valor": 237
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 237
+    },
+    {
+     "etapa": "int(anterior × 1.0)",
+     "valor": 237
+    }
+   ],
+   "final": 237
+  },
+  {
+   "seq": 160,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": 5,
+   "kind": "egide",
+   "defensor": "p1",
+   "fracao": 15,
+   "mp_livre": 201,
+   "dano_entrada": 237,
+   "desejado": 35,
+   "desejado_formula": "int(237 × 15 / 100)",
+   "possivel": 35,
+   "possivel_formula": "min(35, int(201 × 2.0))",
+   "custo_mp": 17,
+   "custo_formula": "max(1, int(35 / 2.0))",
+   "dano_saida": 202
+  },
+  {
+   "seq": 161,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": 5,
+   "kind": "golpe_fim",
+   "atacante": "p2",
+   "defensor": "p1",
+   "resultado": {
+    "attacker_id": "Carrasco",
+    "defender_id": "Geada",
+    "damage": 202,
+    "was_critical": false,
+    "was_evaded": false,
+    "did_defender_die": true,
+    "notes": [
+     "hit"
+    ]
+   },
+   "hp_defensor": [
+    45,
+    -157
+   ],
+   "hp_aplicado": 202,
+   "mp_defensor": [
+    201,
+    184
+   ],
+   "roubo_de_vida": null,
+   "death_ignore_disparou": false,
+   "defensor_morreu": true,
+   "depois": {
+    "atacante": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 58,
+     "mp_max": 123,
+     "st": 103,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "cutelada": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "defensor": {
+     "hp": -157,
+     "hp_max": 652,
+     "mp": 184,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": false
+    }
+   }
+  },
+  {
+   "seq": 162,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_publicado",
+   "topico": "combat.skill_outcome",
+   "tipo": "skill_outcome",
+   "payload": {
+    "caster": "p2",
+    "target": "p1",
+    "result": {
+     "kind": "damage",
+     "mp_spent": 8,
+     "strike": {
+      "attacker_id": "Carrasco",
+      "defender_id": "Geada",
+      "damage": 202,
+      "was_critical": false,
+      "was_evaded": false,
+      "did_defender_die": true,
+      "notes": [
+       "hit"
+      ]
+     },
+     "heal_amount": 0,
+     "status_effect": null,
+     "status_success": null,
+     "buff_name": null
+    }
+   }
+  },
+  {
+   "seq": 163,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "skill_fim",
+   "skill": "golpe_poderoso",
+   "resultado": {
+    "kind": "damage",
+    "mp_spent": 8,
+    "strike": {
+     "attacker_id": "Carrasco",
+     "defender_id": "Geada",
+     "damage": 202,
+     "was_critical": false,
+     "was_evaded": false,
+     "did_defender_die": true,
+     "notes": [
+      "hit"
+     ]
+    },
+    "heal_amount": 0,
+    "status_effect": null,
+    "status_success": null,
+    "buff_name": null
+   },
+   "mp_debitado": 8,
+   "recarga_depois": 2,
+   "buff_gravado": null,
+   "depois": {
+    "caster": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 58,
+     "mp_max": 123,
+     "st": 103,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "cutelada": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    },
+    "alvo": {
+     "hp": -157,
+     "hp_max": 652,
+     "mp": 184,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": false
+    }
+   }
+  },
+  {
+   "seq": 164,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "action_executed",
+   "lado": "p2",
+   "detalhe": {
+    "action": {
+     "kind": "skill",
+     "skill_id": "golpe_poderoso"
+    },
+    "mp_spent": 8,
+    "damage": 202
+   }
+  },
+  {
+   "seq": 165,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "duel_finished",
+   "lado": "p2",
+   "detalhe": {
+    "reason": "ko"
+   }
+  },
+  {
+   "seq": 166,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "mp_refunded",
+   "lado": "p1",
+   "detalhe": {
+    "amount": 9
+   }
+  },
+  {
+   "seq": 167,
+   "rodada": 4,
+   "ator": "p2",
+   "golpe": null,
+   "kind": "evento_do_motor",
+   "nome": "action_cancelled",
+   "lado": "p1",
+   "detalhe": {
+    "cause": "death"
+   }
+  },
+  {
+   "seq": 168,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "rodada_fim",
+   "registro": {
+    "number": 4,
+    "actions": [
+     [
+      "p1",
+      {
+       "kind": "skill",
+       "skill_id": "palavra_de_torpor"
+      }
+     ],
+     [
+      "p2",
+      {
+       "kind": "skill",
+       "skill_id": "golpe_poderoso"
+      }
+     ]
+    ],
+    "initiative": [
+     {
+      "side": "p1",
+      "level": 6,
+      "build": 1.0109250922757071,
+      "level_modifier": 0.995,
+      "score": 1.0058704668143286,
+      "relative_ag": 0.5384615384615384
+     },
+     {
+      "side": "p2",
+      "level": 7,
+      "build": 1.0065079889007493,
+      "level_modifier": 1.005,
+      "score": 1.011540528845253,
+      "relative_ag": 0.6551724137931034
+     }
+    ],
+    "order": {
+     "first": "p2",
+     "second": "p1",
+     "decided_by": "score"
+    },
+    "steps": [
+     {
+      "side": "p2",
+      "action": {
+       "kind": "skill",
+       "skill_id": "golpe_poderoso"
+      },
+      "outcome": "executed",
+      "mp_reserved": 8,
+      "mp_spent": 8,
+      "damage_to_opponent": 202
+     },
+     {
+      "side": "p1",
+      "action": {
+       "kind": "skill",
+       "skill_id": "palavra_de_torpor"
+      },
+      "outcome": "cancelled_death",
+      "mp_reserved": 9,
+      "mp_spent": 0,
+      "damage_to_opponent": 0
+     }
+    ],
+    "hp_end": [
+     [
+      "p1",
+      -157
+     ],
+     [
+      "p2",
+      269
+     ]
+    ],
+    "mp_end": [
+     [
+      "p1",
+      193
+     ],
+     [
+      "p2",
+      58
+     ]
+    ]
+   },
+   "estado": {
+    "p1": {
+     "hp": -157,
+     "hp_max": 652,
+     "mp": 193,
+     "mp_max": 280,
+     "st": 53,
+     "mg": 95,
+     "ag": 14,
+     "df": 51,
+     "recargas": {
+      "palavra_de_torpor": 1,
+      "bola_fogo": 1,
+      "lasca_de_gelo": 3
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": false
+    },
+    "p2": {
+     "hp": 269,
+     "hp_max": 868,
+     "mp": 58,
+     "mp_max": 123,
+     "st": 103,
+     "mg": 59,
+     "ag": 19,
+     "df": 74,
+     "recargas": {
+      "cutelada": 2,
+      "golpe_poderoso": 2
+     },
+     "buffs": {},
+     "efeitos": [],
+     "death_ignore_usado": false,
+     "vivo": true
+    }
+   }
+  },
+  {
+   "seq": 169,
+   "rodada": 4,
+   "ator": null,
+   "golpe": null,
+   "kind": "resultado",
+   "resultado": {
+    "winner": "p2",
+    "loser": "p1",
+    "winner_name": "Carrasco",
+    "loser_name": "Geada",
+    "reason": "ko",
+    "rounds": 4
+   },
+   "inconclusivo": false,
+   "limite_tecnico": 500,
+   "chamadas_ao_rng": 13
+  }
+ ]
+}
