@@ -1059,6 +1059,11 @@ COR = {"Warrior": "var(--c-warrior)", "Mage": "var(--c-mage)", "Rogue": "var(--c
 FONTE = 'font-family="system-ui, -apple-system, Segoe UI, sans-serif"'
 
 
+def _cor(p: dict) -> str:
+    """A cor do participante: a dele, se o modelo trouxer uma, ou a da classe."""
+    return p.get("cor") or COR[p["classe"]]
+
+
 def _e(texto) -> str:
     return html.escape(str(texto), quote=True)
 
@@ -1080,7 +1085,7 @@ def _caixa_da_chave(jogo: dict, part: dict, x: float, cy: float, largura: int, a
         ty = 15 + i * 16
         tom = "t-primary" if ganhou else "t-muted"
         peso = 600 if ganhou else 400
-        s.append(f'<circle cx="9" cy="{ty - 4}" r="4" fill="{COR[p["classe"]]}"/>')
+        s.append(f'<circle cx="9" cy="{ty - 4}" r="4" fill="{_cor(p)}"/>')
         s.append(
             f'<text x="18" y="{ty}" class="{tom}" font-weight="{peso}">{_e(p["nome"][:18])}</text>'
         )
@@ -1242,7 +1247,7 @@ def svg_dispersao_op(dados: dict) -> str:
         dica = f"{j['titulo']}: {v['nome']} {v['op']:.2f} venceu {p['nome']} {p['op']:.2f}"
         s.append(
             f'<circle class="ponto" data-jogo="{j["chave"]}" data-tip="{_e(dica)}" '
-            f'cx="{px(v["op"]):.1f}" cy="{py(p["op"]):.1f}" r="5" fill="{COR[v["classe"]]}"/>'
+            f'cx="{px(v["op"]):.1f}" cy="{py(p["op"]):.1f}" r="5" fill="{_cor(v)}"/>'
         )
     s.append("</svg>")
     return "".join(s)
@@ -1425,7 +1430,7 @@ def graficos(dados: dict) -> dict:
         if g["critico"]:
             dica += " (crítico)"
         rotulo = f"{atacante['nome']} · {g['acao']}"[:34] + (" · crítico" if g["critico"] else "")
-        golpes.append((rotulo, g["dano"], COR[atacante["classe"]], dica))
+        golpes.append((rotulo, g["dano"], _cor(atacante), dica))
     skills = [(nome, n, "var(--c-serie)", f"{nome}: {n} usos") for nome, n in ag["skills"][:12]]
     saida = {
         "chave": svg_chave(dados),
@@ -1441,7 +1446,7 @@ def graficos(dados: dict) -> dict:
     final = dados.get("final")
     if final:
         nomes = {lado: part[final["ids"][lado]]["nome"] for lado in SIDES}
-        cores = {lado: COR[part[final["ids"][lado]]["classe"]] for lado in SIDES}
+        cores = {lado: _cor(part[final["ids"][lado]]) for lado in SIDES}
         if cores["p1"] == cores["p2"]:
             cores["p2"] = "var(--c-neutra)"
         scores = [
