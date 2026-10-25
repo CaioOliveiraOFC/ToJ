@@ -591,6 +591,8 @@ def gravar_atomico(destino: Path, conteudo: str) -> None:
             f.write(conteudo)
             f.flush()
             os.fsync(f.fileno())
+        # `mkstemp` cria com 0600; o arquivo publicado é lido por qualquer um.
+        os.chmod(temporario, 0o644)
         os.replace(temporario, destino)
     except BaseException:
         Path(temporario).unlink(missing_ok=True)

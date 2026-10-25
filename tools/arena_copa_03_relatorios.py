@@ -382,6 +382,8 @@ def modelo_geracao(pasta: Path) -> dict:
             sobrevivencia=_sobrevivencia(rs, min(ate, 30)),
             divergencia_por_faixa=_divergencia_por_faixa(rs, faixas),
             pares=pares.most_common(8),
+            trocas=sum(pares.values()),
+            trocas_para_lutar=sum(n for par, n in pares.items() if par.endswith("→lutar")),
             bandas_na_extracao={str(k): v for k, v in bandas.items()},
             mortes_por_faixa={f: mortes_por_faixa.get(f, 0) for f in faixas},
         )
@@ -687,16 +689,14 @@ def _alavancas_md(g: dict) -> list[str]:
         )
     taxas = {p: g["por_perfil"][p]["taxa_divergencia"] for p in PERFIS}
     ordem = sorted(PERFIS, key=lambda p: -taxas[p])
-    pares = Counter()
-    for p in PERFIS:
-        pares.update(dict(g["por_perfil"][p]["pares"]))
-    viraram_luta = sum(n for par, n in pares.items() if par.endswith("→lutar"))
+    trocas = sum(g["por_perfil"][p]["trocas"] for p in PERFIS)
+    viraram_luta = sum(g["por_perfil"][p]["trocas_para_lutar"] for p in PERFIS)
     linhas += [
         "",
         "Leitura: a agenda mudou escolhas em estados alcançáveis em todos os perfis com linha "
         "diferente da canônica. Taxa de decisões mudadas, da maior para a menor: "
         + ", ".join(f"{PERFIL_PT[p]} {taxas[p]:.1%}" for p in ordem)
-        + f". {viraram_luta} das {sum(pares.values())} trocas foram para `lutar` (no lugar de "
+        + f". {viraram_luta} das {trocas} trocas foram para `lutar` (no lugar de "
         "beber poção, comprar cura, ir a um serviço ou sair para descansar). A agenda não "
         "desliga proteção: abaixo da linha o cérebro continua mandando curar ou sair, e a fuga "
         "dentro do duelo é a canônica.",
@@ -912,6 +912,7 @@ def _perfis_md(g: dict) -> list[str]:
         "Andar de morte (média · mediana)",
         "HP ao entrar na luta fatal (mediana)",
         "Extrações",
+        "Aprovação por OP (na faixa / extrações)",
         "Na faixa / runs",
         "Combates por run",
         "Fugas por run",
@@ -929,6 +930,7 @@ def _perfis_md(g: dict) -> list[str]:
                 f"{v['andar_medio_morte']:.1f} · {v['andar_mediano_morte']:.0f}",
                 f"{v['hp_entrada_fatal']:.0%}",
                 f"{v['extracoes']} ({v['taxa_extracao']:.1%})",
+                f"{v['qualificadas']} ({v['taxa_aprovacao']:.1%})",
                 _pct(v["qualificadas"], v["tentativas"]),
                 f"{v['combates_por_run']:.1f}",
                 f"{v['fugas_por_run']:.2f}",
@@ -1696,8 +1698,9 @@ def relatorio_md(dados: dict, copa) -> str:
         "Arquivos: [`geracao.md`](geracao.md), [`final_detalhada.md`](final_detalhada.md), "
         "[`final_trace.json`](final_trace.json), [`dashboard.html`](dashboard.html), "
         "[`relatorio_visual.pdf`](relatorio_visual.pdf), [`gladiadores.json`](gladiadores.json), "
-        "[`runs.jsonl`](runs.jsonl), [`diagnostico_rng.json`](diagnostico_rng.json) e "
-        "`snapshots/`.",
+        "[`runs.jsonl`](runs.jsonl), [`runs_preenchimento.jsonl`](runs_preenchimento.jsonl), "
+        "[`preenchimento.json`](preenchimento.json), [`runs_piloto.jsonl`](runs_piloto.jsonl), "
+        "[`diagnostico_rng.json`](diagnostico_rng.json) e `snapshots/`.",
         "",
         "## Como a Copa foi disputada",
         "",
@@ -1860,12 +1863,124 @@ def svg_histograma_op(extracoes: list[dict]) -> str:
     return "".join(s)
 
 
+def _escala_op(ops: list[float]) -> tuple[float, float, float, str]:
+    """Escala redonda que cobre os OPs da Copa, sem passar de 30 (o teto da faixa).
+
+    Os gráficos da Copa 02 fixavam 20–30; aqui os 64 ficam num intervalo estreito
+    perto de 30, e o eixo fixo espremia tudo na borda de cima.
+    """
+    lo, hi, passo, fmt = _escala(min(ops) - 0.05, max(ops) + 0.05, marcas=5)
+    return lo, hi, passo, fmt
+
+
+def _marcas(lo: float, hi: float, passo: float) -> list[float]:
+    return [lo + i * passo for i in range(round((hi - lo) / passo) + 1)]
+
+
+def svg_dispersao_op3(dados: dict) -> str:
+    """OP do vencedor × OP do perdedor, na escala dos 64: acima da diagonal, a zebra."""
+    part = {p["id"]: p for p in dados["participantes"]}
+    w, h, m = 520, 400, 52
+    lo, hi, passo, fmt = _escala_op([p["op"] for p in dados["participantes"]])
+
+    def px(v):
+        return m + (v - lo) / (hi - lo) * (w - m - 16)
+
+    def py(v):
+        return h - m - (v - lo) / (hi - lo) * (h - m - 16)
+
+    s = [
+        f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" '
+        f'aria-label="OP do vencedor contra OP do perdedor em cada partida" {FONTE} '
+        'font-size="11">'
+    ]
+    for v in _marcas(lo, hi, passo):
+        s.append(f'<line class="grade" x1="{px(v):.1f}" x2="{px(v):.1f}" y1="16" y2="{h - m}"/>')
+        s.append(f'<line class="grade" x1="{m}" x2="{w - 16}" y1="{py(v):.1f}" y2="{py(v):.1f}"/>')
+        s.append(
+            f'<text x="{px(v):.1f}" y="{h - m + 16}" text-anchor="middle" '
+            f'class="t-muted">{fmt.format(v)}</text>'
+        )
+        s.append(
+            f'<text x="{m - 8}" y="{py(v) + 4:.1f}" text-anchor="end" '
+            f'class="t-muted">{fmt.format(v)}</text>'
+        )
+    s.append(
+        f'<line class="eixo" x1="{px(lo):.1f}" y1="{py(lo):.1f}" '
+        f'x2="{px(hi):.1f}" y2="{py(hi):.1f}"/>'
+    )
+    s.append(
+        f'<text x="{m + 8}" y="30" class="t-secondary">acima da diagonal: venceu o OP menor</text>'
+    )
+    s.append(
+        f'<text x="{(w + m) / 2:.1f}" y="{h - 12}" text-anchor="middle" class="t-secondary">'
+        "OP do vencedor</text>"
+    )
+    s.append(
+        f'<text transform="translate(14,{(h - m) / 2:.1f}) rotate(-90)" text-anchor="middle" '
+        'class="t-secondary">OP do perdedor</text>'
+    )
+    for j in dados["partidas"]:
+        v, p = part[j["vencedor"]], part[j["perdedor"]]
+        dica = f"{j['titulo']}: {v['nome']} {v['op']:.2f} venceu {p['nome']} {p['op']:.2f}"
+        s.append(
+            f'<circle class="ponto" data-jogo="{j["chave"]}" data-tip="{_e(dica)}" '
+            f'cx="{px(v["op"]):.1f}" cy="{py(p["op"]):.1f}" r="5" fill="{v["cor"]}"/>'
+        )
+    s.append("</svg>")
+    return "".join(s)
+
+
+def svg_op_por_fase3(dados: dict) -> str:
+    """OP médio de quem entrou em cada fase, com mínimo e máximo, na escala dos 64."""
+    pontos = [(f["nome"], f["entrando"]) for f in dados["agregados"]["op_por_fase"]]
+    campeao = next((p for p in dados["participantes"] if p["campeao"]), None)
+    if campeao:
+        pontos.append(("Campeão", [campeao["op"]] * 3))
+    w, h, m = 560, 300, 48
+    lo, hi, passo, fmt = _escala_op([p["op"] for p in dados["participantes"]])
+
+    def py(v):
+        return h - 40 - (v - lo) / (hi - lo) * (h - 60)
+
+    largura = (w - m - 70) / max(1, len(pontos) - 1)
+    s = [
+        f'<svg viewBox="0 0 {w} {h}" width="100%" role="img" '
+        f'aria-label="OP de quem entrou em cada fase" {FONTE} font-size="11">'
+    ]
+    s += _grade_y(m, h - 40, 20, lo, hi, passo, w - m - 10, fmt)
+    caminho = []
+    for i, (nome, (media, minimo, maximo)) in enumerate(pontos):
+        x = m + 14 + i * largura
+        s.append(
+            f'<line class="faixa-linha" x1="{x:.1f}" x2="{x:.1f}" '
+            f'y1="{py(minimo):.1f}" y2="{py(maximo):.1f}"/>'
+        )
+        caminho.append(f"{'M' if i == 0 else 'L'}{x:.1f},{py(media):.1f}")
+        s.append(
+            f'<text x="{x:.1f}" y="{h - 22}" text-anchor="middle" class="t-muted">{_e(nome)}</text>'
+        )
+    s.append(f'<path class="linha-1" d="{"".join(caminho)}" fill="none"/>')
+    for i, (nome, (media, minimo, maximo)) in enumerate(pontos):
+        x = m + 14 + i * largura
+        dica = f"{nome}: média {media:.2f}, mínimo {minimo:.2f}, máximo {maximo:.2f}"
+        s.append(
+            f'<circle class="ponto-1" data-tip="{_e(dica)}" cx="{x:.1f}" '
+            f'cy="{py(media):.1f}" r="5"/>'
+        )
+        s.append(
+            f'<text x="{x + 8:.1f}" y="{py(media) - 8:.1f}" class="t-secondary">{media:.2f}</text>'
+        )
+    s.append("</svg>")
+    return "".join(s)
+
+
 def svg_aceitos(aceitos: list[dict]) -> str:
     """OP × andar de extração dos 64, cor por perfil."""
     w, h, m = 520, 340, 50
     andares = [a["andar"] for a in aceitos]
     a_lo, a_hi = min(andares) - 1, max(andares) + 1
-    lo, hi = 20.0, 30.0
+    lo, hi, passo, fmt = _escala_op([a["op"] for a in aceitos])
 
     def px(v):
         return m + (v - a_lo) / (a_hi - a_lo) * (w - m - 16)
@@ -1878,10 +1993,11 @@ def svg_aceitos(aceitos: list[dict]) -> str:
         f'aria-label="OP e andar de extração dos 64" {FONTE} font-size="11">'
     ]
     s += _legenda_svg([(PERFIL_PT[p], COR_PERFIL[p]) for p in PERFIS])
-    for v in range(20, 31, 2):
+    for v in _marcas(lo, hi, passo):
         s.append(f'<line class="grade" x1="{m}" x2="{w - 16}" y1="{py(v):.1f}" y2="{py(v):.1f}"/>')
         s.append(
-            f'<text x="{m - 8}" y="{py(v) + 4:.1f}" text-anchor="end" class="t-muted">{v}</text>'
+            f'<text x="{m - 8}" y="{py(v) + 4:.1f}" text-anchor="end" '
+            f'class="t-muted">{fmt.format(v)}</text>'
         )
     for a in range(a_lo + 1, a_hi, 2):
         s.append(
@@ -1963,6 +2079,8 @@ def svg_linhas_n(series: list[tuple], rotulos_x: list[str], *, titulo: str, fmt=
 def graficos(dados: dict, g: dict) -> dict:
     ag = dados["agregados"]
     saida = c2.graficos(dados)
+    saida["dispersao"] = svg_dispersao_op3(dados)
+    saida["op_por_fase"] = svg_op_por_fase3(dados)
     marcos = list(range(1, len(g["por_perfil"]["conservador"]["sobrevivencia"]) + 1))
     saida["sobrevivencia"] = svg_linhas_n(
         [
