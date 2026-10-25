@@ -56,6 +56,8 @@ reports/pvp/copa_03/*
 !reports/pvp/copa_03/dashboard.html
 !reports/pvp/copa_03/relatorio_visual.pdf
 !reports/pvp/copa_03/diagnostico_rng.json
+!reports/pvp/copa_03/round_robin.json
+!reports/pvp/copa_03/round_robin.md
 
 # IDEs
 .idea/

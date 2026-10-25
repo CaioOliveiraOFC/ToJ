@@ -506,3 +506,48 @@ def test_nenhum_save_slot_ou_gladiador_e_tocado(monkeypatch, tmp_path, copa):
     assert {"geracao.md", "relatorio.md", "final_detalhada.md", "dashboard.html"} <= nomes
     pagina = (pasta / "dashboard.html").read_text(encoding="utf-8")
     assert "@@" not in pagina and pagina.count('class="jogo"') == 63
+
+
+# --- 6. Todos contra todos --------------------------------------------------------
+
+
+def test_bradley_terry_ordena_e_centra():
+    from tools.arena_copa_03_round_robin import bradley_terry
+
+    ids = ["A", "B", "C"]
+    vitorias = {
+        ("A", "B"): 8,
+        ("B", "A"): 2,
+        ("B", "C"): 8,
+        ("C", "B"): 2,
+        ("A", "C"): 9,
+        ("C", "A"): 1,
+    }
+    forca = bradley_terry(ids, vitorias)
+    assert forca["A"] > forca["B"] > forca["C"]
+    assert abs(sum(forca.values())) < 1e-9
+
+
+@entregues
+def test_o_rodizio_conserva_os_duelos_e_se_reproduz():
+    from tools.arena_copa_03_round_robin import jogar_rodizio
+
+    tres = formar_participantes()[:3]
+    resultado = jogar_rodizio(tres, seeds=2)
+    assert set(resultado) == {("W01", "W02"), ("W01", "W03"), ("W02", "W03")}
+    assert all(r["a"] + r["b"] + r["inconclusivos"] == 2 for r in resultado.values())
+    assert jogar_rodizio(tres, seeds=2) == resultado
+
+
+@pytest.mark.skipif(
+    not (PASTA / "round_robin.json").exists(), reason="o todos-contra-todos não foi publicado"
+)
+def test_o_todos_contra_todos_publicado_e_coerente():
+    dados = json.loads((PASTA / "round_robin.json").read_text(encoding="utf-8"))
+    assert len(dados["matriz"]) == 64 * 63 // 2
+    assert all(
+        r["a"] + r["b"] + r["inconclusivos"] == dados["seeds"] for r in dados["matriz"].values()
+    )
+    assert len({r["id"] for r in dados["ranking"]}) == 64
+    forcas = [r["forca"] for r in dados["ranking"]]
+    assert forcas == sorted(forcas, reverse=True)
