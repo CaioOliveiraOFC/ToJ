@@ -43,7 +43,9 @@ from tools.arena_copa_03 import (
     ARQUIVO_DIAGNOSTICO,
     ARQUIVO_GLADIADORES,
     ARQUIVO_PILOTO,
+    ARQUIVO_PLANO,
     ARQUIVO_RUNS,
+    ARQUIVO_RUNS_PREENCHIMENTO,
     COPA,
     PERFIL_PT,
     REPETICOES,
@@ -88,6 +90,12 @@ COR_PERFIL = {
     "hardcore": "var(--c-hard)",
 }
 ARQUETIPOS = ("crítico", "defesa", "controle", "sustento")
+ORIGEM_PT = {
+    "original": "seleção original",
+    "hardcore_adicional": "hardcore adicional do checkpoint",
+    "preenchimento_checkpoint": "preenchimento (qualificada do checkpoint)",
+    "preenchimento_novo": "preenchimento (run nova)",
+}
 RARIDADES = ("Common", "Rare", "Epic", "Legendary")
 RARIDADE_PT = {"Common": "Comum", "Rare": "Rara", "Epic": "Épica", "Legendary": "Lendária"}
 AVISO_NOMES = (
@@ -173,6 +181,7 @@ def _resumo_de(runs: list[dict]) -> dict:
         "invalidas": sum(1 for r in runs if r.get("situacao") == "rejeitada_snapshot"),
         "taxa_morte": len(mortes) / n if n else 0.0,
         "taxa_extracao": len(extracoes) / n if n else 0.0,
+        "taxa_aprovacao": len(qualificadas) / len(extracoes) if extracoes else 0.0,
         "andar_medio_morte": _media(r["andar"] for r in mortes),
         "andar_mediano_morte": _mediana(r["andar"] for r in mortes),
         "mortes_ate_5": sum(1 for r in mortes if r["andar"] <= 5),
@@ -450,6 +459,7 @@ def modelo_geracao(pasta: Path) -> dict:
                 "tentativa": g["tentativa"],
                 "seed": g["seed"],
                 "arquetipos": g["arquetipos"],
+                "origem": g.get("origem", "original"),
             }
             for g in aceitos
         ],
@@ -465,6 +475,15 @@ def modelo_geracao(pasta: Path) -> dict:
         "jaccard": {"dentro": _media(jaccard_dentro), "entre": _media(jaccard_fora)},
         "piloto": _piloto(pasta),
         "marcantes": _marcantes(gladiadores),
+        "preenchimento": _preenchimento(pasta),
+        "distribuicao": {
+            p: {
+                pol: sum(1 for x in aceitos if (x["perfil"], x["politica"]) == (p, pol))
+                for pol in POLITICAS
+            }
+            for p in PERFIS
+        },
+        "origens": dict(Counter(x.get("origem", "original") for x in aceitos)),
     }
 
 
@@ -496,9 +515,10 @@ def geracao_md(g: dict) -> str:
         "",
         "## Resumo",
         "",
-        f"- **{t['tentativas']} runs** para fechar as 64 vagas: {t['mortes']} mortes "
+        f"- **Geração original: {t['tentativas']} runs**, {t['mortes']} mortes "
         f"({t['taxa_morte']:.1%}), {t['extracoes']} extrações ({t['taxa_extracao']:.1%}), "
         f"{t['teto']} chegaram ao teto técnico vivas e {t['erros']} erros técnicos.",
+        *_resumo_do_preenchimento(g),
         f"- Das {t['extracoes']} extrações, {t['qualificadas']} ficaram na faixa de OP 20–30 "
         f"({_pct(t['qualificadas'], t['extracoes'])}); {t['acima']} passaram de 30 e "
         f"{t['abaixo']} ficaram abaixo de 20. {t['sem_vaga']} qualificada(s) chegaram depois de a "
@@ -518,6 +538,7 @@ def geracao_md(g: dict) -> str:
     linhas += _alavancas_md(g)
     linhas += _piloto_md(g)
     linhas += _runs_md(g)
+    linhas += _preenchimento_md(g)
     linhas += _perfis_md(g)
     linhas += _op_md(g)
     linhas += _andares_md(g)
@@ -717,6 +738,123 @@ def _piloto_md(g: dict) -> list[str]:
         "linha de aposta e o critério de aceite.",
         "",
     ]
+    return linhas
+
+
+def _preenchimento(pasta: Path) -> dict | None:
+    """As runs e o plano do preenchimento, separados da geração original."""
+    plano_arq, runs_arq = pasta / ARQUIVO_PLANO, pasta / ARQUIVO_RUNS_PREENCHIMENTO
+    if not plano_arq.exists() or not runs_arq.exists():
+        return None
+    plano = json.loads(plano_arq.read_text(encoding="utf-8"))
+    runs = [json.loads(x) for x in runs_arq.read_text(encoding="utf-8").splitlines() if x]
+    return {
+        "plano": plano,
+        "resumo": _resumo_de(runs),
+        "por_perfil": {
+            p: _resumo_de([r for r in runs if r["perfil"] == p])
+            for p in ("conservador", "moderado")
+        },
+        "por_grupo": plano.get("grupos_do_preenchimento", {}),
+    }
+
+
+def _resumo_do_preenchimento(g: dict) -> list[str]:
+    pre = g.get("preenchimento")
+    original = [a for a in g["aceitos"] if a["origem"] == "original"]
+    por_perfil = Counter(a["perfil"] for a in original)
+    linhas = [
+        "- **Seleção original: "
+        f"{len(original)} aceitos** (conservador {por_perfil['conservador']}/22, moderado "
+        f"{por_perfil['moderado']}/21, hardcore {por_perfil['hardcore']}/21). As quotas "
+        "22/21/21 NÃO foram cumpridas: o hardcore ficou em "
+        f"{por_perfil['hardcore']}/21.",
+    ]
+    if pre:
+        r = pre["resumo"]
+        novos = sum(1 for a in g["aceitos"] if a["origem"].startswith("preenchimento"))
+        linhas.append(
+            f"- **Preenchimento: {novos} vagas**, por decisão do usuário, com {r['tentativas']} "
+            f"runs novas de conservador e moderado ({r['mortes']} mortes, {r['extracoes']} "
+            f"extrações, {r['qualificadas']} na faixa)."
+        )
+    final = Counter(a["perfil"] for a in g["aceitos"])
+    linhas.append(
+        f"- **Os 64 por perfil:** conservador {final['conservador']}, moderado "
+        f"{final['moderado']}, hardcore {final['hardcore']}."
+    )
+    return linhas
+
+
+def _preenchimento_md(g: dict) -> list[str]:
+    pre = g.get("preenchimento")
+    if not pre:
+        return []
+    plano, r = pre["plano"], pre["resumo"]
+    linhas = [
+        "## O preenchimento",
+        "",
+        plano["decisao"],
+        "",
+        f"- Seleção original mantida inteira: {len(plano['selecao_original'])} gladiadores, "
+        "com snapshots, seeds e builds como estavam.",
+        "- Qualificadas que sobraram no checkpoint: "
+        f"{sum(1 for v in plano['preenchimento'] if v['origem'] == 'preenchimento_checkpoint')}"
+        " (nenhuma extração com OP acima de 30 foi usada).",
+        "- Tentativas interrompidas no encerramento da geração original (em voo, sem "
+        "resultado registrado): "
+        + (
+            ", ".join(f"{k} #{', #'.join(map(str, v))}" for k, v in plano["interrompidas"].items())
+            or "nenhuma"
+        )
+        + ".",
+        "- Regra das vagas novas (determinística): a política com menos gladiadores nos 64 "
+        "(empate: survival, offense, economy) e, dentro dela, o perfil com menos vagas novas "
+        "nessa política (empate: menos vagas novas no total; depois conservador). Cada grupo "
+        "continua a própria numeração de tentativas depois da última da geração original, com "
+        "as seeds v2 e o mesmo BotExperimental (linha de aposta e matriz de extração do "
+        "perfil).",
+        f"- {r['tentativas']} runs no preenchimento: {r['mortes']} mortes, {r['extracoes']} "
+        f"extrações ({r['taxa_extracao']:.1%}), {r['qualificadas']} na faixa "
+        f"(aprovação por OP: {r['taxa_aprovacao']:.1%} das extrações).",
+        "",
+    ]
+    cab = ["Grupo", "Vagas", "Primeira tentativa", "Runs", "Aceitas (tentativas)"]
+    corpo = []
+    for chave, v in pre["por_grupo"].items():
+        perfil, politica = chave.split("-")
+        corpo.append(
+            [
+                f"{PERFIL_PT[perfil]}/{politica}",
+                v["quota"],
+                f"#{v['primeira_tentativa']}",
+                v["tentativas"],
+                ", ".join(f"#{k}" for k in v["aceitas"]),
+            ]
+        )
+    linhas += _tabela(cab, corpo)
+    linhas += [
+        "### Distribuição final dos 64",
+        "",
+        "Não é a distribuição das quotas originais: ela mistura a seleção original e o "
+        "preenchimento.",
+        "",
+    ]
+    cab = ["Perfil"] + list(POLITICAS) + ["Total", "Do preenchimento"]
+    corpo = []
+    for perfil in PERFIS:
+        linha = g["distribuicao"][perfil]
+        do_pre = sum(
+            1
+            for a in g["aceitos"]
+            if a["perfil"] == perfil and a["origem"].startswith("preenchimento")
+        )
+        corpo.append(
+            [PERFIL_PT[perfil]] + [linha[p] for p in POLITICAS] + [sum(linha.values()), do_pre]
+        )
+    total = [sum(g["distribuicao"][p][pol] for p in PERFIS) for pol in POLITICAS]
+    corpo.append(["Total"] + total + [sum(total), sum(row[-1] for row in corpo)])
+    linhas += _tabela(cab, corpo)
     return linhas
 
 
@@ -992,12 +1130,12 @@ def _risco_md(g: dict) -> list[str]:
         "OP médio das extrações",
         "OP médio dos aceitos",
         "Andar médio dos aceitos",
-        "Runs por aceito",
+        "Runs por aceito na seleção original",
     ]
     corpo = []
     for p in PERFIS:
         v = g["por_perfil"][p]
-        aceitos = [a for a in g["aceitos"] if a["perfil"] == p]
+        aceitos = [a for a in g["aceitos"] if a["perfil"] == p and a["origem"] == "original"]
         corpo.append(
             [
                 PERFIL_PT[p],
@@ -1026,6 +1164,7 @@ def _aceitos_md(g: dict) -> list[str]:
         "Nível",
         "OP",
         "Canais",
+        "Origem",
     ]
     corpo = [
         [
@@ -1039,13 +1178,15 @@ def _aceitos_md(g: dict) -> list[str]:
             a["nivel"],
             f"{a['op']:.2f}",
             ", ".join(a["arquetipos"]) or "—",
+            ORIGEM_PT[a["origem"]],
         ]
         for a in g["aceitos"]
     ]
     linhas += _tabela(cab, corpo)
     linhas += [
         "Snapshots canônicos em `snapshots/`, metadados e assinatura de cada build em "
-        "`gladiadores.json`, e cada tentativa em `runs.jsonl`.",
+        "`gladiadores.json`, e cada tentativa em `runs.jsonl` (geração original) e "
+        "`runs_preenchimento.jsonl` (preenchimento).",
         "",
     ]
     return linhas
@@ -1069,6 +1210,7 @@ def _ficha(participante, gladiador: dict) -> dict:
         "rotulo": espec.rotulo,
         "foco": espec.foco,
         "arquetipos": gladiador["arquetipos"],
+        "origem": gladiador.get("origem", "original"),
         "cor": COR_PERFIL[espec.perfil],
         "nivel": espec.nivel,
         "andar": espec.andar,
@@ -1496,6 +1638,22 @@ def _rng_md(dados: dict, part: dict) -> list[str]:
     return linhas
 
 
+def _composicao(dados: dict) -> str:
+    perfis = Counter(p["perfil"] for p in dados["participantes"])
+    preenchidos = sum(1 for p in dados["participantes"] if p["origem"].startswith("preenchimento"))
+    texto = (
+        f"- Os 64: conservador {perfis['conservador']}, moderado {perfis['moderado']}, hardcore "
+        f"{perfis['hardcore']}"
+    )
+    if preenchidos:
+        texto += (
+            f"; {64 - preenchidos} da seleção original e {preenchidos} do preenchimento. As "
+            "quotas originais 22/21/21 não foram cumpridas (o hardcore não fechou); a "
+            "distribuição final está em [`geracao.md`](geracao.md)"
+        )
+    return texto + "."
+
+
 def relatorio_md(dados: dict, copa) -> str:
     ag = dados["agregados"]
     part = {p["id"]: p for p in dados["participantes"]}
@@ -1527,6 +1685,7 @@ def relatorio_md(dados: dict, copa) -> str:
         ]
     linhas += [
         f"- OP médio {ag['op_medio']:.2f} (mínimo {ag['op_min']:.2f}, máximo {ag['op_max']:.2f}).",
+        _composicao(dados),
         f"- 63 partidas, {ag['rodadas_total']} rodadas, {ag['golpes_total']} golpes "
         f"({ag['golpes_conectados']} conectados), {ag['criticos_total']} críticos.",
         f"- O favorito (OP maior) venceu {ag['favoritos']} das 63 partidas; houve "
@@ -1899,7 +2058,19 @@ def _kpis(dados: dict, g: dict) -> str:
             if campeao
             else "",
         ),
-        ("Runs PvE", str(t["tentativas"]), f"{t['mortes']} mortes · {t['extracoes']} extrações"),
+        (
+            "Runs PvE",
+            str(
+                t["tentativas"]
+                + (g["preenchimento"]["resumo"]["tentativas"] if g.get("preenchimento") else 0)
+            ),
+            f"{t['tentativas']} na geração original"
+            + (
+                f" · {g['preenchimento']['resumo']['tentativas']} no preenchimento"
+                if g.get("preenchimento")
+                else ""
+            ),
+        ),
         (
             "Extrações na faixa",
             str(t["qualificadas"]),
@@ -2074,11 +2245,25 @@ def dashboard_html(dados: dict, svgs: dict, g: dict) -> str:
 
 def _resumo_geracao(g: dict) -> str:
     t = g["total"]
-    return (
-        f"{t['tentativas']} runs reais de Guerreiro, desde o nível 1: {t['mortes']} mortes, "
-        f"{t['extracoes']} extrações, {t['qualificadas']} na faixa de OP 20–30. A agenda de risco "
-        f"mudou {t['taxa_divergencia']:.1%} das decisões de mapa em relação ao cérebro canônico. "
-        f"OP dos aceitos de {g['op_aceitos']['min']:.2f} a {g['op_aceitos']['max']:.2f}."
+    final = Counter(a["perfil"] for a in g["aceitos"])
+    texto = (
+        f"Geração original: {t['tentativas']} runs reais de Guerreiro, desde o nível 1: "
+        f"{t['mortes']} mortes, {t['extracoes']} extrações, {t['qualificadas']} na faixa de OP "
+        f"20–30. A agenda de risco mudou {t['taxa_divergencia']:.1%} das decisões de mapa em "
+        "relação ao cérebro canônico. "
+    )
+    pre = g.get("preenchimento")
+    if pre:
+        r = pre["resumo"]
+        novos = sum(1 for a in g["aceitos"] if a["origem"].startswith("preenchimento"))
+        texto += (
+            f"O hardcore não fechou a quota (ficou em {final['hardcore']}/21) e, por decisão do "
+            f"usuário, {novos} vagas foram preenchidas com {r['tentativas']} runs novas de "
+            "conservador e moderado. "
+        )
+    return texto + (
+        f"Os 64: conservador {final['conservador']}, moderado {final['moderado']}, hardcore "
+        f"{final['hardcore']}; OP de {g['op_aceitos']['min']:.2f} a {g['op_aceitos']['max']:.2f}."
     )
 
 
@@ -2088,7 +2273,8 @@ def _linhas_participantes(lista: list[dict]) -> str:
         resultado = "Campeão" if p["campeao"] else _e(NOME_DA_FASE[p["fase"]])
         linhas.append(
             f"<tr><td>{p['id']}</td><td>{_dot(p['perfil'])}{_e(p['nome'])}</td>"
-            f"<td>{_e(p['perfil_pt'])}/{_e(p['politica'])}</td><td class=n>{p['andar']}</td>"
+            f"<td>{_e(p['perfil_pt'])}/{_e(p['politica'])}{_marca_origem(p)}</td>"
+            f"<td class=n>{p['andar']}</td>"
             f"<td class=n>{p['nivel']}</td><td class=n>{p['op']:.2f}</td>"
             f"<td class=n>{p['hp']}</td><td class=n>{p['mp']}</td><td class=n>{p['st']}</td>"
             f"<td class=n>{p['ag']}</td><td class=n>{p['df']}</td>"
@@ -2096,6 +2282,10 @@ def _linhas_participantes(lista: list[dict]) -> str:
             f"<td class=n>{p['vitorias']}</td><td>{resultado}</td></tr>"
         )
     return "".join(linhas)
+
+
+def _marca_origem(p: dict) -> str:
+    return "" if p["origem"] == "original" else ' <span class="tag">preench.</span>'
 
 
 def _gladiador_html(p: dict) -> str:
@@ -2249,7 +2439,14 @@ def escrever_tudo(copa, diagnostico: list[dict], pasta: Path | None = None, *, p
             caminhos.append(pasta / ARQUIVO_PDF)
         else:
             print(motivo)
-    for nome in (ARQUIVO_GLADIADORES, ARQUIVO_RUNS, ARQUIVO_PILOTO, ARQUIVO_DIAGNOSTICO):
+    for nome in (
+        ARQUIVO_GLADIADORES,
+        ARQUIVO_RUNS,
+        ARQUIVO_RUNS_PREENCHIMENTO,
+        ARQUIVO_PLANO,
+        ARQUIVO_PILOTO,
+        ARQUIVO_DIAGNOSTICO,
+    ):
         if (pasta / nome).exists():
             caminhos.append(pasta / nome)
     return caminhos
