@@ -1,0 +1,217 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6364,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "enhancement_level": 1,
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Armadura de Espinhos",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas Rasas"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 7.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Aço",
+   "socket_count": 3
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "name": "Machado Terrível",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Espada Longa",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 4409,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Palha"
+  },
+  {
+   "name": "Tamancos de Madeira"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Túnica do Fluxo",
+   "socket_count": 1
+  },
+  {
+   "name": "Colete de Pano"
+  },
+  {
+   "name": "Botas de Ferro",
+   "socket_count": 2
+  },
+  {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  {
+   "name": "Poção de Cura Grande"
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 2,
+  "gold_earned": 22497,
+  "gold_from_combat": 17190,
+  "gold_from_interest": 1121,
+  "gold_from_sale": 4186,
+  "gold_spent": 16133,
+  "gold_spent_on_consumable": 263,
+  "gold_spent_on_enchant": 747,
+  "gold_spent_on_enhancement": 2823,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 5133,
+  "gold_spent_on_recovery": 2681,
+  "gold_spent_on_socket": 150,
+  "interest_payments": 17,
+  "items_dropped": 36,
+  "items_equipped": 25,
+  "items_sold": 20,
+  "max_gold_held": 6869,
+  "paid_exits": 19,
+  "purchases": 65
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 606,
+ "passives": [
+  "olho_aguia",
+  "oraculo_partido",
+  "passos_leves",
+  "essencia_fluida",
+  "fio_serrilhado",
+  "bencao_divina",
+  "musculos_aco",
+  "cabeca_dura",
+  "essencia_fluida",
+  "mente_serena",
+  "heranca_do_abismo",
+  "toque_dragao",
+  "heranca_do_abismo",
+  "odio_antigo",
+  "olho_aguia",
+  "essencia_fluida",
+  "passo_de_corca",
+  "odio_baixo",
+  "toque_dragao",
+  "coracao_ferro",
+  "olho_aguia",
+  "musculos_aco"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "cutelada",
+  "escudo_protetor",
+  "fio_no_rebite",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "investida",
+  "investida_de_ariete",
+  "marca_do_acougueiro",
+  "n_curativo_de_campo",
+  "n_guarda_alta",
+  "n_hora_do_arauto",
+  "n_mao_que_nao_treme",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "postura_de_muro",
+  "provocacao",
+  "quebra_guarda",
+  "soco_de_placa",
+  "veterania"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_duplo",
+  "2": "n_mira_calma",
+  "3": "provocacao",
+  "4": "veterania"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 234
+}

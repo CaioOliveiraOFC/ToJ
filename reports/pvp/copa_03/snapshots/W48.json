@@ -1,0 +1,202 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4591,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 15.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura Divina",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 10.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Couro"
+  },
+  "Ring2": null,
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Bastão Cru"
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5319,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Lança de Madeira"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 9.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  {
+   "name": "Sapatos de Couro"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Tamancos de Madeira"
+  },
+  {
+   "name": "Sandálias de Tecido"
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 17144,
+  "gold_from_combat": 12071,
+  "gold_from_interest": 848,
+  "gold_from_sale": 4225,
+  "gold_spent": 12553,
+  "gold_spent_on_consumable": 391,
+  "gold_spent_on_enchant": 2453,
+  "gold_spent_on_enhancement": 658,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 5101,
+  "gold_spent_on_recovery": 453,
+  "gold_spent_on_socket": 355,
+  "interest_payments": 16,
+  "items_dropped": 28,
+  "items_equipped": 20,
+  "items_sold": 17,
+  "max_gold_held": 6089,
+  "paid_exits": 17,
+  "purchases": 51
+ },
+ "level": 20,
+ "map_state": null,
+ "mp": 208,
+ "passives": [
+  "postura_fechada",
+  "sede_silenciosa",
+  "sede_silenciosa",
+  "postura_fechada",
+  "escudo_fe",
+  "toque_dragao",
+  "casco_calejado",
+  "postura_fechada",
+  "postura_fechada",
+  "bebida_deuses",
+  "passos_leves",
+  "pele_de_sal",
+  "sangue_guerreiro",
+  "coracao_ferro",
+  "casco_calejado",
+  "passo_de_corca",
+  "musculos_aco",
+  "passos_leves",
+  "sangue_guerreiro"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida_de_ariete",
+  "marca_do_acougueiro",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "postura_de_muro",
+  "sangue_nos_olhos",
+  "soco_de_placa"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "golpe_poderoso": 1
+ },
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "n_respirar_fundo",
+  "3": "n_mira_calma",
+  "4": "n_olho_treinado"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 248
+}

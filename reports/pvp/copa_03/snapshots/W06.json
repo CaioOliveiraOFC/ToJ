@@ -1,0 +1,251 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3424,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Couro"
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    },
+    {
+     "gem_type": "Safira",
+     "level": 4
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 4.0
+    }
+   ],
+   "name": "Capacete de Couro"
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Botas de Ferro",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "name": "Porrete"
+  },
+  "Weapon2": {
+   "name": "Gravetos Mágicos"
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 4349,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Anel de Couro"
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 2
+  },
+  {
+   "name": "Espada da Vingança",
+   "socket_count": 2
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Machado Terrível",
+   "socket_count": 3
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Tamancos de Madeira"
+  },
+  {
+   "name": "Manoplas de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Chapéu Encantado",
+   "socket_count": 1
+  },
+  {
+   "name": "Manto do Assassino",
+   "socket_count": 3
+  },
+  {
+   "name": "Anel de Ouro"
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 5,
+  "gold_earned": 20045,
+  "gold_from_combat": 15049,
+  "gold_from_interest": 946,
+  "gold_from_sale": 4050,
+  "gold_spent": 16621,
+  "gold_spent_on_consumable": 2956,
+  "gold_spent_on_enchant": 370,
+  "gold_spent_on_enhancement": 1953,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 5285,
+  "gold_spent_on_recovery": 913,
+  "gold_spent_on_socket": 808,
+  "interest_payments": 18,
+  "items_dropped": 40,
+  "items_equipped": 57,
+  "items_sold": 18,
+  "max_gold_held": 5347,
+  "paid_exits": 19,
+  "purchases": 55
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 288,
+ "passives": [
+  "passo_de_corca",
+  "sangue_guerreiro",
+  "reserva_arcana",
+  "sangue_guerreiro",
+  "pele_de_sal",
+  "casco_calejado",
+  "pele_grossa",
+  "coracao_ferro",
+  "postura_fechada",
+  "mente_serena",
+  "instinto_frio",
+  "pele_grossa",
+  "olho_de_cacador",
+  "coracao_ferro",
+  "pele_de_sal",
+  "sede_silenciosa",
+  "odio_baixo",
+  "musculos_aco",
+  "sangue_guerreiro",
+  "sede_silenciosa"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "golpe_poderoso",
+  "grito_guerra",
+  "marca_do_acougueiro",
+  "n_couro_batido",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "olho_de_ferreiro",
+  "pisada_de_ferro",
+  "quebra_guarda",
+  "rasgo_de_gancho",
+  "respiracao_de_forja",
+  "soco_de_placa",
+  "tomar_folego",
+  "veterania"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "tomar_folego",
+  "2": "n_mira_calma",
+  "3": "n_ritmo_de_duelo",
+  "4": "cutelada"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 3310
+}

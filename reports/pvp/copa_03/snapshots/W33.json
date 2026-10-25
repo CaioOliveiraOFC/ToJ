@@ -1,0 +1,180 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4054,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": {
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura Titânica",
+   "socket_count": 3
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "name": "Luvas de Titânio",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Calça de Pano"
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Espada de Treino"
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 5233,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Espada de Treino"
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 20016,
+  "gold_from_combat": 13374,
+  "gold_from_interest": 670,
+  "gold_from_sale": 5972,
+  "gold_spent": 15962,
+  "gold_spent_on_consumable": 2835,
+  "gold_spent_on_enhancement": 2357,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 5901,
+  "gold_spent_on_recovery": 1452,
+  "gold_spent_on_socket": 275,
+  "interest_payments": 16,
+  "items_dropped": 34,
+  "items_equipped": 19,
+  "items_sold": 25,
+  "max_gold_held": 7171,
+  "paid_exits": 17,
+  "purchases": 63
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 167,
+ "passives": [
+  "fio_serrilhado",
+  "imortalidade",
+  "olho_aguia",
+  "voz_no_escuro",
+  "odio_antigo",
+  "voz_no_escuro",
+  "pele_grossa",
+  "sangue_guerreiro",
+  "furia_berserker",
+  "heranca_do_abismo",
+  "heranca_do_abismo",
+  "odio_antigo",
+  "furia_berserker",
+  "olho_de_cacador",
+  "odio_baixo",
+  "pele_grossa",
+  "pulso_certeiro",
+  "olho_de_cacador",
+  "fio_serrilhado",
+  "musculos_aco"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "escudo_protetor",
+  "fio_no_rebite",
+  "fortalecimento",
+  "golpe_poderoso",
+  "investida",
+  "mao_dupla",
+  "n_areia_no_chao",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_lamina_assentada",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "provocacao",
+  "soco_de_placa",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "mao_dupla": 4
+ },
+ "skills": {
+  "1": "mao_dupla",
+  "2": "tremor_de_bigorna",
+  "3": "n_estocada_seca",
+  "4": "n_lamina_assentada"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1397
+}

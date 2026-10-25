@@ -1,0 +1,250 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6167,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 5
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    }
+   ],
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Lã"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 5.0
+    }
+   ],
+   "name": "Capacete de Couro"
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Couro"
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 5
+    }
+   ],
+   "name": "Botas de Corrida",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "name": "Machado de Batalha",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Espada de Treino"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [
+  {
+   "gem_type": "Topázio",
+   "level": 5
+  }
+ ],
+ "hp": 7593,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Lança de Madeira"
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Lâmina da Tempestade",
+   "socket_count": 1
+  },
+  {
+   "name": "Clava Pesada"
+  },
+  {
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Machado Enferrujado"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 14.0
+    }
+   ],
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 9.0
+    }
+   ],
+   "name": "Machado Terrível",
+   "socket_count": 3
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 33268,
+  "gold_from_combat": 19156,
+  "gold_from_interest": 1765,
+  "gold_from_sale": 12347,
+  "gold_spent": 27101,
+  "gold_spent_on_consumable": 2455,
+  "gold_spent_on_enchant": 2205,
+  "gold_spent_on_enhancement": 1910,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 12855,
+  "gold_spent_on_recovery": 1423,
+  "gold_spent_on_socket": 980,
+  "interest_payments": 19,
+  "items_dropped": 51,
+  "items_equipped": 42,
+  "items_sold": 36,
+  "max_gold_held": 15235,
+  "paid_exits": 20,
+  "purchases": 63
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 502,
+ "passives": [
+  "pele_grossa",
+  "bebida_deuses",
+  "essencia_fluida",
+  "pele_grossa",
+  "escudo_fe",
+  "passos_leves",
+  "boca_de_sangue",
+  "coracao_ferro",
+  "sangue_guerreiro",
+  "pele_de_sal",
+  "sangue_guerreiro",
+  "odio_baixo",
+  "respiracao_contada",
+  "passo_de_corca",
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "escudo_fe",
+  "furia_berserker",
+  "mente_serena",
+  "punho_atordoante",
+  "reserva_arcana",
+  "passos_leves"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "juramento_da_muralha",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_passo_lateral",
+  "n_travar_o_pulso",
+  "postura_de_muro",
+  "quebra_guarda",
+  "rasgo_de_gancho",
+  "sangue_nos_olhos"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "quebra_guarda",
+  "3": "n_guarda_cruzada",
+  "4": "n_areia_no_chao"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1256
+}

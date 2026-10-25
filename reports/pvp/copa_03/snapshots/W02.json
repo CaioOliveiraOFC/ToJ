@@ -1,0 +1,226 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5889,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto de Prata",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Colete de Pano"
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 9.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Calça de Pano"
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Espada Longa",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Espada de Treino"
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [
+  {
+   "gem_type": "Rubi",
+   "level": 4
+  },
+  {
+   "gem_type": "Topázio",
+   "level": 4
+  }
+ ],
+ "hp": 5031,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Clava Pesada"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 1
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Espada do Universo",
+   "socket_count": 3
+  },
+  {
+   "name": "Espada da Vingança",
+   "socket_count": 2
+  },
+  {
+   "name": "Espada da Vingança",
+   "socket_count": 3
+  },
+  {
+   "name": "Amuleto da Imortalidade",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 26448,
+  "gold_from_combat": 18183,
+  "gold_from_interest": 1283,
+  "gold_from_sale": 6982,
+  "gold_spent": 20559,
+  "gold_spent_on_consumable": 2750,
+  "gold_spent_on_enchant": 1718,
+  "gold_spent_on_enhancement": 398,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 8013,
+  "gold_spent_on_recovery": 2602,
+  "gold_spent_on_socket": 742,
+  "interest_payments": 19,
+  "items_dropped": 31,
+  "items_equipped": 22,
+  "items_sold": 18,
+  "max_gold_held": 10710,
+  "paid_exits": 19,
+  "purchases": 55
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 338,
+ "passives": [
+  "passo_de_corca",
+  "passos_leves",
+  "pele_grossa",
+  "postura_fechada",
+  "escudo_fe",
+  "essencia_fluida",
+  "sangue_guerreiro",
+  "pele_de_sal",
+  "bebida_deuses",
+  "olho_aguia",
+  "pele_de_sal",
+  "mente_serena",
+  "essencia_fluida",
+  "musculos_aco",
+  "boca_de_sangue",
+  "postura_fechada",
+  "alma_eterna",
+  "casco_calejado",
+  "coracao_ferro",
+  "sangue_guerreiro",
+  "pele_de_sal",
+  "casco_calejado"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "cutelada",
+  "ferro_contra_ferro",
+  "furia",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "olho_de_ferreiro",
+  "provocacao",
+  "quebra_guarda",
+  "respiracao_de_forja",
+  "soco_de_placa",
+  "tomar_folego"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "n_respirar_fundo",
+  "3": "soco_de_placa",
+  "4": "n_guarda_cruzada"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1550
+}

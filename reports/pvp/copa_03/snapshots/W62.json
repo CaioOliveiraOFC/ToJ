@@ -1,0 +1,229 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6148,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 4.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto de Ouro",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Peitoral de Cota",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    },
+    null
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": null,
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Bronze"
+  },
+  "Ring2": {
+   "name": "Anel de Couro"
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    }
+   ],
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Espada Lendária",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 4107,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 12.0
+    }
+   ],
+   "name": "Amuleto de Madeira"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Gibão de Couro"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Botas de Pano"
+  },
+  {
+   "name": "Amuleto da Força",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Cajado do Oblivion",
+   "socket_count": 3
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 20153,
+  "gold_from_combat": 14938,
+  "gold_from_interest": 1092,
+  "gold_from_sale": 4123,
+  "gold_spent": 14005,
+  "gold_spent_on_consumable": 275,
+  "gold_spent_on_enchant": 1035,
+  "gold_spent_on_enhancement": 1713,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 6630,
+  "gold_spent_on_recovery": 168,
+  "gold_spent_on_socket": 479,
+  "interest_payments": 18,
+  "items_dropped": 34,
+  "items_equipped": 20,
+  "items_sold": 25,
+  "max_gold_held": 6148,
+  "paid_exits": 18,
+  "purchases": 49
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 275,
+ "passives": [
+  "coracao_ferro",
+  "coracao_ferro",
+  "sede_sangue",
+  "musculos_aco",
+  "voz_no_escuro",
+  "furia_berserker",
+  "lamina_lendaria",
+  "odio_antigo",
+  "musculos_aco",
+  "odio_baixo",
+  "odio_antigo",
+  "instinto_frio",
+  "passos_leves",
+  "pulso_certeiro",
+  "furia_berserker",
+  "passo_de_corca",
+  "cabeca_dura",
+  "olho_aguia",
+  "toque_dragao",
+  "sangue_toxico"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "couraca_improvisada",
+  "cutelada",
+  "fio_no_rebite",
+  "fortalecimento",
+  "furia",
+  "golpe_poderoso",
+  "grito_guerra",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_pausa_util",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "pisada_de_ferro",
+  "sangue_nos_olhos",
+  "soco_de_placa",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 3,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "furia",
+  "2": "soco_de_placa",
+  "3": "n_travar_o_pulso",
+  "4": "tremor_de_bigorna"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 315
+}

@@ -1,0 +1,202 @@
+[
+ {
+  "chave": "final-1",
+  "titulo": "Final — lubatv × fer",
+  "vencedor_oficial": "W64",
+  "perdedor_oficial": "W23",
+  "op": [
+   29.9814453125,
+   29.1748046875
+  ],
+  "zebra_oficial": false,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 174,
+  "taxa": 0.87,
+  "ic95": [
+   0.8163353692726989,
+   0.9097185863477437
+  ],
+  "rodadas_media": 36.825
+ },
+ {
+  "chave": "fase32-15",
+  "titulo": "Fase de 32 15 — RazaH × jukes",
+  "vencedor_oficial": "W03",
+  "perdedor_oficial": "W15",
+  "op": [
+   28.1376953125,
+   29.0595703125
+  ],
+  "zebra_oficial": true,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 169,
+  "taxa": 0.845,
+  "ic95": [
+   0.7883919410627441,
+   0.8886043148536146
+  ],
+  "rodadas_media": 24.82
+ },
+ {
+  "chave": "semifinal-1",
+  "titulo": "Semifinal 1 — gafallen × lubatv",
+  "vencedor_oficial": "W23",
+  "perdedor_oficial": "W37",
+  "op": [
+   29.1748046875,
+   29.8662109375
+  ],
+  "zebra_oficial": true,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 126,
+  "taxa": 0.63,
+  "ic95": [
+   0.5612250134987606,
+   0.6938750249624759
+  ],
+  "rodadas_media": 32.24
+ },
+ {
+  "chave": "oitavas-4",
+  "titulo": "Oitavas 4 — lubatv × aXtLOL",
+  "vencedor_oficial": "W23",
+  "perdedor_oficial": "W43",
+  "op": [
+   29.1748046875,
+   29.7509765625
+  ],
+  "zebra_oficial": true,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 181,
+  "taxa": 0.905,
+  "ic95": [
+   0.8563973488560237,
+   0.9383373863501365
+  ],
+  "rodadas_media": 29.88
+ },
+ {
+  "chave": "quartas-2",
+  "titulo": "Quartas 2 — MeikodRJ × lubatv",
+  "vencedor_oficial": "W23",
+  "perdedor_oficial": "W26",
+  "op": [
+   29.1748046875,
+   29.7509765625
+  ],
+  "zebra_oficial": true,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 157,
+  "taxa": 0.785,
+  "ic95": [
+   0.7229757022632792,
+   0.836282074363278
+  ],
+  "rodadas_media": 29.59
+ },
+ {
+  "chave": "fase64-29",
+  "titulo": "Fase de 64 29 — RazaH × mount",
+  "vencedor_oficial": "W15",
+  "perdedor_oficial": "W25",
+  "op": [
+   29.0595703125,
+   29.5205078125
+  ],
+  "zebra_oficial": true,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 106,
+  "taxa": 0.53,
+  "ic95": [
+   0.46091557335361155,
+   0.5979536662912893
+  ],
+  "rodadas_media": 29.98
+ },
+ {
+  "chave": "fase32-2",
+  "titulo": "Fase de 32 2 — gafallen × loud_thurzin",
+  "vencedor_oficial": "W37",
+  "perdedor_oficial": "W32",
+  "op": [
+   29.8662109375,
+   29.8662109375
+  ],
+  "zebra_oficial": false,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 197,
+  "taxa": 0.985,
+  "ic95": [
+   0.9568335194437211,
+   0.9948858548155076
+  ],
+  "rodadas_media": 26.915
+ },
+ {
+  "chave": "quartas-1",
+  "titulo": "Quartas 1 — gafallen × LuquEt4",
+  "vencedor_oficial": "W37",
+  "perdedor_oficial": "W34",
+  "op": [
+   29.8662109375,
+   29.8662109375
+  ],
+  "zebra_oficial": false,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 179,
+  "taxa": 0.895,
+  "ic95": [
+   0.8448186177864638,
+   0.9302930375380627
+  ],
+  "rodadas_media": 29.82
+ },
+ {
+  "chave": "fase32-16",
+  "titulo": "Fase de 32 16 — sacy × RNakano",
+  "vencedor_oficial": "W42",
+  "perdedor_oficial": "W16",
+  "op": [
+   29.6357421875,
+   29.5205078125
+  ],
+  "zebra_oficial": false,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 200,
+  "taxa": 1.0,
+  "ic95": [
+   0.9811539940816791,
+   1.0
+  ],
+  "rodadas_media": 60.33
+ },
+ {
+  "chave": "oitavas-1",
+  "titulo": "Oitavas 1 — Smzinho × gafallen",
+  "vencedor_oficial": "W37",
+  "perdedor_oficial": "W35",
+  "op": [
+   29.8662109375,
+   29.7509765625
+  ],
+  "zebra_oficial": false,
+  "repeticoes": 200,
+  "inconclusivos": 0,
+  "vitorias_do_vencedor_oficial": 83,
+  "taxa": 0.415,
+  "ic95": [
+   0.3489416917324964,
+   0.48426212927361817
+  ],
+  "rodadas_media": 21.315
+ }
+]

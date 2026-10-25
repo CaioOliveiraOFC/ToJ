@@ -1,0 +1,458 @@
+{
+ "vagas": 64,
+ "tentativas_da_geracao_original": 1315,
+ "selecao_original": [
+  {
+   "perfil": "conservador",
+   "politica": "survival",
+   "tentativa": 7,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "survival",
+   "tentativa": 13,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "survival",
+   "tentativa": 15,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "survival",
+   "tentativa": 19,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "survival",
+   "tentativa": 20,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "survival",
+   "tentativa": 24,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "survival",
+   "tentativa": 30,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "survival",
+   "tentativa": 36,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "offense",
+   "tentativa": 4,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "offense",
+   "tentativa": 7,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "offense",
+   "tentativa": 17,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "offense",
+   "tentativa": 21,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "offense",
+   "tentativa": 22,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "offense",
+   "tentativa": 24,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "offense",
+   "tentativa": 33,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "economy",
+   "tentativa": 3,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "economy",
+   "tentativa": 15,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "economy",
+   "tentativa": 23,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "economy",
+   "tentativa": 24,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "economy",
+   "tentativa": 26,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "economy",
+   "tentativa": 32,
+   "origem": "original"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "economy",
+   "tentativa": 36,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "survival",
+   "tentativa": 9,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "survival",
+   "tentativa": 11,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "survival",
+   "tentativa": 14,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "survival",
+   "tentativa": 15,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "survival",
+   "tentativa": 18,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "survival",
+   "tentativa": 19,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "survival",
+   "tentativa": 25,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "offense",
+   "tentativa": 6,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "offense",
+   "tentativa": 9,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "offense",
+   "tentativa": 37,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "offense",
+   "tentativa": 45,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "offense",
+   "tentativa": 47,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "offense",
+   "tentativa": 48,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "offense",
+   "tentativa": 73,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "tentativa": 2,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "tentativa": 6,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "tentativa": 43,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "tentativa": 44,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "tentativa": 50,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "tentativa": 57,
+   "origem": "original"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "tentativa": 61,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "survival",
+   "tentativa": 42,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "survival",
+   "tentativa": 179,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "survival",
+   "tentativa": 199,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "survival",
+   "tentativa": 212,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "survival",
+   "tentativa": 232,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "offense",
+   "tentativa": 66,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "offense",
+   "tentativa": 164,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "offense",
+   "tentativa": 217,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "economy",
+   "tentativa": 3,
+   "origem": "original"
+  },
+  {
+   "perfil": "hardcore",
+   "politica": "economy",
+   "tentativa": 326,
+   "origem": "original"
+  }
+ ],
+ "preenchimento": [
+  {
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "preenchimento_novo"
+  },
+  {
+   "perfil": "moderado",
+   "politica": "survival",
+   "origem": "preenchimento_novo"
+  }
+ ],
+ "primeira_tentativa": {
+  "conservador-survival": 37,
+  "conservador-offense": 34,
+  "conservador-economy": 37,
+  "moderado-survival": 26,
+  "moderado-offense": 74,
+  "moderado-economy": 64
+ },
+ "interrompidas": {
+  "hardcore-offense": [
+   360
+  ],
+  "hardcore-economy": [
+   450
+  ]
+ },
+ "decisao": "Depois de 1315 tentativas da geração original (conservador 22/22, moderado 21/21, hardcore 10/21), o usuário retirou a obrigatoriedade das quotas: a seleção original fica, e as vagas restantes vão para novas runs v2 de conservador e moderado, perto de 50/50, com as políticas equilibradas.",
+ "grupos_do_preenchimento": {
+  "conservador-survival": {
+   "quota": 1,
+   "primeira_tentativa": 37,
+   "tentativas": 9,
+   "aceitas": [
+    44
+   ]
+  },
+  "conservador-offense": {
+   "quota": 2,
+   "primeira_tentativa": 34,
+   "tentativas": 14,
+   "aceitas": [
+    35,
+    43
+   ]
+  },
+  "conservador-economy": {
+   "quota": 2,
+   "primeira_tentativa": 37,
+   "tentativas": 4,
+   "aceitas": [
+    39,
+    40
+   ]
+  },
+  "moderado-survival": {
+   "quota": 1,
+   "primeira_tentativa": 26,
+   "tentativas": 11,
+   "aceitas": [
+    33
+   ]
+  },
+  "moderado-offense": {
+   "quota": 2,
+   "primeira_tentativa": 74,
+   "tentativas": 34,
+   "aceitas": [
+    83,
+    101
+   ]
+  },
+  "moderado-economy": {
+   "quota": 3,
+   "primeira_tentativa": 64,
+   "tentativas": 38,
+   "aceitas": [
+    80,
+    93,
+    100
+   ]
+  }
+ },
+ "tentativas_do_preenchimento": 110,
+ "origens": {
+  "original": 53,
+  "preenchimento_novo": 11
+ }
+}

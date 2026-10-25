@@ -1,0 +1,235 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 11047,
+ "dungeon_level": 17,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 7.0
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Armadura de Couro"
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 3.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    },
+    {
+     "gem_type": "Safira",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 3
+  },
+  "Legs": {
+   "name": "Perneiras de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Botas de Pano"
+  },
+  "Weapon1": {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Espada de Aço",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 17,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 3973,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    }
+   ],
+   "name": "Machado Terrível",
+   "socket_count": 2
+  },
+  {
+   "name": "Amuleto de Madeira"
+  },
+  {
+   "name": "Perneiras de Couro",
+   "origin": "starter"
+  },
+  {
+   "name": "Túnica de Tecido"
+  },
+  {
+   "name": "Amuleto de Concha"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Palha"
+  }
+ ],
+ "last_interest_floor": 16,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 23125,
+  "gold_from_combat": 19870,
+  "gold_from_interest": 1322,
+  "gold_from_sale": 1933,
+  "gold_spent": 12078,
+  "gold_spent_on_consumable": 58,
+  "gold_spent_on_enchant": 1593,
+  "gold_spent_on_enhancement": 1543,
+  "gold_spent_on_exit_fee": 2694,
+  "gold_spent_on_gear": 5716,
+  "gold_spent_on_socket": 474,
+  "interest_payments": 16,
+  "items_dropped": 30,
+  "items_equipped": 18,
+  "items_sold": 19,
+  "max_gold_held": 11047,
+  "paid_exits": 16,
+  "purchases": 40
+ },
+ "level": 20,
+ "map_state": null,
+ "mp": 763,
+ "passives": [
+  "escudo_fe",
+  "reserva_arcana",
+  "sede_silenciosa",
+  "sede_silenciosa",
+  "ritmo_profano",
+  "mente_serena",
+  "lamina_do_juizo",
+  "divida_de_ouro",
+  "alquimia_do_desespero",
+  "sede_silenciosa",
+  "ritmo_profano",
+  "reserva_arcana",
+  "maos_midas",
+  "maos_midas",
+  "maos_midas",
+  "sede_silenciosa",
+  "sede_silenciosa",
+  "ritmo_profano",
+  "sangue_guerreiro"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "cutelada",
+  "escudo_protetor",
+  "furia",
+  "golpe_poderoso",
+  "grito_guerra",
+  "juramento_da_muralha",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_lamina_assentada",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "pisada_de_ferro",
+  "provocacao",
+  "quebra_guarda",
+  "soco_de_placa",
+  "tomar_folego"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "n_mira_calma": 3,
+  "quebra_guarda": 1
+ },
+ "skills": {
+  "1": "tomar_folego",
+  "2": "n_mira_calma",
+  "3": "escudo_protetor",
+  "4": "quebra_guarda"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1177
+}

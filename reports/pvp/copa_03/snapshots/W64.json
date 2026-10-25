@@ -1,0 +1,223 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4516,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Placa Pesada"
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Luvas de Aço",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "crit_chance",
+     "value": 7.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Corrida",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5977,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Cajado de Cristal",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Palha"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 34397,
+  "gold_from_combat": 19389,
+  "gold_from_interest": 1861,
+  "gold_from_sale": 13147,
+  "gold_spent": 29881,
+  "gold_spent_on_consumable": 455,
+  "gold_spent_on_enchant": 1562,
+  "gold_spent_on_enhancement": 3933,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 17162,
+  "gold_spent_on_recovery": 450,
+  "gold_spent_on_socket": 1046,
+  "interest_payments": 20,
+  "items_dropped": 40,
+  "items_equipped": 23,
+  "items_sold": 32,
+  "max_gold_held": 15425,
+  "paid_exits": 20,
+  "purchases": 61
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 344,
+ "passives": [
+  "sangue_guerreiro",
+  "essencia_fluida",
+  "coracao_ferro",
+  "instinto_frio",
+  "olho_aguia",
+  "heranca_do_abismo",
+  "bencao_divina",
+  "postura_fechada",
+  "boca_de_sangue",
+  "pele_grossa",
+  "coracao_ferro",
+  "furia_berserker",
+  "coracao_ferro",
+  "essencia_fluida",
+  "vulto",
+  "essencia_fluida",
+  "coracao_ferro",
+  "boca_de_sangue",
+  "musculos_aco",
+  "essencia_fluida",
+  "sede_sangue",
+  "escudo_fe"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "fortalecimento",
+  "golpe_poderoso",
+  "investida",
+  "juramento_da_muralha",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "olho_de_ferreiro",
+  "pisada_de_ferro",
+  "quebra_guarda",
+  "rasgo_de_gancho",
+  "soco_de_placa"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "juramento_da_muralha",
+  "3": "soco_de_placa",
+  "4": "n_respirar_fundo"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 3705
+}

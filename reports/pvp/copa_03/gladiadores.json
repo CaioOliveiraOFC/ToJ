@@ -1,0 +1,9417 @@
+{
+ "copa": "Copa Arena 03",
+ "semente_principal": 20261025,
+ "aviso": "Nicknames são identificadores fictícios de simulação, sem participação ou endosso das pessoas reais; foram sorteados independentemente das builds, dos perfis e da chave.",
+ "gladiadores": [
+  {
+   "id": "W01",
+   "nick": "dona",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 7,
+   "seed": "2832237389801836401",
+   "andar_de_extracao": 21,
+   "nivel": 23,
+   "op": 29.0595703125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W01.json",
+   "sha256": "59833bbba130e4c425707d18c6900b7b158fda4eb5bcaaca4021a1a85601bc0e",
+   "deck": [
+    "cutelada",
+    "investida",
+    "n_respirar_fundo",
+    "grito_guerra"
+   ],
+   "passivas": [
+    "coracao_ferro",
+    "sede_silenciosa",
+    "sangue_guerreiro",
+    "respiracao_contada",
+    "passo_de_corca",
+    "sangue_guerreiro",
+    "alma_eterna",
+    "passos_leves",
+    "boca_de_sangue",
+    "passo_de_corca",
+    "toque_dragao",
+    "boca_de_sangue",
+    "passos_leves",
+    "passos_leves",
+    "olho_aguia",
+    "lamina_afiada",
+    "furia_berserker",
+    "reserva_arcana",
+    "sangue_guerreiro",
+    "coracao_ferro",
+    "escudo_fe",
+    "postura_fechada"
+   ],
+   "familias": {
+    "max_hp": 6,
+    "life_steal": 3,
+    "mana_regen": 1,
+    "agility": 5,
+    "strength": 2,
+    "crit_chance": 2,
+    "max_mp": 1,
+    "damage_reduction": 2
+   },
+   "raridades": {
+    "Common": 16,
+    "Rare": 4,
+    "Epic": 2
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Lança de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Treino",
+     "raridade": "Common",
+     "mais": 2,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Titânica",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W02",
+   "nick": "alanzoka",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 13,
+   "seed": "6058608939898478784",
+   "andar_de_extracao": 20,
+   "nivel": 23,
+   "op": 28.3681640625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W02.json",
+   "sha256": "51e18e4bfb7ab6f44790cf22ac3586334dcedec86fd388e90c792113fe39db2a",
+   "deck": [
+    "golpe_poderoso",
+    "n_respirar_fundo",
+    "soco_de_placa",
+    "n_guarda_cruzada"
+   ],
+   "passivas": [
+    "passo_de_corca",
+    "passos_leves",
+    "pele_grossa",
+    "postura_fechada",
+    "escudo_fe",
+    "essencia_fluida",
+    "sangue_guerreiro",
+    "pele_de_sal",
+    "bebida_deuses",
+    "olho_aguia",
+    "pele_de_sal",
+    "mente_serena",
+    "essencia_fluida",
+    "musculos_aco",
+    "boca_de_sangue",
+    "postura_fechada",
+    "alma_eterna",
+    "casco_calejado",
+    "coracao_ferro",
+    "sangue_guerreiro",
+    "pele_de_sal",
+    "casco_calejado"
+   ],
+   "familias": {
+    "agility": 2,
+    "defense": 3,
+    "damage_reduction": 3,
+    "max_hp": 6,
+    "status_resistance": 3,
+    "potion_heal_bonus": 1,
+    "crit_chance": 1,
+    "max_mp": 1,
+    "strength": 1,
+    "life_steal": 1
+   },
+   "raridades": {
+    "Common": 15,
+    "Rare": 6,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Prata",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada Longa",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Treino",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Colete de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W03",
+   "nick": "jukes",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 15,
+   "seed": "812624488608970650",
+   "andar_de_extracao": 21,
+   "nivel": 22,
+   "op": 28.1376953125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W03.json",
+   "sha256": "138716315fb8669f7db5fc86d5666471f48db4bbf2ebccb476c767aa42c6e9b7",
+   "deck": [
+    "golpe_poderoso",
+    "n_respirar_fundo",
+    "n_mira_calma",
+    "n_leitura_de_terreno"
+   ],
+   "passivas": [
+    "bencao_divina",
+    "respiracao_contada",
+    "musculos_aco",
+    "alma_eterna",
+    "essencia_fluida",
+    "olho_aguia",
+    "pele_grossa",
+    "pele_de_sal",
+    "respiracao_contada",
+    "alma_eterna",
+    "coracao_ferro",
+    "respiracao_contada",
+    "bencao_divina",
+    "boca_de_sangue",
+    "pele_grossa",
+    "mente_serena",
+    "odio_antigo",
+    "pele_grossa",
+    "sangue_guerreiro",
+    "casco_calejado",
+    "mente_serena"
+   ],
+   "familias": {
+    "max_hp": 7,
+    "mana_regen": 3,
+    "strength": 1,
+    "crit_chance": 1,
+    "defense": 4,
+    "status_resistance": 1,
+    "life_steal": 1,
+    "max_mp": 2,
+    "damage_percent": 1
+   },
+   "raridades": {
+    "Epic": 4,
+    "Common": 14,
+    "Rare": 3
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Ouro",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Porrete",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Adaga de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W04",
+   "nick": "belrodrigues",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 19,
+   "seed": "1846572177730036279",
+   "andar_de_extracao": 19,
+   "nivel": 21,
+   "op": 27.9072265625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W04.json",
+   "sha256": "228d29c733d29115f6234b2aa3e744e7d3c13977861e50b3689d0fae2c6a1d61",
+   "deck": [
+    "furia",
+    "investida",
+    "n_folego_de_marcha",
+    "n_mira_calma"
+   ],
+   "passivas": [
+    "olho_aguia",
+    "pele_adamantio",
+    "passo_de_corca",
+    "essencia_fluida",
+    "passos_leves",
+    "sede_silenciosa",
+    "coracao_ferro",
+    "coracao_ferro",
+    "lamina_afiada",
+    "pele_grossa",
+    "postura_fechada",
+    "pele_de_sal",
+    "passo_de_corca",
+    "passo_de_corca",
+    "passos_leves",
+    "postura_fechada",
+    "coracao_ferro",
+    "musculos_aco",
+    "postura_fechada",
+    "sangue_guerreiro"
+   ],
+   "familias": {
+    "crit_chance": 2,
+    "damage_reduction": 4,
+    "agility": 5,
+    "max_hp": 5,
+    "life_steal": 1,
+    "defense": 1,
+    "status_resistance": 1,
+    "strength": 1
+   },
+   "raridades": {
+    "Common": 16,
+    "Epic": 1,
+    "Rare": 3
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 2,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Batalha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Espinhos",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Manoplas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa"
+   ]
+  },
+  {
+   "id": "W05",
+   "nick": "Dilera",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 20,
+   "seed": "3994255704300115112",
+   "andar_de_extracao": 19,
+   "nivel": 21,
+   "op": 27.9072265625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W05.json",
+   "sha256": "ae221e67db5c710db7ee3f8c4c73e351946f85507e9144077413efb4064192dc",
+   "deck": [
+    "golpe_poderoso",
+    "investida",
+    "couraca_improvisada",
+    "tomar_folego"
+   ],
+   "passivas": [
+    "pele_grossa",
+    "pele_grossa",
+    "pele_grossa",
+    "pele_grossa",
+    "sede_silenciosa",
+    "passos_leves",
+    "boca_de_sangue",
+    "ritmo_profano",
+    "poco_fundo",
+    "coracao_ferro",
+    "passo_de_corca",
+    "pele_adamantio",
+    "essencia_fluida",
+    "alquimia_do_desespero",
+    "coracao_ferro",
+    "casco_calejado",
+    "musculos_aco",
+    "passos_leves",
+    "coracao_tita",
+    "sede_silenciosa"
+   ],
+   "familias": {
+    "defense": 5,
+    "life_steal": 3,
+    "agility": 3,
+    "mana_regen": 1,
+    "max_mp": 1,
+    "max_hp": 4,
+    "damage_reduction": 1,
+    "potion_heal_bonus": 1,
+    "strength": 1
+   },
+   "raridades": {
+    "Common": 11,
+    "Rare": 6,
+    "Epic": 2,
+    "Legendary": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Gravetos Mágicos",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Adaga de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Cota de Malha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W06",
+   "nick": "Baiano",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 24,
+   "seed": "1025959111049801620",
+   "andar_de_extracao": 20,
+   "nivel": 21,
+   "op": 27.9072265625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W06.json",
+   "sha256": "840a497ae771b6d8e2b2eda1836d2091418309db29d18ed5cfc35559e7f97538",
+   "deck": [
+    "tomar_folego",
+    "n_mira_calma",
+    "n_ritmo_de_duelo",
+    "cutelada"
+   ],
+   "passivas": [
+    "passo_de_corca",
+    "sangue_guerreiro",
+    "reserva_arcana",
+    "sangue_guerreiro",
+    "pele_de_sal",
+    "casco_calejado",
+    "pele_grossa",
+    "coracao_ferro",
+    "postura_fechada",
+    "mente_serena",
+    "instinto_frio",
+    "pele_grossa",
+    "olho_de_cacador",
+    "coracao_ferro",
+    "pele_de_sal",
+    "sede_silenciosa",
+    "odio_baixo",
+    "musculos_aco",
+    "sangue_guerreiro",
+    "sede_silenciosa"
+   ],
+   "familias": {
+    "agility": 1,
+    "max_hp": 5,
+    "max_mp": 2,
+    "status_resistance": 2,
+    "defense": 3,
+    "damage_reduction": 1,
+    "precision": 2,
+    "life_steal": 2,
+    "damage_percent": 1,
+    "strength": 1
+   },
+   "raridades": {
+    "Common": 16,
+    "Rare": 4
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Porrete",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Gravetos Mágicos",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 2,
+     "gemas": 3,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W07",
+   "nick": "yayahuz",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 30,
+   "seed": "3208297028327239230",
+   "andar_de_extracao": 20,
+   "nivel": 22,
+   "op": 27.7919921875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W07.json",
+   "sha256": "3cb25dc3c55c264f82c03502093c93fc37519f32edc306a5fc58d49512efe7cc",
+   "deck": [
+    "golpe_poderoso",
+    "n_mira_calma",
+    "sede_de_batalha",
+    "tomar_folego"
+   ],
+   "passivas": [
+    "coracao_ferro",
+    "pele_grossa",
+    "escudo_fe",
+    "coracao_ferro",
+    "pele_grossa",
+    "coracao_ferro",
+    "sangue_guerreiro",
+    "casco_calejado",
+    "pele_de_sal",
+    "essencia_fluida",
+    "coracao_ferro",
+    "bebida_deuses",
+    "pele_adamantio",
+    "bebida_deuses",
+    "postura_fechada",
+    "boca_de_sangue",
+    "pele_de_sal",
+    "postura_fechada",
+    "toque_dragao",
+    "sangue_guerreiro",
+    "coracao_ferro"
+   ],
+   "familias": {
+    "max_hp": 8,
+    "defense": 3,
+    "damage_reduction": 4,
+    "status_resistance": 2,
+    "potion_heal_bonus": 2,
+    "life_steal": 1,
+    "strength": 1
+   },
+   "raridades": {
+    "Common": 14,
+    "Rare": 5,
+    "Epic": 2
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Porrete",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Adaga de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Cota Leve",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Armadura de Camisa",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Manoplas de Ferro",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W08",
+   "nick": "Tenz",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 36,
+   "seed": "4130039241501877988",
+   "andar_de_extracao": 20,
+   "nivel": 23,
+   "op": 28.7138671875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W08.json",
+   "sha256": "b443768975e3bcd4e6eff9a75d8ebc2a9c5a3ab756d4d2b1a2cbc9ce12de3080",
+   "deck": [
+    "golpe_poderoso",
+    "soco_de_placa",
+    "n_gancho_e_corda",
+    "tomar_folego"
+   ],
+   "passivas": [
+    "reserva_arcana",
+    "sede_silenciosa",
+    "sangue_guerreiro",
+    "boca_de_sangue",
+    "mente_serena",
+    "sangue_guerreiro",
+    "imortalidade",
+    "olho_de_cacador",
+    "furia_berserker",
+    "olho_aguia",
+    "poco_fundo",
+    "olho_aguia",
+    "sangue_guerreiro",
+    "pele_de_sal",
+    "sangue_guerreiro",
+    "bencao_divina",
+    "olho_aguia",
+    "boca_de_sangue",
+    "sangue_guerreiro",
+    "pele_de_sal",
+    "postura_fechada",
+    "pele_adamantio"
+   ],
+   "familias": {
+    "max_mp": 3,
+    "life_steal": 3,
+    "max_hp": 6,
+    "death_ignore": 1,
+    "precision": 1,
+    "strength": 1,
+    "crit_chance": 3,
+    "status_resistance": 2,
+    "damage_reduction": 2
+   },
+   "raridades": {
+    "Common": 16,
+    "Rare": 3,
+    "Legendary": 1,
+    "Epic": 2
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Cajado de Cristal",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Peitoral de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Sapatos de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W09",
+   "nick": "brino",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 4,
+   "seed": "18241902303696388387",
+   "andar_de_extracao": 17,
+   "nivel": 18,
+   "op": 28.0224609375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W09.json",
+   "sha256": "20fb0fdaa2e828deed1c20f9dd7b0145fda366db0f0936845638ebcd25efdc89",
+   "deck": [
+    "cutelada",
+    "investida",
+    "n_areia_no_chao",
+    "furia"
+   ],
+   "passivas": [
+    "casco_calejado",
+    "pulso_certeiro",
+    "sangue_de_vidente",
+    "sangue_toxico",
+    "pulso_certeiro",
+    "coracao_ferro",
+    "unha_suja",
+    "musculos_aco",
+    "boca_de_sangue",
+    "olho_aguia",
+    "furia_berserker",
+    "odio_antigo",
+    "sangue_guerreiro",
+    "fio_serrilhado",
+    "odio_baixo",
+    "sangue_de_vidente",
+    "cabeca_dura"
+   ],
+   "familias": {
+    "defense": 1,
+    "crit_damage": 2,
+    "magic": 2,
+    "poison_chance": 2,
+    "max_hp": 2,
+    "strength": 2,
+    "life_steal": 1,
+    "crit_chance": 1,
+    "damage_percent": 2,
+    "bleed_chance": 1,
+    "stun_chance": 1
+   },
+   "raridades": {
+    "Rare": 5,
+    "Common": 11,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Dragão",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Arco Composto",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Faca de Caça",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Manoplas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle"
+   ]
+  },
+  {
+   "id": "W10",
+   "nick": "Patriota",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 7,
+   "seed": "7926199109757061183",
+   "andar_de_extracao": 21,
+   "nivel": 22,
+   "op": 29.8662109375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W10.json",
+   "sha256": "23740b31a4c1fbaf8ca960170bcded867b65946e22d7980ca96283bd631e4608",
+   "deck": [
+    "pisada_de_ferro",
+    "investida_de_ariete",
+    "n_pancada_na_nuca",
+    "n_pausa_util"
+   ],
+   "passivas": [
+    "cabeca_dura",
+    "musculos_aco",
+    "olho_aguia",
+    "sangue_de_vidente",
+    "musculos_aco",
+    "olho_de_cacador",
+    "passo_de_corca",
+    "punho_atordoante",
+    "passos_leves",
+    "cabeca_dura",
+    "sangue_de_vidente",
+    "sangue_guerreiro",
+    "sangue_toxico",
+    "musculos_aco",
+    "odio_baixo",
+    "pele_grossa",
+    "musculos_aco",
+    "instinto_frio",
+    "presenca_errada",
+    "voracidade",
+    "cabeca_dura"
+   ],
+   "familias": {
+    "stun_chance": 4,
+    "strength": 4,
+    "crit_chance": 1,
+    "magic": 2,
+    "precision": 2,
+    "agility": 2,
+    "max_hp": 1,
+    "poison_chance": 1,
+    "damage_percent": 1,
+    "defense": 1,
+    "fear_chance": 1,
+    "life_steal": 1
+   },
+   "raridades": {
+    "Rare": 4,
+    "Common": 13,
+    "Epic": 4
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Clava Pesada",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Clava de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Peitoral de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Sapatos de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "controle"
+   ]
+  },
+  {
+   "id": "W11",
+   "nick": "Forever",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 17,
+   "seed": "14613271384846002655",
+   "andar_de_extracao": 20,
+   "nivel": 22,
+   "op": 28.7138671875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W11.json",
+   "sha256": "7f5e13171d9b98bde257479f11cf370ebeab85fe2c5e6379416ebb69a726e098",
+   "deck": [
+    "n_grito_curto",
+    "peso_do_machado",
+    "n_couro_batido",
+    "n_ultima_carta"
+   ],
+   "passivas": [
+    "bencao_divina",
+    "respiracao_contada",
+    "lamina_afiada",
+    "olho_de_cacador",
+    "furia_berserker",
+    "furia_berserker",
+    "olho_aguia",
+    "estrela_quebrada",
+    "cabeca_dura",
+    "odio_baixo",
+    "voz_no_escuro",
+    "mente_serena",
+    "musculos_aco",
+    "lamina_afiada",
+    "sangue_de_vidente",
+    "agulha_no_osso",
+    "sangue_de_vidente",
+    "musculos_aco",
+    "agulha_no_osso",
+    "passos_leves",
+    "olho_de_cacador"
+   ],
+   "familias": {
+    "max_hp": 1,
+    "mana_regen": 1,
+    "crit_chance": 3,
+    "precision": 2,
+    "strength": 4,
+    "damage_percent": 2,
+    "stun_chance": 1,
+    "fear_chance": 1,
+    "max_mp": 1,
+    "magic": 2,
+    "bleed_chance": 2,
+    "agility": 1
+   },
+   "raridades": {
+    "Epic": 1,
+    "Common": 11,
+    "Rare": 8,
+    "Legendary": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Ouro",
+     "raridade": "Rare",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Lança de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Bastão Cru",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Espinhos",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calças de Tecido",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Lã",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "defesa",
+    "controle"
+   ]
+  },
+  {
+   "id": "W12",
+   "nick": "blackoutz",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 21,
+   "seed": "1797578634168002903",
+   "andar_de_extracao": 19,
+   "nivel": 20,
+   "op": 27.7919921875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W12.json",
+   "sha256": "0663db69887589b94ffa946c61c3ca1121c352e4413bd3742e2fdc5c4dcd3221",
+   "deck": [
+    "golpe_duplo",
+    "n_mira_calma",
+    "baluarte",
+    "n_encarar"
+   ],
+   "passivas": [
+    "passo_de_corca",
+    "instinto_frio",
+    "sangue_de_vidente",
+    "agulha_no_osso",
+    "odio_antigo",
+    "sede_sangue",
+    "unha_suja",
+    "olho_aguia",
+    "pele_grossa",
+    "passo_de_corca",
+    "musculos_aco",
+    "fio_serrilhado",
+    "sangue_de_vidente",
+    "sangue_guerreiro",
+    "musculos_aco",
+    "ritmo_profano",
+    "alma_eterna",
+    "olho_de_cacador",
+    "lamina_do_juizo"
+   ],
+   "familias": {
+    "agility": 2,
+    "precision": 2,
+    "magic": 2,
+    "bleed_chance": 2,
+    "damage_percent": 1,
+    "crit_chance": 2,
+    "poison_chance": 1,
+    "defense": 1,
+    "strength": 2,
+    "max_hp": 2,
+    "mana_regen": 1,
+    "crit_damage": 1
+   },
+   "raridades": {
+    "Common": 11,
+    "Rare": 5,
+    "Epic": 3
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Bandana de Tecido",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada Lendária",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Cajado da Galáxia",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Espinhos",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Armadura de Camisa",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "defesa"
+   ]
+  },
+  {
+   "id": "W13",
+   "nick": "brtt",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 22,
+   "seed": "7532868956086172557",
+   "andar_de_extracao": 20,
+   "nivel": 21,
+   "op": 29.9814453125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W13.json",
+   "sha256": "b8d9387eeee46972976374ec63c6688870d3656696c2a0437839073da42d18f3",
+   "deck": [
+    "n_respirar_fundo",
+    "n_mira_calma",
+    "n_estocada_seca",
+    "soco_de_placa"
+   ],
+   "passivas": [
+    "sangue_de_vidente",
+    "cabeca_dura",
+    "instinto_frio",
+    "odio_baixo",
+    "lamina_do_juizo",
+    "furia_berserker",
+    "unha_suja",
+    "sangue_de_vidente",
+    "olho_de_cacador",
+    "odio_antigo",
+    "agulha_no_osso",
+    "odio_baixo",
+    "presenca_errada",
+    "ritmo_profano",
+    "presenca_errada",
+    "sangue_toxico",
+    "furia_berserker",
+    "lamina_do_juizo",
+    "oraculo_partido",
+    "pele_grossa"
+   ],
+   "familias": {
+    "magic": 3,
+    "stun_chance": 1,
+    "precision": 2,
+    "damage_percent": 3,
+    "crit_damage": 2,
+    "strength": 2,
+    "poison_chance": 2,
+    "bleed_chance": 1,
+    "fear_chance": 2,
+    "mana_regen": 1,
+    "defense": 1
+   },
+   "raridades": {
+    "Common": 6,
+    "Rare": 8,
+    "Epic": 6
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Concha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Lâmina Veloz",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Clava de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Colete da Resistência",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "controle",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W14",
+   "nick": "G0ularte",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 24,
+   "seed": "6291530132541431858",
+   "andar_de_extracao": 19,
+   "nivel": 21,
+   "op": 28.0224609375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W14.json",
+   "sha256": "2e3a7cbe44b5e0bde1d8b5f267f85a09176a12467cfc268d7c541f19d0734236",
+   "deck": [
+    "n_mira_calma",
+    "investida",
+    "tomar_folego",
+    "n_areia_no_chao"
+   ],
+   "passivas": [
+    "passo_de_corca",
+    "odio_baixo",
+    "furia_berserker",
+    "musculos_aco",
+    "sangue_de_vidente",
+    "olho_aguia",
+    "musculos_aco",
+    "passo_de_corca",
+    "bencao_divina",
+    "sangue_guerreiro",
+    "toque_dragao",
+    "heranca_do_abismo",
+    "olho_aguia",
+    "coracao_ferro",
+    "musculos_aco",
+    "postura_fechada",
+    "voz_no_escuro",
+    "olho_aguia",
+    "musculos_aco",
+    "voz_no_escuro"
+   ],
+   "familias": {
+    "agility": 2,
+    "damage_percent": 1,
+    "strength": 6,
+    "magic": 2,
+    "crit_chance": 3,
+    "max_hp": 3,
+    "damage_reduction": 1,
+    "fear_chance": 2
+   },
+   "raridades": {
+    "Common": 14,
+    "Rare": 4,
+    "Epic": 2
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Dragão",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Guerra",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Treino",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Manoplas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Ouro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W15",
+   "nick": "RazaH",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 33,
+   "seed": "6882643742210834252",
+   "andar_de_extracao": 18,
+   "nivel": 20,
+   "op": 29.0595703125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W15.json",
+   "sha256": "a1045239b231a8285e569f1dbdaedfe6f07e73e99bc29eaf2b18053b4644aa75",
+   "deck": [
+    "n_marca_do_cacador",
+    "n_grito_curto",
+    "n_pausa_util",
+    "mao_dupla"
+   ],
+   "passivas": [
+    "punho_atordoante",
+    "olho_de_cacador",
+    "olho_aguia",
+    "essencia_fluida",
+    "unha_suja",
+    "odio_baixo",
+    "presenca_errada",
+    "furia_berserker",
+    "sangue_de_vidente",
+    "musculos_aco",
+    "pele_grossa",
+    "fio_serrilhado",
+    "olho_aguia",
+    "sangue_de_vidente",
+    "pulso_certeiro",
+    "fio_serrilhado",
+    "lamina_afiada",
+    "reserva_arcana",
+    "heranca_do_abismo"
+   ],
+   "familias": {
+    "stun_chance": 1,
+    "precision": 1,
+    "crit_chance": 3,
+    "max_hp": 1,
+    "poison_chance": 1,
+    "damage_percent": 1,
+    "fear_chance": 1,
+    "strength": 2,
+    "magic": 3,
+    "defense": 1,
+    "bleed_chance": 2,
+    "crit_damage": 1,
+    "max_mp": 1
+   },
+   "raridades": {
+    "Epic": 2,
+    "Common": 12,
+    "Rare": 5
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Tridente do Guerreiro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Faca de Caça",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Escudo de Ferro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle"
+   ]
+  },
+  {
+   "id": "W16",
+   "nick": "sacy",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 3,
+   "seed": "16876277710936082885",
+   "andar_de_extracao": 19,
+   "nivel": 23,
+   "op": 29.5205078125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W16.json",
+   "sha256": "6964796bda4c2fffb41f00335b4e9778a2493e6ce47a99261c620e077c9f31ce",
+   "deck": [
+    "golpe_devastador",
+    "n_mira_calma",
+    "escudo_protetor",
+    "silencio_do_veterano"
+   ],
+   "passivas": [
+    "reflexos_rapidos",
+    "boca_de_sangue",
+    "essencia_viva",
+    "fome_batalha",
+    "sorte_iniciante",
+    "mente_serena",
+    "maos_midas",
+    "pele_grossa",
+    "sede_silenciosa",
+    "pele_de_sal",
+    "boca_de_sangue",
+    "sangue_guerreiro",
+    "respiracao_contada",
+    "postura_fechada",
+    "respiracao_contada",
+    "mente_serena",
+    "corpo_inviolavel",
+    "mente_serena",
+    "passos_leves",
+    "postura_fechada",
+    "reserva_arcana",
+    "mente_serena"
+   ],
+   "familias": {
+    "evasion": 1,
+    "life_steal": 3,
+    "essence_bonus": 3,
+    "max_mp": 5,
+    "gold_drop_bonus": 1,
+    "defense": 1,
+    "status_resistance": 2,
+    "max_hp": 1,
+    "mana_regen": 2,
+    "damage_reduction": 2,
+    "agility": 1
+   },
+   "raridades": {
+    "Rare": 4,
+    "Common": 16,
+    "Epic": 1,
+    "Legendary": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada de Treino",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Gravetos Mágicos",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Cota de Malha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Escudo Torre",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W17",
+   "nick": "k13tv",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 15,
+   "seed": "1590218668709156032",
+   "andar_de_extracao": 18,
+   "nivel": 23,
+   "op": 27.9072265625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W17.json",
+   "sha256": "4758f6e07a7a811e2a1fedabe56bbe56bcd1f82c7370788599388d3450a476c8",
+   "deck": [
+    "golpe_poderoso",
+    "n_mira_calma",
+    "fio_no_rebite",
+    "n_guarda_cruzada"
+   ],
+   "passivas": [
+    "poco_fundo",
+    "essencia_viva",
+    "bebida_deuses",
+    "toque_dragao",
+    "poco_fundo",
+    "alquimia_do_desespero",
+    "coracao_ferro",
+    "alma_eterna",
+    "sorte_iniciante",
+    "sorte_iniciante",
+    "furia_berserker",
+    "essencia_viva",
+    "essencia_viva",
+    "pele_grossa",
+    "essencia_viva",
+    "sorte_iniciante",
+    "sangue_de_vidente",
+    "bebida_deuses",
+    "respiracao_contada",
+    "bebida_deuses",
+    "olho_de_cacador",
+    "bebida_deuses"
+   ],
+   "familias": {
+    "max_mp": 2,
+    "essence_bonus": 7,
+    "potion_heal_bonus": 5,
+    "strength": 2,
+    "max_hp": 2,
+    "defense": 1,
+    "magic": 1,
+    "mana_regen": 1,
+    "precision": 1
+   },
+   "raridades": {
+    "Rare": 11,
+    "Epic": 3,
+    "Common": 8
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Força",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Porrete",
+     "raridade": "Common",
+     "mais": 2,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Cota de Malha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W18",
+   "nick": "PlayHard",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 23,
+   "seed": "5988562094137102994",
+   "andar_de_extracao": 17,
+   "nivel": 21,
+   "op": 28.0224609375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W18.json",
+   "sha256": "7fdf8b3799a0a908df8c3b2c64c2bc1ed81773349a5a394a550903f0fc32c103",
+   "deck": [
+    "resistencia_heroica",
+    "n_mira_calma",
+    "quebra_guarda",
+    "n_gancho_e_corda"
+   ],
+   "passivas": [
+    "sorte_iniciante",
+    "sangue_guerreiro",
+    "coracao_ferro",
+    "boca_de_sangue",
+    "essencia_fluida",
+    "musculos_aco",
+    "reserva_arcana",
+    "reserva_arcana",
+    "poco_fundo",
+    "coracao_ferro",
+    "pele_de_sal",
+    "sorte_iniciante",
+    "respiracao_contada",
+    "sorte_iniciante",
+    "sorte_iniciante",
+    "mente_serena",
+    "poco_fundo",
+    "ritmo_profano",
+    "reserva_arcana",
+    "sede_sangue"
+   ],
+   "familias": {
+    "essence_bonus": 4,
+    "max_hp": 4,
+    "life_steal": 1,
+    "strength": 1,
+    "max_mp": 6,
+    "status_resistance": 1,
+    "mana_regen": 2,
+    "crit_chance": 1
+   },
+   "raridades": {
+    "Common": 15,
+    "Rare": 4,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Agilidade",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Gládio de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Porrete",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Colete da Resistência",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Tamancos de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": []
+  },
+  {
+   "id": "W19",
+   "nick": "tteuw",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 24,
+   "seed": "18064938851122302866",
+   "andar_de_extracao": 16,
+   "nivel": 19,
+   "op": 29.1748046875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W19.json",
+   "sha256": "ee79b82418ef4de53a8dc91dbd206d9809f9665a0b197563cb6ee53847468ba0",
+   "deck": [
+    "golpe_poderoso",
+    "n_mira_calma",
+    "tomar_folego",
+    "escudo_protetor"
+   ],
+   "passivas": [
+    "coracao_ferro",
+    "boca_de_sangue",
+    "casco_calejado",
+    "ritmo_profano",
+    "casco_calejado",
+    "pele_adamantio",
+    "casco_calejado",
+    "sorte_iniciante",
+    "mente_serena",
+    "sede_silenciosa",
+    "postura_fechada",
+    "bebida_deuses",
+    "bencao_divina",
+    "mente_serena",
+    "ritmo_profano",
+    "sangue_guerreiro",
+    "pele_adamantio",
+    "voracidade"
+   ],
+   "familias": {
+    "max_hp": 3,
+    "life_steal": 3,
+    "defense": 3,
+    "mana_regen": 2,
+    "damage_reduction": 3,
+    "essence_bonus": 1,
+    "max_mp": 2,
+    "potion_heal_bonus": 1
+   },
+   "raridades": {
+    "Common": 7,
+    "Rare": 7,
+    "Epic": 4
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada Lendária",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada do Eclipse",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Chinelos de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W20",
+   "nick": "xandfps",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 26,
+   "seed": "15403883440795817470",
+   "andar_de_extracao": 17,
+   "nivel": 21,
+   "op": 28.4833984375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W20.json",
+   "sha256": "40587ef67b9b562e38b817204fdba6cda6f42ace5222116b8c871b6ab60d1a5d",
+   "deck": [
+    "mao_dupla",
+    "n_mira_calma",
+    "escudo_protetor",
+    "peso_do_machado"
+   ],
+   "passivas": [
+    "sede_silenciosa",
+    "coracao_ferro",
+    "maos_midas",
+    "sede_silenciosa",
+    "essencia_viva",
+    "reserva_arcana",
+    "boca_de_sangue",
+    "respiracao_contada",
+    "sorte_iniciante",
+    "bebida_deuses",
+    "respiracao_contada",
+    "respiracao_contada",
+    "sorte_iniciante",
+    "sede_silenciosa",
+    "mente_serena",
+    "boca_de_sangue",
+    "boca_de_sangue",
+    "respiracao_contada",
+    "boca_de_sangue",
+    "poco_fundo"
+   ],
+   "familias": {
+    "life_steal": 7,
+    "max_hp": 1,
+    "gold_drop_bonus": 1,
+    "essence_bonus": 3,
+    "max_mp": 3,
+    "mana_regen": 4,
+    "potion_heal_bonus": 1
+   },
+   "raridades": {
+    "Rare": 7,
+    "Common": 13
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Batalha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Tridente do Guerreiro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W21",
+   "nick": "boltz",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 32,
+   "seed": "15217593058595529711",
+   "andar_de_extracao": 17,
+   "nivel": 21,
+   "op": 27.7919921875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W21.json",
+   "sha256": "31af8cdcc97a28da4fa29f767f6defaa0562f5c7a0e212e56d4db2d3656d3d9c",
+   "deck": [
+    "investida",
+    "soco_de_placa",
+    "n_leitura_de_terreno",
+    "olho_de_ferreiro"
+   ],
+   "passivas": [
+    "essencia_viva",
+    "ritmo_profano",
+    "sorte_iniciante",
+    "respiracao_contada",
+    "maos_midas",
+    "respiracao_contada",
+    "reserva_arcana",
+    "poco_fundo",
+    "coracao_ferro",
+    "ritmo_profano",
+    "sorte_iniciante",
+    "mente_serena",
+    "coracao_ferro",
+    "poco_fundo",
+    "sorte_iniciante",
+    "bebida_deuses",
+    "bebida_deuses",
+    "boca_de_sangue",
+    "boca_de_sangue",
+    "boca_de_sangue"
+   ],
+   "familias": {
+    "essence_bonus": 4,
+    "mana_regen": 4,
+    "gold_drop_bonus": 1,
+    "max_mp": 4,
+    "max_hp": 2,
+    "potion_heal_bonus": 2,
+    "life_steal": 3
+   },
+   "raridades": {
+    "Rare": 8,
+    "Common": 12
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Prata",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Guerra",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Espinhos",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Fênix",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W22",
+   "nick": "jovirone",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 36,
+   "seed": "8138257030839068038",
+   "andar_de_extracao": 17,
+   "nivel": 24,
+   "op": 29.5205078125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W22.json",
+   "sha256": "f8486572b887c156245b8d44a8ba2fa6cc92bab01824134282bed3f0666fc61a",
+   "deck": [
+    "marca_do_acougueiro",
+    "quebra_guarda",
+    "n_disciplina_de_forja",
+    "sangue_nos_olhos"
+   ],
+   "passivas": [
+    "voracidade",
+    "divida_de_ouro",
+    "poco_fundo",
+    "fome_batalha",
+    "sorte_iniciante",
+    "sorte_iniciante",
+    "voracidade",
+    "sangue_guerreiro",
+    "coracao_ferro",
+    "essencia_pura",
+    "sorte_iniciante",
+    "mente_serena",
+    "casco_calejado",
+    "pele_de_sal",
+    "ritmo_profano",
+    "essencia_viva",
+    "coracao_ferro",
+    "lamina_afiada",
+    "boca_de_sangue",
+    "sangue_guerreiro",
+    "sorte_iniciante",
+    "boca_de_sangue",
+    "poco_fundo"
+   ],
+   "familias": {
+    "life_steal": 4,
+    "gold_drop_bonus": 1,
+    "max_mp": 3,
+    "essence_bonus": 7,
+    "max_hp": 4,
+    "defense": 1,
+    "status_resistance": 1,
+    "mana_regen": 1,
+    "crit_chance": 1
+   },
+   "raridades": {
+    "Epic": 4,
+    "Rare": 6,
+    "Common": 12,
+    "Legendary": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada Longa",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Adaga de Madeira",
+     "raridade": "Common",
+     "mais": 2,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Placa",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W23",
+   "nick": "lubatv",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 9,
+   "seed": "6639738590781069291",
+   "andar_de_extracao": 20,
+   "nivel": 22,
+   "op": 29.1748046875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W23.json",
+   "sha256": "bf41a2aa41bc77af8c10096e5645eb4a54586fc8a4e08308ef5b5c80b79e2648",
+   "deck": [
+    "esmagar",
+    "quebra_guarda",
+    "tomar_folego",
+    "n_postura_impecavel"
+   ],
+   "passivas": [
+    "musculos_aco",
+    "postura_fechada",
+    "reserva_arcana",
+    "olho_de_cacador",
+    "vulto",
+    "postura_fechada",
+    "pele_grossa",
+    "casco_calejado",
+    "alma_eterna",
+    "toque_dragao",
+    "sangue_guerreiro",
+    "postura_fechada",
+    "passo_de_corca",
+    "lamina_afiada",
+    "reserva_arcana",
+    "olho_aguia",
+    "vulto",
+    "lamina_afiada",
+    "lamina_afiada",
+    "bencao_divina",
+    "passos_leves"
+   ],
+   "familias": {
+    "strength": 2,
+    "damage_reduction": 3,
+    "max_mp": 2,
+    "precision": 1,
+    "evasion": 2,
+    "defense": 2,
+    "max_hp": 3,
+    "agility": 2,
+    "crit_chance": 4
+   },
+   "raridades": {
+    "Common": 12,
+    "Epic": 5,
+    "Rare": 4
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Dragão",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Gládio de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Lança de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Titânica",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Chinelos de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W24",
+   "nick": "fnxLNTC",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 11,
+   "seed": "12625970359534049939",
+   "andar_de_extracao": 19,
+   "nivel": 22,
+   "op": 29.5205078125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W24.json",
+   "sha256": "e79cc2f987aa8ce9f2bef443bf0ac434a5bffe407407355d28a91d721c093b03",
+   "deck": [
+    "golpe_poderoso",
+    "investida",
+    "couraca_improvisada",
+    "berro_de_ferro"
+   ],
+   "passivas": [
+    "sede_silenciosa",
+    "postura_fechada",
+    "passo_de_corca",
+    "pele_de_sal",
+    "lamina_afiada",
+    "postura_fechada",
+    "pele_de_sal",
+    "passo_de_corca",
+    "corpo_inviolavel",
+    "pele_adamantio",
+    "heranca_do_abismo",
+    "bebida_deuses",
+    "postura_fechada",
+    "sangue_guerreiro",
+    "pele_grossa",
+    "boca_de_sangue",
+    "passos_leves",
+    "coracao_ferro",
+    "essencia_fluida",
+    "sangue_guerreiro",
+    "sangue_guerreiro"
+   ],
+   "familias": {
+    "life_steal": 2,
+    "damage_reduction": 4,
+    "agility": 3,
+    "status_resistance": 3,
+    "crit_chance": 1,
+    "magic": 1,
+    "potion_heal_bonus": 1,
+    "max_hp": 5,
+    "defense": 1
+   },
+   "raridades": {
+    "Rare": 5,
+    "Common": 14,
+    "Legendary": 1,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Cajado de Cristal",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W25",
+   "nick": "mount",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 14,
+   "seed": "165671388714954225",
+   "andar_de_extracao": 21,
+   "nivel": 23,
+   "op": 29.5205078125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W25.json",
+   "sha256": "3af064b5e99269a799e9c649ba283d5f45cb33011183e3876c8583c1b83920be",
+   "deck": [
+    "golpe_poderoso",
+    "soco_de_placa",
+    "n_couro_batido",
+    "n_disciplina_de_forja"
+   ],
+   "passivas": [
+    "pele_adamantio",
+    "bebida_deuses",
+    "sangue_guerreiro",
+    "sangue_guerreiro",
+    "odio_baixo",
+    "boca_de_sangue",
+    "bebida_deuses",
+    "sangue_guerreiro",
+    "escudo_fe",
+    "bebida_deuses",
+    "musculos_aco",
+    "sangue_de_vidente",
+    "lamina_afiada",
+    "pele_grossa",
+    "sangue_guerreiro",
+    "respiracao_contada",
+    "boca_de_sangue",
+    "pele_grossa",
+    "sangue_guerreiro",
+    "sangue_guerreiro",
+    "escudo_fe",
+    "escudo_fe"
+   ],
+   "familias": {
+    "damage_reduction": 4,
+    "potion_heal_bonus": 3,
+    "max_hp": 6,
+    "damage_percent": 1,
+    "life_steal": 2,
+    "strength": 1,
+    "magic": 1,
+    "crit_chance": 1,
+    "defense": 2,
+    "mana_regen": 1
+   },
+   "raridades": {
+    "Epic": 1,
+    "Rare": 7,
+    "Common": 14
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Lança de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Machado Enferrujado",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Titânica",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 3,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Fênix",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W26",
+   "nick": "MeikodRJ",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 15,
+   "seed": "3771523583190698800",
+   "andar_de_extracao": 19,
+   "nivel": 22,
+   "op": 29.7509765625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W26.json",
+   "sha256": "763adddf8e4f5f7774c5986942e4acf8ccfea1f634c9571145d7e9b8946ab227",
+   "deck": [
+    "golpe_poderoso",
+    "n_mira_calma",
+    "tomar_folego",
+    "n_leitura_de_terreno"
+   ],
+   "passivas": [
+    "sangue_guerreiro",
+    "bebida_deuses",
+    "sangue_guerreiro",
+    "pele_de_sal",
+    "alma_eterna",
+    "olho_aguia",
+    "sangue_guerreiro",
+    "sangue_guerreiro",
+    "toque_dragao",
+    "alquimia_do_desespero",
+    "sede_silenciosa",
+    "postura_fechada",
+    "coracao_ferro",
+    "boca_de_sangue",
+    "passo_de_corca",
+    "bebida_deuses",
+    "fio_serrilhado",
+    "olho_aguia",
+    "pele_de_sal",
+    "pele_de_sal",
+    "boca_de_sangue"
+   ],
+   "familias": {
+    "max_hp": 6,
+    "potion_heal_bonus": 3,
+    "status_resistance": 3,
+    "crit_chance": 2,
+    "strength": 1,
+    "life_steal": 3,
+    "damage_reduction": 1,
+    "agility": 1,
+    "bleed_chance": 1
+   },
+   "raridades": {
+    "Common": 15,
+    "Rare": 3,
+    "Epic": 3
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Guerra",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Cajado de Cristal",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Titânica",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Manoplas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Ouro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W27",
+   "nick": "aspaszin",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 18,
+   "seed": "14843769489525258320",
+   "andar_de_extracao": 19,
+   "nivel": 22,
+   "op": 29.2900390625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W27.json",
+   "sha256": "8e2431fd44f105adda75d971da8181786eb5d174d0e6af679978df9a50d31e01",
+   "deck": [
+    "golpe_poderoso",
+    "quebra_guarda",
+    "n_folego_de_marcha",
+    "n_respirar_fundo"
+   ],
+   "passivas": [
+    "sangue_guerreiro",
+    "toque_dragao",
+    "passos_leves",
+    "reflexos_rapidos",
+    "sede_silenciosa",
+    "bebida_deuses",
+    "casco_calejado",
+    "coracao_ferro",
+    "pele_de_sal",
+    "coracao_ferro",
+    "essencia_fluida",
+    "sangue_guerreiro",
+    "pele_de_sal",
+    "sede_sangue",
+    "olho_aguia",
+    "sede_sangue",
+    "postura_fechada",
+    "musculos_aco",
+    "passos_leves",
+    "pele_de_sal",
+    "pele_grossa"
+   ],
+   "familias": {
+    "max_hp": 5,
+    "strength": 2,
+    "agility": 2,
+    "evasion": 1,
+    "life_steal": 1,
+    "potion_heal_bonus": 1,
+    "defense": 2,
+    "status_resistance": 3,
+    "crit_chance": 3,
+    "damage_reduction": 1
+   },
+   "raridades": {
+    "Common": 13,
+    "Epic": 3,
+    "Rare": 5
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada Lendária",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Bastão Cru",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Tamancos de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W28",
+   "nick": "furq",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 19,
+   "seed": "4703126176621684437",
+   "andar_de_extracao": 21,
+   "nivel": 23,
+   "op": 29.5205078125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W28.json",
+   "sha256": "1dc13f275347746fd97b52bec14b18c5558899764520c84d869679c7521fe145",
+   "deck": [
+    "golpe_poderoso",
+    "quebra_guarda",
+    "n_guarda_cruzada",
+    "n_areia_no_chao"
+   ],
+   "passivas": [
+    "pele_grossa",
+    "bebida_deuses",
+    "essencia_fluida",
+    "pele_grossa",
+    "escudo_fe",
+    "passos_leves",
+    "boca_de_sangue",
+    "coracao_ferro",
+    "sangue_guerreiro",
+    "pele_de_sal",
+    "sangue_guerreiro",
+    "odio_baixo",
+    "respiracao_contada",
+    "passo_de_corca",
+    "sangue_guerreiro",
+    "sangue_guerreiro",
+    "escudo_fe",
+    "furia_berserker",
+    "mente_serena",
+    "punho_atordoante",
+    "reserva_arcana",
+    "passos_leves"
+   ],
+   "familias": {
+    "defense": 2,
+    "potion_heal_bonus": 1,
+    "max_hp": 6,
+    "damage_reduction": 2,
+    "agility": 3,
+    "life_steal": 1,
+    "status_resistance": 1,
+    "damage_percent": 1,
+    "mana_regen": 1,
+    "strength": 1,
+    "max_mp": 2,
+    "stun_chance": 1
+   },
+   "raridades": {
+    "Common": 16,
+    "Rare": 5,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Batalha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Treino",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Cota de Malha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Lã",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "controle",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W29",
+   "nick": "DavyJones",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 25,
+   "seed": "5183847945833891140",
+   "andar_de_extracao": 20,
+   "nivel": 22,
+   "op": 29.9814453125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W29.json",
+   "sha256": "372be28d1bd6697906876373c0ef49e73b9aa66b5930e84d173e2fced38e7530",
+   "deck": [
+    "golpe_poderoso",
+    "n_mira_calma",
+    "n_paciencia_do_coveiro",
+    "n_respirar_fundo"
+   ],
+   "passivas": [
+    "boca_de_sangue",
+    "pele_de_sal",
+    "postura_fechada",
+    "pele_de_sal",
+    "sangue_guerreiro",
+    "musculos_aco",
+    "casco_calejado",
+    "casco_calejado",
+    "coracao_ferro",
+    "sangue_guerreiro",
+    "sangue_guerreiro",
+    "coracao_ferro",
+    "sangue_guerreiro",
+    "boca_de_sangue",
+    "boca_de_sangue",
+    "coracao_ferro",
+    "escudo_fe",
+    "passos_leves",
+    "sangue_guerreiro",
+    "pele_grossa",
+    "casco_calejado"
+   ],
+   "familias": {
+    "life_steal": 3,
+    "status_resistance": 2,
+    "damage_reduction": 2,
+    "max_hp": 8,
+    "strength": 1,
+    "defense": 4,
+    "agility": 1
+   },
+   "raridades": {
+    "Common": 17,
+    "Rare": 4
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Guerra",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Cajado da Galáxia",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Titânica",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Escudo de Ferro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W30",
+   "nick": "bakzera",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 6,
+   "seed": "2794895444418811611",
+   "andar_de_extracao": 20,
+   "nivel": 23,
+   "op": 29.9814453125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W30.json",
+   "sha256": "0cc018412b7b0b422d501425082ca97d493a22439fc597b98eebb2a3b6814619",
+   "deck": [
+    "golpe_duplo",
+    "n_mira_calma",
+    "provocacao",
+    "veterania"
+   ],
+   "passivas": [
+    "olho_aguia",
+    "oraculo_partido",
+    "passos_leves",
+    "essencia_fluida",
+    "fio_serrilhado",
+    "bencao_divina",
+    "musculos_aco",
+    "cabeca_dura",
+    "essencia_fluida",
+    "mente_serena",
+    "heranca_do_abismo",
+    "toque_dragao",
+    "heranca_do_abismo",
+    "odio_antigo",
+    "olho_aguia",
+    "essencia_fluida",
+    "passo_de_corca",
+    "odio_baixo",
+    "toque_dragao",
+    "coracao_ferro",
+    "olho_aguia",
+    "musculos_aco"
+   ],
+   "familias": {
+    "crit_chance": 3,
+    "magic": 3,
+    "agility": 2,
+    "max_hp": 5,
+    "bleed_chance": 1,
+    "strength": 4,
+    "stun_chance": 1,
+    "max_mp": 1,
+    "damage_percent": 2
+   },
+   "raridades": {
+    "Common": 11,
+    "Epic": 4,
+    "Rare": 7
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado Terrível",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada Longa",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Espinhos",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas Rasas",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle"
+   ]
+  },
+  {
+   "id": "W31",
+   "nick": "Felps",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 9,
+   "seed": "375831289381730531",
+   "andar_de_extracao": 17,
+   "nivel": 20,
+   "op": 29.6357421875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W31.json",
+   "sha256": "e98599f530d3142f06d8ffcaecaf1d506f4990cbb970f7c01326be47b803f0a1",
+   "deck": [
+    "sangue_nos_olhos",
+    "quebra_guarda",
+    "n_travar_o_pulso",
+    "marca_do_acougueiro"
+   ],
+   "passivas": [
+    "punho_atordoante",
+    "furia_berserker",
+    "sede_silenciosa",
+    "agulha_no_osso",
+    "odio_baixo",
+    "olho_aguia",
+    "coracao_ferro",
+    "sangue_guerreiro",
+    "sede_sangue",
+    "instinto_frio",
+    "pulso_certeiro",
+    "olho_de_cacador",
+    "musculos_aco",
+    "pulso_certeiro",
+    "sangue_toxico",
+    "cabeca_dura",
+    "odio_baixo",
+    "pulso_certeiro",
+    "coracao_ferro"
+   ],
+   "familias": {
+    "stun_chance": 2,
+    "strength": 2,
+    "life_steal": 1,
+    "bleed_chance": 1,
+    "damage_percent": 2,
+    "crit_chance": 2,
+    "max_hp": 3,
+    "precision": 2,
+    "crit_damage": 3,
+    "poison_chance": 1
+   },
+   "raridades": {
+    "Epic": 3,
+    "Rare": 5,
+    "Common": 11
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Pedra",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Batalha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Ferro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Peitoral de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Ouro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle"
+   ]
+  },
+  {
+   "id": "W32",
+   "nick": "loud_thurzin",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 37,
+   "seed": "4152108452749171475",
+   "andar_de_extracao": 19,
+   "nivel": 22,
+   "op": 29.8662109375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W32.json",
+   "sha256": "e46a9c9691d394b4017de339a1d004eccb872b75e4e4ad3afcef2a49c61e7c73",
+   "deck": [
+    "n_marca_do_cacador",
+    "golpe_devastador",
+    "n_guarda_alta",
+    "n_grito_curto"
+   ],
+   "passivas": [
+    "olho_de_cacador",
+    "olho_de_cacador",
+    "fio_serrilhado",
+    "essencia_fluida",
+    "olho_aguia",
+    "passo_de_corca",
+    "cabeca_dura",
+    "lamina_do_juizo",
+    "pulso_certeiro",
+    "unha_suja",
+    "musculos_aco",
+    "instinto_frio",
+    "instinto_frio",
+    "passos_leves",
+    "olho_aguia",
+    "fio_serrilhado",
+    "musculos_aco",
+    "passo_de_corca",
+    "musculos_aco",
+    "passos_leves",
+    "cabeca_dura"
+   ],
+   "familias": {
+    "precision": 4,
+    "bleed_chance": 2,
+    "max_hp": 1,
+    "crit_chance": 2,
+    "agility": 4,
+    "stun_chance": 2,
+    "crit_damage": 2,
+    "poison_chance": 1,
+    "strength": 3
+   },
+   "raridades": {
+    "Common": 14,
+    "Rare": 6,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Gládio de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Escudo Torre",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle"
+   ]
+  },
+  {
+   "id": "W33",
+   "nick": "YoDa",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 45,
+   "seed": "12897313214226887121",
+   "andar_de_extracao": 18,
+   "nivel": 21,
+   "op": 29.4052734375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W33.json",
+   "sha256": "e229ce67861f8d836d11379ad43b446315f5a5ef4b9a271b428e9fe117041121",
+   "deck": [
+    "mao_dupla",
+    "tremor_de_bigorna",
+    "n_estocada_seca",
+    "n_lamina_assentada"
+   ],
+   "passivas": [
+    "fio_serrilhado",
+    "imortalidade",
+    "olho_aguia",
+    "voz_no_escuro",
+    "odio_antigo",
+    "voz_no_escuro",
+    "pele_grossa",
+    "sangue_guerreiro",
+    "furia_berserker",
+    "heranca_do_abismo",
+    "heranca_do_abismo",
+    "odio_antigo",
+    "furia_berserker",
+    "olho_de_cacador",
+    "odio_baixo",
+    "pele_grossa",
+    "pulso_certeiro",
+    "olho_de_cacador",
+    "fio_serrilhado",
+    "musculos_aco"
+   ],
+   "familias": {
+    "bleed_chance": 2,
+    "death_ignore": 1,
+    "crit_chance": 1,
+    "fear_chance": 2,
+    "damage_percent": 3,
+    "defense": 2,
+    "max_hp": 1,
+    "strength": 3,
+    "magic": 2,
+    "precision": 2,
+    "crit_damage": 1
+   },
+   "raridades": {
+    "Common": 11,
+    "Legendary": 1,
+    "Rare": 8
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Prata",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Batalha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Treino",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Titânica",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 2,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "controle"
+   ]
+  },
+  {
+   "id": "W34",
+   "nick": "LuquEt4",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 47,
+   "seed": "2809686733962074657",
+   "andar_de_extracao": 21,
+   "nivel": 23,
+   "op": 29.8662109375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W34.json",
+   "sha256": "66e138abd449861caa0e828a0d0e2517ecb2370f141aac2dbca30367d66ca989",
+   "deck": [
+    "golpe_duplo",
+    "grito_guerra",
+    "cutelada",
+    "n_areia_no_chao"
+   ],
+   "passivas": [
+    "odio_baixo",
+    "odio_baixo",
+    "olho_de_cacador",
+    "furia_berserker",
+    "furia_berserker",
+    "odio_baixo",
+    "odio_baixo",
+    "postura_fechada",
+    "musculos_aco",
+    "sangue_de_vidente",
+    "olho_de_cacador",
+    "lamina_lendaria",
+    "olho_aguia",
+    "pulso_certeiro",
+    "olho_aguia",
+    "pulso_certeiro",
+    "sangue_de_vidente",
+    "passos_leves",
+    "odio_baixo",
+    "pele_grossa",
+    "odio_baixo",
+    "odio_baixo"
+   ],
+   "familias": {
+    "damage_percent": 7,
+    "precision": 2,
+    "strength": 3,
+    "damage_reduction": 1,
+    "magic": 2,
+    "crit_chance": 3,
+    "crit_damage": 2,
+    "agility": 1,
+    "defense": 1
+   },
+   "raridades": {
+    "Common": 19,
+    "Rare": 2,
+    "Legendary": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Dragão",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 3,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Cajado de Cristal",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Adaga de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Camisa de Corrente",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico"
+   ]
+  },
+  {
+   "id": "W35",
+   "nick": "Smzinho",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 48,
+   "seed": "11635301397804779693",
+   "andar_de_extracao": 20,
+   "nivel": 23,
+   "op": 29.7509765625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W35.json",
+   "sha256": "f69935c2cadf1b481eb91ae9b7e9ab1ca4798a9188a93c1a3e878c2aea183259",
+   "deck": [
+    "cutelada",
+    "n_mira_calma",
+    "veterania",
+    "n_estocada_seca"
+   ],
+   "passivas": [
+    "odio_antigo",
+    "passos_leves",
+    "passo_de_corca",
+    "odio_baixo",
+    "sangue_guerreiro",
+    "odio_baixo",
+    "voz_no_escuro",
+    "cabeca_dura",
+    "passo_de_corca",
+    "furia_berserker",
+    "heranca_do_abismo",
+    "sangue_de_vidente",
+    "olho_aguia",
+    "instinto_frio",
+    "passo_de_corca",
+    "instinto_frio",
+    "odio_antigo",
+    "ritmo_profano",
+    "musculos_aco",
+    "pele_grossa",
+    "furia_berserker",
+    "pulso_certeiro"
+   ],
+   "familias": {
+    "damage_percent": 4,
+    "agility": 4,
+    "max_hp": 1,
+    "fear_chance": 1,
+    "stun_chance": 1,
+    "strength": 3,
+    "magic": 2,
+    "crit_chance": 1,
+    "precision": 2,
+    "mana_regen": 1,
+    "defense": 1,
+    "crit_damage": 1
+   },
+   "raridades": {
+    "Rare": 10,
+    "Common": 12
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Machado Enferrujado",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Titânica",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Escudo de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "controle"
+   ]
+  },
+  {
+   "id": "W36",
+   "nick": "Gaules",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 73,
+   "seed": "4961004880316520679",
+   "andar_de_extracao": 20,
+   "nivel": 22,
+   "op": 29.9814453125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W36.json",
+   "sha256": "ca99077dfaee53ef12266d657d00a80ffb1cd3f2b656b8ef1e0ce6b54c49f08f",
+   "deck": [
+    "mao_dupla",
+    "peso_do_machado",
+    "n_estocada_seca",
+    "furia"
+   ],
+   "passivas": [
+    "toque_dragao",
+    "coracao_ferro",
+    "furia_berserker",
+    "cabeca_dura",
+    "lamina_afiada",
+    "unha_suja",
+    "sangue_guerreiro",
+    "respiracao_contada",
+    "sede_sangue",
+    "lamina_afiada",
+    "heranca_do_abismo",
+    "musculos_aco",
+    "fio_serrilhado",
+    "musculos_aco",
+    "lamina_afiada",
+    "coracao_ferro",
+    "olho_de_cacador",
+    "olho_de_cacador",
+    "furia_berserker",
+    "escudo_fe",
+    "reserva_arcana"
+   ],
+   "familias": {
+    "strength": 5,
+    "max_hp": 3,
+    "stun_chance": 1,
+    "crit_chance": 4,
+    "poison_chance": 1,
+    "mana_regen": 1,
+    "magic": 1,
+    "bleed_chance": 1,
+    "precision": 2,
+    "damage_reduction": 1,
+    "max_mp": 1
+   },
+   "raridades": {
+    "Epic": 2,
+    "Common": 10,
+    "Rare": 9
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Agilidade",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 3,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Lâmina da Tempestade",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Gravetos Mágicos",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Placa Pesada",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Escudo Torre",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Chinelos de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle"
+   ]
+  },
+  {
+   "id": "W37",
+   "nick": "gafallen",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 2,
+   "seed": "9669742153661310724",
+   "andar_de_extracao": 17,
+   "nivel": 20,
+   "op": 29.8662109375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W37.json",
+   "sha256": "0763a1ca9c7593b10d525f1e23f43cee3d1e609a934e6864d0acc05d807ce5e8",
+   "deck": [
+    "tomar_folego",
+    "n_mira_calma",
+    "escudo_protetor",
+    "quebra_guarda"
+   ],
+   "passivas": [
+    "escudo_fe",
+    "reserva_arcana",
+    "sede_silenciosa",
+    "sede_silenciosa",
+    "ritmo_profano",
+    "mente_serena",
+    "lamina_do_juizo",
+    "divida_de_ouro",
+    "alquimia_do_desespero",
+    "sede_silenciosa",
+    "ritmo_profano",
+    "reserva_arcana",
+    "maos_midas",
+    "maos_midas",
+    "maos_midas",
+    "sede_silenciosa",
+    "sede_silenciosa",
+    "ritmo_profano",
+    "sangue_guerreiro"
+   ],
+   "familias": {
+    "damage_reduction": 1,
+    "max_mp": 3,
+    "life_steal": 5,
+    "mana_regen": 3,
+    "crit_damage": 1,
+    "gold_drop_bonus": 4,
+    "potion_heal_bonus": 1,
+    "max_hp": 1
+   },
+   "raridades": {
+    "Rare": 12,
+    "Common": 4,
+    "Epic": 3
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Dragão",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Guerra",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W38",
+   "nick": "Neskwga",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 6,
+   "seed": "650757519477940328",
+   "andar_de_extracao": 18,
+   "nivel": 22,
+   "op": 29.4052734375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W38.json",
+   "sha256": "f279a888388857193840c695213ecaba62aef047c0bcee9eb4ef416c44c4b6b0",
+   "deck": [
+    "golpe_poderoso",
+    "n_mira_calma",
+    "escudo_protetor",
+    "baluarte"
+   ],
+   "passivas": [
+    "essencia_viva",
+    "alma_eterna",
+    "coracao_ferro",
+    "alquimia_do_desespero",
+    "odio_antigo",
+    "sorte_iniciante",
+    "respiracao_contada",
+    "divida_de_ouro",
+    "coracao_ferro",
+    "pele_de_sal",
+    "sangue_guerreiro",
+    "reserva_arcana",
+    "maos_midas",
+    "odio_baixo",
+    "postura_fechada",
+    "essencia_viva",
+    "sede_sangue",
+    "sangue_guerreiro",
+    "essencia_viva",
+    "musculos_aco",
+    "boca_de_sangue"
+   ],
+   "familias": {
+    "essence_bonus": 4,
+    "max_hp": 5,
+    "potion_heal_bonus": 1,
+    "damage_percent": 2,
+    "mana_regen": 1,
+    "gold_drop_bonus": 2,
+    "status_resistance": 1,
+    "max_mp": 1,
+    "damage_reduction": 1,
+    "crit_chance": 1,
+    "strength": 1,
+    "life_steal": 1
+   },
+   "raridades": {
+    "Rare": 5,
+    "Epic": 4,
+    "Common": 12
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Prata",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Cajado de Cristal",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Arco Composto",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Espinhos",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 2,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Fênix",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W39",
+   "nick": "yeTz",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 43,
+   "seed": "488179884306871621",
+   "andar_de_extracao": 20,
+   "nivel": 23,
+   "op": 29.8662109375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W39.json",
+   "sha256": "1ec2cee764022c930891f9bbb0602c54d946df477a30af14cbd07a2e1f92e4c8",
+   "deck": [
+    "n_paciencia_do_coveiro",
+    "quebra_guarda",
+    "postura_de_muro",
+    "cutelada"
+   ],
+   "passivas": [
+    "bebida_deuses",
+    "mente_serena",
+    "ritmo_profano",
+    "bebida_deuses",
+    "sorte_iniciante",
+    "sede_silenciosa",
+    "respiracao_contada",
+    "furia_berserker",
+    "passo_de_corca",
+    "boca_de_sangue",
+    "vulto",
+    "poco_fundo",
+    "musculos_aco",
+    "sangue_guerreiro",
+    "respiracao_contada",
+    "coracao_ferro",
+    "sorte_iniciante",
+    "boca_de_sangue",
+    "boca_de_sangue",
+    "sede_silenciosa",
+    "maos_midas",
+    "boca_de_sangue"
+   ],
+   "familias": {
+    "potion_heal_bonus": 2,
+    "max_mp": 2,
+    "mana_regen": 3,
+    "essence_bonus": 2,
+    "life_steal": 6,
+    "strength": 2,
+    "agility": 1,
+    "evasion": 1,
+    "max_hp": 2,
+    "gold_drop_bonus": 1
+   },
+   "raridades": {
+    "Rare": 8,
+    "Common": 13,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": "starter"
+    },
+    "Amulet": {
+     "nome": "Amuleto de Prata",
+     "raridade": "Rare",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Lâmina Veloz",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Clava Pesada",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Peitoral de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Escudo de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W40",
+   "nick": "NOBRU",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 44,
+   "seed": "2844704781525308444",
+   "andar_de_extracao": 19,
+   "nivel": 23,
+   "op": 29.7509765625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W40.json",
+   "sha256": "decd2023c2488496dca7b72ce2af0ba3d95d0aa90c6bda8f75eb90eb427c0a12",
+   "deck": [
+    "cutelada",
+    "investida",
+    "postura_de_muro",
+    "imortal"
+   ],
+   "passivas": [
+    "boca_de_sangue",
+    "essencia_viva",
+    "essencia_fluida",
+    "reflexos_rapidos",
+    "mente_serena",
+    "coracao_ferro",
+    "sede_silenciosa",
+    "sangue_guerreiro",
+    "sangue_guerreiro",
+    "sede_silenciosa",
+    "coracao_ferro",
+    "reserva_arcana",
+    "respiracao_contada",
+    "pele_de_sal",
+    "toque_dragao",
+    "boca_de_sangue",
+    "essencia_viva",
+    "boca_de_sangue",
+    "sorte_iniciante",
+    "sangue_guerreiro",
+    "reserva_arcana",
+    "postura_fechada"
+   ],
+   "familias": {
+    "life_steal": 5,
+    "essence_bonus": 3,
+    "max_hp": 6,
+    "evasion": 1,
+    "max_mp": 3,
+    "mana_regen": 1,
+    "status_resistance": 1,
+    "strength": 1,
+    "damage_reduction": 1
+   },
+   "raridades": {
+    "Common": 15,
+    "Rare": 6,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Guerra",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Gládio de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Ouro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W41",
+   "nick": "coldzin",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 50,
+   "seed": "9284565610362645380",
+   "andar_de_extracao": 21,
+   "nivel": 24,
+   "op": 29.6357421875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W41.json",
+   "sha256": "05e0f282c20ab7fdfafdfeb45402aed438313308e65797191971912c8a1ecdec",
+   "deck": [
+    "n_pancada_na_nuca",
+    "postura_de_muro",
+    "cutelada",
+    "tremor_de_bigorna"
+   ],
+   "passivas": [
+    "passo_de_corca",
+    "respiracao_contada",
+    "essencia_viva",
+    "sede_silenciosa",
+    "reflexos_rapidos",
+    "olho_de_cacador",
+    "fortuna_absoluta",
+    "boca_de_sangue",
+    "essencia_viva",
+    "mente_serena",
+    "fortuna_absoluta",
+    "bebida_deuses",
+    "mente_serena",
+    "reserva_arcana",
+    "alquimia_do_desespero",
+    "reserva_arcana",
+    "passos_leves",
+    "poco_fundo",
+    "mente_serena",
+    "lamina_afiada",
+    "instinto_frio",
+    "musculos_aco",
+    "sorte_iniciante"
+   ],
+   "familias": {
+    "agility": 2,
+    "mana_regen": 1,
+    "essence_bonus": 3,
+    "life_steal": 2,
+    "evasion": 1,
+    "precision": 2,
+    "gold_drop_bonus": 2,
+    "max_mp": 6,
+    "potion_heal_bonus": 2,
+    "crit_chance": 1,
+    "strength": 1
+   },
+   "raridades": {
+    "Common": 12,
+    "Rare": 8,
+    "Legendary": 2,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Bandana de Tecido",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Adaga de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Placa",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 2,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W42",
+   "nick": "RNakano",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 57,
+   "seed": "4580664160974118811",
+   "andar_de_extracao": 19,
+   "nivel": 24,
+   "op": 29.6357421875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W42.json",
+   "sha256": "f868fa7544a83b11867d30519353c27ae83dbffd8aaf53e26aca2c7e09e783d6",
+   "deck": [
+    "golpe_duplo",
+    "cutelada",
+    "n_gancho_e_corda",
+    "n_disciplina_de_forja"
+   ],
+   "passivas": [
+    "essencia_viva",
+    "maos_midas",
+    "poco_fundo",
+    "mente_serena",
+    "pele_grossa",
+    "ritmo_profano",
+    "essencia_fluida",
+    "poco_fundo",
+    "boca_de_sangue",
+    "respiracao_contada",
+    "bebida_deuses",
+    "sangue_guerreiro",
+    "voracidade",
+    "maos_midas",
+    "sorte_iniciante",
+    "bebida_deuses",
+    "alma_eterna",
+    "odio_antigo",
+    "boca_de_sangue",
+    "mente_serena",
+    "essencia_pura",
+    "sorte_iniciante",
+    "boca_de_sangue"
+   ],
+   "familias": {
+    "essence_bonus": 4,
+    "gold_drop_bonus": 2,
+    "max_mp": 4,
+    "defense": 1,
+    "mana_regen": 2,
+    "max_hp": 3,
+    "life_steal": 4,
+    "potion_heal_bonus": 2,
+    "damage_percent": 1
+   },
+   "raridades": {
+    "Rare": 10,
+    "Common": 10,
+    "Epic": 2,
+    "Legendary": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Prata",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Ferro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Fenrir",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 2,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W43",
+   "nick": "aXtLOL",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 61,
+   "seed": "16872040783703285537",
+   "andar_de_extracao": 20,
+   "nivel": 23,
+   "op": 29.7509765625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W43.json",
+   "sha256": "753eb80928873d68633cb946f2768f56f8153cc1428a781d48931515e874c958",
+   "deck": [
+    "n_travar_o_pulso",
+    "n_mira_calma",
+    "ferro_contra_ferro",
+    "n_ritmo_de_duelo"
+   ],
+   "passivas": [
+    "olho_de_cacador",
+    "casco_calejado",
+    "mente_serena",
+    "mente_serena",
+    "essencia_viva",
+    "respiracao_contada",
+    "pele_de_sal",
+    "reserva_arcana",
+    "essencia_fluida",
+    "bebida_deuses",
+    "divida_de_ouro",
+    "sangue_guerreiro",
+    "ritmo_profano",
+    "furia_berserker",
+    "ritmo_profano",
+    "boca_de_sangue",
+    "sangue_guerreiro",
+    "maos_midas",
+    "essencia_viva",
+    "ritmo_profano",
+    "olho_aguia",
+    "essencia_fluida"
+   ],
+   "familias": {
+    "precision": 1,
+    "defense": 1,
+    "max_mp": 3,
+    "essence_bonus": 2,
+    "mana_regen": 4,
+    "status_resistance": 1,
+    "max_hp": 4,
+    "potion_heal_bonus": 1,
+    "gold_drop_bonus": 2,
+    "strength": 1,
+    "life_steal": 1,
+    "crit_chance": 1
+   },
+   "raridades": {
+    "Common": 10,
+    "Rare": 11,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Dragão",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Imortalidade",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Machado de Batalha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Ferro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Gibão de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    },
+    "Legs": {
+     "nome": "Perneiras de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Ouro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W44",
+   "nick": "calango",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 42,
+   "seed": "2645495527007246633",
+   "andar_de_extracao": 19,
+   "nivel": 22,
+   "op": 28.5986328125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W44.json",
+   "sha256": "777dab239932fa216721e02f8a26af6e1e76170e6abdba5724907a8f8889f5f0",
+   "deck": [
+    "golpe_poderoso",
+    "quebra_guarda",
+    "imortal",
+    "tomar_folego"
+   ],
+   "passivas": [
+    "voracidade",
+    "alma_eterna",
+    "sangue_guerreiro",
+    "passos_leves",
+    "coracao_ferro",
+    "sede_silenciosa",
+    "pele_grossa",
+    "passos_leves",
+    "boca_de_sangue",
+    "passos_leves",
+    "boca_de_sangue",
+    "instinto_frio",
+    "olho_de_cacador",
+    "pele_grossa",
+    "olho_aguia",
+    "essencia_fluida",
+    "alma_eterna",
+    "coracao_ferro",
+    "coracao_ferro",
+    "voracidade",
+    "instinto_frio"
+   ],
+   "familias": {
+    "life_steal": 5,
+    "max_hp": 7,
+    "agility": 3,
+    "defense": 2,
+    "precision": 3,
+    "crit_chance": 1
+   },
+   "raridades": {
+    "Epic": 4,
+    "Common": 13,
+    "Rare": 4
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Tridente do Guerreiro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Gravetos Mágicos",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Placa Pesada",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Manoplas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W45",
+   "nick": "Hayashii",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 179,
+   "seed": "15214951623552712880",
+   "andar_de_extracao": 20,
+   "nivel": 22,
+   "op": 27.9072265625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W45.json",
+   "sha256": "11857b5ce2dbb4b57aed3f1c136fb8b6f5534a28cea405cba5f04a315486a986",
+   "deck": [
+    "golpe_poderoso",
+    "quebra_guarda",
+    "quebra_ossos",
+    "baluarte"
+   ],
+   "passivas": [
+    "pele_de_sal",
+    "postura_fechada",
+    "coracao_ferro",
+    "alma_eterna",
+    "pele_grossa",
+    "coracao_ferro",
+    "coracao_ferro",
+    "boca_de_sangue",
+    "sangue_guerreiro",
+    "coracao_ferro",
+    "pele_de_sal",
+    "passo_de_corca",
+    "olho_de_cacador",
+    "voracidade",
+    "boca_de_sangue",
+    "olho_de_cacador",
+    "pele_de_sal",
+    "postura_fechada",
+    "passo_de_corca",
+    "musculos_aco",
+    "sede_silenciosa"
+   ],
+   "familias": {
+    "status_resistance": 3,
+    "damage_reduction": 2,
+    "max_hp": 6,
+    "defense": 1,
+    "life_steal": 4,
+    "agility": 2,
+    "precision": 2,
+    "strength": 1
+   },
+   "raridades": {
+    "Common": 18,
+    "Epic": 2,
+    "Rare": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Arco Composto",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Bastão Cru",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Fenrir",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W46",
+   "nick": "PaulinhoLOKObr",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 199,
+   "seed": "10006103864399723504",
+   "andar_de_extracao": 20,
+   "nivel": 22,
+   "op": 28.4833984375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W46.json",
+   "sha256": "c020fd10038b6fb40c0b6242bb2b456da0a2c8dc1f8604aadff9822f7609152d",
+   "deck": [
+    "tremor_de_bigorna",
+    "quebra_guarda",
+    "n_respirar_fundo",
+    "baluarte"
+   ],
+   "passivas": [
+    "corpo_inviolavel",
+    "postura_fechada",
+    "passo_de_corca",
+    "passos_leves",
+    "respiracao_contada",
+    "toque_dragao",
+    "casco_calejado",
+    "escudo_fe",
+    "coracao_ferro",
+    "coracao_ferro",
+    "bebida_deuses",
+    "essencia_fluida",
+    "essencia_fluida",
+    "coracao_ferro",
+    "boca_de_sangue",
+    "essencia_fluida",
+    "pele_de_sal",
+    "sede_silenciosa",
+    "furia_berserker",
+    "passo_de_corca",
+    "passo_de_corca"
+   ],
+   "familias": {
+    "status_resistance": 2,
+    "damage_reduction": 2,
+    "agility": 4,
+    "mana_regen": 1,
+    "strength": 2,
+    "defense": 1,
+    "max_hp": 6,
+    "potion_heal_bonus": 1,
+    "life_steal": 2
+   },
+   "raridades": {
+    "Legendary": 1,
+    "Common": 11,
+    "Epic": 1,
+    "Rare": 8
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Pedra",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada Longa",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Clava de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Fenrir",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W47",
+   "nick": "XANDAOOGOD",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 212,
+   "seed": "16962208254202598663",
+   "andar_de_extracao": 22,
+   "nivel": 23,
+   "op": 29.6357421875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W47.json",
+   "sha256": "08d939a415de4dd1a600de525d5aec33daf5ab045b22bf40d4c63e70ca5cee26",
+   "deck": [
+    "esmagar",
+    "n_mira_calma",
+    "n_leitura_de_terreno",
+    "veterania"
+   ],
+   "passivas": [
+    "respiracao_contada",
+    "sangue_de_vidente",
+    "olho_aguia",
+    "coracao_ferro",
+    "alma_eterna",
+    "passo_de_corca",
+    "reserva_arcana",
+    "poco_fundo",
+    "musculos_aco",
+    "coracao_ferro",
+    "coracao_ferro",
+    "bebida_deuses",
+    "coracao_tita",
+    "instinto_frio",
+    "pele_de_sal",
+    "agulha_no_osso",
+    "coracao_ferro",
+    "pele_de_sal",
+    "pele_de_sal",
+    "postura_fechada",
+    "musculos_aco",
+    "pele_adamantio"
+   ],
+   "familias": {
+    "mana_regen": 1,
+    "magic": 1,
+    "crit_chance": 1,
+    "max_hp": 6,
+    "agility": 1,
+    "max_mp": 2,
+    "strength": 2,
+    "potion_heal_bonus": 1,
+    "precision": 1,
+    "status_resistance": 3,
+    "bleed_chance": 1,
+    "damage_reduction": 2
+   },
+   "raridades": {
+    "Common": 15,
+    "Epic": 2,
+    "Rare": 4,
+    "Legendary": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Clava Pesada",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Treino",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Cota de Malha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa"
+   ]
+  },
+  {
+   "id": "W48",
+   "nick": "Bagi",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "origem": "original",
+   "tentativa": 232,
+   "seed": "15085905063680726777",
+   "andar_de_extracao": 18,
+   "nivel": 20,
+   "op": 27.7919921875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W48.json",
+   "sha256": "143f3cd01d0bcdd34728346e788de46a2ed768967a67ad41e6924ba0d8ac3057",
+   "deck": [
+    "golpe_poderoso",
+    "n_respirar_fundo",
+    "n_mira_calma",
+    "n_olho_treinado"
+   ],
+   "passivas": [
+    "postura_fechada",
+    "sede_silenciosa",
+    "sede_silenciosa",
+    "postura_fechada",
+    "escudo_fe",
+    "toque_dragao",
+    "casco_calejado",
+    "postura_fechada",
+    "postura_fechada",
+    "bebida_deuses",
+    "passos_leves",
+    "pele_de_sal",
+    "sangue_guerreiro",
+    "coracao_ferro",
+    "casco_calejado",
+    "passo_de_corca",
+    "musculos_aco",
+    "passos_leves",
+    "sangue_guerreiro"
+   ],
+   "familias": {
+    "damage_reduction": 5,
+    "life_steal": 2,
+    "strength": 2,
+    "defense": 2,
+    "potion_heal_bonus": 1,
+    "agility": 3,
+    "status_resistance": 1,
+    "max_hp": 3
+   },
+   "raridades": {
+    "Common": 12,
+    "Rare": 6,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Bastão Cru",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W49",
+   "nick": "Bisteconee",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 66,
+   "seed": "2487864230724086036",
+   "andar_de_extracao": 20,
+   "nivel": 22,
+   "op": 28.5986328125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W49.json",
+   "sha256": "0906d981fc17a184d182637625289bd786d087324258cfe09e9e82c7d9ec5dbe",
+   "deck": [
+    "cutelada",
+    "n_mira_calma",
+    "n_areia_no_chao",
+    "n_leitura_de_terreno"
+   ],
+   "passivas": [
+    "sangue_de_vidente",
+    "sangue_de_vidente",
+    "sangue_guerreiro",
+    "cabeca_dura",
+    "musculos_aco",
+    "fio_serrilhado",
+    "musculos_aco",
+    "mente_serena",
+    "heranca_do_abismo",
+    "olho_aguia",
+    "odio_antigo",
+    "odio_baixo",
+    "olho_de_cacador",
+    "olho_de_cacador",
+    "agulha_no_osso",
+    "heranca_do_abismo",
+    "odio_antigo",
+    "toque_dragao",
+    "odio_baixo",
+    "olho_de_cacador",
+    "sangue_de_vidente"
+   ],
+   "familias": {
+    "magic": 5,
+    "max_hp": 1,
+    "stun_chance": 1,
+    "strength": 3,
+    "bleed_chance": 2,
+    "max_mp": 1,
+    "crit_chance": 1,
+    "damage_percent": 4,
+    "precision": 3
+   },
+   "raridades": {
+    "Common": 14,
+    "Rare": 6,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    },
+    "Amulet": {
+     "nome": "Amuleto de Ouro",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Treino",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Cota Leve",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Saia de Tecido",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Escudo de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "controle"
+   ]
+  },
+  {
+   "id": "W50",
+   "nick": "hastad",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 164,
+   "seed": "4385105589953273700",
+   "andar_de_extracao": 21,
+   "nivel": 22,
+   "op": 28.5986328125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W50.json",
+   "sha256": "dda60f45b72b9640b6f6fadb173b4e66284c3e5344526abdac797c81db44352f",
+   "deck": [
+    "mao_dupla",
+    "n_mira_calma",
+    "n_estocada_seca",
+    "n_couro_batido"
+   ],
+   "passivas": [
+    "olho_aguia",
+    "lamina_lendaria",
+    "odio_baixo",
+    "musculos_aco",
+    "furia_berserker",
+    "sangue_guerreiro",
+    "respiracao_contada",
+    "musculos_aco",
+    "coracao_ferro",
+    "odio_baixo",
+    "agulha_no_osso",
+    "heranca_do_abismo",
+    "sangue_de_vidente",
+    "pele_grossa",
+    "heranca_do_abismo",
+    "musculos_aco",
+    "olho_aguia",
+    "passo_de_corca",
+    "voz_no_escuro",
+    "respiracao_contada",
+    "fio_serrilhado"
+   ],
+   "familias": {
+    "crit_chance": 3,
+    "damage_percent": 2,
+    "strength": 4,
+    "max_hp": 2,
+    "mana_regen": 2,
+    "bleed_chance": 2,
+    "magic": 3,
+    "defense": 1,
+    "agility": 1,
+    "fear_chance": 1
+   },
+   "raridades": {
+    "Common": 15,
+    "Legendary": 1,
+    "Rare": 5
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Couro",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    },
+    "Weapon1": {
+     "nome": "Tridente do Guerreiro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Adaga de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Peitoral de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas Rasas",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Ouro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "defesa",
+    "controle"
+   ]
+  },
+  {
+   "id": "W51",
+   "nick": "suetam1v4",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "origem": "original",
+   "tentativa": 217,
+   "seed": "12730939534942729493",
+   "andar_de_extracao": 19,
+   "nivel": 21,
+   "op": 27.9072265625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W51.json",
+   "sha256": "7add54bd886fc7d362eff27f468b894db8f063dd5c2399176bc2c900e6b0ad7e",
+   "deck": [
+    "golpe_duplo",
+    "tremor_de_bigorna",
+    "n_areia_no_chao",
+    "postura_de_muro"
+   ],
+   "passivas": [
+    "fio_serrilhado",
+    "toque_dragao",
+    "passo_de_corca",
+    "odio_antigo",
+    "musculos_aco",
+    "furia_berserker",
+    "musculos_aco",
+    "passo_de_corca",
+    "olho_de_cacador",
+    "furia_berserker",
+    "musculos_aco",
+    "instinto_frio",
+    "sangue_guerreiro",
+    "heranca_do_abismo",
+    "pulso_certeiro",
+    "fio_serrilhado",
+    "unha_suja",
+    "lamina_afiada",
+    "pele_grossa",
+    "musculos_aco"
+   ],
+   "familias": {
+    "bleed_chance": 2,
+    "strength": 7,
+    "agility": 2,
+    "damage_percent": 1,
+    "precision": 2,
+    "max_hp": 1,
+    "magic": 1,
+    "crit_damage": 1,
+    "poison_chance": 1,
+    "crit_chance": 1,
+    "defense": 1
+   },
+   "raridades": {
+    "Common": 12,
+    "Epic": 1,
+    "Rare": 7
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Prata",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Porrete",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Faca de Caça",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Cota Leve",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Manoplas de Ferro",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Tamancos de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": []
+  },
+  {
+   "id": "W52",
+   "nick": "SkipNhO",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 3,
+   "seed": "13489461355466704452",
+   "andar_de_extracao": 19,
+   "nivel": 23,
+   "op": 28.0224609375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W52.json",
+   "sha256": "18b4de8e974813410ed84495f543e59670dd8c8dafbb8539a5fd1b0132f8eae2",
+   "deck": [
+    "golpe_poderoso",
+    "postura_de_muro",
+    "pisada_de_ferro",
+    "juramento_da_muralha"
+   ],
+   "passivas": [
+    "boca_de_sangue",
+    "sede_silenciosa",
+    "bebida_deuses",
+    "sangue_guerreiro",
+    "sorte_iniciante",
+    "respiracao_contada",
+    "poco_fundo",
+    "sorte_iniciante",
+    "pele_de_sal",
+    "alquimia_do_desespero",
+    "olho_aguia",
+    "passos_leves",
+    "olho_aguia",
+    "sede_silenciosa",
+    "ritmo_profano",
+    "respiracao_contada",
+    "respiracao_contada",
+    "sorte_iniciante",
+    "essencia_viva",
+    "fome_batalha",
+    "sorte_iniciante",
+    "maos_midas"
+   ],
+   "familias": {
+    "life_steal": 3,
+    "potion_heal_bonus": 2,
+    "max_hp": 1,
+    "essence_bonus": 6,
+    "mana_regen": 4,
+    "max_mp": 1,
+    "status_resistance": 1,
+    "crit_chance": 2,
+    "agility": 1,
+    "gold_drop_bonus": 1
+   },
+   "raridades": {
+    "Common": 13,
+    "Rare": 7,
+    "Epic": 2
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Bastão Cru",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Adaga de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Jaqueta de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Palha",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W53",
+   "nick": "babi",
+   "classe": "Warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "origem": "original",
+   "tentativa": 326,
+   "seed": "12624093366700675930",
+   "andar_de_extracao": 20,
+   "nivel": 24,
+   "op": 28.4833984375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W53.json",
+   "sha256": "65efc1b897bb61d54983e12165549bf82e08ecc5b20ead2b26f418859c11abc5",
+   "deck": [
+    "rasgo_de_gancho",
+    "postura_de_muro",
+    "sangue_nos_olhos",
+    "marca_do_acougueiro"
+   ],
+   "passivas": [
+    "postura_fechada",
+    "sede_silenciosa",
+    "boca_de_sangue",
+    "postura_fechada",
+    "reserva_arcana",
+    "essencia_fluida",
+    "sangue_guerreiro",
+    "musculos_aco",
+    "olho_aguia",
+    "olho_de_cacador",
+    "alma_eterna",
+    "olho_de_cacador",
+    "boca_de_sangue",
+    "boca_de_sangue",
+    "olho_aguia",
+    "boca_de_sangue",
+    "essencia_pura",
+    "respiracao_contada",
+    "reserva_arcana",
+    "pele_grossa",
+    "boca_de_sangue",
+    "sangue_guerreiro",
+    "pele_grossa"
+   ],
+   "familias": {
+    "damage_reduction": 2,
+    "life_steal": 6,
+    "max_mp": 2,
+    "max_hp": 4,
+    "strength": 1,
+    "crit_chance": 2,
+    "precision": 2,
+    "essence_bonus": 1,
+    "mana_regen": 1,
+    "defense": 2
+   },
+   "raridades": {
+    "Common": 19,
+    "Rare": 2,
+    "Epic": 1,
+    "Legendary": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Pá de Batalha",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Clava Pesada",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Peitoral de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 2,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Tamancos de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W54",
+   "nick": "TheBurntPeanut",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "preenchimento_novo",
+   "tentativa": 39,
+   "seed": "16267420974496528008",
+   "andar_de_extracao": 20,
+   "nivel": 23,
+   "op": 29.6357421875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W54.json",
+   "sha256": "d142a7227c42321182079d7b0eaeb4a0d0824c70eb5445f6bb03568b4ef142a3",
+   "deck": [
+    "mao_dupla",
+    "n_mira_calma",
+    "provocacao",
+    "grito_guerra"
+   ],
+   "passivas": [
+    "essencia_viva",
+    "sorte_iniciante",
+    "maos_midas",
+    "sorte_iniciante",
+    "divida_de_ouro",
+    "reserva_arcana",
+    "coracao_ferro",
+    "respiracao_contada",
+    "escudo_fe",
+    "olho_aguia",
+    "pele_grossa",
+    "olho_aguia",
+    "heranca_do_abismo",
+    "olho_de_cacador",
+    "respiracao_contada",
+    "mente_serena",
+    "pele_grossa",
+    "olho_de_cacador",
+    "sangue_guerreiro",
+    "reserva_arcana",
+    "sede_silenciosa",
+    "mente_serena"
+   ],
+   "familias": {
+    "essence_bonus": 3,
+    "gold_drop_bonus": 2,
+    "max_mp": 4,
+    "max_hp": 2,
+    "mana_regen": 2,
+    "damage_reduction": 1,
+    "crit_chance": 2,
+    "defense": 2,
+    "magic": 1,
+    "precision": 2,
+    "life_steal": 1
+   },
+   "raridades": {
+    "Rare": 5,
+    "Common": 16,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Clava Pesada",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Faca de Caça",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Placa",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Ouro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": []
+  },
+  {
+   "id": "W55",
+   "nick": "casimito",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "preenchimento_novo",
+   "tentativa": 83,
+   "seed": "9680521760163710385",
+   "andar_de_extracao": 21,
+   "nivel": 23,
+   "op": 29.7509765625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W55.json",
+   "sha256": "a275c82fb99f88858cbfc5644ab18c14937605fc6441b77fc87bfeb63de628ed",
+   "deck": [
+    "peso_do_machado",
+    "esmagar",
+    "provocacao",
+    "n_disciplina_de_forja"
+   ],
+   "passivas": [
+    "postura_fechada",
+    "lamina_afiada",
+    "sangue_de_vidente",
+    "olho_aguia",
+    "odio_baixo",
+    "sangue_guerreiro",
+    "furia_berserker",
+    "instinto_frio",
+    "musculos_aco",
+    "postura_fechada",
+    "coracao_ferro",
+    "musculos_aco",
+    "pulso_certeiro",
+    "odio_baixo",
+    "pulso_certeiro",
+    "voz_no_escuro",
+    "furia_berserker",
+    "pulso_certeiro",
+    "odio_baixo",
+    "olho_aguia",
+    "pulso_certeiro",
+    "sangue_guerreiro"
+   ],
+   "familias": {
+    "damage_reduction": 2,
+    "crit_chance": 3,
+    "magic": 1,
+    "damage_percent": 3,
+    "max_hp": 3,
+    "strength": 4,
+    "precision": 1,
+    "crit_damage": 4,
+    "fear_chance": 1
+   },
+   "raridades": {
+    "Common": 17,
+    "Rare": 5
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Lança de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Gravetos Mágicos",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Armadura de Camisa",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel do Rubi",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle"
+   ]
+  },
+  {
+   "id": "W56",
+   "nick": "sofiaespanha",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "preenchimento_novo",
+   "tentativa": 80,
+   "seed": "17466784782611362638",
+   "andar_de_extracao": 17,
+   "nivel": 23,
+   "op": 29.2900390625,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W56.json",
+   "sha256": "b099e1544b7efe103b75ec623aaa78407bb7ffdf4298777e67f00a91a5ca56a5",
+   "deck": [
+    "soco_de_placa",
+    "n_passo_lateral",
+    "quebra_guarda",
+    "baluarte"
+   ],
+   "passivas": [
+    "instinto_frio",
+    "essencia_viva",
+    "cabeca_dura",
+    "boca_de_sangue",
+    "reserva_arcana",
+    "reserva_arcana",
+    "sorte_iniciante",
+    "pele_grossa",
+    "reserva_arcana",
+    "pele_de_sal",
+    "reserva_arcana",
+    "essencia_viva",
+    "fome_batalha",
+    "reserva_arcana",
+    "pele_grossa",
+    "sorte_iniciante",
+    "vulto",
+    "mente_serena",
+    "bencao_divina",
+    "sangue_guerreiro",
+    "respiracao_contada",
+    "essencia_viva"
+   ],
+   "familias": {
+    "precision": 1,
+    "essence_bonus": 6,
+    "stun_chance": 1,
+    "life_steal": 1,
+    "max_mp": 6,
+    "defense": 2,
+    "status_resistance": 1,
+    "evasion": 1,
+    "max_hp": 2,
+    "mana_regen": 1
+   },
+   "raridades": {
+    "Rare": 5,
+    "Common": 14,
+    "Epic": 3
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Tridente do Guerreiro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Adaga de Madeira",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Espinhos",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Sapatos de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "controle"
+   ]
+  },
+  {
+   "id": "W57",
+   "nick": "Coringa",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "preenchimento_novo",
+   "tentativa": 35,
+   "seed": "2589369501754876463",
+   "andar_de_extracao": 18,
+   "nivel": 20,
+   "op": 27.7919921875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W57.json",
+   "sha256": "7859438a2bd9ecec037cb38967a71eea202c1b7975622471890c0c9370c61345",
+   "deck": [
+    "cutelada",
+    "golpe_devastador",
+    "n_areia_no_chao",
+    "escudo_protetor"
+   ],
+   "passivas": [
+    "odio_baixo",
+    "odio_baixo",
+    "odio_baixo",
+    "pulso_certeiro",
+    "olho_de_cacador",
+    "lamina_lendaria",
+    "furia_berserker",
+    "coracao_ferro",
+    "sangue_de_vidente",
+    "postura_fechada",
+    "passos_leves",
+    "odio_antigo",
+    "instinto_frio",
+    "toque_dragao",
+    "escudo_fe",
+    "heranca_do_abismo",
+    "olho_de_cacador",
+    "furia_berserker",
+    "odio_baixo"
+   ],
+   "familias": {
+    "damage_percent": 5,
+    "crit_damage": 1,
+    "precision": 3,
+    "crit_chance": 1,
+    "strength": 3,
+    "max_hp": 1,
+    "magic": 2,
+    "damage_reduction": 2,
+    "agility": 1
+   },
+   "raridades": {
+    "Common": 11,
+    "Legendary": 1,
+    "Rare": 6,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Dragão",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Pedra",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Lâmina Veloz",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Machado Enferrujado",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Fênix",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": []
+  },
+  {
+   "id": "W58",
+   "nick": "JonVlogs",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "origem": "preenchimento_novo",
+   "tentativa": 40,
+   "seed": "8172921485304172074",
+   "andar_de_extracao": 19,
+   "nivel": 22,
+   "op": 28.5986328125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W58.json",
+   "sha256": "58e1461aa52956b6a07eeb894955b9d99feca40ed15a86a5f0cc3545d6b1bcc8",
+   "deck": [
+    "golpe_poderoso",
+    "investida",
+    "n_guarda_alta",
+    "couraca_improvisada"
+   ],
+   "passivas": [
+    "olho_aguia",
+    "boca_de_sangue",
+    "reserva_arcana",
+    "reserva_arcana",
+    "respiracao_contada",
+    "musculos_aco",
+    "instinto_frio",
+    "mente_serena",
+    "sorte_iniciante",
+    "coracao_ferro",
+    "musculos_aco",
+    "coracao_ferro",
+    "mente_serena",
+    "musculos_aco",
+    "maos_midas",
+    "sorte_iniciante",
+    "pele_de_sal",
+    "boca_de_sangue",
+    "pele_grossa",
+    "fome_batalha",
+    "odio_antigo"
+   ],
+   "familias": {
+    "crit_chance": 1,
+    "life_steal": 2,
+    "max_mp": 4,
+    "mana_regen": 1,
+    "strength": 3,
+    "precision": 1,
+    "essence_bonus": 3,
+    "max_hp": 2,
+    "gold_drop_bonus": 1,
+    "status_resistance": 1,
+    "defense": 1,
+    "damage_percent": 1
+   },
+   "raridades": {
+    "Common": 17,
+    "Rare": 3,
+    "Epic": 1
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Dragão",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Vida",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Porrete",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Gravetos Mágicos",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Cota de Malha",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Tamancos de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Fênix",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W59",
+   "nick": "liminhag0d",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "origem": "preenchimento_novo",
+   "tentativa": 101,
+   "seed": "2418842632503645723",
+   "andar_de_extracao": 19,
+   "nivel": 22,
+   "op": 29.6357421875,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W59.json",
+   "sha256": "8969ffc492410597dae06781cbb114c57ff4203e18338a4620bda753e9be019a",
+   "deck": [
+    "golpe_poderoso",
+    "investida",
+    "n_estocada_seca",
+    "n_guarda_alta"
+   ],
+   "passivas": [
+    "coracao_ferro",
+    "odio_baixo",
+    "instinto_frio",
+    "fio_serrilhado",
+    "pulso_certeiro",
+    "fio_serrilhado",
+    "pulso_certeiro",
+    "passos_leves",
+    "olho_aguia",
+    "escudo_fe",
+    "postura_fechada",
+    "olho_aguia",
+    "odio_antigo",
+    "voz_no_escuro",
+    "lamina_afiada",
+    "essencia_fluida",
+    "furia_berserker",
+    "lamina_afiada",
+    "odio_antigo",
+    "fio_serrilhado",
+    "sangue_de_vidente"
+   ],
+   "familias": {
+    "max_hp": 2,
+    "damage_percent": 3,
+    "precision": 1,
+    "bleed_chance": 3,
+    "crit_damage": 2,
+    "agility": 1,
+    "crit_chance": 4,
+    "damage_reduction": 2,
+    "fear_chance": 1,
+    "strength": 1,
+    "magic": 1
+   },
+   "raridades": {
+    "Common": 12,
+    "Rare": 9
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Imortalidade",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Lança de Madeira",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Martelo de Mão",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Chinelos de Pano",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle"
+   ]
+  },
+  {
+   "id": "W60",
+   "nick": "frttt",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "preenchimento_novo",
+   "tentativa": 93,
+   "seed": "10776659354567911830",
+   "andar_de_extracao": 19,
+   "nivel": 23,
+   "op": 29.5205078125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W60.json",
+   "sha256": "e01eab0950c6ddf4e2328a7c463548e0dfdd12ab29009850aea8e69f2342beae",
+   "deck": [
+    "golpe_devastador",
+    "n_mira_calma",
+    "n_pausa_util",
+    "n_estocada_seca"
+   ],
+   "passivas": [
+    "sangue_guerreiro",
+    "coracao_ferro",
+    "olho_aguia",
+    "respiracao_contada",
+    "musculos_aco",
+    "sorte_iniciante",
+    "reserva_arcana",
+    "olho_de_cacador",
+    "bebida_deuses",
+    "sorte_iniciante",
+    "pele_de_sal",
+    "sede_silenciosa",
+    "mente_serena",
+    "fome_batalha",
+    "reserva_arcana",
+    "coracao_ferro",
+    "maos_midas",
+    "respiracao_contada",
+    "furia_berserker",
+    "boca_de_sangue",
+    "sede_sangue",
+    "boca_de_sangue"
+   ],
+   "familias": {
+    "max_hp": 3,
+    "crit_chance": 2,
+    "mana_regen": 2,
+    "strength": 2,
+    "essence_bonus": 3,
+    "max_mp": 3,
+    "precision": 1,
+    "potion_heal_bonus": 1,
+    "status_resistance": 1,
+    "life_steal": 3,
+    "gold_drop_bonus": 1
+   },
+   "raridades": {
+    "Common": 16,
+    "Rare": 4,
+    "Epic": 2
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Ouro",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Faca de Caça",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Ouro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel Vegetal",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "sustento"
+   ]
+  },
+  {
+   "id": "W61",
+   "nick": "Tealzlol",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "origem": "preenchimento_novo",
+   "tentativa": 44,
+   "seed": "5167399243287148898",
+   "andar_de_extracao": 17,
+   "nivel": 19,
+   "op": 28.1376953125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W61.json",
+   "sha256": "745f1a16d3862794f2bbac4016a20c3c4d6db72d01c0faa8665113e8ed5b4ac3",
+   "deck": [
+    "golpe_poderoso",
+    "n_mira_calma",
+    "n_folego_de_marcha",
+    "n_ritmo_de_duelo"
+   ],
+   "passivas": [
+    "olho_aguia",
+    "passo_de_corca",
+    "postura_fechada",
+    "olho_aguia",
+    "postura_fechada",
+    "sede_silenciosa",
+    "sangue_guerreiro",
+    "escudo_fe",
+    "pele_de_sal",
+    "musculos_aco",
+    "corpo_inviolavel",
+    "pele_de_sal",
+    "olho_de_cacador",
+    "boca_de_sangue",
+    "sede_sangue",
+    "escudo_fe",
+    "toque_dragao",
+    "boca_de_sangue"
+   ],
+   "familias": {
+    "crit_chance": 3,
+    "agility": 1,
+    "damage_reduction": 4,
+    "life_steal": 3,
+    "max_hp": 1,
+    "status_resistance": 3,
+    "strength": 2,
+    "precision": 1
+   },
+   "raridades": {
+    "Common": 12,
+    "Rare": 3,
+    "Legendary": 1,
+    "Epic": 2
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Prata",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada do Universo",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada do Universo",
+     "raridade": "Legendary",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura Divina",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Bermuda de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W62",
+   "nick": "gabepeixe",
+   "classe": "Warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "origem": "preenchimento_novo",
+   "tentativa": 43,
+   "seed": "2193193603985627856",
+   "andar_de_extracao": 19,
+   "nivel": 21,
+   "op": 28.5986328125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W62.json",
+   "sha256": "5fdb9f5ff5edc5d54e23579060949189e3becb2873c411f495ae6b0840234551",
+   "deck": [
+    "furia",
+    "soco_de_placa",
+    "n_travar_o_pulso",
+    "tremor_de_bigorna"
+   ],
+   "passivas": [
+    "coracao_ferro",
+    "coracao_ferro",
+    "sede_sangue",
+    "musculos_aco",
+    "voz_no_escuro",
+    "furia_berserker",
+    "lamina_lendaria",
+    "odio_antigo",
+    "musculos_aco",
+    "odio_baixo",
+    "odio_antigo",
+    "instinto_frio",
+    "passos_leves",
+    "pulso_certeiro",
+    "furia_berserker",
+    "passo_de_corca",
+    "cabeca_dura",
+    "olho_aguia",
+    "toque_dragao",
+    "sangue_toxico"
+   ],
+   "familias": {
+    "max_hp": 2,
+    "crit_chance": 3,
+    "strength": 5,
+    "fear_chance": 1,
+    "damage_percent": 3,
+    "precision": 1,
+    "agility": 2,
+    "crit_damage": 1,
+    "stun_chance": 1,
+    "poison_chance": 1
+   },
+   "raridades": {
+    "Common": 9,
+    "Epic": 3,
+    "Rare": 7,
+    "Legendary": 1
+   },
+   "equipamento": {
+    "Amulet": {
+     "nome": "Amuleto de Ouro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Espada da Vingança",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Espada Lendária",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Peitoral de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Titânio",
+     "raridade": "Epic",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel de Bronze",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Couro",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "crítico",
+    "controle"
+   ]
+  },
+  {
+   "id": "W63",
+   "nick": "tioorochitwitch",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "origem": "preenchimento_novo",
+   "tentativa": 100,
+   "seed": "14337888470259174021",
+   "andar_de_extracao": 18,
+   "nivel": 23,
+   "op": 29.4052734375,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W63.json",
+   "sha256": "4c4228342230a5e1d5565a302bc0a44dd195abd1fcac1be5c474f3315a9ddb4a",
+   "deck": [
+    "golpe_poderoso",
+    "investida",
+    "postura_de_muro",
+    "baluarte"
+   ],
+   "passivas": [
+    "sangue_guerreiro",
+    "musculos_aco",
+    "sorte_iniciante",
+    "sangue_guerreiro",
+    "ritmo_profano",
+    "sorte_iniciante",
+    "sorte_iniciante",
+    "bencao_divina",
+    "coracao_ferro",
+    "divida_de_ouro",
+    "musculos_aco",
+    "pele_grossa",
+    "ritmo_profano",
+    "sangue_guerreiro",
+    "maos_midas",
+    "mente_serena",
+    "pele_de_sal",
+    "bebida_deuses",
+    "essencia_fluida",
+    "sorte_iniciante",
+    "boca_de_sangue",
+    "olho_aguia"
+   ],
+   "familias": {
+    "max_hp": 6,
+    "strength": 2,
+    "essence_bonus": 4,
+    "mana_regen": 2,
+    "gold_drop_bonus": 2,
+    "defense": 1,
+    "max_mp": 1,
+    "status_resistance": 1,
+    "potion_heal_bonus": 1,
+    "life_steal": 1,
+    "crit_chance": 1
+   },
+   "raridades": {
+    "Common": 15,
+    "Rare": 5,
+    "Epic": 2
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Elmo de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto de Prata",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 1,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Cajado de Cristal",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Tridente do Guerreiro",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Armadura de Fenrir",
+     "raridade": "Epic",
+     "mais": 0,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Perneiras de Aço",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Manoplas de Ferro",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel da Fênix",
+     "raridade": "Epic",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  },
+  {
+   "id": "W64",
+   "nick": "fer",
+   "classe": "Warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "origem": "preenchimento_novo",
+   "tentativa": 33,
+   "seed": "6146495459393456226",
+   "andar_de_extracao": 21,
+   "nivel": 23,
+   "op": 29.9814453125,
+   "duelos_da_medicao": 1100,
+   "snapshot": "snapshots/W64.json",
+   "sha256": "6f9d75df238ec59c98acb3b795122bb0e499ebcdba65a77aaa4fb08384a51610",
+   "deck": [
+    "golpe_poderoso",
+    "juramento_da_muralha",
+    "soco_de_placa",
+    "n_respirar_fundo"
+   ],
+   "passivas": [
+    "sangue_guerreiro",
+    "essencia_fluida",
+    "coracao_ferro",
+    "instinto_frio",
+    "olho_aguia",
+    "heranca_do_abismo",
+    "bencao_divina",
+    "postura_fechada",
+    "boca_de_sangue",
+    "pele_grossa",
+    "coracao_ferro",
+    "furia_berserker",
+    "coracao_ferro",
+    "essencia_fluida",
+    "vulto",
+    "essencia_fluida",
+    "coracao_ferro",
+    "boca_de_sangue",
+    "musculos_aco",
+    "essencia_fluida",
+    "sede_sangue",
+    "escudo_fe"
+   ],
+   "familias": {
+    "max_hp": 10,
+    "precision": 1,
+    "crit_chance": 2,
+    "magic": 1,
+    "damage_reduction": 2,
+    "life_steal": 2,
+    "defense": 1,
+    "strength": 2,
+    "evasion": 1
+   },
+   "raridades": {
+    "Common": 11,
+    "Rare": 8,
+    "Epic": 3
+   },
+   "equipamento": {
+    "Helmet": {
+     "nome": "Capacete de Ferro",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 1,
+     "origem": null
+    },
+    "Amulet": {
+     "nome": "Amuleto da Mana",
+     "raridade": "Rare",
+     "mais": 2,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon1": {
+     "nome": "Cajado de Cristal",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Weapon2": {
+     "nome": "Porrete",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Body": {
+     "nome": "Placa Pesada",
+     "raridade": "Common",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Legs": {
+     "nome": "Calça de Cota",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 1,
+     "encantos": 0,
+     "origem": null
+    },
+    "Hands": {
+     "nome": "Luvas de Aço",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 2,
+     "encantos": 0,
+     "origem": null
+    },
+    "Shoes": {
+     "nome": "Botas de Corrida",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring1": {
+     "nome": "Anel da Esmeralda",
+     "raridade": "Rare",
+     "mais": 0,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Ring2": {
+     "nome": "Anel de Diamante",
+     "raridade": "Rare",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": null
+    },
+    "Accessory": {
+     "nome": "Talismã do Viajante",
+     "raridade": "Common",
+     "mais": 1,
+     "gemas": 0,
+     "encantos": 0,
+     "origem": "starter"
+    }
+   },
+   "arquetipos": [
+    "defesa",
+    "sustento"
+   ]
+  }
+ ]
+}

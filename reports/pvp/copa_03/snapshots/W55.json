@@ -1,0 +1,232 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6019,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 2.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Armadura Divina",
+   "socket_count": 2
+  },
+  "Hands": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    }
+   ],
+   "name": "Luvas de Aço",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    },
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Armadura de Camisa"
+  },
+  "Ring1": {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Lança de Madeira"
+  },
+  "Weapon2": {
+   "name": "Gravetos Mágicos"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 6250,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Lança de Madeira"
+  },
+  {
+   "name": "Saia de Couro"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada de Ferro"
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Anel de Bronze",
+   "origin": "starter"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 23128,
+  "gold_from_combat": 18359,
+  "gold_from_interest": 1876,
+  "gold_from_sale": 2893,
+  "gold_spent": 17109,
+  "gold_spent_on_consumable": 857,
+  "gold_spent_on_enchant": 1090,
+  "gold_spent_on_enhancement": 1978,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 6296,
+  "gold_spent_on_recovery": 729,
+  "gold_spent_on_socket": 886,
+  "interest_payments": 20,
+  "items_dropped": 25,
+  "items_equipped": 20,
+  "items_sold": 13,
+  "max_gold_held": 8665,
+  "paid_exits": 20,
+  "purchases": 54
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 684,
+ "passives": [
+  "postura_fechada",
+  "lamina_afiada",
+  "sangue_de_vidente",
+  "olho_aguia",
+  "odio_baixo",
+  "sangue_guerreiro",
+  "furia_berserker",
+  "instinto_frio",
+  "musculos_aco",
+  "postura_fechada",
+  "coracao_ferro",
+  "musculos_aco",
+  "pulso_certeiro",
+  "odio_baixo",
+  "pulso_certeiro",
+  "voz_no_escuro",
+  "furia_berserker",
+  "pulso_certeiro",
+  "odio_baixo",
+  "olho_aguia",
+  "pulso_certeiro",
+  "sangue_guerreiro"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "couraca_improvisada",
+  "esmagar",
+  "golpe_poderoso",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_disciplina_de_forja",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "postura_de_muro",
+  "provocacao",
+  "sangue_nos_olhos",
+  "soco_de_placa",
+  "tomar_folego",
+  "veterania"
+ ],
+ "shop_miss_streak": 3,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "peso_do_machado",
+  "2": "esmagar",
+  "3": "provocacao",
+  "4": "n_disciplina_de_forja"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 3663
+}

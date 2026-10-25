@@ -1,0 +1,227 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4725,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "name": "Amuleto de Pedra"
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Armadura de Fenrir",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 10.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 2
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Espada Longa",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "name": "Clava de Madeira"
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [
+  {
+   "gem_type": "Esmeralda",
+   "level": 4
+  }
+ ],
+ "hp": 5803,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Espada de Ferro"
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Porrete"
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 23737,
+  "gold_from_combat": 17033,
+  "gold_from_interest": 1025,
+  "gold_from_sale": 5679,
+  "gold_spent": 19012,
+  "gold_spent_on_consumable": 2162,
+  "gold_spent_on_enchant": 1053,
+  "gold_spent_on_enhancement": 1678,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 5168,
+  "gold_spent_on_recovery": 3599,
+  "gold_spent_on_socket": 1016,
+  "interest_payments": 19,
+  "items_dropped": 37,
+  "items_equipped": 50,
+  "items_sold": 28,
+  "max_gold_held": 8677,
+  "paid_exits": 19,
+  "purchases": 74
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 661,
+ "passives": [
+  "corpo_inviolavel",
+  "postura_fechada",
+  "passo_de_corca",
+  "passos_leves",
+  "respiracao_contada",
+  "toque_dragao",
+  "casco_calejado",
+  "escudo_fe",
+  "coracao_ferro",
+  "coracao_ferro",
+  "bebida_deuses",
+  "essencia_fluida",
+  "essencia_fluida",
+  "coracao_ferro",
+  "boca_de_sangue",
+  "essencia_fluida",
+  "pele_de_sal",
+  "sede_silenciosa",
+  "furia_berserker",
+  "passo_de_corca",
+  "passo_de_corca"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "berro_de_ferro",
+  "carga_do_condenado",
+  "cutelada",
+  "escudo_protetor",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "investida",
+  "investida_de_ariete",
+  "mao_dupla",
+  "n_couro_batido",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_voto_de_silencio",
+  "pisada_de_ferro",
+  "quebra_guarda",
+  "sede_de_batalha",
+  "soco_de_placa",
+  "tomar_folego",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {
+  "quebra_guarda": 2,
+  "tremor_de_bigorna": 2
+ },
+ "skills": {
+  "1": "tremor_de_bigorna",
+  "2": "quebra_guarda",
+  "3": "n_respirar_fundo",
+  "4": "baluarte"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 43
+}

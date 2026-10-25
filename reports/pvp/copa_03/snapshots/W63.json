@@ -1,0 +1,251 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5917,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Armadura de Fenrir",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Manoplas de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 5.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Tridente do Guerreiro",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 7189,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Lâmina da Tempestade",
+   "socket_count": 3
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 9.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null,
+    null
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 3
+  },
+  {
+   "name": "Cajado de Aprendiz"
+  },
+  {
+   "name": "Armadura de Espinhos",
+   "socket_count": 2
+  },
+  {
+   "name": "Armadura de Espinhos",
+   "socket_count": 1
+  },
+  {
+   "name": "Armadura de Couro"
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 27401,
+  "gold_from_combat": 20148,
+  "gold_from_interest": 1384,
+  "gold_from_sale": 5869,
+  "gold_spent": 21484,
+  "gold_spent_on_consumable": 57,
+  "gold_spent_on_enchant": 2436,
+  "gold_spent_on_enhancement": 3369,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 11661,
+  "gold_spent_on_recovery": 323,
+  "gold_spent_on_socket": 496,
+  "interest_payments": 16,
+  "items_dropped": 40,
+  "items_equipped": 26,
+  "items_sold": 31,
+  "max_gold_held": 9394,
+  "paid_exits": 17,
+  "purchases": 56
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 431,
+ "passives": [
+  "sangue_guerreiro",
+  "musculos_aco",
+  "sorte_iniciante",
+  "sangue_guerreiro",
+  "ritmo_profano",
+  "sorte_iniciante",
+  "sorte_iniciante",
+  "bencao_divina",
+  "coracao_ferro",
+  "divida_de_ouro",
+  "musculos_aco",
+  "pele_grossa",
+  "ritmo_profano",
+  "sangue_guerreiro",
+  "maos_midas",
+  "mente_serena",
+  "pele_de_sal",
+  "bebida_deuses",
+  "essencia_fluida",
+  "sorte_iniciante",
+  "boca_de_sangue",
+  "olho_aguia"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "couraca_improvisada",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "fio_no_rebite",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_guarda_cruzada",
+  "n_marca_do_cacador",
+  "n_passo_lateral",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "peso_do_machado",
+  "postura_de_muro",
+  "provocacao",
+  "quebra_guarda",
+  "tomar_folego"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "investida": 1
+ },
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "investida",
+  "3": "postura_de_muro",
+  "4": "baluarte"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 196
+}

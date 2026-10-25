@@ -1,0 +1,259 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3906,
+ "dungeon_level": 17,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Agilidade",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Colete da Resistência",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 7.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Calça de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Tamancos de Madeira"
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  }
+ },
+ "extracted_on_floor": 17,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [
+  {
+   "gem_type": "Rubi",
+   "level": 4
+  }
+ ],
+ "hp": 4339,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  },
+  {
+   "name": "Túnica Arcana",
+   "socket_count": 2
+  },
+  {
+   "name": "Capacete de Couro"
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Cajado do Vazio",
+   "socket_count": 2
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Chinelos de Pano"
+  },
+  {
+   "name": "Cota Leve"
+  }
+ ],
+ "last_interest_floor": 16,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 11,
+  "gold_earned": 12858,
+  "gold_from_combat": 10297,
+  "gold_from_interest": 638,
+  "gold_from_sale": 1923,
+  "gold_spent": 8952,
+  "gold_spent_on_consumable": 421,
+  "gold_spent_on_enchant": 665,
+  "gold_spent_on_enhancement": 1574,
+  "gold_spent_on_exit_fee": 2694,
+  "gold_spent_on_gear": 2572,
+  "gold_spent_on_recovery": 166,
+  "gold_spent_on_socket": 860,
+  "interest_payments": 16,
+  "items_dropped": 27,
+  "items_equipped": 14,
+  "items_sold": 13,
+  "max_gold_held": 3936,
+  "paid_exits": 16,
+  "purchases": 44
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 865,
+ "passives": [
+  "sorte_iniciante",
+  "sangue_guerreiro",
+  "coracao_ferro",
+  "boca_de_sangue",
+  "essencia_fluida",
+  "musculos_aco",
+  "reserva_arcana",
+  "reserva_arcana",
+  "poco_fundo",
+  "coracao_ferro",
+  "pele_de_sal",
+  "sorte_iniciante",
+  "respiracao_contada",
+  "sorte_iniciante",
+  "sorte_iniciante",
+  "mente_serena",
+  "poco_fundo",
+  "ritmo_profano",
+  "reserva_arcana",
+  "sede_sangue"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "escudo_protetor",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_pausa_util",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "quebra_guarda",
+  "resistencia_heroica",
+  "soco_de_placa",
+  "veterania"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "n_mira_calma": 3,
+  "pisada_de_ferro": 2,
+  "quebra_guarda": 1
+ },
+ "skills": {
+  "1": "resistencia_heroica",
+  "2": "n_mira_calma",
+  "3": "quebra_guarda",
+  "4": "n_gancho_e_corda"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 456
+}

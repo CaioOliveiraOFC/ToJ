@@ -1,0 +1,217 @@
+{
+ "active_buffs": {},
+ "active_effects": {
+  "slowed#mob_guincho": {
+   "duration": 1,
+   "effect": "slowed",
+   "intensity": 20.0,
+   "source_id": "mob_guincho",
+   "stacks": 1,
+   "value": 20.0
+  }
+ },
+ "coins": 6285,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Placa Pesada"
+  },
+  "Hands": {
+   "name": "Manoplas de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    null,
+    null
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 3
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel Vegetal"
+  },
+  "Ring2": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Couro"
+  },
+  "Weapon1": {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Gravetos Mágicos"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Safira",
+   "level": 3
+  },
+  {
+   "gem_type": "Ametista",
+   "level": 3
+  },
+  {
+   "gem_type": "Topázio",
+   "level": 4
+  }
+ ],
+ "hp": 5367,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Machado Terrível",
+   "socket_count": 2
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Adaga de Madeira"
+  },
+  {
+   "name": "Chapéu de Tecido"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Lâmina da Tempestade",
+   "socket_count": 2
+  },
+  {
+   "name": "Arco Curto"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 21221,
+  "gold_from_combat": 15158,
+  "gold_from_interest": 826,
+  "gold_from_sale": 5237,
+  "gold_spent": 14936,
+  "gold_spent_on_consumable": 427,
+  "gold_spent_on_enchant": 168,
+  "gold_spent_on_enhancement": 490,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 9606,
+  "gold_spent_on_recovery": 265,
+  "gold_spent_on_socket": 275,
+  "interest_payments": 18,
+  "items_dropped": 35,
+  "items_equipped": 27,
+  "items_sold": 26,
+  "max_gold_held": 6285,
+  "paid_exits": 18,
+  "purchases": 50
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 829,
+ "passives": [
+  "voracidade",
+  "alma_eterna",
+  "sangue_guerreiro",
+  "passos_leves",
+  "coracao_ferro",
+  "sede_silenciosa",
+  "pele_grossa",
+  "passos_leves",
+  "boca_de_sangue",
+  "passos_leves",
+  "boca_de_sangue",
+  "instinto_frio",
+  "olho_de_cacador",
+  "pele_grossa",
+  "olho_aguia",
+  "essencia_fluida",
+  "alma_eterna",
+  "coracao_ferro",
+  "coracao_ferro",
+  "voracidade",
+  "instinto_frio"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "escudo_protetor",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "grito_guerra",
+  "imortal",
+  "investida",
+  "investida_de_ariete",
+  "juramento_da_muralha",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_estocada_seca",
+  "n_gancho_e_corda",
+  "n_leitura_de_terreno",
+  "n_olho_treinado",
+  "n_pausa_util",
+  "n_postura_impecavel",
+  "peso_do_machado",
+  "quebra_guarda",
+  "sangue_nos_olhos",
+  "tomar_folego",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "quebra_guarda",
+  "3": "imortal",
+  "4": "tomar_folego"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 90
+}

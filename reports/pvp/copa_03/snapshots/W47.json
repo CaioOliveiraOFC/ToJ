@@ -1,0 +1,223 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 8681,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 5.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Couro"
+  },
+  "Ring2": {
+   "name": "Anel de Couro"
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Clava Pesada"
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Espada de Treino"
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 1900,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada Lendária",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  },
+  {
+   "name": "Espada de Ferro"
+  },
+  {
+   "name": "Machado Terrível",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Perneiras de Couro"
+  },
+  {
+   "name": "Botas de Corrida",
+   "socket_count": 2
+  },
+  {
+   "name": "Saia de Tecido"
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 2,
+  "gold_earned": 33452,
+  "gold_from_combat": 21341,
+  "gold_from_interest": 2206,
+  "gold_from_sale": 9905,
+  "gold_spent": 24771,
+  "gold_spent_on_consumable": 2126,
+  "gold_spent_on_enchant": 949,
+  "gold_spent_on_enhancement": 2390,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 10115,
+  "gold_spent_on_recovery": 2892,
+  "gold_spent_on_socket": 149,
+  "interest_payments": 21,
+  "items_dropped": 48,
+  "items_equipped": 47,
+  "items_sold": 27,
+  "max_gold_held": 11974,
+  "paid_exits": 21,
+  "purchases": 61
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 494,
+ "passives": [
+  "respiracao_contada",
+  "sangue_de_vidente",
+  "olho_aguia",
+  "coracao_ferro",
+  "alma_eterna",
+  "passo_de_corca",
+  "reserva_arcana",
+  "poco_fundo",
+  "musculos_aco",
+  "coracao_ferro",
+  "coracao_ferro",
+  "bebida_deuses",
+  "coracao_tita",
+  "instinto_frio",
+  "pele_de_sal",
+  "agulha_no_osso",
+  "coracao_ferro",
+  "pele_de_sal",
+  "pele_de_sal",
+  "postura_fechada",
+  "musculos_aco",
+  "pele_adamantio"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "cutelada",
+  "escudo_protetor",
+  "esmagar",
+  "golpe_poderoso",
+  "grito_guerra",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_lamina_assentada",
+  "n_leitura_de_terreno",
+  "n_marca_do_cacador",
+  "n_mira_calma",
+  "n_travar_o_pulso",
+  "n_ultima_carta",
+  "n_voto_de_silencio",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "quebra_guarda",
+  "sangue_nos_olhos",
+  "veterania"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "esmagar",
+  "2": "n_mira_calma",
+  "3": "n_leitura_de_terreno",
+  "4": "veterania"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 6971
+}

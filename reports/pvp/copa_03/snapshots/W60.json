@@ -1,0 +1,198 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 2866,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto de Ouro",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Armadura Divina",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 4.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "name": "Anel de Ouro"
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Espada da Vingança",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Faca de Caça"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5379,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 21713,
+  "gold_from_combat": 14641,
+  "gold_from_interest": 753,
+  "gold_from_sale": 6319,
+  "gold_spent": 18847,
+  "gold_spent_on_consumable": 1606,
+  "gold_spent_on_enchant": 1355,
+  "gold_spent_on_enhancement": 1783,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 8967,
+  "gold_spent_on_recovery": 971,
+  "gold_spent_on_socket": 460,
+  "interest_payments": 18,
+  "items_dropped": 35,
+  "items_equipped": 30,
+  "items_sold": 30,
+  "max_gold_held": 6673,
+  "paid_exits": 18,
+  "purchases": 57
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 822,
+ "passives": [
+  "sangue_guerreiro",
+  "coracao_ferro",
+  "olho_aguia",
+  "respiracao_contada",
+  "musculos_aco",
+  "sorte_iniciante",
+  "reserva_arcana",
+  "olho_de_cacador",
+  "bebida_deuses",
+  "sorte_iniciante",
+  "pele_de_sal",
+  "sede_silenciosa",
+  "mente_serena",
+  "fome_batalha",
+  "reserva_arcana",
+  "coracao_ferro",
+  "maos_midas",
+  "respiracao_contada",
+  "furia_berserker",
+  "boca_de_sangue",
+  "sede_sangue",
+  "boca_de_sangue"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "cutelada",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "golpe_devastador",
+  "golpe_poderoso",
+  "investida",
+  "investida_de_ariete",
+  "juramento_da_muralha",
+  "mao_dupla",
+  "n_amuleto_rachado",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_guarda_cruzada",
+  "n_hora_do_arauto",
+  "n_marca_do_cacador",
+  "n_mira_calma",
+  "n_pausa_util",
+  "n_ritmo_de_duelo",
+  "pisada_de_ferro",
+  "sangue_nos_olhos",
+  "soco_de_placa"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_devastador",
+  "2": "n_mira_calma",
+  "3": "n_pausa_util",
+  "4": "n_estocada_seca"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1910
+}
