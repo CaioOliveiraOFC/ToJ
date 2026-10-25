@@ -54,9 +54,15 @@ from tools.arena_copa_03_geracao import (  # noqa: E402
     PASTA,
     SEMENTE_PRINCIPAL,
     TRABALHO,
+    VAGAS,
+    chave_do_grupo,
+    fila_do_preenchimento,
     gravar_atomico,
+    ler_plano,
     ler_tentativas,
     montar_fila,
+    na_faixa,
+    plano_de_preenchimento,
     reconstruir,
 )
 from tools.arena_copa_teste import (  # noqa: E402
@@ -74,6 +80,8 @@ ARQUIVO_GLADIADORES = "gladiadores.json"
 ARQUIVO_RUNS = "runs.jsonl"
 ARQUIVO_DIAGNOSTICO = "diagnostico_rng.json"
 ARQUIVO_PILOTO = "runs_piloto.jsonl"
+ARQUIVO_RUNS_PREENCHIMENTO = "runs_preenchimento.jsonl"
+ARQUIVO_PLANO = "preenchimento.json"
 PERFIL_PT = {"conservador": "Conservador", "moderado": "Moderado", "hardcore": "Hardcore"}
 # Repetições por confronto no diagnóstico de RNG, metade com os lados trocados.
 REPETICOES = 200
@@ -175,25 +183,78 @@ def _sha(texto: str) -> str:
     return hashlib.sha256(texto.encode()).hexdigest()
 
 
-def finalizar(trabalho: Path = TRABALHO, pasta: Path = PASTA) -> dict:
-    """Grava `snapshots/`, `gladiadores.json` e `runs.jsonl` a partir do checkpoint."""
-    registros = ler_tentativas(trabalho)
-    fila = montar_fila(registros)
-    abertos = [f"{g.perfil}/{g.politica}" for g in fila.values() if not g.completo]
-    if abertos:
-        raise RuntimeError(f"a geração não fechou as quotas: {', '.join(abertos)}")
+def selecionar(trabalho: Path = TRABALHO) -> tuple[list[tuple[dict, str]], dict | None]:
+    """Os 64, em ordem, com a origem de cada um: `(registro da run, origem)`.
 
-    aceitos = [(fila[g], k) for g in GRUPOS for k in fila[g].aceitas()]
-    ids = [f"W{i:02d}" for i in range(1, len(aceitos) + 1)]
+    Sem plano de preenchimento, é a regra original: as nove quotas fechadas. Com
+    plano, a seleção original do plano (conferida contra o checkpoint) e, depois,
+    as vagas do preenchimento na ordem do plano; cada vaga nova recebe a próxima
+    aceita do grupo dela, na ordem das tentativas.
+    """
+    fila = montar_fila(ler_tentativas(trabalho))
+    plano = ler_plano(trabalho)
+    if plano is None:
+        abertos = [f"{g.perfil}/{g.politica}" for g in fila.values() if not g.completo]
+        if abertos:
+            raise RuntimeError(f"a geração não fechou as quotas: {', '.join(abertos)}")
+        return [
+            (fila[g].concluidas[k], "original") for g in GRUPOS for k in fila[g].aceitas()
+        ], None
+    if json.loads(json.dumps(plano_de_preenchimento(fila))) != plano:
+        raise RuntimeError("o checkpoint da geração original não bate com o plano gravado")
+    preenchimento = fila_do_preenchimento(plano, trabalho)
+    abertos = [f"{g.perfil}/{g.politica}" for g in preenchimento.values() if not g.completo]
+    if abertos:
+        raise RuntimeError(f"o preenchimento não fechou: {', '.join(abertos)}")
+    escolhidos = [
+        (fila[(s["perfil"], s["politica"])].concluidas[s["tentativa"]], s["origem"])
+        for s in plano["selecao_original"]
+    ]
+    proximas = {chave: iter(g.aceitas()) for chave, g in preenchimento.items()}
+    for vaga in plano["preenchimento"]:
+        chave = (vaga["perfil"], vaga["politica"])
+        if vaga["origem"] == "preenchimento_checkpoint":
+            registro = fila[chave].concluidas[vaga["tentativa"]]
+        else:
+            registro = preenchimento[chave].concluidas[next(proximas[chave])]
+        escolhidos.append((registro, vaga["origem"]))
+    if len({(r["perfil"], r["politica"], r["tentativa"]) for r, _ in escolhidos}) != VAGAS:
+        raise RuntimeError("a seleção não tem 64 participantes distintos")
+    return escolhidos, plano
+
+
+def _linhas_de_runs(fila: dict, escolhidas: dict, fase: str) -> list[str]:
+    linhas = []
+    for chave, grupo in fila.items():
+        aceitas = set(grupo.aceitas())
+        ultima = max(aceitas, default=0)
+        for k in sorted(grupo.concluidas):
+            r = dict(grupo.concluidas[k])
+            r["situacao"] = situacao(r, aceitas, ultima)
+            r["apos_a_quota"] = grupo.completo and k > ultima
+            r["fase"] = fase
+            if (*chave, k) in escolhidas:
+                r["selecionada"] = escolhidas[(*chave, k)]
+            r["seed"] = str(r["seed"])
+            r.pop("candidato", None)
+            linhas.append(json.dumps(r, ensure_ascii=False, sort_keys=True))
+    return linhas
+
+
+def finalizar(trabalho: Path = TRABALHO, pasta: Path = PASTA) -> dict:
+    """Grava `snapshots/`, `gladiadores.json`, os `runs*.jsonl` e o preenchimento."""
+    escolhidos, plano = selecionar(trabalho)
+    ids = [f"W{i:02d}" for i in range(1, len(escolhidos) + 1)]
     nomes = sortear_nomes(ids)
     gladiadores = []
-    for gid, (grupo, k) in zip(ids, aceitos):
-        registro = grupo.concluidas[k]
+    for gid, (registro, origem) in zip(ids, escolhidos):
         texto = (trabalho / "candidatos" / registro["candidato"]).read_text(encoding="utf-8")
         snapshot = json.loads(texto)
         heroi = reconstruir(snapshot)
         if heroi is None or not was_extracted(heroi) or heroi.get_classname() != "Warrior":
             raise RuntimeError(f"{gid}: o snapshot não reconstrói um Guerreiro extraído")
+        if not na_faixa(registro["op"]):
+            raise RuntimeError(f"{gid}: OP {registro['op']} fora de 20–30")
         destino = pasta / "snapshots" / f"{gid}.json"
         conteudo = json.dumps(snapshot, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
         if destino.exists() and destino.read_text(encoding="utf-8") != conteudo:
@@ -206,9 +267,10 @@ def finalizar(trabalho: Path = TRABALHO, pasta: Path = PASTA) -> dict:
                 "id": gid,
                 "nick": nomes[gid],
                 "classe": "Warrior",
-                "perfil": grupo.perfil,
-                "politica": grupo.politica,
-                "tentativa": k,
+                "perfil": registro["perfil"],
+                "politica": registro["politica"],
+                "origem": origem,
+                "tentativa": registro["tentativa"],
                 "seed": str(registro["seed"]),
                 "andar_de_extracao": registro["andar"],
                 "nivel": registro["nivel"],
@@ -243,19 +305,39 @@ def finalizar(trabalho: Path = TRABALHO, pasta: Path = PASTA) -> dict:
         + "\n",
     )
 
-    linhas = []
-    for g in GRUPOS:
-        grupo = fila[g]
-        aceitas = set(grupo.aceitas())
-        ultima = max(aceitas)
-        for k in sorted(grupo.concluidas):
-            r = dict(grupo.concluidas[k])
-            r["situacao"] = situacao(r, aceitas, ultima)
-            r["apos_a_quota"] = k > ultima
-            r["seed"] = str(r["seed"])
-            r.pop("candidato", None)
-            linhas.append(json.dumps(r, ensure_ascii=False, sort_keys=True))
+    escolhidas = {(r["perfil"], r["politica"], r["tentativa"]): o for r, o in escolhidos}
+    fila = montar_fila(ler_tentativas(trabalho))
+    linhas = _linhas_de_runs(fila, escolhidas, "geracao")
     gravar_atomico(pasta / ARQUIVO_RUNS, "\n".join(linhas) + "\n")
+    linhas_preenchimento = []
+    if plano is not None:
+        preenchimento = fila_do_preenchimento(plano, trabalho)
+        linhas_preenchimento = _linhas_de_runs(preenchimento, escolhidas, "preenchimento")
+        gravar_atomico(pasta / ARQUIVO_RUNS_PREENCHIMENTO, "\n".join(linhas_preenchimento) + "\n")
+        resumo = dict(
+            plano,
+            decisao=(
+                "Depois de 1315 tentativas da geração original (conservador 22/22, moderado "
+                "21/21, hardcore 10/21), o usuário retirou a obrigatoriedade das quotas: a "
+                "seleção original fica, e as vagas restantes vão para novas runs v2 de "
+                "conservador e moderado, perto de 50/50, com as políticas equilibradas."
+            ),
+            grupos_do_preenchimento={
+                chave_do_grupo(chave): {
+                    "quota": g.quota,
+                    "primeira_tentativa": g.primeira,
+                    "tentativas": len(g.concluidas),
+                    "aceitas": g.aceitas(),
+                }
+                for chave, g in preenchimento.items()
+            },
+            tentativas_do_preenchimento=sum(len(g.concluidas) for g in preenchimento.values()),
+            origens=dict(Counter(o for _, o in escolhidos)),
+        )
+        gravar_atomico(
+            pasta / ARQUIVO_PLANO,
+            json.dumps(resumo, ensure_ascii=False, indent=1) + "\n",
+        )
 
     # O piloto v1 (só a linha de aposta, matriz de extração canônica) não entra na
     # Copa, mas é a evidência que levou à v2: fica publicado à parte.
@@ -269,7 +351,12 @@ def finalizar(trabalho: Path = TRABALHO, pasta: Path = PASTA) -> dict:
             r.pop("candidato", None)
             linhas_piloto.append(json.dumps(r, ensure_ascii=False, sort_keys=True))
         gravar_atomico(pasta / ARQUIVO_PILOTO, "\n".join(linhas_piloto) + "\n")
-    return {"gladiadores": gladiadores, "tentativas": len(linhas), "piloto": len(piloto)}
+    return {
+        "gladiadores": gladiadores,
+        "tentativas": len(linhas),
+        "preenchimento": len(linhas_preenchimento),
+        "piloto": len(piloto),
+    }
 
 
 def ler_gladiadores(pasta: Path = PASTA) -> list[dict]:

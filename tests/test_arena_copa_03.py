@@ -37,6 +37,8 @@ from tools import arena_copa_03_geracao as ger
 from tools.arena_copa_02 import FASES, NICKS
 from tools.arena_copa_03 import (
     ARQUIVO_PILOTO,
+    ARQUIVO_PLANO,
+    ARQUIVO_RUNS_PREENCHIMENTO,
     PASTA,
     diagnostico_rng,
     disputar_copa,
@@ -239,6 +241,62 @@ def test_o_checkpoint_retoma_sem_repetir_runs(monkeypatch, tmp_path):
     assert {g: final[g].aceitas() for g in quotas} == {g: [3, 6] for g in quotas}
 
 
+def _checkpoint_sintetico(qualificadas_do_hardcore: int) -> list[dict]:
+    """Conservador e moderado com as quotas fechadas; o hardcore incompleto."""
+    registros = []
+    for perfil, politica in ger.GRUPOS:
+        if perfil == "hardcore":
+            for k in range(1, 8):
+                registros.append(_registro(perfil, politica, k, k <= qualificadas_do_hardcore))
+        else:
+            for k in range(1, ger.QUOTAS[(perfil, politica)] + 2):
+                registros.append(_registro(perfil, politica, k, True))
+    return registros
+
+
+def test_o_plano_de_preenchimento_e_deterministico_e_equilibrado():
+    fila = ger.montar_fila(_checkpoint_sintetico(qualificadas_do_hardcore=3))
+    plano = ger.plano_de_preenchimento(fila)
+    assert plano == ger.plano_de_preenchimento(ger.montar_fila(_checkpoint_sintetico(3)))
+    original = plano["selecao_original"]
+    assert len(original) == 22 + 21 + 9
+    vagas = plano["preenchimento"]
+    assert len(original) + len(vagas) == ger.VAGAS
+    # As qualificadas que sobraram no checkpoint (uma por grupo de C/M) vêm primeiro.
+    assert [v["origem"] for v in vagas[:6]] == ["preenchimento_checkpoint"] * 6
+    novas = [v for v in vagas if v["origem"] == "preenchimento_novo"]
+    assert {v["perfil"] for v in vagas} <= set(ger.PERFIS_DO_PREENCHIMENTO)
+    por_perfil = Counter(v["perfil"] for v in novas)
+    assert abs(por_perfil["conservador"] - por_perfil["moderado"]) <= 1
+    politicas = Counter(s["politica"] for s in original + vagas)
+    assert max(politicas.values()) - min(politicas.values()) <= 1
+    chaves = [(s["perfil"], s["politica"], s.get("tentativa")) for s in original]
+    assert len(set(chaves)) == len(chaves)
+
+
+def test_o_preenchimento_retoma_e_confere_o_plano(monkeypatch, tmp_path):
+    with open(tmp_path / "tentativas.jsonl", "w") as f:
+        for r in _checkpoint_sintetico(qualificadas_do_hardcore=2):
+            f.write(json.dumps(r) + "\n")
+    chamadas = []
+    monkeypatch.setattr(ger, "executar", _falso_executar(chamadas))
+    plano = ger.preencher(2, tmp_path, executor=ThreadPoolExecutor(2))
+    assert all(g.completo for g in ger.fila_do_preenchimento(plano, tmp_path).values())
+    primeiras = plano["primeira_tentativa"]
+    assert all(k >= primeiras[f"{p}-{pol}"] for p, pol, k in chamadas)
+    feitas = len(ger.ler_tentativas(tmp_path, ger.LOG_DO_PREENCHIMENTO))
+    # Retomar com o preenchimento completo não roda nada e confere o plano.
+    chamadas.clear()
+    assert ger.preencher(2, tmp_path, executor=ThreadPoolExecutor(2)) == plano
+    assert chamadas == []
+    assert len(ger.ler_tentativas(tmp_path, ger.LOG_DO_PREENCHIMENTO)) == feitas
+    # Um checkpoint original que mudou depois do plano é recusado.
+    with open(tmp_path / "tentativas.jsonl", "a") as f:
+        f.write(json.dumps(_registro("hardcore", "survival", 8, True)) + "\n")
+    with pytest.raises(RuntimeError, match="mudou"):
+        ger.preencher(2, tmp_path, executor=ThreadPoolExecutor(2))
+
+
 # --- 4. Os 64 entregues ---------------------------------------------------------
 
 
@@ -250,7 +308,19 @@ def gladiadores():
 @entregues
 def test_os_64_snapshots_sao_integros(gladiadores):
     assert [g["id"] for g in gladiadores] == [f"W{i:02d}" for i in range(1, 65)]
-    assert Counter((g["perfil"], g["politica"]) for g in gladiadores) == Counter(ger.QUOTAS)
+    chaves = [(g["perfil"], g["politica"], g["tentativa"]) for g in gladiadores]
+    assert len(set(chaves)) == 64
+    plano = json.loads((PASTA / ARQUIVO_PLANO).read_text(encoding="utf-8"))
+    originais = [g for g in gladiadores if g["origem"] == "original"]
+    assert [(g["perfil"], g["politica"], g["tentativa"]) for g in originais] == [
+        (s["perfil"], s["politica"], s["tentativa"]) for s in plano["selecao_original"]
+    ]
+    preenchidos = [g for g in gladiadores if g["origem"].startswith("preenchimento")]
+    assert len(originais) + len(preenchidos) == 64
+    assert {g["perfil"] for g in preenchidos} <= set(ger.PERFIS_DO_PREENCHIMENTO)
+    assert [(g["perfil"], g["politica"]) for g in preenchidos] == [
+        (v["perfil"], v["politica"]) for v in plano["preenchimento"]
+    ]
     todos = {nick for lista in NICKS.values() for nick in lista}
     assert {g["nick"] for g in gladiadores} == todos
     arquivos = sorted((PASTA / "snapshots").glob("*.json"))
@@ -286,28 +356,43 @@ def test_o_op_gravado_e_a_medicao_canonica(gladiadores):
     assert overall_power(ger.reconstruir(snapshot), usar_cache=False).nivel_equivalente == g["op"]
 
 
+def _ler_jsonl(nome: str) -> list[dict]:
+    return [json.loads(x) for x in (PASTA / nome).read_text(encoding="utf-8").splitlines() if x]
+
+
 @entregues
 def test_runs_jsonl_coerente_com_os_aceitos(gladiadores):
-    runs = [json.loads(linha) for linha in (PASTA / "runs.jsonl").read_text().splitlines()]
-    assert len({r["seed"] for r in runs}) == len(runs)
-    assert all(r["versao"] == "v2" for r in runs)
-    assert sum(r.get("ilegais", 0) for r in runs) == 0
-    assert all(r.get("linha_restaurada", True) for r in runs)
-    aceitas = {
-        (r["perfil"], r["politica"], r["tentativa"]) for r in runs if r["situacao"] == "aceita"
+    runs = _ler_jsonl("runs.jsonl")
+    novas = _ler_jsonl(ARQUIVO_RUNS_PREENCHIMENTO)
+    plano = json.loads((PASTA / ARQUIVO_PLANO).read_text(encoding="utf-8"))
+    todas_as_runs = runs + novas
+    assert len({r["seed"] for r in todas_as_runs}) == len(todas_as_runs)
+    assert all(r["versao"] == "v2" for r in todas_as_runs)
+    assert sum(r.get("ilegais", 0) for r in todas_as_runs) == 0
+    assert all(r.get("linha_restaurada", True) for r in todas_as_runs)
+    assert {r["fase"] for r in runs} == {"geracao"} and {r["fase"] for r in novas} == {
+        "preenchimento"
     }
-    assert aceitas == {(g["perfil"], g["politica"], g["tentativa"]) for g in gladiadores}
+    assert plano["tentativas_da_geracao_original"] == len(runs)
+    selecionadas = {
+        (r["perfil"], r["politica"], r["tentativa"]) for r in todas_as_runs if "selecionada" in r
+    }
+    assert selecionadas == {(g["perfil"], g["politica"], g["tentativa"]) for g in gladiadores}
     for perfil, politica in ger.GRUPOS:
+        chave = f"{perfil}-{politica}"
         do_grupo = sorted(
-            (r for r in runs if (r["perfil"], r["politica"]) == (perfil, politica)),
-            key=lambda r: r["tentativa"],
+            r["tentativa"] for r in runs if (r["perfil"], r["politica"]) == (perfil, politica)
         )
-        assert [r["tentativa"] for r in do_grupo] == list(range(1, len(do_grupo) + 1))
-        qualificadas = [r["tentativa"] for r in do_grupo if r.get("qualificada")]
-        quota = ger.QUOTAS[(perfil, politica)]
-        assert [r["tentativa"] for r in do_grupo if r["situacao"] == "aceita"] == (
-            qualificadas[:quota]
-        )
+        lacunas = plano["interrompidas"].get(chave, [])
+        assert sorted(do_grupo + lacunas) == list(range(1, max(do_grupo) + 1))
+        if chave in plano["primeira_tentativa"]:
+            depois = sorted(
+                r["tentativa"] for r in novas if (r["perfil"], r["politica"]) == (perfil, politica)
+            )
+            assert not depois or depois[0] == plano["primeira_tentativa"][chave]
+    for r in todas_as_runs:
+        if "selecionada" in r:
+            assert r["qualificada"] and ger.na_faixa(r["op"])
     piloto = (PASTA / ARQUIVO_PILOTO).read_text().splitlines()
     assert piloto and all(json.loads(linha)["versao"] == "v1" for linha in piloto)
 

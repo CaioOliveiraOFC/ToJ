@@ -104,6 +104,19 @@ sequência dele, sem lacuna. Assim o resultado não depende de quantos processos
 rodaram nem de quem terminou antes. Tentativas em voo quando a quota fecha são
 executadas e registradas como excedentes.
 
+## Preenchimento
+
+Depois de 1315 tentativas (conservador 22/22, moderado 21/21, hardcore 10/21),
+o usuário tirou a obrigatoriedade das quotas: a seleção original fica como
+está, e as vagas restantes vão para NOVAS runs v2 de conservador e moderado
+(`preencher`). O plano é determinístico e gravado em `preenchimento.json`:
+primeiro qualificadas que tenham sobrado no checkpoint, depois vaga a vaga a
+política com menos gladiadores nos 64 e, dentro dela, o perfil com menos vagas
+novas. Cada grupo continua a própria numeração depois da última tentativa da
+geração original, com as mesmas seeds v2. As runs do preenchimento vão para
+`preenchimento.jsonl`, com fila própria; o log da geração original não muda.
+Retomar confere o plano gravado contra o checkpoint e não repete run.
+
 ## Checkpoint
 
 Tudo o que é transitório fica em `reports/pvp/copa_03/_trabalho/` (fora do git):
@@ -584,9 +597,9 @@ def gravar_atomico(destino: Path, conteudo: str) -> None:
         raise
 
 
-def ler_tentativas(trabalho: Path = TRABALHO) -> list[dict]:
+def ler_tentativas(trabalho: Path = TRABALHO, nome: str = "tentativas.jsonl") -> list[dict]:
     """As tentativas concluídas. Uma linha final incompleta (corte) é ignorada."""
-    arquivo = trabalho / "tentativas.jsonl"
+    arquivo = trabalho / nome
     if not arquivo.exists():
         return []
     registros = []
@@ -607,6 +620,9 @@ class Grupo:
     quota: int
     concluidas: dict
     em_voo: set
+    # A primeira tentativa desta fila. O preenchimento continua a numeração de
+    # cada grupo depois da última tentativa da geração original.
+    primeira: int = 1
 
     @property
     def chave(self) -> tuple[str, str]:
@@ -615,7 +631,7 @@ class Grupo:
     def aceitas(self) -> list[int]:
         """As primeiras qualificadas da sequência, sem lacuna, até a quota."""
         aceitas = []
-        k = 1
+        k = self.primeira
         while k in self.concluidas and len(aceitas) < self.quota:
             if self.concluidas[k].get("qualificada"):
                 aceitas.append(k)
@@ -628,14 +644,18 @@ class Grupo:
 
     def proxima(self) -> int:
         """A menor tentativa ainda não concluída nem em voo."""
-        k = 1
+        k = self.primeira
         while k in self.concluidas or k in self.em_voo:
             k += 1
         return k
 
 
-def montar_fila(registros: list[dict]) -> dict[tuple[str, str], Grupo]:
-    fila = {g: Grupo(g[0], g[1], q, {}, set()) for g, q in QUOTAS.items()}
+def montar_fila(
+    registros: list[dict], quotas: dict | None = None, primeiras: dict | None = None
+) -> dict[tuple[str, str], Grupo]:
+    quotas = QUOTAS if quotas is None else quotas
+    primeiras = primeiras or {}
+    fila = {g: Grupo(g[0], g[1], q, {}, set(), primeiras.get(g, 1)) for g, q in quotas.items()}
     sementes = set()
     for r in registros:
         grupo = fila[(r["perfil"], r["politica"])]
@@ -681,7 +701,7 @@ def escolher_grupo(fila: dict) -> Grupo | None:
 
     def prioridade(g: Grupo) -> tuple:
         vagas = g.quota - len(g.aceitas())
-        return ((len(g.concluidas) + len(g.em_voo)) / vagas, GRUPOS.index(g.chave))
+        return ((len(g.concluidas) + len(g.em_voo)) / vagas, list(fila).index(g.chave))
 
     return min(abertos, key=prioridade)
 
@@ -700,7 +720,7 @@ def linha_de_progresso(fila: dict) -> str:
     return (
         f"Tentativas: {len(todos)} | "
         f"Extrações: {sum(r['desfecho'] == 'extraiu' for r in todos)} | "
-        f"Aceitos: {len(aceitos)}/64 | "
+        f"Aceitos: {len(aceitos)}/{sum(g.quota for g in fila.values())} | "
         + " | ".join(f"{p[0].upper()}: {a}/{q}" for p, (a, q) in por_perfil.items())
         + f" | OP médio: {media:.1f}".replace(".", ",")
     )
@@ -728,12 +748,26 @@ def _log(texto: str, trabalho: Path) -> None:
         f.write(texto + "\n")
 
 
-def gerar(trabalhadores: int = 4, trabalho: Path = TRABALHO, *, executor=None) -> dict:
-    """Roda tentativas até os nove grupos completarem as quotas."""
+def gerar(
+    trabalhadores: int = 4,
+    trabalho: Path = TRABALHO,
+    *,
+    executor=None,
+    quotas: dict | None = None,
+    primeiras: dict | None = None,
+    nome: str = "tentativas.jsonl",
+    estado: str = "fila.json",
+) -> dict:
+    """Roda tentativas até os grupos completarem as quotas.
+
+    Sem argumentos, é a geração original: nove grupos, `QUOTAS`, o log
+    `tentativas.jsonl`. O preenchimento chama a mesma máquina com as quotas, a
+    numeração e o log dele.
+    """
     trabalho.mkdir(parents=True, exist_ok=True)
     (trabalho / "candidatos").mkdir(exist_ok=True)
-    fila = montar_fila(ler_tentativas(trabalho))
-    gravar_atomico(trabalho / "fila.json", json.dumps(estado_da_fila(fila), indent=1))
+    fila = montar_fila(ler_tentativas(trabalho, nome), quotas, primeiras)
+    gravar_atomico(trabalho / estado, json.dumps(estado_da_fila(fila), indent=1))
     _log(f"Retomada: {linha_de_progresso(fila)}", trabalho)
     feitos_na_sessao = 0
     erros_recentes: list[bool] = []
@@ -753,7 +787,7 @@ def gerar(trabalhadores: int = 4, trabalho: Path = TRABALHO, *, executor=None) -
                 futuros[pool.submit(executar, grupo.perfil, grupo.politica, k)] = (grupo, k)
 
         despachar()
-        with open(trabalho / "tentativas.jsonl", "a", encoding="utf-8") as log:
+        with open(trabalho / nome, "a", encoding="utf-8") as log:
             while futuros:
                 prontos, _ = wait(futuros, return_when=FIRST_COMPLETED)
                 for futuro in prontos:
@@ -802,9 +836,7 @@ def gerar(trabalhadores: int = 4, trabalho: Path = TRABALHO, *, executor=None) -
                         _log(linha_de_progresso(fila), trabalho)
                     if feitos_na_sessao % 100 == 0:
                         _log(diagnostico(fila), trabalho)
-                    gravar_atomico(
-                        trabalho / "fila.json", json.dumps(estado_da_fila(fila), indent=1)
-                    )
+                    gravar_atomico(trabalho / estado, json.dumps(estado_da_fila(fila), indent=1))
                 if sum(erros_recentes) >= 5 and sum(erros_recentes) * 5 >= len(erros_recentes):
                     _log("PARADA: erros técnicos sistemáticos; ver erros.log", trabalho)
                     for f in futuros:
@@ -816,19 +848,180 @@ def gerar(trabalhadores: int = 4, trabalho: Path = TRABALHO, *, executor=None) -
     return estado_da_fila(fila)
 
 
+# --- o preenchimento ----------------------------------------------------------
+
+# Decisão do usuário depois de 1315 tentativas: as quotas 22/21/21 deixam de ser
+# obrigatórias. A seleção original fica como está; as vagas que o hardcore não
+# fechou vão para NOVAS runs v2 de conservador e moderado. O log da geração
+# original não é tocado: o preenchimento tem log, fila e plano próprios.
+VAGAS = 64
+PERFIS_DO_PREENCHIMENTO = ("conservador", "moderado")
+LOG_DO_PREENCHIMENTO = "preenchimento.jsonl"
+FILA_DO_PREENCHIMENTO = "fila_preenchimento.json"
+PLANO_DO_PREENCHIMENTO = "preenchimento.json"
+
+
+def selecao_original(fila: dict) -> list[dict]:
+    """Os aceitos da geração original e as extrações qualificadas que sobraram.
+
+    Grupo completo: as aceitas da quota. Grupo incompleto (o hardcore): todas as
+    qualificadas do checkpoint, inclusive alguma que tenha ficado depois de uma
+    tentativa interrompida — essas entram como `hardcore_adicional`.
+    """
+    selecao = []
+    for chave in GRUPOS:
+        grupo = fila[chave]
+        aceitas = grupo.aceitas()
+        for k in aceitas:
+            selecao.append(
+                {"perfil": chave[0], "politica": chave[1], "tentativa": k, "origem": "original"}
+            )
+        if not grupo.completo:
+            for k in sorted(grupo.concluidas):
+                if grupo.concluidas[k].get("qualificada") and k not in aceitas:
+                    selecao.append(
+                        {
+                            "perfil": chave[0],
+                            "politica": chave[1],
+                            "tentativa": k,
+                            "origem": "hardcore_adicional",
+                        }
+                    )
+    return selecao
+
+
+def candidatos_do_checkpoint(fila: dict, selecao: list[dict]) -> list[dict]:
+    """Extrações qualificadas de conservador e moderado que ficaram sem vaga."""
+    usadas = {(s["perfil"], s["politica"], s["tentativa"]) for s in selecao}
+    saida = []
+    for chave in GRUPOS:
+        if chave[0] not in PERFIS_DO_PREENCHIMENTO:
+            continue
+        for k in sorted(fila[chave].concluidas):
+            r = fila[chave].concluidas[k]
+            if r.get("qualificada") and (*chave, k) not in usadas:
+                saida.append(
+                    {
+                        "perfil": chave[0],
+                        "politica": chave[1],
+                        "tentativa": k,
+                        "origem": "preenchimento_checkpoint",
+                    }
+                )
+    return saida
+
+
+def plano_de_preenchimento(fila: dict) -> dict:
+    """As vagas que faltam, em ordem, e de onde cada uma vem. Determinístico.
+
+    Primeiro as qualificadas que sobraram no checkpoint. Depois, vaga a vaga: a
+    política com menos gladiadores na população inteira (empate: survival,
+    offense, economy) e, dentro dela, o perfil com menos vagas novas nessa
+    política (empate: o com menos vagas novas no total; depois conservador).
+    Isso dá perto de 50/50 entre conservador e moderado e equilibra as três
+    políticas nos 64.
+    """
+    selecao = selecao_original(fila)
+    candidatos = candidatos_do_checkpoint(fila, selecao)
+    faltam = VAGAS - len(selecao)
+    vagas = candidatos[:faltam]
+    politicas = Counter(s["politica"] for s in selecao + vagas)
+    while len(vagas) < faltam:
+        politica = min(POLITICAS, key=lambda p: (politicas[p], POLITICAS.index(p)))
+        novas = [v for v in vagas if v["origem"] == "preenchimento_novo"]
+        na_politica = Counter(v["perfil"] for v in novas if v["politica"] == politica)
+        no_total = Counter(v["perfil"] for v in novas)
+        perfil = min(
+            PERFIS_DO_PREENCHIMENTO,
+            key=lambda p: (na_politica[p], no_total[p], PERFIS_DO_PREENCHIMENTO.index(p)),
+        )
+        vagas.append({"perfil": perfil, "politica": politica, "origem": "preenchimento_novo"})
+        politicas[politica] += 1
+    interrompidas = {
+        chave_do_grupo(chave): [k for k in range(1, max(g.concluidas) + 1) if k not in g.concluidas]
+        for chave, g in fila.items()
+        if g.concluidas
+    }
+    return {
+        "vagas": VAGAS,
+        "tentativas_da_geracao_original": sum(len(g.concluidas) for g in fila.values()),
+        "selecao_original": selecao,
+        "preenchimento": vagas,
+        "primeira_tentativa": {
+            chave_do_grupo(chave): max(fila[chave].concluidas, default=0) + 1
+            for chave in GRUPOS
+            if chave[0] in PERFIS_DO_PREENCHIMENTO
+        },
+        "interrompidas": {k: v for k, v in interrompidas.items() if v},
+    }
+
+
+def _quotas_do_plano(plano: dict) -> tuple[dict, dict]:
+    novas = Counter(
+        (v["perfil"], v["politica"])
+        for v in plano["preenchimento"]
+        if v["origem"] == "preenchimento_novo"
+    )
+    quotas = {chave: novas[chave] for chave in GRUPOS if novas[chave]}
+    primeiras = {chave: plano["primeira_tentativa"][chave_do_grupo(chave)] for chave in quotas}
+    return quotas, primeiras
+
+
+def ler_plano(trabalho: Path = TRABALHO) -> dict | None:
+    arquivo = trabalho / PLANO_DO_PREENCHIMENTO
+    return json.loads(arquivo.read_text(encoding="utf-8")) if arquivo.exists() else None
+
+
+def fila_do_preenchimento(plano: dict, trabalho: Path = TRABALHO) -> dict:
+    quotas, primeiras = _quotas_do_plano(plano)
+    return montar_fila(ler_tentativas(trabalho, LOG_DO_PREENCHIMENTO), quotas, primeiras)
+
+
+def preencher(trabalhadores: int = 4, trabalho: Path = TRABALHO, *, executor=None) -> dict:
+    """Grava (ou confere) o plano e roda as runs novas que ele pede."""
+    plano = plano_de_preenchimento(montar_fila(ler_tentativas(trabalho)))
+    plano = json.loads(json.dumps(plano))
+    gravado = ler_plano(trabalho)
+    if gravado is None:
+        gravar_atomico(trabalho / PLANO_DO_PREENCHIMENTO, json.dumps(plano, indent=1))
+    elif gravado != plano:
+        raise RuntimeError("o checkpoint da geração original mudou depois do plano")
+    quotas, primeiras = _quotas_do_plano(plano)
+    if quotas:
+        gerar(
+            trabalhadores,
+            trabalho,
+            executor=executor,
+            quotas=quotas,
+            primeiras=primeiras,
+            nome=LOG_DO_PREENCHIMENTO,
+            estado=FILA_DO_PREENCHIMENTO,
+        )
+    return plano
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="comando", required=True)
     g = sub.add_parser("gerar")
     g.add_argument("--trabalhadores", type=int, default=os.cpu_count() or 2)
+    p = sub.add_parser("preencher")
+    p.add_argument("--trabalhadores", type=int, default=os.cpu_count() or 2)
     sub.add_parser("status")
     args = parser.parse_args()
     if args.comando == "gerar":
         estado = gerar(args.trabalhadores)
         return 0 if all(g["completo"] for g in estado["grupos"].values()) else 1
+    if args.comando == "preencher":
+        plano = preencher(args.trabalhadores)
+        return 0 if all(g.completo for g in fila_do_preenchimento(plano).values()) else 1
     fila = montar_fila(ler_tentativas())
     print(linha_de_progresso(fila))
     print(diagnostico(fila))
+    plano = ler_plano()
+    if plano:
+        fila = fila_do_preenchimento(plano)
+        print("Preenchimento: " + linha_de_progresso(fila))
     return 0
 
 

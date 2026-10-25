@@ -46,6 +46,8 @@ reports/pvp/copa_03/*
 !reports/pvp/copa_03/geracao.md
 !reports/pvp/copa_03/runs.jsonl
 !reports/pvp/copa_03/runs_piloto.jsonl
+!reports/pvp/copa_03/runs_preenchimento.jsonl
+!reports/pvp/copa_03/preenchimento.json
 !reports/pvp/copa_03/gladiadores.json
 !reports/pvp/copa_03/snapshots/
 !reports/pvp/copa_03/relatorio.md
