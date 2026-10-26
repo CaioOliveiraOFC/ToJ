@@ -30,6 +30,11 @@ ALLOWED_IMPORTS: dict[str, set[str]] = {
     "sim": {"content", "entities", "mechanics", "shared", "data"},
     "engine": {"content", "mechanics", "entities", "storage", "shared", "ui", "data", "sim"},
     "ui": {"shared", "content", "entities", "storage", "data"},
+    # O servidor multiplayer roda o motor canônico e reconstrói o gladiador pelo
+    # caminho de `engine/arena_setup.py`. Nunca importa `ui/` nem `sim/`: é
+    # headless, e bot de medição não é regra (`test_multiplayer_manifesto.py`
+    # confere o que ele de fato carrega).
+    "multiplayer": {"engine", "content", "mechanics", "entities", "storage", "shared", "data"},
 }
 
 # Regra 4: `print()` é da camada de apresentação. `sim/runner.py` é a única

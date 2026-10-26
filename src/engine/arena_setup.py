@@ -76,6 +76,15 @@ def _reconstruir(snapshot: dict):
     return heroi
 
 
+def character_from_snapshot(snapshot: dict):
+    """O personagem do snapshot, reconstruído pelo caminho canônico e ainda NÃO preparado.
+
+    Para quem precisa conferir a reconstrução antes da preparação (a validação
+    do gladiador no multiplayer). Não altera o snapshot.
+    """
+    return _reconstruir(snapshot)
+
+
 def _snapshot_do_slot(slot: int) -> dict:
     dados = load_save_data(slot)
     if dados is None:
