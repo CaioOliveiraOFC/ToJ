@@ -385,6 +385,9 @@ class TestOBotNaoConsultaRngFuturo:
             "src/engine/encounter.py",
             "src/entities/heroes.py",
             "src/storage/save_manager.py",
+            # O esquema do gladiador no multiplayer só NOMEIA o campo do save
+            # para conferir o tipo; não dá, não vende e não muda chave.
+            "src/multiplayer/gladiadores.py",
         )
         for linha in saida.strip().splitlines():
             arquivo = linha.split(":")[0]
