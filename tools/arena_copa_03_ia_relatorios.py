@@ -768,12 +768,26 @@ def _orcamento_md(m: dict) -> list[str]:
         linhas.append(
             f"- {nome}: venceu {_taxa(v['vitorias_da_variante'], v['n'])}{inconclusivos}."
         )
-    linhas += [
-        "",
-        "Um intervalo que contém 50% quer dizer que a variante não joga melhor: o orçamento da "
-        "Copa não é o que limita a IA.",
-        "",
+    empates = [
+        nome
+        for nome, v in m["variantes"].items()
+        if _wilson(v["vitorias_da_variante"], v["n"])[0]
+        <= 0.5
+        <= _wilson(v["vitorias_da_variante"], v["n"])[1]
     ]
+    if len(empates) == len(m["variantes"]):
+        leitura = (
+            "Nenhuma variante se distingue da configuração da Copa (os intervalos contêm 50%): "
+            "dobrar as continuações não rende, e encurtar o horizonte também não perde. O que "
+            "limita a IA no espelho não é o orçamento, é o modelo — do adversário e da corrida "
+            "depois do horizonte."
+        )
+    else:
+        leitura = (
+            "Intervalo que contém 50%: a variante não se distingue da configuração da Copa; "
+            "fora dele, ela joga melhor ou pior de fato."
+        )
+    linhas += ["", leitura, ""]
     return linhas
 
 
@@ -1341,7 +1355,7 @@ def decisoes_md(m: dict) -> str:
         "## Por quê, caso a caso",
         "",
         "Em cada categoria, o caso em que a IA via mais diferença entre a escolha dela e a da "
-        "política:",
+        "política, e um caso típico (o da diferença mediana):",
         "",
     ]
     explicacao = {
