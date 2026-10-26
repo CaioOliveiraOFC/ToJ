@@ -1,0 +1,70 @@
+# Publicação de uma distribuição do ToJ.
+#
+# Disparada pela tag `v<versão>`, que é também o registro de que aquela versão
+# foi publicada: a partir dela, o manifesto da versão é imutável
+# (`tools/multiplayer_manifesto.py verificar` confere isso em todo PR).
+#
+# Nada é empacotado se o gate falhar. O job `distribuicao` depende de
+# `compatibilidade`, que exige:
+#   - a tag igual à versão declarada em `src/multiplayer/versao.py`;
+#   - o manifesto dessa versão igual ao código (regras, catálogos, persistência,
+#     protocolo e servidor), e nenhum manifesto publicado alterado;
+#   - a suíte padrão verde, com os testes de compatibilidade dentro dela.
+# Incompatibilidade bloqueia; nunca sai uma distribuição com regras divergentes.
+name: Publicação
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_PADRAO: "3.11"
+
+jobs:
+  compatibilidade:
+    name: Gate de compatibilidade
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_PADRAO }}
+          cache: pip
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Manifesto da versão da tag
+        run: python tools/multiplayer_manifesto.py verificar --tag "${GITHUB_REF_NAME}"
+
+      - name: Suíte padrão (inclui os testes de compatibilidade)
+        run: python -m pytest -q
+
+  distribuicao:
+    name: Distribuição
+    needs: compatibilidade
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Empacotar a versão com o manifesto
+        run: |
+          versao="${GITHUB_REF_NAME#v}"
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="toj-${versao}/" \
+            -o "dist/toj-${versao}.tar.gz" "${GITHUB_REF_NAME}"
+          cp "src/multiplayer/manifestos/${versao}.json" "dist/manifesto-${versao}.json"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: toj-${{ github.ref_name }}
+          path: dist/

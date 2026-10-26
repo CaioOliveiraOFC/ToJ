@@ -4,9 +4,10 @@
 # afirmação sobre a máquina de quem rodou por último, e os checks "pending" que
 # apareciam no pull request eram AUSÊNCIA de verificação, não aprovação.
 #
-# Três jobs, todos bloqueantes. Nasceu com um quarto job informativo
-# (`compat`, sem gate) para descobrir se o piso de 3.10 declarado no
-# `pyproject.toml` era verdade; era, e a matriz foi absorvida pelo job `testes`.
+# Quatro jobs, todos bloqueantes. Nasceu com um job informativo (`compat`, sem
+# gate) para descobrir se o piso de 3.10 declarado no `pyproject.toml` era
+# verdade; era, e a matriz foi absorvida pelo job `testes`. O quarto,
+# `compatibilidade`, é o gate do contrato multiplayer.
 name: CI
 
 # Pushes em branch de trabalho são cobertos pelo evento de pull request: gatilho
@@ -81,6 +82,38 @@ jobs:
       - name: Suíte de balanceamento
         timeout-minutes: 25
         run: python -m pytest -q -m "balance or balance_full"
+
+  # O contrato de compatibilidade multiplayer (`GAMEPLAY_CONTRACTS.md`, seção
+  # Multiplayer). Reprova quando regra ou catálogo mudou sem manifesto novo,
+  # quando um manifesto publicado foi alterado, ou quando qualquer teste de
+  # versão, servidor autoritativo, atualização ou persistência falha. O mesmo
+  # gate abre o workflow de publicação (`publicacao.yml`).
+  compatibilidade:
+    name: Compatibilidade multiplayer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # As tags `v<versão>` são o registro do que foi publicado: sem elas o
+          # gate não confere a imutabilidade dos manifestos.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_PADRAO }}
+          cache: pip
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Manifesto confere com o código
+        run: python tools/multiplayer_manifesto.py verificar
+
+      - name: Testes de compatibilidade
+        run: python -m pytest -q tests/test_multiplayer_*.py
 
   lint:
     name: Lint
