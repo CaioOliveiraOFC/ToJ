@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Copa Arena 03 v2 — relatório visual</title>
+<style>
+@@estilo@@
+@page{size:297mm 210mm;margin:11mm}
+@page chave{size:594mm 420mm;margin:10mm}
+html,body{background:#fff}
+body{font-size:11px}
+.pagina{break-after:page}
+.pagina:last-child{break-after:auto}
+.chave-pagina{page:chave}
+.chave-pagina svg{width:100%;height:auto}
+h1{font-size:24px;margin:0 0 4px}
+h2{font-size:15px;margin:0 0 6px}
+h3{font-size:12px;margin:8px 0 4px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:10px 0}
+.kpi{border:1px solid var(--border);border-radius:8px;padding:8px}
+.kpi .kv{font-size:17px;font-weight:650}
+.kpi .kl{color:var(--t2);font-size:9.5px}
+.duas{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+table{border-collapse:collapse;width:100%;font-size:9px}
+th,td{padding:2.5px 4px;border-bottom:1px solid var(--grid);text-align:left;vertical-align:top}
+th{color:var(--t2)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.muted{color:var(--t3)}
+.aviso{font-size:9.5px;color:var(--t2)}
+.leg{display:inline-flex;align-items:center;gap:5px;margin-right:12px;font-size:9.5px;color:var(--t2)}
+.leg i{display:inline-block;width:12px;height:4px;border-radius:2px}
+.media svg{max-height:70mm}
+.compacto table{font-size:8px}
+.compacto th,.compacto td{padding:1.4px 3px}
+li{margin-bottom:2px}
+code{font-size:9px}
+</style></head><body>
+<div class="pagina">
+ <h1>Copa Arena 03 v2 — Inteligência Estratégica</h1>
+ <p class="aviso">@@subtitulo@@</p>
+ <div class="kpis">@@kpis@@</div>
+ <h2>A comparação obrigatória</h2>
+ <table><thead><tr><th></th><th>Original (PoliticaCopa)</th><th>v2 (IA estratégica)</th></tr></thead><tbody>@@linhas_comparacao@@</tbody></table>
+</div>
+<div class="pagina media">
+ <div class="duas">
+  <div><h2>Rodadas por partida — original</h2>@@svg_rodadas_original@@</div>
+  <div><h2>Rodadas por partida — v2</h2>@@svg_rodadas_ia@@</div>
+ </div>
+ <div class="duas">
+  <div><h2>Motivo de cada básico (% dos básicos)</h2><p><span class="leg"><i style="background:var(--c-neutra)"></i>Original</span><span class="leg"><i style="background:var(--c-serie)"></i>v2</span></p>@@svg_motivos@@</div>
+  <div><h2>Skills usadas, por tipo</h2><p><span class="leg"><i style="background:var(--c-neutra)"></i>Original</span><span class="leg"><i style="background:var(--c-serie)"></i>v2</span></p>@@svg_tipos@@</div>
+ </div>
+ <p class="aviso">@@aviso_economia@@</p>
+</div>
+<div class="pagina">
+ <h2>IA × PoliticaCopa em confrontos controlados</h2>
+ <div class="kpis">@@kpis_controlados@@</div>
+ <div class="duas">
+  <div><h3>Espelho: IA vence a PoliticaCopa, por canal da build (%)</h3>@@svg_arquetipos@@
+   <h3>Por tipo de build, nas Copas</h3><table><thead><tr><th>Build</th><th class=n>Glad.</th><th>Original</th><th>v2</th><th>Fase média</th><th>Espelho</th></tr></thead><tbody>@@linhas_builds@@</tbody></table></div>
+  <div><h3>Competência nos mesmos duelos (espelho, por lado)</h3><table><thead><tr><th></th><th class=n>IA</th><th class=n>PoliticaCopa</th></tr></thead><tbody>@@linhas_competencia@@</tbody></table>
+   <h3>Calibração das estimativas</h3><p class="aviso">@@texto_calibracao@@</p><table><thead><tr><th>P estimada</th><th class=n>Decisões</th><th class=n>P média</th><th class=n>Vitórias</th></tr></thead><tbody>@@linhas_calibracao@@</tbody></table></div>
+ </div>
+</div>
+<div class="pagina chave-pagina"><h2>Chave da v2</h2><p class="muted">Nome em negrito: quem venceu. Número: OP. Cor: perfil. Borda amarela: zebra.</p>@@svg_chave@@</div>
+@@lutas@@
+<div class="pagina">
+ <h2>As decisões da IA</h2>
+ <p>@@texto_decisoes@@</p>
+ <table><thead><tr><th>A PoliticaCopa faria</th><th>A IA fez</th><th class=n>Vezes</th></tr></thead><tbody>@@linhas_divergencias@@</tbody></table>
+ @@exemplos@@
+</div>
+<div class="pagina compacto"><h2>As 63 partidas da v2</h2>
+ <table><thead><tr><th>Partida</th><th>Lado 1</th><th>Lado 2</th><th>Vencedor</th><th class=n>Rod.</th><th class=n>HP final</th><th class=n>ΔOP</th></tr></thead><tbody>@@linhas_partidas@@</tbody></table>
+ <p class="aviso">Auditoria integral da final em final_detalhada.md; trace em final_trace.json; comparação, controlados e lutas em relatorio.md; decisões em decisoes.md.</p></div>
+</body></html>

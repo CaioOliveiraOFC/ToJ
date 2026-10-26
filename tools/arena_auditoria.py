@@ -190,6 +190,8 @@ class Trace:
         self._golpes: list[int] = []
         self._acerto_pendente: dict | None = None
         self.contador_golpes = 0
+        # As trocas de `interceptar` enquanto ele está ativo (ver `fora_do_duelo`).
+        self.trocas: list = []
 
     def registrar_lados(self, duelo: Duel) -> None:
         for lado in SIDES:
@@ -422,13 +424,20 @@ def _detalhe_acerto(atacante, defensor, modificador_acao) -> dict:
 
 @contextlib.contextmanager
 def interceptar(trace: Trace):
-    """Troca as funções canônicas por embrulhos durante o bloco. Restaura no fim."""
-    trocadas: list[tuple[object, str, object]] = []
+    """Troca as funções canônicas por embrulhos durante o bloco. Restaura no fim.
+
+    As trocas ficam em `trace.trocas`, para que `ControladorAuditado` possa
+    desfazê-las enquanto o controlador pensa: o que um controlador simula por
+    conta própria não é o duelo, e não entra no trace.
+    """
+    trocadas: list[tuple[object, str, object, object]] = []
+    trace.trocas = trocadas
 
     def troca(modulo, nome, fabrica):
         original = getattr(modulo, nome)
-        trocadas.append((modulo, nome, original))
-        setattr(modulo, nome, fabrica(original))
+        embrulho = fabrica(original)
+        trocadas.append((modulo, nome, original, embrulho))
+        setattr(modulo, nome, embrulho)
 
     # Originais puras usadas nos recálculos: capturadas ANTES da troca, para
     # que um recálculo nunca passe por um embrulho e duplique um registro.
@@ -955,8 +964,28 @@ def interceptar(trace: Trace):
     try:
         yield trace
     finally:
-        for modulo, nome, original in reversed(trocadas):
+        for modulo, nome, original, _ in reversed(trocadas):
             setattr(modulo, nome, original)
+        trace.trocas = []
+
+
+@contextlib.contextmanager
+def fora_do_duelo(trace: Trace):
+    """As funções canônicas originais durante o bloco; os embrulhos de volta no fim.
+
+    É o que um controlador enxerga enquanto escolhe. A `PoliticaCopa` não chama
+    nada do motor; a IA estratégica simula rodadas inteiras em cópias, e cada
+    golpe simulado entraria no trace do duelo verdadeiro como se tivesse
+    acontecido.
+    """
+    trocadas = list(getattr(trace, "trocas", ()))
+    for modulo, nome, original, _ in reversed(trocadas):
+        setattr(modulo, nome, original)
+    try:
+        yield
+    finally:
+        for modulo, nome, _, embrulho in trocadas:
+            setattr(modulo, nome, embrulho)
 
 
 class ControladorAuditado:
@@ -969,7 +998,8 @@ class ControladorAuditado:
         self._trace = trace
 
     def choose(self, view):
-        acao = self._interno.choose(view)
+        with fora_do_duelo(self._trace):
+            acao = self._interno.choose(view)
         skill = None
         if acao.kind == "skill":
             skill = next((s for s in self._heroi.skills.values() if s.id == acao.skill_id), None)

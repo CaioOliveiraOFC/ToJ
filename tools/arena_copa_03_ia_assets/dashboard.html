@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Copa Arena 03 v2</title>
+<style>
+@@estilo@@
+header{max-width:1280px;margin:0 auto;padding:20px 16px 8px}
+nav{position:sticky;top:0;z-index:5;background:var(--page);border-bottom:1px solid var(--grid)}
+nav .in{max-width:1280px;margin:0 auto;padding:6px 16px;display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+nav button{background:none;border:0;color:var(--t2);font:inherit;padding:8px 12px;border-radius:8px;cursor:pointer}
+nav button[aria-selected=true]{background:var(--surface);color:var(--t1);font-weight:600;box-shadow:0 0 0 1px var(--border)}
+nav .tema{margin-left:auto}
+main{max-width:1280px;margin:0 auto;padding:16px}
+section{display:none}
+section.ativa{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
+.kpi .kv{font-size:24px;font-weight:650;margin:2px 0}
+.kpi .kl{color:var(--t2);font-size:12px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px}
+.rolagem{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:5px 8px;border-bottom:1px solid var(--grid);text-align:left;vertical-align:top}
+th{color:var(--t2);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.muted{color:var(--t3)}
+.sec{color:var(--t2)}
+details{margin:8px 0}
+summary{cursor:pointer;color:var(--acento)}
+#dica{position:fixed;pointer-events:none;background:var(--surface);color:var(--t1);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:12px;max-width:320px;box-shadow:0 4px 14px rgba(0,0,0,.12);display:none;z-index:40}
+.chave-wrap{overflow:auto;max-height:82vh;border:1px solid var(--grid);border-radius:8px}
+.leg{display:inline-flex;align-items:center;gap:6px;margin-right:14px;font-size:12px;color:var(--t2)}
+.leg i{display:inline-block;width:12px;height:4px;border-radius:2px}
+code{font-size:12px;background:var(--grid);padding:0 3px;border-radius:3px}
+@media (max-width:640px){header,main{padding-left:16px;padding-right:16px}.kpi .kv{font-size:20px}}
+</style></head><body>
+<header>
+ <h1 style="margin:0 0 4px">Copa Arena 03 v2 — Inteligência Estratégica</h1>
+ <p class="sec" style="margin:0">@@subtitulo@@</p>
+</header>
+<nav><div class="in" role="tablist">
+ <button role="tab" data-aba="resumo" aria-selected="true">Resumo</button>
+ <button role="tab" data-aba="comparacao">Comparação</button>
+ <button role="tab" data-aba="controlados">IA × PoliticaCopa</button>
+ <button role="tab" data-aba="chave">Chave</button>
+ <button role="tab" data-aba="lutas">Três lutas</button>
+ <button role="tab" data-aba="decisoes">Decisões</button>
+ <button role="tab" data-aba="partidas">Partidas</button>
+ <button class="tema" id="tema" aria-label="Alternar tema">◐</button>
+</div></nav>
+<main>
+<section id="resumo" class="ativa">
+ <div class="kpis">@@kpis@@</div>
+ <div class="grid2">
+  <div class="card"><h3>Rodadas por partida — original</h3>@@svg_rodadas_original@@</div>
+  <div class="card"><h3>Rodadas por partida — v2</h3>@@svg_rodadas_ia@@</div>
+ </div>
+ <div class="grid2">
+  <div class="card"><h3>Motivo de cada ataque básico (% dos básicos)</h3><p><span class="leg"><i style="background:var(--c-neutra)"></i>Original (PoliticaCopa)</span><span class="leg"><i style="background:var(--c-serie)"></i>v2 (IA)</span></p>@@svg_motivos@@</div>
+  <div class="card"><h3>Skills usadas, por tipo</h3><p><span class="leg"><i style="background:var(--c-neutra)"></i>Original</span><span class="leg"><i style="background:var(--c-serie)"></i>v2</span></p>@@svg_tipos@@</div>
+ </div>
+ <div class="card"><h3>Integridade</h3><ul>@@integridade@@</ul></div>
+</section>
+<section id="comparacao">
+ <div class="card rolagem"><h3>A comparação obrigatória</h3><table><thead><tr><th></th><th>Original (PoliticaCopa)</th><th>v2 (IA estratégica)</th></tr></thead><tbody>@@linhas_comparacao@@</tbody></table></div>
+ <div class="card rolagem"><h3>Primeira fase: os mesmos 32 pares e as mesmas seeds</h3><p>@@texto_viradas@@</p><table><thead><tr><th>Partida</th><th>Vencia com a PoliticaCopa</th><th>Vence com a IA</th><th class=n>Rodadas</th></tr></thead><tbody>@@linhas_viradas@@</tbody></table></div>
+ <div class="card rolagem"><h3>Por tipo de build</h3><table><thead><tr><th>Build</th><th class=n>Gladiadores</th><th>Copa original</th><th>Copa v2</th><th>Fase média</th><th>Espelho: IA vence a PoliticaCopa</th></tr></thead><tbody>@@linhas_builds@@</tbody></table><p class="muted">Fase média: 0 = caiu na fase de 64, 6 = campeão. A eliminatória não mede força de build; o ranking Bradley-Terry da Copa 03 segue como referência.</p></div>
+</section>
+<section id="controlados">
+ <div class="kpis">@@kpis_controlados@@</div>
+ <div class="grid2">
+  <div class="card"><h3>Espelho: IA vence a PoliticaCopa, por canal da build (%)</h3>@@svg_arquetipos@@</div>
+  <div class="card rolagem"><h3>Competência nos mesmos duelos (espelho, por lado)</h3><table><thead><tr><th></th><th class=n>IA</th><th class=n>PoliticaCopa</th></tr></thead><tbody>@@linhas_competencia@@</tbody></table></div>
+ </div>
+ <div class="card rolagem"><h3>As estimativas da IA batem com o que acontece?</h3><p>@@texto_calibracao@@</p><table><thead><tr><th>P estimada</th><th class=n>Decisões</th><th class=n>P média</th><th class=n>Vitórias de fato</th></tr></thead><tbody>@@linhas_calibracao@@</tbody></table></div>
+</section>
+<section id="chave">
+ <div class="card"><h3>Chave da v2</h3><p class="muted">Nome em negrito: quem venceu. Número: OP. Cor: perfil de geração. Borda amarela: zebra.</p><div class="chave-wrap">@@svg_chave@@</div></div>
+</section>
+<section id="lutas">@@lutas@@</section>
+<section id="decisoes">
+ <div class="card"><p>@@texto_decisoes@@</p></div>
+ <div class="card rolagem"><h3>Onde a IA divergiu da PoliticaCopa</h3><table><thead><tr><th>A PoliticaCopa faria</th><th>A IA fez</th><th class=n>Vezes</th></tr></thead><tbody>@@linhas_divergencias@@</tbody></table></div>
+ @@exemplos@@
+</section>
+<section id="partidas">
+ <div class="card rolagem"><table><thead><tr><th>Partida</th><th>Lado 1</th><th>Lado 2</th><th>Vencedor</th><th class=n>Rod.</th><th class=n>HP final</th><th class=n>ΔOP</th></tr></thead><tbody>@@linhas_partidas@@</tbody></table></div>
+</section>
+</main>
+<div id="dica"></div>
+<script>
+(function(){
+  var abas=document.querySelectorAll('nav button[data-aba]');
+  function abrir(id){abas.forEach(function(b){b.setAttribute('aria-selected',b.dataset.aba===id)});
+    document.querySelectorAll('main>section').forEach(function(s){s.classList.toggle('ativa',s.id===id)});
+    try{localStorage.setItem('copa03ia-aba',id)}catch(e){}}
+  abas.forEach(function(b){b.addEventListener('click',function(){abrir(b.dataset.aba)})});
+  try{var salva=localStorage.getItem('copa03ia-aba');if(salva&&document.getElementById(salva))abrir(salva)}catch(e){}
+  document.getElementById('tema').addEventListener('click',function(){
+    var r=document.documentElement,atual=r.getAttribute('data-theme');
+    var escuro=atual?atual==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+    r.setAttribute('data-theme',escuro?'light':'dark')});
+  var dica=document.getElementById('dica');
+  document.addEventListener('mousemove',function(e){var t=e.target.closest&&e.target.closest('[data-tip]');
+    if(!t){dica.style.display='none';return}
+    dica.textContent=t.getAttribute('data-tip');dica.style.display='block';
+    dica.style.left=Math.min(e.clientX+12,innerWidth-330)+'px';dica.style.top=(e.clientY+12)+'px'});
+})();
+</script>
+</body></html>

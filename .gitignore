@@ -58,6 +58,17 @@ reports/pvp/copa_03/*
 !reports/pvp/copa_03/diagnostico_rng.json
 !reports/pvp/copa_03/round_robin.json
 !reports/pvp/copa_03/round_robin.md
+# A Copa Arena 03 v2 (`tools/arena_copa_03_ia.py`): os mesmos 64, só o
+# controlador muda.
+!reports/pvp/copa_03_ia/
+reports/pvp/copa_03_ia/*
+!reports/pvp/copa_03_ia/relatorio.md
+!reports/pvp/copa_03_ia/decisoes.md
+!reports/pvp/copa_03_ia/final_detalhada.md
+!reports/pvp/copa_03_ia/final_trace.json
+!reports/pvp/copa_03_ia/dashboard.html
+!reports/pvp/copa_03_ia/relatorio_visual.pdf
+!reports/pvp/copa_03_ia/confrontos.json
 
 # IDEs
 .idea/

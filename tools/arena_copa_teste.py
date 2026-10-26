@@ -403,7 +403,13 @@ def jogar_partida(
     *,
     semente_principal: int = SEMENTE_PRINCIPAL,
     nome_da_fase: str | None = None,
+    controlador=PoliticaCopa,
 ) -> Partida:
+    """Uma partida MD1, jogada duas vezes: sem e com a auditoria.
+
+    `controlador` é a fábrica dos dois lados (recebe o herói do duelo). A Copa
+    01, a 02 e a 03 jogam com `PoliticaCopa`; a Copa 03 v2 troca só isto.
+    """
     semente = semente_da_partida(fase, indice, semente_principal)
 
     def duelo(auditar: bool) -> DueloAuditado:
@@ -412,7 +418,7 @@ def jogar_partida(
             prepare_gladiator(p1.heroi),
             prepare_gladiator(p2.heroi),
             semente,
-            PoliticaCopa,
+            controlador,
             auditar=auditar,
             limite=LIMITE_TECNICO,
         )
