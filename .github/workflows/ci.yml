@@ -10,11 +10,14 @@
 # `compatibilidade`, é o gate do contrato multiplayer.
 name: CI
 
-# Pushes em branch de trabalho são cobertos pelo evento de pull request: gatilho
-# duplo faria toda execução rodar duas vezes, inclusive a suíte de minutos.
+# `master` e a branch de trabalho da Arena. Na `phase/pvp-arena` o trabalho é
+# publicado por push, sem pull request aberto: sem este gatilho, testes, lint e o
+# gate de compatibilidade só rodariam no PR final, e "verde" na branch seria
+# afirmação sem verificação. O preço é rodar duas vezes o commit que estiver
+# também num PR para `master`.
 on:
   push:
-    branches: [master]
+    branches: [master, phase/pvp-arena]
   pull_request:
     branches: [master]
 
@@ -61,6 +64,11 @@ jobs:
 
   balanceamento:
     name: Invariantes de balanceamento
+    # Em `master` e em todo PR para ela, como sempre. No push da branch de
+    # trabalho da Arena fica de fora: o PvE está congelado em `v0.3-pve`, a
+    # Arena não toca nas réguas dele, e a medição leva 25 minutos. O PR para
+    # `master` continua passando por ela antes de qualquer merge.
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

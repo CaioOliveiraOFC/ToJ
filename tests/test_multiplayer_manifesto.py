@@ -379,6 +379,23 @@ def test_o_ci_tem_o_gate_de_compatibilidade_bloqueante():
     assert "python -m pytest -q" in jobs["testes"]
 
 
+def test_o_ci_roda_no_push_da_branch_de_trabalho_sem_enfraquecer_master():
+    texto = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
+    assert "    branches: [master, phase/pvp-arena]" in texto  # push
+    assert "  pull_request:\n    branches: [master]" in texto
+    jobs = _jobs("ci.yml")
+    assert set(jobs) == {"testes", "balanceamento", "compatibilidade", "lint"}
+    # Testes, lint e compatibilidade rodam em todo evento, sem condição.
+    for nome in ("testes", "compatibilidade", "lint"):
+        assert "\n    if:" not in jobs[nome], nome
+    # O balanceamento continua em `master` e em todo PR para ela.
+    assert (
+        "if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'"
+        in jobs["balanceamento"]
+    )
+    assert 'pytest -q -m "balance or balance_full"' in jobs["balanceamento"]
+
+
 def test_a_publicacao_so_empacota_depois_do_gate():
     texto = (WORKFLOWS / "publicacao.yml").read_text(encoding="utf-8")
     assert 'tags: ["v*"]' in texto
