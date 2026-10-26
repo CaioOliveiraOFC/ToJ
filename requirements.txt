@@ -1,2 +1,5 @@
 rich
 pyfiglet
+# Transporte do multiplayer (src/multiplayer/rede.py). 16.x é a última série com
+# suporte a Python 3.10, o piso do projeto.
+websockets==16.1.1

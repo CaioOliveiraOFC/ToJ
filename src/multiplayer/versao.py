@@ -26,8 +26,8 @@ Quando mudar cada um:
 
 from __future__ import annotations
 
-VERSAO_DO_JOGO = "0.4.0-arena.1"
-VERSAO_DO_PROTOCOLO = 1
+VERSAO_DO_JOGO = "0.4.0-arena.2"
+VERSAO_DO_PROTOCOLO = 2
 REGRAS_DE_COMBATE = "duelo-1"
 ESQUEMA_DO_GLADIADOR = 1
 

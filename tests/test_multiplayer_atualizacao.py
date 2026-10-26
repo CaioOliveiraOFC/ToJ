@@ -32,10 +32,12 @@ from src.multiplayer.servidor import (  # noqa: E402
 from src.multiplayer.transporte import RedeLocal  # noqa: E402
 from tests._multiplayer_apoio import (  # noqa: E402
     PrimeiraSkill,
-    acervo,
     cliente,
+    conta_id,
     em_fila,
+    entrar,
     manifesto_de_outra_versao,
+    registro,
     servidor,
 )
 
@@ -62,14 +64,17 @@ def _rodar(rede, partida, rodadas):
 
 def test_publicar_versao_nova_drena_a_antiga_e_recusa_o_que_e_novo():
     resultados = Resultados()
-    antiga = servidor(resultados=resultados, nome="a")
-    nova = servidor(manifesto=manifesto_de_outra_versao(), resultados=resultados, nome="b")
+    gladiadores = registro(ana="W23", bia="W64", caio="W01")
+    antiga = servidor(gladiadores, resultados=resultados, nome="a")
+    nova = servidor(
+        gladiadores, manifesto=manifesto_de_outra_versao(), resultados=resultados, nome="b"
+    )
     frota = Frota(antiga)
     rede = RedeLocal(antiga)
 
-    na_fila = cliente("na_fila")
-    em_fila(rede, "c1", na_fila, "W23")
-    assert antiga.na_fila() == ("na_fila",)
+    na_fila = cliente("caio")
+    em_fila(rede, "c1", na_fila, "W01")
+    assert antiga.na_fila() == ("caio",)
 
     rede.entregar(frota.publicar(nova))
     assert antiga.estado == DRENANDO
@@ -78,23 +83,21 @@ def test_publicar_versao_nova_drena_a_antiga_e_recusa_o_que_e_novo():
     assert na_fila.recusas[-1]["motivo"] == compat.SERVIDOR_EM_ATUALIZACAO
     assert antiga.na_fila() == ()
 
-    # Nada novo começa na versão antiga: nem sessão, nem fila.
-    atrasado = cliente("atrasado")
-    rede.conectar("c2", atrasado)
-    rede.enviar("c2", atrasado.ola())
+    # Nada novo começa na versão antiga: nem login, nem sessão, nem fila.
+    atrasado = cliente("ana")
+    entrar(rede, "c2", atrasado)
     assert atrasado.recusas[-1]["motivo"] == compat.SERVIDOR_EM_ATUALIZACAO
-    rede.enviar("c1", na_fila.entrar_na_fila("W23"))
+    assert atrasado.token is None
+    rede.enviar("c1", na_fila.entrar_na_fila("W01"))
     assert na_fila.recusas[-1]["motivo"] == compat.SERVIDOR_EM_ATUALIZACAO
     assert antiga.partidas_em_andamento() == ()
 
     # A versão nova recusa o cliente antigo e aceita o atualizado.
-    rede.conectar("c3", cliente("velho"), nova)
-    velho = rede._clientes["c3"]
-    rede.enviar("c3", velho.ola())
+    velho = cliente("bia")
+    entrar(rede, "c3", velho, nova)
     assert velho.recusas[-1]["motivo"] == compat.VERSAO_DO_JOGO
-    atualizado = cliente("atualizado", identidade=nova.identidade)
-    rede.conectar("c4", atualizado, nova)
-    rede.enviar("c4", atualizado.ola())
+    atualizado = cliente("bia", identidade=nova.identidade)
+    entrar(rede, "c4", atualizado, nova)
     assert atualizado.ultima("bem_vindo") is not None
 
 
@@ -206,9 +209,9 @@ def test_sem_instancia_compativel_a_partida_e_anulada_sem_vitoria_derrota_ou_mmr
     assert desfecho.estado == ANULADA
     assert (desfecho.vencedor, desfecho.perdedor) == (None, None)
     assert resultados.classificaveis() == ()
-    for jogador in ("ana", "bia"):
-        assert resultados.vitorias(jogador) == 0
-        assert resultados.derrotas(jogador) == 0
+    for usuario in ("ana", "bia"):
+        assert resultados.vitorias(conta_id(usuario)) == 0
+        assert resultados.derrotas(conta_id(usuario)) == 0
 
     # A instância desligada não aceita mais nada.
     rede.enviar("c1", ana.reconectar())
@@ -231,9 +234,9 @@ def test_retomar_recusa_replay_divergente_e_gladiador_diferente():
     rede = RedeLocal(a1)
     ana, bia, partida = _em_partida(a1, rede)
     _rodar(rede, partida, 3)
-    registro = a1.exportar(partida.id)
+    exportado = a1.exportar(partida.id)
 
-    adulterado = {**registro, "rodadas": [dict(r) for r in registro["rodadas"]]}
+    adulterado = {**exportado, "rodadas": [dict(r) for r in exportado["rodadas"]]}
     adulterado["rodadas"][1] = {**adulterado["rodadas"][1], "mp_fim": {"p1": 0, "p2": 0}}
     a2 = servidor(nome="a2")
     with pytest.raises(PartidaIncompativelError, match="rodada 2"):
@@ -241,11 +244,11 @@ def test_retomar_recusa_replay_divergente_e_gladiador_diferente():
     assert a2.partidas_em_andamento() == ()
 
     # Mesmo id de gladiador, outro registro: não é o gladiador da partida.
-    outro_acervo = acervo("W23", "W01")
-    outro_acervo._registros["W64"] = outro_acervo._registros.pop("W01")
-    a3 = servidor(outro_acervo, nome="a3")
+    outro = registro(ana="W23", bia="W01")
+    outro._itens["W64"] = outro._itens.pop("W01")
+    a3 = servidor(outro, nome="a3")
     with pytest.raises(PartidaIncompativelError, match="não é o registro da partida"):
-        a3.retomar(registro)
+        a3.retomar(exportado)
 
 
 def test_desligar_com_partida_sem_passar_pela_frota_e_proibido():
@@ -261,8 +264,8 @@ def test_partida_transferida_nao_aceita_mais_acao_na_instancia_antiga():
     frota = Frota(a1, a2)
     rede = RedeLocal(a1)
     ana, bia, partida = _em_partida(a1, rede)
-    registro = a1.exportar(partida.id)
-    a2.retomar(registro)
+    exportado = a1.exportar(partida.id)
+    a2.retomar(exportado)
     a1.transferir(partida.id)
     assert partida.estado == TRANSFERIDA
     assert a1.partidas_em_andamento() == ()

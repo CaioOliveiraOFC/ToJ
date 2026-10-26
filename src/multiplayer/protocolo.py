@@ -1,14 +1,20 @@
 """As mensagens entre cliente e servidor, em JSON, sem tolerância.
 
 A rede só transporta texto. Este módulo define o que esse texto pode dizer — e,
-principalmente, o que ele NÃO pode: do cliente só saem a identidade de versão,
-os comandos de sessão (entrar, fila, reconectar) e a AÇÃO do duelo (tipo e id da
-carta). Não existe campo para HP, dano, atributo, equipamento, recarga,
-resultado ou MMR; uma mensagem com campo a mais é recusada inteira.
+principalmente, o que ele NÃO pode. Do cliente só saem:
+
+- a identidade de versão, em todo comando que compromete algo;
+- a autenticação (`login` com usuário e senha, ou o token emitido pelo servidor);
+- os comandos de sessão: `ola`, fila, sala direta, `reconectar`;
+- a AÇÃO do duelo: tipo e id da carta.
+
+Não existe campo para HP, dano, atributo, equipamento, recarga, resultado, MMR,
+id de conta ou dono de gladiador; uma mensagem com campo a mais é recusada
+inteira. A conta é sempre a que o servidor extraiu do token.
 
 Do servidor saem a observação (a mesma `DuelView` que o controlador local
-recebe), o registro público da rodada (sem a iniciativa, que é auditoria) e o
-desfecho.
+recebe), a ficha pública dos dois gladiadores, o registro público da rodada (sem
+a iniciativa, que é auditoria) e o desfecho.
 """
 
 from __future__ import annotations
@@ -19,19 +25,28 @@ from src.mechanics.pvp_duel import DUEL_ACTION_KINDS, DuelAction, DuelView, Figh
 
 TAMANHO_MAXIMO = 64 * 1024
 
+# Nenhum texto de mensagem passa disto (o token tem até 2048 caracteres).
+LIMITE_DE_TEXTO = 2048
+
 # tipo → {campo: tipos aceitos}. Exatamente estes campos, além de `tipo`.
 MENSAGENS_DO_CLIENTE: dict[str, dict[str, tuple[type, ...]]] = {
-    "ola": {"identidade": (dict,), "jogador": (str,)},
+    "login": {"identidade": (dict,), "usuario": (str,), "senha": (str,)},
+    "ola": {"identidade": (dict,), "token": (str,)},
     "entrar_na_fila": {"identidade": (dict,), "gladiador": (str,)},
     "sair_da_fila": {},
+    "criar_sala": {"identidade": (dict,), "gladiador": (str,)},
+    "entrar_na_sala": {"identidade": (dict,), "sala": (str,), "gladiador": (str,)},
+    "cancelar_sala": {},
     "acao": {"partida": (str,), "rodada": (int,), "acao": (dict,)},
-    "reconectar": {"identidade": (dict,), "token": (str,)},
+    "reconectar": {"identidade": (dict,), "sessao": (str,), "token": (str,)},
 }
 
 MENSAGENS_DO_SERVIDOR = (
+    "autenticado",
     "bem_vindo",
     "recusado",
     "na_fila",
+    "sala_criada",
     "partida_criada",
     "observacao",
     "acao_recebida",
@@ -86,6 +101,8 @@ def decodificar_do_cliente(texto) -> dict:
     for campo, tipos in esquema.items():
         if not _tipo_certo(dados[campo], tipos):
             raise ProtocoloInvalidoError("campos_invalidos", f"`{campo}` com tipo errado.")
+        if isinstance(dados[campo], str) and len(dados[campo]) > LIMITE_DE_TEXTO:
+            raise ProtocoloInvalidoError("campos_invalidos", f"`{campo}` longo demais.")
     if dados["tipo"] == "acao":
         acao_de(dados["acao"])
     return dados
@@ -181,4 +198,39 @@ def rodada_publica(registro: RoundRecord) -> dict:
         ],
         "hp_fim": dict(registro.hp_end),
         "mp_fim": dict(registro.mp_end),
+    }
+
+
+def ficha_publica(heroi) -> dict:
+    """A build pública do gladiador PRONTO para o duelo — a mesma ficha da Arena local.
+
+    Só leitura dos getters do herói: atributos, equipamento, cartas (custo e
+    recarga pelo caminho do motor) e passivas. Nada é calculado aqui.
+    """
+    return {
+        "nome": str(heroi.get_nick_name()),
+        "classe": str(heroi.get_classname()),
+        "nivel": int(heroi.get_level()),
+        "atributos": {
+            "hp": int(heroi.base_hp),
+            "mp": int(heroi.base_mp),
+            "st": int(heroi.get_st()),
+            "mg": int(heroi.get_mg()),
+            "ag": int(heroi.get_ag()),
+            "df": int(heroi.get_df()),
+        },
+        "equipamento": {
+            posicao: (None if item is None else str(item.display_name))
+            for posicao, item in heroi.equipment.items()
+        },
+        "skills": [
+            {
+                "id": skill.id,
+                "nome": skill.name,
+                "mp": int(heroi.skill_mana_cost(skill)),
+                "recarga": int(getattr(skill, "cooldown", 0) or 0),
+            }
+            for skill in heroi.skills.values()
+        ],
+        "passivas": [{"nome": p.name, "descricao": p.description} for p in heroi.passives],
     }

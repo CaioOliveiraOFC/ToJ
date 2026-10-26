@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "A dungeon crawler RPG game"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["rich", "pyfiglet"]
+dependencies = ["rich", "pyfiglet", "websockets==16.1.1"]
 
 [tool.ruff]
 target-version = "py310"

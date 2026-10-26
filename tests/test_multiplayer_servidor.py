@@ -44,7 +44,10 @@ from tests._multiplayer_apoio import (  # noqa: E402
     acervo,
     acoes_da_final,
     cliente,
+    conta_id,
     em_fila,
+    entrar,
+    registro,
     resultado_da_final,
     rodadas_da_final,
     servidor,
@@ -53,7 +56,7 @@ from tests._multiplayer_apoio import (  # noqa: E402
 
 
 def _duelo_pela_rede(controlador_1, controlador_2, gladiadores=("W23", "W64")):
-    srv = servidor(acervo(*gladiadores))
+    srv = servidor(registro(ana=gladiadores[0], bia=gladiadores[1]))
     rede = RedeLocal(srv)
     ana, bia = cliente("ana", controlador_1), cliente("bia", controlador_2)
     em_fila(rede, "c1", ana, gladiadores[0])
@@ -168,9 +171,8 @@ def test_rodada_errada_e_acao_repetida_sao_recusadas():
 
 def test_quem_nao_joga_a_partida_nao_age_nela():
     srv, rede, ana, bia, partida = _parado_na_rodada_1()
-    intruso = cliente("intruso")
-    rede.conectar("c9", intruso)
-    rede.enviar("c9", intruso.ola())
+    intruso = cliente("caio")
+    entrar(rede, "c9", intruso)
     antes = _estado(partida)
     ataque = {"kind": "attack", "skill_id": None}
     rede.enviar("c9", protocolo.codificar("acao", partida=partida.id, rodada=1, acao=ataque))
@@ -200,7 +202,8 @@ def test_a_final_publicada_da_copa_03_rejogada_pelo_servidor_da_o_mesmo_resultad
         final["rounds"],
     )
     (desfecho,) = srv.resultados.classificaveis()
-    assert (desfecho.vencedor, desfecho.perdedor) == ("bia", "ana")  # fer (W64) vence
+    # fer (W64), da bia, vence; o livro guarda as contas, não nomes declarados.
+    assert (desfecho.vencedor, desfecho.perdedor) == (conta_id("bia"), conta_id("ana"))
 
 
 def test_partida_pelo_servidor_e_o_mesmo_duelo_que_o_motor_direto():

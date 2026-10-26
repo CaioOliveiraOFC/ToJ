@@ -45,12 +45,15 @@
     "src/mechanics/pvp_duel.py": "065e8b025d3ebd0461102cb3919188ebbc17cace5f5f33777188ffe45749814b",
     "src/mechanics/pvp_initiative.py": "0a4836e949defb25257ad732126dfaea5eb4258acfea0c86ea25aa41d3e91e05",
     "src/multiplayer/__init__.py": "ef8c68187339338d42324001d412f973e1c0bd1fee653df142f2662da41a086a",
-    "src/multiplayer/cliente.py": "9a7dce8b1cb7732e99a6a4f57c8f8ccb6c997633ea66a514686ba0ae62517cd8",
+    "src/multiplayer/cliente.py": "a1a4c87b0cf5d850eed134a766e8fe3b934ce01345ae11bc4f5b9178a7073f9d",
     "src/multiplayer/compatibilidade.py": "a7507e212debbc1b49b9cdb2b1416291a20754893fa02be83fd3ed4847eb4a16",
+    "src/multiplayer/contas.py": "35aaad07485881564289708b1606f6fe0df1149025c1212f6134e9251b0be2bb",
     "src/multiplayer/gladiadores.py": "d764d7caa606fcc934363c39c4bd780aaf2c7198e85c206af1a0314f40d84c4e",
     "src/multiplayer/manifesto.py": "ec66146ef72aa3a1b803279e65b6ec03bcfb9cb0103522a0f0b5d332e9d7d1b2",
-    "src/multiplayer/protocolo.py": "f8170de3e25b1a4c3e0616f502011cdef18fe8b6d8886800a9d72f785493e82f",
-    "src/multiplayer/servidor.py": "9f0912951cb2a8c617231ae3ae949b292af4092a63ecca555593b951ed4356df",
+    "src/multiplayer/protocolo.py": "b27c1b44ef68e1a031d32d23db8864b6ffdca6e6de0efe96226c0192640be0e9",
+    "src/multiplayer/rede.py": "fa1ca127f4f308d3e4993ca33d84e9e1de45053ce7bb1aaa76438fb1a0d4abed",
+    "src/multiplayer/registro.py": "4a459e19e983f574270c3fd488010005a2b9fff2da77b813cf9170f43bb659a8",
+    "src/multiplayer/servidor.py": "2c684fc74e4571c893ee43d3be0baf4aa22278709ad5fa0793c54120feddfa0e",
     "src/multiplayer/transporte.py": "ed75ee1698bd0a155eceb1b3ed3ee6008f8f256ba965ad9a499a4b13bdee1d67",
     "src/shared/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
     "src/shared/combat_topics.py": "a7fe477654f5f103992835e7ce6a5961c089d5f11a389b635effe8b85989cc69",
@@ -65,17 +68,17 @@
     "src/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "src/storage/save_manager.py": "462f766f76fe0de59a7cbc1b57db98ab3215a77af242c3787ad3c43251f445c6"
   },
-  "conteudo": "3bd4e7f0338cd61a4453e225f9e18d28f38e2859c516c3d1107aa25f7eac00a1",
+  "conteudo": "079a1fa2b946b3c523557f0b04948379214def7a5556af9c956e10e285e45bc0",
   "esquema_gladiador": 1,
   "formato": 1,
   "grupos": {
     "catalogos": "2e5db9f152eafc10aa378516069682a3c68c777a7d41f73eccc892afd4b3966a",
     "persistencia": "e3180df03530bebbac6c5f6bc5d3a5fcd8fcbf6adbdbacedf282bb2a7704a1a8",
-    "protocolo": "52af0b79bd49462a5b965e3b5cf72553cac586c86a20bee019f5ac8b2030875e",
+    "protocolo": "6d9aef769fd4257d994e3c53dfebaab25c7ddf28e879e22f7e93abf83eab60fd",
     "regras": "6bb430eb758594290097f27a1bd6c0fbd72264dde2299c2d39ec5738d3ea555b",
-    "servidor": "29abd0266e3d8d0a9e071b024db9036e262009df49b406740cfb0ec473ca340f"
+    "servidor": "a7a2a5d9bd5d881a5e0573e8471c7db1c2e1010e5ab0bc264f5a12dfbef023b7"
   },
-  "jogo": "0.4.0-arena.1",
-  "protocolo": 1,
+  "jogo": "0.4.0-arena.2",
+  "protocolo": 2,
   "regras": "duelo-1"
 }

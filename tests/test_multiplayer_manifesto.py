@@ -23,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.multiplayer import manifesto as mf  # noqa: E402
 from src.multiplayer import versao  # noqa: E402
 from src.multiplayer.servidor import ServidorAutoritativo  # noqa: E402
-from tests._multiplayer_apoio import ROOT, acervo  # noqa: E402
+from tests._multiplayer_apoio import ROOT, contas, registro  # noqa: E402
 from tools import multiplayer_manifesto as ferramenta  # noqa: E402
 
 WORKFLOWS = ROOT / ".github" / "workflows"
@@ -84,31 +84,60 @@ def test_o_manifesto_cobre_os_grupos_e_so_o_escopo():
 
 
 def test_o_escopo_cobre_tudo_o_que_o_servidor_carrega_para_jogar():
-    """Num processo limpo: sobe o servidor, joga uma partida pela rede e lista os módulos."""
+    """Num processo limpo: sobe o servidor de rede, autentica duas contas, joga uma
+    partida por WebSocket e lista os módulos carregados."""
     programa = """
-import json, sys
+import json, sys, threading, time
+from pathlib import Path
 sys.path.insert(0, sys.argv[1])
 from src.mechanics.pvp_duel import DuelAction
-from src.multiplayer.gladiadores import AcervoDeGladiadores
-from src.multiplayer.servidor import ServidorAutoritativo
 from src.multiplayer.cliente import ClienteMultiplayer
-from src.multiplayer.transporte import RedeLocal
+from src.multiplayer.contas import ContasLocais, TokensAssinados
+from src.multiplayer.rede import ConexaoDeRede, ServidorDeRede, ServidorEmThread
+from src.multiplayer.registro import RegistroDeGladiadores, importar_da_copa
+from src.multiplayer.servidor import ServidorAutoritativo
 
 class Ataca:
     def choose(self, view):
         return DuelAction.attack()
 
-pasta = sys.argv[1] + "/reports/pvp/copa_03/snapshots/"
-acervo = AcervoDeGladiadores.de_snapshots(
-    {g: json.load(open(pasta + g + ".json")) for g in ("W23", "W64")}
-)
-srv = ServidorAutoritativo.da_instalacao(acervo)
-rede = RedeLocal(srv)
-for conexao, nome, gladiador in (("c1", "ana", "W23"), ("c2", "bia", "W64")):
-    cli = ClienteMultiplayer(srv.identidade, nome, Ataca())
-    rede.conectar(conexao, cli)
-    rede.enviar(conexao, cli.ola())
-    rede.enviar(conexao, cli.entrar_na_fila(gladiador))
+contas = ContasLocais(None, TokensAssinados(bytes(range(32))))
+registro = RegistroDeGladiadores()
+copa = Path(sys.argv[1]) / "reports/pvp/copa_03"
+for usuario, gladiador in (("ana", "W23"), ("bia", "W64")):
+    conta = contas.criar(usuario, "senha-de-teste-" + usuario)
+    importar_da_copa(registro, copa, gladiador, conta.id)
+srv = ServidorAutoritativo.da_instalacao(registro, contas)
+
+def jogar(url, usuario, gladiador, sala):
+    cli = ClienteMultiplayer(srv.identidade, Ataca())
+    con = ConexaoDeRede(url)
+    def esperar(tipo):
+        while True:
+            for resposta in cli.receber(con.receber(20)):
+                con.enviar(resposta)
+            if cli.recebidas[-1]["tipo"] in (tipo, "recusado"):
+                return cli.recebidas[-1]
+    con.enviar(cli.login(usuario, "senha-de-teste-" + usuario))
+    esperar("autenticado")
+    con.enviar(cli.ola())
+    esperar("bem_vindo")
+    if not sala:
+        con.enviar(cli.criar_sala(gladiador))
+        sala.append(esperar("sala_criada")["sala"])
+    else:
+        con.enviar(cli.entrar_na_sala(sala[0], gladiador))
+    esperar("fim")
+    con.fechar()
+
+with ServidorEmThread(ServidorDeRede(srv, "127.0.0.1", 0)) as rodando:
+    sala = []
+    jogar_ana = threading.Thread(target=jogar, args=(rodando.url, "ana", "W23", sala))
+    jogar_ana.start()
+    while not sala:
+        time.sleep(0.01)
+    jogar(rodando.url, "bia", "W64", sala)
+    jogar_ana.join(30)
 assert srv.resultados.classificaveis(), "a partida não terminou"
 print(json.dumps(sorted(
     (nome, getattr(m, "__file__", None)) for nome, m in sys.modules.items()
@@ -163,7 +192,7 @@ def test_mudanca_em_regra_ou_catalogo_sem_atualizar_o_manifesto_bloqueia(tmp_pat
     # E a instalação divergente não sobe servidor.
     with pytest.raises(mf.InstalacaoDivergenteError, match=arquivo):
         ServidorAutoritativo.da_instalacao(
-            acervo(), raiz=raiz, pasta=raiz / "src/multiplayer/manifestos"
+            registro(), contas(), raiz=raiz, pasta=raiz / "src/multiplayer/manifestos"
         )
 
 
