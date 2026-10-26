@@ -651,4 +651,8 @@ Estes contratos não dependem de nada acima e ainda não existem:
 - persistência dos resultados entre reinícios do servidor (o livro `Resultados`
   vive na memória, porque ninguém o lê enquanto o MMR não existe);
 - provedor de identidade externo, troca de senha e revogação de token antes da
-  expiração (trocar a chave invalida todos).
+  expiração (trocar a chave invalida todos);
+- limite de tentativas de login por conta e por endereço. Hoje é por conexão, e
+  quem abre conexões novas continua tentando; cada tentativa custa um scrypt, que
+  roda no laço do servidor de rede. Basta para uma rede de teste, não para um
+  servidor exposto.
