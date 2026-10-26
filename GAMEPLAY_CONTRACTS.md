@@ -216,10 +216,11 @@ Mudar uma classe exige mostrar a causa na régua de combate, e mantê-la verde.
 Branch `phase/pvp-arena`, sobre a fundação congelada em `v0.3-pve`. **O motor do
 duelo é headless** (Fases 1 e 1.1): dois gladiadores, decisões simultâneas,
 resolução sequencial. **O modo local é jogável no terminal** (Fase 2): opção 3
-do menu principal, o jogador contra um controlador automático. O servidor
-autoritativo, o protocolo e a fila (sem relógio) existem, sob o contrato de
-compatibilidade da seção [Multiplayer](#multiplayer--compatibilidade-de-versão);
-MMR, transporte de rede e relógio de decisão ainda não.
+do menu principal, o jogador contra um controlador automático. **O multiplayer
+humano × humano funciona pela rede** (Fases 3 e 4): servidor autoritativo,
+WebSocket com TLS, contas autenticadas, gladiadores com dono e salas diretas, sob
+o contrato da seção [Multiplayer](#multiplayer--compatibilidade-de-versão). MMR,
+matchmaking público, bots na fila e relógio de decisão ainda não existem.
 
 Verificado em `tests/test_pvp_duel.py`, `tests/test_pvp_initiative.py`,
 `tests/test_pvp_references.py` e `tests/test_arena_mode.py`.
@@ -387,9 +388,9 @@ o CI em `.github/workflows/ci.yml` (job `compatibilidade`) e
   - A final publicada da Copa Arena 03, rejogada pela rede, chega aos mesmos HP,
     MP e resultado nas 37 rodadas.
 - **A rede é uma camada à parte.** O servidor recebe `(conexão, texto)` e devolve
-  os envios; não conhece socket nem relógio. `transporte.RedeLocal` é o
-  transporte em processo, usado pelos testes. Um transporte de rede faz o mesmo
-  papel e não toca em regra.
+  os envios; não conhece socket nem relógio. `rede.ServidorDeRede` é o transporte
+  WebSocket e `transporte.RedeLocal` o transporte em processo; os dois só movem
+  texto e não tocam em regra.
 - **Nada entra sozinho numa versão publicada.** Mudança no PvE, nos catálogos, nas
   classes ou nas mecânicas compartilhadas muda o hash; hash novo exige manifesto
   novo, e manifesto publicado não muda. Toda mudança passa pelo gate, pela suíte
@@ -450,8 +451,9 @@ O workflow `publicacao.yml` só empacota a distribuição depois do gate e da su
 
 ### Versão obrigatória entre cliente e servidor
 
-- **O servidor é a autoridade.** O cliente manda a identidade da versão no `ola`.
-  Só identidade **idêntica** conecta: os quatro identificadores, os hashes de
+- **O servidor é a autoridade.** O cliente manda a identidade da versão no
+  `login` e no `ola`, e o login é recusado por versão ANTES de olhar a senha. Só
+  identidade **idêntica** conecta: os quatro identificadores, os hashes de
   todos os grupos e o hash do conteúdo. Não há compatibilidade com versão
   próxima, anterior ou posterior.
 - **A recusa é explícita.** Mensagem `recusado`, com `atualizacao_obrigatoria:
@@ -460,8 +462,8 @@ O workflow `publicacao.yml` só empacota a distribuição depois do gate e da su
   - `conteudo`: o mesmo número de versão com outro hash;
   - `identidade_invalida`;
   - `servidor_em_atualizacao`.
-- **A conferência se repete** na entrada da fila, na criação da partida (para os
-  dois lados) e na reconexão. Reconexão recusada deixa a partida exatamente como
+- **A conferência se repete** na entrada da fila e da sala, na criação da
+  partida (para os dois lados) e na reconexão. Reconexão recusada deixa a partida exatamente como
   estava.
 - **A instalação se confere antes de jogar.** `manifesto_da_instalacao` compara o
   código que está rodando com o manifesto da versão que ele declara.
@@ -470,14 +472,15 @@ O workflow `publicacao.yml` só empacota a distribuição depois do gate e da su
 
 ### Servidor autoritativo
 
-- **O cliente só manda ação e comando de sessão.** A ação é `kind` e `skill_id`;
-  os comandos são `ola`, `entrar_na_fila`, `sair_da_fila` e `reconectar`.
+- **O cliente só manda autenticação, ação e comando de sessão.** A ação é `kind`
+  e `skill_id`; os comandos são `login`, `ola`, `entrar_na_fila`, `sair_da_fila`,
+  `criar_sala`, `entrar_na_sala`, `cancelar_sala` e `reconectar`.
   - Mensagem com campo a mais, de tipo desconhecido ou com ação fora do
     vocabulário é recusada inteira, e nada muda.
-  - Não existe campo para HP, dano, atributo, equipamento, recarga, resultado ou
-    MMR.
-- **O gladiador fica no servidor** (`AcervoDeGladiadores`). O cliente só nomeia o
-  id; nunca envia ficha.
+  - Não existe campo para HP, dano, atributo, equipamento, recarga, resultado,
+    MMR, conta ou dono.
+- **O gladiador fica no servidor** (`RegistroDeGladiadores`). O cliente só nomeia
+  o id; nunca envia ficha nem snapshot.
 - **O servidor decide tudo.** Ele valida a ação contra `Duel.legal_actions`,
   recusa a ilegal sem mudar nada e roda o motor. O desfecho vai para o livro
   `Resultados`.
@@ -531,6 +534,92 @@ O workflow `publicacao.yml` só empacota a distribuição depois do gate e da su
 - **O gladiador é revalidado a cada preparação.** Um registro que deixou de ser
   compatível é recusado na fila ou na criação da partida, nunca depois.
 
+### Rede, autenticação e propriedade
+
+A Fase 4 pôs dois humanos em computadores diferentes na mesma partida. Nada aqui
+toca o motor: a rede só transporta texto, e quem decide é o mesmo servidor.
+
+- **Transporte WebSocket** (`src/multiplayer/rede.py`, `websockets` 16.1.1).
+  - Mensagens JSON estruturadas, só texto; quadro binário fecha a conexão.
+  - Quadro acima de 64 KiB derruba a conexão; texto acima de 2048 caracteres num
+    campo é recusado.
+  - Até 64 conexões. Conexão que não abre sessão em 30 segundos é fechada; dez
+    mensagens malformadas também.
+  - Cada conexão tem uma fila de saída própria: as mensagens chegam na ordem em
+    que o servidor as produziu, e um cliente que não lê é desconectado em vez de
+    travar os outros.
+- **TLS obrigatório fora do loopback.** O servidor não escuta fora de
+  `127.0.0.1` sem certificado, e o cliente não usa `ws://` para fora, a menos que
+  alguém peça explicitamente o modo inseguro de desenvolvimento. O cliente confere
+  o certificado e o nome do servidor; um certificado próprio entra pela
+  autoridade (`--autoridade`).
+- **Contas e sessão autenticada** (`src/multiplayer/contas.py`).
+  - O login troca usuário e senha por um token. A conta da sessão é a que o
+    servidor extrai do token, nunca um nome que o cliente declara.
+  - A senha é guardada como scrypt com sal. Usuário inexistente e senha errada
+    custam o mesmo e dão a mesma resposta. Cada conexão tem cinco tentativas.
+  - O token é assinado com HMAC-SHA256 e expira em 8 horas. A assinatura é
+    conferida antes do conteúdo; token alterado, de outra chave, vencido ou
+    malformado é recusado.
+  - Um token que vence no meio da sessão não deixa entrar em fila nem em sala.
+    A partida em andamento segue: não existe política de derrota por isso.
+  - A chave dos tokens fica num arquivo 0600 na pasta de dados do servidor.
+  - Contas são criadas só pelo administrador; não há cadastro pela rede.
+  - `Autenticador` é a interface; um provedor externo entra por ela.
+- **Credenciais fora dos logs.**
+  - Os quadros do WebSocket carregam senha e token, e o logger entregue à
+    biblioteca descarta o conteúdo deles.
+  - Os objetos que carregam token ou sessão não os mostram no `repr`.
+  - Um teste roda uma partida inteira com log em DEBUG e confere que nenhum
+    segredo aparece.
+- **Propriedade dos gladiadores** (`src/multiplayer/registro.py`).
+  - O registro guarda, em arquivo, o snapshot validado, o dono e a origem.
+  - Só entra por importação do administrador, de origem confiável: hoje, o
+    snapshot publicado de uma Copa, conferido pelo sha256 do índice. Snapshot
+    enviado por cliente nunca é aceito; o protocolo não tem como enviá-lo.
+  - Não há transferência, troca de dono nem o mesmo personagem registrado duas
+    vezes.
+  - O arquivo guarda a impressão de cada registro: alterado por fora, o
+    gladiador é recusado.
+- **A posse é conferida** na entrada da fila, na criação e na entrada da sala, e
+  de novo na criação da partida. Gladiador alheio e inexistente dão a mesma
+  resposta, para ninguém descobrir o acervo dos outros perguntando.
+- **Uma conta, um lado.**
+  - A conta tem uma sessão ativa por vez: uma segunda conexão da mesma conta é
+    recusada.
+  - Não se entra na própria sala, e a criação da partida recusa a mesma conta
+    nos dois lados, mesmo que as outras travas falhem.
+- **Partida direta por sala.** Um jogador cria a sala e passa o código; o outro
+  entra com o próprio gladiador. A fila simples continua existindo e só junta os
+  dois primeiros que esperam. Não há matchmaking público.
+- **Sigilo antes do lock.** Quem age recebe só `acao_recebida`. O adversário não
+  recebe nada até a rodada resolver; aí os dois recebem a mesma rodada pública.
+- **Queda de conexão.**
+  - A partida espera, intacta: estado, rodada e histórico não mudam.
+  - O jogador volta por `reconectar`, com a sessão e um token válido da MESMA
+    conta. O token de outra conta não assume a sessão.
+  - Prazo de reconexão e derrota por desconexão dependem do relógio competitivo,
+    que ainda não existe.
+- **O cliente de terminal** (`tools/toj_multiplayer.py`) faz o fluxo inteiro:
+  login, escolha do gladiador próprio, sala, as fichas públicas dos dois lados,
+  a ação escolhida sem ver a do outro, a rodada resolvida e o resultado. O passo
+  a passo está em [`MULTIPLAYER.md`](MULTIPLAYER.md).
+
+| garantia da Fase 4 | onde |
+|---|---|
+| dois clientes reais, partida inteira, resultado do servidor e replay canônico | `test_multiplayer_rede.py::test_dois_clientes_reais_jogam_uma_partida_inteira` |
+| sessões independentes | `…::test_partidas_e_sessoes_independentes` |
+| handshake válido e inválido pela rede | `…::test_handshake_valido_e_invalido_pela_rede` |
+| autenticação válida, expirada e adulterada | `test_multiplayer_contas.py`, `test_multiplayer_propriedade.py`, `test_multiplayer_rede.py::test_autenticacao_*` e `::test_token_expirado_pela_rede` |
+| gladiador de outra conta | `test_multiplayer_propriedade.py::test_gladiador_de_outra_conta_e_recusado` e os de sala e criação |
+| uma conta nos dois lados | `test_multiplayer_propriedade.py::test_a_mesma_conta_*` e `::test_a_criacao_da_partida_recusa_a_mesma_conta_dos_dois_lados` |
+| ação ilegal sem mudar o estado | `test_multiplayer_rede.py::test_acao_ilegal_pela_rede_nao_muda_o_estado` |
+| decisões simultâneas e sigilo antes do lock | `…::test_decisoes_simultaneas_sem_revelar_a_escolha_antes_do_lock` |
+| queda de conexão sem corromper o duelo | `…::test_queda_de_conexao_nao_corrompe_o_duelo` |
+| limites, TLS e log sem segredo | `…::test_mensagem_acima_*`, `::test_quadro_binario_*`, `::test_abuso_*`, `::test_conexao_sem_autenticacao_*`, `::test_limite_de_conexoes`, `::test_wss_*`, `::test_sem_tls_*`, `::test_senha_e_token_nunca_vao_para_o_log` |
+| compatibilidade após atualização, pela rede | `…::test_drenagem_pela_rede_*` e `::test_servidor_de_outra_versao_recusa_o_cliente_antigo` |
+| o terminal humano × humano | `…::test_o_cliente_de_terminal_joga_humano_contra_humano` |
+
 ### Testes bloqueantes
 
 Todos rodam na suíte padrão e no job `compatibilidade`.
@@ -552,11 +641,14 @@ Todos rodam na suíte padrão e no job `compatibilidade`.
 
 Estes contratos não dependem de nada acima e ainda não existem:
 
-- o transporte de rede (socket ou websocket) e a autenticação do jogador. Sem
-  ela também não existe posse: qualquer sessão pode nomear qualquer gladiador do
-  acervo;
+- **registrar uma extração nova no servidor.** A run PvE roda no computador do
+  jogador, e o servidor não tem como confiar num snapshot que chega de lá. Hoje
+  só entram snapshots de origem confiável (as Copas publicadas). Fechar isso
+  exige PvE autoritativo ou extração assinada;
 - o relógio de decisão (45 segundos), o prazo de reconexão (60 segundos) e a
   derrota por desconexão (`Duel.forfeit` existe; falta o relógio);
-- o MMR, a prioridade humana na fila e bots na fila;
-- o registro de gladiadores no servidor a partir das extrações. Hoje o acervo é
-  carregado de snapshots canônicos.
+- o MMR, o matchmaking público, a prioridade humana na fila e bots na fila;
+- persistência dos resultados entre reinícios do servidor (o livro `Resultados`
+  vive na memória, porque ninguém o lê enquanto o MMR não existe);
+- provedor de identidade externo, troca de senha e revogação de token antes da
+  expiração (trocar a chave invalida todos).

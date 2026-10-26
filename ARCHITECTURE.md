@@ -29,7 +29,7 @@ ui/ ←── engine/ ←── mechanics/ ←── entities/
                 data/
 
 multiplayer/ ──→ engine/arena_setup ──→ storage/, content/
-     └─────────→ mechanics/pvp_duel   (nunca ui/ nem sim/)
+     └─────────→ mechanics/pvp_duel   (nunca ui/ nem sim/; rede pelo pacote websockets)
 ```
 
 | camada | responsabilidade | pode importar |
@@ -100,8 +100,12 @@ Os módulos onde a responsabilidade não é óbvia pelo nome da camada:
 | `multiplayer/compatibilidade.py` | a decisão de conexão: identidade **idêntica** ou recusa com "atualização obrigatória". Não existe versão próxima |
 | `multiplayer/protocolo.py` | as mensagens em JSON, sem tolerância. Do cliente, só identidade, comandos de sessão e ação (`kind`, `skill_id`); do servidor, a `DuelView`, a rodada pública (sem iniciativa) e o desfecho |
 | `multiplayer/gladiadores.py` | o gladiador no servidor: esquema versionado, validação antes e depois da reconstrução canônica, migrações explícitas (`MIGRACOES`) e o `AcervoDeGladiadores` |
-| `multiplayer/servidor.py` | o **servidor autoritativo**: sessões, fila, partida presa à versão, legalidade pelo motor, `Resultados`, drenagem, retomada por replay conferido, anulação e a `Frota` da atualização. Recebe `(conexão, texto)`, devolve envios; não conhece rede nem relógio |
-| `multiplayer/cliente.py`, `multiplayer/transporte.py` | o cliente de referência (entrega a `DuelView` a um `DuelController` e devolve só a ação) e o transporte em processo (`RedeLocal`). Um transporte de rede ocupa o lugar do segundo sem tocar em regra |
+| `multiplayer/servidor.py` | o **servidor autoritativo**: login, sessão autenticada, posse conferida, sala direta e fila simples, partida presa à versão, legalidade pelo motor, `Resultados`, drenagem, retomada por replay conferido, anulação e a `Frota` da atualização. Recebe `(conexão, texto)`, devolve envios; não conhece rede |
+| `multiplayer/contas.py` | a **identidade**, independente do duelo: a interface `Autenticador`, senha em scrypt, tokens assinados (HMAC-SHA256) com expiração e `ContasLocais`, a implementação mínima de desenvolvimento |
+| `multiplayer/registro.py` | a **propriedade**: o registro persistente de gladiadores com dono e origem; só entra por importação de origem confiável (`importar_da_copa`, conferida pelo sha256 publicado); sem transferência nem cópia |
+| `multiplayer/rede.py` | o **transporte WebSocket** (WSS fora do loopback): servidor asyncio com fila de saída por conexão, limites de tamanho e de conexões, prazo para autenticar, fechamento por abuso, logger sem o conteúdo dos quadros; cliente síncrono. Só move texto |
+| `multiplayer/cliente.py`, `multiplayer/transporte.py` | o cliente de referência (entrega a `DuelView` a um `DuelController` e devolve só a ação) e o transporte em processo (`RedeLocal`), que faz o papel da rede nos testes |
+| `tools/toj_multiplayer.py` | o **humano × humano no terminal**: administração (conta, importação de gladiador), servidor e cliente. É ferramenta, por isso pode imprimir; a regra está toda em `src/multiplayer/` |
 | `tools/multiplayer_manifesto.py` | o **gate de publicação** (`verificar`, `gerar`), lendo as tags `v<versão>` do git. É o passo que o CI roda |
 
 **Tudo o que decide uma partida multiplayer está no manifesto.** O escopo
@@ -130,5 +134,6 @@ produziu um simulador medindo um andar que o jogo não gera.
 | problemas abertos | `KNOWN_ISSUES.md` |
 | versão multiplayer | `src/multiplayer/versao.py` e o manifesto em `src/multiplayer/manifestos/` |
 | compatibilidade multiplayer | `python tools/multiplayer_manifesto.py verificar` e `tests/test_multiplayer_*.py` |
+| como jogar em rede | `MULTIPLAYER.md` |
 
 Nada além disso deve tentar ser uma segunda fonte de verdade.
