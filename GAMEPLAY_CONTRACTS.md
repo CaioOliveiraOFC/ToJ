@@ -216,8 +216,10 @@ Mudar uma classe exige mostrar a causa na régua de combate, e mantê-la verde.
 Branch `phase/pvp-arena`, sobre a fundação congelada em `v0.3-pve`. **O motor do
 duelo é headless** (Fases 1 e 1.1): dois gladiadores, decisões simultâneas,
 resolução sequencial. **O modo local é jogável no terminal** (Fase 2): opção 3
-do menu principal, o jogador contra um controlador automático. Fila, MMR, rede e
-relógio de decisão ainda não existem.
+do menu principal, o jogador contra um controlador automático. O servidor
+autoritativo, o protocolo e a fila (sem relógio) existem, sob o contrato de
+compatibilidade da seção [Multiplayer](#multiplayer--compatibilidade-de-versão);
+MMR, transporte de rede e relógio de decisão ainda não.
 
 Verificado em `tests/test_pvp_duel.py`, `tests/test_pvp_initiative.py`,
 `tests/test_pvp_references.py` e `tests/test_arena_mode.py`.
@@ -363,3 +365,198 @@ A arquitetura não os impede, mas nenhum existe ainda.
   chegam por `forfeit`.
 - MMR individual por gladiador.
 - A população artificial sai só de heróis extraídos de runs PvE reais.
+
+## Multiplayer — compatibilidade de versão
+
+Requisito **obrigatório e bloqueante**: o multiplayer só está pronto com estes
+controles implementados, testados e no pipeline de publicação. Princípio:
+**incompatibilidade implica bloqueio seguro, nunca execução silenciosa com regras
+divergentes.**
+
+O código está em `src/multiplayer/`, o gate em `tools/multiplayer_manifesto.py`, e
+o CI em `.github/workflows/ci.yml` (job `compatibilidade`) e
+`.github/workflows/publicacao.yml`.
+
+### Isolamento e estabilidade
+
+- **O multiplayer usa o motor canônico.** O servidor resolve a rodada com
+  `Duel.play_round` e não tem fórmula, dano, efeito, iniciativa, mana ou recarga
+  próprios.
+  - Uma partida pelo servidor é o mesmo duelo do motor direto, rodada a rodada,
+    com iniciativa e eventos.
+  - A final publicada da Copa Arena 03, rejogada pela rede, chega aos mesmos HP,
+    MP e resultado nas 37 rodadas.
+- **A rede é uma camada à parte.** O servidor recebe `(conexão, texto)` e devolve
+  os envios; não conhece socket nem relógio. `transporte.RedeLocal` é o
+  transporte em processo, usado pelos testes. Um transporte de rede faz o mesmo
+  papel e não toca em regra.
+- **Nada entra sozinho numa versão publicada.** Mudança no PvE, nos catálogos, nas
+  classes ou nas mecânicas compartilhadas muda o hash; hash novo exige manifesto
+  novo, e manifesto publicado não muda. Toda mudança passa pelo gate, pela suíte
+  e por uma publicação explícita.
+
+### O manifesto da versão
+
+Cada distribuição tem um manifesto imutável em
+`src/multiplayer/manifestos/<versão>.json`, com:
+
+- a versão exata do jogo;
+- a versão do protocolo multiplayer;
+- o identificador das regras de combate;
+- a versão do esquema de persistência do gladiador;
+- o sha256 de cada arquivo que decide uma partida, o hash de cada grupo e o do
+  conjunto.
+
+Os quatro identificadores são declarados em `src/multiplayer/versao.py`, que fica
+fora dos hashes. Os grupos medidos:
+
+| grupo | o que cobre | quem responde por ele |
+|---|---|---|
+| `regras` | `src/mechanics/`, `src/shared/`, `src/entities/` | `REGRAS_DE_COMBATE` |
+| `catalogos` | `src/data/`, `src/content/`, `src/engine/game_logic.py` | a versão do jogo |
+| `persistencia` | `src/storage/`, `src/engine/arena_setup.py` (e o `__init__` do pacote), `src/multiplayer/gladiadores.py` | `ESQUEMA_DO_GLADIADOR` |
+| `protocolo` | `src/multiplayer/protocolo.py` | `VERSAO_DO_PROTOCOLO` |
+| `servidor` | o resto de `src/multiplayer/` | a versão do jogo |
+
+- **O escopo é testado, não suposto.** Um processo limpo sobe o servidor, joga uma
+  partida pela rede e confere que todo módulo de `src/` que carregou está no
+  manifesto. O teste já pegou uma lacuna: `src/engine/__init__.py`.
+- **Fora do escopo:** `ui/`, `sim/` (bot de medição não é regra) e o resto de
+  `engine/`. O servidor não os carrega, e o mesmo teste falha se passar a
+  carregar.
+- **Fim de linha é normalizado.** O mesmo arquivo em checkout Windows ou Linux é a
+  mesma versão.
+- **Um identificador nomeia um só conteúdo.** Dois manifestos com o mesmo
+  identificador de regras, protocolo ou esquema e conteúdo diferente nesse grupo
+  são recusados. Regra nova exige identificador de regras novo; catálogo novo
+  exige só versão nova.
+- **Manifesto publicado é imutável.** Publicar é criar a tag `v<versão>`. Depois
+  dela:
+  - `gerar` recusa reescrever aquela versão;
+  - `verificar` acusa manifesto publicado alterado ou apagado, lendo o texto
+    na tag.
+
+Para publicar uma mudança de gameplay:
+
+1. Mude o código.
+2. Em `versao.py`, declare uma versão nova e o identificador novo do grupo
+   afetado.
+3. Se o esquema mudou, registre a migração em `gladiadores.MIGRACOES`, com teste.
+4. Rode `python tools/multiplayer_manifesto.py gerar`.
+5. Abra o PR; o job `compatibilidade` precisa ficar verde.
+6. Crie a tag `v<versão>`.
+
+O workflow `publicacao.yml` só empacota a distribuição depois do gate e da suíte.
+
+### Versão obrigatória entre cliente e servidor
+
+- **O servidor é a autoridade.** O cliente manda a identidade da versão no `ola`.
+  Só identidade **idêntica** conecta: os quatro identificadores, os hashes de
+  todos os grupos e o hash do conteúdo. Não há compatibilidade com versão
+  próxima, anterior ou posterior.
+- **A recusa é explícita.** Mensagem `recusado`, com `atualizacao_obrigatoria:
+  true`, a `versao_exigida` e um motivo estável:
+  - `versao_do_jogo`, `protocolo`, `regras`, `esquema_gladiador`;
+  - `conteudo`: o mesmo número de versão com outro hash;
+  - `identidade_invalida`;
+  - `servidor_em_atualizacao`.
+- **A conferência se repete** na entrada da fila, na criação da partida (para os
+  dois lados) e na reconexão. Reconexão recusada deixa a partida exatamente como
+  estava.
+- **A instalação se confere antes de jogar.** `manifesto_da_instalacao` compara o
+  código que está rodando com o manifesto da versão que ele declara.
+  `ServidorAutoritativo.da_instalacao` não sobe com código divergente
+  (`InstalacaoDivergenteError`).
+
+### Servidor autoritativo
+
+- **O cliente só manda ação e comando de sessão.** A ação é `kind` e `skill_id`;
+  os comandos são `ola`, `entrar_na_fila`, `sair_da_fila` e `reconectar`.
+  - Mensagem com campo a mais, de tipo desconhecido ou com ação fora do
+    vocabulário é recusada inteira, e nada muda.
+  - Não existe campo para HP, dano, atributo, equipamento, recarga, resultado ou
+    MMR.
+- **O gladiador fica no servidor** (`AcervoDeGladiadores`). O cliente só nomeia o
+  id; nunca envia ficha.
+- **O servidor decide tudo.** Ele valida a ação contra `Duel.legal_actions`,
+  recusa a ilegal sem mudar nada e roda o motor. O desfecho vai para o livro
+  `Resultados`.
+- **Cada lado vê o mesmo que um controlador local.** A observação é a `DuelView`
+  do motor, e só ela. A rodada pública mostra ações, ordem, passos, HP e MP, mas
+  não a iniciativa.
+- **A identidade declarada pelo cliente não prova integridade.** Quem adultera o
+  código adultera a identidade junto. Ela serve para recusar, com uma mensagem
+  útil, quem está honestamente na versão errada. A segurança competitiva vem de o
+  servidor validar e executar tudo.
+
+### Atualização sem interrupção indevida
+
+- **A partida fica presa à versão em que nasceu.** Ela guarda a impressão da
+  versão (sha256 da identidade).
+- **Publicar uma versão nova drena a antiga** (`Frota.publicar`). A versão antiga:
+  - recusa sessão, fila e partida novas e avisa quem estava na fila;
+  - deixa as partidas em andamento terminarem nela;
+  - aceita reconexão só para terminar a partida.
+- **Desligar uma instância** (`Frota.desligar`) passa cada partida em andamento
+  para outra instância da **mesma** versão, por replay conferido.
+  - O replay usa a semente e as ações registradas.
+  - HP e MP de cada rodada têm de bater, e cada gladiador tem de ser o mesmo
+    registro.
+  - O resultado é o mesmo da partida sem interrupção.
+- **Sem instância compatível, a partida é anulada:**
+  - não há vencedor nem derrota;
+  - ela fica fora de `Resultados.classificaveis()`, de onde um MMR futuro vai ler;
+  - uma partida nunca muda de versão.
+- **Replay de outra versão é recusado**, e não rejogado com outras regras.
+
+### Gladiadores e persistência
+
+- **O multiplayer nunca altera o snapshot.** Tudo trabalha em cópias, e o sha256
+  dos 64 snapshots da Copa 03 é conferido depois das partidas.
+- **A reconstrução é a canônica** (`arena_setup.character_from_snapshot`, sobre
+  `player_from_save_data`), com uma conferência antes e outra depois.
+  - **Antes:** os campos exatos do esquema e os tipos, a extração, e todo item,
+    carta e passiva no catálogo desta versão.
+  - **Depois:** o personagem, serializado de volta por `to_save_data`, devolve
+    classe, nome, nível, equipamento, mochila, gemas, passivas e deck idênticos.
+  - O carregador local é tolerante de propósito: um item que saiu do catálogo
+    some e o save abre. O multiplayer não aceita essa tolerância. Um deck de 5
+    cartas, que o carregador cortaria em silêncio, é recusado.
+- **O registro tem esquema:** `{"esquema": N, "snapshot": {...}}`.
+  - O esquema 1 são exatamente os campos de `to_save_data`. Um campo novo no save
+    reprova `test_o_esquema_e_exatamente_o_formato_de_save` até existir esquema
+    novo e migração.
+  - Esquema mais novo que o da versão é recusado. Esquema mais velho só entra por
+    um passo registrado em `gladiadores.MIGRACOES`.
+- **O gladiador é revalidado a cada preparação.** Um registro que deixou de ser
+  compatível é recusado na fila ou na criação da partida, nunca depois.
+
+### Testes bloqueantes
+
+Todos rodam na suíte padrão e no job `compatibilidade`.
+
+| garantia | onde |
+|---|---|
+| cliente e servidor idênticos: conexão autorizada | `test_multiplayer_conexao.py::test_cliente_e_servidor_identicos_conexao_autorizada` |
+| cliente desatualizado: recusado | `…::test_cliente_desatualizado_conexao_recusada` |
+| cliente com versão superior: recusado | `…::test_cliente_com_versao_superior_conexao_recusada` |
+| mesma versão, hash incompatível: recusado | `…::test_mesmo_numero_de_versao_com_hash_incompativel_conexao_recusada` (os cinco grupos) |
+| regra ou catálogo mudou sem manifesto: publicação bloqueada | `test_multiplayer_manifesto.py::test_mudanca_em_regra_ou_catalogo_sem_atualizar_o_manifesto_bloqueia` e os testes de identificador e imutabilidade |
+| atualização durante partida: continuidade ou encerramento seguro | `test_multiplayer_atualizacao.py` |
+| reconexão com versão incompatível: recusada | `test_multiplayer_conexao.py::test_reconexao_com_versao_incompativel_e_recusada` |
+| snapshots e resultados canônicos intactos | `test_multiplayer_servidor.py` (final da Copa 03, motor direto, sha256 dos snapshots) e `test_multiplayer_gladiadores.py` |
+| replay determinístico na versão contratada | `test_multiplayer_servidor.py::test_replay_*` (inclusive em outro processo) |
+| falha de compatibilidade bloqueia build e deploy | `test_multiplayer_manifesto.py::test_o_ci_tem_o_gate_*` e `::test_a_publicacao_so_empacota_depois_do_gate` |
+
+### Ainda não implementado
+
+Estes contratos não dependem de nada acima e ainda não existem:
+
+- o transporte de rede (socket ou websocket) e a autenticação do jogador. Sem
+  ela também não existe posse: qualquer sessão pode nomear qualquer gladiador do
+  acervo;
+- o relógio de decisão (45 segundos), o prazo de reconexão (60 segundos) e a
+  derrota por desconexão (`Duel.forfeit` existe; falta o relógio);
+- o MMR, a prioridade humana na fila e bots na fila;
+- o registro de gladiadores no servidor a partir das extrações. Hoje o acervo é
+  carregado de snapshots canônicos.

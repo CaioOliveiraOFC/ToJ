@@ -27,6 +27,9 @@ ui/ ←── engine/ ←── mechanics/ ←── entities/
                storage/
                   ↑
                 data/
+
+multiplayer/ ──→ engine/arena_setup ──→ storage/, content/
+     └─────────→ mechanics/pvp_duel   (nunca ui/ nem sim/)
 ```
 
 | camada | responsabilidade | pode importar |
@@ -40,6 +43,7 @@ ui/ ←── engine/ ←── mechanics/ ←── entities/
 | `storage/` | save/load | content/, entities/, shared/, data/ |
 | `engine/` | orquestração | todas |
 | `ui/` | apresentação e input | shared/, content/, entities/, storage/, data/ |
+| `multiplayer/` | versão, protocolo e servidor autoritativo da Arena | engine/, content/, mechanics/, entities/, storage/, shared/, data/ — nunca ui/ nem sim/ |
 
 Imports sob `TYPE_CHECKING` não contam: não existem em tempo de execução.
 
@@ -91,6 +95,20 @@ Os módulos onde a responsabilidade não é óbvia pelo nome da camada:
 | `engine/arena_mode.py` | o **modo Arena local** no terminal: seleção, preparação, ficha do adversário, duelo do jogador contra o controlador automático e resultado. Só desenha, lê teclas e pergunta; a regra é do motor do duelo |
 | `ui/arena_screens.py` | as telas da Arena, desenhadas a partir da `DuelView` do motor: o que a tela mostra é o que o controlador recebe |
 | `sim/pvp_controllers.py` | controladores de referência do duelo (roteiro, primeira skill legal). Provam a interface; não são o bot de PvP |
+| `multiplayer/versao.py` | a versão que a instalação **declara**: jogo, protocolo, regras de combate, esquema do gladiador. Fica fora dos hashes |
+| `multiplayer/manifesto.py` | o **escopo do gameplay** (`ESCOPO`, cinco grupos), os hashes, a `Identidade` e as conferências do gate: código contra manifesto, um identificador para um conteúdo, imutabilidade do publicado. `manifesto_da_instalacao` é o único caminho de produção para a identidade |
+| `multiplayer/compatibilidade.py` | a decisão de conexão: identidade **idêntica** ou recusa com "atualização obrigatória". Não existe versão próxima |
+| `multiplayer/protocolo.py` | as mensagens em JSON, sem tolerância. Do cliente, só identidade, comandos de sessão e ação (`kind`, `skill_id`); do servidor, a `DuelView`, a rodada pública (sem iniciativa) e o desfecho |
+| `multiplayer/gladiadores.py` | o gladiador no servidor: esquema versionado, validação antes e depois da reconstrução canônica, migrações explícitas (`MIGRACOES`) e o `AcervoDeGladiadores` |
+| `multiplayer/servidor.py` | o **servidor autoritativo**: sessões, fila, partida presa à versão, legalidade pelo motor, `Resultados`, drenagem, retomada por replay conferido, anulação e a `Frota` da atualização. Recebe `(conexão, texto)`, devolve envios; não conhece rede nem relógio |
+| `multiplayer/cliente.py`, `multiplayer/transporte.py` | o cliente de referência (entrega a `DuelView` a um `DuelController` e devolve só a ação) e o transporte em processo (`RedeLocal`). Um transporte de rede ocupa o lugar do segundo sem tocar em regra |
+| `tools/multiplayer_manifesto.py` | o **gate de publicação** (`verificar`, `gerar`), lendo as tags `v<versão>` do git. É o passo que o CI roda |
+
+**Tudo o que decide uma partida multiplayer está no manifesto.** O escopo
+(`multiplayer/manifesto.ESCOPO`) não é uma lista de boa-fé: um teste sobe o
+servidor num processo limpo, joga uma partida e reprova se algum módulo de `src/`
+carregado estiver fora dele. Código novo que o servidor passe a usar entra no
+escopo, ou o teste fica vermelho.
 
 **Fonte única é regra, não estilo.** Renda do andar, população do andar, custo de
 reroll, preços do Ferreiro e penalidade de Essência vivem cada um em exatamente
@@ -110,5 +128,7 @@ produziu um simulador medindo um andar que o jogo não gera.
 | balanceamento de combate e classe | `python -m pytest -q -m balance` e `src/sim/` |
 | medições de referência | `BASELINES.md`, que aponta para cada uma (ex.: `baselines/progression/`) |
 | problemas abertos | `KNOWN_ISSUES.md` |
+| versão multiplayer | `src/multiplayer/versao.py` e o manifesto em `src/multiplayer/manifestos/` |
+| compatibilidade multiplayer | `python tools/multiplayer_manifesto.py verificar` e `tests/test_multiplayer_*.py` |
 
 Nada além disso deve tentar ser uma segunda fonte de verdade.
