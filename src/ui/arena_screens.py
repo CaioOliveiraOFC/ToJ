@@ -44,19 +44,36 @@ def render_arena_header(subtitle: str = "") -> None:
 
 
 def render_arena_unavailable(count: int) -> None:
-    """Menos de dois gladiadores: não há duelo possível, e o jogador precisa saber por quê."""
+    """Nenhum gladiador do jogador: não há partida possível, e ele precisa saber por quê."""
     render_arena_header()
     console.print(
         Panel(
             Text.from_markup(
                 f"Há [bold]{count}[/bold] gladiador(es) extraído(s) nos saves.\n\n"
-                "Um duelo precisa de dois personagens que tenham terminado a run pela "
-                "[bold]Extração[/bold]. Volte à masmorra, conquiste a Chave de Extração "
-                "e saia vivo para trazer novos gladiadores.\n\n"
+                "Para lutar na Arena você precisa de um personagem que tenha terminado a "
+                "run pela [bold]Extração[/bold]. Volte à masmorra, conquiste a Chave de "
+                "Extração e saia vivo para trazer o seu gladiador.\n\n"
                 "[dim]Pressione qualquer tecla para voltar.[/dim]",
                 justify="center",
             ),
             border_style="yellow",
+        )
+    )
+
+
+def render_population_unavailable(reason: str) -> None:
+    """A população não passou na conferência: a Arena não abre com adversário duvidoso."""
+    render_arena_header()
+    console.print(
+        Panel(
+            Text.from_markup(
+                "Os gladiadores da Arena não passaram na conferência de integridade, e "
+                "nenhuma partida começa assim.\n\n"
+                f"[dim]{_escapa(reason)}[/dim]\n\n"
+                "[dim]Reinstale o jogo. Pressione qualquer tecla para voltar.[/dim]",
+                justify="center",
+            ),
+            border_style="red",
         )
     )
 
@@ -83,6 +100,69 @@ def render_gladiator_list(title: str, entries, cursor: int) -> None:
         )
     console.print(tabela)
     console.print(Text("W/S = navegar  |  ENTER = escolher  |  Q = voltar", style="bold cyan"))
+
+
+def render_opponent_list(
+    opponents, cursor: int, class_filter: str, page: int, pages: int, total: int
+) -> None:
+    """Uma página da população offline, com o cursor e o filtro de classe.
+
+    FORÇA é a referência inicial (o OP medido na geração), não rating. ESTILO é
+    como a run PvE daquele gladiador foi jogada.
+    """
+    render_arena_header("ESCOLHA O ADVERSÁRIO")
+    tabela = Table(show_header=True, expand=True)
+    tabela.add_column("", width=2)
+    tabela.add_column("ID", style="bold yellow", justify="center", width=5)
+    tabela.add_column("NOME", style="cyan")
+    tabela.add_column("CLASSE", style="magenta")
+    tabela.add_column("NÍVEL", style="green", justify="center")
+    tabela.add_column("FORÇA", style="red", justify="right")
+    tabela.add_column("ESTILO DA RUN", style="dim")
+    tabela.add_column("ANDAR", justify="center")
+    for i, oponente in enumerate(opponents):
+        tabela.add_row(
+            ">" if i == cursor else " ",
+            oponente.id,
+            _escapa(oponente.apelido),
+            oponente.nome_da_classe,
+            str(oponente.nivel),
+            f"{oponente.op:.1f}".replace(".", ","),
+            oponente.estilo,
+            str(oponente.andar_de_extracao),
+        )
+    console.print(tabela)
+    console.print(
+        Text(
+            f"Classe: {class_filter}  |  página {page}/{pages}  |  {total} gladiador(es)",
+            style="dim",
+        )
+    )
+    console.print(
+        Text(
+            "W/S = navegar  |  A/D = página  |  F = filtrar classe  |  ENTER = ver ficha  |  "
+            "Q = voltar",
+            style="bold cyan",
+        )
+    )
+
+
+def render_opponent_origin(opponent) -> None:
+    """De onde o adversário veio: a run PvE que o extraiu, e a força de referência."""
+    console.print(
+        Panel(
+            Text(
+                f"{opponent.id}  |  extraído no andar {opponent.andar_de_extracao}  |  "
+                f"run {opponent.estilo}  |  força de referência "
+                + f"{opponent.op:.1f}".replace(".", ",")
+                + "  |  controlado pela IA",
+                justify="center",
+                style="dim",
+            ),
+            title="Origem",
+            border_style="dim white",
+        )
+    )
 
 
 def render_build_sheet(hero, title: str) -> None:
@@ -302,11 +382,26 @@ def render_duel_result(
                 f"[bold {cor}]{titulo}[/bold {cor}]\n\n"
                 f"[bold]{_escapa(winner_name)}[/bold] venceu [bold]{_escapa(loser_name)}[/bold] "
                 f"por {reason}, em {rounds} rodada(s).\n\n"
-                "[dim]Duelo local: nenhum gladiador morre, nada é gravado no save e não há "
-                "XP, ouro nem recompensa.\nPressione qualquer tecla para voltar à Arena.[/dim]",
+                "[dim]Partida offline: nenhum gladiador morre, nada é gravado no save e não "
+                "há XP, ouro nem recompensa.[/dim]",
                 justify="center",
             ),
             title="[bold]Fim do duelo[/bold]",
             border_style=cor,
+        )
+    )
+
+
+def render_after_match_menu(wins: int, losses: int) -> None:
+    """O placar da sessão do gladiador e o que fazer em seguida."""
+    console.print(
+        Panel(
+            Text(
+                f"Nesta sessão: {wins} vitória(s), {losses} derrota(s)\n"
+                "[R] Revanche  |  [A] Outro adversário  |  [Q] Voltar à Arena",
+                justify="center",
+                style="bold yellow",
+            ),
+            border_style="yellow",
         )
     )

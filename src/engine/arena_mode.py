@@ -1,8 +1,10 @@
-"""O modo Arena no terminal: escolher, preparar, conhecer o adversário, duelar, voltar.
+"""A Arena offline no terminal: escolher, preparar, conhecer o adversário, duelar, de novo.
 
-Uma experiência LOCAL de validação do duelo, não a ranked: um jogador humano
-contra um controlador automático, os dois gladiadores tirados dos saves de
-personagens extraídos. Não há fila, relógio, rede nem MMR.
+O modo competitivo do ToJ 1.0, 100% local. O jogador leva um gladiador
+extraído dos próprios saves contra a POPULAÇÃO OFFLINE (`engine/arena_populacao`):
+gladiadores extraídos de runs PvE reais, controlados pela IA estratégica
+(`sim/ia_estrategica`). Não há rede, fila, relógio nem conta; o multiplayer das
+Fases 3 e 4 continua no repositório, fora deste fluxo.
 
 Nada de regra mora aqui. O duelo é `mechanics/pvp_duel` — `run_round` monta as
 duas visões antes de qualquer escolha e chama `play_round` —, o gladiador é
@@ -11,11 +13,14 @@ duas visões antes de qualquer escolha e chama `play_round` —, o gladiador é
 
     p1  o jogador, por `HumanDuelController`, que lê a própria visão e o
         próprio deck;
-    p2  `FirstLegalSkillController`, que decide só pela visão do motor.
+    p2  a IA estratégica, que decide pela visão do lado dela e simula só
+        sobre cópias.
 
 O duelo roda sobre cópias. Vencer ou perder não mata ninguém, não dá XP, ouro
 nem recompensa, e não grava nada. A única escrita da Arena é o equipamento que
-o jogador escolher gravar na preparação.
+o jogador escolher gravar na preparação. Cada partida terminada vira um
+`ResultadoDaPartida` no histórico da sessão e passa pela `Classificacao` — hoje
+a nula; a fórmula do MMR é da Fase 6.
 """
 
 from __future__ import annotations
@@ -24,19 +29,44 @@ import random
 
 from src.content.gladiator import prepare_gladiator
 from src.engine import arena_setup
+from src.engine.arena_historico import (
+    Classificacao,
+    Historico,
+    HistoricoDaSessao,
+    Participante,
+    ResultadoDaPartida,
+    SemClassificacao,
+    identidade_do_gladiador,
+)
+from src.engine.arena_populacao import (
+    VERSAO_DO_CATALOGO,
+    Oponente,
+    Populacao,
+    PopulacaoInvalidaError,
+)
 from src.engine.events import EventBus
+from src.engine.game_logic import CLASS_MAP
 from src.mechanics.pvp_duel import SIDES, Duel, DuelAction, run_round
 from src.shared import combat_topics as topics
 from src.shared.types import GameEvent
-from src.sim.pvp_controllers import FirstLegalSkillController
+from src.sim.ia_estrategica import IAEstrategica
+from src.storage.save_manager import load_save_data
 from src.ui import arena_screens
 from src.ui.combat_event_handlers import register_combat_ui_handlers
 from src.ui.prompts import safe_get_key
 from src.ui.ui_event_handlers import register_ui_handlers
 
-# O jogador é sempre p1 e o controlador automático, p2. O lado não dá
-# vantagem nenhuma: a ordem de cada rodada é a iniciativa.
+# O jogador é sempre p1 e a IA, p2. O lado não dá vantagem nenhuma: a ordem de
+# cada rodada é a iniciativa.
 JOGADOR, ADVERSARIO = SIDES
+
+# A lista da população: filtro de classe (None = todas) e tamanho da página.
+FILTROS = (None, "warrior", "mage", "rogue")
+POR_PAGINA = 15
+
+# O histórico desta sessão do jogo: sobrevive à volta ao menu principal e some
+# quando o jogo fecha. A persistência é da Fase 6.
+HISTORICO = HistoricoDaSessao()
 
 MOTIVOS = {
     "ko": "nocaute",
@@ -235,31 +265,73 @@ def _preparar(entrada, personagem, publish) -> bool:
         return True
 
 
-def _escolher_adversario(entradas):
-    """Escolhe o adversário e mostra a build dele antes de confirmar."""
+def _escolher_oponente(populacao: Populacao) -> Oponente | None:
+    """Navega a população, com filtro de classe e páginas. `None` volta."""
+    filtro = cursor = 0
     while True:
-        escolhida = _escolher(entradas, "ESCOLHA O ADVERSÁRIO")
-        if escolhida is None:
+        lista = populacao.oponentes(FILTROS[filtro])
+        cursor = max(0, min(cursor, len(lista) - 1))
+        pagina, paginas = cursor // POR_PAGINA, max(1, -(-len(lista) // POR_PAGINA))
+        inicio = pagina * POR_PAGINA
+        rotulo = "todas" if FILTROS[filtro] is None else CLASS_MAP[FILTROS[filtro]][1]
+        arena_screens.render_opponent_list(
+            lista[inicio : inicio + POR_PAGINA],
+            cursor - inicio,
+            rotulo,
+            pagina + 1,
+            paginas,
+            len(lista),
+        )
+        tecla = safe_get_key(valid_keys=["w", "s", "a", "d", "f", "enter", "q"])
+        if tecla in (None, "q"):
             return None
-        gladiador = arena_setup.gladiator_from_slot(escolhida.slot)
-        arena_screens.render_arena_header("ADVERSÁRIO")
-        arena_screens.render_build_sheet(gladiador.hero, "Adversário")
-        arena_screens.render_opponent_menu()
-        if safe_get_key(valid_keys=["enter", "q"]) == "enter":
-            return gladiador
+        if tecla == "f":
+            filtro, cursor = (filtro + 1) % len(FILTROS), 0
+        elif not lista:
+            continue
+        elif tecla == "w":
+            cursor = (cursor - 1) % len(lista)
+        elif tecla == "s":
+            cursor = (cursor + 1) % len(lista)
+        elif tecla == "a":
+            cursor = max(0, cursor - POR_PAGINA)
+        elif tecla == "d":
+            cursor = min(len(lista) - 1, cursor + POR_PAGINA)
+        elif tecla == "enter":
+            return lista[cursor]
 
 
-def duel(personagem, adversario, *, rng: random.Random, publish=None) -> Duel:
-    """Um duelo completo: o jogador contra o controlador automático.
+def _ficha_do_oponente(populacao: Populacao, oponente: Oponente):
+    """A ficha pública do oponente antes de confirmar. O gladiador, ou `None`."""
+    try:
+        gladiador = populacao.gladiador(oponente)
+    except PopulacaoInvalidaError as erro:
+        arena_screens.render_notice(f"{oponente.apelido} não pode lutar: {erro}", "red")
+        safe_get_key(allow_escape=False)
+        return None
+    arena_screens.render_arena_header("ADVERSÁRIO")
+    arena_screens.render_build_sheet(gladiador.hero, "Adversário")
+    arena_screens.render_opponent_origin(oponente)
+    arena_screens.render_opponent_menu()
+    if safe_get_key(valid_keys=["enter", "q"]) == "enter":
+        return gladiador
+    return None
 
-    Uma rodada por vez, pelo motor: `run_round` pede as duas ações e chama
-    `play_round`. Durante a resolução a voz do combate chega pelo bus, na
-    ordem em que as ações acontecem; depois, o resumo da rodada.
+
+def duel(personagem, adversario, *, rng: random.Random, publish=None, controlador=None) -> Duel:
+    """Um duelo completo: o jogador contra o adversário automático.
+
+    `controlador` recebe o herói do adversário NO DUELO e devolve o
+    `DuelController` dele; sem ele, é a IA estratégica. Uma rodada por vez,
+    pelo motor: `run_round` pede as duas ações e chama `play_round`. Durante a
+    resolução a voz do combate chega pelo bus, na ordem em que as ações
+    acontecem; depois, o resumo da rodada.
     """
     meu = prepare_gladiator(personagem)
     duelo = Duel(meu, adversario, rng=rng, publish=publish)
     humano = HumanDuelController(meu.hero)
-    controladores = {JOGADOR: humano, ADVERSARIO: FirstLegalSkillController()}
+    fabrica = controlador if controlador is not None else IAEstrategica
+    controladores = {JOGADOR: humano, ADVERSARIO: fabrica(adversario.hero)}
     while not duelo.finished:
         registro = run_round(duelo, controladores)
         humano.log = round_lines(registro, duelo)
@@ -268,7 +340,28 @@ def duel(personagem, adversario, *, rng: random.Random, publish=None) -> Duel:
     return duelo
 
 
-def _mostrar_resultado(duelo: Duel) -> None:
+def resultado_da_partida(duelo: Duel, identidade: str, oponente: Oponente) -> ResultadoDaPartida:
+    """O registro da partida terminada, para o histórico e a classificação."""
+    resultado = duelo.result
+    meu, dele = duelo.hero(JOGADOR), duelo.hero(ADVERSARIO)
+    return ResultadoDaPartida(
+        jogador=Participante(identidade, meu.get_nick_name(), meu.get_classname(), meu.get_level()),
+        oponente=Participante(
+            oponente.identidade,
+            oponente.apelido,
+            dele.get_classname(),
+            dele.get_level(),
+            oponente.op,
+        ),
+        venceu=resultado.winner == JOGADOR,
+        motivo=resultado.reason,
+        rodadas=resultado.rounds,
+        versao_do_catalogo=VERSAO_DO_CATALOGO,
+    )
+
+
+def _mostrar_resultado(duelo: Duel, historico: Historico, identidade: str) -> str:
+    """O fim da partida e o próximo passo: "revanche", "outro" ou "voltar"."""
     resultado = duelo.result
     arena_screens.render_arena_header("RESULTADO")
     arena_screens.render_duel_result(
@@ -278,21 +371,81 @@ def _mostrar_resultado(duelo: Duel) -> None:
         MOTIVOS[resultado.reason],
         resultado.rounds,
     )
-    safe_get_key(allow_escape=False)
+    arena_screens.render_after_match_menu(*historico.placar(identidade))
+    tecla = safe_get_key(valid_keys=["r", "a", "q", "enter"])
+    return {"r": "revanche", "a": "outro"}.get(tecla, "voltar")
 
 
-def run_arena(rng: random.Random | None = None) -> None:
-    """A Arena, do menu principal de volta a ele.
+def _partidas(
+    personagem,
+    identidade: str,
+    populacao: Populacao,
+    *,
+    rng: random.Random,
+    publish,
+    controlador,
+    historico,
+    classificacao: Classificacao,
+) -> None:
+    """Partidas seguidas do mesmo gladiador, até o jogador voltar à lista."""
+    oponente = gladiador = None
+    while True:
+        if gladiador is None:
+            oponente = _escolher_oponente(populacao)
+            if oponente is None:
+                return
+            gladiador = _ficha_do_oponente(populacao, oponente)
+            if gladiador is None:
+                continue
+        duelo = duel(personagem, gladiador, rng=rng, publish=publish, controlador=controlador)
+        resultado = resultado_da_partida(duelo, identidade, oponente)
+        historico.registrar(resultado)
+        classificacao.atualizar(resultado)
+        proximo = _mostrar_resultado(duelo, historico, identidade)
+        if proximo == "voltar":
+            return
+        # A revanche é o mesmo oponente, montado de novo do catálogo (o duelo
+        # anterior gastou a instância dele) e conferido de novo.
+        gladiador = None
+        if proximo == "revanche":
+            try:
+                gladiador = populacao.gladiador(oponente)
+            except PopulacaoInvalidaError as erro:
+                arena_screens.render_notice(f"{oponente.apelido} não pode lutar: {erro}", "red")
+                safe_get_key(allow_escape=False)
 
-    `rng` é o gerador dos duelos; sem ele, cada duelo sorteia o próprio.
+
+def run_arena(
+    rng: random.Random | None = None,
+    *,
+    populacao: Populacao | None = None,
+    controlador=None,
+    historico: Historico | None = None,
+    classificacao: Classificacao | None = None,
+) -> None:
+    """A Arena offline, do menu principal de volta a ele.
+
+    `rng` é o gerador dos duelos; sem ele, cada duelo sorteia o próprio. Os
+    outros parâmetros existem para teste e para a Fase 6: a população (o
+    catálogo do jogo), o controlador do adversário (a IA), o histórico (o da
+    sessão) e a classificação (a nula).
     """
     rng = rng if rng is not None else random.Random()
+    historico = historico if historico is not None else HISTORICO
+    classificacao = classificacao if classificacao is not None else SemClassificacao()
     publish, limpar = _barramento()
     try:
+        if populacao is None:
+            try:
+                populacao = Populacao()
+            except PopulacaoInvalidaError as erro:
+                arena_screens.render_population_unavailable(str(erro))
+                safe_get_key(allow_escape=False)
+                return
         while True:
             entradas = arena_setup.list_gladiators()
-            if len(entradas) < 2:
-                arena_screens.render_arena_unavailable(len(entradas))
+            if not entradas:
+                arena_screens.render_arena_unavailable(0)
                 safe_get_key(allow_escape=False)
                 return
             minha = _escolher(entradas, "ESCOLHA SEU GLADIADOR")
@@ -301,9 +454,16 @@ def run_arena(rng: random.Random | None = None) -> None:
             personagem = arena_setup.load_character(minha.slot)
             if not _preparar(minha, personagem, publish):
                 continue
-            adversario = _escolher_adversario([e for e in entradas if e.slot != minha.slot])
-            if adversario is None:
-                continue
-            _mostrar_resultado(duel(personagem, adversario, rng=rng, publish=publish))
+            identidade = identidade_do_gladiador(load_save_data(minha.slot), minha.slot)
+            _partidas(
+                personagem,
+                identidade,
+                populacao,
+                rng=rng,
+                publish=publish,
+                controlador=controlador,
+                historico=historico,
+                classificacao=classificacao,
+            )
     finally:
         limpar()

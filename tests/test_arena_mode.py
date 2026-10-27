@@ -1,12 +1,17 @@
-"""O modo Arena jogável: menu, seleção, preparação, adversário, duelo e volta.
+"""A Arena offline jogável: menu, seleção, preparação, adversário, duelo e volta.
 
-Os gladiadores daqui são FIXTURES de teste: heróis construídos pelo jogo,
-marcados como extraídos e gravados num diretório de saves temporário. O jogo de
-verdade só lista o que está em save.
+Os gladiadores DO JOGADOR daqui são FIXTURES de teste: heróis construídos pelo
+jogo, marcados como extraídos e gravados num diretório de saves temporário. O
+jogo de verdade só lista o que está em save. Os ADVERSÁRIOS são da população
+offline de verdade (`src/data/arena_populacao/`): um catálogo pequeno com um
+gladiador de cada classe, copiado do catálogo do jogo com os mesmos bytes.
 
 O teclado é roteirizado. Quando o roteiro acaba, `Teclado` responde como um
 jogador que só ataca: "1" no menu de ação, qualquer tecla nos avisos e "q" nas
-listas — o que devolve o fluxo ao menu principal.
+listas e no fim da partida — o que devolve o fluxo ao menu principal.
+
+O adversário é a IA estratégica com um orçamento menor de continuações
+(`IA_RAPIDA`): a mesma decisão por simulação, em menos tempo de teste.
 """
 
 from __future__ import annotations
@@ -27,10 +32,11 @@ from src.content.extraction import mark_extracted  # noqa: E402
 from src.content.gladiator import GladiatorNotEligibleError, prepare_gladiator  # noqa: E402
 from src.content.items import get_all_items  # noqa: E402
 from src.content.passives import get_passive_by_id  # noqa: E402
-from src.engine import arena_mode, arena_setup, bootstrap  # noqa: E402
+from src.engine import arena_mode, arena_populacao, arena_setup, bootstrap  # noqa: E402
+from src.engine.arena_historico import HistoricoDaSessao, identidade_do_gladiador  # noqa: E402
 from src.mechanics.pvp_duel import Duel, DuelAction  # noqa: E402
 from src.sim.harness import make_hero  # noqa: E402
-from src.sim.pvp_controllers import FirstLegalSkillController  # noqa: E402
+from src.sim.ia_estrategica import Configuracao, IAEstrategica  # noqa: E402
 from src.storage import save_manager  # noqa: E402
 from src.ui import (  # noqa: E402
     arena_screens,
@@ -58,6 +64,37 @@ class Teclado:
         if "1" in valid_keys:
             return "1"
         return "q"
+
+
+IA_RAPIDA = Configuracao(rollouts=2, rollouts_criticos=3)
+
+
+def ia_rapida(heroi):
+    return IAEstrategica(heroi, IA_RAPIDA)
+
+
+def catalogo_pequeno(destino: Path, ids=None) -> arena_populacao.Populacao:
+    """Um catálogo de teste com os mesmos bytes do catálogo do jogo.
+
+    Sem `ids`, o gladiador de menor força de cada classe.
+    """
+    jogo = arena_populacao.Populacao()
+    if ids is None:
+        ids = [jogo.oponentes(classe)[0].id for classe in ("warrior", "mage", "rogue")]
+    indice = json.loads((jogo.pasta / "indice.json").read_text(encoding="utf-8"))
+    escolhidos = [g for g in indice["gladiadores"] if g["id"] in ids]
+    destino.mkdir(parents=True, exist_ok=True)
+    for g in escolhidos:
+        (destino / g["arquivo"]).write_bytes((jogo.pasta / g["arquivo"]).read_bytes())
+    (destino / "indice.json").write_text(
+        json.dumps({**indice, "gladiadores": escolhidos}, ensure_ascii=False), encoding="utf-8"
+    )
+    return arena_populacao.Populacao(destino, limites=(1, 256))
+
+
+@pytest.fixture
+def populacao(tmp_path):
+    return catalogo_pequeno(tmp_path / "populacao")
 
 
 @pytest.fixture
@@ -112,11 +149,24 @@ def ler(slot) -> str:
     return Path(save_manager.get_slot_file(slot)).read_text(encoding="utf-8")
 
 
-def jogar_arena(monkeypatch, roteiro=(), seed=1):
+def jogar_arena(monkeypatch, populacao, roteiro=(), seed=1, **kwargs):
     teclado = Teclado(roteiro)
     monkeypatch.setattr(arena_mode, "safe_get_key", teclado)
-    arena_mode.run_arena(rng=random.Random(seed))
+    kwargs.setdefault("controlador", ia_rapida)
+    kwargs.setdefault("historico", HistoricoDaSessao())
+    arena_mode.run_arena(rng=random.Random(seed), populacao=populacao, **kwargs)
     return teclado
+
+
+def sem_duelo(monkeypatch, lutas: list) -> None:
+    """Troca o duelo por um registro de quem chegou a ele, e volta à lista."""
+    monkeypatch.setattr(
+        arena_mode,
+        "duel",
+        lambda personagem, adversario, **k: lutas.append((personagem, adversario)),
+    )
+    monkeypatch.setattr(arena_mode, "resultado_da_partida", lambda *a: None)
+    monkeypatch.setattr(arena_mode, "_mostrar_resultado", lambda *a: "voltar")
 
 
 # ---------------------------------------------------------------------------
@@ -139,17 +189,17 @@ class TestMenu:
         bootstrap.run_main_loop()
         assert chamadas == ["arena"]
 
-    def test_q_na_lista_volta_sem_duelo(self, saves, tela, monkeypatch):
+    def test_q_na_lista_volta_sem_duelo(self, saves, tela, populacao, monkeypatch):
         salvar(1, "Warrior", 10)
-        salvar(2, "Mage", 10)
-        duelos: list = []
-        monkeypatch.setattr(arena_mode, "duel", lambda *a, **k: duelos.append(a))
-        jogar_arena(monkeypatch, ["q"])
-        assert duelos == []
+        lutas: list = []
+        sem_duelo(monkeypatch, lutas)
+        jogar_arena(monkeypatch, populacao, ["q"])
+        assert lutas == []
 
-    def test_depois_do_resultado_volta_para_a_lista_e_dali_ao_menu(self, saves, tela, monkeypatch):
+    def test_depois_do_resultado_volta_para_a_lista_e_dali_ao_menu(
+        self, saves, tela, populacao, monkeypatch
+    ):
         salvar(1, "Warrior", 10)
-        salvar(2, "Mage", 10)
         listas: list = []
         original = arena_screens.render_gladiator_list
         monkeypatch.setattr(
@@ -160,12 +210,31 @@ class TestMenu:
                 original(titulo, entradas, cursor),
             ),
         )
-        teclado = jogar_arena(monkeypatch, ["enter", "enter", "enter", "enter"])
+        teclado = jogar_arena(monkeypatch, populacao, ["enter", "enter", "enter", "enter"])
         texto = tela.export_text()
         assert "VITÓRIA" in texto or "DERROTA" in texto
-        # Depois do duelo a lista volta, e o "q" do jogador sai da Arena.
-        assert listas[-1] == "ESCOLHA SEU GLADIADOR" and listas.count("ESCOLHA SEU GLADIADOR") == 2
+        # Depois do duelo, o "q" do fim da partida volta à lista, e o "q" da
+        # lista sai da Arena.
+        assert listas == ["ESCOLHA SEU GLADIADOR", "ESCOLHA SEU GLADIADOR"]
         assert teclado.roteiro == []
+
+    def test_populacao_adulterada_bloqueia_a_arena(self, saves, tela, tmp_path, monkeypatch):
+        salvar(1, "Warrior", 10)
+        pasta = tmp_path / "adulterada"
+        catalogo_pequeno(pasta)
+        indice = json.loads((pasta / "indice.json").read_text(encoding="utf-8"))
+        indice["versao"] = 999
+        (pasta / "indice.json").write_text(json.dumps(indice), encoding="utf-8")
+        monkeypatch.setattr(
+            arena_mode, "Populacao", lambda: arena_populacao.Populacao(pasta, limites=(1, 256))
+        )
+        lutas: list = []
+        sem_duelo(monkeypatch, lutas)
+        teclado = Teclado()
+        monkeypatch.setattr(arena_mode, "safe_get_key", teclado)
+        arena_mode.run_arena(rng=random.Random(1), historico=HistoricoDaSessao())
+        assert "conferência de integridade" in tela.export_text()
+        assert lutas == []
 
 
 # ---------------------------------------------------------------------------
@@ -191,48 +260,87 @@ class TestElegibilidade:
         with pytest.raises(GladiatorNotEligibleError):
             arena_setup.store_loadout(2, heroi)
 
-    def test_com_menos_de_dois_gladiadores_explica_e_volta(self, saves, tela, monkeypatch):
-        salvar(1, "Warrior", 10)
+    def test_sem_gladiador_extraido_explica_e_volta(self, saves, tela, populacao, monkeypatch):
         salvar(2, "Rogue", 8, extraido=False)
-        duelos: list = []
-        monkeypatch.setattr(arena_mode, "duel", lambda *a, **k: duelos.append(a))
-        jogar_arena(monkeypatch)
+        lutas: list = []
+        sem_duelo(monkeypatch, lutas)
+        jogar_arena(monkeypatch, populacao)
         texto = tela.export_text()
-        assert "Extração" in texto and "1 gladiador" in texto
-        assert duelos == []
+        assert "Extração" in texto and "0 gladiador" in texto
+        assert lutas == []
 
-    def test_o_adversario_e_outro_gladiador_valido(self, saves, tela, monkeypatch):
+    def test_um_gladiador_extraido_basta(self, saves, tela, populacao, monkeypatch):
         salvar(1, "Warrior", 10)
-        salvar(2, "Rogue", 8, extraido=False)
+        lutas: list = []
+        sem_duelo(monkeypatch, lutas)
+        jogar_arena(monkeypatch, populacao, ["enter", "enter", "enter", "enter"])
+        assert len(lutas) == 1
+
+    def test_o_adversario_vem_da_populacao_offline(self, saves, tela, populacao, monkeypatch):
+        salvar(1, "Warrior", 10)
         salvar(3, "Mage", 10)
-        salvar(4, "Rogue", 10)
         listas: list = []
-        original = arena_screens.render_gladiator_list
+        original = arena_screens.render_opponent_list
         monkeypatch.setattr(
             arena_screens,
-            "render_gladiator_list",
-            lambda titulo, entradas, cursor: (
-                listas.append((titulo, [e.slot for e in entradas])),
-                original(titulo, entradas, cursor),
+            "render_opponent_list",
+            lambda oponentes, *a: (
+                listas.append([o.id for o in oponentes]),
+                original(oponentes, *a),
             ),
         )
         lutas: list = []
-        monkeypatch.setattr(
-            arena_mode,
-            "duel",
-            lambda personagem, adversario, **k: lutas.append((personagem, adversario)),
-        )
-        monkeypatch.setattr(arena_mode, "_mostrar_resultado", lambda duelo: None)
-        jogar_arena(monkeypatch, ["s", "enter", "enter", "enter", "enter"])
-        # A lista é redesenhada a cada passo do cursor: o que importa é a
-        # sequência de telas DISTINTAS.
-        telas = [t for i, t in enumerate(listas) if i == 0 or t != listas[i - 1]]
-        assert telas[0] == ("ESCOLHA SEU GLADIADOR", [1, 3, 4])
-        assert telas[1] == ("ESCOLHA O ADVERSÁRIO", [1, 4])
+        sem_duelo(monkeypatch, lutas)
+        jogar_arena(monkeypatch, populacao, ["s", "enter", "enter", "s", "enter", "enter"])
+        ordem = [o.id for o in populacao.oponentes()]
+        assert listas[0] == ordem
         personagem, adversario = lutas[0]
         assert personagem.get_nick_name() == "Mage3"
-        assert adversario.name == "Warrior1"
-        assert adversario.hero is not personagem
+        segundo = populacao.get(ordem[1])
+        assert adversario.name == segundo.apelido
+        assert adversario.hero.get_classname().lower() == segundo.classe
+        assert adversario.hero.base_hp == adversario.hero.get_hp()
+
+    def test_filtro_de_classe_e_paginas(self, saves, tela, tmp_path, monkeypatch):
+        jogo = arena_populacao.Populacao()
+        ids = [o.id for o in jogo.oponentes("rogue")[:20]] + [jogo.oponentes("mage")[0].id]
+        populacao = catalogo_pequeno(tmp_path / "grande", ids)
+        salvar(1, "Warrior", 10)
+        vistas: list = []
+        original = arena_screens.render_opponent_list
+        monkeypatch.setattr(
+            arena_screens,
+            "render_opponent_list",
+            lambda oponentes, cursor, filtro, pagina, paginas, total: (
+                vistas.append(
+                    (filtro, pagina, paginas, total, oponentes[cursor].id if oponentes else None)
+                ),
+                original(oponentes, cursor, filtro, pagina, paginas, total),
+            ),
+        )
+        lutas: list = []
+        sem_duelo(monkeypatch, lutas)
+        # Todas → Warrior (vazio) → Mage → Rogue; página seguinte; escolher.
+        jogar_arena(
+            monkeypatch, populacao, ["enter", "enter", "f", "f", "f", "d", "enter", "enter"]
+        )
+        assert [v[0] for v in vistas[:4]] == ["todas", "Warrior", "Mage", "Rogue"]
+        assert vistas[1][3] == 0 and vistas[2][3] == 1 and vistas[3][3] == 20
+        rogues = [o.id for o in populacao.oponentes("rogue")]
+        assert vistas[4][1:4] == (2, 2, 20) and vistas[4][4] == rogues[arena_mode.POR_PAGINA]
+        assert lutas[0][1].name == populacao.get(rogues[arena_mode.POR_PAGINA]).apelido
+
+    def test_oponente_com_arquivo_adulterado_nao_luta(self, saves, tela, tmp_path, monkeypatch):
+        populacao = catalogo_pequeno(tmp_path / "pop")
+        primeiro = populacao.oponentes()[0]
+        alvo = populacao.pasta / primeiro.arquivo
+        alvo.write_bytes(alvo.read_bytes().replace(b'"level": ', b'"level": 1', 1))
+        salvar(1, "Warrior", 10)
+        lutas: list = []
+        sem_duelo(monkeypatch, lutas)
+        jogar_arena(monkeypatch, populacao, ["enter", "enter", "enter", "x", "q"])
+        assert lutas == []
+        assert "não pode lutar" in tela.export_text()
 
 
 # ---------------------------------------------------------------------------
@@ -290,10 +398,9 @@ class TestPreparacao:
         assert cajado not in heroi.equipment.values()
         assert cajado in heroi.inventory
 
-    def _trocar_e_confirmar(self, monkeypatch, resposta):
+    def _trocar_e_confirmar(self, monkeypatch, populacao, resposta):
         arma = _arma_solta("Warrior")
         salvar(1, "Warrior", 10, extras=[arma])
-        salvar(2, "Mage", 10)
         antes = ler(1)
         # A arma solta é o único equipável da mochila, e a mochila lista
         # equipável antes de consumível: ela está sob o cursor. Equipar na
@@ -301,18 +408,19 @@ class TestPreparacao:
         teclas = iter(["e", "1", "q"])
         monkeypatch.setattr(navigation_menu, "get_key", lambda: next(teclas, "q"))
         lutas: list = []
-        monkeypatch.setattr(arena_mode, "duel", lambda p, a, **k: lutas.append(p))
-        monkeypatch.setattr(arena_mode, "_mostrar_resultado", lambda duelo: None)
-        jogar_arena(monkeypatch, ["enter", "e", "enter", resposta, "x", "enter", "enter"])
-        return antes, lutas
+        sem_duelo(monkeypatch, lutas)
+        jogar_arena(
+            monkeypatch, populacao, ["enter", "e", "enter", resposta, "x", "enter", "enter"]
+        )
+        return antes, [personagem for personagem, _ in lutas]
 
-    def test_sem_gravar_o_save_fica_intacto(self, saves, tela, monkeypatch):
-        antes, lutas = self._trocar_e_confirmar(monkeypatch, "n")
+    def test_sem_gravar_o_save_fica_intacto(self, saves, tela, populacao, monkeypatch):
+        antes, lutas = self._trocar_e_confirmar(monkeypatch, populacao, "n")
         assert ler(1) == antes
         assert lutas, "a configuração confirmada não chegou ao duelo"
 
-    def test_gravar_muda_so_o_equipamento(self, saves, tela, monkeypatch):
-        antes, lutas = self._trocar_e_confirmar(monkeypatch, "s")
+    def test_gravar_muda_so_o_equipamento(self, saves, tela, populacao, monkeypatch):
+        antes, lutas = self._trocar_e_confirmar(monkeypatch, populacao, "s")
         velho, novo = json.loads(antes), json.loads(ler(1))
         assert velho["equipment"] != novo["equipment"]
         for campo in velho:
@@ -327,6 +435,8 @@ class TestPreparacao:
         assert {i.name for i in recarregado.equipment.values() if i} == {
             i.name for i in lutas[0].equipment.values() if i
         }
+        # Gravar equipamento não muda quem o gladiador é para o histórico.
+        assert identidade_do_gladiador(velho, 1) == identidade_do_gladiador(novo, 1)
 
     def test_equipamento_nao_passa_para_outro_gladiador(self, saves):
         salvar(1, "Warrior", 10)
@@ -359,9 +469,10 @@ class TestBuildAdversaria:
             assert skill.name in texto
         assert get_passive_by_id("passos_leves").name in texto
 
-    def test_a_ficha_do_adversario_aparece_antes_de_confirmar(self, saves, tela, monkeypatch):
+    def test_a_ficha_do_adversario_aparece_antes_de_confirmar(
+        self, saves, tela, populacao, monkeypatch
+    ):
         salvar(1, "Warrior", 10)
-        salvar(2, "Mage", 10, nome="Ilsa")
         fichas: list = []
         original = arena_screens.render_build_sheet
         monkeypatch.setattr(
@@ -372,10 +483,15 @@ class TestBuildAdversaria:
                 original(heroi, titulo),
             ),
         )
-        monkeypatch.setattr(arena_mode, "duel", lambda *a, **k: None)
-        monkeypatch.setattr(arena_mode, "_mostrar_resultado", lambda duelo: None)
-        jogar_arena(monkeypatch, ["enter", "enter", "enter", "q"])
-        assert ("Adversário", "Ilsa") in fichas
+        lutas: list = []
+        sem_duelo(monkeypatch, lutas)
+        # A ficha aparece, e "q" nela volta à lista sem lutar.
+        jogar_arena(monkeypatch, populacao, ["enter", "enter", "enter", "q", "q"])
+        primeiro = populacao.oponentes()[0]
+        assert ("Adversário", primeiro.apelido) in fichas
+        assert lutas == []
+        texto = tela.export_text()
+        assert primeiro.id in texto and "controlado pela IA" in texto
 
 
 def prepare_gladiator_safe(heroi):
@@ -386,23 +502,20 @@ def prepare_gladiator_safe(heroi):
 
 
 # ---------------------------------------------------------------------------
-# 7, 8, 9 — o duelo: ação manual, controlador automático e a rodada na tela
+# 7, 8, 9 — o duelo: ação manual, IA e a rodada na tela
 # ---------------------------------------------------------------------------
 
 
-def _gladiadores(nivel_meu=10, nivel_outro=10, classe_minha="Warrior", classe_outra="Mage"):
+def _gladiadores(populacao, nivel_meu=10, classe_minha="Warrior", classe_outra="mage"):
     meu = make_hero(classe_minha, nivel_meu, "expected")
     meu.nick_name = "Eu"
     mark_extracted(meu, nivel_meu)
-    outro = make_hero(classe_outra, nivel_outro, "expected")
-    outro.nick_name = "Ele"
-    mark_extracted(outro, nivel_outro)
-    return meu, prepare_gladiator(outro)
+    return meu, populacao.gladiador(populacao.oponentes(classe_outra)[0])
 
 
 class TestDuelo:
-    def test_a_skill_escolhida_pelo_jogador_chega_ao_motor(self, tela, monkeypatch):
-        meu, outro = _gladiadores()
+    def test_a_skill_escolhida_pelo_jogador_chega_ao_motor(self, tela, populacao, monkeypatch):
+        meu, outro = _gladiadores(populacao)
         duelo = Duel(prepare_gladiator(meu), outro, rng=random.Random(3))
         humano = arena_mode.HumanDuelController(duelo.hero("p1"))
         tecla, skill = next(iter(sorted(duelo.hero("p1").skills.items())))
@@ -413,8 +526,8 @@ class TestDuelo:
         assert dict(registro.actions)["p1"] == acao
         assert next(p for p in registro.steps if p.side == "p1").outcome == "executed"
 
-    def test_skill_indisponivel_nao_e_escolhivel(self, tela, monkeypatch):
-        meu, outro = _gladiadores()
+    def test_skill_indisponivel_nao_e_escolhivel(self, tela, populacao, monkeypatch):
+        meu, outro = _gladiadores(populacao)
         duelo = Duel(prepare_gladiator(meu), outro, rng=random.Random(3))
         duelo.hero("p1")._mp = 0
         humano = arena_mode.HumanDuelController(duelo.hero("p1"))
@@ -423,23 +536,26 @@ class TestDuelo:
         monkeypatch.setattr(arena_mode, "safe_get_key", Teclado(["2", str(tecla), "x", "0", "1"]))
         assert humano.choose(duelo.view("p1")) == DuelAction.attack()
 
-    def test_o_controlador_automatico_so_trava_acao_legal(self, tela, monkeypatch):
+    def test_o_adversario_padrao_e_a_ia_e_so_trava_acao_legal(self, tela, populacao, monkeypatch):
         acoes: list = []
 
-        class Conferido(FirstLegalSkillController):
+        class Conferida(IAEstrategica):
+            def __init__(self, heroi):
+                super().__init__(heroi, IA_RAPIDA)
+
             def choose(self, view):
                 acao = super().choose(view)
-                assert acao in view.legal_actions
+                assert acao in view.legal_actions and acao.kind != "surrender"
                 acoes.append(acao)
                 return acao
 
-        monkeypatch.setattr(arena_mode, "FirstLegalSkillController", Conferido)
+        monkeypatch.setattr(arena_mode, "IAEstrategica", Conferida)
         monkeypatch.setattr(arena_mode, "safe_get_key", Teclado())
-        meu, outro = _gladiadores()
+        meu, outro = _gladiadores(populacao)
         duelo = arena_mode.duel(meu, outro, rng=random.Random(5))
         assert duelo.finished and len(acoes) == duelo.result.rounds
 
-    def test_a_rodada_aparece_na_ordem_resolvida_pelo_motor(self, tela, monkeypatch):
+    def test_a_rodada_aparece_na_ordem_resolvida_pelo_motor(self, tela, populacao, monkeypatch):
         resumos: list = []
         original = arena_screens.render_round_summary
         monkeypatch.setattr(
@@ -448,8 +564,8 @@ class TestDuelo:
             lambda texto: (resumos.append(list(texto)), original(texto)),
         )
         monkeypatch.setattr(arena_mode, "safe_get_key", Teclado())
-        meu, outro = _gladiadores()
-        duelo = arena_mode.duel(meu, outro, rng=random.Random(5))
+        meu, outro = _gladiadores(populacao)
+        duelo = arena_mode.duel(meu, outro, rng=random.Random(5), controlador=ia_rapida)
         assert len(resumos) == len(duelo.history)
         nomes = {lado: duelo.hero(lado).get_nick_name() for lado in ("p1", "p2")}
         for linhas, registro in zip(resumos, duelo.history):
@@ -461,17 +577,30 @@ class TestDuelo:
         assert "Rodada resolvida" in texto
         assert "score" not in texto.lower() and "iniciativa" not in texto.lower()
 
+    def test_a_tela_mostra_hp_mp_e_efeitos_do_adversario(self, tela, populacao, monkeypatch):
+        quadros: list = []
+        monkeypatch.setattr(
+            arena_screens, "render_duel_frame", lambda view, log: quadros.append(view.opponent)
+        )
+        monkeypatch.setattr(arena_mode, "safe_get_key", Teclado())
+        meu, outro = _gladiadores(populacao)
+        duelo = arena_mode.duel(meu, outro, rng=random.Random(5), controlador=ia_rapida)
+        assert len(quadros) == duelo.result.rounds or duelo.result.reason == "surrender"
+        primeiro = quadros[0]
+        assert (primeiro.hp, primeiro.hp_max) == (outro.hero.base_hp, outro.hero.base_hp)
+        assert primeiro.mp_max == outro.hero.base_mp
+        assert primeiro.name == outro.name
+
 
 # ---------------------------------------------------------------------------
-# 10, 12 — vitória, derrota, rendição, e o save intocado
+# 10, 12 — vitória, derrota, rendição, revanche, e o save intocado
 # ---------------------------------------------------------------------------
 
 
 class TestFimEPersistencia:
-    def _duelo_completo(self, saves, tela, monkeypatch, meu, outro, roteiro=()):
+    def _partida(self, saves, tela, populacao, monkeypatch, meu, roteiro=(), alvo="mage"):
         salvar(1, *meu)
-        salvar(2, *outro)
-        antes = {s: ler(s) for s in (1, 2)}
+        antes = ler(1)
         resultados: list = []
         original = arena_screens.render_duel_result
         monkeypatch.setattr(
@@ -479,33 +608,123 @@ class TestFimEPersistencia:
             "render_duel_result",
             lambda *a: (resultados.append(a), original(*a)),
         )
-        jogar_arena(monkeypatch, ["enter", "enter", "enter", "enter", *roteiro], seed=11)
-        assert len(resultados) == 1
-        return resultados[0], antes
-
-    def test_vitoria(self, saves, tela, monkeypatch):
-        (ganhou, vencedor, perdedor, motivo, _), _ = self._duelo_completo(
-            saves, tela, monkeypatch, ("Warrior", 20), ("Mage", 4)
+        # O alvo é o primeiro da lista ordenada por força; ele é escolhido
+        # descendo o cursor até ele.
+        ordem = [o.id for o in populacao.oponentes()]
+        descer = ["s"] * ordem.index(populacao.oponentes(alvo)[0].id)
+        historico = HistoricoDaSessao()
+        jogar_arena(
+            monkeypatch,
+            populacao,
+            ["enter", "enter", *descer, "enter", "enter", *roteiro],
+            seed=11,
+            historico=historico,
         )
-        assert ganhou and (vencedor, perdedor, motivo) == ("Warrior1", "Mage2", "nocaute")
+        return resultados, antes, historico
 
-    def test_derrota(self, saves, tela, monkeypatch):
-        (ganhou, vencedor, perdedor, motivo, _), _ = self._duelo_completo(
-            saves, tela, monkeypatch, ("Mage", 4), ("Warrior", 20)
+    def test_vitoria(self, saves, tela, populacao, monkeypatch):
+        resultados, _, historico = self._partida(
+            saves, tela, populacao, monkeypatch, ("Warrior", 40)
         )
-        assert not ganhou and (vencedor, perdedor, motivo) == ("Warrior2", "Mage1", "nocaute")
+        ganhou, vencedor, perdedor, motivo, _ = resultados[0]
+        assert ganhou and (vencedor, motivo) == ("Warrior1", "nocaute")
+        assert historico.partidas()[0].venceu
 
-    def test_rendicao(self, saves, tela, monkeypatch):
-        (ganhou, vencedor, perdedor, motivo, rodadas), _ = self._duelo_completo(
-            saves, tela, monkeypatch, ("Warrior", 20), ("Mage", 4), roteiro=["3", "s"]
+    def test_derrota(self, saves, tela, populacao, monkeypatch):
+        resultados, _, historico = self._partida(
+            saves, tela, populacao, monkeypatch, ("Mage", 2), alvo="rogue"
         )
-        assert not ganhou
-        assert (vencedor, perdedor, motivo, rodadas) == ("Mage2", "Warrior1", "rendição", 1)
+        ganhou, vencedor, perdedor, motivo, _ = resultados[0]
+        assert not ganhou and perdedor == "Mage1" and motivo == "nocaute"
+        assert historico.placar(historico.partidas()[0].jogador.identidade) == (0, 1)
 
-    def test_os_dois_saves_saem_do_duelo_como_entraram(self, saves, tela, monkeypatch):
-        _, antes = self._duelo_completo(saves, tela, monkeypatch, ("Mage", 4), ("Warrior", 20))
+    def test_rendicao(self, saves, tela, populacao, monkeypatch):
+        resultados, _, historico = self._partida(
+            saves, tela, populacao, monkeypatch, ("Warrior", 20), roteiro=["3", "s"]
+        )
+        ganhou, vencedor, perdedor, motivo, rodadas = resultados[0]
+        assert not ganhou and (perdedor, motivo, rodadas) == ("Warrior1", "rendição", 1)
+        assert historico.partidas()[0].motivo == "surrender"
+
+    def test_revanche_e_outro_adversario(self, saves, tela, populacao, monkeypatch):
+        # Rendição, revanche (mesmo oponente), rendição, outro adversário (o
+        # primeiro da lista que não é o Mage do alvo), rendição, voltar. O "x"
+        # é a tecla do resumo da rodada.
+        alvo = populacao.oponentes("mage")[0].id
+        outro = next(i for i, o in enumerate(populacao.oponentes()) if o.id != alvo)
+        roteiro = [
+            *("3", "s", "x", "r", "3", "s", "x", "a"),
+            *["s"] * outro,
+            *("enter", "enter", "3", "s", "x", "q"),
+        ]
+        _, _, historico = self._partida(
+            saves, tela, populacao, monkeypatch, ("Warrior", 20), roteiro=roteiro
+        )
+        partidas = historico.partidas()
+        assert len(partidas) == 3
+        assert partidas[0].oponente == partidas[1].oponente != partidas[2].oponente
+        assert historico.placar(partidas[0].jogador.identidade) == (0, 3)
+        assert "Nesta sessão: 0 vitória(s), 3 derrota(s)" in tela.export_text()
+
+    def test_o_save_sai_da_partida_como_entrou(self, saves, tela, populacao, monkeypatch):
+        _, antes, _ = self._partida(saves, tela, populacao, monkeypatch, ("Mage", 2))
         # Perdeu, e continua existindo: mesmo arquivo, byte a byte — sem HP
         # perdido, sem XP, sem ouro, sem troféu de morte.
-        assert {s: ler(s) for s in (1, 2)} == antes
-        assert [e.slot for e in arena_setup.list_gladiators()] == [1, 2]
+        assert ler(1) == antes
+        assert [e.slot for e in arena_setup.list_gladiators()] == [1]
         assert not (saves / save_manager.TROPHY_FILE).exists()
+
+    def test_o_catalogo_sai_da_partida_como_entrou(self, saves, tela, populacao, monkeypatch):
+        bytes_antes = {o.id: (populacao.pasta / o.arquivo).read_bytes() for o in populacao}
+        self._partida(saves, tela, populacao, monkeypatch, ("Warrior", 20))
+        assert {o.id: (populacao.pasta / o.arquivo).read_bytes() for o in populacao} == bytes_antes
+
+
+# ---------------------------------------------------------------------------
+# Histórico e classificação: os pontos de extensão do MMR
+# ---------------------------------------------------------------------------
+
+
+class TestPontosDeExtensaoDoMMR:
+    def test_cada_partida_vira_um_resultado_e_passa_pela_classificacao(
+        self, saves, tela, populacao, monkeypatch
+    ):
+        salvar(1, "Warrior", 20)
+        vistos: list = []
+
+        class Espia:
+            def atualizar(self, resultado):
+                vistos.append(resultado)
+
+            def rating(self, identidade):
+                return None
+
+        historico = HistoricoDaSessao()
+        jogar_arena(
+            monkeypatch,
+            populacao,
+            ["enter", "enter", "enter", "enter", "3", "s"],
+            historico=historico,
+            classificacao=Espia(),
+        )
+        assert vistos == historico.partidas() and len(vistos) == 1
+        resultado = vistos[0]
+        oponente = populacao.oponentes()[0]
+        assert resultado.oponente.identidade == oponente.identidade
+        assert resultado.oponente.forca_de_referencia == oponente.op
+        assert resultado.jogador.forca_de_referencia is None
+        assert resultado.jogador.identidade == identidade_do_gladiador(
+            save_manager.load_save_data(1), 1
+        )
+        assert resultado.versao_do_catalogo == arena_populacao.VERSAO_DO_CATALOGO
+
+    def test_a_classificacao_padrao_nao_tem_formula(self):
+        from src.engine.arena_historico import SemClassificacao
+
+        assert SemClassificacao().rating("qualquer") is None
+
+    def test_identidade_muda_com_outra_run_no_mesmo_slot(self, saves):
+        salvar(1, "Warrior", 10)
+        primeira = identidade_do_gladiador(save_manager.load_save_data(1), 1)
+        salvar(1, "Warrior", 11)
+        assert identidade_do_gladiador(save_manager.load_save_data(1), 1) != primeira
