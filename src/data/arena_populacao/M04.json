@@ -1,0 +1,218 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5344,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 9.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Peitoral de Cota",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Bastão Mágico",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 3.0
+    }
+   ],
+   "name": "Elmo de Madeira"
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel Vegetal"
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "name": "Tamancos de Madeira"
+  },
+  "Weapon1": {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Esmeralda",
+   "level": 4
+  }
+ ],
+ "hp": 4724,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  },
+  {
+   "name": "Luvas Rasas"
+  },
+  {
+   "name": "Luvas de Lã"
+  },
+  {
+   "name": "Espada Longa",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 19689,
+  "gold_from_combat": 14272,
+  "gold_from_interest": 1292,
+  "gold_from_sale": 4125,
+  "gold_spent": 14345,
+  "gold_spent_on_consumable": 291,
+  "gold_spent_on_enchant": 1213,
+  "gold_spent_on_enhancement": 1721,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 6902,
+  "gold_spent_on_recovery": 337,
+  "gold_spent_on_socket": 176,
+  "interest_payments": 17,
+  "items_dropped": 31,
+  "items_equipped": 22,
+  "items_sold": 23,
+  "max_gold_held": 6719,
+  "paid_exits": 18,
+  "purchases": 49
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 2027,
+ "passives": [
+  "boca_de_sangue",
+  "alma_eterna",
+  "pele_grossa",
+  "bencao_divina",
+  "boca_de_sangue",
+  "respiracao_contada",
+  "pele_de_sal",
+  "postura_fechada",
+  "olho_aguia",
+  "pele_de_sal",
+  "sede_silenciosa",
+  "passo_de_corca",
+  "pele_de_sal",
+  "bencao_divina",
+  "pele_grossa",
+  "pele_grossa",
+  "alma_eterna",
+  "olho_de_cacador",
+  "escudo_fe",
+  "sangue_guerreiro",
+  "boca_de_sangue"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "dissonancia",
+  "escudo_magico",
+  "explosao_arcana",
+  "fagulha_teimosa",
+  "lancar_pedra",
+  "lasca_de_gelo",
+  "lente_de_obsidiana",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_encarar",
+  "n_marca_do_cacador",
+  "n_mira_calma",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "pacto_do_vazio",
+  "palavra_de_torpor",
+  "pele_de_quartzo",
+  "reserva_profunda",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "lasca_de_gelo": 2
+ },
+ "skills": {
+  "1": "bola_fogo",
+  "2": "n_respirar_fundo",
+  "3": "lasca_de_gelo",
+  "4": "pacto_do_vazio"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 391
+}

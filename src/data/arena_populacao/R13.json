@@ -1,0 +1,233 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 2500,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 4.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Cota Leve"
+  },
+  "Hands": {
+   "name": "Garras de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 7.0
+    }
+   ],
+   "name": "Elmo de Madeira"
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas Fantasma",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 4.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 1
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Espada do Universo",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 5.0
+    }
+   ],
+   "name": "Arco do Silêncio",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5003,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Colete de Pano"
+  },
+  {
+   "name": "Manoplas de Ferro",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 25455,
+  "gold_from_combat": 18130,
+  "gold_from_interest": 1389,
+  "gold_from_sale": 5936,
+  "gold_spent": 22955,
+  "gold_spent_on_consumable": 163,
+  "gold_spent_on_enchant": 3003,
+  "gold_spent_on_enhancement": 52,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 14789,
+  "gold_spent_on_recovery": 149,
+  "gold_spent_on_socket": 463,
+  "interest_payments": 19,
+  "items_dropped": 34,
+  "items_equipped": 41,
+  "items_sold": 28,
+  "max_gold_held": 8279,
+  "paid_exits": 19,
+  "purchases": 52
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 1129,
+ "passives": [
+  "respiracao_contada",
+  "mente_serena",
+  "respiracao_contada",
+  "pele_grossa",
+  "reserva_arcana",
+  "sangue_guerreiro",
+  "boca_de_sangue",
+  "postura_fechada",
+  "mente_serena",
+  "casco_calejado",
+  "coracao_ferro",
+  "sorte_iniciante",
+  "maos_midas",
+  "bencao_divina",
+  "respiracao_contada",
+  "ritmo_profano",
+  "boca_de_sangue",
+  "postura_fechada",
+  "ritmo_profano",
+  "essencia_pura",
+  "respiracao_contada",
+  "essencia_viva"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "bolso_do_alfaiate",
+  "capa_rasgada",
+  "cortina_fumaca",
+  "dose_da_viuva",
+  "evasao",
+  "ferida_paga",
+  "golpe_sombras",
+  "lancar_adaga",
+  "leitura_de_guarda",
+  "mao_leve",
+  "n_curativo_de_campo",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_lamina_assentada",
+  "n_mira_calma",
+  "n_pausa_util",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "passo_felino",
+  "respiracao_de_ladrao"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "n_mira_calma",
+  "3": "bolso_do_alfaiate",
+  "4": "n_lamina_assentada"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1248
+}

@@ -1,0 +1,287 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 8421,
+ "dungeon_level": 27,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 8.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 5
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Armadura Divina",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 5
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Machado de Batalha",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Bastão Cru"
+  }
+ },
+ "extracted_on_floor": 27,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 16252,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 6
+    }
+   ],
+   "name": "Espada Longa",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado Terrível",
+   "socket_count": 3
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada de Ferro"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  {
+   "name": "Lâmina da Tempestade",
+   "socket_count": 3
+  },
+  {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado Enferrujado"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 2.0
+    }
+   ],
+   "name": "Lança de Madeira"
+  },
+  {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 26,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 10,
+  "gold_earned": 85817,
+  "gold_from_combat": 47598,
+  "gold_from_interest": 4875,
+  "gold_from_sale": 33344,
+  "gold_spent": 77396,
+  "gold_spent_on_consumable": 278,
+  "gold_spent_on_enchant": 2831,
+  "gold_spent_on_enhancement": 8466,
+  "gold_spent_on_exit_fee": 13217,
+  "gold_spent_on_gear": 49267,
+  "gold_spent_on_recovery": 325,
+  "gold_spent_on_socket": 3012,
+  "interest_payments": 24,
+  "items_dropped": 63,
+  "items_equipped": 79,
+  "items_sold": 51,
+  "max_gold_held": 42137,
+  "paid_exits": 26,
+  "purchases": 71
+ },
+ "level": 29,
+ "map_state": null,
+ "mp": 753,
+ "passives": [
+  "odio_baixo",
+  "sede_silenciosa",
+  "sangue_de_vidente",
+  "heranca_do_abismo",
+  "ritmo_profano",
+  "musculos_aco",
+  "lamina_lendaria",
+  "furia_berserker",
+  "odio_baixo",
+  "odio_antigo",
+  "olho_aguia",
+  "fio_serrilhado",
+  "olho_aguia",
+  "passos_leves",
+  "olho_de_cacador",
+  "coracao_ferro",
+  "coracao_ferro",
+  "essencia_fluida",
+  "olho_aguia",
+  "olho_aguia",
+  "passos_leves",
+  "heranca_do_abismo",
+  "bencao_divina",
+  "pulso_certeiro",
+  "coracao_ferro",
+  "fio_serrilhado",
+  "olho_aguia",
+  "odio_baixo"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "cutelada",
+  "fortalecimento",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "juramento_da_muralha",
+  "marca_do_acougueiro",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "postura_de_muro",
+  "provocacao",
+  "quebra_guarda",
+  "quebra_ossos",
+  "silencio_do_veterano",
+  "soco_de_placa",
+  "tomar_folego"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "marca_do_acougueiro",
+  "2": "investida",
+  "3": "provocacao",
+  "4": "juramento_da_muralha"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4641
+}

@@ -1,0 +1,221 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4338,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 10.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "name": "Luvas de Titânio",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 9.0
+    }
+   ],
+   "name": "Capacete de Couro"
+  },
+  "Legs": {
+   "name": "Perneiras de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Aço",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel de Osso"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Arco do Silêncio",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "name": "Faca de Caça"
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 3428,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Arco da Precisão",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Adaga do Vazio",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Amuleto de Madeira"
+  },
+  {
+   "name": "Gravetos Mágicos"
+  },
+  {
+   "name": "Espada Longa",
+   "socket_count": 1
+  },
+  {
+   "name": "Adaga do Assassino",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 23124,
+  "gold_from_combat": 16295,
+  "gold_from_interest": 1125,
+  "gold_from_sale": 5704,
+  "gold_spent": 18786,
+  "gold_spent_on_consumable": 376,
+  "gold_spent_on_enchant": 1992,
+  "gold_spent_on_enhancement": 1350,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 9126,
+  "gold_spent_on_recovery": 1347,
+  "gold_spent_on_socket": 259,
+  "interest_payments": 18,
+  "items_dropped": 42,
+  "items_equipped": 33,
+  "items_sold": 30,
+  "max_gold_held": 5656,
+  "paid_exits": 19,
+  "purchases": 49
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 596,
+ "passives": [
+  "odio_baixo",
+  "toque_dragao",
+  "furia_berserker",
+  "voz_no_escuro",
+  "odio_baixo",
+  "lamina_afiada",
+  "cabeca_dura",
+  "cabeca_dura",
+  "pulso_certeiro",
+  "odio_baixo",
+  "pele_grossa",
+  "musculos_aco",
+  "passo_de_corca",
+  "postura_fechada",
+  "toque_dragao",
+  "sangue_de_vidente",
+  "musculos_aco",
+  "pulso_certeiro",
+  "postura_fechada",
+  "sangue_de_vidente",
+  "musculos_aco"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "bolso_furado",
+  "capa_rasgada",
+  "chuva_de_ferrões",
+  "corte_de_tendao",
+  "dose_da_viuva",
+  "duas_maos_um_tempo",
+  "evasao",
+  "n_amuleto_rachado",
+  "n_curativo_de_campo",
+  "n_disciplina_de_forja",
+  "n_gancho_e_corda",
+  "n_guarda_alta",
+  "n_marca_do_cacador",
+  "n_mira_calma",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "passo_felino",
+  "picada_certeira",
+  "respiracao_de_ladrao",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {
+  "assassinato": 4
+ },
+ "skills": {
+  "1": "assassinato",
+  "2": "n_marca_do_cacador",
+  "3": "respiracao_de_ladrao",
+  "4": "bolso_furado"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 363
+}

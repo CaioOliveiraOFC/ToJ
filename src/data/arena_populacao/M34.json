@@ -1,0 +1,248 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5109,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 7.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura Divina",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Luvas de Lã"
+  },
+  "Helmet": {
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "name": "Perneiras de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel da Fênix",
+   "socket_count": 3
+  },
+  "Ring2": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado da Galáxia",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 3995,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "damage_percent",
+     "value": 10.0
+    }
+   ],
+   "name": "Cajado do Vazio",
+   "socket_count": 2
+  },
+  {
+   "name": "Cajado do Vazio",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  {
+   "name": "Túnica do Fluxo",
+   "socket_count": 1
+  },
+  {
+   "name": "Amuleto de Concha"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 3.0
+    }
+   ],
+   "name": "Óculos de Couro"
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada do Eclipse",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 20213,
+  "gold_from_combat": 13055,
+  "gold_from_interest": 1305,
+  "gold_from_sale": 5853,
+  "gold_spent": 15104,
+  "gold_spent_on_consumable": 411,
+  "gold_spent_on_enchant": 1307,
+  "gold_spent_on_enhancement": 752,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 8659,
+  "gold_spent_on_recovery": 71,
+  "gold_spent_on_socket": 199,
+  "interest_payments": 18,
+  "items_dropped": 36,
+  "items_equipped": 37,
+  "items_sold": 17,
+  "max_gold_held": 7615,
+  "paid_exits": 18,
+  "purchases": 43
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 1894,
+ "passives": [
+  "coracao_ferro",
+  "passos_leves",
+  "essencia_fluida",
+  "postura_fechada",
+  "coracao_ferro",
+  "sangue_guerreiro",
+  "pele_grossa",
+  "olho_de_cacador",
+  "musculos_aco",
+  "postura_fechada",
+  "pele_de_sal",
+  "sangue_guerreiro",
+  "boca_de_sangue",
+  "essencia_fluida",
+  "casco_calejado",
+  "boca_de_sangue",
+  "passo_de_corca",
+  "bebida_deuses",
+  "essencia_fluida",
+  "passo_de_corca"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "drenar_vida",
+  "foco_do_estudante",
+  "lancar_pedra",
+  "lente_de_obsidiana",
+  "maldicao_de_cinzas",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pausa_util",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "palavra_de_torpor",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "relampago"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "n_mira_calma",
+  "3": "drenar_vida",
+  "4": "n_guarda_cruzada"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1339
+}

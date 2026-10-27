@@ -1,0 +1,253 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5415,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    }
+   ],
+   "name": "Colete da Resistência",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Couro",
+   "origin": "starter"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_percent",
+     "value": 5.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    }
+   ],
+   "name": "Máscara de Sombra",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Couro"
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Osso"
+  },
+  "Shoes": {
+   "name": "Chinelos de Pano"
+  },
+  "Weapon1": {
+   "name": "Pá de Batalha"
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 6237,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Clava de Madeira"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Espada de Ferro"
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    },
+    null
+   ],
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Arco da Precisão",
+   "socket_count": 3
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 2
+  },
+  {
+   "name": "Arco Curto"
+  },
+  {
+   "name": "Amuleto de Ouro",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado de Aprendiz"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 22221,
+  "gold_from_combat": 16267,
+  "gold_from_interest": 1387,
+  "gold_from_sale": 4567,
+  "gold_spent": 16806,
+  "gold_spent_on_consumable": 343,
+  "gold_spent_on_enchant": 939,
+  "gold_spent_on_enhancement": 2584,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 8625,
+  "gold_spent_on_socket": 610,
+  "interest_payments": 18,
+  "items_dropped": 32,
+  "items_equipped": 44,
+  "items_sold": 16,
+  "max_gold_held": 7764,
+  "paid_exits": 18,
+  "purchases": 47
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 613,
+ "passives": [
+  "sorte_iniciante",
+  "essencia_fluida",
+  "essencia_fluida",
+  "lamina_afiada",
+  "coracao_ferro",
+  "bebida_deuses",
+  "respiracao_contada",
+  "casco_calejado",
+  "sangue_guerreiro",
+  "odio_baixo",
+  "sorte_iniciante",
+  "respiracao_contada",
+  "sorte_iniciante",
+  "sorte_iniciante",
+  "sede_silenciosa",
+  "reserva_arcana",
+  "divida_de_ouro",
+  "reserva_arcana",
+  "coracao_ferro",
+  "sorte_iniciante",
+  "fome_batalha",
+  "respiracao_contada"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "bolso_furado",
+  "dose_da_viuva",
+  "duas_maos_um_tempo",
+  "faro_de_rua",
+  "golpe_sombras",
+  "hora_do_lobo",
+  "joelho_torto",
+  "lamina_no_escuro",
+  "leitura_de_guarda",
+  "n_couro_batido",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "olho_do_falcão",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_sombras",
+  "2": "hora_do_lobo",
+  "3": "joelho_torto",
+  "4": "sombra_rapida"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4065
+}

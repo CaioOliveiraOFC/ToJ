@@ -1,0 +1,201 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 11527,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura Divina",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Bastão Mágico",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 3.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel do Rubi",
+   "socket_count": 3
+  },
+  "Ring2": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 4557,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 41534,
+  "gold_from_combat": 21208,
+  "gold_from_interest": 2787,
+  "gold_from_sale": 17539,
+  "gold_spent": 30007,
+  "gold_spent_on_consumable": 737,
+  "gold_spent_on_enchant": 51,
+  "gold_spent_on_enhancement": 3727,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 17515,
+  "gold_spent_on_recovery": 1068,
+  "gold_spent_on_socket": 759,
+  "interest_payments": 20,
+  "items_dropped": 52,
+  "items_equipped": 20,
+  "items_sold": 46,
+  "max_gold_held": 15607,
+  "paid_exits": 21,
+  "purchases": 53
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 2236,
+ "passives": [
+  "furia_berserker",
+  "postura_fechada",
+  "oraculo_partido",
+  "sangue_guerreiro",
+  "furia_berserker",
+  "musculos_aco",
+  "musculos_aco",
+  "coracao_ferro",
+  "sede_silenciosa",
+  "agulha_no_osso",
+  "coracao_ferro",
+  "escudo_fe",
+  "heranca_do_abismo",
+  "escudo_fe",
+  "sede_sangue",
+  "passos_leves",
+  "instinto_frio",
+  "cabeca_dura",
+  "musculos_aco",
+  "sangue_guerreiro",
+  "olho_aguia",
+  "sede_sangue"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "dissonancia",
+  "drenar_vida",
+  "dreno_mana",
+  "egide_de_runas",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "hora_parada",
+  "lasca_de_gelo",
+  "missil_magico",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_postura_impecavel",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "reserva_profunda"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "passo_borrado",
+  "3": "pulso_de_forca",
+  "4": "n_travar_o_pulso"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 6071
+}

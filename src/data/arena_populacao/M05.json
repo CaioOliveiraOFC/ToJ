@@ -1,0 +1,179 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4302,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Peitoral de Cota",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Bastão Mágico",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Madeira"
+  },
+  "Legs": {
+   "name": "Calça de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 4239,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Perneiras de Couro"
+  },
+  {
+   "name": "Garras de Ferro",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 1,
+  "gold_earned": 17210,
+  "gold_from_combat": 12267,
+  "gold_from_interest": 1105,
+  "gold_from_sale": 3838,
+  "gold_spent": 12908,
+  "gold_spent_on_consumable": 847,
+  "gold_spent_on_enhancement": 1254,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 6688,
+  "gold_spent_on_recovery": 265,
+  "gold_spent_on_socket": 149,
+  "interest_payments": 17,
+  "items_dropped": 32,
+  "items_equipped": 18,
+  "items_sold": 21,
+  "max_gold_held": 6867,
+  "paid_exits": 18,
+  "purchases": 43
+ },
+ "level": 20,
+ "map_state": null,
+ "mp": 1206,
+ "passives": [
+  "olho_aguia",
+  "pele_de_sal",
+  "postura_fechada",
+  "boca_de_sangue",
+  "pele_de_sal",
+  "casco_calejado",
+  "pele_grossa",
+  "alquimia_do_desespero",
+  "sede_silenciosa",
+  "passos_leves",
+  "pele_adamantio",
+  "pele_grossa",
+  "escudo_fe",
+  "punho_atordoante",
+  "sangue_guerreiro",
+  "instinto_frio",
+  "olho_aguia",
+  "pele_de_sal",
+  "bebida_deuses"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "drenar_vida",
+  "dreno_mana",
+  "escudo_magico",
+  "lasca_de_gelo",
+  "n_encarar",
+  "n_grito_curto",
+  "n_leitura_de_terreno",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_postura_impecavel",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "palavra_de_torpor",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "raio_congelante",
+  "tempestade"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "n_ritmo_de_duelo",
+  "3": "lasca_de_gelo",
+  "4": "n_respirar_fundo"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1063
+}

@@ -1,0 +1,213 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 7164,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Colete da Sombra",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Luvas de Couro"
+  },
+  "Helmet": {
+   "name": "Bandana de Tecido"
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Bronze"
+  },
+  "Ring2": {
+   "name": "Anel de Ouro"
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "name": "Arco Élfico",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Adaga Sangrenta"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 3979,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Jaqueta de Couro"
+  },
+  {
+   "name": "Sandálias de Tecido"
+  },
+  {
+   "name": "Cajado do Oblivion",
+   "socket_count": 3
+  },
+  {
+   "name": "Amuleto de Madeira"
+  },
+  {
+   "name": "Machado Terrível",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Arco Longbow",
+   "socket_count": 1
+  },
+  {
+   "name": "Amuleto de Madeira"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Amuleto da Agilidade",
+   "socket_count": 3
+  },
+  {
+   "name": "Chinelos de Pano"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Amuleto de Argila"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 27199,
+  "gold_from_combat": 18818,
+  "gold_from_interest": 1412,
+  "gold_from_sale": 6969,
+  "gold_spent": 20035,
+  "gold_spent_on_consumable": 776,
+  "gold_spent_on_enhancement": 2388,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 9518,
+  "gold_spent_on_recovery": 1707,
+  "gold_spent_on_socket": 373,
+  "interest_payments": 20,
+  "items_dropped": 43,
+  "items_equipped": 25,
+  "items_sold": 26,
+  "max_gold_held": 7760,
+  "paid_exits": 20,
+  "purchases": 63
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 1437,
+ "passives": [
+  "essencia_fluida",
+  "sangue_guerreiro",
+  "instinto_frio",
+  "escudo_fe",
+  "coracao_ferro",
+  "casco_calejado",
+  "lamina_afiada",
+  "respiracao_contada",
+  "musculos_aco",
+  "casco_calejado",
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "olho_de_cacador",
+  "respiracao_contada",
+  "sangue_guerreiro",
+  "passos_leves",
+  "passos_leves",
+  "pele_grossa",
+  "escudo_fe",
+  "bebida_deuses",
+  "sangue_guerreiro",
+  "instinto_frio"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "capa_rasgada",
+  "corte_de_tendao",
+  "dose_da_viuva",
+  "evasao",
+  "ferida_paga",
+  "golpe_baixo",
+  "golpe_sombras",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "picada_certeira",
+  "pó_nos_olhos",
+  "respiracao_de_ladrao"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "ferida_paga",
+  "3": "picada_certeira",
+  "4": "capa_rasgada"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1658
+}

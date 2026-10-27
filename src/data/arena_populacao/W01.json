@@ -1,0 +1,233 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4400,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": {
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 7.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 5
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura Titânica",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Martelo de Mão"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 2.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel Vegetal"
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Lança de Madeira"
+  },
+  "Weapon2": {
+   "enhancement_level": 2,
+   "name": "Espada de Treino"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 7574,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Cajado da Galáxia",
+   "socket_count": 2
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Tridente do Guerreiro",
+   "socket_count": 2
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Armadura de Couro"
+  },
+  {
+   "name": "Armadura de Camisa"
+  },
+  {
+   "name": "Sapatos de Pano"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 27312,
+  "gold_from_combat": 17889,
+  "gold_from_interest": 1285,
+  "gold_from_sale": 8138,
+  "gold_spent": 22912,
+  "gold_spent_on_consumable": 1519,
+  "gold_spent_on_enchant": 2309,
+  "gold_spent_on_enhancement": 1277,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 11405,
+  "gold_spent_on_recovery": 221,
+  "gold_spent_on_socket": 908,
+  "interest_payments": 18,
+  "items_dropped": 40,
+  "items_equipped": 33,
+  "items_sold": 31,
+  "max_gold_held": 7002,
+  "paid_exits": 20,
+  "purchases": 58
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 520,
+ "passives": [
+  "coracao_ferro",
+  "sede_silenciosa",
+  "sangue_guerreiro",
+  "respiracao_contada",
+  "passo_de_corca",
+  "sangue_guerreiro",
+  "alma_eterna",
+  "passos_leves",
+  "boca_de_sangue",
+  "passo_de_corca",
+  "toque_dragao",
+  "boca_de_sangue",
+  "passos_leves",
+  "passos_leves",
+  "olho_aguia",
+  "lamina_afiada",
+  "furia_berserker",
+  "reserva_arcana",
+  "sangue_guerreiro",
+  "coracao_ferro",
+  "escudo_fe",
+  "postura_fechada"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "couraca_improvisada",
+  "cutelada",
+  "ferro_contra_ferro",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "n_areia_no_chao",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_cruzada",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "sangue_nos_olhos",
+  "soco_de_placa",
+  "tomar_folego"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "cutelada",
+  "2": "investida",
+  "3": "n_respirar_fundo",
+  "4": "grito_guerra"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1501
+}

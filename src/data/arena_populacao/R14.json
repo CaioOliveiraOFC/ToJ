@@ -1,0 +1,213 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4620,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 8.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Manto do Assassino",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Garras de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Ferro",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Sapatos de Pano"
+  },
+  "Weapon1": {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Arco Longbow",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 3,
+ "gems": [
+  {
+   "gem_type": "Topázio",
+   "level": 3
+  }
+ ],
+ "hp": 5867,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Lâmina da Tempestade",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Arco Élfico",
+   "socket_count": 1
+  },
+  {
+   "name": "Saia de Couro"
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 5,
+  "gold_earned": 21317,
+  "gold_from_combat": 14217,
+  "gold_from_interest": 1015,
+  "gold_from_sale": 6085,
+  "gold_spent": 16697,
+  "gold_spent_on_consumable": 447,
+  "gold_spent_on_enchant": 1281,
+  "gold_spent_on_enhancement": 969,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 10447,
+  "gold_spent_on_recovery": 106,
+  "gold_spent_on_socket": 305,
+  "interest_payments": 17,
+  "items_dropped": 34,
+  "items_equipped": 36,
+  "items_sold": 27,
+  "max_gold_held": 9971,
+  "paid_exits": 17,
+  "purchases": 45
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 1353,
+ "passives": [
+  "sede_silenciosa",
+  "pele_de_sal",
+  "sorte_iniciante",
+  "voracidade",
+  "mente_serena",
+  "respiracao_contada",
+  "sorte_iniciante",
+  "sangue_guerreiro",
+  "essencia_pura",
+  "sangue_guerreiro",
+  "reserva_arcana",
+  "divida_de_ouro",
+  "sorte_iniciante",
+  "alma_eterna",
+  "boca_de_sangue",
+  "sorte_iniciante",
+  "essencia_pura",
+  "reserva_arcana",
+  "coracao_ferro",
+  "essencia_viva",
+  "sangue_guerreiro",
+  "pele_grossa",
+  "postura_fechada"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "bolso_do_alfaiate",
+  "capa_rasgada",
+  "corte_de_tendao",
+  "cortina_fumaca",
+  "duas_maos_um_tempo",
+  "evasao",
+  "golpe_baixo",
+  "joelho_torto",
+  "n_couro_batido",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_postura_impecavel",
+  "pó_nos_olhos",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "duas_maos_um_tempo",
+  "2": "n_mira_calma",
+  "3": "pó_nos_olhos",
+  "4": "n_disciplina_de_forja"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 7656
+}

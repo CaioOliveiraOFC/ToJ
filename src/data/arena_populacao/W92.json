@@ -1,0 +1,246 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 11816,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 9.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 3
+  },
+  "Body": {
+   "name": "Armadura Divina",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Escudo Torre",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 3.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Bronze"
+  },
+  "Ring2": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Machado de Batalha",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    }
+   ],
+   "name": "Espada Longa",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 7544,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 11.0
+    }
+   ],
+   "name": "Cajado da Galáxia",
+   "socket_count": 3
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 9.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Espada Lendária",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 40347,
+  "gold_from_combat": 21294,
+  "gold_from_interest": 2693,
+  "gold_from_sale": 16360,
+  "gold_spent": 28531,
+  "gold_spent_on_consumable": 387,
+  "gold_spent_on_enchant": 3872,
+  "gold_spent_on_enhancement": 1577,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 15337,
+  "gold_spent_on_recovery": 142,
+  "gold_spent_on_socket": 1066,
+  "interest_payments": 21,
+  "items_dropped": 56,
+  "items_equipped": 30,
+  "items_sold": 45,
+  "max_gold_held": 16985,
+  "paid_exits": 21,
+  "purchases": 53
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 355,
+ "passives": [
+  "passo_de_corca",
+  "sede_sangue",
+  "musculos_aco",
+  "lamina_do_juizo",
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "instinto_frio",
+  "escudo_fe",
+  "bencao_divina",
+  "cabeca_dura",
+  "fio_serrilhado",
+  "olho_de_cacador",
+  "lamina_afiada",
+  "fio_serrilhado",
+  "furia_berserker",
+  "voz_no_escuro",
+  "lamina_afiada",
+  "toque_dragao",
+  "musculos_aco",
+  "oraculo_partido",
+  "olho_de_cacador",
+  "boca_de_sangue"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "escudo_protetor",
+  "fio_no_rebite",
+  "furia",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "investida",
+  "investida_de_ariete",
+  "n_disciplina_de_forja",
+  "n_folego_de_marcha",
+  "n_gancho_e_corda",
+  "n_passo_lateral",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "postura_de_muro",
+  "provocacao",
+  "quebra_guarda",
+  "quebra_ossos",
+  "rasgo_de_gancho",
+  "sangue_nos_olhos"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_duplo",
+  "2": "quebra_guarda",
+  "3": "n_respirar_fundo",
+  "4": "provocacao"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 6409
+}

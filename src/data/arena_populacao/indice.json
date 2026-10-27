@@ -1,0 +1,3418 @@
+{
+ "versao": 1,
+ "aviso": "Gerado por tools/arena_offline_geracao.py catalogar. Cada gladiador é a extração de uma run PvE real; não edite à mão.",
+ "gladiadores": [
+  {
+   "id": "W01",
+   "apelido": "Esra do Lobo",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 29.0595703125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W01",
+    "versao": "v2",
+    "tentativa": 7,
+    "seed": "2832237389801836401"
+   },
+   "sha256": "59833bbba130e4c425707d18c6900b7b158fda4eb5bcaaca4021a1a85601bc0e",
+   "arquivo": "W01.json"
+  },
+  {
+   "id": "W02",
+   "apelido": "Bruma da Aurora",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 28.3681640625,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W02",
+    "versao": "v2",
+    "tentativa": 13,
+    "seed": "6058608939898478784"
+   },
+   "sha256": "51e18e4bfb7ab6f44790cf22ac3586334dcedec86fd388e90c792113fe39db2a",
+   "arquivo": "W02.json"
+  },
+  {
+   "id": "W03",
+   "apelido": "Vesna da Vigília",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 28.1376953125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W03",
+    "versao": "v2",
+    "tentativa": 15,
+    "seed": "812624488608970650"
+   },
+   "sha256": "138716315fb8669f7db5fc86d5666471f48db4bbf2ebccb476c767aa42c6e9b7",
+   "arquivo": "W03.json"
+  },
+  {
+   "id": "W04",
+   "apelido": "Oriel do Corvo",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 21,
+   "op": 27.9072265625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W04",
+    "versao": "v2",
+    "tentativa": 19,
+    "seed": "1846572177730036279"
+   },
+   "sha256": "228d29c733d29115f6234b2aa3e744e7d3c13977861e50b3689d0fae2c6a1d61",
+   "arquivo": "W04.json"
+  },
+  {
+   "id": "W05",
+   "apelido": "Nilo do Rochedo",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 21,
+   "op": 27.9072265625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W05",
+    "versao": "v2",
+    "tentativa": 20,
+    "seed": "3994255704300115112"
+   },
+   "sha256": "ae221e67db5c710db7ee3f8c4c73e351946f85507e9144077413efb4064192dc",
+   "arquivo": "W05.json"
+  },
+  {
+   "id": "W06",
+   "apelido": "Maren do Abismo",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 21,
+   "op": 27.9072265625,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W06",
+    "versao": "v2",
+    "tentativa": 24,
+    "seed": "1025959111049801620"
+   },
+   "sha256": "840a497ae771b6d8e2b2eda1836d2091418309db29d18ed5cfc35559e7f97538",
+   "arquivo": "W06.json"
+  },
+  {
+   "id": "W07",
+   "apelido": "Gael da Forja",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 27.7919921875,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W07",
+    "versao": "v2",
+    "tentativa": 30,
+    "seed": "3208297028327239230"
+   },
+   "sha256": "3cb25dc3c55c264f82c03502093c93fc37519f32edc306a5fc58d49512efe7cc",
+   "arquivo": "W07.json"
+  },
+  {
+   "id": "W08",
+   "apelido": "Esra da Serra",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 28.7138671875,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W08",
+    "versao": "v2",
+    "tentativa": 36,
+    "seed": "4130039241501877988"
+   },
+   "sha256": "b443768975e3bcd4e6eff9a75d8ebc2a9c5a3ab756d4d2b1a2cbc9ce12de3080",
+   "arquivo": "W08.json"
+  },
+  {
+   "id": "W09",
+   "apelido": "Wren do Lume",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 18,
+   "op": 28.0224609375,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W09",
+    "versao": "v2",
+    "tentativa": 4,
+    "seed": "18241902303696388387"
+   },
+   "sha256": "20fb0fdaa2e828deed1c20f9dd7b0145fda366db0f0936845638ebcd25efdc89",
+   "arquivo": "W09.json"
+  },
+  {
+   "id": "W10",
+   "apelido": "Caeli da Forja",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 29.8662109375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W10",
+    "versao": "v2",
+    "tentativa": 7,
+    "seed": "7926199109757061183"
+   },
+   "sha256": "23740b31a4c1fbaf8ca960170bcded867b65946e22d7980ca96283bd631e4608",
+   "arquivo": "W10.json"
+  },
+  {
+   "id": "W11",
+   "apelido": "Tália da Geada",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 28.7138671875,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W11",
+    "versao": "v2",
+    "tentativa": 17,
+    "seed": "14613271384846002655"
+   },
+   "sha256": "7f5e13171d9b98bde257479f11cf370ebeab85fe2c5e6379416ebb69a726e098",
+   "arquivo": "W11.json"
+  },
+  {
+   "id": "W12",
+   "apelido": "Jora da Geada",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 20,
+   "op": 27.7919921875,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W12",
+    "versao": "v2",
+    "tentativa": 21,
+    "seed": "1797578634168002903"
+   },
+   "sha256": "0663db69887589b94ffa946c61c3ca1121c352e4413bd3742e2fdc5c4dcd3221",
+   "arquivo": "W12.json"
+  },
+  {
+   "id": "W13",
+   "apelido": "Cirro do Sal",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 29.9814453125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W13",
+    "versao": "v2",
+    "tentativa": 22,
+    "seed": "7532868956086172557"
+   },
+   "sha256": "b8d9387eeee46972976374ec63c6688870d3656696c2a0437839073da42d18f3",
+   "arquivo": "W13.json"
+  },
+  {
+   "id": "W14",
+   "apelido": "Fírio da Maré",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 28.0224609375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W14",
+    "versao": "v2",
+    "tentativa": 24,
+    "seed": "6291530132541431858"
+   },
+   "sha256": "2e3a7cbe44b5e0bde1d8b5f267f85a09176a12467cfc268d7c541f19d0734236",
+   "arquivo": "W14.json"
+  },
+  {
+   "id": "W15",
+   "apelido": "Faro do Sal",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 20,
+   "op": 29.0595703125,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W15",
+    "versao": "v2",
+    "tentativa": 33,
+    "seed": "6882643742210834252"
+   },
+   "sha256": "a1045239b231a8285e569f1dbdaedfe6f07e73e99bc29eaf2b18053b4644aa75",
+   "arquivo": "W15.json"
+  },
+  {
+   "id": "W16",
+   "apelido": "Pira da Pedra",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.5205078125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W16",
+    "versao": "v2",
+    "tentativa": 3,
+    "seed": "16876277710936082885"
+   },
+   "sha256": "6964796bda4c2fffb41f00335b4e9778a2493e6ce47a99261c620e077c9f31ce",
+   "arquivo": "W16.json"
+  },
+  {
+   "id": "W17",
+   "apelido": "Rana da Forja",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 27.9072265625,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W17",
+    "versao": "v2",
+    "tentativa": 15,
+    "seed": "1590218668709156032"
+   },
+   "sha256": "4758f6e07a7a811e2a1fedabe56bbe56bcd1f82c7370788599388d3450a476c8",
+   "arquivo": "W17.json"
+  },
+  {
+   "id": "W18",
+   "apelido": "Hesta do Cardo",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 21,
+   "op": 28.0224609375,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W18",
+    "versao": "v2",
+    "tentativa": 23,
+    "seed": "5988562094137102994"
+   },
+   "sha256": "7fdf8b3799a0a908df8c3b2c64c2bc1ed81773349a5a394a550903f0fc32c103",
+   "arquivo": "W18.json"
+  },
+  {
+   "id": "W19",
+   "apelido": "Vesna do Espinho",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 19,
+   "op": 29.1748046875,
+   "andar_de_extracao": 16,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W19",
+    "versao": "v2",
+    "tentativa": 24,
+    "seed": "18064938851122302866"
+   },
+   "sha256": "ee79b82418ef4de53a8dc91dbd206d9809f9665a0b197563cb6ee53847468ba0",
+   "arquivo": "W19.json"
+  },
+  {
+   "id": "W20",
+   "apelido": "Aldo do Penhasco",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 21,
+   "op": 28.4833984375,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W20",
+    "versao": "v2",
+    "tentativa": 26,
+    "seed": "15403883440795817470"
+   },
+   "sha256": "40587ef67b9b562e38b817204fdba6cda6f42ace5222116b8c871b6ab60d1a5d",
+   "arquivo": "W20.json"
+  },
+  {
+   "id": "W21",
+   "apelido": "Zeno da Raposa",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 21,
+   "op": 27.7919921875,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W21",
+    "versao": "v2",
+    "tentativa": 32,
+    "seed": "15217593058595529711"
+   },
+   "sha256": "31af8cdcc97a28da4fa29f767f6defaa0562f5c7a0e212e56d4db2d3656d3d9c",
+   "arquivo": "W21.json"
+  },
+  {
+   "id": "W22",
+   "apelido": "Rana do Vau",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 29.5205078125,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W22",
+    "versao": "v2",
+    "tentativa": 36,
+    "seed": "8138257030839068038"
+   },
+   "sha256": "f8486572b887c156245b8d44a8ba2fa6cc92bab01824134282bed3f0666fc61a",
+   "arquivo": "W22.json"
+  },
+  {
+   "id": "W23",
+   "apelido": "Caeli da Geada",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 29.1748046875,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W23",
+    "versao": "v2",
+    "tentativa": 9,
+    "seed": "6639738590781069291"
+   },
+   "sha256": "bf41a2aa41bc77af8c10096e5645eb4a54586fc8a4e08308ef5b5c80b79e2648",
+   "arquivo": "W23.json"
+  },
+  {
+   "id": "W24",
+   "apelido": "Esra do Rochedo",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 29.5205078125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W24",
+    "versao": "v2",
+    "tentativa": 11,
+    "seed": "12625970359534049939"
+   },
+   "sha256": "e79cc2f987aa8ce9f2bef443bf0ac434a5bffe407407355d28a91d721c093b03",
+   "arquivo": "W24.json"
+  },
+  {
+   "id": "W25",
+   "apelido": "Jora da Pedra",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 29.5205078125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W25",
+    "versao": "v2",
+    "tentativa": 14,
+    "seed": "165671388714954225"
+   },
+   "sha256": "3af064b5e99269a799e9c649ba283d5f45cb33011183e3876c8583c1b83920be",
+   "arquivo": "W25.json"
+  },
+  {
+   "id": "W26",
+   "apelido": "Galena da Forja",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 29.7509765625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W26",
+    "versao": "v2",
+    "tentativa": 15,
+    "seed": "3771523583190698800"
+   },
+   "sha256": "763adddf8e4f5f7774c5986942e4acf8ccfea1f634c9571145d7e9b8946ab227",
+   "arquivo": "W26.json"
+  },
+  {
+   "id": "W27",
+   "apelido": "Iago do Ermo",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 29.2900390625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W27",
+    "versao": "v2",
+    "tentativa": 18,
+    "seed": "14843769489525258320"
+   },
+   "sha256": "8e2431fd44f105adda75d971da8181786eb5d174d0e6af679978df9a50d31e01",
+   "arquivo": "W27.json"
+  },
+  {
+   "id": "W28",
+   "apelido": "Ébano da Forja",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 29.5205078125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W28",
+    "versao": "v2",
+    "tentativa": 19,
+    "seed": "4703126176621684437"
+   },
+   "sha256": "1dc13f275347746fd97b52bec14b18c5558899764520c84d869679c7521fe145",
+   "arquivo": "W28.json"
+  },
+  {
+   "id": "W29",
+   "apelido": "Tália do Espinho",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 29.9814453125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W29",
+    "versao": "v2",
+    "tentativa": 25,
+    "seed": "5183847945833891140"
+   },
+   "sha256": "372be28d1bd6697906876373c0ef49e73b9aa66b5930e84d173e2fced38e7530",
+   "arquivo": "W29.json"
+  },
+  {
+   "id": "W30",
+   "apelido": "Xisto do Ermo",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 29.9814453125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W30",
+    "versao": "v2",
+    "tentativa": 6,
+    "seed": "2794895444418811611"
+   },
+   "sha256": "0cc018412b7b0b422d501425082ca97d493a22439fc597b98eebb2a3b6814619",
+   "arquivo": "W30.json"
+  },
+  {
+   "id": "W31",
+   "apelido": "Bruma da Torre",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 20,
+   "op": 29.6357421875,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W31",
+    "versao": "v2",
+    "tentativa": 9,
+    "seed": "375831289381730531"
+   },
+   "sha256": "e98599f530d3142f06d8ffcaecaf1d506f4990cbb970f7c01326be47b803f0a1",
+   "arquivo": "W31.json"
+  },
+  {
+   "id": "W32",
+   "apelido": "Yara da Fenda",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 29.8662109375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W32",
+    "versao": "v2",
+    "tentativa": 37,
+    "seed": "4152108452749171475"
+   },
+   "sha256": "e46a9c9691d394b4017de339a1d004eccb872b75e4e4ad3afcef2a49c61e7c73",
+   "arquivo": "W32.json"
+  },
+  {
+   "id": "W33",
+   "apelido": "Faro da Vigília",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 29.4052734375,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W33",
+    "versao": "v2",
+    "tentativa": 45,
+    "seed": "12897313214226887121"
+   },
+   "sha256": "e229ce67861f8d836d11379ad43b446315f5a5ef4b9a271b428e9fe117041121",
+   "arquivo": "W33.json"
+  },
+  {
+   "id": "W34",
+   "apelido": "Dália da Vigília",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 29.8662109375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W34",
+    "versao": "v2",
+    "tentativa": 47,
+    "seed": "2809686733962074657"
+   },
+   "sha256": "66e138abd449861caa0e828a0d0e2517ecb2370f141aac2dbca30367d66ca989",
+   "arquivo": "W34.json"
+  },
+  {
+   "id": "W35",
+   "apelido": "Galena da Brasa",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 29.7509765625,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W35",
+    "versao": "v2",
+    "tentativa": 48,
+    "seed": "11635301397804779693"
+   },
+   "sha256": "f69935c2cadf1b481eb91ae9b7e9ab1ca4798a9188a93c1a3e878c2aea183259",
+   "arquivo": "W35.json"
+  },
+  {
+   "id": "W36",
+   "apelido": "Gael da Torre",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 29.9814453125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W36",
+    "versao": "v2",
+    "tentativa": 73,
+    "seed": "4961004880316520679"
+   },
+   "sha256": "ca99077dfaee53ef12266d657d00a80ffb1cd3f2b656b8ef1e0ce6b54c49f08f",
+   "arquivo": "W36.json"
+  },
+  {
+   "id": "W37",
+   "apelido": "Aldo da Fenda",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 20,
+   "op": 29.8662109375,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W37",
+    "versao": "v2",
+    "tentativa": 2,
+    "seed": "9669742153661310724"
+   },
+   "sha256": "0763a1ca9c7593b10d525f1e23f43cee3d1e609a934e6864d0acc05d807ce5e8",
+   "arquivo": "W37.json"
+  },
+  {
+   "id": "W38",
+   "apelido": "Ébano do Lobo",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 22,
+   "op": 29.4052734375,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W38",
+    "versao": "v2",
+    "tentativa": 6,
+    "seed": "650757519477940328"
+   },
+   "sha256": "f279a888388857193840c695213ecaba62aef047c0bcee9eb4ef416c44c4b6b0",
+   "arquivo": "W38.json"
+  },
+  {
+   "id": "W39",
+   "apelido": "Ébano do Eclipse",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.8662109375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W39",
+    "versao": "v2",
+    "tentativa": 43,
+    "seed": "488179884306871621"
+   },
+   "sha256": "1ec2cee764022c930891f9bbb0602c54d946df477a30af14cbd07a2e1f92e4c8",
+   "arquivo": "W39.json"
+  },
+  {
+   "id": "W40",
+   "apelido": "Ulme da Fenda",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.7509765625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W40",
+    "versao": "v2",
+    "tentativa": 44,
+    "seed": "2844704781525308444"
+   },
+   "sha256": "decd2023c2488496dca7b72ce2af0ba3d95d0aa90c6bda8f75eb90eb427c0a12",
+   "arquivo": "W40.json"
+  },
+  {
+   "id": "W41",
+   "apelido": "Bruma da Névoa",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 29.6357421875,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W41",
+    "versao": "v2",
+    "tentativa": 50,
+    "seed": "9284565610362645380"
+   },
+   "sha256": "05e0f282c20ab7fdfafdfeb45402aed438313308e65797191971912c8a1ecdec",
+   "arquivo": "W41.json"
+  },
+  {
+   "id": "W42",
+   "apelido": "Tália do Ermo",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 29.6357421875,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W42",
+    "versao": "v2",
+    "tentativa": 57,
+    "seed": "4580664160974118811"
+   },
+   "sha256": "f868fa7544a83b11867d30519353c27ae83dbffd8aaf53e26aca2c7e09e783d6",
+   "arquivo": "W42.json"
+  },
+  {
+   "id": "W43",
+   "apelido": "Xisto do Lobo",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.7509765625,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W43",
+    "versao": "v2",
+    "tentativa": 61,
+    "seed": "16872040783703285537"
+   },
+   "sha256": "753eb80928873d68633cb946f2768f56f8153cc1428a781d48931515e874c958",
+   "arquivo": "W43.json"
+  },
+  {
+   "id": "W44",
+   "apelido": "Cirro do Vau",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 28.5986328125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W44",
+    "versao": "v2",
+    "tentativa": 42,
+    "seed": "2645495527007246633"
+   },
+   "sha256": "777dab239932fa216721e02f8a26af6e1e76170e6abdba5724907a8f8889f5f0",
+   "arquivo": "W44.json"
+  },
+  {
+   "id": "W45",
+   "apelido": "Gael da Geada",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 27.9072265625,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W45",
+    "versao": "v2",
+    "tentativa": 179,
+    "seed": "15214951623552712880"
+   },
+   "sha256": "11857b5ce2dbb4b57aed3f1c136fb8b6f5534a28cea405cba5f04a315486a986",
+   "arquivo": "W45.json"
+  },
+  {
+   "id": "W46",
+   "apelido": "Fírio da Raposa",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 28.4833984375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W46",
+    "versao": "v2",
+    "tentativa": 199,
+    "seed": "10006103864399723504"
+   },
+   "sha256": "c020fd10038b6fb40c0b6242bb2b456da0a2c8dc1f8604aadff9822f7609152d",
+   "arquivo": "W46.json"
+  },
+  {
+   "id": "W47",
+   "apelido": "Pira do Ermo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 29.6357421875,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W47",
+    "versao": "v2",
+    "tentativa": 212,
+    "seed": "16962208254202598663"
+   },
+   "sha256": "08d939a415de4dd1a600de525d5aec33daf5ab045b22bf40d4c63e70ca5cee26",
+   "arquivo": "W47.json"
+  },
+  {
+   "id": "W48",
+   "apelido": "Jora da Cinza",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 20,
+   "op": 27.7919921875,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W48",
+    "versao": "v2",
+    "tentativa": 232,
+    "seed": "15085905063680726777"
+   },
+   "sha256": "143f3cd01d0bcdd34728346e788de46a2ed768967a67ad41e6924ba0d8ac3057",
+   "arquivo": "W48.json"
+  },
+  {
+   "id": "W49",
+   "apelido": "Jora do Ermo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 28.5986328125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W49",
+    "versao": "v2",
+    "tentativa": 66,
+    "seed": "2487864230724086036"
+   },
+   "sha256": "0906d981fc17a184d182637625289bd786d087324258cfe09e9e82c7d9ec5dbe",
+   "arquivo": "W49.json"
+  },
+  {
+   "id": "W50",
+   "apelido": "Galena do Junco",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 28.5986328125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W50",
+    "versao": "v2",
+    "tentativa": 164,
+    "seed": "4385105589953273700"
+   },
+   "sha256": "dda60f45b72b9640b6f6fadb173b4e66284c3e5344526abdac797c81db44352f",
+   "arquivo": "W50.json"
+  },
+  {
+   "id": "W51",
+   "apelido": "Maren da Brasa",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 27.9072265625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W51",
+    "versao": "v2",
+    "tentativa": 217,
+    "seed": "12730939534942729493"
+   },
+   "sha256": "7add54bd886fc7d362eff27f468b894db8f063dd5c2399176bc2c900e6b0ad7e",
+   "arquivo": "W51.json"
+  },
+  {
+   "id": "W52",
+   "apelido": "Cirro do Ermo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 28.0224609375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W52",
+    "versao": "v2",
+    "tentativa": 3,
+    "seed": "13489461355466704452"
+   },
+   "sha256": "18b4de8e974813410ed84495f543e59670dd8c8dafbb8539a5fd1b0132f8eae2",
+   "arquivo": "W52.json"
+  },
+  {
+   "id": "W53",
+   "apelido": "Gael do Trovão",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 28.4833984375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W53",
+    "versao": "v2",
+    "tentativa": 326,
+    "seed": "12624093366700675930"
+   },
+   "sha256": "65efc1b897bb61d54983e12165549bf82e08ecc5b20ead2b26f418859c11abc5",
+   "arquivo": "W53.json"
+  },
+  {
+   "id": "W54",
+   "apelido": "Hesta do Penhasco",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.6357421875,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W54",
+    "versao": "v2",
+    "tentativa": 39,
+    "seed": "16267420974496528008"
+   },
+   "sha256": "d142a7227c42321182079d7b0eaeb4a0d0824c70eb5445f6bb03568b4ef142a3",
+   "arquivo": "W54.json"
+  },
+  {
+   "id": "W55",
+   "apelido": "Brisa da Geada",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 29.7509765625,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W55",
+    "versao": "v2",
+    "tentativa": 83,
+    "seed": "9680521760163710385"
+   },
+   "sha256": "a275c82fb99f88858cbfc5644ab18c14937605fc6441b77fc87bfeb63de628ed",
+   "arquivo": "W55.json"
+  },
+  {
+   "id": "W56",
+   "apelido": "Faro do Junco",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.2900390625,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W56",
+    "versao": "v2",
+    "tentativa": 80,
+    "seed": "17466784782611362638"
+   },
+   "sha256": "b099e1544b7efe103b75ec623aaa78407bb7ffdf4298777e67f00a91a5ca56a5",
+   "arquivo": "W56.json"
+  },
+  {
+   "id": "W57",
+   "apelido": "Caeli do Penhasco",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 20,
+   "op": 27.7919921875,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W57",
+    "versao": "v2",
+    "tentativa": 35,
+    "seed": "2589369501754876463"
+   },
+   "sha256": "7859438a2bd9ecec037cb38967a71eea202c1b7975622471890c0c9370c61345",
+   "arquivo": "W57.json"
+  },
+  {
+   "id": "W58",
+   "apelido": "Dália da Forja",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 22,
+   "op": 28.5986328125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W58",
+    "versao": "v2",
+    "tentativa": 40,
+    "seed": "8172921485304172074"
+   },
+   "sha256": "58e1461aa52956b6a07eeb894955b9d99feca40ed15a86a5f0cc3545d6b1bcc8",
+   "arquivo": "W58.json"
+  },
+  {
+   "id": "W59",
+   "apelido": "Brisa do Lobo",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 29.6357421875,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W59",
+    "versao": "v2",
+    "tentativa": 101,
+    "seed": "2418842632503645723"
+   },
+   "sha256": "8969ffc492410597dae06781cbb114c57ff4203e18338a4620bda753e9be019a",
+   "arquivo": "W59.json"
+  },
+  {
+   "id": "W60",
+   "apelido": "Sauro do Penhasco",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.5205078125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W60",
+    "versao": "v2",
+    "tentativa": 93,
+    "seed": "10776659354567911830"
+   },
+   "sha256": "e01eab0950c6ddf4e2328a7c463548e0dfdd12ab29009850aea8e69f2342beae",
+   "arquivo": "W60.json"
+  },
+  {
+   "id": "W61",
+   "apelido": "Kael da Geada",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 19,
+   "op": 28.1376953125,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W61",
+    "versao": "v2",
+    "tentativa": 44,
+    "seed": "5167399243287148898"
+   },
+   "sha256": "745f1a16d3862794f2bbac4016a20c3c4d6db72d01c0faa8665113e8ed5b4ac3",
+   "arquivo": "W61.json"
+  },
+  {
+   "id": "W62",
+   "apelido": "Xisto do Rochedo",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 28.5986328125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W62",
+    "versao": "v2",
+    "tentativa": 43,
+    "seed": "2193193603985627856"
+   },
+   "sha256": "5fdb9f5ff5edc5d54e23579060949189e3becb2873c411f495ae6b0840234551",
+   "arquivo": "W62.json"
+  },
+  {
+   "id": "W63",
+   "apelido": "Brisa do Eclipse",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.4052734375,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W63",
+    "versao": "v2",
+    "tentativa": 100,
+    "seed": "14337888470259174021"
+   },
+   "sha256": "4c4228342230a5e1d5565a302bc0a44dd195abd1fcac1be5c474f3315a9ddb4a",
+   "arquivo": "W63.json"
+  },
+  {
+   "id": "W64",
+   "apelido": "Esra da Aurora",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 29.9814453125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03",
+    "id_na_copa": "W64",
+    "versao": "v2",
+    "tentativa": 33,
+    "seed": "6146495459393456226"
+   },
+   "sha256": "6f9d75df238ec59c98acb3b795122bb0e499ebcdba65a77aaa4fb08384a51610",
+   "arquivo": "W64.json"
+  },
+  {
+   "id": "W65",
+   "apelido": "Gael da Areia",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 3,
+   "op": 5.623779296875,
+   "andar_de_extracao": 3,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 191,
+    "seed": "11143271561656614859"
+   },
+   "sha256": "ac2b71d21de6ea136b6a8711bde9e854437ff4818d98ce5b1a58258742e462b7",
+   "arquivo": "W65.json"
+  },
+  {
+   "id": "W66",
+   "apelido": "Cirro da Aurora",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 22,
+   "op": 30.3271484375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 92,
+    "seed": "7576989347618681148"
+   },
+   "sha256": "49cf7057206b7ce788717349e610252a3b5dd6fc230038b75ee0b7ded933918e",
+   "arquivo": "W66.json"
+  },
+  {
+   "id": "W67",
+   "apelido": "Caeli do Junco",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 30.6728515625,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 137,
+    "seed": "8109693677195970167"
+   },
+   "sha256": "ea2f01feea9a27dc985e3a35ae183b01ce611831fb529f6ee03939cf93f0b235",
+   "arquivo": "W67.json"
+  },
+  {
+   "id": "W68",
+   "apelido": "Fírio do Lobo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 30.7880859375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 47,
+    "seed": "3792168768405610542"
+   },
+   "sha256": "7761a84f89d6a2aeb750925620efaa027c2163465c895b7eb74064a30d670a1f",
+   "arquivo": "W68.json"
+  },
+  {
+   "id": "W69",
+   "apelido": "Yara do Corvo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 30.7880859375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 248,
+    "seed": "4872475650291886058"
+   },
+   "sha256": "cd39702a29c21f0dae7eb7eb85051381c6013cca3f279ca5b4d7c13085c09103",
+   "arquivo": "W69.json"
+  },
+  {
+   "id": "W70",
+   "apelido": "Pira da Forja",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 30.9033203125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 245,
+    "seed": "6078495922476437356"
+   },
+   "sha256": "e57b8845fed1381455d5dbd70f16f1eaf293f73605ade899dabe25d17d05ea92",
+   "arquivo": "W70.json"
+  },
+  {
+   "id": "W71",
+   "apelido": "Xisto da Areia",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 22,
+   "op": 31.0185546875,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 124,
+    "seed": "9194853240646071665"
+   },
+   "sha256": "e226d14235f1ed82fe2dde22fe0f94f36140b9e56ca92f1340edb781ab99c586",
+   "arquivo": "W71.json"
+  },
+  {
+   "id": "W72",
+   "apelido": "Galena da Lança",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 31.0185546875,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 296,
+    "seed": "17379905972534987004"
+   },
+   "sha256": "9bcd7424c4d54cc45031aab5304062d1f3cf6917574ef1c421bd46f7d0543d39",
+   "arquivo": "W72.json"
+  },
+  {
+   "id": "W73",
+   "apelido": "Xisto do Lume",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 31.0185546875,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 20,
+    "seed": "16071999164206910320"
+   },
+   "sha256": "757376266ffda169e3390130b901fbc8bd82d0fa8c4fd156675c00f71aae14fb",
+   "arquivo": "W73.json"
+  },
+  {
+   "id": "W74",
+   "apelido": "Lira do Abismo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 31.1337890625,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 94,
+    "seed": "11169663788251353183"
+   },
+   "sha256": "d3f8996807bdab2717f87623198b1883530ac1ebad5e456bfadc074e3a978e0e",
+   "arquivo": "W74.json"
+  },
+  {
+   "id": "W75",
+   "apelido": "Pira do Lobo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 31.2490234375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 71,
+    "seed": "10007335204053616365"
+   },
+   "sha256": "384f0f8b1767f97479e39a94f9c06ae52b027ceb5129cc78be848e9002599c41",
+   "arquivo": "W75.json"
+  },
+  {
+   "id": "W76",
+   "apelido": "Nilo do Cardo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 31.3642578125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 219,
+    "seed": "7113233736403613857"
+   },
+   "sha256": "f302a5af107d9864351d4a008cab5f9f733a29a39ca9e61b7179b16dca6ab38c",
+   "arquivo": "W76.json"
+  },
+  {
+   "id": "W77",
+   "apelido": "Fírio do Sal",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 24,
+   "op": 31.3642578125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 202,
+    "seed": "14031056492893383360"
+   },
+   "sha256": "01aca47e8746bdd4dd1d1a40b66f87572060188b6538be817df951e47bdf23cd",
+   "arquivo": "W77.json"
+  },
+  {
+   "id": "W78",
+   "apelido": "Bruma do Ermo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 24,
+   "op": 31.4794921875,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 31,
+    "seed": "12894685164152629667"
+   },
+   "sha256": "0d038c90cc99ce62d5ee804f02162616beb5a769da12f349f10623c8c61dccab",
+   "arquivo": "W78.json"
+  },
+  {
+   "id": "W79",
+   "apelido": "Maren do Espinho",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 25,
+   "op": 31.5947265625,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 37,
+    "seed": "7604541633884576425"
+   },
+   "sha256": "e9c7cb2b2fe16cba91a1018d527163bd5bc930de893ee5dc9a16a1591caf364c",
+   "arquivo": "W79.json"
+  },
+  {
+   "id": "W80",
+   "apelido": "Pira do Cardo",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 31.5947265625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 68,
+    "seed": "5709222183527200585"
+   },
+   "sha256": "be3d3b9ca51e3c40faf90d7e919dc52cdefa47a8eba979bcd4ed1854164f35d0",
+   "arquivo": "W80.json"
+  },
+  {
+   "id": "W81",
+   "apelido": "Galena da Fenda",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 25,
+   "op": 31.7099609375,
+   "andar_de_extracao": 24,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 159,
+    "seed": "12792100768379800749"
+   },
+   "sha256": "6a76b7395a55ea80f8020732178a5d6b863230eeec26c172862b578da8e6e14a",
+   "arquivo": "W81.json"
+  },
+  {
+   "id": "W82",
+   "apelido": "Caeli do Vau",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 26,
+   "op": 31.9404296875,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 307,
+    "seed": "5059307379019968349"
+   },
+   "sha256": "06195382756fb1715705a0a4e6d4b589e8e7190e87ce437fa8b3a9513a50eee9",
+   "arquivo": "W82.json"
+  },
+  {
+   "id": "W83",
+   "apelido": "Faro da Forja",
+   "classe": "warrior",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 26,
+   "op": 32.1708984375,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 34,
+    "seed": "7919059588941062770"
+   },
+   "sha256": "500277ce6b9f3b3f5cc3dd916507f8bfd440fe476bfa9a52679739a9e1ed83b0",
+   "arquivo": "W83.json"
+  },
+  {
+   "id": "W84",
+   "apelido": "Nilo do Sal",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 26,
+   "op": 32.2861328125,
+   "andar_de_extracao": 24,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 221,
+    "seed": "9035046515540041938"
+   },
+   "sha256": "ef87e726653e168477e8ee65566225eb2f6c99462a4258f032a7f7fefb2f9bf5",
+   "arquivo": "W84.json"
+  },
+  {
+   "id": "W85",
+   "apelido": "Sauro do Lume",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 25,
+   "op": 32.6318359375,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 8,
+    "seed": "14645508172812973643"
+   },
+   "sha256": "73806f06dc736bc5ac0d4c8493c8899881293e7fafc892dd0fa6477137c085f8",
+   "arquivo": "W85.json"
+  },
+  {
+   "id": "W86",
+   "apelido": "Oriel do Lobo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 24,
+   "op": 32.8623046875,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 27,
+    "seed": "1830911202288158286"
+   },
+   "sha256": "c8dd1fa24a483072347ad48ac3f8a346e22e13cf923f4b207ad67f964c25c332",
+   "arquivo": "W86.json"
+  },
+  {
+   "id": "W87",
+   "apelido": "Kael da Areia",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 25,
+   "op": 33.2080078125,
+   "andar_de_extracao": 24,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 16,
+    "seed": "5880242530522613383"
+   },
+   "sha256": "4132035ad8d275dbd284be9e890ad74219252f09156d161300e91adfc47aaa61",
+   "arquivo": "W87.json"
+  },
+  {
+   "id": "W88",
+   "apelido": "Bruma do Abismo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 26,
+   "op": 33.5537109375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 287,
+    "seed": "3137438833295307649"
+   },
+   "sha256": "ebec48829932ff4931396508e201947dc5128e04dc81adabee376aa5a191d593",
+   "arquivo": "W88.json"
+  },
+  {
+   "id": "W89",
+   "apelido": "Dorin do Abismo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 25,
+   "op": 33.8994140625,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 15,
+    "seed": "2429512349616136164"
+   },
+   "sha256": "b76f5d46c5e86768e8f8e0fba90d67895d5f303b9af810e541d392d467d97291",
+   "arquivo": "W89.json"
+  },
+  {
+   "id": "W90",
+   "apelido": "Kael do Lume",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 28,
+   "op": 34.1298828125,
+   "andar_de_extracao": 24,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 295,
+    "seed": "6353003691253294905"
+   },
+   "sha256": "9f5b9ae529b3bae058e445606b4629c8fc0a0fdc9abce0abca4473bcda734806",
+   "arquivo": "W90.json"
+  },
+  {
+   "id": "W91",
+   "apelido": "Cirro do Abismo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 26,
+   "op": 34.2451171875,
+   "andar_de_extracao": 25,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 263,
+    "seed": "476946257793290563"
+   },
+   "sha256": "056518d3726df8e94f0a6b7107923a7fab20b3b0b74ce21216baf03e723172b9",
+   "arquivo": "W91.json"
+  },
+  {
+   "id": "W92",
+   "apelido": "Gael do Sal",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 34.7060546875,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 184,
+    "seed": "3711095965219298022"
+   },
+   "sha256": "4d5b5bec9e74b12c7df4e63b829cd9768ddf3b76015c4c99bce3443ac77881a1",
+   "arquivo": "W92.json"
+  },
+  {
+   "id": "W93",
+   "apelido": "Bruma do Granito",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 24,
+   "op": 35.1669921875,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 28,
+    "seed": "16655269870907675600"
+   },
+   "sha256": "b3f2bb0700dfb97f1f2280146e53db341bbedaf0fbf6c09eb030e895b6267255",
+   "arquivo": "W93.json"
+  },
+  {
+   "id": "W94",
+   "apelido": "Ébano do Junco",
+   "classe": "warrior",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 25,
+   "op": 35.8583984375,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 93,
+    "seed": "5959443396375608316"
+   },
+   "sha256": "3bc92e64e396f857f78de71d2c60fc82cade7b7e0593799963101561bdf7d1aa",
+   "arquivo": "W94.json"
+  },
+  {
+   "id": "W95",
+   "apelido": "Rana da Geada",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 29,
+   "op": 37.4716796875,
+   "andar_de_extracao": 26,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 87,
+    "seed": "17028768007165701291"
+   },
+   "sha256": "03133f3dffa2590165356695a6948a3342fa13e5fcbb4f65bec5bcd62c43dcd5",
+   "arquivo": "W95.json"
+  },
+  {
+   "id": "W96",
+   "apelido": "Iago do Abismo",
+   "classe": "warrior",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 29,
+   "op": 42.369140625,
+   "andar_de_extracao": 27,
+   "origem": {
+    "fonte": "copa_03_fora_da_faixa",
+    "versao": "v2",
+    "tentativa": 67,
+    "seed": "7488591496836264949"
+   },
+   "sha256": "71356933905686cb34f224e2668fe43bc470d67d2f62baea4c91c33542b713db",
+   "arquivo": "W96.json"
+  },
+  {
+   "id": "M01",
+   "apelido": "Aldo da Lança",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 21,
+   "op": 30.2119140625,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 1,
+    "seed": "10589380679554223221"
+   },
+   "sha256": "0a5c8d37a1e6a7948af2d7f87dd4b7992d04e70a1a7ce0ad9fd147858a6d2a80",
+   "arquivo": "M01.json"
+  },
+  {
+   "id": "M02",
+   "apelido": "Kael do Penhasco",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 21,
+   "op": 30.4423828125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 2,
+    "seed": "3373143991458687886"
+   },
+   "sha256": "bbb303e3289dbdf04019f1ca54f485eed72aa5c374442707da28c1499073a25b",
+   "arquivo": "M02.json"
+  },
+  {
+   "id": "M03",
+   "apelido": "Ébano do Espinho",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 19,
+   "op": 28.2529296875,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 3,
+    "seed": "13088473458148340880"
+   },
+   "sha256": "cc8b2b186ac861dc1278898ef1606c974e0156c71da3647703a2e53e4239470d",
+   "arquivo": "M03.json"
+  },
+  {
+   "id": "M04",
+   "apelido": "Wren da Lança",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 28.4833984375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 5,
+    "seed": "10046465572753129987"
+   },
+   "sha256": "1474bfb41193b59a55e64596526903299bade198fd5fd0afaa7ee55e47c07c3b",
+   "arquivo": "M04.json"
+  },
+  {
+   "id": "M05",
+   "apelido": "Ébano da Geada",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 20,
+   "op": 28.4833984375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 8,
+    "seed": "6591422722547926298"
+   },
+   "sha256": "d460bb17d1c17ff86ece38a9f0ad4c9de2c805b401e1cffbf260813fb1a96a05",
+   "arquivo": "M05.json"
+  },
+  {
+   "id": "M06",
+   "apelido": "Iago do Junco",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 18,
+   "op": 28.7138671875,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 3,
+    "seed": "463577616793653040"
+   },
+   "sha256": "9ca7bb4ccbb898799a7ac58e6cbfc8c5630ce45a18dc8c442ed91a7518e24711",
+   "arquivo": "M06.json"
+  },
+  {
+   "id": "M07",
+   "apelido": "Lira da Brasa",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 20,
+   "op": 27.9072265625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 10,
+    "seed": "288088028846527073"
+   },
+   "sha256": "381e91d7d460c6c05d8036383e1ee5e094fa8bbcbb0de521a8971003ac305a68",
+   "arquivo": "M07.json"
+  },
+  {
+   "id": "M08",
+   "apelido": "Bruma do Lobo",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 32.9775390625,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 12,
+    "seed": "2923400136418625383"
+   },
+   "sha256": "769bd1109e508114ae95cd7118c29790abf052518b45e75f5a20384a669284a4",
+   "arquivo": "M08.json"
+  },
+  {
+   "id": "M09",
+   "apelido": "Vesna do Eclipse",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 2,
+   "op": 4.2769775390625,
+   "andar_de_extracao": 8,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 13,
+    "seed": "3055665148829755002"
+   },
+   "sha256": "0cf2e6cdea3cf321adfa7d52ea6ebea83738acbafc1dcf3e1279407bff2e5d31",
+   "arquivo": "M09.json"
+  },
+  {
+   "id": "M10",
+   "apelido": "Maren da Torre",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 28.8291015625,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 14,
+    "seed": "13136684884117296770"
+   },
+   "sha256": "bdf6eee29e9949684e8933c0e2d082455fc702266a2259efdfeb5c9193a1bd3c",
+   "arquivo": "M10.json"
+  },
+  {
+   "id": "M11",
+   "apelido": "Cirro da Forja",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 25,
+   "op": 32.1708984375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 2,
+    "seed": "17557321864463906934"
+   },
+   "sha256": "592f2987e320a831e99cfe59d9ce15981352efa8c4fdbf494489c29c1520a8d3",
+   "arquivo": "M11.json"
+  },
+  {
+   "id": "M12",
+   "apelido": "Wren da Cinza",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 28.5986328125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 7,
+    "seed": "7857356135227955684"
+   },
+   "sha256": "a969ce66384c9fceeb785c06e23f979903a0fef5ddf43a348c0b1777b7fe977a",
+   "arquivo": "M12.json"
+  },
+  {
+   "id": "M13",
+   "apelido": "Yara do Eclipse",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 31.1337890625,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 9,
+    "seed": "5161800761589491322"
+   },
+   "sha256": "05e2c4cb8c6cb68bb6bc11185cab5909399c72b1c9f569121f59a5d413be2890",
+   "arquivo": "M13.json"
+  },
+  {
+   "id": "M14",
+   "apelido": "Ulme do Lobo",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 27,
+   "op": 32.7470703125,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 10,
+    "seed": "3554689375528368224"
+   },
+   "sha256": "8c26592fcebeb4aaedf5f938fb6618bfa04947e3deb3e88e31d8a87c19507170",
+   "arquivo": "M14.json"
+  },
+  {
+   "id": "M15",
+   "apelido": "Quila da Forja",
+   "classe": "mage",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 22,
+   "op": 28.5986328125,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 12,
+    "seed": "10634002019615855358"
+   },
+   "sha256": "2db73cc8d6eab31eb740b48cedbe427d6c62b8225d12ba9f3e2f4027073d618c",
+   "arquivo": "M15.json"
+  },
+  {
+   "id": "M16",
+   "apelido": "Dorin da Lança",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 24,
+   "op": 32.0556640625,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 4,
+    "seed": "17088095747423714288"
+   },
+   "sha256": "193e78e0550227de77910e4f686b707efe7551d9c6aa048eae51abeb877b74b9",
+   "arquivo": "M16.json"
+  },
+  {
+   "id": "M17",
+   "apelido": "Hesta do Rochedo",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 29.5205078125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 7,
+    "seed": "601471190494630592"
+   },
+   "sha256": "9d15f74f4ea4af6d9df3e793c3bea9efb013bee44b06729def598a64231f6d4a",
+   "arquivo": "M17.json"
+  },
+  {
+   "id": "M18",
+   "apelido": "Iago do Cardo",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 20,
+   "op": 30.3271484375,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 12,
+    "seed": "16700213100988565646"
+   },
+   "sha256": "2f09d5964f036ad87d539e507ba49840c5765bb073cadc16abeed991be644697",
+   "arquivo": "M18.json"
+  },
+  {
+   "id": "M19",
+   "apelido": "Dália da Névoa",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 30.9033203125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 15,
+    "seed": "9883933165321650466"
+   },
+   "sha256": "5f3cd275d9688bebca735ac3668166df00e734ca07a37feecc81f9f743719859",
+   "arquivo": "M19.json"
+  },
+  {
+   "id": "M20",
+   "apelido": "Aldo do Corvo",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 21,
+   "op": 29.4052734375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 16,
+    "seed": "8482184746882286868"
+   },
+   "sha256": "5f7c8029b2c6d9c940bd464f5017eb0b16c90b7f493843463ec60f3fabd23f84",
+   "arquivo": "M20.json"
+  },
+  {
+   "id": "M21",
+   "apelido": "Tália da Vigília",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 30.5576171875,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 1,
+    "seed": "9948405280617193863"
+   },
+   "sha256": "a3b02b18ee0b811654a00fb188c9098bec7fac148060aa8efb0bf840564ff70b",
+   "arquivo": "M21.json"
+  },
+  {
+   "id": "M22",
+   "apelido": "Pira da Serra",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 20,
+   "op": 30.2119140625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 3,
+    "seed": "15302510310663398734"
+   },
+   "sha256": "5ceaa40aa7bc7a9f517b7ea17bb57d96d0036a4fad1ce183cb45e371c84f30ea",
+   "arquivo": "M22.json"
+  },
+  {
+   "id": "M23",
+   "apelido": "Yara da Névoa",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 30.7880859375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 5,
+    "seed": "17841467818588650845"
+   },
+   "sha256": "b87c248c2af72ad764a4b184b1652091bca7d46f0b926589b9b1b9b194b66b0b",
+   "arquivo": "M23.json"
+  },
+  {
+   "id": "M24",
+   "apelido": "Cirro do Cardo",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 31.1337890625,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 7,
+    "seed": "3013478406876088699"
+   },
+   "sha256": "612000ad13a0bfa4ed9ec3ad8ec7f85c4ca8a8e405df0d7d50edeac39bc42c93",
+   "arquivo": "M24.json"
+  },
+  {
+   "id": "M25",
+   "apelido": "Faro da Névoa",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 30.5576171875,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 8,
+    "seed": "17493233258348464201"
+   },
+   "sha256": "1027e2bc7350cbc78468c03c5cc4375d8c69199d5300b2ae5c5add44457211d3",
+   "arquivo": "M25.json"
+  },
+  {
+   "id": "M26",
+   "apelido": "Ébano do Rochedo",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.5205078125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 12,
+    "seed": "2839458879776211512"
+   },
+   "sha256": "5f5d9a7c0be35f8eb09cdf9e31c3e7c03567cdeddde95ff70d4169793184fe5d",
+   "arquivo": "M26.json"
+  },
+  {
+   "id": "M27",
+   "apelido": "Brisa do Rochedo",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 35.3974609375,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 13,
+    "seed": "5047570135112767981"
+   },
+   "sha256": "587ca204bceada684c9f050d67c5e2c7655038e16fd98615f5bdfb68055871f1",
+   "arquivo": "M27.json"
+  },
+  {
+   "id": "M28",
+   "apelido": "Nilo da Vigília",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 31.2490234375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 17,
+    "seed": "1870544910578981368"
+   },
+   "sha256": "75e92011521d6ecd24d452ede55f76d99f324fa4e380dfaf89c81cf44503f87f",
+   "arquivo": "M28.json"
+  },
+  {
+   "id": "M29",
+   "apelido": "Ébano do Lume",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 30.2119140625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 28,
+    "seed": "8253078826789589107"
+   },
+   "sha256": "62d99cb8e0df81b098b57fccdba7a20be33b6b1582a9b38e10e606e49f79166c",
+   "arquivo": "M29.json"
+  },
+  {
+   "id": "M30",
+   "apelido": "Bruma do Penhasco",
+   "classe": "mage",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 33.5537109375,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 40,
+    "seed": "18088042997015853286"
+   },
+   "sha256": "f1a6a68319366177b31383eb71378e19aa9c9e2611d0b60705e44c248f76390e",
+   "arquivo": "M30.json"
+  },
+  {
+   "id": "M31",
+   "apelido": "Esra da Pedra",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 26,
+   "op": 34.3603515625,
+   "andar_de_extracao": 24,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 2,
+    "seed": "12405028522044424638"
+   },
+   "sha256": "0e6863194c253beda26bfbb7addb9e40e5022800b062b8a38272170ea8844de3",
+   "arquivo": "M31.json"
+  },
+  {
+   "id": "M32",
+   "apelido": "Oriel do Espinho",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 27,
+   "op": 35.7431640625,
+   "andar_de_extracao": 25,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 3,
+    "seed": "16920637555811294449"
+   },
+   "sha256": "ba23673f003b88590ff77cdadbd7a795fabc558ffac74ea6b2ba28ac6b0d6fc2",
+   "arquivo": "M32.json"
+  },
+  {
+   "id": "M33",
+   "apelido": "Quila da Fenda",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 25,
+   "op": 35.2822265625,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 4,
+    "seed": "4406473266775733877"
+   },
+   "sha256": "9f39d2994a37600f5e94c1dbe474a96bc0adf67e4d5aca19f92978a850514ba1",
+   "arquivo": "M33.json"
+  },
+  {
+   "id": "M34",
+   "apelido": "Dorin da Aurora",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 21,
+   "op": 30.6728515625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 5,
+    "seed": "11635392497345010939"
+   },
+   "sha256": "e87528bedb4f2c797e6f37f8fa87bad5e28913f5432ba6bf1bfd958519d23fc1",
+   "arquivo": "M34.json"
+  },
+  {
+   "id": "M35",
+   "apelido": "Caeli da Areia",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 31.2490234375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 8,
+    "seed": "2745128889673000834"
+   },
+   "sha256": "ed483431fd3fe38127c13be8aaaabfc710f5fabd28fb115762f11545191ae617",
+   "arquivo": "M35.json"
+  },
+  {
+   "id": "M36",
+   "apelido": "Pira do Sal",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 24,
+   "op": 32.0556640625,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 10,
+    "seed": "17087330742850030297"
+   },
+   "sha256": "ae22d577aaeecd4083f160f6cba99165f4d47130a4d95a59c3d3ceec1cfe448a",
+   "arquivo": "M36.json"
+  },
+  {
+   "id": "M37",
+   "apelido": "Vesna da Brasa",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 30.9033203125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 12,
+    "seed": "14240164299099180410"
+   },
+   "sha256": "155248eb5d13655fe18269b5e388e30c52012b1809e21036a3cefa3eb2cbb5d9",
+   "arquivo": "M37.json"
+  },
+  {
+   "id": "M38",
+   "apelido": "Sauro do Eclipse",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 32.4013671875,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 14,
+    "seed": "14865960696819074943"
+   },
+   "sha256": "c1bbe2731eff00d5f4e8851ac31027bbae19bcc07e77fde38b5cba7b4eed6caf",
+   "arquivo": "M38.json"
+  },
+  {
+   "id": "M39",
+   "apelido": "Xisto do Vau",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 20,
+   "op": 31.0185546875,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 15,
+    "seed": "5327037967505469112"
+   },
+   "sha256": "c465f905d9758e4cda011edc5ccc8b31e17bc3e814ea5f70872380f7d50f08d3",
+   "arquivo": "M39.json"
+  },
+  {
+   "id": "M40",
+   "apelido": "Pira do Eclipse",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 30.7880859375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 18,
+    "seed": "3264595895570877111"
+   },
+   "sha256": "f0ee21ceeded6d4d31fb6069cb0bb22e300212d46819c8c9e82eb43783b15eb2",
+   "arquivo": "M40.json"
+  },
+  {
+   "id": "M41",
+   "apelido": "Brisa do Junco",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 27,
+   "op": 33.6689453125,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 2,
+    "seed": "8443605338776237019"
+   },
+   "sha256": "933d9e720fcc8f872bc2c30d67c6e51696e4521743a27bd50cfedbe2758b4dc7",
+   "arquivo": "M41.json"
+  },
+  {
+   "id": "M42",
+   "apelido": "Dália do Granito",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 22,
+   "op": 31.2490234375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 4,
+    "seed": "149553577479527826"
+   },
+   "sha256": "8c464e061e3526a13e84bd4fbd3ff0d3a60ef91b9551a294193fb2dec886cde1",
+   "arquivo": "M42.json"
+  },
+  {
+   "id": "M43",
+   "apelido": "Dália do Lume",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 31.1337890625,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 6,
+    "seed": "8708642442821856947"
+   },
+   "sha256": "489745455376f90826d0b2be5c1e8a51aeb93ce8470dbb9f0478b0f5d155e6bd",
+   "arquivo": "M43.json"
+  },
+  {
+   "id": "M44",
+   "apelido": "Dália da Cinza",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 25,
+   "op": 31.8251953125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 8,
+    "seed": "16538841447363030851"
+   },
+   "sha256": "2baa9e75ca211b130eb228089a319f304d7127eab47eda7e7ed511e97b02f1b1",
+   "arquivo": "M44.json"
+  },
+  {
+   "id": "M45",
+   "apelido": "Wren do Trovão",
+   "classe": "mage",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 25,
+   "op": 33.5537109375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 10,
+    "seed": "951835902864764605"
+   },
+   "sha256": "519727121657040e45506cd3a6022524699925b592b1216cbb9bc79259fe6669",
+   "arquivo": "M45.json"
+  },
+  {
+   "id": "R01",
+   "apelido": "Fírio do Espinho",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 28.4833984375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 6,
+    "seed": "6872419384663970029"
+   },
+   "sha256": "e969384c94f5cb8edef9d2703e2d594ae5fe84ea4cfb78f6f110298a0b1815c6",
+   "arquivo": "R01.json"
+  },
+  {
+   "id": "R02",
+   "apelido": "Vesna do Lume",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 21,
+   "op": 28.8291015625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 8,
+    "seed": "3777792147030540123"
+   },
+   "sha256": "09f1a7ed552a169afa8e82ffb34ed065bc7e9b4b55700bbd10b012e5220b7087",
+   "arquivo": "R02.json"
+  },
+  {
+   "id": "R03",
+   "apelido": "Bruma do Corvo",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 22,
+   "op": 28.8291015625,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 12,
+    "seed": "4019553869280077470"
+   },
+   "sha256": "da127941ac520d3640174c04153b3bf6c22b6f8521934b1d66c5218cb7f5ffc8",
+   "arquivo": "R03.json"
+  },
+  {
+   "id": "R04",
+   "apelido": "Iago da Torre",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 24,
+   "op": 32.6318359375,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 24,
+    "seed": "13080224753454690836"
+   },
+   "sha256": "2488b823197697748d0088ac8fc01e196e14fa6bc2d8c075031381c502cf7f01",
+   "arquivo": "R04.json"
+  },
+  {
+   "id": "R05",
+   "apelido": "Iago da Geada",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "survival",
+   "nivel": 20,
+   "op": 28.8291015625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 29,
+    "seed": "3069267973807384716"
+   },
+   "sha256": "e8e5f99c7504d5429cc115d6882d19d726ee888774305ec445c58f9c6f5fae4c",
+   "arquivo": "R05.json"
+  },
+  {
+   "id": "R06",
+   "apelido": "Wren do Penhasco",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 29.8662109375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 10,
+    "seed": "16971128498801824826"
+   },
+   "sha256": "ae6ee8de98e30917308d284e56f3095ac541e801c5acae8c6d5eeeba47715ea2",
+   "arquivo": "R06.json"
+  },
+  {
+   "id": "R07",
+   "apelido": "Yara da Forja",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 20,
+   "op": 28.0224609375,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 21,
+    "seed": "15215927899474474349"
+   },
+   "sha256": "181967fd55cd4d7bfc55cf23d74f58ccb62b9c762f3286fb32b5a36d06c58894",
+   "arquivo": "R07.json"
+  },
+  {
+   "id": "R08",
+   "apelido": "Aldo da Cinza",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 29.0595703125,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 33,
+    "seed": "13633777905610681335"
+   },
+   "sha256": "a0273aae885c842eac8eac9cb29be76c530fe1352f33cf2c8cf650a3aebc21d3",
+   "arquivo": "R08.json"
+  },
+  {
+   "id": "R09",
+   "apelido": "Ulme do Sal",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 28.4833984375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 34,
+    "seed": "15620572392515199139"
+   },
+   "sha256": "9e2029a68d1446c46da7cd4c61fb0d778549ec54bad522966bdb7afa8a03c244",
+   "arquivo": "R09.json"
+  },
+  {
+   "id": "R10",
+   "apelido": "Zeno do Vau",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "offense",
+   "nivel": 20,
+   "op": 28.0224609375,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 41,
+    "seed": "15353550019674060363"
+   },
+   "sha256": "eff4df06018e44d8d654f90b328981df7b62e0fcb5676f4e0fd88347ce46779e",
+   "arquivo": "R10.json"
+  },
+  {
+   "id": "R11",
+   "apelido": "Faro do Lobo",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 25,
+   "op": 35.3974609375,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 11,
+    "seed": "13061186693933013009"
+   },
+   "sha256": "9a73872c5d2b7759a925ea5b9ab77b40307d41e5d907f27a0df62f116cfb2683",
+   "arquivo": "R11.json"
+  },
+  {
+   "id": "R12",
+   "apelido": "Rana do Penhasco",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 30.0966796875,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 13,
+    "seed": "11593707915603335641"
+   },
+   "sha256": "81143dcfbd434ee3d8ee340c9737296944a8693e6e92f182ebf1e309aa21cde3",
+   "arquivo": "R12.json"
+  },
+  {
+   "id": "R13",
+   "apelido": "Yara da Pedra",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 30.9033203125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 14,
+    "seed": "6922245767251511348"
+   },
+   "sha256": "21759875617511c83356ce2fdb4f85ac6434dfa9318f6534201a1ac031b4f0e1",
+   "arquivo": "R13.json"
+  },
+  {
+   "id": "R14",
+   "apelido": "Bruma da Serra",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 32.7470703125,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 17,
+    "seed": "10061217775981695490"
+   },
+   "sha256": "9ac38243ffe0946bccfb2dc44b3fc722a82aa29d66008771be7927e877e5b432",
+   "arquivo": "R14.json"
+  },
+  {
+   "id": "R15",
+   "apelido": "Kael da Fenda",
+   "classe": "rogue",
+   "perfil": "conservador",
+   "politica": "economy",
+   "nivel": 22,
+   "op": 28.1376953125,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 24,
+    "seed": "5143649908500175489"
+   },
+   "sha256": "192d4c8ee526932bc0a41db607d5287d2573d25711a33c607eff3c86b75fffd3",
+   "arquivo": "R15.json"
+  },
+  {
+   "id": "R16",
+   "apelido": "Maren do Ermo",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 29.6357421875,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 1,
+    "seed": "17286678554745022275"
+   },
+   "sha256": "69cc9b36b822a9fda05cdf13122812d8089979fce0f01b23c45b6dee89dc40f8",
+   "arquivo": "R16.json"
+  },
+  {
+   "id": "R17",
+   "apelido": "Zeno do Abismo",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 29.4052734375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 5,
+    "seed": "3647113154434836632"
+   },
+   "sha256": "b0629fe5d57fa72472b8a4fec233f5cb92b3166696e608bc4a375317f0fb98b9",
+   "arquivo": "R17.json"
+  },
+  {
+   "id": "R18",
+   "apelido": "Ulme do Junco",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 20,
+   "op": 29.4052734375,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 7,
+    "seed": "305980943498864936"
+   },
+   "sha256": "010da1202650a09039ab970c3377f46e100632a0f3911ecc9d7935b175c165e9",
+   "arquivo": "R18.json"
+  },
+  {
+   "id": "R19",
+   "apelido": "Iago da Vigília",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 28.4833984375,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 11,
+    "seed": "8269424763475282680"
+   },
+   "sha256": "b5ddb86a000f680e606fab6f277cf19471b29d71c2d7da2d53065bc7af99ee48",
+   "arquivo": "R19.json"
+  },
+  {
+   "id": "R20",
+   "apelido": "Jora do Sal",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "survival",
+   "nivel": 21,
+   "op": 29.4052734375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 20,
+    "seed": "17111062862548642836"
+   },
+   "sha256": "df28e0836c3c163c162685415e5d4efe41cff09c441babfecddde7a421f541dd",
+   "arquivo": "R20.json"
+  },
+  {
+   "id": "R21",
+   "apelido": "Dália do Sal",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 29.4052734375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 4,
+    "seed": "15662319361201208152"
+   },
+   "sha256": "fcddb2a22c5db81ac1b1f3fe3e1979d285be2206e0172ecc78b433de5eb26688",
+   "arquivo": "R21.json"
+  },
+  {
+   "id": "R22",
+   "apelido": "Oriel do Granito",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 25,
+   "op": 33.4384765625,
+   "andar_de_extracao": 24,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 6,
+    "seed": "13685868135508548834"
+   },
+   "sha256": "bab0e2669e0a7095f7c87e30601b812520f8cd5a8fe139d372fbdd7d8c960f75",
+   "arquivo": "R22.json"
+  },
+  {
+   "id": "R23",
+   "apelido": "Vesna da Maré",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 31.1337890625,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 13,
+    "seed": "6399925192054527557"
+   },
+   "sha256": "a6dabed3a8a9568d0987b7f704eac38848a1581409ae85c0cc794c0e5b4b28bd",
+   "arquivo": "R23.json"
+  },
+  {
+   "id": "R24",
+   "apelido": "Sauro do Ermo",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 23,
+   "op": 29.9814453125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 14,
+    "seed": "13188580015059978683"
+   },
+   "sha256": "a6fd2a180e7776b287b8a32fa53a406425c2bc850156e4e50affa8fcaf308a03",
+   "arquivo": "R24.json"
+  },
+  {
+   "id": "R25",
+   "apelido": "Xisto da Serra",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "offense",
+   "nivel": 19,
+   "op": 30.5576171875,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 17,
+    "seed": "13212831842481163527"
+   },
+   "sha256": "8eb71466dc7249499c7f0c1c1c960297916d957e21b4afa3eb2532e18eb40552",
+   "arquivo": "R25.json"
+  },
+  {
+   "id": "R26",
+   "apelido": "Rana da Fenda",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 27,
+   "op": 30.9033203125,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 4,
+    "seed": "12902169242471688882"
+   },
+   "sha256": "fb1e7839bb5053130a3d5d56c6bb3056adf9b281d2383fe0bbb6de7aaf00f7d2",
+   "arquivo": "R26.json"
+  },
+  {
+   "id": "R27",
+   "apelido": "Dorin do Espinho",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 30.3271484375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 19,
+    "seed": "17789049440650826421"
+   },
+   "sha256": "1903e062a2d63263b8c2dac7ffd4a10ae1cb1cea301d089c3c9c7ae5883e2a7d",
+   "arquivo": "R27.json"
+  },
+  {
+   "id": "R28",
+   "apelido": "Dália do Penhasco",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 29.9814453125,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 22,
+    "seed": "7402829239627967665"
+   },
+   "sha256": "6472f77da9d578cd7ad75e008c94dcbceef49a93523e9a290ba99bfc8e7a932b",
+   "arquivo": "R28.json"
+  },
+  {
+   "id": "R29",
+   "apelido": "Brisa da Aurora",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 25,
+   "op": 29.5205078125,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 25,
+    "seed": "15488738090544981444"
+   },
+   "sha256": "7167e14821849b21eda6d1c3b4853524c17437dcf715779097720bfef93976ad",
+   "arquivo": "R29.json"
+  },
+  {
+   "id": "R30",
+   "apelido": "Bruma da Cinza",
+   "classe": "rogue",
+   "perfil": "moderado",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 30.5576171875,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 27,
+    "seed": "14693651421855125553"
+   },
+   "sha256": "c604e75d56e2c4441df5d96c10c58b826b35db2710fa98dfed3f1dbd76ecce0b",
+   "arquivo": "R30.json"
+  },
+  {
+   "id": "R31",
+   "apelido": "Tália do Eclipse",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 27,
+   "op": 36.0888671875,
+   "andar_de_extracao": 25,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 3,
+    "seed": "5715610910949050668"
+   },
+   "sha256": "52b93c2c4bfc70b26ae222646f8434da5f3349d2a28b2f5cc572758a58a3c9d0",
+   "arquivo": "R31.json"
+  },
+  {
+   "id": "R32",
+   "apelido": "Maren da Aurora",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 30.7880859375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 5,
+    "seed": "3826624072130668531"
+   },
+   "sha256": "4eaab1381caf36e4ac6a99756e3e63164cd1b35895de5674183b6578b275679e",
+   "arquivo": "R32.json"
+  },
+  {
+   "id": "R33",
+   "apelido": "Ulme do Trovão",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 26,
+   "op": 32.8623046875,
+   "andar_de_extracao": 24,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 6,
+    "seed": "3801545186860354049"
+   },
+   "sha256": "f25c806195952dac53c757b105c9138912f1199056c5e8f2b634dce2a3c013e3",
+   "arquivo": "R33.json"
+  },
+  {
+   "id": "R34",
+   "apelido": "Faro da Torre",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 29,
+   "op": 37.4716796875,
+   "andar_de_extracao": 26,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 8,
+    "seed": "17233915939498307087"
+   },
+   "sha256": "ca65b8025d4f8bd840771cf60429db22f305e578fcb04970a479a7307456fef3",
+   "arquivo": "R34.json"
+  },
+  {
+   "id": "R35",
+   "apelido": "Tália do Trovão",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "survival",
+   "nivel": 23,
+   "op": 30.6728515625,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 10,
+    "seed": "7143001235224682809"
+   },
+   "sha256": "a9d5184ecfa7091b36fa4aa00070cf6c5f8bf50e4c317857b306e6e225ec8461",
+   "arquivo": "R35.json"
+  },
+  {
+   "id": "R36",
+   "apelido": "Iago do Rochedo",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 30.7880859375,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 5,
+    "seed": "10920730334781643775"
+   },
+   "sha256": "0f6a976b44ef0ef5aa4510da7beda012dda8cf7874d3b29e1793e572794ef757",
+   "arquivo": "R36.json"
+  },
+  {
+   "id": "R37",
+   "apelido": "Wren do Corvo",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 21,
+   "op": 29.4052734375,
+   "andar_de_extracao": 19,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 14,
+    "seed": "13772577068576870368"
+   },
+   "sha256": "dcd0e04a8ba18a7be17c7f6a7eea1d514bdff23cb3f18edbbe60b87241b0f318",
+   "arquivo": "R37.json"
+  },
+  {
+   "id": "R38",
+   "apelido": "Brisa da Maré",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 31.7099609375,
+   "andar_de_extracao": 21,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 24,
+    "seed": "12179894518658572602"
+   },
+   "sha256": "6ccbf99d3f6c1847478c6ac1cd4e8a3381f00a8e70fff42b6f3667e9e6e53594",
+   "arquivo": "R38.json"
+  },
+  {
+   "id": "R39",
+   "apelido": "Dália da Brasa",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 26,
+   "op": 35.3974609375,
+   "andar_de_extracao": 25,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 29,
+    "seed": "4905925526712755731"
+   },
+   "sha256": "faee7533f6058dff5ee4266b0f15393e040d6d66ea14c23aa78aa7674a90aa93",
+   "arquivo": "R39.json"
+  },
+  {
+   "id": "R40",
+   "apelido": "Nilo da Forja",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "offense",
+   "nivel": 22,
+   "op": 32.8623046875,
+   "andar_de_extracao": 20,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 31,
+    "seed": "13464486417206879230"
+   },
+   "sha256": "c6081f3962e198c1bafc9cb5e4d1502fccb9e7bd0285438d499eb0a741956445",
+   "arquivo": "R40.json"
+  },
+  {
+   "id": "R41",
+   "apelido": "Jora do Lume",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 23,
+   "op": 30.7880859375,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 6,
+    "seed": "11387481442612232587"
+   },
+   "sha256": "b480d2038362776386773fc2f4e43b558182d17da54e8484bf0efbd8c9b57248",
+   "arquivo": "R41.json"
+  },
+  {
+   "id": "R42",
+   "apelido": "Ulme da Névoa",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 22,
+   "op": 30.6728515625,
+   "andar_de_extracao": 17,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 8,
+    "seed": "4831862400529185532"
+   },
+   "sha256": "74a8adb697202d7154c77ca4343dfc5975178e2b113f4313f041e553daeb6a43",
+   "arquivo": "R42.json"
+  },
+  {
+   "id": "R43",
+   "apelido": "Nilo da Torre",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 24,
+   "op": 30.6728515625,
+   "andar_de_extracao": 18,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 26,
+    "seed": "7038744527733455422"
+   },
+   "sha256": "41aa90dc80276d0905be318eab4e14f427b827b3a3e4757475211fd3d0a0f779",
+   "arquivo": "R43.json"
+  },
+  {
+   "id": "R44",
+   "apelido": "Dália da Geada",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 28,
+   "op": 34.8212890625,
+   "andar_de_extracao": 22,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 32,
+    "seed": "15402562124101114462"
+   },
+   "sha256": "e0d6ef625790e220ff06c0f615f5a5debd15faa7bb02a412256398f5cea261f0",
+   "arquivo": "R44.json"
+  },
+  {
+   "id": "R45",
+   "apelido": "Iago do Sal",
+   "classe": "rogue",
+   "perfil": "hardcore",
+   "politica": "economy",
+   "nivel": 28,
+   "op": 33.8994140625,
+   "andar_de_extracao": 23,
+   "origem": {
+    "fonte": "arena_offline",
+    "versao": "v2",
+    "tentativa": 41,
+    "seed": "9940240850586800607"
+   },
+   "sha256": "01de72bf4b45ca928c3ceaad93c5b02853be7ccc9b4e803f1eab33303cbdaa29",
+   "arquivo": "R45.json"
+  }
+ ]
+}

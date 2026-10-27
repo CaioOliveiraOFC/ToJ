@@ -1,0 +1,268 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6295,
+ "dungeon_level": 24,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 6.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Colete da Resistência",
+   "socket_count": 1
+  },
+  "Hands": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    }
+   ],
+   "name": "Escudo Torre",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 5.0
+    }
+   ],
+   "name": "Capacete de Couro"
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Couro"
+  },
+  "Shoes": {
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 5
+    }
+   ],
+   "name": "Gládio de Ferro",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "name": "Espada de Ferro"
+  }
+ },
+ "extracted_on_floor": 24,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 10003,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Clava Pesada"
+  },
+  {
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  {
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Espada da Vingança",
+   "socket_count": 2
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    }
+   ],
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Gládio de Ferro",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Machado Terrível",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Tamancos de Madeira"
+  },
+  {
+   "name": "Arco Curto"
+  }
+ ],
+ "last_interest_floor": 23,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 40915,
+  "gold_from_combat": 27519,
+  "gold_from_interest": 1721,
+  "gold_from_sale": 11675,
+  "gold_spent": 34620,
+  "gold_spent_on_consumable": 1206,
+  "gold_spent_on_enchant": 2227,
+  "gold_spent_on_enhancement": 4474,
+  "gold_spent_on_exit_fee": 8234,
+  "gold_spent_on_gear": 16189,
+  "gold_spent_on_recovery": 1064,
+  "gold_spent_on_socket": 1226,
+  "interest_payments": 23,
+  "items_dropped": 47,
+  "items_equipped": 48,
+  "items_sold": 28,
+  "max_gold_held": 9549,
+  "paid_exits": 23,
+  "purchases": 65
+ },
+ "level": 25,
+ "map_state": null,
+ "mp": 284,
+ "passives": [
+  "sangue_guerreiro",
+  "pele_de_sal",
+  "instinto_frio",
+  "furia_berserker",
+  "sangue_guerreiro",
+  "musculos_aco",
+  "olho_aguia",
+  "olho_de_cacador",
+  "olho_aguia",
+  "essencia_fluida",
+  "olho_de_cacador",
+  "sede_silenciosa",
+  "coracao_ferro",
+  "sangue_guerreiro",
+  "mente_serena",
+  "reflexos_rapidos",
+  "boca_de_sangue",
+  "lamina_afiada",
+  "escudo_fe",
+  "vulto",
+  "pele_de_sal",
+  "sangue_de_vidente",
+  "respiracao_contada",
+  "coracao_ferro"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "fortalecimento",
+  "golpe_poderoso",
+  "investida",
+  "mao_dupla",
+  "marca_do_acougueiro",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_estocada_seca",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "provocacao",
+  "sede_de_batalha",
+  "tomar_folego",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "n_mira_calma",
+  "3": "n_passo_lateral",
+  "4": "tomar_folego"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 8070
+}

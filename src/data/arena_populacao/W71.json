@@ -1,0 +1,226 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 7414,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Armadura Titânica",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Manoplas de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Aço",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 5.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    },
+    null,
+    null
+   ],
+   "name": "Espada Lendária",
+   "socket_count": 3
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 6086,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Elmo de Couro"
+  },
+  {
+   "name": "Armadura de Camisa"
+  },
+  {
+   "name": "Machado Enferrujado"
+  },
+  {
+   "name": "Perneiras de Ferro",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 25564,
+  "gold_from_combat": 15801,
+  "gold_from_interest": 1110,
+  "gold_from_sale": 8653,
+  "gold_spent": 18150,
+  "gold_spent_on_consumable": 208,
+  "gold_spent_on_enchant": 1166,
+  "gold_spent_on_enhancement": 1614,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 10736,
+  "gold_spent_on_recovery": 302,
+  "gold_spent_on_socket": 419,
+  "interest_payments": 18,
+  "items_dropped": 38,
+  "items_equipped": 22,
+  "items_sold": 29,
+  "max_gold_held": 9341,
+  "paid_exits": 18,
+  "purchases": 47
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 352,
+ "passives": [
+  "alma_eterna",
+  "alquimia_do_desespero",
+  "ritmo_profano",
+  "bebida_deuses",
+  "essencia_fluida",
+  "sorte_iniciante",
+  "furia_berserker",
+  "bebida_deuses",
+  "sangue_guerreiro",
+  "olho_de_cacador",
+  "bebida_deuses",
+  "sangue_guerreiro",
+  "bebida_deuses",
+  "pele_grossa",
+  "reserva_arcana",
+  "poco_fundo",
+  "musculos_aco",
+  "mente_serena",
+  "maos_midas",
+  "maos_midas",
+  "poco_fundo"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "couraca_improvisada",
+  "fortalecimento",
+  "golpe_poderoso",
+  "investida",
+  "investida_de_ariete",
+  "mao_dupla",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_estocada_seca",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "postura_de_muro",
+  "soco_de_placa",
+  "veterania"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {
+  "mao_dupla": 1,
+  "n_mira_calma": 3
+ },
+ "skills": {
+  "1": "mao_dupla",
+  "2": "n_mira_calma",
+  "3": "n_travar_o_pulso",
+  "4": "n_curativo_de_campo"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 360
+}

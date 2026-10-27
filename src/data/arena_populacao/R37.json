@@ -1,0 +1,219 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4362,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Colete da Resistência",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "name": "Tamancos de Madeira"
+  },
+  "Weapon1": {
+   "name": "Lâmina Veloz"
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Ametista",
+   "level": 3
+  },
+  {
+   "gem_type": "Ônix",
+   "level": 3
+  },
+  {
+   "gem_type": "Ônix",
+   "level": 3
+  }
+ ],
+ "hp": 3029,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  {
+   "name": "Manto do Curandeiro"
+  },
+  {
+   "name": "Manto Etéreo",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 21167,
+  "gold_from_combat": 12727,
+  "gold_from_interest": 1136,
+  "gold_from_sale": 7304,
+  "gold_spent": 16805,
+  "gold_spent_on_consumable": 329,
+  "gold_spent_on_enhancement": 2042,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 9629,
+  "gold_spent_on_recovery": 371,
+  "gold_spent_on_socket": 729,
+  "interest_payments": 17,
+  "items_dropped": 25,
+  "items_equipped": 14,
+  "items_sold": 17,
+  "max_gold_held": 8215,
+  "paid_exits": 18,
+  "purchases": 51
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 837,
+ "passives": [
+  "voracidade",
+  "musculos_aco",
+  "voz_no_escuro",
+  "odio_antigo",
+  "sede_sangue",
+  "musculos_aco",
+  "musculos_aco",
+  "odio_baixo",
+  "odio_baixo",
+  "furia_berserker",
+  "olho_de_cacador",
+  "sede_sangue",
+  "olho_aguia",
+  "odio_antigo",
+  "odio_antigo",
+  "olho_de_cacador",
+  "odio_baixo",
+  "olho_de_cacador",
+  "furia_berserker",
+  "olho_de_cacador"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "capa_rasgada",
+  "cobranca_de_juros",
+  "corte_de_tendao",
+  "dose_da_viuva",
+  "evasao",
+  "faro_de_rua",
+  "ferida_paga",
+  "golpe_baixo",
+  "lamina_no_escuro",
+  "leitura_de_guarda",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_ritmo_de_duelo",
+  "n_voto_de_silencio"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "cobranca_de_juros",
+  "2": "n_encarar",
+  "3": "leitura_de_guarda",
+  "4": "assassinato"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 483
+}

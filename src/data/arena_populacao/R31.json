@@ -1,0 +1,289 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 8579,
+ "dungeon_level": 25,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 5
+    }
+   ],
+   "name": "Manto de Sombra",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Luvas de Couro"
+  },
+  "Helmet": {
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Tamancos de Madeira"
+  },
+  "Weapon1": {
+   "name": "Pá de Batalha"
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Bastão Cru"
+  }
+ },
+ "extracted_on_floor": 25,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 6781,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Arco da Precisão",
+   "socket_count": 2
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Adaga Sangrenta"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Espada do Universo",
+   "socket_count": 3
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Bandana de Tecido"
+  },
+  {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "name": "Perneiras de Couro"
+  },
+  {
+   "name": "Amuleto da Força",
+   "socket_count": 2
+  },
+  {
+   "name": "Cajado de Aprendiz"
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 24,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 53623,
+  "gold_from_combat": 33955,
+  "gold_from_interest": 3142,
+  "gold_from_sale": 16526,
+  "gold_spent": 45044,
+  "gold_spent_on_consumable": 57,
+  "gold_spent_on_enchant": 1978,
+  "gold_spent_on_enhancement": 4994,
+  "gold_spent_on_exit_fee": 9591,
+  "gold_spent_on_gear": 26435,
+  "gold_spent_on_recovery": 121,
+  "gold_spent_on_socket": 1868,
+  "interest_payments": 24,
+  "items_dropped": 49,
+  "items_equipped": 74,
+  "items_sold": 33,
+  "max_gold_held": 19685,
+  "paid_exits": 24,
+  "purchases": 64
+ },
+ "level": 27,
+ "map_state": null,
+ "mp": 1598,
+ "passives": [
+  "passos_leves",
+  "musculos_aco",
+  "poco_fundo",
+  "voracidade",
+  "escudo_fe",
+  "reflexos_rapidos",
+  "olho_aguia",
+  "pele_adamantio",
+  "sede_silenciosa",
+  "pele_de_sal",
+  "sangue_guerreiro",
+  "instinto_frio",
+  "passos_leves",
+  "pele_grossa",
+  "boca_de_sangue",
+  "reserva_arcana",
+  "olho_de_cacador",
+  "pele_grossa",
+  "bencao_divina",
+  "escudo_fe",
+  "boca_de_sangue",
+  "olho_aguia",
+  "olho_de_cacador",
+  "essencia_fluida",
+  "bencao_divina",
+  "instinto_frio"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "bolso_furado",
+  "corte_de_tendao",
+  "couro_endurecido",
+  "dose_da_viuva",
+  "evasao",
+  "faro_de_rua",
+  "ferida_paga",
+  "golpe_baixo",
+  "joelho_torto",
+  "lamina_no_escuro",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_grito_curto",
+  "n_guarda_cruzada",
+  "n_marca_do_cacador",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "passo_felino",
+  "picada_certeira",
+  "sombra_rapida",
+  "testamento_do_ladrao"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "corte_de_tendao",
+  "3": "ferida_paga",
+  "4": "n_couro_batido"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 3548
+}

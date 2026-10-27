@@ -1,0 +1,241 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6408,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Colete da Resistência",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Couro"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 7.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel de Ouro"
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Botas Fantasma",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 2,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 4660,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Arco Curto"
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    null
+   ],
+   "name": "Lâmina da Tempestade",
+   "socket_count": 2
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 9.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Agilidade",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 5,
+  "gold_earned": 32467,
+  "gold_from_combat": 21748,
+  "gold_from_interest": 1424,
+  "gold_from_sale": 9295,
+  "gold_spent": 26059,
+  "gold_spent_on_consumable": 1197,
+  "gold_spent_on_enchant": 1213,
+  "gold_spent_on_enhancement": 3150,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 12797,
+  "gold_spent_on_recovery": 813,
+  "gold_spent_on_socket": 739,
+  "interest_payments": 21,
+  "items_dropped": 42,
+  "items_equipped": 41,
+  "items_sold": 29,
+  "max_gold_held": 9377,
+  "paid_exits": 21,
+  "purchases": 67
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 737,
+ "passives": [
+  "boca_de_sangue",
+  "essencia_fluida",
+  "passos_leves",
+  "pele_de_sal",
+  "escudo_fe",
+  "sangue_guerreiro",
+  "alma_eterna",
+  "postura_fechada",
+  "boca_de_sangue",
+  "sangue_guerreiro",
+  "coracao_tita",
+  "pele_grossa",
+  "casco_calejado",
+  "pulso_certeiro",
+  "passo_de_corca",
+  "coracao_ferro",
+  "cabeca_dura",
+  "olho_aguia",
+  "odio_baixo",
+  "olho_de_cacador",
+  "presenca_errada",
+  "lamina_afiada",
+  "musculos_aco"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "bolso_do_alfaiate",
+  "bolso_furado",
+  "chuva_de_ferrões",
+  "cobranca_de_juros",
+  "corte_de_tendao",
+  "evasao",
+  "ferida_paga",
+  "flecha_pela_fresta",
+  "joelho_torto",
+  "lancar_adaga",
+  "n_couro_batido",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "n_ultima_carta",
+  "olho_do_falcão",
+  "picada_certeira",
+  "pó_nos_olhos",
+  "respiracao_de_ladrao",
+  "sangria_lenta",
+  "silencio_de_seda"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "picada_certeira",
+  "3": "n_couro_batido",
+  "4": "ferida_paga"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1766
+}

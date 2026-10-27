@@ -1,0 +1,247 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 10485,
+ "dungeon_level": 24,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 10.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 5
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Escudo de Madeira"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 9.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Couro"
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Faca de Caça"
+  }
+ },
+ "extracted_on_floor": 24,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 6475,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Gibão de Couro"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "name": "Martelo de Mão"
+  },
+  {
+   "name": "Adaga Sangrenta"
+  }
+ ],
+ "last_interest_floor": 23,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 45282,
+  "gold_from_combat": 29701,
+  "gold_from_interest": 3078,
+  "gold_from_sale": 12503,
+  "gold_spent": 34797,
+  "gold_spent_on_consumable": 1193,
+  "gold_spent_on_enchant": 2843,
+  "gold_spent_on_enhancement": 4889,
+  "gold_spent_on_exit_fee": 8234,
+  "gold_spent_on_gear": 16170,
+  "gold_spent_on_recovery": 555,
+  "gold_spent_on_socket": 913,
+  "interest_payments": 23,
+  "items_dropped": 50,
+  "items_equipped": 30,
+  "items_sold": 31,
+  "max_gold_held": 14868,
+  "paid_exits": 23,
+  "purchases": 61
+ },
+ "level": 26,
+ "map_state": null,
+ "mp": 3181,
+ "passives": [
+  "coracao_ferro",
+  "mente_serena",
+  "pele_de_sal",
+  "olho_aguia",
+  "sangue_guerreiro",
+  "olho_de_cacador",
+  "postura_fechada",
+  "sangue_guerreiro",
+  "pele_adamantio",
+  "coracao_ferro",
+  "boca_de_sangue",
+  "essencia_fluida",
+  "sangue_guerreiro",
+  "furia_berserker",
+  "pele_de_sal",
+  "pele_de_sal",
+  "sede_silenciosa",
+  "passo_de_corca",
+  "heranca_do_abismo",
+  "casco_calejado",
+  "mente_serena",
+  "essencia_fluida",
+  "mente_serena",
+  "pele_de_sal",
+  "pele_grossa"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "cerco_de_espelhos",
+  "escudo_magico",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "lancar_pedra",
+  "lasca_de_gelo",
+  "mao_firme",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_respirar_fundo",
+  "n_voto_de_silencio",
+  "pacto_do_vazio",
+  "palavra_de_torpor",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "relampago"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "missil_magico",
+  "3": "n_respirar_fundo",
+  "4": "n_areia_no_chao"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 996
+}

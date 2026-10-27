@@ -1,0 +1,268 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 7149,
+ "dungeon_level": 25,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Colete da Resistência",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Punhos de Lona"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 9.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Pá de Batalha"
+  },
+  "Weapon2": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 9.0
+    }
+   ],
+   "enhancement_level": 2,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 25,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 6395,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 4.0
+    }
+   ],
+   "name": "Arco Curto"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_chance",
+     "value": 5.0
+    }
+   ],
+   "name": "Pá de Batalha"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel Vegetal"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 3
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 7.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto de Ouro",
+   "socket_count": 1
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 10.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Espada de Aço",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 24,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 51342,
+  "gold_from_combat": 33427,
+  "gold_from_interest": 2577,
+  "gold_from_sale": 15338,
+  "gold_spent": 44193,
+  "gold_spent_on_consumable": 4245,
+  "gold_spent_on_enchant": 6221,
+  "gold_spent_on_enhancement": 3708,
+  "gold_spent_on_exit_fee": 9591,
+  "gold_spent_on_gear": 17311,
+  "gold_spent_on_recovery": 2648,
+  "gold_spent_on_socket": 469,
+  "interest_payments": 24,
+  "items_dropped": 46,
+  "items_equipped": 59,
+  "items_sold": 33,
+  "max_gold_held": 18596,
+  "paid_exits": 24,
+  "purchases": 79
+ },
+ "level": 26,
+ "map_state": null,
+ "mp": 603,
+ "passives": [
+  "passo_de_corca",
+  "sede_sangue",
+  "passos_leves",
+  "pulso_certeiro",
+  "olho_de_cacador",
+  "alma_eterna",
+  "musculos_aco",
+  "coracao_ferro",
+  "passo_de_corca",
+  "musculos_aco",
+  "olho_de_cacador",
+  "lamina_afiada",
+  "musculos_aco",
+  "musculos_aco",
+  "sede_sangue",
+  "sangue_toxico",
+  "coracao_ferro",
+  "instinto_frio",
+  "musculos_aco",
+  "cabeca_dura",
+  "pulso_certeiro",
+  "olho_de_cacador",
+  "furia_berserker",
+  "olho_aguia",
+  "odio_antigo"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "bolso_do_alfaiate",
+  "capa_rasgada",
+  "corte_de_tendao",
+  "couro_endurecido",
+  "duas_maos_um_tempo",
+  "envenenar",
+  "evasao",
+  "flecha_pela_fresta",
+  "golpe_baixo",
+  "leitura_de_guarda",
+  "n_areia_no_chao",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_gancho_e_corda",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_mao_que_nao_treme",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_voto_de_silencio",
+  "olho_do_falcão",
+  "pó_nos_olhos",
+  "sangria_lenta"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "duas_maos_um_tempo",
+  "2": "corte_de_tendao",
+  "3": "n_mao_que_nao_treme",
+  "4": "n_estocada_seca"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 8268
+}

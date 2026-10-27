@@ -1,0 +1,243 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6180,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 6.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 4.0
+    }
+   ],
+   "name": "Túnica Arcana",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Aço",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_percent",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Botas Encantadas",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 9.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 8.0
+    }
+   ],
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 5376,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Escudo de Madeira"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Botas de Pano"
+  },
+  {
+   "name": "Bermuda de Couro"
+  },
+  {
+   "name": "Elmo de Couro"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Calça de Pano"
+  },
+  {
+   "name": "Calças de Tecido"
+  },
+  {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 2,
+  "gold_earned": 21790,
+  "gold_from_combat": 14070,
+  "gold_from_interest": 1442,
+  "gold_from_sale": 6278,
+  "gold_spent": 15610,
+  "gold_spent_on_consumable": 249,
+  "gold_spent_on_enchant": 2011,
+  "gold_spent_on_enhancement": 3078,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 6095,
+  "gold_spent_on_recovery": 190,
+  "gold_spent_on_socket": 282,
+  "interest_payments": 18,
+  "items_dropped": 42,
+  "items_equipped": 18,
+  "items_sold": 25,
+  "max_gold_held": 8106,
+  "paid_exits": 18,
+  "purchases": 47
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 1350,
+ "passives": [
+  "boca_de_sangue",
+  "casco_calejado",
+  "voracidade",
+  "essencia_fluida",
+  "essencia_fluida",
+  "pele_de_sal",
+  "sangue_guerreiro",
+  "sede_sangue",
+  "casco_calejado",
+  "escudo_fe",
+  "sangue_guerreiro",
+  "musculos_aco",
+  "sangue_guerreiro",
+  "lamina_afiada",
+  "pele_grossa",
+  "pele_grossa",
+  "passo_de_corca",
+  "coracao_ferro",
+  "bencao_divina",
+  "coracao_ferro"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "dissonancia",
+  "drenar_vida",
+  "dreno_mana",
+  "escudo_magico",
+  "explosao_arcana",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "maldicao_de_cinzas",
+  "missil_magico",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_lamina_assentada",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "reserva_profunda",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "fagulha_teimosa",
+  "3": "drenar_vida",
+  "4": "n_guarda_alta"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 299
+}

@@ -1,0 +1,244 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3447,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Armadura de Fenrir",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas Rasas"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 4.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel de Ouro"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Lança de Madeira"
+  },
+  "Weapon2": {
+   "name": "Espada de Ferro"
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [
+  {
+   "gem_type": "Ônix",
+   "level": 4
+  },
+  {
+   "gem_type": "Esmeralda",
+   "level": 4
+  },
+  {
+   "gem_type": "Esmeralda",
+   "level": 4
+  }
+ ],
+ "hp": 7633,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Pá de Batalha"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Lâmina Veloz"
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 11,
+  "gold_earned": 36485,
+  "gold_from_combat": 21460,
+  "gold_from_interest": 1541,
+  "gold_from_sale": 13484,
+  "gold_spent": 33038,
+  "gold_spent_on_consumable": 486,
+  "gold_spent_on_enchant": 1462,
+  "gold_spent_on_enhancement": 4732,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 18773,
+  "gold_spent_on_recovery": 251,
+  "gold_spent_on_socket": 1184,
+  "interest_payments": 20,
+  "items_dropped": 43,
+  "items_equipped": 36,
+  "items_sold": 37,
+  "max_gold_held": 10477,
+  "paid_exits": 21,
+  "purchases": 57
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 816,
+ "passives": [
+  "olho_de_cacador",
+  "boca_de_sangue",
+  "olho_de_cacador",
+  "boca_de_sangue",
+  "olho_de_cacador",
+  "ritmo_profano",
+  "sangue_guerreiro",
+  "voz_no_escuro",
+  "sede_sangue",
+  "sangue_de_vidente",
+  "toque_dragao",
+  "respiracao_contada",
+  "agulha_no_osso",
+  "punho_atordoante",
+  "olho_de_cacador",
+  "musculos_aco",
+  "pulso_certeiro",
+  "furia_berserker",
+  "coracao_ferro",
+  "musculos_aco",
+  "odio_baixo",
+  "unha_suja"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "couraca_improvisada",
+  "cutelada",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "marca_do_acougueiro",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_lamina_assentada",
+  "n_leitura_de_terreno",
+  "n_mao_que_nao_treme",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "postura_de_muro",
+  "soco_de_placa",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "cutelada",
+  "2": "tremor_de_bigorna",
+  "3": "n_travar_o_pulso",
+  "4": "postura_de_muro"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 5170
+}

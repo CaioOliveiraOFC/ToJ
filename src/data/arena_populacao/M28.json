@@ -1,0 +1,231 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5578,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 14.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Túnica do Arquimago",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "name": "Luvas de Titânio",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Chapéu Encantado",
+   "socket_count": 2
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "name": "Bermuda de Couro",
+   "origin": "starter"
+  },
+  "Ring1": {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Espada de Aço",
+   "socket_count": 3
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 9771,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 5.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 30506,
+  "gold_from_combat": 21096,
+  "gold_from_interest": 1696,
+  "gold_from_sale": 7714,
+  "gold_spent": 24928,
+  "gold_spent_on_consumable": 192,
+  "gold_spent_on_enchant": 2242,
+  "gold_spent_on_enhancement": 3041,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 14718,
+  "gold_spent_on_recovery": 190,
+  "gold_spent_on_socket": 840,
+  "interest_payments": 18,
+  "items_dropped": 32,
+  "items_equipped": 19,
+  "items_sold": 29,
+  "max_gold_held": 11359,
+  "paid_exits": 18,
+  "purchases": 56
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 2085,
+ "passives": [
+  "voracidade",
+  "casco_calejado",
+  "toque_dragao",
+  "sangue_guerreiro",
+  "poco_fundo",
+  "essencia_viva",
+  "coracao_ferro",
+  "olho_aguia",
+  "sede_silenciosa",
+  "maos_midas",
+  "fortuna_absoluta",
+  "pele_de_sal",
+  "essencia_viva",
+  "olho_de_cacador",
+  "pele_grossa",
+  "essencia_viva",
+  "reserva_arcana",
+  "boca_de_sangue",
+  "reserva_arcana",
+  "musculos_aco",
+  "sorte_iniciante",
+  "reserva_arcana"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "clarividencia",
+  "dissonancia",
+  "drenar_vida",
+  "lasca_de_gelo",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "relampago",
+  "sanguessuga_arcana",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "n_couro_batido",
+  "3": "missil_magico",
+  "4": "passo_borrado"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4327
+}

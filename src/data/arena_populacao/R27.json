@@ -1,0 +1,257 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5864,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 2
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Manto de Sombra",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Garras de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 13.0
+    }
+   ],
+   "name": "Elmo de Couro",
+   "origin": "starter"
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Osso"
+  },
+  "Shoes": {
+   "name": "Botas Fantasma",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "name": "Adaga Sangrenta"
+  },
+  "Weapon2": {
+   "enhancement_level": 3,
+   "name": "Espada de Treino"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 3824,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Gládio de Ferro",
+   "socket_count": 2
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Arco da Precisão",
+   "socket_count": 1
+  },
+  {
+   "name": "Arco da Precisão",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Armadura de Camisa"
+  },
+  {
+   "name": "Adaga de Madeira"
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Perneiras de Couro"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 24344,
+  "gold_from_combat": 19590,
+  "gold_from_interest": 1280,
+  "gold_from_sale": 3474,
+  "gold_spent": 18480,
+  "gold_spent_on_consumable": 704,
+  "gold_spent_on_enchant": 1355,
+  "gold_spent_on_enhancement": 3545,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 7486,
+  "gold_spent_on_recovery": 544,
+  "gold_spent_on_socket": 1141,
+  "interest_payments": 17,
+  "items_dropped": 27,
+  "items_equipped": 23,
+  "items_sold": 13,
+  "max_gold_held": 7684,
+  "paid_exits": 18,
+  "purchases": 67
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 1685,
+ "passives": [
+  "olho_de_cacador",
+  "respiracao_contada",
+  "sorte_iniciante",
+  "boca_de_sangue",
+  "sorte_iniciante",
+  "bebida_deuses",
+  "mente_serena",
+  "mente_serena",
+  "maos_midas",
+  "pele_adamantio",
+  "essencia_viva",
+  "maos_midas",
+  "olho_de_cacador",
+  "ritmo_profano",
+  "sede_silenciosa",
+  "sorte_iniciante",
+  "pele_de_sal",
+  "divida_de_ouro",
+  "sangue_guerreiro",
+  "bebida_deuses",
+  "respiracao_contada",
+  "furia_berserker"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "capa_rasgada",
+  "corte_de_tendao",
+  "cortina_fumaca",
+  "evasao",
+  "faro_de_rua",
+  "flecha_pela_fresta",
+  "n_areia_no_chao",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_respirar_fundo",
+  "nó_corredio",
+  "picada_certeira",
+  "pó_nos_olhos",
+  "sangria_lenta",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 3,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "assassinato",
+  "2": "corte_de_tendao",
+  "3": "n_leitura_de_terreno",
+  "4": "n_estocada_seca"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 269
+}

@@ -1,0 +1,243 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6555,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    },
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Armadura de Fenrir",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 10.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 3
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 5
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 9727,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Armadura de Camisa"
+  },
+  {
+   "name": "Escudo de Madeira"
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 36878,
+  "gold_from_combat": 26251,
+  "gold_from_interest": 2055,
+  "gold_from_sale": 8572,
+  "gold_spent": 30323,
+  "gold_spent_on_consumable": 90,
+  "gold_spent_on_enchant": 2309,
+  "gold_spent_on_enhancement": 4802,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 16067,
+  "gold_spent_on_recovery": 59,
+  "gold_spent_on_socket": 846,
+  "interest_payments": 21,
+  "items_dropped": 31,
+  "items_equipped": 20,
+  "items_sold": 28,
+  "max_gold_held": 11299,
+  "paid_exits": 21,
+  "purchases": 55
+ },
+ "level": 25,
+ "map_state": null,
+ "mp": 546,
+ "passives": [
+  "sorte_iniciante",
+  "musculos_aco",
+  "bencao_divina",
+  "ritmo_profano",
+  "sorte_iniciante",
+  "alquimia_do_desespero",
+  "boca_de_sangue",
+  "voracidade",
+  "maos_midas",
+  "sangue_guerreiro",
+  "sede_silenciosa",
+  "furia_berserker",
+  "alquimia_do_desespero",
+  "sangue_guerreiro",
+  "sorte_iniciante",
+  "poco_fundo",
+  "respiracao_contada",
+  "musculos_aco",
+  "casco_calejado",
+  "coracao_ferro",
+  "pele_adamantio",
+  "respiracao_contada",
+  "mente_serena",
+  "alquimia_do_desespero"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "escudo_protetor",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "investida_de_ariete",
+  "mao_dupla",
+  "marca_do_acougueiro",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_grito_curto",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "postura_de_muro",
+  "quebra_ossos",
+  "rasgo_de_gancho",
+  "soco_de_placa",
+  "tomar_folego",
+  "veterania"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_duplo",
+  "2": "postura_de_muro",
+  "3": "n_mira_calma",
+  "4": "quebra_ossos"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 6900
+}

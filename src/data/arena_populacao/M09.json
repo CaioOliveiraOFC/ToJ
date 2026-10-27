@@ -1,0 +1,69 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 54,
+ "dungeon_level": 8,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": null,
+  "Body": {
+   "name": "Colete de Pano",
+   "origin": "starter"
+  },
+  "Hands": null,
+  "Helmet": null,
+  "Legs": null,
+  "Ring1": null,
+  "Ring2": null,
+  "Shoes": null,
+  "Weapon1": null,
+  "Weapon2": null
+ },
+ "extracted_on_floor": 8,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 104,
+ "initial_skills_learned": 1,
+ "inventory": [],
+ "last_interest_floor": 7,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gold_earned": 242,
+  "gold_from_combat": 236,
+  "gold_from_interest": 6,
+  "gold_spent": 188,
+  "gold_spent_on_consumable": 33,
+  "gold_spent_on_exit_fee": 51,
+  "gold_spent_on_recovery": 104,
+  "interest_payments": 5,
+  "items_dropped": 0,
+  "items_equipped": 1,
+  "items_sold": 0,
+  "max_gold_held": 82,
+  "max_unpaid_exit_streak": 3,
+  "paid_exits": 1,
+  "purchases": 4,
+  "unpaid_exits": 6
+ },
+ "level": 2,
+ "map_state": null,
+ "mp": 157,
+ "passives": [
+  "lamina_afiada"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo"
+ },
+ "unpaid_exit_streak": 3,
+ "xp": 173
+}

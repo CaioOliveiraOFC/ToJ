@@ -1,0 +1,259 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 7991,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 7.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 3,
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 3.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Ouro"
+  },
+  "Ring2": {
+   "name": "Anel de Couro"
+  },
+  "Shoes": {
+   "name": "Botas de Couro"
+  },
+  "Weapon1": {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 2,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 6792,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 3
+  },
+  {
+   "name": "Cajado Eterno",
+   "socket_count": 2
+  },
+  {
+   "name": "Adaga Mortal",
+   "socket_count": 1
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Manto do Curandeiro"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Garras de Ferro",
+   "socket_count": 2
+  },
+  {
+   "name": "Machado Enferrujado"
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 27367,
+  "gold_from_combat": 21484,
+  "gold_from_interest": 1478,
+  "gold_from_sale": 4405,
+  "gold_spent": 19376,
+  "gold_spent_on_consumable": 191,
+  "gold_spent_on_enchant": 1163,
+  "gold_spent_on_enhancement": 5076,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 7823,
+  "gold_spent_on_recovery": 264,
+  "gold_spent_on_socket": 523,
+  "interest_payments": 19,
+  "items_dropped": 42,
+  "items_equipped": 59,
+  "items_sold": 21,
+  "max_gold_held": 7991,
+  "paid_exits": 19,
+  "purchases": 49
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 1967,
+ "passives": [
+  "sede_silenciosa",
+  "boca_de_sangue",
+  "sorte_iniciante",
+  "boca_de_sangue",
+  "pele_de_sal",
+  "sangue_guerreiro",
+  "sorte_iniciante",
+  "coracao_ferro",
+  "musculos_aco",
+  "boca_de_sangue",
+  "maos_midas",
+  "poco_fundo",
+  "respiracao_contada",
+  "pele_de_sal",
+  "bebida_deuses",
+  "mente_serena",
+  "maos_midas",
+  "pele_grossa",
+  "sorte_iniciante",
+  "coracao_ferro",
+  "sede_silenciosa",
+  "reserva_arcana",
+  "alquimia_do_desespero"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "drenar_vida",
+  "fagulha_teimosa",
+  "lasca_de_gelo",
+  "maldicao_de_cinzas",
+  "mao_firme",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_disciplina_de_forja",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "palavra_de_torpor",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "raio_congelante"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "bola_fogo": 1
+ },
+ "skills": {
+  "1": "bola_fogo",
+  "2": "mao_firme",
+  "3": "lasca_de_gelo",
+  "4": "n_guarda_alta"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 515
+}

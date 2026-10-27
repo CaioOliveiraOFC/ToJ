@@ -1,0 +1,90 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 153,
+ "dungeon_level": 3,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": null,
+  "Body": {
+   "name": "Túnica de Tecido",
+   "origin": "starter"
+  },
+  "Hands": null,
+  "Helmet": null,
+  "Legs": {
+   "name": "Armadura de Camisa"
+  },
+  "Ring1": null,
+  "Ring2": null,
+  "Shoes": null,
+  "Weapon1": null,
+  "Weapon2": null
+ },
+ "extracted_on_floor": 3,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 3,
+ "gems": [
+  {
+   "gem_type": "Rubi",
+   "level": 1
+  },
+  {
+   "gem_type": "Safira",
+   "level": 1
+  }
+ ],
+ "hp": 146,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 2,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 2,
+  "gold_earned": 210,
+  "gold_from_combat": 200,
+  "gold_from_interest": 10,
+  "gold_spent": 57,
+  "gold_spent_on_exit_fee": 57,
+  "interest_payments": 2,
+  "items_dropped": 3,
+  "items_equipped": 2,
+  "items_sold": 0,
+  "max_gold_held": 176,
+  "paid_exits": 2,
+  "purchases": 2
+ },
+ "level": 3,
+ "map_state": null,
+ "mp": 75,
+ "passives": [
+  "casco_calejado",
+  "odio_baixo"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "golpe_poderoso",
+  "investida",
+  "n_grito_curto",
+  "quebra_guarda"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "quebra_guarda"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 101
+}

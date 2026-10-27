@@ -1,0 +1,239 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 8046,
+ "dungeon_level": 23,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Peitoral de Ferro",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Couro"
+  },
+  "Helmet": {
+   "name": "Capacete de Couro"
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    }
+   ],
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 23,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Safira",
+   "level": 4
+  },
+  {
+   "gem_type": "Esmeralda",
+   "level": 5
+  },
+  {
+   "gem_type": "Topázio",
+   "level": 4
+  },
+  {
+   "gem_type": "Ametista",
+   "level": 4
+  }
+ ],
+ "hp": 6719,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 3
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 2
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 2,
+   "name": "Luvas de Lã"
+  }
+ ],
+ "last_interest_floor": 22,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 10,
+  "gold_earned": 38927,
+  "gold_from_combat": 26611,
+  "gold_from_interest": 2191,
+  "gold_from_sale": 10125,
+  "gold_spent": 30881,
+  "gold_spent_on_consumable": 139,
+  "gold_spent_on_enchant": 86,
+  "gold_spent_on_enhancement": 1573,
+  "gold_spent_on_exit_fee": 7133,
+  "gold_spent_on_gear": 21226,
+  "gold_spent_on_recovery": 99,
+  "gold_spent_on_socket": 625,
+  "interest_payments": 22,
+  "items_dropped": 31,
+  "items_equipped": 37,
+  "items_sold": 27,
+  "max_gold_held": 15772,
+  "paid_exits": 22,
+  "purchases": 56
+ },
+ "level": 25,
+ "map_state": null,
+ "mp": 3142,
+ "passives": [
+  "sede_sangue",
+  "sangue_guerreiro",
+  "olho_aguia",
+  "casco_calejado",
+  "voracidade",
+  "coracao_ferro",
+  "passos_leves",
+  "postura_fechada",
+  "olho_aguia",
+  "pele_grossa",
+  "postura_fechada",
+  "coracao_ferro",
+  "postura_fechada",
+  "pele_de_sal",
+  "sangue_guerreiro",
+  "musculos_aco",
+  "voracidade",
+  "postura_fechada",
+  "sede_silenciosa",
+  "postura_fechada",
+  "boca_de_sangue",
+  "postura_fechada",
+  "postura_fechada",
+  "mente_serena"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "dissonancia",
+  "drenar_vida",
+  "escudo_magico",
+  "explosao_arcana",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "grilhoes_de_gelo",
+  "lasca_de_gelo",
+  "lente_de_obsidiana",
+  "missil_magico",
+  "n_couro_batido",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "passo_borrado",
+  "reserva_profunda",
+  "sanguessuga_arcana",
+  "troca_de_sangue",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "foco_do_estudante",
+  "3": "lasca_de_gelo",
+  "4": "drenar_vida"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4828
+}

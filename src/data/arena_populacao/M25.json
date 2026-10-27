@@ -1,0 +1,267 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5911,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Jaqueta de Couro"
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_percent",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 5
+    }
+   ],
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Bastão Cru"
+  },
+  "Weapon2": {
+   "name": "Gravetos Mágicos"
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5281,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado da Galáxia",
+   "socket_count": 3
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Cajado do Vazio",
+   "socket_count": 3
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Anel de Couro"
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 12,
+  "gold_earned": 30086,
+  "gold_from_combat": 21451,
+  "gold_from_interest": 1646,
+  "gold_from_sale": 6989,
+  "gold_spent": 24175,
+  "gold_spent_on_consumable": 2000,
+  "gold_spent_on_enchant": 2401,
+  "gold_spent_on_enhancement": 1159,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 10270,
+  "gold_spent_on_recovery": 345,
+  "gold_spent_on_socket": 1850,
+  "interest_payments": 21,
+  "items_dropped": 33,
+  "items_equipped": 50,
+  "items_sold": 25,
+  "max_gold_held": 10032,
+  "paid_exits": 21,
+  "purchases": 67
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 2418,
+ "passives": [
+  "sede_silenciosa",
+  "olho_aguia",
+  "passo_de_corca",
+  "musculos_aco",
+  "heranca_do_abismo",
+  "instinto_frio",
+  "musculos_aco",
+  "olho_de_cacador",
+  "lamina_afiada",
+  "fio_serrilhado",
+  "sede_sangue",
+  "musculos_aco",
+  "musculos_aco",
+  "passos_leves",
+  "lamina_afiada",
+  "furia_berserker",
+  "odio_baixo",
+  "odio_baixo",
+  "olho_de_cacador",
+  "passo_de_corca",
+  "olho_aguia",
+  "heranca_do_abismo"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "escudo_magico",
+  "foco_do_estudante",
+  "lasca_de_gelo",
+  "mao_firme",
+  "marca_ardente",
+  "missil_magico",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_estocada_seca",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_travar_o_pulso",
+  "pulso_de_forca",
+  "relampago",
+  "reserva_profunda",
+  "sono_profundo",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "n_mira_calma",
+  "3": "n_estocada_seca",
+  "4": "sono_profundo"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 5300
+}

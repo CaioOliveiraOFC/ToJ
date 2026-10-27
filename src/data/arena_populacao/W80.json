@@ -1,0 +1,247 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5243,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 5.0
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura Divina",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "name": "Capacete de Ferro",
+   "socket_count": 2
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    },
+    null
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Ouro"
+  },
+  "Shoes": {
+   "name": "Sapatos de Couro"
+  },
+  "Weapon1": {
+   "name": "Espada do Universo",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 6237,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Espada do Eclipse",
+   "socket_count": 3
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 7.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    },
+    null
+   ],
+   "name": "Machado Terrível",
+   "socket_count": 3
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Escudo de Madeira",
+   "origin": "starter"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 2.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 23751,
+  "gold_from_combat": 15026,
+  "gold_from_interest": 1479,
+  "gold_from_sale": 7246,
+  "gold_spent": 18508,
+  "gold_spent_on_consumable": 551,
+  "gold_spent_on_enchant": 2273,
+  "gold_spent_on_enhancement": 795,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 10761,
+  "gold_spent_on_recovery": 257,
+  "gold_spent_on_socket": 166,
+  "interest_payments": 17,
+  "items_dropped": 38,
+  "items_equipped": 26,
+  "items_sold": 21,
+  "max_gold_held": 11434,
+  "paid_exits": 18,
+  "purchases": 50
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 1117,
+ "passives": [
+  "respiracao_contada",
+  "olho_de_cacador",
+  "fome_batalha",
+  "ritmo_profano",
+  "olho_aguia",
+  "respiracao_contada",
+  "casco_calejado",
+  "respiracao_contada",
+  "pele_grossa",
+  "sangue_guerreiro",
+  "essencia_viva",
+  "essencia_viva",
+  "voracidade",
+  "reserva_arcana",
+  "bebida_deuses",
+  "passo_de_corca",
+  "bebida_deuses",
+  "maos_midas",
+  "poco_fundo",
+  "sorte_iniciante",
+  "boca_de_sangue",
+  "passo_de_corca",
+  "boca_de_sangue"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "couraca_improvisada",
+  "escudo_protetor",
+  "fio_no_rebite",
+  "fortalecimento",
+  "golpe_poderoso",
+  "mao_dupla",
+  "marca_do_acougueiro",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_postura_impecavel",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "peso_do_machado",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "sede_de_batalha",
+  "soco_de_placa",
+  "veterania"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "peso_do_machado",
+  "2": "postura_de_muro",
+  "3": "n_mira_calma",
+  "4": "n_pancada_na_nuca"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4743
+}

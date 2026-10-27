@@ -1,0 +1,221 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 2600,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "name": "Amuleto de Ouro",
+   "socket_count": 2
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Peitoral de Ferro",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Garras de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Aço",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Arco do Silêncio",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Lâmina Veloz"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [
+  {
+   "gem_type": "Rubi",
+   "level": 4
+  },
+  {
+   "gem_type": "Topázio",
+   "level": 4
+  },
+  {
+   "gem_type": "Safira",
+   "level": 3
+  }
+ ],
+ "hp": 3244,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Arco da Precisão",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Arco do Silêncio",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    }
+   ],
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  {
+   "name": "Perneiras de Couro",
+   "origin": "starter"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 21067,
+  "gold_from_combat": 13575,
+  "gold_from_interest": 855,
+  "gold_from_sale": 6637,
+  "gold_spent": 18467,
+  "gold_spent_on_consumable": 1228,
+  "gold_spent_on_enhancement": 2007,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 10996,
+  "gold_spent_on_recovery": 132,
+  "gold_spent_on_socket": 399,
+  "interest_payments": 17,
+  "items_dropped": 32,
+  "items_equipped": 41,
+  "items_sold": 22,
+  "max_gold_held": 4749,
+  "paid_exits": 18,
+  "purchases": 45
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 902,
+ "passives": [
+  "coracao_ferro",
+  "odio_baixo",
+  "passos_leves",
+  "olho_de_cacador",
+  "sede_sangue",
+  "coracao_tita",
+  "sede_sangue",
+  "musculos_aco",
+  "odio_antigo",
+  "furia_berserker",
+  "boca_de_sangue",
+  "toque_dragao",
+  "furia_berserker",
+  "pele_grossa",
+  "pulso_certeiro",
+  "musculos_aco",
+  "odio_baixo",
+  "casco_calejado",
+  "olho_de_cacador",
+  "odio_antigo"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "bolso_furado",
+  "capa_rasgada",
+  "chuva_de_ferrões",
+  "corte_de_tendao",
+  "cortina_fumaca",
+  "dose_da_viuva",
+  "duas_maos_um_tempo",
+  "envenenar",
+  "flecha_pela_fresta",
+  "joelho_torto",
+  "lamina_no_escuro",
+  "lancar_adaga",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_marca_do_cacador",
+  "n_mira_calma",
+  "n_pausa_util",
+  "olho_do_falcão",
+  "picada_certeira",
+  "respiracao_de_ladrao"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "assassinato": 4,
+  "chuva_de_ferrões": 1
+ },
+ "skills": {
+  "1": "chuva_de_ferrões",
+  "2": "lamina_no_escuro",
+  "3": "joelho_torto",
+  "4": "assassinato"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 62
+}

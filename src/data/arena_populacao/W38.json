@@ -1,0 +1,236 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 8377,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 8.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Armadura de Espinhos",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "name": "Luvas de Titânio",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 7.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Ferro",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado de Cristal",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Arco Composto",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Rubi",
+   "level": 4
+  }
+ ],
+ "hp": 6216,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 10.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Luvas de Lã"
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 26046,
+  "gold_from_combat": 16668,
+  "gold_from_interest": 1713,
+  "gold_from_sale": 7665,
+  "gold_spent": 17669,
+  "gold_spent_on_consumable": 380,
+  "gold_spent_on_enchant": 2134,
+  "gold_spent_on_enhancement": 2831,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 8679,
+  "gold_spent_on_recovery": 38,
+  "gold_spent_on_socket": 465,
+  "interest_payments": 15,
+  "items_dropped": 38,
+  "items_equipped": 19,
+  "items_sold": 30,
+  "max_gold_held": 8805,
+  "paid_exits": 17,
+  "purchases": 49
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 352,
+ "passives": [
+  "essencia_viva",
+  "alma_eterna",
+  "coracao_ferro",
+  "alquimia_do_desespero",
+  "odio_antigo",
+  "sorte_iniciante",
+  "respiracao_contada",
+  "divida_de_ouro",
+  "coracao_ferro",
+  "pele_de_sal",
+  "sangue_guerreiro",
+  "reserva_arcana",
+  "maos_midas",
+  "odio_baixo",
+  "postura_fechada",
+  "essencia_viva",
+  "sede_sangue",
+  "sangue_guerreiro",
+  "essencia_viva",
+  "musculos_aco",
+  "boca_de_sangue"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "berro_de_ferro",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "golpe_poderoso",
+  "investida",
+  "investida_de_ariete",
+  "n_curativo_de_campo",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "provocacao",
+  "sangue_nos_olhos",
+  "sede_de_batalha",
+  "soco_de_placa",
+  "tomar_folego"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {
+  "n_mira_calma": 2
+ },
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "n_mira_calma",
+  "3": "escudo_protetor",
+  "4": "baluarte"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 375
+}

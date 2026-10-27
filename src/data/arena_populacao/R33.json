@@ -1,0 +1,227 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 8043,
+ "dungeon_level": 24,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Colete da Sombra",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 7.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Machado de Guerra",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Bastão Cru"
+  }
+ },
+ "extracted_on_floor": 24,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 5468,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Arco da Precisão",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Arco da Precisão",
+   "socket_count": 2
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Faca de Caça"
+  }
+ ],
+ "last_interest_floor": 23,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 49308,
+  "gold_from_combat": 28766,
+  "gold_from_interest": 2624,
+  "gold_from_sale": 17918,
+  "gold_spent": 41265,
+  "gold_spent_on_consumable": 6401,
+  "gold_spent_on_enchant": 2501,
+  "gold_spent_on_enhancement": 2501,
+  "gold_spent_on_exit_fee": 8234,
+  "gold_spent_on_gear": 17061,
+  "gold_spent_on_recovery": 3618,
+  "gold_spent_on_socket": 949,
+  "interest_payments": 23,
+  "items_dropped": 48,
+  "items_equipped": 78,
+  "items_sold": 36,
+  "max_gold_held": 15373,
+  "paid_exits": 23,
+  "purchases": 70
+ },
+ "level": 26,
+ "map_state": null,
+ "mp": 1200,
+ "passives": [
+  "lamina_afiada",
+  "musculos_aco",
+  "casco_calejado",
+  "sangue_guerreiro",
+  "reserva_arcana",
+  "essencia_fluida",
+  "passo_de_corca",
+  "pele_grossa",
+  "pele_grossa",
+  "pele_grossa",
+  "bebida_deuses",
+  "passos_leves",
+  "postura_fechada",
+  "escudo_fe",
+  "coracao_ferro",
+  "musculos_aco",
+  "passo_de_corca",
+  "sangue_guerreiro",
+  "furia_berserker",
+  "sangue_guerreiro",
+  "fio_serrilhado",
+  "sede_silenciosa",
+  "casco_calejado",
+  "postura_fechada",
+  "postura_fechada"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "capa_rasgada",
+  "chuva_de_ferrões",
+  "cortina_fumaca",
+  "couro_endurecido",
+  "dose_da_viuva",
+  "duas_maos_um_tempo",
+  "evasao",
+  "faro_de_rua",
+  "ferida_paga",
+  "golpe_baixo",
+  "golpe_sombras",
+  "joelho_torto",
+  "leitura_de_guarda",
+  "marcar_a_presa",
+  "n_couro_batido",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_olho_treinado",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ultima_carta",
+  "pó_nos_olhos",
+  "respiracao_de_ladrao",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "capa_rasgada",
+  "3": "golpe_sombras",
+  "4": "n_respirar_fundo"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1904
+}

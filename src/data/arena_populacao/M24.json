@@ -1,0 +1,216 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3481,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Titânio",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Madeira"
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Calça de Ferro",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 3
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 3
+  },
+  "Shoes": {
+   "name": "Botas de Couro"
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    }
+   ],
+   "name": "Cajado do Vazio",
+   "socket_count": 2
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 4410,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Colete da Resistência",
+   "socket_count": 1
+  },
+  {
+   "name": "Clava de Madeira"
+  },
+  {
+   "name": "Machado Enferrujado"
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 26380,
+  "gold_from_combat": 16020,
+  "gold_from_interest": 1341,
+  "gold_from_sale": 9019,
+  "gold_spent": 22899,
+  "gold_spent_on_consumable": 304,
+  "gold_spent_on_enchant": 741,
+  "gold_spent_on_enhancement": 2849,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 13328,
+  "gold_spent_on_recovery": 201,
+  "gold_spent_on_socket": 1140,
+  "interest_payments": 19,
+  "items_dropped": 42,
+  "items_equipped": 24,
+  "items_sold": 34,
+  "max_gold_held": 8461,
+  "paid_exits": 19,
+  "purchases": 54
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 2171,
+ "passives": [
+  "furia_berserker",
+  "odio_antigo",
+  "musculos_aco",
+  "sangue_de_vidente",
+  "instinto_frio",
+  "instinto_frio",
+  "sangue_de_vidente",
+  "musculos_aco",
+  "pulso_certeiro",
+  "cabeca_dura",
+  "cabeca_dura",
+  "olho_aguia",
+  "olho_aguia",
+  "sangue_guerreiro",
+  "reserva_arcana",
+  "sangue_de_vidente",
+  "lamina_afiada",
+  "furia_berserker",
+  "passo_de_corca",
+  "toque_dragao",
+  "odio_baixo"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "dividendo_de_mana",
+  "drenar_vida",
+  "escudo_magico",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "lasca_de_gelo",
+  "marca_ardente",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_folego_de_marcha",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_ritmo_de_duelo",
+  "relampago"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "drenar_vida",
+  "3": "n_areia_no_chao",
+  "4": "dividendo_de_mana"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 170
+}

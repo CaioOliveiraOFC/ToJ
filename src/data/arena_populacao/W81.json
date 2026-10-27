@@ -1,0 +1,269 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 10548,
+ "dungeon_level": 24,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 8.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 5
+    },
+    null
+   ],
+   "name": "Colete da Resistência",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Martelo de Mão"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 9.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 3
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Botas de Couro"
+  },
+  "Weapon1": {
+   "name": "Faca de Caça"
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 24,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Topázio",
+   "level": 5
+  },
+  {
+   "gem_type": "Ônix",
+   "level": 4
+  },
+  {
+   "gem_type": "Topázio",
+   "level": 5
+  }
+ ],
+ "hp": 7297,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Espada de Treino"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Espada Longa",
+   "socket_count": 2
+  },
+  {
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  {
+   "name": "Chinelos de Pano"
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  {
+   "name": "Capa de Pano"
+  }
+ ],
+ "last_interest_floor": 23,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 38342,
+  "gold_from_combat": 28474,
+  "gold_from_interest": 2640,
+  "gold_from_sale": 7228,
+  "gold_spent": 27794,
+  "gold_spent_on_consumable": 1011,
+  "gold_spent_on_enchant": 1423,
+  "gold_spent_on_enhancement": 3164,
+  "gold_spent_on_exit_fee": 8234,
+  "gold_spent_on_gear": 12332,
+  "gold_spent_on_recovery": 1007,
+  "gold_spent_on_socket": 623,
+  "interest_payments": 22,
+  "items_dropped": 43,
+  "items_equipped": 40,
+  "items_sold": 22,
+  "max_gold_held": 13875,
+  "paid_exits": 23,
+  "purchases": 58
+ },
+ "level": 25,
+ "map_state": null,
+ "mp": 398,
+ "passives": [
+  "sangue_guerreiro",
+  "passo_de_corca",
+  "odio_baixo",
+  "passos_leves",
+  "sede_sangue",
+  "postura_fechada",
+  "sangue_guerreiro",
+  "escudo_fe",
+  "escudo_fe",
+  "pele_grossa",
+  "postura_fechada",
+  "bencao_divina",
+  "passo_de_corca",
+  "sede_silenciosa",
+  "heranca_do_abismo",
+  "pele_grossa",
+  "escudo_fe",
+  "passos_leves",
+  "toque_dragao",
+  "passo_de_corca",
+  "boca_de_sangue",
+  "bencao_divina",
+  "coracao_ferro",
+  "fio_serrilhado"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "golpe_poderoso",
+  "investida_de_ariete",
+  "juramento_da_muralha",
+  "mao_dupla",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "postura_de_muro",
+  "provocacao",
+  "rasgo_de_gancho",
+  "sede_de_batalha",
+  "silencio_do_veterano",
+  "soco_de_placa",
+  "tomar_folego",
+  "tremor_de_bigorna",
+  "veterania"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "soco_de_placa",
+  "3": "tomar_folego",
+  "4": "n_folego_de_marcha"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 6796
+}

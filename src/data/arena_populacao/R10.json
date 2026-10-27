@@ -1,0 +1,184 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3997,
+ "dungeon_level": 17,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 6.0
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Capa de Pano"
+  },
+  "Hands": {
+   "name": "Escudo Torre",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 10.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Couro"
+  },
+  "Ring1": {
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Sapatos de Couro",
+   "origin": "starter"
+  },
+  "Weapon1": {
+   "name": "Adaga do Vazio",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  }
+ },
+ "extracted_on_floor": 17,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 2532,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Espada do Universo",
+   "socket_count": 3
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 16,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 15098,
+  "gold_from_combat": 11911,
+  "gold_from_interest": 505,
+  "gold_from_sale": 2682,
+  "gold_spent": 11101,
+  "gold_spent_on_consumable": 1782,
+  "gold_spent_on_enchant": 1131,
+  "gold_spent_on_enhancement": 566,
+  "gold_spent_on_exit_fee": 2694,
+  "gold_spent_on_gear": 4099,
+  "gold_spent_on_recovery": 557,
+  "gold_spent_on_socket": 272,
+  "interest_payments": 15,
+  "items_dropped": 28,
+  "items_equipped": 20,
+  "items_sold": 20,
+  "max_gold_held": 3997,
+  "paid_exits": 16,
+  "purchases": 53
+ },
+ "level": 20,
+ "map_state": null,
+ "mp": 455,
+ "passives": [
+  "odio_baixo",
+  "punho_atordoante",
+  "oraculo_partido",
+  "casco_calejado",
+  "sangue_de_vidente",
+  "respiracao_contada",
+  "heranca_do_abismo",
+  "pulso_certeiro",
+  "pulso_certeiro",
+  "lamina_afiada",
+  "passos_leves",
+  "pulso_certeiro",
+  "heranca_do_abismo",
+  "olho_de_cacador",
+  "pulso_certeiro",
+  "musculos_aco",
+  "olho_de_cacador",
+  "sangue_de_vidente",
+  "fio_serrilhado"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "corte_de_tendao",
+  "dose_da_viuva",
+  "fantasma",
+  "faro_de_rua",
+  "ferida_paga",
+  "joelho_torto",
+  "mao_leve",
+  "n_areia_no_chao",
+  "n_disciplina_de_forja",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "respiracao_de_ladrao",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {
+  "corte_de_tendao": 3,
+  "n_mira_calma": 1
+ },
+ "skills": {
+  "1": "n_mira_calma",
+  "2": "mao_leve",
+  "3": "corte_de_tendao",
+  "4": "n_areia_no_chao"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 2106
+}

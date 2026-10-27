@@ -1,0 +1,232 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4718,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 10.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Armadura Divina",
+   "socket_count": 3
+  },
+  "Hands": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Bastão Mágico",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 6.0
+    }
+   ],
+   "name": "Bandana de Tecido"
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 6225,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Anel de Couro"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 10,
+  "gold_earned": 26235,
+  "gold_from_combat": 19215,
+  "gold_from_interest": 1242,
+  "gold_from_sale": 5778,
+  "gold_spent": 21517,
+  "gold_spent_on_consumable": 780,
+  "gold_spent_on_enchant": 1604,
+  "gold_spent_on_enhancement": 2386,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 10959,
+  "gold_spent_on_recovery": 725,
+  "gold_spent_on_socket": 1358,
+  "interest_payments": 17,
+  "items_dropped": 25,
+  "items_equipped": 17,
+  "items_sold": 22,
+  "max_gold_held": 10540,
+  "paid_exits": 18,
+  "purchases": 66
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 2178,
+ "passives": [
+  "essencia_viva",
+  "coracao_ferro",
+  "respiracao_contada",
+  "essencia_viva",
+  "reserva_arcana",
+  "casco_calejado",
+  "ritmo_profano",
+  "poco_fundo",
+  "furia_berserker",
+  "maos_midas",
+  "maos_midas",
+  "reserva_arcana",
+  "sangue_de_vidente",
+  "sede_silenciosa",
+  "sorte_iniciante",
+  "ritmo_profano",
+  "furia_berserker",
+  "maos_midas",
+  "sede_silenciosa",
+  "essencia_pura",
+  "mente_serena",
+  "ritmo_profano"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "dissonancia",
+  "drenar_vida",
+  "egide_de_runas",
+  "foco_do_estudante",
+  "lasca_de_gelo",
+  "mao_firme",
+  "missil_magico",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_voto_de_silencio",
+  "reserva_profunda",
+  "sanguessuga_arcana",
+  "tempestade",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "lasca_de_gelo",
+  "3": "egide_de_runas",
+  "4": "reserva_profunda"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4047
+}

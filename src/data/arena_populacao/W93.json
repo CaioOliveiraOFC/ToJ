@@ -1,0 +1,220 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 10232,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Camisa de Corrente"
+  },
+  "Hands": {
+   "name": "Manoplas de Ferro",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 5
+    }
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 5
+    }
+   ],
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Botas de Couro"
+  },
+  "Weapon1": {
+   "name": "Lâmina Veloz"
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Arco Composto",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [
+  {
+   "gem_type": "Safira",
+   "level": 4
+  }
+ ],
+ "hp": 8631,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Luvas de Couro"
+  },
+  {
+   "name": "Tamancos de Madeira"
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 32452,
+  "gold_from_combat": 22697,
+  "gold_from_interest": 1793,
+  "gold_from_sale": 7962,
+  "gold_spent": 22220,
+  "gold_spent_on_consumable": 356,
+  "gold_spent_on_enchant": 226,
+  "gold_spent_on_enhancement": 3296,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 9778,
+  "gold_spent_on_recovery": 980,
+  "gold_spent_on_socket": 1434,
+  "interest_payments": 21,
+  "items_dropped": 32,
+  "items_equipped": 19,
+  "items_sold": 28,
+  "max_gold_held": 10622,
+  "paid_exits": 21,
+  "purchases": 59
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 685,
+ "passives": [
+  "sangue_de_vidente",
+  "fio_serrilhado",
+  "instinto_frio",
+  "sangue_de_vidente",
+  "unha_suja",
+  "furia_berserker",
+  "fio_serrilhado",
+  "olho_aguia",
+  "fio_serrilhado",
+  "olho_de_cacador",
+  "sede_sangue",
+  "sede_sangue",
+  "pulso_certeiro",
+  "fio_serrilhado",
+  "sangue_de_vidente",
+  "olho_aguia",
+  "musculos_aco",
+  "ritmo_profano",
+  "postura_fechada",
+  "olho_aguia",
+  "fio_serrilhado",
+  "musculos_aco",
+  "toque_dragao"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "carga_do_condenado",
+  "escudo_protetor",
+  "fortalecimento",
+  "golpe_devastador",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_guarda_alta",
+  "n_leitura_de_terreno",
+  "n_marca_do_cacador",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_postura_impecavel",
+  "n_respirar_fundo",
+  "olho_de_ferreiro",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "provocacao",
+  "sangue_nos_olhos",
+  "soco_de_placa"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "provocacao",
+  "2": "golpe_duplo",
+  "3": "n_leitura_de_terreno",
+  "4": "n_mira_calma"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1551
+}

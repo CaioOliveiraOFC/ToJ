@@ -1,0 +1,234 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5532,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Manto de Sombra",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    },
+    null
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "name": "Elmo de Madeira"
+  },
+  "Legs": {
+   "name": "Saia de Tecido"
+  },
+  "Ring1": {
+   "name": "Anel de Bronze"
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "name": "Chinelos de Pano"
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Arco Élfico",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 1
+    }
+   ],
+   "name": "Arco Longbow",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 4081,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze",
+   "origin": "starter"
+  },
+  {
+   "name": "Anel de Couro"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Capa de Pano"
+  },
+  {
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 25382,
+  "gold_from_combat": 17464,
+  "gold_from_interest": 1160,
+  "gold_from_sale": 6758,
+  "gold_spent": 19850,
+  "gold_spent_on_consumable": 1662,
+  "gold_spent_on_enhancement": 1635,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 10151,
+  "gold_spent_on_recovery": 980,
+  "gold_spent_on_socket": 1086,
+  "interest_payments": 19,
+  "items_dropped": 33,
+  "items_equipped": 34,
+  "items_sold": 22,
+  "max_gold_held": 8813,
+  "paid_exits": 19,
+  "purchases": 63
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 1547,
+ "passives": [
+  "sede_sangue",
+  "olho_aguia",
+  "olho_aguia",
+  "heranca_do_abismo",
+  "heranca_do_abismo",
+  "pulso_certeiro",
+  "pele_grossa",
+  "sangue_de_vidente",
+  "sede_silenciosa",
+  "passos_leves",
+  "olho_de_cacador",
+  "coracao_ferro",
+  "sede_sangue",
+  "odio_antigo",
+  "instinto_frio",
+  "coracao_ferro",
+  "musculos_aco",
+  "olho_aguia",
+  "odio_antigo",
+  "voz_no_escuro",
+  "olho_de_cacador",
+  "sede_sangue"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "couro_endurecido",
+  "envenenar",
+  "evasao",
+  "faro_de_rua",
+  "joelho_torto",
+  "leitura_de_guarda",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_lamina_assentada",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "passo_felino",
+  "picada_certeira",
+  "sangria_lenta",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {
+  "n_mira_calma": 3
+ },
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "n_mira_calma",
+  "3": "joelho_torto",
+  "4": "passo_felino"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 572
+}

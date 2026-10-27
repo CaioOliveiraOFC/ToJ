@@ -1,0 +1,236 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6459,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Peitoral de Cota",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 10.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "name": "Botas Encantadas",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    }
+   ],
+   "name": "Cajado Eterno",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Faca de Caça"
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5712,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Força",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 2,
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Perneiras de Couro"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Lança de Madeira"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  },
+  {
+   "name": "Jaqueta de Couro"
+  },
+  {
+   "name": "Anel de Palha"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Perneiras de Couro"
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 23004,
+  "gold_from_combat": 15017,
+  "gold_from_interest": 1747,
+  "gold_from_sale": 6240,
+  "gold_spent": 16545,
+  "gold_spent_on_consumable": 694,
+  "gold_spent_on_enchant": 1053,
+  "gold_spent_on_enhancement": 1830,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 7428,
+  "gold_spent_on_recovery": 322,
+  "gold_spent_on_socket": 882,
+  "interest_payments": 18,
+  "items_dropped": 39,
+  "items_equipped": 25,
+  "items_sold": 26,
+  "max_gold_held": 10793,
+  "paid_exits": 19,
+  "purchases": 55
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 1519,
+ "passives": [
+  "boca_de_sangue",
+  "casco_calejado",
+  "pele_de_sal",
+  "pele_grossa",
+  "casco_calejado",
+  "sangue_guerreiro",
+  "sede_silenciosa",
+  "casco_calejado",
+  "postura_fechada",
+  "instinto_frio",
+  "passos_leves",
+  "reflexos_rapidos",
+  "essencia_fluida",
+  "pele_de_sal",
+  "pulso_certeiro",
+  "pele_grossa",
+  "alma_eterna",
+  "pele_grossa",
+  "pele_grossa",
+  "sangue_guerreiro"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "drenar_vida",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "grilhoes_de_gelo",
+  "maldicao_de_cinzas",
+  "marca_ardente",
+  "missil_magico",
+  "n_curativo_de_campo",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_hora_do_arauto",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "pacto_do_vazio",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "reserva_profunda",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "missil_magico",
+  "3": "n_curativo_de_campo",
+  "4": "drenar_vida"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 3275
+}

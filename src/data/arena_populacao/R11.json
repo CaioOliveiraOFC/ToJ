@@ -1,0 +1,249 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 17049,
+ "dungeon_level": 23,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 2.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Colete da Sombra",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Titânio",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas Fantasma",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Adaga do Vazio",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Lâmina da Tempestade",
+   "socket_count": 2
+  }
+ },
+ "extracted_on_floor": 23,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Rubi",
+   "level": 5
+  },
+  {
+   "gem_type": "Ametista",
+   "level": 5
+  }
+ ],
+ "hp": 6376,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  {
+   "name": "Calça de Cota",
+   "socket_count": 2
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 10.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Máscara de Sombra",
+   "socket_count": 2
+  },
+  {
+   "name": "Bandana de Tecido"
+  },
+  {
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "name": "Punhos de Lona"
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Adaga Mortal",
+   "socket_count": 1
+  },
+  {
+   "name": "Saia de Couro"
+  },
+  {
+   "name": "Túnica de Pano"
+  }
+ ],
+ "last_interest_floor": 22,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 55983,
+  "gold_from_combat": 32419,
+  "gold_from_interest": 3819,
+  "gold_from_sale": 19745,
+  "gold_spent": 38934,
+  "gold_spent_on_consumable": 559,
+  "gold_spent_on_enchant": 3677,
+  "gold_spent_on_enhancement": 5569,
+  "gold_spent_on_exit_fee": 7133,
+  "gold_spent_on_gear": 20927,
+  "gold_spent_on_recovery": 173,
+  "gold_spent_on_socket": 896,
+  "interest_payments": 21,
+  "items_dropped": 55,
+  "items_equipped": 27,
+  "items_sold": 47,
+  "max_gold_held": 23228,
+  "paid_exits": 22,
+  "purchases": 67
+ },
+ "level": 25,
+ "map_state": null,
+ "mp": 1077,
+ "passives": [
+  "maos_midas",
+  "boca_de_sangue",
+  "boca_de_sangue",
+  "boca_de_sangue",
+  "voracidade",
+  "mente_serena",
+  "bebida_deuses",
+  "casco_calejado",
+  "furia_berserker",
+  "respiracao_contada",
+  "respiracao_contada",
+  "mente_serena",
+  "reserva_arcana",
+  "ritmo_profano",
+  "bebida_deuses",
+  "odio_baixo",
+  "sangue_guerreiro",
+  "mente_serena",
+  "sorte_iniciante",
+  "essencia_fluida",
+  "voracidade",
+  "divida_de_ouro",
+  "punho_atordoante",
+  "poco_fundo"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "bolso_furado",
+  "corte_de_tendao",
+  "dose_da_viuva",
+  "duas_maos_um_tempo",
+  "envenenar",
+  "evasao",
+  "faro_de_rua",
+  "ferida_paga",
+  "flecha_pela_fresta",
+  "golpe_baixo",
+  "golpe_sombras",
+  "hora_do_lobo",
+  "joelho_torto",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_olho_treinado",
+  "n_postura_impecavel",
+  "picada_certeira",
+  "respiracao_de_ladrao",
+  "sangria_lenta"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "assassinato",
+  "2": "hora_do_lobo",
+  "3": "n_guarda_alta",
+  "4": "ferida_paga"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4487
+}

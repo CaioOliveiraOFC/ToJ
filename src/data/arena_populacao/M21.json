@@ -1,0 +1,207 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6654,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Couro"
+  },
+  "Hands": {
+   "name": "Luvas de Couro"
+  },
+  "Helmet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Botas Encantadas",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "name": "Porrete"
+  },
+  "Weapon2": {
+   "name": "Clava de Madeira"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5018,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Arco Composto",
+   "socket_count": 2
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 35834,
+  "gold_from_combat": 19174,
+  "gold_from_interest": 1393,
+  "gold_from_sale": 15267,
+  "gold_spent": 29180,
+  "gold_spent_on_consumable": 519,
+  "gold_spent_on_enchant": 370,
+  "gold_spent_on_enhancement": 4653,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 16069,
+  "gold_spent_on_recovery": 1716,
+  "gold_spent_on_socket": 580,
+  "interest_payments": 20,
+  "items_dropped": 45,
+  "items_equipped": 33,
+  "items_sold": 39,
+  "max_gold_held": 15443,
+  "paid_exits": 20,
+  "purchases": 65
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 2269,
+ "passives": [
+  "lamina_afiada",
+  "alma_eterna",
+  "pulso_certeiro",
+  "lamina_do_juizo",
+  "olho_de_cacador",
+  "agulha_no_osso",
+  "voz_no_escuro",
+  "sangue_de_vidente",
+  "odio_antigo",
+  "odio_baixo",
+  "olho_aguia",
+  "olho_aguia",
+  "musculos_aco",
+  "musculos_aco",
+  "olho_de_cacador",
+  "odio_antigo",
+  "olho_de_cacador",
+  "musculos_aco",
+  "olho_de_cacador",
+  "voz_no_escuro",
+  "furia_berserker",
+  "oraculo_partido"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "clarividencia",
+  "egide_de_runas",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "lasca_de_gelo",
+  "marca_ardente",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pacto_de_ferro",
+  "n_pancada_na_nuca",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "lasca_de_gelo",
+  "3": "n_travar_o_pulso",
+  "4": "n_pacto_de_ferro"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 2487
+}

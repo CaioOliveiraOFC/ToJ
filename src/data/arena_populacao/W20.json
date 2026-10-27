@@ -1,0 +1,203 @@
+{
+ "active_buffs": {},
+ "active_effects": {
+  "bleed": {
+   "duration": 1,
+   "effect": "bleed",
+   "intensity": 4.0,
+   "source_id": "mob_mordida_suja",
+   "stacks": 1,
+   "value": 4.0
+  }
+ },
+ "coins": 2843,
+ "dungeon_level": 17,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": null,
+  "Hands": {
+   "name": "Martelo de Mão"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_percent",
+     "value": 5.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Machado de Batalha",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 17,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 4259,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  {
+   "name": "Lâmina da Tempestade",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 1
+    },
+    null,
+    null
+   ],
+   "name": "Espada do Eclipse",
+   "socket_count": 3
+  },
+  {
+   "name": "Elmo de Madeira"
+  }
+ ],
+ "last_interest_floor": 16,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 2,
+  "gold_earned": 16316,
+  "gold_from_combat": 12266,
+  "gold_from_interest": 741,
+  "gold_from_sale": 3309,
+  "gold_spent": 13473,
+  "gold_spent_on_consumable": 264,
+  "gold_spent_on_enchant": 983,
+  "gold_spent_on_enhancement": 866,
+  "gold_spent_on_exit_fee": 2694,
+  "gold_spent_on_gear": 8474,
+  "gold_spent_on_recovery": 103,
+  "gold_spent_on_socket": 89,
+  "interest_payments": 16,
+  "items_dropped": 27,
+  "items_equipped": 35,
+  "items_sold": 21,
+  "max_gold_held": 5103,
+  "paid_exits": 16,
+  "purchases": 43
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 623,
+ "passives": [
+  "sede_silenciosa",
+  "coracao_ferro",
+  "maos_midas",
+  "sede_silenciosa",
+  "essencia_viva",
+  "reserva_arcana",
+  "boca_de_sangue",
+  "respiracao_contada",
+  "sorte_iniciante",
+  "bebida_deuses",
+  "respiracao_contada",
+  "respiracao_contada",
+  "sorte_iniciante",
+  "sede_silenciosa",
+  "mente_serena",
+  "boca_de_sangue",
+  "boca_de_sangue",
+  "respiracao_contada",
+  "boca_de_sangue",
+  "poco_fundo"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "escudo_protetor",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida_de_ariete",
+  "mao_dupla",
+  "marca_do_acougueiro",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_mao_que_nao_treme",
+  "n_marca_do_cacador",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pausa_util",
+  "n_ritmo_de_duelo",
+  "peso_do_machado",
+  "pisada_de_ferro",
+  "quebra_guarda",
+  "sangue_nos_olhos",
+  "soco_de_placa"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "mao_dupla": 3,
+  "n_mira_calma": 1
+ },
+ "skills": {
+  "1": "mao_dupla",
+  "2": "n_mira_calma",
+  "3": "escudo_protetor",
+  "4": "peso_do_machado"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 491
+}

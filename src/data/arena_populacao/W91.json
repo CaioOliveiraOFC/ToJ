@@ -1,0 +1,267 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 7470,
+ "dungeon_level": 25,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "crit_chance",
+     "value": 4.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Gibão de Couro"
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Couro",
+   "origin": "starter"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 8.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 5
+    },
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 2
+  },
+  "Ring1": null,
+  "Ring2": null,
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Lança de Madeira"
+  },
+  "Weapon2": {
+   "name": "Clava de Madeira"
+  }
+ },
+ "extracted_on_floor": 25,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [
+  {
+   "gem_type": "Ametista",
+   "level": 2
+  },
+  {
+   "gem_type": "Ametista",
+   "level": 3
+  }
+ ],
+ "hp": 6315,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada de Ferro"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    },
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Tridente do Guerreiro",
+   "socket_count": 2
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 3
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    },
+    null
+   ],
+   "name": "Espada Lendária",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Lança de Madeira"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Amuleto de Ferro"
+  },
+  {
+   "name": "Luvas Rasas"
+  },
+  {
+   "name": "Arco Longbow",
+   "socket_count": 1
+  },
+  {
+   "name": "Camisa de Corrente"
+  }
+ ],
+ "last_interest_floor": 24,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 10,
+  "gold_earned": 46579,
+  "gold_from_combat": 33943,
+  "gold_from_interest": 2147,
+  "gold_from_sale": 10489,
+  "gold_spent": 39109,
+  "gold_spent_on_consumable": 3344,
+  "gold_spent_on_enchant": 1992,
+  "gold_spent_on_enhancement": 4105,
+  "gold_spent_on_exit_fee": 9591,
+  "gold_spent_on_gear": 14888,
+  "gold_spent_on_recovery": 3689,
+  "gold_spent_on_socket": 1500,
+  "interest_payments": 24,
+  "items_dropped": 45,
+  "items_equipped": 44,
+  "items_sold": 32,
+  "max_gold_held": 10816,
+  "paid_exits": 24,
+  "purchases": 72
+ },
+ "level": 26,
+ "map_state": null,
+ "mp": 592,
+ "passives": [
+  "furia_berserker",
+  "musculos_aco",
+  "furia_berserker",
+  "odio_baixo",
+  "postura_fechada",
+  "lamina_afiada",
+  "sangue_toxico",
+  "musculos_aco",
+  "lamina_afiada",
+  "olho_de_cacador",
+  "heranca_do_abismo",
+  "casco_calejado",
+  "respiracao_contada",
+  "instinto_frio",
+  "furia_berserker",
+  "olho_de_cacador",
+  "passo_de_corca",
+  "olho_aguia",
+  "olho_de_cacador",
+  "olho_de_cacador",
+  "pulso_certeiro",
+  "passo_de_corca",
+  "sangue_guerreiro",
+  "musculos_aco",
+  "pulso_certeiro"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "escudo_protetor",
+  "fio_no_rebite",
+  "fortalecimento",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "grito_guerra",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_encarar",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_paciencia_do_coveiro",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "n_ultima_carta",
+  "olho_de_ferreiro",
+  "provocacao",
+  "quebra_guarda",
+  "respiracao_de_forja",
+  "sangue_nos_olhos",
+  "soco_de_placa"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_duplo",
+  "2": "quebra_guarda",
+  "3": "n_guarda_cruzada",
+  "4": "n_paciencia_do_coveiro"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 7473
+}

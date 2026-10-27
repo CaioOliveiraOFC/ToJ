@@ -1,0 +1,236 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 8509,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 8.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 4.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Couro"
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "name": "Cajado Eterno",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null,
+    null
+   ],
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 3
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 3,
+ "gems": [],
+ "hp": 7309,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Anel de Couro"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    },
+    null
+   ],
+   "name": "Escudo Torre",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel Vegetal",
+   "origin": "starter"
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 36706,
+  "gold_from_combat": 21818,
+  "gold_from_interest": 2357,
+  "gold_from_sale": 12531,
+  "gold_spent": 28197,
+  "gold_spent_on_consumable": 353,
+  "gold_spent_on_enchant": 786,
+  "gold_spent_on_enhancement": 2994,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 16237,
+  "gold_spent_on_recovery": 763,
+  "gold_spent_on_shop_reroll": 468,
+  "gold_spent_on_socket": 446,
+  "interest_payments": 19,
+  "items_dropped": 40,
+  "items_equipped": 23,
+  "items_sold": 29,
+  "max_gold_held": 16275,
+  "paid_exits": 21,
+  "purchases": 57
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 2043,
+ "passives": [
+  "heranca_do_abismo",
+  "coracao_ferro",
+  "essencia_fluida",
+  "bencao_divina",
+  "pele_grossa",
+  "olho_de_cacador",
+  "musculos_aco",
+  "escudo_fe",
+  "odio_baixo",
+  "escudo_fe",
+  "sede_silenciosa",
+  "musculos_aco",
+  "pulso_certeiro",
+  "boca_de_sangue",
+  "coracao_ferro",
+  "olho_de_cacador",
+  "pele_grossa",
+  "essencia_fluida",
+  "coracao_ferro",
+  "furia_berserker",
+  "boca_de_sangue",
+  "reserva_arcana",
+  "pele_grossa"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "clarividencia",
+  "dissonancia",
+  "drenar_vida",
+  "fagulha_teimosa",
+  "lasca_de_gelo",
+  "mao_firme",
+  "n_amuleto_rachado",
+  "n_curativo_de_campo",
+  "n_estocada_seca",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_lamina_assentada",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "palavra_de_torpor",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "fagulha_teimosa",
+  "3": "n_leitura_de_terreno",
+  "4": "clarividencia"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 937
+}

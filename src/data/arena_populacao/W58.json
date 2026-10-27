@@ -1,0 +1,220 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 2838,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 1
+    }
+   ],
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    },
+    null,
+    null
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 3
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    }
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Tamancos de Madeira"
+  },
+  "Weapon1": {
+   "name": "Porrete"
+  },
+  "Weapon2": {
+   "name": "Gravetos Mágicos"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 6314,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Clava Pesada"
+  },
+  {
+   "name": "Clava de Madeira"
+  },
+  {
+   "name": "Clava Pesada"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Chinelos de Pano"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 21177,
+  "gold_from_combat": 15054,
+  "gold_from_interest": 725,
+  "gold_from_sale": 5398,
+  "gold_spent": 18339,
+  "gold_spent_on_consumable": 325,
+  "gold_spent_on_enchant": 377,
+  "gold_spent_on_enhancement": 2949,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 10299,
+  "gold_spent_on_recovery": 90,
+  "gold_spent_on_socket": 594,
+  "interest_payments": 18,
+  "items_dropped": 36,
+  "items_equipped": 61,
+  "items_sold": 23,
+  "max_gold_held": 4432,
+  "paid_exits": 18,
+  "purchases": 49
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 249,
+ "passives": [
+  "olho_aguia",
+  "boca_de_sangue",
+  "reserva_arcana",
+  "reserva_arcana",
+  "respiracao_contada",
+  "musculos_aco",
+  "instinto_frio",
+  "mente_serena",
+  "sorte_iniciante",
+  "coracao_ferro",
+  "musculos_aco",
+  "coracao_ferro",
+  "mente_serena",
+  "musculos_aco",
+  "maos_midas",
+  "sorte_iniciante",
+  "pele_de_sal",
+  "boca_de_sangue",
+  "pele_grossa",
+  "fome_batalha",
+  "odio_antigo"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "golpe_poderoso",
+  "investida",
+  "juramento_da_muralha",
+  "n_encarar",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_lamina_assentada",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "olho_de_ferreiro",
+  "postura_de_muro",
+  "quebra_guarda",
+  "sangue_nos_olhos",
+  "tomar_folego"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "investida": 1
+ },
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "investida",
+  "3": "n_guarda_alta",
+  "4": "couraca_improvisada"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 790
+}

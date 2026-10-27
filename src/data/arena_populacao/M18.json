@@ -1,0 +1,178 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5112,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Manto Etéreo",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Bastão Mágico",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 6.0
+    }
+   ],
+   "name": "Bandana de Tecido"
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas Encantadas",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "name": "Espada do Universo",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "name": "Espada do Universo",
+   "socket_count": 3
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 4322,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  {
+   "name": "Tamancos de Madeira"
+  },
+  {
+   "name": "Capuz de Pano"
+  },
+  {
+   "name": "Armadura de Camisa"
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 2,
+  "gold_earned": 18924,
+  "gold_from_combat": 11995,
+  "gold_from_interest": 1010,
+  "gold_from_sale": 5919,
+  "gold_spent": 13812,
+  "gold_spent_on_consumable": 57,
+  "gold_spent_on_enchant": 1298,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 9213,
+  "gold_spent_on_recovery": 60,
+  "gold_spent_on_socket": 42,
+  "interest_payments": 17,
+  "items_dropped": 26,
+  "items_equipped": 20,
+  "items_sold": 25,
+  "max_gold_held": 8064,
+  "paid_exits": 17,
+  "purchases": 41
+ },
+ "level": 20,
+ "map_state": null,
+ "mp": 1833,
+ "passives": [
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "alma_eterna",
+  "lamina_afiada",
+  "pele_grossa",
+  "postura_fechada",
+  "sangue_guerreiro",
+  "pele_adamantio",
+  "odio_antigo",
+  "passos_leves",
+  "pele_de_sal",
+  "lamina_afiada",
+  "coracao_ferro",
+  "casco_calejado",
+  "voracidade",
+  "pele_de_sal",
+  "escudo_fe",
+  "instinto_frio",
+  "boca_de_sangue"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "drenar_vida",
+  "escudo_magico",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "maldicao_de_cinzas",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_cruzada",
+  "n_olho_treinado",
+  "n_travar_o_pulso",
+  "pele_de_quartzo",
+  "relampago",
+  "sanguessuga_arcana",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {
+  "bola_fogo": 1,
+  "missil_magico": 2
+ },
+ "skills": {
+  "1": "bola_fogo",
+  "2": "missil_magico",
+  "3": "n_guarda_cruzada",
+  "4": "drenar_vida"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 197
+}

@@ -1,0 +1,232 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4014,
+ "dungeon_level": 16,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Couro"
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 4.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Chinelos de Pano"
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    },
+    null,
+    null
+   ],
+   "name": "Espada Lendária",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "name": "Espada do Eclipse",
+   "socket_count": 3
+  }
+ },
+ "extracted_on_floor": 16,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [
+  {
+   "gem_type": "Rubi",
+   "level": 3
+  }
+ ],
+ "hp": 4842,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel Vegetal"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 10.0
+    }
+   ],
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Capuz de Pano"
+  },
+  {
+   "name": "Clava de Madeira"
+  },
+  {
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Saia de Tecido"
+  },
+  {
+   "name": "Perneiras de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Chapéu de Tecido"
+  },
+  {
+   "name": "Colete de Pano",
+   "origin": "starter"
+  },
+  {
+   "name": "Elixir de Foco"
+  }
+ ],
+ "last_interest_floor": 15,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 12140,
+  "gold_from_combat": 8713,
+  "gold_from_interest": 617,
+  "gold_from_sale": 2810,
+  "gold_spent": 8126,
+  "gold_spent_on_consumable": 184,
+  "gold_spent_on_enchant": 601,
+  "gold_spent_on_enhancement": 416,
+  "gold_spent_on_exit_fee": 2268,
+  "gold_spent_on_gear": 4112,
+  "gold_spent_on_recovery": 266,
+  "gold_spent_on_socket": 279,
+  "interest_payments": 14,
+  "items_dropped": 35,
+  "items_equipped": 18,
+  "items_sold": 21,
+  "max_gold_held": 4014,
+  "max_unpaid_exit_streak": 1,
+  "paid_exits": 14,
+  "purchases": 43,
+  "unpaid_exits": 1
+ },
+ "level": 19,
+ "map_state": null,
+ "mp": 521,
+ "passives": [
+  "coracao_ferro",
+  "boca_de_sangue",
+  "casco_calejado",
+  "ritmo_profano",
+  "casco_calejado",
+  "pele_adamantio",
+  "casco_calejado",
+  "sorte_iniciante",
+  "mente_serena",
+  "sede_silenciosa",
+  "postura_fechada",
+  "bebida_deuses",
+  "bencao_divina",
+  "mente_serena",
+  "ritmo_profano",
+  "sangue_guerreiro",
+  "pele_adamantio",
+  "voracidade"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "escudo_protetor",
+  "golpe_poderoso",
+  "investida_de_ariete",
+  "mao_dupla",
+  "n_amuleto_rachado",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "provocacao",
+  "quebra_guarda",
+  "sede_de_batalha",
+  "tomar_folego",
+  "veterania"
+ ],
+ "shop_miss_streak": 3,
+ "skill_cooldowns": {
+  "golpe_poderoso": 1,
+  "n_mira_calma": 1
+ },
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "n_mira_calma",
+  "3": "tomar_folego",
+  "4": "escudo_protetor"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 145
+}

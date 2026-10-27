@@ -1,0 +1,223 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 7759,
+ "dungeon_level": 23,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 11.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Fenrir",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "crit_chance",
+     "value": 7.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 5.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Espada Lendária",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Lâmina da Tempestade",
+   "socket_count": 2
+  }
+ },
+ "extracted_on_floor": 23,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 9256,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 22,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 46794,
+  "gold_from_combat": 25598,
+  "gold_from_interest": 2207,
+  "gold_from_sale": 18989,
+  "gold_spent": 39035,
+  "gold_spent_on_consumable": 415,
+  "gold_spent_on_enchant": 3151,
+  "gold_spent_on_enhancement": 382,
+  "gold_spent_on_exit_fee": 7133,
+  "gold_spent_on_gear": 24679,
+  "gold_spent_on_recovery": 2309,
+  "gold_spent_on_socket": 966,
+  "interest_payments": 22,
+  "items_dropped": 48,
+  "items_equipped": 28,
+  "items_sold": 46,
+  "max_gold_held": 12776,
+  "paid_exits": 22,
+  "purchases": 68
+ },
+ "level": 25,
+ "map_state": null,
+ "mp": 998,
+ "passives": [
+  "olho_aguia",
+  "musculos_aco",
+  "passos_leves",
+  "sangue_de_vidente",
+  "pulso_certeiro",
+  "furia_berserker",
+  "musculos_aco",
+  "furia_berserker",
+  "pulso_certeiro",
+  "instinto_frio",
+  "musculos_aco",
+  "lamina_afiada",
+  "cabeca_dura",
+  "cabeca_dura",
+  "unha_suja",
+  "pulso_certeiro",
+  "heranca_do_abismo",
+  "sangue_de_vidente",
+  "voz_no_escuro",
+  "punho_atordoante",
+  "sede_sangue",
+  "odio_baixo",
+  "odio_baixo",
+  "pulso_certeiro"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "fio_no_rebite",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "marca_do_acougueiro",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_encarar",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_marca_do_cacador",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "olho_de_ferreiro",
+  "pisada_de_ferro",
+  "sangue_nos_olhos",
+  "soco_de_placa",
+  "tomar_folego"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ferro_contra_ferro",
+  "2": "n_grito_curto",
+  "3": "n_marca_do_cacador",
+  "4": "tomar_folego"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4198
+}

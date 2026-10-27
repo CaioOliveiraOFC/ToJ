@@ -1,0 +1,220 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 7631,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Peitoral de Ferro",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Bastão Mágico",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel da Fênix",
+   "socket_count": 3
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 3
+  },
+  "Shoes": {
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Cajado Eterno",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 2
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 8012,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Elmo de Ferro",
+   "socket_count": 3
+  },
+  {
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada de Ferro"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 5,
+  "gold_earned": 31309,
+  "gold_from_combat": 21633,
+  "gold_from_interest": 1710,
+  "gold_from_sale": 7966,
+  "gold_spent": 23678,
+  "gold_spent_on_consumable": 344,
+  "gold_spent_on_enchant": 2158,
+  "gold_spent_on_enhancement": 1742,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 12666,
+  "gold_spent_on_recovery": 55,
+  "gold_spent_on_shop_reroll": 505,
+  "gold_spent_on_socket": 935,
+  "interest_payments": 19,
+  "items_dropped": 39,
+  "items_equipped": 20,
+  "items_sold": 31,
+  "max_gold_held": 10391,
+  "paid_exits": 20,
+  "purchases": 52
+ },
+ "level": 25,
+ "map_state": null,
+ "mp": 2352,
+ "passives": [
+  "mente_serena",
+  "casco_calejado",
+  "boca_de_sangue",
+  "respiracao_contada",
+  "furia_berserker",
+  "mente_serena",
+  "pele_grossa",
+  "passos_leves",
+  "sorte_iniciante",
+  "coracao_ferro",
+  "sangue_guerreiro",
+  "pele_de_sal",
+  "ritmo_profano",
+  "pele_grossa",
+  "fome_batalha",
+  "pele_grossa",
+  "pele_grossa",
+  "maos_midas",
+  "sede_silenciosa",
+  "respiracao_contada",
+  "pele_grossa",
+  "essencia_viva",
+  "casco_calejado",
+  "essencia_viva"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "clarividencia",
+  "cura_menor",
+  "drenar_vida",
+  "lancar_pedra",
+  "mao_firme",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_respirar_fundo",
+  "pacto_do_vazio",
+  "palavra_de_torpor",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "raio_congelante",
+  "reserva_profunda",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "pulso_de_forca",
+  "3": "n_pancada_na_nuca",
+  "4": "n_disciplina_de_forja"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 7114
+}

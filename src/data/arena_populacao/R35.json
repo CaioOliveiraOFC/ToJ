@@ -1,0 +1,236 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5119,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 7.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto de Ouro",
+   "socket_count": 2
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 5
+    }
+   ],
+   "name": "Armadura Divina",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 1
+    }
+   ],
+   "name": "Máscara de Sombra",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 3
+  },
+  "Ring1": {
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel de Couro"
+  },
+  "Shoes": {
+   "name": "Tamancos de Madeira"
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Pá de Batalha"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 4334,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null,
+    null
+   ],
+   "name": "Cajado da Galáxia",
+   "socket_count": 3
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Arco Composto",
+   "socket_count": 2
+  },
+  {
+   "name": "Saia de Couro"
+  },
+  {
+   "name": "Cajado do Vazio",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 28734,
+  "gold_from_combat": 19523,
+  "gold_from_interest": 1370,
+  "gold_from_sale": 7841,
+  "gold_spent": 23615,
+  "gold_spent_on_consumable": 844,
+  "gold_spent_on_enchant": 1754,
+  "gold_spent_on_enhancement": 1157,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 12505,
+  "gold_spent_on_recovery": 831,
+  "gold_spent_on_socket": 1251,
+  "interest_payments": 20,
+  "items_dropped": 34,
+  "items_equipped": 26,
+  "items_sold": 27,
+  "max_gold_held": 6437,
+  "paid_exits": 20,
+  "purchases": 66
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 482,
+ "passives": [
+  "postura_fechada",
+  "musculos_aco",
+  "casco_calejado",
+  "pele_de_sal",
+  "passos_leves",
+  "pele_grossa",
+  "coracao_ferro",
+  "boca_de_sangue",
+  "sangue_guerreiro",
+  "coracao_ferro",
+  "boca_de_sangue",
+  "coracao_ferro",
+  "casco_calejado",
+  "toque_dragao",
+  "coracao_ferro",
+  "coracao_ferro",
+  "respiracao_contada",
+  "coracao_ferro",
+  "passos_leves",
+  "postura_fechada",
+  "escudo_fe",
+  "oraculo_partido"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "cobranca_de_juros",
+  "cortina_fumaca",
+  "evasao",
+  "ferida_paga",
+  "golpe_sombras",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_grito_curto",
+  "n_guarda_cruzada",
+  "n_hora_do_arauto",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "passo_felino",
+  "picada_certeira",
+  "pó_nos_olhos",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "n_mira_calma",
+  "3": "n_guarda_cruzada",
+  "4": "ferida_paga"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4309
+}

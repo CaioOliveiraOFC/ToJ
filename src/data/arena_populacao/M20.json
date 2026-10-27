@@ -1,0 +1,199 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5453,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 7.0
+    }
+   ],
+   "name": "Amuleto de Prata",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Colete da Resistência",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Titânio",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "name": "Calça de Cota",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Tamancos de Madeira"
+  },
+  "Weapon1": {
+   "name": "Espada de Aço",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "name": "Arco Composto",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [
+  {
+   "gem_type": "Esmeralda",
+   "level": 4
+  },
+  {
+   "gem_type": "Rubi",
+   "level": 3
+  }
+ ],
+ "hp": 4685,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 23378,
+  "gold_from_combat": 13544,
+  "gold_from_interest": 1057,
+  "gold_from_sale": 8777,
+  "gold_spent": 17925,
+  "gold_spent_on_consumable": 284,
+  "gold_spent_on_enchant": 1031,
+  "gold_spent_on_enhancement": 1193,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 11319,
+  "gold_spent_on_recovery": 244,
+  "gold_spent_on_socket": 149,
+  "interest_payments": 18,
+  "items_dropped": 32,
+  "items_equipped": 24,
+  "items_sold": 29,
+  "max_gold_held": 7400,
+  "paid_exits": 18,
+  "purchases": 48
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 1093,
+ "passives": [
+  "alma_eterna",
+  "essencia_fluida",
+  "pele_de_sal",
+  "postura_fechada",
+  "casco_calejado",
+  "pele_grossa",
+  "musculos_aco",
+  "alma_eterna",
+  "casco_calejado",
+  "alquimia_do_desespero",
+  "boca_de_sangue",
+  "reflexos_rapidos",
+  "postura_fechada",
+  "pele_grossa",
+  "furia_berserker",
+  "sede_silenciosa",
+  "passos_leves",
+  "passo_de_corca",
+  "pele_grossa",
+  "odio_antigo"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "drenar_vida",
+  "egide_de_runas",
+  "fagulha_teimosa",
+  "lasca_de_gelo",
+  "mao_firme",
+  "n_amuleto_rachado",
+  "n_couro_batido",
+  "n_encarar",
+  "n_grito_curto",
+  "n_mira_calma",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "n_voto_de_silencio",
+  "palavra_de_torpor",
+  "pulso_de_forca",
+  "relampago",
+  "reserva_profunda",
+  "ressurgir",
+  "sono_profundo",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {
+  "bola_fogo": 2,
+  "fagulha_teimosa": 1
+ },
+ "skills": {
+  "1": "bola_fogo",
+  "2": "fagulha_teimosa",
+  "3": "n_amuleto_rachado",
+  "4": "drenar_vida"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 509
+}

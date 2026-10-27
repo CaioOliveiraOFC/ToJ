@@ -1,0 +1,196 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5220,
+ "dungeon_level": 17,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "name": "Amuleto da Mana",
+   "socket_count": 3
+  },
+  "Body": {
+   "name": "Túnica do Arquimago",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Escudo Torre",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Capacete de Ferro",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  "Shoes": {
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado de Cristal",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "name": "Cajado Eterno",
+   "socket_count": 3
+  }
+ },
+ "extracted_on_floor": 17,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Safira",
+   "level": 4
+  },
+  {
+   "gem_type": "Esmeralda",
+   "level": 3
+  }
+ ],
+ "hp": 3137,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 10.0
+    }
+   ],
+   "name": "Capacete de Couro"
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Óculos de Couro"
+  },
+  {
+   "name": "Cajado de Aprendiz"
+  },
+  {
+   "name": "Amuleto de Ferro"
+  },
+  {
+   "name": "Túnica do Fluxo",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 16,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 14231,
+  "gold_from_combat": 10677,
+  "gold_from_interest": 797,
+  "gold_from_sale": 2757,
+  "gold_spent": 9011,
+  "gold_spent_on_consumable": 161,
+  "gold_spent_on_enchant": 466,
+  "gold_spent_on_enhancement": 80,
+  "gold_spent_on_exit_fee": 2694,
+  "gold_spent_on_gear": 5302,
+  "gold_spent_on_recovery": 233,
+  "gold_spent_on_socket": 75,
+  "interest_payments": 16,
+  "items_dropped": 29,
+  "items_equipped": 21,
+  "items_sold": 18,
+  "max_gold_held": 5220,
+  "paid_exits": 16,
+  "purchases": 40
+ },
+ "level": 19,
+ "map_state": null,
+ "mp": 1378,
+ "passives": [
+  "postura_fechada",
+  "passo_de_corca",
+  "passos_leves",
+  "sangue_guerreiro",
+  "postura_fechada",
+  "sangue_guerreiro",
+  "passo_de_corca",
+  "boca_de_sangue",
+  "reflexos_rapidos",
+  "passos_leves",
+  "sangue_guerreiro",
+  "pele_grossa",
+  "pele_adamantio",
+  "coracao_ferro",
+  "postura_fechada",
+  "olho_aguia",
+  "sangue_guerreiro",
+  "postura_fechada"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "dreno_mana",
+  "explosao_arcana",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "lasca_de_gelo",
+  "maldicao_de_cinzas",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "pele_de_quartzo",
+  "relampago",
+  "sono_profundo"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "lasca_de_gelo": 2
+ },
+ "skills": {
+  "1": "bola_fogo",
+  "2": "lasca_de_gelo",
+  "3": "n_couro_batido",
+  "4": "n_respirar_fundo"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 358
+}

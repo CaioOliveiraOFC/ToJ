@@ -1,0 +1,224 @@
+{
+ "active_buffs": {},
+ "active_effects": {
+  "bleed": {
+   "duration": 1,
+   "effect": "bleed",
+   "intensity": 4.0,
+   "source_id": "mob_mordida_suja",
+   "stacks": 1,
+   "value": 4.0
+  }
+ },
+ "coins": 5632,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "enhancement_level": 1,
+   "name": "Armadura Divina",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Couro"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "name": "Anel de Ouro"
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": null,
+  "Weapon1": {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 5469,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Machado Terrível",
+   "socket_count": 2
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Gibão de Couro"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze",
+   "origin": "starter"
+  },
+  {
+   "name": "Calças de Tecido"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Arco Curto"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 17451,
+  "gold_from_combat": 13531,
+  "gold_from_interest": 1242,
+  "gold_from_sale": 2678,
+  "gold_spent": 11819,
+  "gold_spent_on_consumable": 240,
+  "gold_spent_on_enchant": 451,
+  "gold_spent_on_enhancement": 2431,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 4846,
+  "gold_spent_on_recovery": 79,
+  "gold_spent_on_socket": 67,
+  "interest_payments": 18,
+  "items_dropped": 28,
+  "items_equipped": 25,
+  "items_sold": 14,
+  "max_gold_held": 5632,
+  "paid_exits": 18,
+  "purchases": 40
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 923,
+ "passives": [
+  "boca_de_sangue",
+  "essencia_viva",
+  "essencia_fluida",
+  "reflexos_rapidos",
+  "mente_serena",
+  "coracao_ferro",
+  "sede_silenciosa",
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "sede_silenciosa",
+  "coracao_ferro",
+  "reserva_arcana",
+  "respiracao_contada",
+  "pele_de_sal",
+  "toque_dragao",
+  "boca_de_sangue",
+  "essencia_viva",
+  "boca_de_sangue",
+  "sorte_iniciante",
+  "sangue_guerreiro",
+  "reserva_arcana",
+  "postura_fechada"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "fio_no_rebite",
+  "golpe_poderoso",
+  "imortal",
+  "investida",
+  "marca_do_acougueiro",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_disciplina_de_forja",
+  "n_grito_curto",
+  "n_hora_do_arauto",
+  "n_pancada_na_nuca",
+  "n_respirar_fundo",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "sede_de_batalha"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "cutelada": 3,
+  "investida": 1
+ },
+ "skills": {
+  "1": "cutelada",
+  "2": "investida",
+  "3": "postura_de_muro",
+  "4": "imortal"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 923
+}

@@ -1,0 +1,178 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 2223,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 6.0
+    }
+   ],
+   "enhancement_level": 2,
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Colete da Sombra",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 10.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 3
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas Fantasma",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Espada de Aço",
+   "socket_count": 2
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 3370,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Arco do Silêncio",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 1,
+  "gold_earned": 20348,
+  "gold_from_combat": 11004,
+  "gold_from_interest": 1122,
+  "gold_from_sale": 8222,
+  "gold_spent": 18125,
+  "gold_spent_on_consumable": 377,
+  "gold_spent_on_enchant": 1782,
+  "gold_spent_on_enhancement": 1807,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 10264,
+  "gold_spent_on_recovery": 346,
+  "gold_spent_on_shop_reroll": 244,
+  "gold_spent_on_socket": 163,
+  "interest_payments": 16,
+  "items_dropped": 32,
+  "items_equipped": 23,
+  "items_sold": 31,
+  "max_gold_held": 5255,
+  "paid_exits": 17,
+  "purchases": 47
+ },
+ "level": 19,
+ "map_state": null,
+ "mp": 284,
+ "passives": [
+  "sede_silenciosa",
+  "olho_aguia",
+  "passo_de_corca",
+  "alma_eterna",
+  "sede_silenciosa",
+  "agulha_no_osso",
+  "olho_de_cacador",
+  "agulha_no_osso",
+  "pulso_certeiro",
+  "odio_antigo",
+  "passos_leves",
+  "olho_aguia",
+  "olho_aguia",
+  "sede_sangue",
+  "musculos_aco",
+  "pulso_certeiro",
+  "voz_no_escuro",
+  "furia_berserker"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "duas_maos_um_tempo",
+  "faro_de_rua",
+  "flecha_pela_fresta",
+  "golpe_baixo",
+  "n_areia_no_chao",
+  "n_estocada_seca",
+  "n_gancho_e_corda",
+  "n_guarda_cruzada",
+  "n_marca_do_cacador",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "passo_felino",
+  "pó_nos_olhos",
+  "sombra_rapida",
+  "testamento_do_ladrao"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "testamento_do_ladrao",
+  "2": "n_mira_calma",
+  "3": "faro_de_rua",
+  "4": "passo_felino"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 2532
+}

@@ -1,0 +1,248 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 12069,
+ "dungeon_level": 23,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Armadura Titânica",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "name": "Capacete de Ferro",
+   "socket_count": 3
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  }
+ },
+ "extracted_on_floor": 23,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 8503,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Espada do Universo",
+   "socket_count": 3
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    }
+   ],
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 7.0
+    }
+   ],
+   "name": "Capacete de Couro"
+  },
+  {
+   "name": "Luvas Rasas"
+  },
+  {
+   "name": "Perneiras de Couro"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  }
+ ],
+ "last_interest_floor": 22,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 56063,
+  "gold_from_combat": 36611,
+  "gold_from_interest": 2777,
+  "gold_from_sale": 16675,
+  "gold_spent": 43994,
+  "gold_spent_on_consumable": 2979,
+  "gold_spent_on_enchant": 3180,
+  "gold_spent_on_enhancement": 3905,
+  "gold_spent_on_exit_fee": 7133,
+  "gold_spent_on_gear": 24657,
+  "gold_spent_on_recovery": 1267,
+  "gold_spent_on_socket": 873,
+  "interest_payments": 22,
+  "items_dropped": 43,
+  "items_equipped": 46,
+  "items_sold": 32,
+  "max_gold_held": 18697,
+  "paid_exits": 22,
+  "purchases": 79
+ },
+ "level": 26,
+ "map_state": null,
+ "mp": 1116,
+ "passives": [
+  "respiracao_contada",
+  "pele_grossa",
+  "maos_midas",
+  "musculos_aco",
+  "olho_aguia",
+  "ritmo_profano",
+  "sangue_guerreiro",
+  "maos_midas",
+  "coracao_ferro",
+  "musculos_aco",
+  "respiracao_contada",
+  "sorte_iniciante",
+  "sede_sangue",
+  "postura_fechada",
+  "voracidade",
+  "maos_midas",
+  "essencia_viva",
+  "respiracao_contada",
+  "boca_de_sangue",
+  "sorte_iniciante",
+  "toque_dragao",
+  "boca_de_sangue",
+  "casco_calejado",
+  "essencia_fluida",
+  "mente_serena"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "carga_do_condenado",
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "fio_no_rebite",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "n_areia_no_chao",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_lamina_assentada",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "pisada_de_ferro",
+  "quebra_ossos",
+  "respiracao_de_forja",
+  "sangue_nos_olhos",
+  "sede_de_batalha",
+  "soco_de_placa"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "pisada_de_ferro",
+  "2": "carga_do_condenado",
+  "3": "berro_de_ferro",
+  "4": "n_folego_de_marcha"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 7946
+}

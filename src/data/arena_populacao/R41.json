@@ -1,0 +1,193 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3220,
+ "dungeon_level": 17,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto de Ouro",
+   "socket_count": 2
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Colete da Sombra",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enhancement_level": 1,
+   "name": "Elmo de Madeira",
+   "origin": "starter"
+  },
+  "Legs": {
+   "name": "Saia de Tecido"
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas Fantasma",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Lâmina Veloz"
+  },
+  "Weapon2": {
+   "name": "Pá de Batalha"
+  }
+ },
+ "extracted_on_floor": 17,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 4506,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 16,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 16576,
+  "gold_from_combat": 11098,
+  "gold_from_interest": 685,
+  "gold_from_sale": 4793,
+  "gold_spent": 13356,
+  "gold_spent_on_consumable": 226,
+  "gold_spent_on_enhancement": 618,
+  "gold_spent_on_exit_fee": 2694,
+  "gold_spent_on_gear": 8883,
+  "gold_spent_on_recovery": 190,
+  "gold_spent_on_socket": 745,
+  "interest_payments": 15,
+  "items_dropped": 25,
+  "items_equipped": 23,
+  "items_sold": 22,
+  "max_gold_held": 5214,
+  "paid_exits": 16,
+  "purchases": 45
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 1448,
+ "passives": [
+  "reserva_arcana",
+  "sorte_iniciante",
+  "sorte_iniciante",
+  "essencia_viva",
+  "voracidade",
+  "sangue_guerreiro",
+  "pele_de_sal",
+  "sorte_iniciante",
+  "boca_de_sangue",
+  "sorte_iniciante",
+  "sorte_iniciante",
+  "reserva_arcana",
+  "coracao_ferro",
+  "mente_serena",
+  "sorte_iniciante",
+  "mente_serena",
+  "furia_berserker",
+  "sorte_iniciante",
+  "maos_midas",
+  "sangue_guerreiro",
+  "boca_de_sangue",
+  "poco_fundo"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "bolso_furado",
+  "cobranca_de_juros",
+  "corte_de_tendao",
+  "couro_endurecido",
+  "duas_maos_um_tempo",
+  "ferida_paga",
+  "golpe_baixo",
+  "golpe_sombras",
+  "joelho_torto",
+  "n_disciplina_de_forja",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_travar_o_pulso",
+  "picada_certeira",
+  "respiracao_de_ladrao"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "cobranca_de_juros": 2,
+  "n_mira_calma": 3
+ },
+ "skills": {
+  "1": "cobranca_de_juros",
+  "2": "n_mira_calma",
+  "3": "n_folego_de_marcha",
+  "4": "n_guarda_cruzada"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 275
+}

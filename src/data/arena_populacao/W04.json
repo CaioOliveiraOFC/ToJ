@@ -1,0 +1,195 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 9574,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Armadura de Espinhos",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Manoplas de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Aço",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Ônix",
+   "level": 4
+  },
+  {
+   "gem_type": "Safira",
+   "level": 3
+  }
+ ],
+ "hp": 5834,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Martelo de Mão"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 5.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 5,
+  "gold_earned": 24750,
+  "gold_from_combat": 13138,
+  "gold_from_interest": 1432,
+  "gold_from_sale": 10180,
+  "gold_spent": 15176,
+  "gold_spent_on_consumable": 260,
+  "gold_spent_on_enchant": 226,
+  "gold_spent_on_enhancement": 1234,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 9273,
+  "gold_spent_on_recovery": 107,
+  "gold_spent_on_socket": 371,
+  "interest_payments": 18,
+  "items_dropped": 39,
+  "items_equipped": 21,
+  "items_sold": 32,
+  "max_gold_held": 13982,
+  "paid_exits": 18,
+  "purchases": 42
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 366,
+ "passives": [
+  "olho_aguia",
+  "pele_adamantio",
+  "passo_de_corca",
+  "essencia_fluida",
+  "passos_leves",
+  "sede_silenciosa",
+  "coracao_ferro",
+  "coracao_ferro",
+  "lamina_afiada",
+  "pele_grossa",
+  "postura_fechada",
+  "pele_de_sal",
+  "passo_de_corca",
+  "passo_de_corca",
+  "passos_leves",
+  "postura_fechada",
+  "coracao_ferro",
+  "musculos_aco",
+  "postura_fechada",
+  "sangue_guerreiro"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "couraca_improvisada",
+  "cutelada",
+  "ferro_contra_ferro",
+  "fio_no_rebite",
+  "furia",
+  "golpe_devastador",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "marca_do_acougueiro",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "pisada_de_ferro",
+  "quebra_guarda",
+  "rasgo_de_gancho",
+  "sede_de_batalha"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "furia",
+  "2": "investida",
+  "3": "n_folego_de_marcha",
+  "4": "n_mira_calma"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 11
+}

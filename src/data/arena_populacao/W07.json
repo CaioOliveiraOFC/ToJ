@@ -1,0 +1,213 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 2752,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Cota Leve"
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Manoplas de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Armadura de Camisa"
+  },
+  "Ring1": {
+   "name": "Anel de Couro"
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Porrete"
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Topázio",
+   "level": 4
+  },
+  {
+   "gem_type": "Esmeralda",
+   "level": 4
+  },
+  {
+   "gem_type": "Topázio",
+   "level": 3
+  }
+ ],
+ "hp": 6296,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Machado Enferrujado"
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 18512,
+  "gold_from_combat": 15761,
+  "gold_from_interest": 751,
+  "gold_from_sale": 2000,
+  "gold_spent": 15760,
+  "gold_spent_on_consumable": 3619,
+  "gold_spent_on_enhancement": 465,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 4247,
+  "gold_spent_on_recovery": 2572,
+  "gold_spent_on_socket": 521,
+  "interest_payments": 18,
+  "items_dropped": 22,
+  "items_equipped": 27,
+  "items_sold": 8,
+  "max_gold_held": 4331,
+  "paid_exits": 19,
+  "purchases": 62
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 290,
+ "passives": [
+  "coracao_ferro",
+  "pele_grossa",
+  "escudo_fe",
+  "coracao_ferro",
+  "pele_grossa",
+  "coracao_ferro",
+  "sangue_guerreiro",
+  "casco_calejado",
+  "pele_de_sal",
+  "essencia_fluida",
+  "coracao_ferro",
+  "bebida_deuses",
+  "pele_adamantio",
+  "bebida_deuses",
+  "postura_fechada",
+  "boca_de_sangue",
+  "pele_de_sal",
+  "postura_fechada",
+  "toque_dragao",
+  "sangue_guerreiro",
+  "coracao_ferro"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "cutelada",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_gancho_e_corda",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "pisada_de_ferro",
+  "quebra_guarda",
+  "sangue_nos_olhos",
+  "sede_de_batalha",
+  "tomar_folego",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "n_mira_calma",
+  "3": "sede_de_batalha",
+  "4": "tomar_folego"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 170
+}

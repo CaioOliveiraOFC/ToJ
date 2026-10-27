@@ -1,0 +1,229 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4102,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 4.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Jaqueta de Couro"
+  },
+  "Hands": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 3.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Calça de Pano"
+  },
+  "Ring1": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Anel de Diamante",
+   "socket_count": 3
+  },
+  "Shoes": {
+   "name": "Botas de Couro"
+  },
+  "Weapon1": {
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [
+  {
+   "gem_type": "Safira",
+   "level": 4
+  }
+ ],
+ "hp": 6983,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Clava de Madeira"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 29462,
+  "gold_from_combat": 19748,
+  "gold_from_interest": 1359,
+  "gold_from_sale": 8355,
+  "gold_spent": 25360,
+  "gold_spent_on_consumable": 590,
+  "gold_spent_on_enchant": 2615,
+  "gold_spent_on_enhancement": 1603,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 14074,
+  "gold_spent_on_recovery": 132,
+  "gold_spent_on_socket": 1073,
+  "interest_payments": 20,
+  "items_dropped": 30,
+  "items_equipped": 20,
+  "items_sold": 24,
+  "max_gold_held": 9592,
+  "paid_exits": 20,
+  "purchases": 56
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 2246,
+ "passives": [
+  "boca_de_sangue",
+  "postura_fechada",
+  "alquimia_do_desespero",
+  "respiracao_contada",
+  "odio_baixo",
+  "poco_fundo",
+  "sangue_guerreiro",
+  "lamina_afiada",
+  "boca_de_sangue",
+  "sede_silenciosa",
+  "boca_de_sangue",
+  "poco_fundo",
+  "bebida_deuses",
+  "respiracao_contada",
+  "boca_de_sangue",
+  "essencia_viva",
+  "sorte_iniciante",
+  "maos_midas",
+  "olho_de_cacador",
+  "mente_serena",
+  "sorte_iniciante",
+  "fome_batalha",
+  "mente_serena"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "cura_menor",
+  "drenar_vida",
+  "egide_de_runas",
+  "fagulha_teimosa",
+  "hora_parada",
+  "missil_magico",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_lamina_assentada",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "ressurgir",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "fagulha_teimosa",
+  "3": "n_pancada_na_nuca",
+  "4": "n_amuleto_rachado"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 2201
+}

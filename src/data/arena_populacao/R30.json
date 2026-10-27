@@ -1,0 +1,235 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3245,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Colete da Sombra",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 11.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel de Ouro"
+  },
+  "Ring2": {
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Tamancos de Madeira"
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Cajado da Galáxia",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "name": "Adaga do Vazio",
+   "socket_count": 2
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5287,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado da Galáxia",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 2
+  },
+  {
+   "name": "Botas de Pano"
+  },
+  {
+   "name": "Amuleto de Prata",
+   "socket_count": 2
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 16963,
+  "gold_from_combat": 11107,
+  "gold_from_interest": 841,
+  "gold_from_sale": 5015,
+  "gold_spent": 13718,
+  "gold_spent_on_consumable": 311,
+  "gold_spent_on_enchant": 747,
+  "gold_spent_on_enhancement": 134,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 8454,
+  "gold_spent_on_recovery": 364,
+  "gold_spent_on_socket": 566,
+  "interest_payments": 15,
+  "items_dropped": 33,
+  "items_equipped": 32,
+  "items_sold": 20,
+  "max_gold_held": 4849,
+  "paid_exits": 17,
+  "purchases": 48
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 1415,
+ "passives": [
+  "boca_de_sangue",
+  "odio_antigo",
+  "sangue_guerreiro",
+  "sorte_iniciante",
+  "essencia_viva",
+  "poco_fundo",
+  "boca_de_sangue",
+  "sorte_iniciante",
+  "pele_grossa",
+  "bebida_deuses",
+  "sorte_iniciante",
+  "instinto_frio",
+  "essencia_viva",
+  "fome_batalha",
+  "mente_serena",
+  "passo_de_corca",
+  "mente_serena",
+  "casco_calejado",
+  "respiracao_contada",
+  "essencia_fluida",
+  "coracao_ferro",
+  "sorte_iniciante"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "bolso_furado",
+  "corte_de_tendao",
+  "duas_maos_um_tempo",
+  "ferida_paga",
+  "flecha_pela_fresta",
+  "golpe_baixo",
+  "joelho_torto",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_postura_impecavel",
+  "n_respirar_fundo",
+  "respiracao_de_ladrao"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "n_mira_calma",
+  "2": "corte_de_tendao",
+  "3": "respiracao_de_ladrao",
+  "4": "ferida_paga"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 5429
+}

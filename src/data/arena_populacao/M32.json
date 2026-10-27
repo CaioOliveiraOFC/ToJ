@@ -1,0 +1,308 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 9787,
+ "dungeon_level": 25,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 12.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 5
+    },
+    null
+   ],
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    },
+    null
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Espada de Aço",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 25,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Topázio",
+   "level": 5
+  }
+ ],
+ "hp": 7285,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 13.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Cajado de Cristal",
+   "socket_count": 2
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 14.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 5.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada do Universo",
+   "socket_count": 2
+  },
+  {
+   "name": "Escudo Torre",
+   "socket_count": 1
+  },
+  {
+   "name": "Calça de Pano"
+  },
+  {
+   "name": "Bastão Mágico",
+   "socket_count": 2
+  },
+  {
+   "name": "Botas de Couro"
+  },
+  {
+   "name": "Cota Leve"
+  }
+ ],
+ "last_interest_floor": 24,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 10,
+  "gold_earned": 55757,
+  "gold_from_combat": 33650,
+  "gold_from_interest": 3227,
+  "gold_from_sale": 18880,
+  "gold_spent": 45970,
+  "gold_spent_on_consumable": 63,
+  "gold_spent_on_enchant": 5206,
+  "gold_spent_on_enhancement": 2593,
+  "gold_spent_on_exit_fee": 9591,
+  "gold_spent_on_gear": 26904,
+  "gold_spent_on_recovery": 170,
+  "gold_spent_on_socket": 1443,
+  "interest_payments": 23,
+  "items_dropped": 56,
+  "items_equipped": 37,
+  "items_sold": 41,
+  "max_gold_held": 13006,
+  "paid_exits": 24,
+  "purchases": 60
+ },
+ "level": 27,
+ "map_state": null,
+ "mp": 3657,
+ "passives": [
+  "boca_de_sangue",
+  "coracao_ferro",
+  "furia_berserker",
+  "passo_de_corca",
+  "passo_de_corca",
+  "reserva_arcana",
+  "escudo_fe",
+  "sede_silenciosa",
+  "coracao_ferro",
+  "bencao_divina",
+  "coracao_ferro",
+  "pele_de_sal",
+  "passo_de_corca",
+  "musculos_aco",
+  "musculos_aco",
+  "pele_de_sal",
+  "olho_aguia",
+  "escudo_fe",
+  "alma_eterna",
+  "furia_berserker",
+  "postura_fechada",
+  "sangue_guerreiro",
+  "boca_de_sangue",
+  "boca_de_sangue",
+  "lamina_afiada",
+  "passos_leves"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "drenar_vida",
+  "escudo_magico",
+  "foco_do_estudante",
+  "grilhoes_de_gelo",
+  "lasca_de_gelo",
+  "mao_firme",
+  "marca_ardente",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mao_que_nao_treme",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_paciencia_do_coveiro",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "pele_de_quartzo",
+  "prisma_de_devastacao",
+  "pulso_de_forca",
+  "relampago",
+  "sono_profundo",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "missil_magico",
+  "3": "veias_de_eter",
+  "4": "n_respirar_fundo"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 923
+}

@@ -1,0 +1,272 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 9618,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 8.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "enhancement_level": 1,
+   "name": "Armadura Divina",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Bastão Mágico",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Calças de Tecido"
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 3
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    },
+    null
+   ],
+   "name": "Cajado Arcano",
+   "socket_count": 2
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 7073,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 11.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  {
+   "name": "Cajado da Galáxia",
+   "socket_count": 3
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 2
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    },
+    null,
+    null
+   ],
+   "name": "Cajado do Oblivion",
+   "socket_count": 3
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze",
+   "origin": "starter"
+  },
+  {
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 46461,
+  "gold_from_combat": 33954,
+  "gold_from_interest": 3177,
+  "gold_from_sale": 9330,
+  "gold_spent": 36843,
+  "gold_spent_on_consumable": 418,
+  "gold_spent_on_enchant": 2761,
+  "gold_spent_on_enhancement": 3785,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 22623,
+  "gold_spent_on_recovery": 266,
+  "gold_spent_on_socket": 840,
+  "interest_payments": 21,
+  "items_dropped": 41,
+  "items_equipped": 56,
+  "items_sold": 31,
+  "max_gold_held": 22872,
+  "paid_exits": 21,
+  "purchases": 65
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 2163,
+ "passives": [
+  "sede_silenciosa",
+  "bebida_deuses",
+  "pele_de_sal",
+  "poco_fundo",
+  "essencia_fluida",
+  "sede_silenciosa",
+  "maos_midas",
+  "escudo_fe",
+  "coracao_ferro",
+  "reserva_arcana",
+  "maos_midas",
+  "respiracao_contada",
+  "respiracao_contada",
+  "boca_de_sangue",
+  "sorte_iniciante",
+  "sangue_guerreiro",
+  "divida_de_ouro",
+  "alma_eterna",
+  "alma_eterna",
+  "poco_fundo",
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "coracao_ferro"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "drenar_vida",
+  "escudo_magico",
+  "lasca_de_gelo",
+  "maldicao_de_cinzas",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_marca_do_cacador",
+  "n_respirar_fundo",
+  "n_ultima_carta",
+  "palavra_de_pavor",
+  "palavra_de_torpor",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "prisma_de_devastacao",
+  "pulso_de_forca",
+  "relampago",
+  "troca_de_sangue",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "relampago",
+  "2": "n_guarda_alta",
+  "3": "prisma_de_devastacao",
+  "4": "drenar_vida"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 5802
+}

@@ -1,0 +1,221 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 2296,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": {
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "enhancement_level": 1,
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Túnica do Arquimago",
+   "socket_count": 3
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Bastão Mágico",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 12.0
+    }
+   ],
+   "name": "Chapéu de Tecido"
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 10.0
+    }
+   ],
+   "name": "Espada do Universo",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Arco Composto",
+   "socket_count": 2
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Topázio",
+   "level": 3
+  },
+  {
+   "gem_type": "Esmeralda",
+   "level": 4
+  }
+ ],
+ "hp": 7240,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    },
+    null
+   ],
+   "name": "Cajado do Vazio",
+   "socket_count": 2
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Cajado do Oblivion",
+   "socket_count": 3
+  },
+  {
+   "name": "Anel de Couro"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 18747,
+  "gold_from_combat": 13459,
+  "gold_from_interest": 782,
+  "gold_from_sale": 4506,
+  "gold_spent": 16451,
+  "gold_spent_on_consumable": 612,
+  "gold_spent_on_enchant": 502,
+  "gold_spent_on_enhancement": 1445,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 7742,
+  "gold_spent_on_recovery": 1801,
+  "gold_spent_on_socket": 644,
+  "interest_payments": 16,
+  "items_dropped": 26,
+  "items_equipped": 27,
+  "items_sold": 16,
+  "max_gold_held": 5229,
+  "paid_exits": 18,
+  "purchases": 58
+ },
+ "level": 20,
+ "map_state": null,
+ "mp": 1226,
+ "passives": [
+  "pulso_certeiro",
+  "sangue_guerreiro",
+  "pulso_certeiro",
+  "sangue_de_vidente",
+  "furia_berserker",
+  "respiracao_contada",
+  "reserva_arcana",
+  "odio_antigo",
+  "essencia_fluida",
+  "fio_serrilhado",
+  "passo_de_corca",
+  "fio_serrilhado",
+  "boca_de_sangue",
+  "postura_fechada",
+  "passos_leves",
+  "pulso_certeiro",
+  "odio_antigo",
+  "olho_de_cacador",
+  "sangue_toxico"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "dissonancia",
+  "drenar_vida",
+  "egide_de_runas",
+  "escudo_magico",
+  "foco_do_estudante",
+  "grilhoes_de_gelo",
+  "lancar_pedra",
+  "lasca_de_gelo",
+  "marca_ardente",
+  "missil_magico",
+  "n_couro_batido",
+  "n_encarar",
+  "n_gancho_e_corda",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "palavra_de_pavor",
+  "sanguessuga_arcana"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "sanguessuga_arcana",
+  "3": "marca_ardente",
+  "4": "n_pancada_na_nuca"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4342
+}

@@ -1,0 +1,214 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 9610,
+ "dungeon_level": 23,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Fenrir",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Manoplas de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "name": "Bermuda de Couro",
+   "origin": "starter"
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel do Rubi",
+   "socket_count": 3
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "name": "Espada Lendária",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Espada Lendária",
+   "socket_count": 2
+  }
+ },
+ "extracted_on_floor": 23,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [
+  {
+   "gem_type": "Esmeralda",
+   "level": 4
+  }
+ ],
+ "hp": 6013,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Escudo Torre",
+   "socket_count": 1
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 4.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 2
+  },
+  {
+   "name": "Botas de Ferro",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 22,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 43379,
+  "gold_from_combat": 24412,
+  "gold_from_interest": 2695,
+  "gold_from_sale": 16272,
+  "gold_spent": 33769,
+  "gold_spent_on_consumable": 1148,
+  "gold_spent_on_enchant": 939,
+  "gold_spent_on_enhancement": 3005,
+  "gold_spent_on_exit_fee": 7133,
+  "gold_spent_on_gear": 18927,
+  "gold_spent_on_recovery": 2355,
+  "gold_spent_on_socket": 262,
+  "interest_payments": 22,
+  "items_dropped": 44,
+  "items_equipped": 21,
+  "items_sold": 37,
+  "max_gold_held": 21083,
+  "paid_exits": 22,
+  "purchases": 64
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 277,
+ "passives": [
+  "pulso_certeiro",
+  "cabeca_dura",
+  "odio_baixo",
+  "olho_de_cacador",
+  "lamina_do_juizo",
+  "passo_de_corca",
+  "musculos_aco",
+  "olho_de_cacador",
+  "sangue_guerreiro",
+  "agulha_no_osso",
+  "voz_no_escuro",
+  "lamina_afiada",
+  "voz_no_escuro",
+  "pulso_certeiro",
+  "furia_berserker",
+  "olho_aguia",
+  "postura_fechada",
+  "lamina_afiada",
+  "pulso_certeiro",
+  "cabeca_dura",
+  "sangue_guerreiro",
+  "olho_aguia",
+  "lamina_afiada"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "ferro_contra_ferro",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida_de_ariete",
+  "mao_dupla",
+  "marca_do_acougueiro",
+  "n_couro_batido",
+  "n_disciplina_de_forja",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "olho_de_ferreiro",
+  "postura_de_muro",
+  "quebra_guarda",
+  "sangue_nos_olhos",
+  "soco_de_placa",
+  "tomar_folego",
+  "veterania"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "investida_de_ariete",
+  "2": "soco_de_placa",
+  "3": "couraca_improvisada",
+  "4": "sangue_nos_olhos"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 6581
+}

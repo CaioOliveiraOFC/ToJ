@@ -1,0 +1,225 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3927,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "bleed_chance",
+     "value": 10.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    },
+    null,
+    null
+   ],
+   "name": "Manto do Assassino",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "name": "Capacete de Ferro",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 3
+  },
+  "Ring1": {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas Fantasma",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Adaga Mortal",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Arco do Silêncio",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 3,
+ "gems": [
+  {
+   "gem_type": "Ametista",
+   "level": 4
+  }
+ ],
+ "hp": 3262,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Adaga do Vazio",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 9,
+  "gold_earned": 18491,
+  "gold_from_combat": 11406,
+  "gold_from_interest": 1027,
+  "gold_from_sale": 6058,
+  "gold_spent": 14564,
+  "gold_spent_on_consumable": 138,
+  "gold_spent_on_enchant": 1185,
+  "gold_spent_on_enhancement": 526,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 9090,
+  "gold_spent_on_recovery": 19,
+  "gold_spent_on_socket": 464,
+  "interest_payments": 16,
+  "items_dropped": 29,
+  "items_equipped": 22,
+  "items_sold": 21,
+  "max_gold_held": 8281,
+  "paid_exits": 17,
+  "purchases": 43
+ },
+ "level": 20,
+ "map_state": null,
+ "mp": 1074,
+ "passives": [
+  "instinto_frio",
+  "sede_silenciosa",
+  "boca_de_sangue",
+  "casco_calejado",
+  "boca_de_sangue",
+  "furia_berserker",
+  "sangue_guerreiro",
+  "coracao_ferro",
+  "coracao_ferro",
+  "olho_aguia",
+  "olho_aguia",
+  "sangue_guerreiro",
+  "odio_baixo",
+  "pele_grossa",
+  "pele_grossa",
+  "boca_de_sangue",
+  "coracao_ferro",
+  "essencia_fluida",
+  "respiracao_contada"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "bolso_furado",
+  "duas_maos_um_tempo",
+  "evasao",
+  "faro_de_rua",
+  "flecha_pela_fresta",
+  "golpe_baixo",
+  "n_encarar",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "olho_do_falcão",
+  "respiracao_de_ladrao"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "n_mira_calma",
+  "3": "n_leitura_de_terreno",
+  "4": "olho_do_falcão"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 671
+}

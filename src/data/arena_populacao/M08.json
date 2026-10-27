@@ -1,0 +1,281 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5008,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    }
+   ],
+   "name": "Perneiras de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    }
+   ],
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Ouro"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "name": "Clava de Madeira",
+   "origin": "starter"
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Espada de Treino"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [
+  {
+   "gem_type": "Esmeralda",
+   "level": 5
+  }
+ ],
+ "hp": 5781,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 8.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Cajado da Galáxia",
+   "socket_count": 1
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Cajado de Aprendiz"
+  },
+  {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  },
+  {
+   "name": "Armadura de Placa",
+   "socket_count": 1
+  },
+  {
+   "name": "Escudo de Ferro"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Gibão de Couro"
+  },
+  {
+   "name": "Bermuda de Couro"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 11,
+  "gold_earned": 26157,
+  "gold_from_combat": 18491,
+  "gold_from_interest": 1306,
+  "gold_from_sale": 6360,
+  "gold_spent": 21149,
+  "gold_spent_on_consumable": 755,
+  "gold_spent_on_enchant": 812,
+  "gold_spent_on_enhancement": 1684,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 10418,
+  "gold_spent_on_recovery": 385,
+  "gold_spent_on_socket": 1822,
+  "interest_payments": 20,
+  "items_dropped": 43,
+  "items_equipped": 46,
+  "items_sold": 27,
+  "max_gold_held": 7285,
+  "paid_exits": 20,
+  "purchases": 62
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 1049,
+ "passives": [
+  "odio_baixo",
+  "furia_berserker",
+  "agulha_no_osso",
+  "olho_de_cacador",
+  "sangue_de_vidente",
+  "coracao_ferro",
+  "sangue_guerreiro",
+  "odio_baixo",
+  "olho_aguia",
+  "postura_fechada",
+  "olho_aguia",
+  "olho_de_cacador",
+  "voz_no_escuro",
+  "sede_sangue",
+  "agulha_no_osso",
+  "pulso_certeiro",
+  "pulso_certeiro",
+  "pulso_certeiro",
+  "voz_no_escuro",
+  "heranca_do_abismo",
+  "passos_leves",
+  "olho_aguia"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "bola_fogo",
+  "dissonancia",
+  "drenar_vida",
+  "escudo_magico",
+  "foco_do_estudante",
+  "lancar_pedra",
+  "lasca_de_gelo",
+  "mao_firme",
+  "marca_ardente",
+  "n_areia_no_chao",
+  "n_curativo_de_campo",
+  "n_estocada_seca",
+  "n_lamina_assentada",
+  "n_mao_que_nao_treme",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "pulso_de_forca",
+  "tempestade",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "drenar_vida",
+  "3": "n_areia_no_chao",
+  "4": "tempestade"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 2561
+}

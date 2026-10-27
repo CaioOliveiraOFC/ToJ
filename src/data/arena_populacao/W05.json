@@ -1,0 +1,218 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3581,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    }
+   ],
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 1
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Gravetos Mágicos"
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5077,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Gravetos Mágicos"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Clava de Madeira"
+  },
+  {
+   "name": "Cajado da Galáxia",
+   "socket_count": 3
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Escudo de Madeira"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 18991,
+  "gold_from_combat": 13749,
+  "gold_from_interest": 923,
+  "gold_from_sale": 4319,
+  "gold_spent": 15410,
+  "gold_spent_on_consumable": 678,
+  "gold_spent_on_enhancement": 2409,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 7094,
+  "gold_spent_on_recovery": 832,
+  "gold_spent_on_socket": 692,
+  "interest_payments": 18,
+  "items_dropped": 38,
+  "items_equipped": 42,
+  "items_sold": 25,
+  "max_gold_held": 5173,
+  "paid_exits": 18,
+  "purchases": 56
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 840,
+ "passives": [
+  "pele_grossa",
+  "pele_grossa",
+  "pele_grossa",
+  "pele_grossa",
+  "sede_silenciosa",
+  "passos_leves",
+  "boca_de_sangue",
+  "ritmo_profano",
+  "poco_fundo",
+  "coracao_ferro",
+  "passo_de_corca",
+  "pele_adamantio",
+  "essencia_fluida",
+  "alquimia_do_desespero",
+  "coracao_ferro",
+  "casco_calejado",
+  "musculos_aco",
+  "passos_leves",
+  "coracao_tita",
+  "sede_silenciosa"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "fortalecimento",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "marca_do_acougueiro",
+  "n_couro_batido",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_travar_o_pulso",
+  "postura_de_muro",
+  "provocacao",
+  "rasgo_de_gancho",
+  "sangue_nos_olhos",
+  "tomar_folego"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "investida",
+  "3": "couraca_improvisada",
+  "4": "tomar_folego"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1086
+}

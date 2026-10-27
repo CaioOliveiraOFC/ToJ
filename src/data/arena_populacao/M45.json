@@ -1,0 +1,259 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 8644,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 5.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Imortalidade",
+   "socket_count": 3
+  },
+  "Body": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    },
+    null
+   ],
+   "name": "Armadura Divina",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "name": "Luvas de Titânio",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Couro"
+  },
+  "Shoes": {
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Lâmina Veloz"
+  },
+  "Weapon2": {
+   "name": "Faca de Caça"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [
+  {
+   "gem_type": "Ametista",
+   "level": 4
+  }
+ ],
+ "hp": 6375,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Foco"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 10.0
+    }
+   ],
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 3
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 2
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    },
+    null
+   ],
+   "name": "Arco Composto",
+   "socket_count": 2
+  },
+  {
+   "name": "Cajado Eterno",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 2,
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Peitoral de Ferro",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 7,
+  "gold_earned": 35633,
+  "gold_from_combat": 26959,
+  "gold_from_interest": 1976,
+  "gold_from_sale": 6698,
+  "gold_spent": 26989,
+  "gold_spent_on_consumable": 53,
+  "gold_spent_on_enchant": 1389,
+  "gold_spent_on_enhancement": 4998,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 14405,
+  "gold_spent_on_recovery": 74,
+  "gold_spent_on_socket": 797,
+  "interest_payments": 19,
+  "items_dropped": 34,
+  "items_equipped": 46,
+  "items_sold": 24,
+  "max_gold_held": 9765,
+  "paid_exits": 20,
+  "purchases": 51
+ },
+ "level": 25,
+ "map_state": null,
+ "mp": 2395,
+ "passives": [
+  "coracao_tita",
+  "maos_midas",
+  "escudo_fe",
+  "voracidade",
+  "bebida_deuses",
+  "boca_de_sangue",
+  "alquimia_do_desespero",
+  "sorte_iniciante",
+  "reserva_arcana",
+  "alquimia_do_desespero",
+  "sede_silenciosa",
+  "essencia_fluida",
+  "pele_de_sal",
+  "bebida_deuses",
+  "boca_de_sangue",
+  "fome_batalha",
+  "mente_serena",
+  "reserva_arcana",
+  "divida_de_ouro",
+  "boca_de_sangue",
+  "coracao_ferro",
+  "coracao_ferro",
+  "voracidade",
+  "mente_serena"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "dissonancia",
+  "egide_de_runas",
+  "escudo_magico",
+  "fagulha_teimosa",
+  "lancar_pedra",
+  "lasca_de_gelo",
+  "mao_firme",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_mira_calma",
+  "n_paciencia_do_coveiro",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "pele_de_quartzo",
+  "prisma_de_devastacao",
+  "pulso_de_forca",
+  "sono_profundo"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "n_mira_calma",
+  "3": "n_paciencia_do_coveiro",
+  "4": "escudo_magico"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 1691
+}

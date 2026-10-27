@@ -1,0 +1,259 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 6078,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    }
+   ],
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Colete da Sombra",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Luvas de Titânio",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Couro"
+  },
+  "Ring1": {
+   "name": "Anel de Osso"
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "name": "Botas de Couro"
+  },
+  "Weapon1": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Adaga Mortal",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 2,
+   "name": "Espada de Treino"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Topázio",
+   "level": 3
+  },
+  {
+   "gem_type": "Ametista",
+   "level": 4
+  },
+  {
+   "gem_type": "Ônix",
+   "level": 5
+  }
+ ],
+ "hp": 2194,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_chance",
+     "value": 6.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 2
+    }
+   ],
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Amuleto de Pedra"
+  },
+  {
+   "name": "Botas de Pano"
+  },
+  {
+   "name": "Escudo de Ferro"
+  },
+  {
+   "name": "Sapatos de Pano"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 10,
+  "gold_earned": 26356,
+  "gold_from_combat": 18347,
+  "gold_from_interest": 1311,
+  "gold_from_sale": 6698,
+  "gold_spent": 20278,
+  "gold_spent_on_consumable": 844,
+  "gold_spent_on_enchant": 1869,
+  "gold_spent_on_enhancement": 1255,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 9362,
+  "gold_spent_on_recovery": 1186,
+  "gold_spent_on_socket": 489,
+  "interest_payments": 19,
+  "items_dropped": 41,
+  "items_equipped": 38,
+  "items_sold": 27,
+  "max_gold_held": 7020,
+  "paid_exits": 20,
+  "purchases": 64
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 392,
+ "passives": [
+  "odio_baixo",
+  "olho_aguia",
+  "olho_aguia",
+  "coracao_ferro",
+  "odio_baixo",
+  "fio_serrilhado",
+  "agulha_no_osso",
+  "lamina_do_juizo",
+  "heranca_do_abismo",
+  "odio_baixo",
+  "pulso_certeiro",
+  "passos_leves",
+  "instinto_frio",
+  "agulha_no_osso",
+  "passos_leves",
+  "sangue_de_vidente",
+  "lamina_do_juizo",
+  "odio_baixo",
+  "fio_serrilhado",
+  "furia_berserker",
+  "olho_de_cacador"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "bolso_furado",
+  "chuva_de_ferrões",
+  "corte_de_tendao",
+  "dose_da_viuva",
+  "duas_maos_um_tempo",
+  "envenenar",
+  "faro_de_rua",
+  "n_amuleto_rachado",
+  "n_estocada_seca",
+  "n_grito_curto",
+  "n_mira_calma",
+  "n_pacto_de_ferro",
+  "n_passo_lateral",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "nó_corredio",
+  "olho_do_falcão",
+  "passo_felino",
+  "pó_nos_olhos",
+  "sangria_lenta",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "corte_de_tendao",
+  "3": "passo_felino",
+  "4": "envenenar"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 4527
+}

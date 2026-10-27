@@ -1,0 +1,226 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4932,
+ "dungeon_level": 20,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 2,
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Fenrir",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Aço",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Ouro"
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas de Couro"
+  },
+  "Weapon1": {
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "name": "Machado Enferrujado"
+  }
+ },
+ "extracted_on_floor": 20,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 5942,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 3
+  },
+  {
+   "name": "Clava Pesada"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 5.0
+    }
+   ],
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Lâmina da Tempestade",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Elmo de Madeira"
+  },
+  {
+   "name": "Capacete de Couro"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 1
+    },
+    null
+   ],
+   "name": "Peitoral de Cota",
+   "socket_count": 2
+  },
+  {
+   "name": "Camisa de Corrente"
+  },
+  {
+   "name": "Capacete de Couro"
+  }
+ ],
+ "last_interest_floor": 19,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 23626,
+  "gold_from_combat": 17390,
+  "gold_from_interest": 997,
+  "gold_from_sale": 5239,
+  "gold_spent": 18694,
+  "gold_spent_on_consumable": 619,
+  "gold_spent_on_enchant": 661,
+  "gold_spent_on_enhancement": 2649,
+  "gold_spent_on_exit_fee": 4336,
+  "gold_spent_on_gear": 8488,
+  "gold_spent_on_recovery": 1634,
+  "gold_spent_on_socket": 307,
+  "interest_payments": 19,
+  "items_dropped": 44,
+  "items_equipped": 48,
+  "items_sold": 29,
+  "max_gold_held": 4932,
+  "paid_exits": 19,
+  "purchases": 55
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 315,
+ "passives": [
+  "coracao_ferro",
+  "sangue_de_vidente",
+  "passos_leves",
+  "olho_aguia",
+  "estrela_quebrada",
+  "essencia_fluida",
+  "furia_berserker",
+  "musculos_aco",
+  "agulha_no_osso",
+  "heranca_do_abismo",
+  "agulha_no_osso",
+  "punho_atordoante",
+  "coracao_ferro",
+  "voz_no_escuro",
+  "pulso_certeiro",
+  "passos_leves",
+  "sangue_de_vidente",
+  "passo_de_corca",
+  "furia_berserker",
+  "passo_de_corca",
+  "furia_berserker",
+  "olho_aguia"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "cutelada",
+  "fio_no_rebite",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "juramento_da_muralha",
+  "marca_do_acougueiro",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pacto_de_ferro",
+  "n_passo_lateral",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "quebra_guarda"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "quebra_guarda",
+  "3": "n_pacto_de_ferro",
+  "4": "n_grito_curto"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 303
+}

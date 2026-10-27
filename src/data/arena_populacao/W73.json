@@ -1,0 +1,235 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5141,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    }
+   ],
+   "name": "Armadura de Espinhos",
+   "socket_count": 2
+  },
+  "Hands": {
+   "name": "Manoplas de Ferro",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "crit_chance",
+     "value": 4.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 5
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 4
+    }
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "name": "Lâmina Veloz"
+  },
+  "Weapon2": {
+   "name": "Lança de Madeira"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 6822,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Tridente do Guerreiro",
+   "socket_count": 1
+  },
+  {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Espada Lendária",
+   "socket_count": 2
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Lâmina da Tempestade",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    }
+   ],
+   "name": "Tridente do Guerreiro",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel da Fênix",
+   "socket_count": 1
+  },
+  {
+   "name": "Clava Pesada"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 30201,
+  "gold_from_combat": 18028,
+  "gold_from_interest": 1530,
+  "gold_from_sale": 10643,
+  "gold_spent": 25060,
+  "gold_spent_on_consumable": 1119,
+  "gold_spent_on_enchant": 665,
+  "gold_spent_on_enhancement": 1397,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 13791,
+  "gold_spent_on_recovery": 1018,
+  "gold_spent_on_socket": 1797,
+  "interest_payments": 20,
+  "items_dropped": 36,
+  "items_equipped": 46,
+  "items_sold": 26,
+  "max_gold_held": 9192,
+  "paid_exits": 20,
+  "purchases": 60
+ },
+ "level": 22,
+ "map_state": null,
+ "mp": 550,
+ "passives": [
+  "olho_de_cacador",
+  "musculos_aco",
+  "olho_aguia",
+  "musculos_aco",
+  "furia_berserker",
+  "musculos_aco",
+  "odio_baixo",
+  "agulha_no_osso",
+  "passo_de_corca",
+  "sangue_guerreiro",
+  "passos_leves",
+  "passo_de_corca",
+  "odio_antigo",
+  "sede_sangue",
+  "pulso_certeiro",
+  "passos_leves",
+  "passos_leves",
+  "boca_de_sangue",
+  "voz_no_escuro",
+  "fio_serrilhado",
+  "musculos_aco"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ferro_contra_ferro",
+  "fio_no_rebite",
+  "golpe_poderoso",
+  "investida",
+  "marca_do_acougueiro",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_postura_impecavel",
+  "olho_de_ferreiro",
+  "pisada_de_ferro",
+  "provocacao",
+  "quebra_guarda",
+  "rasgo_de_gancho",
+  "sangue_nos_olhos",
+  "soco_de_placa"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ferro_contra_ferro",
+  "2": "quebra_guarda",
+  "3": "n_estocada_seca",
+  "4": "n_couro_batido"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 5893
+}

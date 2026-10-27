@@ -1,0 +1,240 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5668,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 4.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "enhancement_level": 1,
+   "name": "Armadura Divina",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas Rasas"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 3.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel Vegetal",
+   "origin": "starter"
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "name": "Botas de Ferro",
+   "socket_count": 2
+  },
+  "Weapon1": {
+   "name": "Cajado do Oblivion",
+   "socket_count": 3
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 5926,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Poção de Mana Grande"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 5.0
+    }
+   ],
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 6.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 4.0
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Manto Etéreo",
+   "socket_count": 3
+  },
+  {
+   "name": "Óculos de Couro"
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 1,
+  "gold_earned": 25635,
+  "gold_from_combat": 20897,
+  "gold_from_interest": 1019,
+  "gold_from_sale": 3719,
+  "gold_spent": 19967,
+  "gold_spent_on_consumable": 215,
+  "gold_spent_on_enchant": 2331,
+  "gold_spent_on_enhancement": 1752,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 11837,
+  "gold_spent_on_recovery": 527,
+  "gold_spent_on_socket": 163,
+  "interest_payments": 17,
+  "items_dropped": 31,
+  "items_equipped": 37,
+  "items_sold": 20,
+  "max_gold_held": 7231,
+  "paid_exits": 17,
+  "purchases": 50
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 1734,
+ "passives": [
+  "boca_de_sangue",
+  "ritmo_profano",
+  "maos_midas",
+  "reserva_arcana",
+  "pele_grossa",
+  "respiracao_contada",
+  "passo_de_corca",
+  "sorte_iniciante",
+  "maos_midas",
+  "essencia_viva",
+  "alquimia_do_desespero",
+  "ritmo_profano",
+  "sorte_iniciante",
+  "maos_midas",
+  "casco_calejado",
+  "fome_batalha",
+  "maos_midas",
+  "sangue_guerreiro",
+  "respiracao_contada",
+  "sede_silenciosa",
+  "reserva_arcana",
+  "ritmo_profano"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "drenar_vida",
+  "foco_do_estudante",
+  "mao_firme",
+  "marca_ardente",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_respirar_fundo",
+  "n_voto_de_silencio",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "relampago",
+  "reserva_profunda",
+  "ressurgir",
+  "sanguessuga_arcana",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "missil_magico": 1
+ },
+ "skills": {
+  "1": "bola_fogo",
+  "2": "missil_magico",
+  "3": "ressurgir",
+  "4": "reserva_profunda"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 6535
+}

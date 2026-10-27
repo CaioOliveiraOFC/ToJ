@@ -1,0 +1,225 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 11060,
+ "dungeon_level": 24,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 2
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 2
+  },
+  "Body": {
+   "name": "Armadura de Couro"
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Manoplas de Ferro",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "name": "Elmo de Madeira"
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "name": "Perneiras de Ferro",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas de Aço",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Porrete"
+  },
+  "Weapon2": {
+   "name": "Machado Enferrujado"
+  }
+ },
+ "extracted_on_floor": 24,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [],
+ "hp": 10249,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Arco do Silêncio",
+   "socket_count": 1
+  },
+  {
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  },
+  {
+   "name": "Arco Longbow",
+   "socket_count": 1
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Amuleto da Imortalidade",
+   "socket_count": 1
+  },
+  {
+   "name": "Amuleto de Cordão"
+  },
+  {
+   "name": "Capa de Pano"
+  },
+  {
+   "name": "Chapéu de Tecido"
+  }
+ ],
+ "last_interest_floor": 23,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 3,
+  "gold_earned": 41859,
+  "gold_from_combat": 29847,
+  "gold_from_interest": 2214,
+  "gold_from_sale": 9798,
+  "gold_spent": 30799,
+  "gold_spent_on_consumable": 748,
+  "gold_spent_on_enhancement": 4239,
+  "gold_spent_on_exit_fee": 8234,
+  "gold_spent_on_gear": 15663,
+  "gold_spent_on_recovery": 1586,
+  "gold_spent_on_socket": 329,
+  "interest_payments": 22,
+  "items_dropped": 44,
+  "items_equipped": 34,
+  "items_sold": 32,
+  "max_gold_held": 11635,
+  "paid_exits": 23,
+  "purchases": 65
+ },
+ "level": 26,
+ "map_state": null,
+ "mp": 391,
+ "passives": [
+  "lamina_afiada",
+  "toque_dragao",
+  "pele_adamantio",
+  "casco_calejado",
+  "pele_grossa",
+  "pele_grossa",
+  "pele_grossa",
+  "passos_leves",
+  "essencia_fluida",
+  "alma_eterna",
+  "musculos_aco",
+  "sangue_guerreiro",
+  "passos_leves",
+  "essencia_fluida",
+  "sede_silenciosa",
+  "boca_de_sangue",
+  "essencia_fluida",
+  "coracao_ferro",
+  "casco_calejado",
+  "musculos_aco",
+  "postura_fechada",
+  "sangue_guerreiro",
+  "lamina_do_juizo",
+  "sede_sangue",
+  "postura_fechada"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "baluarte",
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "ferro_contra_ferro",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "investida_de_ariete",
+  "juramento_da_muralha",
+  "n_disciplina_de_forja",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_lamina_assentada",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "olho_de_ferreiro",
+  "postura_de_muro",
+  "quebra_guarda",
+  "respiracao_de_forja"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "n_mira_calma",
+  "3": "n_guarda_cruzada",
+  "4": "n_respirar_fundo"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 5781
+}

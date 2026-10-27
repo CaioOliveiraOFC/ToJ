@@ -1,0 +1,216 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5817,
+ "dungeon_level": 19,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "name": "Amuleto de Prata",
+   "socket_count": 3
+  },
+  "Body": {
+   "name": "Cota Leve"
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Manoplas de Ferro",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Elmo de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Aço",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Tamancos de Madeira"
+  },
+  "Weapon1": {
+   "name": "Porrete"
+  },
+  "Weapon2": {
+   "name": "Faca de Caça"
+  }
+ },
+ "extracted_on_floor": 19,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 2322,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Anel de Bronze",
+   "origin": "starter"
+  },
+  {
+   "name": "Elmo de Madeira"
+  },
+  {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Adaga Sangrenta"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Amuleto de Cordão"
+  },
+  {
+   "name": "Escudo Torre",
+   "socket_count": 1
+  },
+  {
+   "name": "Elmo de Madeira"
+  }
+ ],
+ "last_interest_floor": 18,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 1,
+  "gold_earned": 18420,
+  "gold_from_combat": 14905,
+  "gold_from_interest": 945,
+  "gold_from_sale": 2570,
+  "gold_spent": 12603,
+  "gold_spent_on_consumable": 1087,
+  "gold_spent_on_enhancement": 1822,
+  "gold_spent_on_exit_fee": 3705,
+  "gold_spent_on_gear": 5195,
+  "gold_spent_on_recovery": 645,
+  "gold_spent_on_socket": 149,
+  "interest_payments": 18,
+  "items_dropped": 40,
+  "items_equipped": 44,
+  "items_sold": 22,
+  "max_gold_held": 5817,
+  "paid_exits": 18,
+  "purchases": 50
+ },
+ "level": 21,
+ "map_state": null,
+ "mp": 115,
+ "passives": [
+  "fio_serrilhado",
+  "toque_dragao",
+  "passo_de_corca",
+  "odio_antigo",
+  "musculos_aco",
+  "furia_berserker",
+  "musculos_aco",
+  "passo_de_corca",
+  "olho_de_cacador",
+  "furia_berserker",
+  "musculos_aco",
+  "instinto_frio",
+  "sangue_guerreiro",
+  "heranca_do_abismo",
+  "pulso_certeiro",
+  "fio_serrilhado",
+  "unha_suja",
+  "lamina_afiada",
+  "pele_grossa",
+  "musculos_aco"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "cutelada",
+  "escudo_protetor",
+  "golpe_duplo",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_passo_lateral",
+  "n_respirar_fundo",
+  "n_travar_o_pulso",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "sede_de_batalha",
+  "soco_de_placa",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 3,
+ "skill_cooldowns": {
+  "golpe_duplo": 4
+ },
+ "skills": {
+  "1": "golpe_duplo",
+  "2": "tremor_de_bigorna",
+  "3": "n_areia_no_chao",
+  "4": "postura_de_muro"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 3337
+}

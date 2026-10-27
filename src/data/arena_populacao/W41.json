@@ -1,0 +1,267 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 5719,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 4.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura de Placa",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 1
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 1
+    }
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 3.0
+    }
+   ],
+   "name": "Bandana de Tecido"
+  },
+  "Legs": {
+   "name": "Calça de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 3
+  },
+  "Ring2": {
+   "name": "Anel de Couro"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Botas de Corrida",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [],
+ "hp": 8119,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 1
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Gravetos Mágicos"
+  },
+  {
+   "name": "Clava Pesada"
+  },
+  {
+   "name": "Gravetos Mágicos"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Gravetos Mágicos"
+  },
+  {
+   "name": "Gládio de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Espada da Vingança",
+   "socket_count": 1
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 2
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada Longa",
+   "socket_count": 1
+  },
+  {
+   "name": "Gravetos Mágicos"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Lâmina da Tempestade",
+   "socket_count": 2
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 4,
+  "gold_earned": 49168,
+  "gold_from_combat": 37067,
+  "gold_from_interest": 2420,
+  "gold_from_sale": 9681,
+  "gold_spent": 43449,
+  "gold_spent_on_consumable": 339,
+  "gold_spent_on_enchant": 1501,
+  "gold_spent_on_enhancement": 3334,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 32455,
+  "gold_spent_on_recovery": 338,
+  "gold_spent_on_socket": 209,
+  "interest_payments": 20,
+  "items_dropped": 50,
+  "items_equipped": 103,
+  "items_sold": 33,
+  "max_gold_held": 13115,
+  "paid_exits": 20,
+  "purchases": 63
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 936,
+ "passives": [
+  "passo_de_corca",
+  "respiracao_contada",
+  "essencia_viva",
+  "sede_silenciosa",
+  "reflexos_rapidos",
+  "olho_de_cacador",
+  "fortuna_absoluta",
+  "boca_de_sangue",
+  "essencia_viva",
+  "mente_serena",
+  "fortuna_absoluta",
+  "bebida_deuses",
+  "mente_serena",
+  "reserva_arcana",
+  "alquimia_do_desespero",
+  "reserva_arcana",
+  "passos_leves",
+  "poco_fundo",
+  "mente_serena",
+  "lamina_afiada",
+  "instinto_frio",
+  "musculos_aco",
+  "sorte_iniciante"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "fio_no_rebite",
+  "golpe_poderoso",
+  "investida",
+  "marca_do_acougueiro",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_postura_impecavel",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "peso_do_machado",
+  "postura_de_muro",
+  "quebra_guarda",
+  "soco_de_placa",
+  "tomar_folego",
+  "tremor_de_bigorna",
+  "veterania"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "n_pancada_na_nuca",
+  "2": "postura_de_muro",
+  "3": "cutelada",
+  "4": "tremor_de_bigorna"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 6029
+}

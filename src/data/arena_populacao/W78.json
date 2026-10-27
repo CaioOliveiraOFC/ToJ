@@ -1,0 +1,269 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 7347,
+ "dungeon_level": 22,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    },
+    null,
+    null
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 3
+  },
+  "Body": {
+   "name": "Armadura de Cota de Malha",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Martelo de Mão"
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "stun_chance",
+     "value": 3.0
+    }
+   ],
+   "name": "Elmo de Couro"
+  },
+  "Legs": {
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Palha"
+  },
+  "Ring2": {
+   "name": "Anel de Couro"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    }
+   ],
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Clava de Madeira"
+  },
+  "Weapon2": {
+   "enhancement_level": 1,
+   "name": "Adaga de Madeira"
+  }
+ },
+ "extracted_on_floor": 22,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Ônix",
+   "level": 5
+  },
+  {
+   "gem_type": "Topázio",
+   "level": 5
+  }
+ ],
+ "hp": 5963,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 1
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Lâmina da Tempestade",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Lança de Madeira"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Clava de Madeira"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Machado Enferrujado"
+  },
+  {
+   "name": "Espada do Universo",
+   "socket_count": 3
+  },
+  {
+   "name": "Clava de Madeira"
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Saia de Tecido"
+  },
+  {
+   "name": "Armadura de Couro"
+  },
+  {
+   "name": "Capa de Pano"
+  },
+  {
+   "name": "Colete da Sombra",
+   "socket_count": 1
+  },
+  {
+   "name": "Elmo de Couro"
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Espada de Ferro"
+  }
+ ],
+ "last_interest_floor": 21,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 26802,
+  "gold_from_combat": 21610,
+  "gold_from_interest": 1513,
+  "gold_from_sale": 3679,
+  "gold_spent": 19455,
+  "gold_spent_on_consumable": 1296,
+  "gold_spent_on_enchant": 665,
+  "gold_spent_on_enhancement": 1223,
+  "gold_spent_on_exit_fee": 6150,
+  "gold_spent_on_gear": 7947,
+  "gold_spent_on_recovery": 1667,
+  "gold_spent_on_socket": 507,
+  "interest_payments": 21,
+  "items_dropped": 44,
+  "items_equipped": 72,
+  "items_sold": 17,
+  "max_gold_held": 7875,
+  "paid_exits": 21,
+  "purchases": 65
+ },
+ "level": 24,
+ "map_state": null,
+ "mp": 650,
+ "passives": [
+  "odio_antigo",
+  "olho_aguia",
+  "odio_baixo",
+  "odio_antigo",
+  "sangue_de_vidente",
+  "sangue_de_vidente",
+  "furia_berserker",
+  "lamina_do_juizo",
+  "odio_antigo",
+  "pele_grossa",
+  "cabeca_dura",
+  "voz_no_escuro",
+  "olho_aguia",
+  "pulso_certeiro",
+  "passo_de_corca",
+  "odio_antigo",
+  "olho_aguia",
+  "olho_aguia",
+  "fio_serrilhado",
+  "escudo_fe",
+  "sangue_de_vidente",
+  "odio_antigo",
+  "olho_de_cacador"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "couraca_improvisada",
+  "ferro_contra_ferro",
+  "golpe_poderoso",
+  "investida",
+  "investida_de_ariete",
+  "mao_dupla",
+  "marca_do_acougueiro",
+  "n_areia_no_chao",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_hora_do_arauto",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "pisada_de_ferro",
+  "postura_de_muro",
+  "provocacao",
+  "quebra_guarda",
+  "sangue_nos_olhos",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 3,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "olho_de_ferreiro",
+  "2": "n_mira_calma",
+  "3": "n_travar_o_pulso",
+  "4": "mao_dupla"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 721
+}

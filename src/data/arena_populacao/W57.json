@@ -1,0 +1,211 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 3389,
+ "dungeon_level": 18,
+ "equipment": {
+  "Accessory": {
+   "enhancement_level": 1,
+   "name": "Talismã do Viajante",
+   "origin": "starter"
+  },
+  "Amulet": {
+   "name": "Amuleto de Pedra"
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Armadura Divina",
+   "socket_count": 1
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 1
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 11.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    },
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Bermuda de Couro"
+  },
+  "Ring1": {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    }
+   ],
+   "name": "Anel da Fênix",
+   "socket_count": 1
+  },
+  "Shoes": {
+   "name": "Botas de Pano"
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "name": "Lâmina Veloz"
+  },
+  "Weapon2": {
+   "name": "Machado Enferrujado"
+  }
+ },
+ "extracted_on_floor": 18,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [
+  {
+   "gem_type": "Rubi",
+   "level": 4
+  },
+  {
+   "gem_type": "Ametista",
+   "level": 3
+  }
+ ],
+ "hp": 4033,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Machado de Batalha",
+   "socket_count": 2
+  },
+  {
+   "name": "Clava Pesada"
+  },
+  {
+   "name": "Espada do Eclipse",
+   "socket_count": 2
+  },
+  {
+   "name": "Luvas de Lã"
+  },
+  {
+   "name": "Túnica de Tecido"
+  }
+ ],
+ "last_interest_floor": 17,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 14661,
+  "gold_from_combat": 11175,
+  "gold_from_interest": 762,
+  "gold_from_sale": 2724,
+  "gold_spent": 11272,
+  "gold_spent_on_consumable": 893,
+  "gold_spent_on_enchant": 416,
+  "gold_spent_on_enhancement": 1354,
+  "gold_spent_on_exit_fee": 3142,
+  "gold_spent_on_gear": 4932,
+  "gold_spent_on_recovery": 257,
+  "gold_spent_on_socket": 278,
+  "interest_payments": 17,
+  "items_dropped": 24,
+  "items_equipped": 27,
+  "items_sold": 10,
+  "max_gold_held": 4184,
+  "paid_exits": 17,
+  "purchases": 48
+ },
+ "level": 20,
+ "map_state": null,
+ "mp": 255,
+ "passives": [
+  "odio_baixo",
+  "odio_baixo",
+  "odio_baixo",
+  "pulso_certeiro",
+  "olho_de_cacador",
+  "lamina_lendaria",
+  "furia_berserker",
+  "coracao_ferro",
+  "sangue_de_vidente",
+  "postura_fechada",
+  "passos_leves",
+  "odio_antigo",
+  "instinto_frio",
+  "toque_dragao",
+  "escudo_fe",
+  "heranca_do_abismo",
+  "olho_de_cacador",
+  "furia_berserker",
+  "odio_baixo"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "couraca_improvisada",
+  "cutelada",
+  "escudo_protetor",
+  "golpe_devastador",
+  "golpe_poderoso",
+  "grito_guerra",
+  "investida_de_ariete",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_folego_de_marcha",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_pausa_util",
+  "n_travar_o_pulso",
+  "quebra_ossos",
+  "rasgo_de_gancho",
+  "respiracao_de_forja",
+  "soco_de_placa",
+  "veterania"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "cutelada",
+  "2": "golpe_devastador",
+  "3": "n_areia_no_chao",
+  "4": "escudo_protetor"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 221
+}

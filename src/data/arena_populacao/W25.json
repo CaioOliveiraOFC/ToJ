@@ -1,0 +1,215 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 4767,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 4
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    },
+    {
+     "gem_type": "Safira",
+     "level": 4
+    }
+   ],
+   "name": "Armadura Titânica",
+   "socket_count": 3
+  },
+  "Hands": {
+   "enhancement_level": 1,
+   "name": "Luvas de Aço",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "name": "Capacete de Couro"
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Perneiras de Ferro",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel da Fênix",
+   "socket_count": 2
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "name": "Botas de Ferro",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Lança de Madeira"
+  },
+  "Weapon2": {
+   "name": "Machado Enferrujado"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 7863,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Lança de Madeira"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 2
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 3
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Espada Lendária",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Ouro"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 6,
+  "gold_earned": 29303,
+  "gold_from_combat": 18522,
+  "gold_from_interest": 1231,
+  "gold_from_sale": 9550,
+  "gold_spent": 24536,
+  "gold_spent_on_consumable": 2642,
+  "gold_spent_on_enhancement": 4223,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 10689,
+  "gold_spent_on_recovery": 776,
+  "gold_spent_on_socket": 933,
+  "interest_payments": 20,
+  "items_dropped": 38,
+  "items_equipped": 40,
+  "items_sold": 27,
+  "max_gold_held": 6536,
+  "paid_exits": 20,
+  "purchases": 62
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 270,
+ "passives": [
+  "pele_adamantio",
+  "bebida_deuses",
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "odio_baixo",
+  "boca_de_sangue",
+  "bebida_deuses",
+  "sangue_guerreiro",
+  "escudo_fe",
+  "bebida_deuses",
+  "musculos_aco",
+  "sangue_de_vidente",
+  "lamina_afiada",
+  "pele_grossa",
+  "sangue_guerreiro",
+  "respiracao_contada",
+  "boca_de_sangue",
+  "pele_grossa",
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "escudo_fe",
+  "escudo_fe"
+ ],
+ "player_class": "Warrior",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "berro_de_ferro",
+  "fortalecimento",
+  "golpe_poderoso",
+  "investida",
+  "marca_do_acougueiro",
+  "n_couro_batido",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_guarda_alta",
+  "n_lamina_assentada",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "olho_de_ferreiro",
+  "peso_do_machado",
+  "provocacao",
+  "quebra_guarda",
+  "sangue_nos_olhos",
+  "soco_de_placa",
+  "tremor_de_bigorna"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {
+  "golpe_poderoso": 1
+ },
+ "skills": {
+  "1": "golpe_poderoso",
+  "2": "soco_de_placa",
+  "3": "n_couro_batido",
+  "4": "n_disciplina_de_forja"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 72
+}

@@ -1,0 +1,221 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 7491,
+ "dungeon_level": 21,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 1
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 2
+    },
+    null
+   ],
+   "name": "Armadura Divina",
+   "socket_count": 3
+  },
+  "Hands": {
+   "name": "Luvas de Aço",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 2.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 3
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "name": "Perneiras de Couro"
+  },
+  "Ring1": {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "name": "Sapatos de Pano"
+  },
+  "Weapon1": {
+   "name": "Cajado de Cristal",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "name": "Adaga Curta"
+  }
+ },
+ "extracted_on_floor": 21,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 2,
+ "gems": [
+  {
+   "gem_type": "Esmeralda",
+   "level": 4
+  }
+ ],
+ "hp": 5478,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Arco Curto"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 1
+    }
+   ],
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 9.0
+    }
+   ],
+   "name": "Espada de Ferro"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Lança de Madeira"
+  },
+  {
+   "name": "Pedra Fantasma"
+  }
+ ],
+ "last_interest_floor": 20,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 5,
+  "gold_earned": 28625,
+  "gold_from_combat": 18549,
+  "gold_from_interest": 1849,
+  "gold_from_sale": 8227,
+  "gold_spent": 21134,
+  "gold_spent_on_consumable": 270,
+  "gold_spent_on_enchant": 1971,
+  "gold_spent_on_enhancement": 2826,
+  "gold_spent_on_exit_fee": 5273,
+  "gold_spent_on_gear": 10367,
+  "gold_spent_on_recovery": 95,
+  "gold_spent_on_socket": 332,
+  "interest_payments": 20,
+  "items_dropped": 45,
+  "items_equipped": 30,
+  "items_sold": 34,
+  "max_gold_held": 9312,
+  "paid_exits": 20,
+  "purchases": 46
+ },
+ "level": 23,
+ "map_state": null,
+ "mp": 755,
+ "passives": [
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "passos_leves",
+  "boca_de_sangue",
+  "sede_silenciosa",
+  "musculos_aco",
+  "boca_de_sangue",
+  "sangue_guerreiro",
+  "boca_de_sangue",
+  "pele_de_sal",
+  "coracao_ferro",
+  "sangue_de_vidente",
+  "pele_grossa",
+  "postura_fechada",
+  "musculos_aco",
+  "passo_de_corca",
+  "coracao_ferro",
+  "pele_de_sal",
+  "boca_de_sangue",
+  "musculos_aco",
+  "furia_berserker",
+  "casco_calejado"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "ataque_furtivo",
+  "bolso_furado",
+  "capa_rasgada",
+  "corte_de_tendao",
+  "couro_endurecido",
+  "dose_da_viuva",
+  "envenenar",
+  "faro_de_rua",
+  "joelho_torto",
+  "lamina_no_escuro",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_leitura_de_terreno",
+  "n_mao_que_nao_treme",
+  "n_mira_calma",
+  "n_passo_lateral",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "picada_certeira",
+  "pó_nos_olhos",
+  "sombra_rapida"
+ ],
+ "shop_miss_streak": 2,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "n_mira_calma",
+  "3": "n_grito_curto",
+  "4": "capa_rasgada"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 2043
+}
