@@ -239,7 +239,11 @@ class MundoRanqueado:
         ]
 
     def aplicar_do_mundo(self, confronto: ranked_partidas.Confronto) -> None:
-        self.ladder.registrar(confronto.a, confronto.b, confronto.vencedor, origem="mundo")
+        """O resultado entra na Ladder; sem vencedor, só no histórico. A vaga é consumida."""
+        if confronto.vencedor is None:
+            self.ladder.registrar_sem_resultado(confronto.a, confronto.b, origem="mundo")
+        else:
+            self.ladder.registrar(confronto.a, confronto.b, confronto.vencedor, origem="mundo")
         self.relogio += 1
         self.fila = max(0, self.fila - 1)
 

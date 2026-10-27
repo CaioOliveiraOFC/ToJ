@@ -170,6 +170,34 @@ class Ladder:
             prob_vencedor,
         )
 
+    def registrar_sem_resultado(self, a: str, b: str, *, origem: str, extra=None) -> None:
+        """Um confronto que terminou sem vencedor: entra no histórico, não no rating.
+
+        Não conta como partida (nem de posicionamento) e não mexe em vitórias e
+        derrotas; fica no histórico para o matchmaking não repetir a dupla logo.
+        """
+        if a == b:
+            raise ValueError("resultado incoerente")
+        self.partidas_jogadas += 1
+        for meu, outro in (
+            (self._registros[a], self._registros[b]),
+            (self._registros[b], self._registros[a]),
+        ):
+            valor = round(self.sistema.exibicao(meu.rating), 2)
+            meu.historico.append(
+                {
+                    "n": self.partidas_jogadas,
+                    "oponente": outro.identidade,
+                    "venceu": None,
+                    "antes": valor,
+                    "depois": valor,
+                    "oponente_antes": round(self.sistema.exibicao(outro.rating), 2),
+                    "origem": origem,
+                    **(extra or {}),
+                }
+            )
+            del meu.historico[:-HISTORICO_MAXIMO]
+
     def inatividade(self, periodos: float) -> None:
         """A incerteza de todos cresce com o tempo sem jogar (a volta depois de dias fora)."""
         for r in self._registros.values():

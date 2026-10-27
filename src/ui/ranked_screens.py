@@ -76,11 +76,13 @@ def render_ranked_panel(status: dict) -> None:
         tabela.add_column("Resultado")
         tabela.add_column("Rating", justify="right")
         for linha in status["recentes"]:
-            cor = "green" if linha["venceu"] else "red"
+            cor, texto = {True: ("green", "Vitória"), False: ("red", "Derrota")}.get(
+                linha["venceu"], ("dim", "Sem resultado")
+            )
             tabela.add_row(
                 str(linha["n"]),
                 escape(linha["oponente"]),
-                f"[{cor}]{'Vitória' if linha['venceu'] else 'Derrota'}[/{cor}]",
+                f"[{cor}]{texto}[/{cor}]",
                 f"{_num(linha['antes'])} → {_num(linha['depois'])} "
                 f"({'+' if linha['depois'] >= linha['antes'] else ''}"
                 f"{_num(linha['depois'] - linha['antes'])})",

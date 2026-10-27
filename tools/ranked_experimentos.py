@@ -710,33 +710,41 @@ def _grind_um(id_gemeo: str, partidas: int, mundo_por_partida: int, arquivo: str
                 os.fsync(saida.fileno())
                 continue
             # Retomada: reaplica o que já foi jogado, na mesma ordem.
-            ladder.registrar(eu, registro["oponente"], registro["vencedor_id"], origem="ranqueada")
+            _registrar(ladder, eu, registro["oponente"], registro["vencedor_id"], "ranqueada")
             for m in registro["mundo"]:
-                ladder.registrar(m["a"], m["b"], m["vencedor"], origem="mundo")
+                _registrar(ladder, m["a"], m["b"], m["vencedor"], "mundo")
     return arquivo
 
 
+def _registrar(ladder, a: str, b: str, vencedor: str | None, origem: str) -> None:
+    if vencedor is None:
+        ladder.registrar_sem_resultado(a, b, origem=origem)
+    else:
+        ladder.registrar(a, b, vencedor, origem=origem)
+
+
 def _uma_partida(ladder, populacao, eu, id_gemeo, n, mundo_por_partida, mm) -> dict:
+    """Uma partida do jogador artificial e as do mundo. Sem vencedor, não conta.
+
+    A partida que bate o limite técnico não é jogada de novo: há duplas que
+    nunca terminam. Ela fica no histórico, e o matchmaking tira a dupla da
+    próxima escolha.
+    """
     rng = random.Random(semente("grind", eu, n))
     escolha = mm.escolher_oponente(ladder, eu, rng, excluir={id_gemeo})
     oponente = escolha.oponente
     prob = ladder.esperado(eu, oponente)
     oponente_antes = ladder.valor(oponente)
-    confronto = None
-    tentativa = 0
-    while confronto is None:
-        confronto = jogar(populacao, id_gemeo, oponente, semente("grind", eu, n, tentativa))
-        tentativa += 1
-    venceu = confronto.vencedor == id_gemeo
-    vencedor_id = eu if venceu else oponente
-    ladder.registrar(eu, oponente, vencedor_id, origem="ranqueada")
+    confronto = jogar(populacao, id_gemeo, oponente, semente("grind", eu, n, 0))
+    venceu = None if confronto.vencedor is None else confronto.vencedor == id_gemeo
+    vencedor_id = None if venceu is None else (eu if venceu else oponente)
+    _registrar(ladder, eu, oponente, vencedor_id, "ranqueada")
     mundo = []
     pares = mm.parear_npcs(ladder, random.Random(semente("grind-mundo", eu, n)), mundo_por_partida)
     for a, b in pares:
         c = jogar(populacao, a, b, semente("grind-mundo", eu, n, a, b))
-        if c is not None:
-            ladder.registrar(a, b, c.vencedor, origem="mundo")
-            mundo.append({"a": a, "b": b, "vencedor": c.vencedor, "segundos": c.segundos})
+        _registrar(ladder, a, b, c.vencedor, "mundo")
+        mundo.append({"a": a, "b": b, "vencedor": c.vencedor, "segundos": c.segundos})
     return {
         "n": n,
         "fase": escolha.fase,
@@ -771,7 +779,7 @@ def analisar_carreira(linhas: list[dict]) -> dict:
                 "rd": r["rd"],
                 "percentil": None if r["percentil"] is None else round(r["percentil"], 1),
                 "rank": r["rank"],
-                "vitorias": sum(x["venceu"] for x in linhas[:k]),
+                "vitorias": sum(x["venceu"] is True for x in linhas[:k]),
             }
     posicionamento = linhas[min(9, n - 1)]
     oponentes = [x["oponente"] for x in linhas]
@@ -799,10 +807,11 @@ def analisar_carreira(linhas: list[dict]) -> dict:
         "cpu_s": round(
             sum(x["segundos"] + sum(m["segundos"] for m in x["mundo"]) for x in linhas), 1
         ),
-        "vitorias": sum(x["venceu"] for x in linhas),
-        "derrotas": sum(not x["venceu"] for x in linhas),
+        "vitorias": sum(x["venceu"] is True for x in linhas),
+        "derrotas": sum(x["venceu"] is False for x in linhas),
+        "sem_resultado": sum(x["venceu"] is None for x in linhas),
         "posicionamento": {
-            "vitorias": sum(x["venceu"] for x in linhas[:10]),
+            "vitorias": sum(x["venceu"] is True for x in linhas[:10]),
             "rank": posicionamento["rank"],
             "percentil": posicionamento["percentil"],
             "rating": posicionamento["rating"],
@@ -977,6 +986,48 @@ def _n(valor, casas: int = 3) -> str:
     return f"{valor:.{casas}f}".replace(".", ",")
 
 
+DECISAO = [
+    "**Glicko-2, com a priori fraca do OP** (`src/ranked/sistema.py`).",
+    "",
+    "- Previsão: empate com o TrueSkill no holdout ampliado (diferença dentro do ruído "
+    "entre as ordens de treino).",
+    "- Convergência: o Glicko-2 erra menos nas primeiras janelas prequenciais — é o "
+    "trecho que importa nas 10 partidas de posicionamento.",
+    "- Estabilidade: levemente maior com o Glicko-2.",
+    "- Incerteza: o RD é em pontos de rating (a tela mostra ± 2 RD); a inatividade "
+    "cresce a incerteza pela volatilidade de cada gladiador.",
+    "- Sequências: os dois reagem igual — sobem com vitórias contra iguais e quase nada "
+    "contra muito mais fracos.",
+    "- Complexidade: o TrueSkill 1 × 1 é mais curto (forma fechada); o Glicko-2 tem uma "
+    "iteração (Illinois), conferida contra o exemplo publicado. O TrueSkill foi feito "
+    "para times e o nome é marca da Microsoft; nada disso pesa num duelo 1 × 1, mas "
+    "também não há ganho.",
+    "- A priori fraca do OP ajuda os dois: sem ela, o holdout ampliado piora de 0,549 "
+    "para 0,603 (Glicko-2).",
+]
+
+PROBLEMAS = [
+    "- **Volatilidade inerte.** Com uma partida por período, o τ do Glicko-2 não muda "
+    "nada (0,3, 0,6 e 1,0 dão o mesmo resultado): na prática ele funciona como Glicko-1.",
+    "- **Entre builds parecidas, a sorte manda.** Nas duplas de OP muito próximo "
+    "(|ΔOP| < 0,5) o favorito venceu 51%; nas repetidas com três seeds, menos da metade "
+    "teve o mesmo vencedor. O meio da Ladder é ruidoso: 1 RD cobre ~19 posições.",
+    "- **Repetição no topo.** Com 186 gladiadores, o topo tem poucos vizinhos de nível; "
+    "a exclusão das últimas 3 partidas não evita repetir o mesmo adversário.",
+    "- **Custo concentrado no topo.** Duelos entre builds fortes são mais longos: a "
+    "carreira do jogador no topo custou o dobro de CPU por partida.",
+    "- **Duplas que nunca terminam.** Uma partida da amostra e uma da calibração bateram "
+    "o limite técnico (500 rodadas); na carreira do jogador no topo, R31 × M33 bateu o "
+    "limite em todas as seeds testadas (~60 s de CPU cada). Isso travava duas coisas, "
+    "corrigidas nesta fase: o jogador artificial, que repetia a dupla com outra seed, e "
+    "o mundo orgânico, que replanejava a mesma dupla para sempre. Agora a partida sem "
+    "vencedor não muda rating, fica no histórico e consome a vaga.",
+    "- **Contra o jogador, a partida sem fim não tem regra.** O duelo humano × IA não tem "
+    "limite de rodadas; só a rendição encerra uma dupla que não termina. O motor não tem "
+    "empate, e a regra é decisão de design pendente.",
+]
+
+
 def _tabela_de_sistemas(dados: dict, nomes: list[str]) -> list[str]:
     linhas = [
         "| sistema | log-loss holdout | Brier | acerto | ECE | estabilidade (Spearman) |",
@@ -1068,7 +1119,7 @@ def relatorio() -> str:
         "",
         "## 3. Calibração dos 186",
         "",
-        f"A amostra e depois {calibracao['rodadas']} rodadas suíças com {sis.ALGORITMO} "
+        f"A amostra e depois {calibracao['rodadas']} rodadas suíças com Glicko-2 "
         "(cada NPC contra um vizinho de rating que ele não enfrentou nas últimas 8; a cada 3 "
         "rodadas, a vizinhança dobra).",
         "",
@@ -1165,6 +1216,7 @@ def relatorio() -> str:
     grind_md = PASTA / "grind" / "resumo.md"
     if grind_md.exists():
         out += ["", grind_md.read_text(encoding="utf-8")]
+    out += ["## 6. A decisão", "", *DECISAO, "", "## 7. Problemas encontrados", "", *PROBLEMAS]
     texto = "\n".join(out) + "\n"
     (PASTA / "relatorio.md").write_text(texto, encoding="utf-8")
     return texto

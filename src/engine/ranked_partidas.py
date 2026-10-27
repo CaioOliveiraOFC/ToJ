@@ -9,10 +9,12 @@ O lado (p1 ou p2) também sai da semente, para nenhum gladiador lutar sempre do
 mesmo lado. Não há vantagem de lado no motor — a ordem de cada rodada é a
 iniciativa —, mas a alternância tira a dúvida.
 
-Uma partida que passa de `LIMITE_TECNICO` rodadas sem resultado não conta: o
-motor não tem empate, e a Ranked não inventa um. `parar` interrompe entre
-rodadas (o mundo orgânico usa isso para não segurar o jogo); a partida
-interrompida também não conta.
+Uma partida que passa de `LIMITE_TECNICO` rodadas termina SEM RESULTADO
+(`vencedor` é `None`): o motor não tem empate, e a Ranked não inventa um — ela
+não muda rating nenhum. Há duplas que nunca terminam (as duas builds se curam
+mais rápido do que se ferem), então quem chama não deve insistir na mesma dupla.
+`parar` interrompe entre rodadas (o mundo orgânico usa isso para não segurar o
+jogo) e devolve `None`: a partida interrompida é jogada de novo depois.
 """
 
 from __future__ import annotations
@@ -35,13 +37,15 @@ class Confronto:
     a: str
     b: str
     semente: int
-    vencedor: str
+    vencedor: str | None
     motivo: str
     rodadas: int
     segundos: float
 
     @property
-    def perdedor(self) -> str:
+    def perdedor(self) -> str | None:
+        if self.vencedor is None:
+            return None
         return self.b if self.vencedor == self.a else self.a
 
     def para_dict(self) -> dict:
@@ -57,7 +61,7 @@ def jogar(
     config: Configuracao | None = None,
     parar=None,
 ) -> Confronto | None:
-    """O confronto de `id_a` contra `id_b`. `None` se não terminou (limite ou `parar`)."""
+    """O confronto de `id_a` contra `id_b`; sem vencedor no limite, `None` se interrompido."""
     if id_a == id_b:
         raise ValueError("Um gladiador não enfrenta a si mesmo.")
     inicio = time.perf_counter()
@@ -69,8 +73,18 @@ def jogar(
         "p2": IAEstrategica(gladiadores[1].hero, config),
     }
     while not duelo.finished:
-        if duelo.round_number > LIMITE_TECNICO or (parar is not None and parar.is_set()):
+        if parar is not None and parar.is_set():
             return None
+        if duelo.round_number > LIMITE_TECNICO:
+            return Confronto(
+                a=id_a,
+                b=id_b,
+                semente=semente,
+                vencedor=None,
+                motivo="limite",
+                rodadas=LIMITE_TECNICO,
+                segundos=round(time.perf_counter() - inicio, 3),
+            )
         run_round(duelo, controladores)
     resultado = duelo.result
     return Confronto(

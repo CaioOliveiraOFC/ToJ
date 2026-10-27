@@ -199,6 +199,36 @@ class TestMundoOrganico:
         assert agente.parar() == 0
         assert mundo.fila == 3 and mundo.relogio == 0
 
+    def test_confronto_sem_vencedor_consome_a_vaga_e_nao_trava_o_mundo(self, populacao, tmp_path):
+        """Regressão: há duplas que nunca terminam; o mundo não pode replanejá-las para sempre."""
+        mundo = _mundo(populacao, tmp_path)
+        mundo.fila = 3
+
+        def empate(populacao, a, b, semente, parar=None, **_):
+            return ranked_partidas.Confronto(a, b, semente, None, "limite", 500, 0.0)
+
+        primeiro_plano = mundo.planejar(1)
+        ((a, b, _),) = primeiro_plano
+        antes = (mundo.ladder.valor(a), mundo.ladder.valor(b))
+        agente = rm.AgendadorDoMundo(mundo, lote=1, jogar=empate)
+        agente.iniciar()
+        agente._thread.join(5)
+        assert agente.coletar() == 1
+        assert (mundo.relogio, mundo.fila) == (1, 2)
+        assert (mundo.ladder.valor(a), mundo.ladder.valor(b)) == antes
+        assert mundo.ladder[a].partidas == 0
+        assert mundo.ladder[a].historico[-1]["venceu"] is None
+        assert mundo.planejar(1) != primeiro_plano
+
+    def test_o_limite_tecnico_devolve_confronto_sem_vencedor(self, populacao, monkeypatch):
+        monkeypatch.setattr(ranked_partidas, "LIMITE_TECNICO", 1)
+        confronto = ranked_partidas.jogar(populacao, "W30", "W31", 4)
+        assert confronto is not None and confronto.vencedor is None
+        assert confronto.motivo == "limite" and confronto.perdedor is None
+        parar = threading.Event()
+        parar.set()
+        assert ranked_partidas.jogar(populacao, "W30", "W31", 4, parar=parar) is None
+
     def test_um_confronto_do_mundo_pelo_motor_de_verdade(self, populacao, tmp_path):
         mundo = _mundo(populacao, tmp_path)
         mundo.fila = 1

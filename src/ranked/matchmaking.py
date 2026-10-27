@@ -72,7 +72,7 @@ def empurrao_da_sequencia(ladder: Ladder, identidade: str, desvio: float) -> flo
     derrota conta se o vencedor não estava muito acima. A sequência para no
     primeiro resultado do outro tipo.
     """
-    historico = ladder[identidade].historico
+    historico = [e for e in ladder[identidade].historico if e["venceu"] is not None]
     if not historico:
         return 0.0
     sinal = 1 if historico[-1]["venceu"] else -1

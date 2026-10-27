@@ -87,6 +87,17 @@ class TestLadder:
             r.identidade for r in ladder.classificacao()
         ]
 
+    def test_sem_resultado_entra_no_historico_e_nao_no_rating(self, sistema):
+        ladder = _ladder(sistema)
+        antes = (ladder.valor("npc:10"), ladder.valor("jogador:1"))
+        ladder.registrar_sem_resultado("npc:10", "jogador:1", origem="mundo")
+        assert (ladder.valor("npc:10"), ladder.valor("jogador:1")) == antes
+        assert ladder["jogador:1"].partidas == 0 and ladder["npc:10"].vitorias == 0
+        entrada = ladder["jogador:1"].historico[-1]
+        assert entrada["venceu"] is None and entrada["oponente"] == "npc:10"
+        copia = Ladder.de_dict(sistema, ladder.para_dict())
+        assert copia["jogador:1"].historico == ladder["jogador:1"].historico
+
     def test_identidade_repetida_e_recusada(self, sistema):
         ladder = _ladder(sistema)
         with pytest.raises(ValueError):
@@ -175,6 +186,9 @@ class TestMatchmaking:
         # Derrota só conta se o vencedor não estava muito acima.
         assert historico((False, 80), (False, 10)) == pytest.approx(-passo)
         assert historico() == 0.0
+        # Confronto sem resultado não conta nem quebra a sequência.
+        assert historico((True, 0), (None, 0), (True, 0)) == pytest.approx(2 * passo)
+        assert historico((None, 0)) == 0.0
 
     def test_o_proprio_gladiador_e_excluidos_nunca_saem(self, sistema):
         ladder = _ladder(sistema, n=6)
