@@ -75,6 +75,19 @@ reports/pvp/copa_03_ia/*
 !reports/pvp/arena_offline/
 reports/pvp/arena_offline/*
 !reports/pvp/arena_offline/tentativas.jsonl
+# A Ranked offline (`tools/ranked_experimentos.py`): os confrontos reais, a
+# comparação Glicko-2 × TrueSkill, a calibração dos 186, os jogadores
+# artificiais e o relatório. `_trabalho/` (checkpoints e logs) fica fora.
+!reports/ranked/
+reports/ranked/*
+!reports/ranked/relatorio.md
+!reports/ranked/amostra.jsonl
+!reports/ranked/comparacao.json
+!reports/ranked/calibracao.json
+!reports/ranked/calibracao.jsonl
+!reports/ranked/holdout2.jsonl
+!reports/ranked/comparacao_ampliada.json
+!reports/ranked/grind/
 
 # IDEs
 .idea/

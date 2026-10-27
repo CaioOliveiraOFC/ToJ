@@ -1,0 +1,947 @@
+{
+ "partidas": {
+  "treino": 396,
+  "holdout": 120
+ },
+ "k_op_logit_por_ponto": 1.4241,
+ "repeticoes": {
+  "trios": 30,
+  "vencedor_unanime": 13
+ },
+ "custo_medio_s": 2.941,
+ "rodadas_medias": 22.8,
+ "linhas_de_base": {
+  "moeda": {
+   "log_loss": 0.6931,
+   "brier": 0.25,
+   "acerto": 0.0,
+   "ece": 0.5
+  },
+  "OP logístico": {
+   "log_loss": 0.4902,
+   "brier": 0.1678,
+   "acerto": 0.7766,
+   "ece": 0.0411
+  },
+  "Bradley-Terry em lote": {
+   "log_loss": 0.6865,
+   "brier": 0.2419,
+   "acerto": 0.6417,
+   "ece": 0.1205
+  }
+ },
+ "sistemas": {
+  "Glicko-2 τ=0.3 plano": {
+   "holdout": {
+    "log_loss": 0.7032,
+    "brier": 0.2472,
+    "acerto": 0.6094,
+    "ece": 0.1068
+   },
+   "holdout_dp_log_loss": 0.0131,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.7107,
+    "holdout_classes": 0.793,
+    "holdout_proximo": 0.6234
+   },
+   "prequencial_por_janela": [
+    0.6968,
+    0.6824,
+    0.6763,
+    0.652
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9551,
+   "top5_mais_frequentes": [
+    [
+     "M43",
+     29
+    ],
+    [
+     "R44",
+     27
+    ],
+    [
+     "R43",
+     27
+    ],
+    [
+     "W88",
+     23
+    ],
+    [
+     "M33",
+     12
+    ],
+    [
+     "M21",
+     9
+    ],
+    [
+     "W75",
+     7
+    ],
+    [
+     "W84",
+     6
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.911,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.872,
+     "posicao": 46
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.258,
+     "posicao": 71
+    },
+    "alternado_seis": {
+     "delta_em_dp": 0.002,
+     "posicao": 93
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.039,
+     "posicao": 89
+    }
+   }
+  },
+  "Glicko-2 τ=0.3 OP": {
+   "holdout": {
+    "log_loss": 0.6118,
+    "brier": 0.2097,
+    "acerto": 0.6919,
+    "ece": 0.0733
+   },
+   "holdout_dp_log_loss": 0.0097,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.5146,
+    "holdout_classes": 0.7174,
+    "holdout_proximo": 0.6155
+   },
+   "prequencial_por_janela": [
+    0.5868,
+    0.5842,
+    0.5906,
+    0.5773
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9829,
+   "top5_mais_frequentes": [
+    [
+     "R34",
+     30
+    ],
+    [
+     "R44",
+     30
+    ],
+    [
+     "M33",
+     30
+    ],
+    [
+     "W88",
+     29
+    ],
+    [
+     "W96",
+     13
+    ],
+    [
+     "R39",
+     9
+    ],
+    [
+     "W90",
+     3
+    ],
+    [
+     "R45",
+     2
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.8452,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.848,
+     "posicao": 43
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.179,
+     "posicao": 82
+    },
+    "alternado_seis": {
+     "delta_em_dp": 0.01,
+     "posicao": 93
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.074,
+     "posicao": 87
+    }
+   }
+  },
+  "Glicko-2 τ=0.6 plano": {
+   "holdout": {
+    "log_loss": 0.7032,
+    "brier": 0.2472,
+    "acerto": 0.6094,
+    "ece": 0.1068
+   },
+   "holdout_dp_log_loss": 0.0131,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.7107,
+    "holdout_classes": 0.793,
+    "holdout_proximo": 0.6234
+   },
+   "prequencial_por_janela": [
+    0.6968,
+    0.6824,
+    0.6763,
+    0.652
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9551,
+   "top5_mais_frequentes": [
+    [
+     "M43",
+     29
+    ],
+    [
+     "R44",
+     27
+    ],
+    [
+     "R43",
+     27
+    ],
+    [
+     "W88",
+     23
+    ],
+    [
+     "M33",
+     12
+    ],
+    [
+     "M21",
+     9
+    ],
+    [
+     "W75",
+     7
+    ],
+    [
+     "W84",
+     6
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.911,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.872,
+     "posicao": 46
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.258,
+     "posicao": 71
+    },
+    "alternado_seis": {
+     "delta_em_dp": 0.002,
+     "posicao": 93
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.039,
+     "posicao": 89
+    }
+   }
+  },
+  "Glicko-2 τ=0.6 OP": {
+   "holdout": {
+    "log_loss": 0.6118,
+    "brier": 0.2097,
+    "acerto": 0.6919,
+    "ece": 0.0733
+   },
+   "holdout_dp_log_loss": 0.0097,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.5146,
+    "holdout_classes": 0.7174,
+    "holdout_proximo": 0.6155
+   },
+   "prequencial_por_janela": [
+    0.5868,
+    0.5842,
+    0.5906,
+    0.5773
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9829,
+   "top5_mais_frequentes": [
+    [
+     "R34",
+     30
+    ],
+    [
+     "R44",
+     30
+    ],
+    [
+     "M33",
+     30
+    ],
+    [
+     "W88",
+     29
+    ],
+    [
+     "W96",
+     13
+    ],
+    [
+     "R39",
+     9
+    ],
+    [
+     "W90",
+     3
+    ],
+    [
+     "R45",
+     2
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.8452,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.848,
+     "posicao": 43
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.179,
+     "posicao": 82
+    },
+    "alternado_seis": {
+     "delta_em_dp": 0.01,
+     "posicao": 93
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.074,
+     "posicao": 87
+    }
+   }
+  },
+  "Glicko-2 τ=1.0 plano": {
+   "holdout": {
+    "log_loss": 0.7032,
+    "brier": 0.2472,
+    "acerto": 0.6094,
+    "ece": 0.1068
+   },
+   "holdout_dp_log_loss": 0.0131,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.7107,
+    "holdout_classes": 0.793,
+    "holdout_proximo": 0.6234
+   },
+   "prequencial_por_janela": [
+    0.6968,
+    0.6824,
+    0.6763,
+    0.652
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9551,
+   "top5_mais_frequentes": [
+    [
+     "M43",
+     29
+    ],
+    [
+     "R44",
+     27
+    ],
+    [
+     "R43",
+     27
+    ],
+    [
+     "W88",
+     23
+    ],
+    [
+     "M33",
+     12
+    ],
+    [
+     "M21",
+     9
+    ],
+    [
+     "W75",
+     7
+    ],
+    [
+     "W84",
+     6
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.911,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.872,
+     "posicao": 46
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.258,
+     "posicao": 71
+    },
+    "alternado_seis": {
+     "delta_em_dp": 0.002,
+     "posicao": 93
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.039,
+     "posicao": 89
+    }
+   }
+  },
+  "Glicko-2 τ=1.0 OP": {
+   "holdout": {
+    "log_loss": 0.6118,
+    "brier": 0.2097,
+    "acerto": 0.6919,
+    "ece": 0.0733
+   },
+   "holdout_dp_log_loss": 0.0097,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.5146,
+    "holdout_classes": 0.7174,
+    "holdout_proximo": 0.6155
+   },
+   "prequencial_por_janela": [
+    0.5868,
+    0.5842,
+    0.5906,
+    0.5773
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9829,
+   "top5_mais_frequentes": [
+    [
+     "R34",
+     30
+    ],
+    [
+     "R44",
+     30
+    ],
+    [
+     "M33",
+     30
+    ],
+    [
+     "W88",
+     29
+    ],
+    [
+     "W96",
+     13
+    ],
+    [
+     "R39",
+     9
+    ],
+    [
+     "W90",
+     3
+    ],
+    [
+     "R45",
+     2
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.8452,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.848,
+     "posicao": 43
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.179,
+     "posicao": 82
+    },
+    "alternado_seis": {
+     "delta_em_dp": 0.01,
+     "posicao": 93
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.074,
+     "posicao": 87
+    }
+   }
+  },
+  "TrueSkill β=σ/2 plano": {
+   "holdout": {
+    "log_loss": 0.7274,
+    "brier": 0.252,
+    "acerto": 0.6061,
+    "ece": 0.12
+   },
+   "holdout_dp_log_loss": 0.0139,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.7389,
+    "holdout_classes": 0.8262,
+    "holdout_proximo": 0.6428
+   },
+   "prequencial_por_janela": [
+    0.6984,
+    0.6876,
+    0.6853,
+    0.6614
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9578,
+   "top5_mais_frequentes": [
+    [
+     "M43",
+     30
+    ],
+    [
+     "R43",
+     30
+    ],
+    [
+     "R44",
+     29
+    ],
+    [
+     "W88",
+     24
+    ],
+    [
+     "M33",
+     13
+    ],
+    [
+     "M21",
+     11
+    ],
+    [
+     "W84",
+     7
+    ],
+    [
+     "M13",
+     2
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.8925,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 1.157,
+     "posicao": 24
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.372,
+     "posicao": 65
+    },
+    "alternado_seis": {
+     "delta_em_dp": -0.006,
+     "posicao": 93
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.049,
+     "posicao": 89
+    }
+   }
+  },
+  "TrueSkill β=σ/2 OP": {
+   "holdout": {
+    "log_loss": 0.6467,
+    "brier": 0.2202,
+    "acerto": 0.6817,
+    "ece": 0.099
+   },
+   "holdout_dp_log_loss": 0.011,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.5734,
+    "holdout_classes": 0.7589,
+    "holdout_proximo": 0.6282
+   },
+   "prequencial_por_janela": [
+    0.6012,
+    0.5988,
+    0.6068,
+    0.5931
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.98,
+   "top5_mais_frequentes": [
+    [
+     "R34",
+     30
+    ],
+    [
+     "R44",
+     30
+    ],
+    [
+     "M33",
+     30
+    ],
+    [
+     "W88",
+     30
+    ],
+    [
+     "W96",
+     14
+    ],
+    [
+     "R39",
+     5
+    ],
+    [
+     "M14",
+     3
+    ],
+    [
+     "W84",
+     2
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.8542,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.728,
+     "posicao": 50
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.157,
+     "posicao": 83
+    },
+    "alternado_seis": {
+     "delta_em_dp": -0.0,
+     "posicao": 93
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.006,
+     "posicao": 92
+    }
+   }
+  },
+  "TrueSkill β=σ/4 plano": {
+   "holdout": {
+    "log_loss": 0.8052,
+    "brier": 0.2636,
+    "acerto": 0.6094,
+    "ece": 0.1629
+   },
+   "holdout_dp_log_loss": 0.0274,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.8413,
+    "holdout_classes": 0.9671,
+    "holdout_proximo": 0.6871
+   },
+   "prequencial_por_janela": [
+    0.7103,
+    0.717,
+    0.7319,
+    0.7096
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9252,
+   "top5_mais_frequentes": [
+    [
+     "M43",
+     28
+    ],
+    [
+     "R44",
+     22
+    ],
+    [
+     "W88",
+     20
+    ],
+    [
+     "R43",
+     19
+    ],
+    [
+     "M33",
+     14
+    ],
+    [
+     "W84",
+     13
+    ],
+    [
+     "R34",
+     8
+    ],
+    [
+     "M21",
+     8
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.811,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 1.087,
+     "posicao": 31
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.237,
+     "posicao": 78
+    },
+    "alternado_seis": {
+     "delta_em_dp": 0.003,
+     "posicao": 93
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.076,
+     "posicao": 86
+    }
+   }
+  },
+  "TrueSkill β=σ/4 OP": {
+   "holdout": {
+    "log_loss": 0.751,
+    "brier": 0.2451,
+    "acerto": 0.6439,
+    "ece": 0.1397
+   },
+   "holdout_dp_log_loss": 0.0238,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.7376,
+    "holdout_classes": 0.9073,
+    "holdout_proximo": 0.6725
+   },
+   "prequencial_por_janela": [
+    0.6465,
+    0.6568,
+    0.6787,
+    0.6655
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9472,
+   "top5_mais_frequentes": [
+    [
+     "R44",
+     28
+    ],
+    [
+     "M33",
+     28
+    ],
+    [
+     "W88",
+     27
+    ],
+    [
+     "R34",
+     23
+    ],
+    [
+     "W84",
+     14
+    ],
+    [
+     "M43",
+     9
+    ],
+    [
+     "W75",
+     4
+    ],
+    [
+     "M36",
+     4
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.7891,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.885,
+     "posicao": 46
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.168,
+     "posicao": 85
+    },
+    "alternado_seis": {
+     "delta_em_dp": -0.028,
+     "posicao": 98
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.044,
+     "posicao": 92
+    }
+   }
+  },
+  "TrueSkill β=σ/8 plano": {
+   "holdout": {
+    "log_loss": 0.8602,
+    "brier": 0.2701,
+    "acerto": 0.6106,
+    "ece": 0.1834
+   },
+   "holdout_dp_log_loss": 0.0377,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.9223,
+    "holdout_classes": 1.0555,
+    "holdout_proximo": 0.7253
+   },
+   "prequencial_por_janela": [
+    0.7155,
+    0.7322,
+    0.7598,
+    0.7437
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9075,
+   "top5_mais_frequentes": [
+    [
+     "M43",
+     27
+    ],
+    [
+     "R44",
+     20
+    ],
+    [
+     "W88",
+     19
+    ],
+    [
+     "W84",
+     14
+    ],
+    [
+     "R43",
+     14
+    ],
+    [
+     "M33",
+     14
+    ],
+    [
+     "R34",
+     10
+    ],
+    [
+     "W75",
+     9
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.7618,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.976,
+     "posicao": 38
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.154,
+     "posicao": 81
+    },
+    "alternado_seis": {
+     "delta_em_dp": -0.042,
+     "posicao": 96
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.075,
+     "posicao": 87
+    }
+   }
+  },
+  "TrueSkill β=σ/8 OP": {
+   "holdout": {
+    "log_loss": 0.8274,
+    "brier": 0.2601,
+    "acerto": 0.6264,
+    "ece": 0.1678
+   },
+   "holdout_dp_log_loss": 0.0346,
+   "holdout_por_estrato": {
+    "holdout_aleatorio": 0.8629,
+    "holdout_classes": 1.0139,
+    "holdout_proximo": 0.7146
+   },
+   "prequencial_por_janela": [
+    0.6793,
+    0.697,
+    0.7282,
+    0.7176
+   ],
+   "janela": 100,
+   "estabilidade_spearman": 0.9212,
+   "top5_mais_frequentes": [
+    [
+     "R44",
+     23
+    ],
+    [
+     "W88",
+     23
+    ],
+    [
+     "M43",
+     22
+    ],
+    [
+     "M33",
+     21
+    ],
+    [
+     "R34",
+     16
+    ],
+    [
+     "W84",
+     15
+    ],
+    [
+     "W75",
+     7
+    ],
+    [
+     "M36",
+     7
+    ]
+   ],
+   "incerteza_x_jogos_spearman": 0.7522,
+   "sequencias": {
+    "posicao_inicial": 93,
+    "cinco_vitorias_contra_iguais": {
+     "delta_em_dp": 0.876,
+     "posicao": 45
+    },
+    "cinco_vitorias_contra_fracos": {
+     "delta_em_dp": 0.126,
+     "posicao": 86
+    },
+    "alternado_seis": {
+     "delta_em_dp": 0.032,
+     "posicao": 91
+    },
+    "cinco_derrotas_e_cinco_vitorias": {
+     "delta_em_dp": 0.053,
+     "posicao": 90
+    }
+   }
+  }
+ }
+}

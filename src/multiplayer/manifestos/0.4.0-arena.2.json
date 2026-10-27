@@ -211,6 +211,7 @@
     "src/data/arena_populacao/W95.json": "03133f3dffa2590165356695a6948a3342fa13e5fcbb4f65bec5bcd62c43dcd5",
     "src/data/arena_populacao/W96.json": "71356933905686cb34f224e2668fe43bc470d67d2f62baea4c91c33542b713db",
     "src/data/arena_populacao/indice.json": "af06b0d21d592b989ee54c3b4e04fd05ba11f742595f23e54fcb5172ec186765",
+    "src/data/arena_ranked/ladder_inicial.json": "6a77061d1c18a603c86ee985a6cd541bdf0bb1723683c9743985849aaa2591e7",
     "src/data/items.json": "b00c1f349ef9946a62f47fe5c3e296ee325d3312388d84a9eda86607c4be042e",
     "src/data/loader.py": "2b9db5132fd039bc0622a4744e5e232781159d67a4c9d5b52553cee21e23b13c",
     "src/data/monsters.json": "45c23682ade183da470094dd66ea89767807d8ee4bb54dfe459f57eee2a9a136",
@@ -255,11 +256,11 @@
     "src/storage/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "src/storage/save_manager.py": "462f766f76fe0de59a7cbc1b57db98ab3215a77af242c3787ad3c43251f445c6"
   },
-  "conteudo": "d0c9f3ab7cbad2fa902bdc058c0a332adbea4bf761711a9960cb64c6a435cc7b",
+  "conteudo": "547f773d1c9c5f8e75bb94f891b644d3cae0f5dc7c68ae053898d6f010ea8ad4",
   "esquema_gladiador": 1,
   "formato": 1,
   "grupos": {
-    "catalogos": "55bfea5a3c52d2b58d5dd2ff95394396b78611b3dc89eca83e500f3a81daedd9",
+    "catalogos": "81d9d716e8aef8e3a8e7cf810a813fad10456b85949980097fb5b4b9c818f244",
     "persistencia": "e3180df03530bebbac6c5f6bc5d3a5fcd8fcbf6adbdbacedf282bb2a7704a1a8",
     "protocolo": "6d9aef769fd4257d994e3c53dfebaab25c7ddf28e879e22f7e93abf83eab60fd",
     "regras": "6bb430eb758594290097f27a1bd6c0fbd72264dde2299c2d39ec5738d3ea555b",
