@@ -213,17 +213,26 @@ Mudar uma classe exige mostrar a causa na régua de combate, e mantê-la verde.
 
 ## Arena
 
-Branch `phase/pvp-arena`, sobre a fundação congelada em `v0.3-pve`. **O motor do
-duelo é headless** (Fases 1 e 1.1): dois gladiadores, decisões simultâneas,
-resolução sequencial. **O modo local é jogável no terminal** (Fase 2): opção 3
-do menu principal, o jogador contra um controlador automático. **O multiplayer
-humano × humano funciona pela rede** (Fases 3 e 4): servidor autoritativo,
-WebSocket com TLS, contas autenticadas, gladiadores com dono e salas diretas, sob
-o contrato da seção [Multiplayer](#multiplayer--compatibilidade-de-versão). MMR,
-matchmaking público, bots na fila e relógio de decisão ainda não existem.
+Branch `phase/pvp-arena`, sobre a fundação congelada em `v0.3-pve`.
+
+**O ToJ 1.0 é 100% offline, em Python.** A Arena do jogo é a **Arena offline**
+(Fase 5): o gladiador extraído do jogador contra uma população fixa de
+gladiadores extraídos de runs PvE reais, controlados pela IA estratégica, sem
+rede, conta nem servidor.
+
+- **O motor do duelo é headless** (Fases 1 e 1.1): dois gladiadores, decisões
+  simultâneas, resolução sequencial.
+- **O modo local** (Fase 2) virou a Arena offline (Fase 5).
+- **O multiplayer humano × humano** (Fases 3 e 4) continua no repositório e no
+  histórico, com os testes e o gate de compatibilidade, mas **fora do fluxo do
+  jogo**: o menu não o abre e a Arena não importa `src/multiplayer/`. Os
+  contratos dele estão na seção [Multiplayer](#multiplayer--compatibilidade-de-versão).
+- O MMR offline por gladiador é a Fase 6. Fila, matchmaking público e relógio de
+  decisão eram da ranked em rede e saem do escopo do 1.0.
 
 Verificado em `tests/test_pvp_duel.py`, `tests/test_pvp_initiative.py`,
-`tests/test_pvp_references.py` e `tests/test_arena_mode.py`.
+`tests/test_pvp_references.py`, `tests/test_arena_mode.py`,
+`tests/test_arena_populacao.py` e `tests/test_arena_ia_offline.py`.
 
 ### Fronteira com o PvE
 
@@ -320,19 +329,20 @@ Verificado em `tests/test_pvp_duel.py`, `tests/test_pvp_initiative.py`,
 ### Pendência de decisão
 
 - **Rendição simultânea.** Hoje perde quem está à frente da ordem travada, para o
-  motor ser total. É provisório.
+  motor ser total. É provisório. Na Arena offline ela não acontece: a IA nunca
+  se rende.
 
 O desempate, as referências globais e as consequências da interrupção, que
 apareciam aqui na Fase 1, estão fechados acima.
 
-### Modo local jogável
+### Arena offline
 
-`src/engine/arena_mode.py`, desenhado por `src/ui/arena_screens.py`. É uma
-experiência local de validação do duelo, não a ranked.
+`src/engine/arena_mode.py`, desenhado por `src/ui/arena_screens.py`. É a opção 3
+do menu principal, e o modo competitivo do ToJ 1.0.
 
-- **Quem luta.** Só personagens salvos com extração registrada aparecem. Nenhum
-  gladiador é gerado para completar a lista. Com menos de dois, a Arena explica
-  que faltam extrações e volta ao menu. O adversário é outro slot.
+- **Quem luta.** Do lado do jogador, só personagens salvos com extração
+  registrada; um basta. Nenhum gladiador do jogador é gerado. Sem nenhum, a
+  Arena explica que falta uma extração e volta ao menu.
 - **Preparação.** Ficha do gladiador (atributos, equipamento, skills e
   passivas) e o inventário de sempre, com as regras de sempre: classe, posição e
   mãos.
@@ -342,32 +352,103 @@ experiência local de validação do duelo, não a ranked.
   - A configuração é confirmada antes do duelo. Gravá-la é escolha explícita, e
     regrava só `equipment` e `inventory` no save do próprio slot
     (`save_loadout`). O resto do save fica como estava.
-- **Adversário.** Antes de confirmar, a ficha pública dele: nome, classe, nível,
-  equipamento, skills e passivas.
+- **Adversário.** Da [população offline](#população-offline), numa lista com
+  filtro de classe e páginas, ordenada pela força de referência. Antes de
+  confirmar, a ficha pública: nome, classe, nível, equipamento, skills,
+  passivas, o andar da extração e o estilo da run que o formou.
 - **Duelo.** O jogador decide pela visão do motor (`HumanDuelController`), e o
-  adversário por `FirstLegalSkillController`, só pela visão dele. A cada rodada
-  `run_round` monta as duas visões antes de qualquer escolha e chama
-  `play_round`.
+  adversário pela IA estratégica (`src/sim/ia_estrategica.py`), só pela visão
+  dele. A cada rodada `run_round` monta as duas visões antes de qualquer escolha
+  e chama `play_round`.
   - A tela mostra os dois gladiadores, HP, MP, efeitos ativos, skills com custo
     e recarga, e as três ações: ataque básico, skill e rendição.
-  - Depois do lock, a rodada aparece na ordem em que o motor a resolveu, com
-    cancelamentos por controle ou morte. O Initiative Score não aparece.
-- **Fim.** Vitória, derrota ou rendição, e volta à Arena. O duelo roda sobre
-  cópias: ninguém morre, o save não muda e não há XP, ouro, recompensa nem MMR.
+  - Depois do lock, a rodada aparece na ordem em que o motor a resolveu, com a
+    ação de cada lado e os cancelamentos por controle ou morte. O Initiative
+    Score não aparece.
+- **Fim.** Vitória, derrota ou rendição, o placar do gladiador na sessão, e a
+  escolha: revanche, outro adversário ou voltar. O duelo roda sobre cópias:
+  ninguém morre, o save não muda, o catálogo não muda e não há XP, ouro nem
+  recompensa.
+
+### A IA dos adversários
+
+A mesma IA da Copa Arena 03 v2, trazida de `tools/` para `src/sim/` sem mudar
+uma decisão (`test_a_mudanca_para_src_sim_nao_mudou_decisao`).
+
+- **Só ação legal.** Ela escolhe entre as ações de `DuelView.legal_actions`, e
+  nunca a rendição.
+- **Só a própria visão.** Do adversário ela vê o que a tela mostra (classe,
+  nível, HP, MP, efeitos e buffs) e modela o resto a partir do herói canônico da
+  classe e do que observa rodada a rodada.
+- **Simulação isolada.** As continuações rodam no motor de verdade, sobre
+  cópias, com geradores próprios. Escolher não consome o gerador do duelo, não
+  mexe nos heróis do duelo e não toca o `random` global.
+- **Determinística.** A mesma visão dá a mesma ação; a mesma semente de duelo
+  dá a mesma partida.
+- **Custo.** No orçamento padrão, uma decisão leva décimos de segundo; o teste
+  exige mediana abaixo de 1 s.
+
+### População offline
+
+O catálogo está em `src/data/arena_populacao/` (um snapshot por gladiador e o
+`indice.json`), é lido por `src/engine/arena_populacao.py` e é gerado por
+`tools/arena_offline_geracao.py`. O resumo de cada tentativa da geração está em
+`reports/pvp/arena_offline/tentativas.jsonl`.
+
+- **Só extração real.** Todo gladiador é o snapshot canônico do save de uma
+  run PvE real, jogada pelo BotPadrão com a variante perfil × política da Copa
+  Arena 03, desde a criação canônica da jornada até a Extração. Nada é inventado:
+  atributo, item, passiva e carta são os que a run deixou.
+- **As origens.** Os 64 Guerreiros da Copa 03 com os mesmos bytes; Guerreiros
+  que a Copa 03 recusou só pelo OP, re-executados pela mesma seed e conferidos
+  contra o log dela; e Mages e Rogues de runs novas. A população não tem limite
+  de OP.
+- **Elegibilidade.** Classe do índice, marca de extração no andar do snapshot,
+  vivo, Chave gasta, e o snapshot volta idêntico pela ida e volta canônica.
+- **Unicidade.** Id, apelido, bytes, seed e build não se repetem.
+- **Tamanho.** Entre 128 e 256 gladiadores. O catálogo atual tem **186**: 96
+  Guerreiros (64 da Copa 03 e 32 fora da faixa dela), 45 Mages e 45 Rogues, cinco
+  por grupo perfil × política em cada classe nova. Níveis de 2 a 29, força de
+  referência de 4,3 a 42,4. A geração custou 151 runs de Mage e 265 de Rogue; as
+  32 re-execuções de Guerreiro saíram iguais ao log da Copa 03.
+- **Integridade em jogo.** Antes de cada partida, o arquivo tem de bater com o
+  sha256 do índice e passar de novo pela elegibilidade. Um adversário que não
+  passa não luta; um índice ilegível, de outra versão ou com entrada repetida
+  bloqueia a Arena inteira, com aviso. Nunca há gladiador montado pela metade.
+- **Apelidos fictícios**, sorteados com semente fixa. O nome do jogador de
+  origem não entra.
+- **Força de referência.** O OP medido na geração (`overall_power`). É só o
+  ponto de partida para comparar gladiadores; não é rating nem regra.
+
+### Pontos de extensão do MMR
+
+`src/engine/arena_historico.py`. A Fase 6 escolhe a fórmula e a persistência;
+hoje nada calcula rating nem grava em disco.
+
+- Cada partida terminada vira um `ResultadoDaPartida`: a identidade e a ficha
+  curta dos dois lados, quem venceu, o motivo do motor, as rodadas, a força de
+  referência do oponente e a versão do catálogo.
+- O resultado vai para o `Historico` (hoje `HistoricoDaSessao`, em memória) e
+  para a `Classificacao` (hoje `SemClassificacao`, que não tem fórmula).
+- **Identidade estável.** O oponente é `populacao:<id>:<sha256>`. O gladiador do
+  jogador é o slot mais o hash do save sem `equipment` e `inventory`: gravar
+  equipamento não muda quem ele é, e uma run nova no mesmo slot é outro
+  gladiador.
 
 ### Contratos futuros, ainda não implementados
 
-A arquitetura não os impede, mas nenhum existe ainda.
-
-- A fila prioriza humanos por 30 segundos e depois aceita bots. Partida contra
-  bot conta normalmente no MMR.
-- 45 segundos por decisão, e o primeiro timeout é derrota. A desconexão dá 60
-  segundos para voltar e pausa o cronômetro. O motor não tem relógio: os dois
-  chegam por `forfeit`.
-- MMR individual por gladiador.
-- A população artificial sai só de heróis extraídos de runs PvE reais.
+- **MMR offline por gladiador** (Fase 6): a fórmula, o rating inicial (a força
+  de referência pode ou não entrar), a persistência local do histórico e como a
+  rendição conta.
+- A ranked em rede (fila com prioridade humana, bots na fila, 45 segundos por
+  decisão, 60 segundos de reconexão) era do multiplayer e não faz parte do 1.0.
 
 ## Multiplayer — compatibilidade de versão
+
+> **Fora do ToJ 1.0.** O 1.0 é offline. O multiplayer das Fases 3 e 4 está
+> preservado no repositório, com testes e gate, e fora do fluxo do jogo: o menu
+> não o abre e a Arena não o importa. Os contratos abaixo valem para quando ele
+> voltar.
 
 Requisito **obrigatório e bloqueante**: o multiplayer só está pronto com estes
 controles implementados, testados e no pipeline de publicação. Princípio:

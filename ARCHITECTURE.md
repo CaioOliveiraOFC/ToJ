@@ -39,7 +39,7 @@ multiplayer/ ──→ engine/arena_setup ──→ storage/, content/
 | `entities/` | estado (Player, Monster) | shared/ |
 | `mechanics/` | regras de combate e matemática | entities/, shared/ |
 | `content/` | catálogos e fábricas | entities/, mechanics/, shared/, data/ |
-| `sim/` | simulação headless para medir balanceamento | content/, mechanics/, entities/, shared/, data/ |
+| `sim/` | simulação headless: medir balanceamento e a IA dos adversários da Arena | content/, mechanics/, entities/, shared/, data/ |
 | `storage/` | save/load | content/, entities/, shared/, data/ |
 | `engine/` | orquestração | todas |
 | `ui/` | apresentação e input | shared/, content/, entities/, storage/, data/ |
@@ -92,9 +92,12 @@ Os módulos onde a responsabilidade não é óbvia pelo nome da camada:
 | `mechanics/pvp_initiative.py` | a iniciativa do duelo: a fórmula aprovada, a **referência global** por nível (`foundation_reference`: a média das três classes pelo crescimento canônico, sem número próprio) e o desempate pela semente. Os dois são o padrão do duelo e continuam injetáveis para teste |
 | `content/gladiator.py` | a preparação do gladiador: só personagem extraído, cópia normalizada, sem consumível |
 | `engine/arena_setup.py` | o gladiador a partir do snapshot do save, pelo caminho canônico de reconstrução (`player_from_save_data`); a lista de elegíveis (slots com extração) e a gravação do equipamento confirmado, só no slot do próprio gladiador |
-| `engine/arena_mode.py` | o **modo Arena local** no terminal: seleção, preparação, ficha do adversário, duelo do jogador contra o controlador automático e resultado. Só desenha, lê teclas e pergunta; a regra é do motor do duelo |
+| `engine/arena_mode.py` | a **Arena offline** no terminal (o modo competitivo do ToJ 1.0): seleção do gladiador, preparação, escolha do adversário na população, ficha pública, duelo do jogador contra a IA, resultado, revanche. Só desenha, lê teclas e pergunta; a regra é do motor do duelo. Não importa `multiplayer/` |
+| `engine/arena_populacao.py` | a **população offline**: lê o catálogo de `data/arena_populacao/` e confere cada adversário antes da partida (sha256 do índice, reconstrução canônica, extração, classe, ida e volta). Quem gera o catálogo é `tools/arena_offline_geracao.py` |
+| `engine/arena_historico.py` | os pontos de extensão do MMR: o `ResultadoDaPartida`, o histórico da sessão, a `Classificacao` (hoje a nula) e a identidade estável do gladiador do jogador. Não calcula rating nem grava em disco |
 | `ui/arena_screens.py` | as telas da Arena, desenhadas a partir da `DuelView` do motor: o que a tela mostra é o que o controlador recebe |
-| `sim/pvp_controllers.py` | controladores de referência do duelo (roteiro, primeira skill legal). Provam a interface; não são o bot de PvP |
+| `sim/ia_estrategica.py` | a **IA estratégica** dos adversários da Arena: decide só pela `DuelView`, joga continuações curtas no próprio motor sobre cópias e avalia o fim com as fórmulas canônicas de dano. Não é regra; não muda o motor |
+| `sim/pvp_controllers.py` | controladores de referência do duelo (roteiro, primeira skill legal). Provam a interface |
 | `multiplayer/versao.py` | a versão que a instalação **declara**: jogo, protocolo, regras de combate, esquema do gladiador. Fica fora dos hashes |
 | `multiplayer/manifesto.py` | o **escopo do gameplay** (`ESCOPO`, cinco grupos), os hashes, a `Identidade` e as conferências do gate: código contra manifesto, um identificador para um conteúdo, imutabilidade do publicado. `manifesto_da_instalacao` é o único caminho de produção para a identidade |
 | `multiplayer/compatibilidade.py` | a decisão de conexão: identidade **idêntica** ou recusa com "atualização obrigatória". Não existe versão próxima |

@@ -13,10 +13,13 @@
 >   `expected loadout`.
 > - **O Run/Progression Balance está `[em calibração]`.** A jornada real está
 >   implementada e medida, mas a calibração está aberta.
-> - **A Arena (PvP) `[em construção]`.** O motor do duelo e um modo local
->   jogável no terminal estão implementados (`phase/pvp-arena`): o jogador
->   contra um controlador automático. Fila, MMR e rede não existem. As regras
->   estão em [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
+> - **O ToJ 1.0 é 100% offline.** A Arena do jogo é a **Arena offline**
+>   `[implementado]` (`phase/pvp-arena`): o gladiador extraído do jogador contra
+>   uma população fixa de gladiadores extraídos de runs PvE reais, controlados
+>   pela IA estratégica. O MMR offline por gladiador `[não existe]` ainda: é a
+>   próxima fase. O multiplayer humano × humano em rede foi construído (Fases 3
+>   e 4) e está preservado no repositório, fora do fluxo do jogo. As regras estão
+>   em [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 >
 > As decisões que não podem mudar de passagem estão em
 > [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md). As medições estão em
@@ -69,17 +72,40 @@ digno da **Arena (PvP)**.
 | Modo | Propósito | Risco | Estado |
 |---|---|---|---|
 | **Forge Run** | Criar e fortalecer personagens na masmorra | Morte permanente. Perde tudo. | **`[implementado]`** — progressão **`[em calibração]`** |
-| **Arena** | Provar o valor do personagem contra jogadores | Sem risco de morte. Ranking por Elo. | **`[em construção]`** — modo local |
+| **Arena** | Provar o valor do personagem contra a população da Arena | Sem risco de morte. Rating por gladiador. | **`[implementado]`** — offline; o rating **`[não existe]`** |
 
-**`[em construção]`** O menu principal tem a Arena, na opção 3. Hoje ela é um modo
-LOCAL: o jogador escolhe um gladiador extraído e duela contra outro, controlado
-automaticamente, sem fila, ranking nem rede. As regras estão em
+**`[implementado]`** O menu principal tem a Arena, na opção 3. Ela é OFFLINE: o
+jogador escolhe um gladiador extraído, prepara o equipamento, escolhe um
+adversário da população e duela contra a IA estratégica, quantas vezes quiser —
+revanche, outro adversário, outro gladiador. Ninguém morre, o save não muda e não
+há XP, ouro nem recompensa. As regras estão em
 [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
+
+### Estratégia de lançamento: o 1.0 é offline
+
+**`[implementado]`** O ToJ 1.0 roda inteiro no computador do jogador, em Python,
+sem serviço externo. A Arena precisava de adversários, e humanos em rede exigem
+servidor, conta, confiança na extração feita no computador do jogador e um
+relógio de decisão. A resposta do 1.0 é outra:
+
+- **A população é feita de extrações reais.** Cada adversário é um personagem
+  que desceu a masmorra numa run PvE de verdade e saiu vivo pela Extração. Ele
+  não é montado; a build é a que a run deixou. São 186 hoje — 96 Guerreiros, 45
+  Magos e 45 Ladinos —, do nível 2 ao 29, de estilos de run diferentes; o
+  catálogo comporta de 128 a 256.
+- **A IA joga pelo que vê.** O adversário decide pela mesma visão que o jogador
+  tem do duelo, simulando continuações curtas no próprio motor.
+- **O valor do gladiador vira número na Fase 6.** O rating por gladiador (MMR
+  offline) é a próxima fase; a força medida na geração é só a referência
+  inicial.
+- **O multiplayer não foi descartado.** O código das Fases 3 e 4 continua no
+  repositório e nos testes, fora do fluxo do 1.0.
 
 > **A consequência disso é maior do que parece.** A Arena é a resposta do jogo à
 > pergunta "por que o jogador recomeça depois de morrer". Sem ela, extrair um
 > personagem vivo não leva a lugar nenhum: o gladiador salvo não tem onde provar
-> valor. Metade do laço do jogo está especificada e não construída.
+> valor. Com a Arena offline o laço fecha — extrair leva a lutar —, e o que ainda
+> falta é o número que guarda o valor provado: o rating por gladiador.
 
 ---
 
@@ -845,8 +871,8 @@ nascem vazios. Nenhum arquivo precisou ser migrado.
 **`[implementado]`** **Morte na Forge Run:** o save é deletado e um troféu é gravado
 com nome, classe, nível, andar alcançado e causa.
 
-**`[não existe]`** O troféu não guarda Elo (não há Arena) nem nada que seja lido na
-run seguinte. É um registro de mortos, não uma progressão.
+**`[não existe]`** O troféu não guarda rating (o MMR da Arena é a próxima fase) nem
+nada que seja lido na run seguinte. É um registro de mortos, não uma progressão.
 
 **`[implementado]`** O save grava **HP e MP**. **Extrair encerra a run.** O save marca
 o andar em que o personagem foi extraído, e esse personagem não volta para a mesma
