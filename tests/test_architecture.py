@@ -28,7 +28,20 @@ ALLOWED_IMPORTS: dict[str, set[str]] = {
     # `sim/` mede balanceamento chamando as regras direto. Nunca importa `ui/`
     # nem `engine/`: é isso que a mantém rápida e headless.
     "sim": {"content", "entities", "mechanics", "shared", "data"},
-    "engine": {"content", "mechanics", "entities", "storage", "shared", "ui", "data", "sim"},
+    "engine": {
+        "content",
+        "mechanics",
+        "entities",
+        "storage",
+        "shared",
+        "ui",
+        "data",
+        "sim",
+        "ranked",
+    },
+    # A Ranked offline: rating, ranks, Ladder e matchmaking. Matemática e
+    # estado puros; quem joga as partidas e grava é `engine/`.
+    "ranked": {"shared"},
     "ui": {"shared", "content", "entities", "storage", "data"},
     # O servidor multiplayer roda o motor canônico e reconstrói o gladiador pelo
     # caminho de `engine/arena_setup.py`. Nunca importa `ui/` nem `sim/`: é
