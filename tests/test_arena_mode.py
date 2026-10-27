@@ -185,7 +185,7 @@ class TestMenu:
         respostas = iter(["arena", "quit"])
         chamadas: list = []
         monkeypatch.setattr(bootstrap, "call_main_menu", lambda: next(respostas))
-        monkeypatch.setattr(bootstrap, "run_arena", lambda: chamadas.append("arena"))
+        monkeypatch.setattr(bootstrap, "run_arena_hub", lambda: chamadas.append("arena"))
         bootstrap.run_main_loop()
         assert chamadas == ["arena"]
 

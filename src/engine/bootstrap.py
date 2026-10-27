@@ -11,10 +11,10 @@ from typing import TYPE_CHECKING
 
 from src.content.extraction import extracted_floor, was_extracted
 from src.content.items import ALL_ITEMS, get_all_items
-from src.engine.arena_mode import run_arena
 from src.engine.events import EventBus
 from src.engine.game_logic import create_player_for_new_run
 from src.engine.loop import start_game
+from src.engine.ranked_mode import run_arena_hub
 from src.entities.heroes import Mage, Rogue, Warrior
 from src.storage.save_manager import load_game
 from src.ui import screens
@@ -95,7 +95,7 @@ def run_main_loop() -> None:
         if menu_result == "quit":
             break
         elif menu_result == "arena":
-            run_arena()
+            run_arena_hub()
         elif menu_result == "auto_test":
             if AutoTester is None:
                 screens.render_game_saved("AutoTester não disponível.")
