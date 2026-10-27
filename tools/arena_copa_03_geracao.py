@@ -265,9 +265,12 @@ def _aplicar(linha: float, matriz: dict) -> None:
     evaluators._MATRIZ = matriz
 
 
-def semente_da_run(perfil: str, politica: str, tentativa: int) -> int:
+def semente_da_run(perfil: str, politica: str, tentativa: int, classe: str = CLASSE) -> int:
+    """A seed da tentativa. Warrior mantém a fórmula da Copa 03; as outras classes
+    levam o nome da classe na chave, para nunca repetir uma seed de Guerreiro."""
+    rotulo = f"{perfil}" if classe == CLASSE else f"{classe}:{perfil}"
     digest = hashlib.sha256(
-        f"{SEMENTE_PRINCIPAL}:{VERSAO}:{perfil}:{politica}:{tentativa}".encode()
+        f"{SEMENTE_PRINCIPAL}:{VERSAO}:{rotulo}:{politica}:{tentativa}".encode()
     ).digest()
     return int.from_bytes(digest[:8], "big")
 
@@ -279,8 +282,10 @@ def _familia(action_id: str) -> str:
 class BotExperimental(bp.BotPadrao):
     """BotPadrão com política de escolha e agenda de risco do grupo."""
 
-    def __init__(self, seed: int, perfil: str, politica: str, max_andar: int = TETO) -> None:
-        super().__init__(CLASSE, seed, max_andar, bp.PERFIS[perfil])
+    def __init__(
+        self, seed: int, perfil: str, politica: str, max_andar: int = TETO, classe: str = CLASSE
+    ) -> None:
+        super().__init__(classe, seed, max_andar, bp.PERFIS[perfil])
         self.perfil_nome = perfil
         self.picker = get_pick_policy(politica)
         self.linha = LINHA_CANONICA
@@ -429,7 +434,7 @@ def _conferir_reconstrucao(vivo, snapshot: dict) -> list[str]:
     falhas = []
     if reconstruido is None:
         return ["snapshot ilegível"]
-    if reconstruido.get_classname() != "Warrior":
+    if reconstruido.get_classname() != vivo.get_classname():
         falhas.append(f"classe {reconstruido.get_classname()}")
     if not was_extracted(reconstruido):
         falhas.append("sem marca de extração")
@@ -462,9 +467,19 @@ def _sem_telemetria_de_carga(dados: dict) -> dict:
     return copia
 
 
-def executar(perfil: str, politica: str, tentativa: int) -> dict:
-    """Uma run inteira, e o veredito de elegibilidade. Roda num processo próprio."""
-    semente = semente_da_run(perfil, politica, tentativa)
+def executar(
+    perfil: str,
+    politica: str,
+    tentativa: int,
+    classe: str = CLASSE,
+    faixa: tuple[float, float] | None = FAIXA_DE_OP,
+) -> dict:
+    """Uma run inteira, e o veredito de elegibilidade. Roda num processo próprio.
+
+    `classe` e `faixa` são os da Copa 03 por padrão (Guerreiro, OP 20–30). A
+    população offline da Arena usa as três classes e `faixa=None`: qualquer OP.
+    """
+    semente = semente_da_run(perfil, politica, tentativa, classe)
     inicio = time.time()
     registro: dict = {
         "perfil": perfil,
@@ -477,7 +492,7 @@ def executar(perfil: str, politica: str, tentativa: int) -> dict:
         "extrai_desde": PRESERVA_DESDE.get(perfil, "canônica"),
     }
     try:
-        bot = BotExperimental(semente, perfil, politica)
+        bot = BotExperimental(semente, perfil, politica, classe=classe)
         bot.jogar()
     except Exception:  # noqa: BLE001 — o erro vira registro, nunca some
         registro.update(
@@ -539,8 +554,8 @@ def executar(perfil: str, politica: str, tentativa: int) -> dict:
 
     snapshot = json.loads(json.dumps(to_save_data(heroi, bot.andar)))
     falhas = []
-    if heroi.get_classname() != "Warrior":
-        falhas.append("não é Warrior")
+    if heroi.get_classname().lower() != classe:
+        falhas.append(f"não é {classe}")
     if not vivo:
         falhas.append("extraiu sem vida")
     if not was_extracted(heroi) or extracted_floor(heroi) != bot.andar:
@@ -559,12 +574,12 @@ def executar(perfil: str, politica: str, tentativa: int) -> dict:
 
     leitura = overall_power(reconstruir(snapshot), usar_cache=False)
     op = leitura.nivel_equivalente
-    dentro = na_faixa(op)
+    dentro = faixa is None or faixa[0] <= op <= faixa[1]
     registro.update(
         op=op,
         duelos_op=leitura.duelos,
         qualificada=dentro,
-        motivo="qualificada" if dentro else f"OP {op:.2f} fora de 20–30",
+        motivo="qualificada" if dentro else f"OP {op:.2f} fora de {faixa[0]:g}–{faixa[1]:g}",
         tempo_s=round(time.time() - inicio, 1),
     )
     if dentro:
@@ -688,7 +703,7 @@ def estado_da_fila(fila: dict) -> dict:
     }
 
 
-def escolher_grupo(fila: dict) -> Grupo | None:
+def escolher_grupo(fila: dict, limite: int | None = None) -> Grupo | None:
     """O grupo incompleto com menos tentativas despachadas por vaga restante.
 
     Proporcional às vagas: um grupo com sete vagas recebe sete vezes mais
@@ -696,8 +711,16 @@ def escolher_grupo(fila: dict) -> Grupo | None:
     pela ordem dos grupos, e como a morte cedo devolve o processo em segundos,
     os grupos do conservador eram despachados de novo antes de os outros
     receberem a primeira tentativa.
+
+    `limite` fecha o grupo que já despachou essa quantidade de tentativas, cheio
+    ou não. A Copa 03 não tem limite; a população offline tem, porque há classe
+    e perfil que quase nunca extraem.
     """
-    abertos = [g for g in fila.values() if not g.completo]
+    abertos = [
+        g
+        for g in fila.values()
+        if not g.completo and (limite is None or len(g.concluidas) + len(g.em_voo) < limite)
+    ]
     if not abertos:
         return None
 
@@ -759,8 +782,11 @@ def gerar(
     primeiras: dict | None = None,
     nome: str = "tentativas.jsonl",
     estado: str = "fila.json",
+    classe: str = CLASSE,
+    faixa: tuple[float, float] | None = FAIXA_DE_OP,
+    limite: int | None = None,
 ) -> dict:
-    """Roda tentativas até os grupos completarem as quotas.
+    """Roda tentativas até os grupos completarem as quotas (ou o `limite`).
 
     Sem argumentos, é a geração original: nove grupos, `QUOTAS`, o log
     `tentativas.jsonl`. O preenchimento chama a mesma máquina com as quotas, a
@@ -773,6 +799,9 @@ def gerar(
     _log(f"Retomada: {linha_de_progresso(fila)}", trabalho)
     feitos_na_sessao = 0
     erros_recentes: list[bool] = []
+    # Só a população offline passa classe e faixa: a Copa 03 chama `executar`
+    # exatamente como antes.
+    extra = {} if (classe, faixa) == (CLASSE, FAIXA_DE_OP) else {"classe": classe, "faixa": faixa}
     contexto = mp.get_context("spawn")
     with executor or ProcessPoolExecutor(
         max_workers=trabalhadores, mp_context=contexto, max_tasks_per_child=1
@@ -781,12 +810,15 @@ def gerar(
 
         def despachar() -> None:
             while len(futuros) < trabalhadores:
-                grupo = escolher_grupo(fila)
+                grupo = escolher_grupo(fila, limite)
                 if grupo is None:
                     return
                 k = grupo.proxima()
                 grupo.em_voo.add(k)
-                futuros[pool.submit(executar, grupo.perfil, grupo.politica, k)] = (grupo, k)
+                futuros[pool.submit(executar, grupo.perfil, grupo.politica, k, **extra)] = (
+                    grupo,
+                    k,
+                )
 
         despachar()
         with open(trabalho / nome, "a", encoding="utf-8") as log:
@@ -803,7 +835,7 @@ def gerar(
                             "perfil": grupo.perfil,
                             "politica": grupo.politica,
                             "tentativa": k,
-                            "seed": semente_da_run(grupo.perfil, grupo.politica, k),
+                            "seed": semente_da_run(grupo.perfil, grupo.politica, k, classe),
                             "teto": TETO,
                             "desfecho": "erro",
                             "motivo": "o processo da run falhou",

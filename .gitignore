@@ -69,6 +69,12 @@ reports/pvp/copa_03_ia/*
 !reports/pvp/copa_03_ia/dashboard.html
 !reports/pvp/copa_03_ia/relatorio_visual.pdf
 !reports/pvp/copa_03_ia/confrontos.json
+# A população da Arena offline (`tools/arena_offline_geracao.py`): o resumo de
+# cada tentativa. O catálogo do jogo fica em `src/data/arena_populacao/`, e
+# `_trabalho/` (checkpoint, logs, candidatos) fica fora.
+!reports/pvp/arena_offline/
+reports/pvp/arena_offline/*
+!reports/pvp/arena_offline/tentativas.jsonl
 
 # IDEs
 .idea/
