@@ -40,6 +40,7 @@ multiplayer/ ──→ engine/arena_setup ──→ storage/, content/
 | `mechanics/` | regras de combate e matemática | entities/, shared/ |
 | `content/` | catálogos e fábricas | entities/, mechanics/, shared/, data/ |
 | `sim/` | simulação headless: medir balanceamento e a IA dos adversários da Arena | content/, mechanics/, entities/, shared/, data/ |
+| `ranked/` | a Ranked offline: Glicko-2/TrueSkill, Ladder, ranks por percentil, matchmaking. Matemática e estado puros | shared/ |
 | `storage/` | save/load | content/, entities/, shared/, data/ |
 | `engine/` | orquestração | todas |
 | `ui/` | apresentação e input | shared/, content/, entities/, storage/, data/ |
@@ -94,7 +95,11 @@ Os módulos onde a responsabilidade não é óbvia pelo nome da camada:
 | `engine/arena_setup.py` | o gladiador a partir do snapshot do save, pelo caminho canônico de reconstrução (`player_from_save_data`); a lista de elegíveis (slots com extração) e a gravação do equipamento confirmado, só no slot do próprio gladiador |
 | `engine/arena_mode.py` | a **Arena offline** no terminal (o modo competitivo do ToJ 1.0): seleção do gladiador, preparação, escolha do adversário na população, ficha pública, duelo do jogador contra a IA, resultado, revanche. Só desenha, lê teclas e pergunta; a regra é do motor do duelo. Não importa `multiplayer/` |
 | `engine/arena_populacao.py` | a **população offline**: lê o catálogo de `data/arena_populacao/` e confere cada adversário antes da partida (sha256 do índice, reconstrução canônica, extração, classe, ida e volta). Quem gera o catálogo é `tools/arena_offline_geracao.py` |
+| `engine/ranked_partidas.py` | o confronto NPC × NPC da Ranked: o duelo canônico com a IA estratégica dos dois lados, semeado; interrompível entre rodadas |
+| `engine/ranked_mundo.py` | o estado local da Ranked (`saves/ranked.json`): a Ladder, as reservas de adversário, o retorno depois de dias fora e o `AgendadorDoMundo`, que joga NPC × NPC numa thread enquanto o jogador está nos menus |
+| `engine/ranked_mode.py` | o hub da Arena (Duelo Livre, Ranqueada, Classificação) e as telas da Ranqueada: painel, matchmaking, resultado com a variação de rating, classificação |
 | `engine/arena_historico.py` | os pontos de extensão do MMR: o `ResultadoDaPartida`, o histórico da sessão, a `Classificacao` (hoje a nula) e a identidade estável do gladiador do jogador. Não calcula rating nem grava em disco |
+| `ui/ranked_screens.py` | as telas da Ranqueada e do hub da Arena; recebem dicionários prontos e não decidem nada |
 | `ui/arena_screens.py` | as telas da Arena, desenhadas a partir da `DuelView` do motor: o que a tela mostra é o que o controlador recebe |
 | `sim/ia_estrategica.py` | a **IA estratégica** dos adversários da Arena: decide só pela `DuelView`, joga continuações curtas no próprio motor sobre cópias e avalia o fim com as fórmulas canônicas de dano. Não é regra; não muda o motor |
 | `sim/pvp_controllers.py` | controladores de referência do duelo (roteiro, primeira skill legal). Provam a interface |

@@ -16,7 +16,8 @@ python main.py
 Requer Python 3.10+, `rich` e `pyfiglet`. `main.py` sobe o menu principal e
 encaminha cada escolha (`engine/bootstrap.run_main_loop`). A **Arena** é a opção 3,
 100% offline: um gladiador extraído contra a população da Arena (gladiadores de
-runs PvE reais), controlada pela IA estratégica.
+runs PvE reais), controlada pela IA estratégica — no Duelo Livre ou na Arena
+Ranqueada (experimental), com MMR, posicionamento e ranks.
 Instalação de desenvolvimento:
 
 ```bash
@@ -85,5 +86,5 @@ isso por AST — a regra está em [`ARCHITECTURE.md`](ARCHITECTURE.md).
   fundação, desde `v0.2-prebalance`.
 - [`BASELINES.md`](BASELINES.md) — o índice das medições de referência.
 - [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) — os problemas abertos.
-- [`NEXT_PHASE.md`](NEXT_PHASE.md) — o trabalho atual: o MMR offline (Fase 6),
-  depois da Arena offline.
+- [`NEXT_PHASE.md`](NEXT_PHASE.md) — o trabalho atual: validar a Ranked antes de
+  expandir a população para 5.000.

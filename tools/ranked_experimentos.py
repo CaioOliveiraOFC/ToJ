@@ -790,6 +790,7 @@ def analisar_carreira(linhas: list[dict]) -> dict:
 
     nivel = {nome: i for i, nome in enumerate(RANKS)}
     subidas = sum(1 for a, b in zip(ranks_depois, ranks_depois[1:]) if nivel[b] > nivel[a])
+    percentis = [x["percentil"] for x in linhas[10:] if x["percentil"] is not None]
     metade = [x["rating"] for x in linhas[n // 2 :]]
     media = sum(metade) / len(metade)
     final = [x["percentil"] for x in linhas[-max(1, n // 4) :] if x["percentil"] is not None]
@@ -839,6 +840,12 @@ def analisar_carreira(linhas: list[dict]) -> dict:
             math.sqrt(sum((v - media) ** 2 for v in metade) / len(metade)), 1
         ),
         "partidas_ate_a_faixa": faixa,
+        "percentil_depois_do_posicionamento": [
+            round(min(v for v in percentis), 1) if percentis else None,
+            round(max(v for v in percentis), 1) if percentis else None,
+        ],
+        "ranks_visitados": sorted(set(ranks_depois), key=lambda r: nivel[r]),
+        "rd_final": linhas[-1]["rd"],
     }
 
 
@@ -912,7 +919,9 @@ def resumir_grind(nomes: list[str]) -> dict:
         md.append(
             f"| {nome} | {g['id']} {g['classe']} nv {g['nivel']} OP {_n(g['op'], 1)} | "
             f"{r['partidas']} ({_n(r['horas_equivalentes'], 1)}) | "
-            f"{r['vitorias']}-{r['derrotas']} | "
+            f"{r['vitorias']}-{r['derrotas']}"
+            + (f" ({r['sem_resultado']} sem resultado)" if r["sem_resultado"] else "")
+            + " | "
             f"{pos['vitorias']}V → {pos['rank']} ({_n(pos['percentil'], 0)}) | "
             + " | ".join(marco(h) for h in HORAS)
             + f" | {r['final']['rank']} ({_n(r['final']['percentil'], 0)}), "
@@ -923,8 +932,8 @@ def resumir_grind(nomes: list[str]) -> dict:
         "",
         "| carreira | gêmeo NPC calibrado | P(vitória) média depois do posicionamento | "
         "oponentes distintos | repetidos nas últimas 10 | subidas / descidas de rank | "
-        "DP do rating na 2ª metade | partidas até a faixa |",
-        "|---|---|---|---|---|---|---|---|",
+        "percentil depois do posicionamento | DP do rating na 2ª metade | partidas até a faixa |",
+        "|---|---|---|---|---|---|---|---|---|",
     ]
     for nome, r in resumo.items():
         gemeo = r["gemeo_calibrado"]
@@ -934,6 +943,9 @@ def resumir_grind(nomes: list[str]) -> dict:
             f"{_n(r['probabilidade_media_depois_do_posicionamento'])} | "
             f"{r['oponentes_distintos']} | {r['repetidos_nas_ultimas_10']} | "
             f"{r['subidas_de_rank']} / {r['descidas_de_rank']} | "
+            f"{_n(r['percentil_depois_do_posicionamento'][0], 0)}–"
+            f"{_n(r['percentil_depois_do_posicionamento'][1], 0)} "
+            f"({', '.join(r['ranks_visitados'])}) | "
             f"{_n(r['rating_dp_na_segunda_metade'], 1)} | {r['partidas_ate_a_faixa'] or '—'} |"
         )
     (pasta / "resumo.md").write_text("\n".join(md) + "\n", encoding="utf-8")
@@ -1012,16 +1024,26 @@ PROBLEMAS = [
     "- **Entre builds parecidas, a sorte manda.** Nas duplas de OP muito próximo "
     "(|ΔOP| < 0,5) o favorito venceu 51%; nas repetidas com três seeds, menos da metade "
     "teve o mesmo vencedor. O meio da Ladder é ruidoso: 1 RD cobre ~19 posições.",
-    "- **Repetição no topo.** Com 186 gladiadores, o topo tem poucos vizinhos de nível; "
-    "a exclusão das últimas 3 partidas não evita repetir o mesmo adversário.",
-    "- **Custo concentrado no topo.** Duelos entre builds fortes são mais longos: a "
-    "carreira do jogador no topo custou o dobro de CPU por partida.",
-    "- **Duplas que nunca terminam.** Uma partida da amostra e uma da calibração bateram "
-    "o limite técnico (500 rodadas); na carreira do jogador no topo, R31 × M33 bateu o "
-    "limite em todas as seeds testadas (~60 s de CPU cada). Isso travava duas coisas, "
-    "corrigidas nesta fase: o jogador artificial, que repetia a dupla com outra seed, e "
-    "o mundo orgânico, que replanejava a mesma dupla para sempre. Agora a partida sem "
-    "vencedor não muda rating, fica no histórico e consome a vaga.",
+    "- **Custo concentrado no topo.** Duelos entre builds fortes são mais longos e os "
+    "impasses custam ~60 s cada: a carreira do R31 custou ~3× mais CPU por partida, e por "
+    "isso parou em 100 partidas (5 h) em vez de 400.",
+    "- **Duplas que nunca terminam.** Uma partida da amostra e uma da calibração "
+    "bateram o limite técnico (500 rodadas). No topo é frequente: na carreira do R31, "
+    "13 de 100 partidas terminaram sem vencedor, todas contra Magos de topo (M32 e M33 "
+    "seis vezes cada, M27 uma), e R31 × M33 bateu o limite em todas as seeds testadas "
+    "(~60 s de CPU cada). Isso travava duas coisas, corrigidas nesta fase: o jogador "
+    "artificial, que repetia a dupla com outra seed, e o mundo orgânico, que "
+    "replanejava a mesma dupla para sempre. Agora a partida sem vencedor não muda "
+    "rating, fica no histórico e consome a vaga.",
+    "- **Rank piscando na fronteira.** No meio da Ladder, um gladiador que mora perto de "
+    "um limite troca de rank a toda hora (W26: 70 trocas em 390 partidas, entre Gold, "
+    "Platinum e Emerald). Uma histerese — só mudar de rank ao passar o limite com folga — "
+    "resolveria; não está no contrato aprovado e fica proposta.",
+    "- **Repetição de adversários.** Com 186 gladiadores, 15–25% das partidas repetem um "
+    "oponente das últimas 10, e 400 partidas veem 46–82 adversários distintos. No topo é "
+    "pior: o R31 viu 18 adversários em 100 partidas (o M32, várias vezes seguidas).",
+    "- **Piso da incerteza.** Com uma partida por período o RD estabiliza em ~62 (a tela "
+    "mostra ± 123) e não cai mais: é a volatilidade somada a cada partida.",
     "- **Contra o jogador, a partida sem fim não tem regra.** O duelo humano × IA não tem "
     "limite de rodadas; só a rendição encerra uma dupla que não termina. O motor não tem "
     "empate, e a regra é decisão de design pendente.",

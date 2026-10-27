@@ -227,12 +227,16 @@ rede, conta nem servidor.
   histórico, com os testes e o gate de compatibilidade, mas **fora do fluxo do
   jogo**: o menu não o abre e a Arena não importa `src/multiplayer/`. Os
   contratos dele estão na seção [Multiplayer](#multiplayer--compatibilidade-de-versão).
-- O MMR offline por gladiador é a Fase 6. Fila, matchmaking público e relógio de
-  decisão eram da ranked em rede e saem do escopo do 1.0.
+- **A Arena Ranqueada** (Fase 6, experimental) dá a cada gladiador um MMR
+  dinâmico (Glicko-2), com matchmaking automático, 10 partidas de
+  posicionamento, ranks por percentil e um mundo NPC × NPC que continua jogando.
+  Fila em rede, matchmaking público e relógio de decisão eram da ranked online e
+  saem do escopo do 1.0.
 
 Verificado em `tests/test_pvp_duel.py`, `tests/test_pvp_initiative.py`,
 `tests/test_pvp_references.py`, `tests/test_arena_mode.py`,
-`tests/test_arena_populacao.py` e `tests/test_arena_ia_offline.py`.
+`tests/test_arena_populacao.py`, `tests/test_arena_ia_offline.py` e
+`tests/test_ranked_*.py`.
 
 ### Fronteira com o PvE
 
@@ -337,8 +341,10 @@ apareciam aqui na Fase 1, estão fechados acima.
 
 ### Arena offline
 
-`src/engine/arena_mode.py`, desenhado por `src/ui/arena_screens.py`. É a opção 3
-do menu principal, e o modo competitivo do ToJ 1.0.
+A opção 3 do menu principal abre o hub da Arena (`src/engine/ranked_mode.py`):
+**Duelo Livre** (esta seção), **Arena Ranqueada** (a seção abaixo) e a
+**Classificação**. O Duelo Livre é `src/engine/arena_mode.py`, desenhado por
+`src/ui/arena_screens.py`.
 
 - **Quem luta.** Do lado do jogador, só personagens salvos com extração
   registrada; um basta. Nenhum gladiador do jogador é gerado. Sem nenhum, a
@@ -420,28 +426,138 @@ O catálogo está em `src/data/arena_populacao/` (um snapshot por gladiador e o
 - **Força de referência.** O OP medido na geração (`overall_power`). É só o
   ponto de partida para comparar gladiadores; não é rating nem regra.
 
-### Pontos de extensão do MMR
+### Duelo Livre: o histórico da sessão
 
-`src/engine/arena_historico.py`. A Fase 6 escolhe a fórmula e a persistência;
-hoje nada calcula rating nem grava em disco.
+`src/engine/arena_historico.py`. No Duelo Livre o jogador escolhe o adversário,
+e por isso ele **não mexe em rating**: cada partida vira um `ResultadoDaPartida`
+no histórico da sessão (em memória) e passa pela `SemClassificacao`.
 
-- Cada partida terminada vira um `ResultadoDaPartida`: a identidade e a ficha
-  curta dos dois lados, quem venceu, o motivo do motor, as rodadas, a força de
-  referência do oponente e a versão do catálogo.
-- O resultado vai para o `Historico` (hoje `HistoricoDaSessao`, em memória) e
-  para a `Classificacao` (hoje `SemClassificacao`, que não tem fórmula).
-- **Identidade estável.** O oponente é `populacao:<id>:<sha256>`. O gladiador do
-  jogador é o slot mais o hash do save sem `equipment` e `inventory`: gravar
-  equipamento não muda quem ele é, e uma run nova no mesmo slot é outro
-  gladiador.
+- **Identidade estável.** O gladiador do jogador é o slot mais o hash do save
+  sem `equipment` e `inventory`: gravar equipamento não muda quem ele é, e uma
+  run nova no mesmo slot é outro gladiador. A Ranked usa a mesma identidade.
 
-### Contratos futuros, ainda não implementados
+### Arena Ranqueada (Fase 6, experimental)
 
-- **MMR offline por gladiador** (Fase 6): a fórmula, o rating inicial (a força
-  de referência pode ou não entrar), a persistência local do histórico e como a
-  rendição conta.
-- A ranked em rede (fila com prioridade humana, bots na fila, 45 segundos por
-  decisão, 60 segundos de reconexão) era do multiplayer e não faz parte do 1.0.
+A opção 2 do hub da Arena. Código em `src/ranked/` (rating, Ladder, ranks,
+matchmaking: puro, só importa `shared/`), `src/engine/ranked_partidas.py` (o
+confronto NPC × NPC), `src/engine/ranked_mundo.py` (estado local e mundo) e
+`src/engine/ranked_mode.py` (as telas). Os experimentos que sustentam cada
+número estão em `tools/ranked_experimentos.py` e `reports/ranked/relatorio.md`.
+
+**Contrato competitivo aprovado:**
+
+- MMR dinâmico para todos os gladiadores, NPCs e do jogador.
+- Confronto NPC × NPC muda o rating dos dois.
+- O jogador tem um MMR separado para cada gladiador extraído.
+- O OP serve só como estimativa inicial fraca, com incerteza alta.
+- Só vitória ou derrota contam: nada de bônus por duração, HP restante ou dano.
+- Equipamento pode ser reorganizado sem mudar a identidade.
+- Matchmaking automático: o jogador não escolhe o adversário.
+- Rank por percentil da população competitiva; os cinco primeiros são os
+  **Definitive Masters**.
+- 100% offline. O motor PvP, o PvE congelado e a IA estratégica não mudam para
+  favorecer classificação.
+
+**O confronto NPC × NPC** é o duelo canônico, com a IA estratégica nos dois lados
+e o gerador semeado: a mesma dupla com a mesma seed dá o mesmo resultado. O lado
+(p1/p2) sai da seed. Partida que passa de 500 rodadas termina **sem resultado**:
+não muda rating, não conta como partida, entra no histórico (o matchmaking não
+repete a dupla logo) e, no mundo, consome a vaga. Existem duplas que nunca
+terminam — R31 × M33 bateu o limite em todas as seeds testadas —, então ninguém
+insiste na mesma dupla.
+
+**O rating.** Glicko-2, escolhido na comparação com TrueSkill sobre confrontos
+reais (`reports/ranked/relatorio.md`): com 1.631 partidas de treino e 150 duplas
+inéditas no holdout, os dois empataram na previsão (log-loss 0,549 × 0,547,
+Brier 0,190 × 0,190, dentro do ruído); o Glicko-2 convergiu mais rápido no
+começo — o que pesa nas 10 partidas de posicionamento —, foi um pouco mais
+estável, e a incerteza dele é em pontos de rating. Uma partida por período,
+com os valores de antes da partida para os dois lados (`src/ranked/sistema.py`).
+Com um período por partida a volatilidade não tem efeito (τ 0,3, 0,6 e 1,0
+dão o mesmo resultado); fica registrado. O NPC começa na priori
+fraca do OP: metade do logit que o OP prevê, medido em confrontos reais, presa a
+±3, com a incerteza inicial cheia (RD 350). O gladiador do jogador começa no
+centro (1500, RD 350), sem priori. A exibição é o rating ± 2 RD.
+
+**Posicionamento.** As 10 primeiras partidas de cada gladiador do jogador:
+
+| partidas | etapa | o adversário |
+|---|---|---|
+| 1–4 | Descoberta | sorteado numa faixa larga (±1 desvio da população) em volta da estimativa |
+| 5–7 | Nivelamento | entre os 4 mais próximos da estimativa, em ±0,5 desvio |
+| 8–10 | Validação | entre os 2 mais próximos, em ±0,25 desvio |
+| 11+ | Ranqueada | entre os 5 mais próximos, em ±0,35 desvio |
+
+- O rating muda desde a primeira partida; o rank aparece depois da 10ª.
+- **A sequência pesa pelo nível dos derrotados.** Cada vitória seguida contra
+  quem não estava mais de meio desvio abaixo empurra o alvo 0,15 desvio para
+  cima (no máximo 3); a derrota contra quem não estava mais de meio desvio
+  acima, para baixo. Vitórias sobre gladiadores muito mais fracos não endurecem
+  o próximo adversário — e o próprio Glicko-2 já sobe pouco com elas.
+- Quem enfrentou o gladiador nas últimas 3 partidas fica de fora enquanto houver
+  alternativa.
+- O adversário sorteado fica **reservado** até a partida: sair da tela e voltar
+  não troca o oponente.
+
+**A Ladder e os ranks.** A classificação é pelo rating, entre os competitivos
+(todos os NPCs e os gladiadores do jogador já posicionados). O percentil vai de
+0 (o último) a 100 (o primeiro). Os 12 ranks são faixas de percentil
+(`src/ranked/ranks.py`); os limites são uma **proposta** sobre os 186
+calibrados, e a regra definitiva depende de validação com população maior:
+
+| rank | percentil mínimo | com 186 |
+|---|---|---|
+| Iron | 0 | 19 |
+| Bronze | 10 | 22 |
+| Silver | 22 | 24 |
+| Gold | 35 | 24 |
+| Platinum | 48 | 22 |
+| Emerald | 60 | 19 |
+| Sapphire | 70 | 17 |
+| Diamond | 79 | 13 |
+| Obsidian | 86 | 11 |
+| Master | 92 | 7 |
+| International Master | 96 | 5 |
+| Distinguished Master | 98,5 | 3 |
+
+O critério: no meio da classificação uma incerteza (1 RD) cobre ~19 posições, e
+cada faixa do meio tem ~1,2–1,4 RD de largura — o rank diz algo apesar do ruído
+entre builds parecidas. No topo os ratings se separam bem (~1 posição por RD), e
+as faixas podem ser estreitas. Os cinco primeiros, por cima do rank, são os
+Definitive Masters.
+
+**O mundo.** Depois de cada partida do jogador, 2 confrontos NPC × NPC entram na
+fila. O `AgendadorDoMundo` joga a fila numa thread, só enquanto o jogador está
+nos menus da Ranqueada, e para antes do duelo dele; a Ladder só muda na thread
+principal. Ao voltar ao jogo, a incerteza de todos cresce com os dias fora (até
+30) e entram na fila até 24 confrontos (4 por hora fora) — nunca as horas
+inteiras. Duplas e seeds saem da semente e do relógio do mundo.
+
+**Persistência e identidade.** Tudo em `saves/ranked.json`, gravado de forma
+atômica; na primeira vez, ele nasce da calibração publicada
+(`src/data/arena_ranked/ladder_inicial.json`). Arquivo ilegível ou de outra
+versão bloqueia a Ranqueada com aviso e não é sobrescrito. Gladiador novo no
+catálogo ganha registro com a priori; nenhum registro existente é apagado ou
+reiniciado. Uma run nova no slot é outra identidade e não herda nada. O save do
+personagem nunca é tocado: ninguém morre e não há XP nem ouro.
+
+### Ainda não validado
+
+- **Partida sem fim contra o jogador.** No duelo do jogador contra a IA não há
+  limite de rodadas: uma dupla que nunca termina só acaba com a rendição dele.
+  No topo isso é frequente — o jogador artificial com o R31 teve 13 de 100
+  partidas sem vencedor contra Magos de topo. O motor não tem empate, e a regra
+  (empate, limite com desempate, derrota de quem não fecha) é decisão de design,
+  ainda não tomada.
+- **Rank piscando na fronteira.** No meio da Ladder um gladiador perto de um
+  limite troca de rank a toda hora (um jogador artificial: 70 trocas em 390
+  partidas). Histerese de rank é proposta, não regra.
+- **Piso da incerteza.** Com uma partida por período o RD para em ~62 (±123 na
+  tela).
+- Os limites percentuais e o comportamento com 5.000 gladiadores.
+- O ritmo do mundo orgânico (2 confrontos por partida, 4 por hora fora) numa
+  sessão longa real.
+- Rendição na Ranqueada conta como derrota comum.
 
 ## Multiplayer — compatibilidade de versão
 

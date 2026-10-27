@@ -1,0 +1,421 @@
+{
+ "carreira_M03": {
+  "gladiador": {
+   "id": "M03",
+   "classe": "mage",
+   "nivel": 19,
+   "op": 28.2529296875
+  },
+  "gemeo_calibrado": {
+   "rating": 1027.4,
+   "rd": 104.2,
+   "percentil": 8.6,
+   "rank": "Iron"
+  },
+  "partidas": 400,
+  "horas_equivalentes": 20.0,
+  "cpu_s": 2837.9,
+  "vitorias": 199,
+  "derrotas": 201,
+  "sem_resultado": 0,
+  "posicionamento": {
+   "vitorias": 4,
+   "rank": "Bronze",
+   "percentil": 12.365591397849462,
+   "rating": 1124.0,
+   "rd": 118.2,
+   "fases": [
+    "descoberta",
+    "descoberta",
+    "descoberta",
+    "descoberta",
+    "nivelamento",
+    "nivelamento",
+    "nivelamento",
+    "validacao",
+    "validacao",
+    "validacao"
+   ],
+   "probabilidades": [
+    0.2544,
+    0.7097,
+    0.5424,
+    0.8134,
+    0.5202,
+    0.4221,
+    0.5871,
+    0.4283,
+    0.5847,
+    0.426
+   ]
+  },
+  "marcos": {
+   "2h": {
+    "partidas": 40,
+    "rating": 1180.1,
+    "rd": 69.0,
+    "percentil": 15.6,
+    "rank": "Bronze",
+    "vitorias": 20
+   },
+   "5h": {
+    "partidas": 100,
+    "rating": 1174.5,
+    "rd": 62.2,
+    "percentil": 16.1,
+    "rank": "Bronze",
+    "vitorias": 50
+   },
+   "10h": {
+    "partidas": 200,
+    "rating": 1169.6,
+    "rd": 61.6,
+    "percentil": 15.6,
+    "rank": "Bronze",
+    "vitorias": 100
+   },
+   "20h": {
+    "partidas": 400,
+    "rating": 1144.4,
+    "rd": 61.7,
+    "percentil": 15.1,
+    "rank": "Bronze",
+    "vitorias": 199
+   }
+  },
+  "final": {
+   "rating": 1144.4,
+   "rd": 61.7,
+   "percentil": 15.053763440860216,
+   "rank": "Bronze",
+   "posicao": 159
+  },
+  "probabilidade_media_depois_do_posicionamento": 0.5,
+  "oponentes_distintos": 62,
+  "repetidos_nas_ultimas_10": 73,
+  "mudancas_de_rank": 0,
+  "subidas_de_rank": 0,
+  "descidas_de_rank": 0,
+  "rating_dp_na_segunda_metade": 28.8,
+  "partidas_ate_a_faixa": 11,
+  "percentil_depois_do_posicionamento": [
+   11.8,
+   19.9
+  ],
+  "ranks_visitados": [
+   "Bronze"
+  ],
+  "rd_final": 61.7
+ },
+ "carreira_M11": {
+  "gladiador": {
+   "id": "M11",
+   "classe": "mage",
+   "nivel": 25,
+   "op": 32.1708984375
+  },
+  "gemeo_calibrado": {
+   "rating": 1927.6,
+   "rd": 99.1,
+   "percentil": 84.3,
+   "rank": "Diamond"
+  },
+  "partidas": 400,
+  "horas_equivalentes": 20.0,
+  "cpu_s": 3019.5,
+  "vitorias": 204,
+  "derrotas": 196,
+  "sem_resultado": 0,
+  "posicionamento": {
+   "vitorias": 7,
+   "rank": "Sapphire",
+   "percentil": 78.49462365591398,
+   "rating": 1869.4,
+   "rd": 117.1,
+   "fases": [
+    "descoberta",
+    "descoberta",
+    "descoberta",
+    "descoberta",
+    "nivelamento",
+    "nivelamento",
+    "nivelamento",
+    "validacao",
+    "validacao",
+    "validacao"
+   ],
+   "probabilidades": [
+    0.5743,
+    0.1779,
+    0.5855,
+    0.6377,
+    0.3825,
+    0.5797,
+    0.4331,
+    0.355,
+    0.2947,
+    0.5708
+   ]
+  },
+  "marcos": {
+   "2h": {
+    "partidas": 40,
+    "rating": 1900.8,
+    "rd": 68.5,
+    "percentil": 80.6,
+    "rank": "Diamond",
+    "vitorias": 23
+   },
+   "5h": {
+    "partidas": 100,
+    "rating": 1867.1,
+    "rd": 62.0,
+    "percentil": 80.1,
+    "rank": "Diamond",
+    "vitorias": 52
+   },
+   "10h": {
+    "partidas": 200,
+    "rating": 1936.4,
+    "rd": 61.5,
+    "percentil": 83.3,
+    "rank": "Diamond",
+    "vitorias": 104
+   },
+   "20h": {
+    "partidas": 400,
+    "rating": 1917.6,
+    "rd": 61.5,
+    "percentil": 82.3,
+    "rank": "Diamond",
+    "vitorias": 204
+   }
+  },
+  "final": {
+   "rating": 1917.6,
+   "rd": 61.5,
+   "percentil": 82.25806451612904,
+   "rank": "Diamond",
+   "posicao": 34
+  },
+  "probabilidade_media_depois_do_posicionamento": 0.5,
+  "oponentes_distintos": 46,
+  "repetidos_nas_ultimas_10": 102,
+  "mudancas_de_rank": 1,
+  "subidas_de_rank": 1,
+  "descidas_de_rank": 0,
+  "rating_dp_na_segunda_metade": 20.3,
+  "partidas_ate_a_faixa": 11,
+  "percentil_depois_do_posicionamento": [
+   76.3,
+   85.5
+  ],
+  "ranks_visitados": [
+   "Sapphire",
+   "Diamond"
+  ],
+  "rd_final": 61.5
+ },
+ "carreira_R31": {
+  "gladiador": {
+   "id": "R31",
+   "classe": "rogue",
+   "nivel": 27,
+   "op": 36.0888671875
+  },
+  "gemeo_calibrado": {
+   "rating": 2367.0,
+   "rd": 111.2,
+   "percentil": 98.4,
+   "rank": "International Master"
+  },
+  "partidas": 100,
+  "horas_equivalentes": 5.0,
+  "cpu_s": 2138.8,
+  "vitorias": 52,
+  "derrotas": 35,
+  "sem_resultado": 13,
+  "posicionamento": {
+   "vitorias": 8,
+   "rank": "International Master",
+   "percentil": 96.7741935483871,
+   "rating": 2234.3,
+   "rd": 117.1,
+   "fases": [
+    "descoberta",
+    "descoberta",
+    "descoberta",
+    "descoberta",
+    "nivelamento",
+    "nivelamento",
+    "nivelamento",
+    "validacao",
+    "validacao",
+    "validacao"
+   ],
+   "probabilidades": [
+    0.4532,
+    0.4317,
+    0.118,
+    0.6375,
+    0.3789,
+    0.3396,
+    0.5407,
+    0.4111,
+    0.5931,
+    0.4531
+   ]
+  },
+  "marcos": {
+   "2h": {
+    "partidas": 40,
+    "rating": 2329.3,
+    "rd": 70.5,
+    "percentil": 97.3,
+    "rank": "International Master",
+    "vitorias": 25
+   },
+   "5h": {
+    "partidas": 100,
+    "rating": 2363.5,
+    "rd": 65.9,
+    "percentil": 97.8,
+    "rank": "International Master",
+    "vitorias": 52
+   }
+  },
+  "final": {
+   "rating": 2363.5,
+   "rd": 65.9,
+   "percentil": 97.84946236559139,
+   "rank": "International Master",
+   "posicao": 5
+  },
+  "probabilidade_media_depois_do_posicionamento": 0.523,
+  "oponentes_distintos": 18,
+  "repetidos_nas_ultimas_10": 54,
+  "mudancas_de_rank": 0,
+  "subidas_de_rank": 0,
+  "descidas_de_rank": 0,
+  "rating_dp_na_segunda_metade": 12.2,
+  "partidas_ate_a_faixa": 11,
+  "percentil_depois_do_posicionamento": [
+   96.2,
+   97.8
+  ],
+  "ranks_visitados": [
+   "International Master"
+  ],
+  "rd_final": 65.9
+ },
+ "carreira_W26": {
+  "gladiador": {
+   "id": "W26",
+   "classe": "warrior",
+   "nivel": 22,
+   "op": 29.7509765625
+  },
+  "gemeo_calibrado": {
+   "rating": 1554.8,
+   "rd": 95.8,
+   "percentil": 50.3,
+   "rank": "Platinum"
+  },
+  "partidas": 400,
+  "horas_equivalentes": 20.0,
+  "cpu_s": 2819.1,
+  "vitorias": 198,
+  "derrotas": 202,
+  "sem_resultado": 0,
+  "posicionamento": {
+   "vitorias": 5,
+   "rank": "Platinum",
+   "percentil": 58.064516129032256,
+   "rating": 1612.3,
+   "rd": 122.9,
+   "fases": [
+    "descoberta",
+    "descoberta",
+    "descoberta",
+    "descoberta",
+    "nivelamento",
+    "nivelamento",
+    "nivelamento",
+    "validacao",
+    "validacao",
+    "validacao"
+   ],
+   "probabilidades": [
+    0.7223,
+    0.8251,
+    0.1731,
+    0.189,
+    0.505,
+    0.4274,
+    0.5678,
+    0.4312,
+    0.3789,
+    0.568
+   ]
+  },
+  "marcos": {
+   "2h": {
+    "partidas": 40,
+    "rating": 1574.1,
+    "rd": 69.3,
+    "percentil": 53.2,
+    "rank": "Platinum",
+    "vitorias": 19
+   },
+   "5h": {
+    "partidas": 100,
+    "rating": 1557.3,
+    "rd": 62.3,
+    "percentil": 52.2,
+    "rank": "Platinum",
+    "vitorias": 49
+   },
+   "10h": {
+    "partidas": 200,
+    "rating": 1556.0,
+    "rd": 61.6,
+    "percentil": 53.8,
+    "rank": "Platinum",
+    "vitorias": 99
+   },
+   "20h": {
+    "partidas": 400,
+    "rating": 1528.6,
+    "rd": 61.5,
+    "percentil": 47.3,
+    "rank": "Gold",
+    "vitorias": 198
+   }
+  },
+  "final": {
+   "rating": 1528.6,
+   "rd": 61.5,
+   "percentil": 47.31182795698925,
+   "rank": "Gold",
+   "posicao": 99
+  },
+  "probabilidade_media_depois_do_posicionamento": 0.503,
+  "oponentes_distintos": 82,
+  "repetidos_nas_ultimas_10": 62,
+  "mudancas_de_rank": 70,
+  "subidas_de_rank": 34,
+  "descidas_de_rank": 36,
+  "rating_dp_na_segunda_metade": 19.6,
+  "partidas_ate_a_faixa": 13,
+  "percentil_depois_do_posicionamento": [
+   44.6,
+   65.6
+  ],
+  "ranks_visitados": [
+   "Gold",
+   "Platinum",
+   "Emerald"
+  ],
+  "rd_final": 61.5
+ }
+}
