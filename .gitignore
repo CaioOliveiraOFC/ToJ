@@ -31,6 +31,7 @@ reports/pvp/*
 !reports/pvp/copa_teste_01_final_detalhada.md
 !reports/pvp/copa_teste_01_trace.json
 # A Copa Arena 02 (`tools/arena_copa_02.py`): relatórios, calibração e visual.
+!reports/pvp/teste_op_alto/
 !reports/pvp/copa_02/
 reports/pvp/copa_02/*
 !reports/pvp/copa_02/relatorio.md

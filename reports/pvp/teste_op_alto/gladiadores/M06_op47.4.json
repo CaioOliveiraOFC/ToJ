@@ -1,0 +1,362 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 66504,
+ "dungeon_level": 36,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 5
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 5
+    }
+   ],
+   "name": "Manto Etéreo",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 7
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 6
+    }
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 7.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Capacete de Ferro",
+   "socket_count": 1
+  },
+  "Legs": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    }
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Bronze"
+  },
+  "Ring2": {
+   "name": "Anel de Palha"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 7
+    }
+   ],
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Machado de Guerra",
+   "socket_count": 2
+  },
+  "Weapon2": {
+   "name": "Faca de Caça"
+  }
+ },
+ "extracted_on_floor": 36,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Rubi",
+   "level": 7
+  }
+ ],
+ "hp": 34908,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Elixir de Força"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Poção de Cura Média"
+  },
+  {
+   "name": "Anel de Couro"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Porrete"
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 2
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 6
+    }
+   ],
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 6
+    }
+   ],
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Anel de Couro"
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Anel de Ouro"
+  }
+ ],
+ "last_interest_floor": 35,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 17,
+  "gold_earned": 373914,
+  "gold_from_combat": 193189,
+  "gold_from_interest": 15303,
+  "gold_from_sale": 165422,
+  "gold_spent": 307410,
+  "gold_spent_on_consumable": 1427,
+  "gold_spent_on_enchant": 11975,
+  "gold_spent_on_enhancement": 37713,
+  "gold_spent_on_exit_fee": 48980,
+  "gold_spent_on_gear": 193882,
+  "gold_spent_on_recovery": 1656,
+  "gold_spent_on_socket": 11777,
+  "interest_payments": 35,
+  "items_dropped": 92,
+  "items_equipped": 156,
+  "items_sold": 68,
+  "max_gold_held": 121589,
+  "paid_exits": 35,
+  "purchases": 111
+ },
+ "level": 39,
+ "map_state": null,
+ "mp": 20054,
+ "passives": [
+  "postura_fechada",
+  "sangue_de_vidente",
+  "imortalidade",
+  "postura_fechada",
+  "coracao_ferro",
+  "coracao_ferro",
+  "pele_grossa",
+  "sangue_guerreiro",
+  "odio_baixo",
+  "sede_silenciosa",
+  "coracao_ferro",
+  "casco_calejado",
+  "sangue_guerreiro",
+  "postura_fechada",
+  "sangue_guerreiro",
+  "musculos_aco",
+  "coracao_ferro",
+  "pele_de_sal",
+  "pele_grossa",
+  "escudo_fe",
+  "furia_berserker",
+  "reflexos_rapidos",
+  "passo_de_corca",
+  "boca_de_sangue",
+  "reserva_arcana",
+  "bencao_divina",
+  "passo_de_corca",
+  "coracao_tita",
+  "poco_fundo",
+  "sangue_de_vidente",
+  "musculos_aco",
+  "olho_aguia",
+  "olho_aguia",
+  "sangue_guerreiro",
+  "essencia_fluida",
+  "essencia_fluida",
+  "postura_fechada",
+  "musculos_aco"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "clarividencia",
+  "cura_menor",
+  "dissonancia",
+  "drenar_vida",
+  "egide_de_runas",
+  "escudo_magico",
+  "explosao_arcana",
+  "fagulha_teimosa",
+  "foco_do_estudante",
+  "lasca_de_gelo",
+  "mao_firme",
+  "marca_ardente",
+  "missil_magico",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_lamina_assentada",
+  "n_leitura_de_terreno",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_paciencia_do_coveiro",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ultima_carta",
+  "n_voto_de_silencio",
+  "palavra_de_torpor",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "relampago",
+  "reserva_profunda",
+  "troca_de_sangue",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "bola_fogo",
+  "2": "n_mira_calma",
+  "3": "n_respirar_fundo",
+  "4": "cura_menor"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 8644
+}

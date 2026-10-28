@@ -1,0 +1,359 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 50970,
+ "dungeon_level": 35,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "damage_reduction",
+     "value": 4.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 5
+    }
+   ],
+   "name": "Amuleto da Vida",
+   "socket_count": 1
+  },
+  "Body": {
+   "name": "Armadura Divina",
+   "socket_count": 1
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 2
+    },
+    {
+     "gem_type": "Ametista",
+     "level": 3
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 3
+    }
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 3
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "fear_chance",
+     "value": 5.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 2
+    }
+   ],
+   "name": "Elmo de Dragão",
+   "socket_count": 1
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 4
+    }
+   ],
+   "name": "Calça de Cota",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Bronze"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 5
+    }
+   ],
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Clava de Madeira"
+  },
+  "Weapon2": {
+   "name": "Gravetos Mágicos"
+  }
+ },
+ "extracted_on_floor": 35,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 3,
+ "gems": [],
+ "hp": 28901,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 6
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 6
+    }
+   ],
+   "name": "Cajado Arcano",
+   "socket_count": 2
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 2
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "damage_percent",
+     "value": 10.0
+    }
+   ],
+   "name": "Lâmina Veloz"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 8.0
+    }
+   ],
+   "name": "Cajado do Oblivion",
+   "socket_count": 3
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 6
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 5
+    }
+   ],
+   "name": "Arco Composto",
+   "socket_count": 2
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel do Rubi",
+   "socket_count": 2
+  },
+  {
+   "name": "Cajado de Aprendiz"
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Clava de Madeira"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Espada de Treino"
+  },
+  {
+   "name": "Anel de Ouro"
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Bastão Cru"
+  },
+  {
+   "name": "Lâmina Veloz"
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 2
+  },
+  {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Espada de Treino"
+  }
+ ],
+ "last_interest_floor": 34,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 12,
+  "gold_earned": 282562,
+  "gold_from_combat": 145664,
+  "gold_from_interest": 13713,
+  "gold_from_sale": 123185,
+  "gold_spent": 231592,
+  "gold_spent_on_consumable": 5758,
+  "gold_spent_on_enchant": 16632,
+  "gold_spent_on_enhancement": 12958,
+  "gold_spent_on_exit_fee": 41724,
+  "gold_spent_on_gear": 146826,
+  "gold_spent_on_recovery": 1586,
+  "gold_spent_on_socket": 6108,
+  "interest_payments": 34,
+  "items_dropped": 75,
+  "items_equipped": 175,
+  "items_sold": 60,
+  "max_gold_held": 101415,
+  "paid_exits": 34,
+  "purchases": 104
+ },
+ "level": 37,
+ "map_state": null,
+ "mp": 4049,
+ "passives": [
+  "musculos_aco",
+  "sangue_de_vidente",
+  "odio_antigo",
+  "passo_de_corca",
+  "olho_aguia",
+  "oraculo_partido",
+  "voz_no_escuro",
+  "voz_no_escuro",
+  "fio_serrilhado",
+  "pulso_certeiro",
+  "olho_aguia",
+  "furia_berserker",
+  "toque_dragao",
+  "musculos_aco",
+  "olho_aguia",
+  "olho_aguia",
+  "unha_suja",
+  "olho_aguia",
+  "oraculo_partido",
+  "coracao_ferro",
+  "furia_berserker",
+  "pele_grossa",
+  "olho_de_cacador",
+  "furia_berserker",
+  "pulso_certeiro",
+  "odio_baixo",
+  "musculos_aco",
+  "furia_berserker",
+  "sangue_de_vidente",
+  "voz_no_escuro",
+  "olho_aguia",
+  "olho_aguia",
+  "olho_aguia",
+  "olho_aguia",
+  "sangue_de_vidente",
+  "pulso_certeiro"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "barreira_arcana",
+  "bola_fogo",
+  "clarividencia",
+  "dissonancia",
+  "drenar_vida",
+  "escudo_magico",
+  "explosao_arcana",
+  "fagulha_teimosa",
+  "grilhoes_de_gelo",
+  "lancar_pedra",
+  "lasca_de_gelo",
+  "lente_de_obsidiana",
+  "maldicao_de_cinzas",
+  "missil_magico",
+  "n_amuleto_rachado",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_folego_de_marcha",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_marca_do_cacador",
+  "n_pacto_de_ferro",
+  "n_pausa_util",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "palavra_de_pavor",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "pulso_de_forca",
+  "relampago",
+  "reserva_profunda",
+  "troca_de_sangue",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 1,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "relampago",
+  "2": "n_guarda_cruzada",
+  "3": "n_travar_o_pulso",
+  "4": "explosao_arcana"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 21365
+}

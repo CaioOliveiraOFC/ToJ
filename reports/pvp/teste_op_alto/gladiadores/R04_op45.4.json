@@ -1,0 +1,290 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 12686,
+ "dungeon_level": 29,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "mana_regen",
+     "value": 4.0
+    }
+   ],
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto de Prata",
+   "socket_count": 1
+  },
+  "Body": {
+   "gems": [
+    {
+     "gem_type": "Ônix",
+     "level": 5
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 6
+    }
+   ],
+   "name": "Manto do Assassino",
+   "socket_count": 2
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "poison_chance",
+     "value": 9.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 4
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 2
+  },
+  "Legs": {
+   "name": "Perneiras de Aço",
+   "socket_count": 1
+  },
+  "Ring1": {
+   "name": "Anel de Bronze"
+  },
+  "Ring2": {
+   "enhancement_level": 1,
+   "name": "Anel Vegetal"
+  },
+  "Shoes": {
+   "name": "Botas Fantasma",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "enhancement_level": 1,
+   "name": "Adaga Mortal",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 2
+    }
+   ],
+   "name": "Adaga do Vazio",
+   "socket_count": 1
+  }
+ },
+ "extracted_on_floor": 29,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 1,
+ "gems": [],
+ "hp": 13579,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Elixir Vampírico"
+  },
+  {
+   "name": "Elixir de Precisão"
+  },
+  {
+   "name": "Elixir de Couraça"
+  },
+  {
+   "name": "Elixir do Vento"
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 3
+  },
+  {
+   "name": "Anel de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Osso"
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 4
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Arco do Silêncio",
+   "socket_count": 3
+  },
+  {
+   "name": "Tridente do Guerreiro",
+   "socket_count": 2
+  },
+  {
+   "name": "Anel de Palha"
+  }
+ ],
+ "last_interest_floor": 28,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 8,
+  "gold_earned": 111537,
+  "gold_from_combat": 61690,
+  "gold_from_interest": 5793,
+  "gold_from_sale": 44054,
+  "gold_spent": 98851,
+  "gold_spent_on_consumable": 231,
+  "gold_spent_on_enchant": 7590,
+  "gold_spent_on_enhancement": 13471,
+  "gold_spent_on_exit_fee": 17619,
+  "gold_spent_on_gear": 55694,
+  "gold_spent_on_recovery": 331,
+  "gold_spent_on_shop_reroll": 850,
+  "gold_spent_on_socket": 3065,
+  "interest_payments": 28,
+  "items_dropped": 66,
+  "items_equipped": 85,
+  "items_sold": 58,
+  "max_gold_held": 23754,
+  "paid_exits": 28,
+  "purchases": 80
+ },
+ "level": 31,
+ "map_state": null,
+ "mp": 1675,
+ "passives": [
+  "alma_eterna",
+  "reserva_arcana",
+  "voracidade",
+  "olho_de_cacador",
+  "pele_de_sal",
+  "sangue_guerreiro",
+  "lamina_afiada",
+  "furia_berserker",
+  "casco_calejado",
+  "musculos_aco",
+  "alma_eterna",
+  "casco_calejado",
+  "olho_de_cacador",
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "sangue_guerreiro",
+  "pele_de_sal",
+  "pele_adamantio",
+  "escudo_fe",
+  "coracao_ferro",
+  "escudo_fe",
+  "boca_de_sangue",
+  "pele_de_sal",
+  "vulto",
+  "coracao_ferro",
+  "sangue_guerreiro",
+  "musculos_aco",
+  "sangue_guerreiro",
+  "corpo_inviolavel",
+  "pele_grossa"
+ ],
+ "player_class": "Rogue",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "assassinato",
+  "ataque_furtivo",
+  "bolso_furado",
+  "capa_rasgada",
+  "corte_de_tendao",
+  "cortina_fumaca",
+  "envenenar",
+  "evasao",
+  "faro_de_rua",
+  "hora_do_lobo",
+  "leitura_de_guarda",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_folego_de_marcha",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_cruzada",
+  "n_lamina_assentada",
+  "n_mira_calma",
+  "n_pancada_na_nuca",
+  "n_pausa_util",
+  "n_postura_impecavel",
+  "n_respirar_fundo",
+  "n_voto_de_silencio",
+  "nó_corredio",
+  "olho_do_falcão",
+  "respiracao_de_ladrao",
+  "silencio_de_seda"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {},
+ "skills": {
+  "1": "ataque_furtivo",
+  "2": "n_respirar_fundo",
+  "3": "n_voto_de_silencio",
+  "4": "assassinato"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 2004
+}

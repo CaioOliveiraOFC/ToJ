@@ -1,0 +1,470 @@
+{
+ "active_buffs": {},
+ "active_effects": {},
+ "coins": 119650,
+ "dungeon_level": 40,
+ "equipment": {
+  "Accessory": null,
+  "Amulet": {
+   "enchantments": [
+    {
+     "effect": "damage_percent",
+     "value": 8.0
+    }
+   ],
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 3
+    }
+   ],
+   "name": "Amuleto da Mana",
+   "socket_count": 1
+  },
+  "Body": {
+   "enhancement_level": 1,
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 7
+    },
+    {
+     "gem_type": "Safira",
+     "level": 7
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 7
+    }
+   ],
+   "name": "Manto Etéreo",
+   "socket_count": 3
+  },
+  "Hands": {
+   "enhancement_level": 2,
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 8
+    },
+    {
+     "gem_type": "Rubi",
+     "level": 7
+    }
+   ],
+   "name": "Luvas de Titânio",
+   "socket_count": 2
+  },
+  "Helmet": {
+   "enchantments": [
+    {
+     "effect": "crit_damage",
+     "value": 11.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Safira",
+     "level": 5
+    }
+   ],
+   "name": "Elmo de Aço",
+   "socket_count": 1
+  },
+  "Legs": {
+   "gems": [
+    {
+     "gem_type": "Topázio",
+     "level": 7
+    },
+    {
+     "gem_type": "Topázio",
+     "level": 8
+    }
+   ],
+   "name": "Perneiras de Aço",
+   "socket_count": 2
+  },
+  "Ring1": {
+   "enhancement_level": 1,
+   "name": "Anel de Diamante",
+   "socket_count": 1
+  },
+  "Ring2": {
+   "name": "Anel de Couro"
+  },
+  "Shoes": {
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 8
+    }
+   ],
+   "name": "Botas Encantadas",
+   "socket_count": 1
+  },
+  "Weapon1": {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  "Weapon2": {
+   "enchantments": [
+    {
+     "effect": "evasion",
+     "value": 7.0
+    }
+   ],
+   "enhancement_level": 1,
+   "name": "Espada de Treino"
+  }
+ },
+ "extracted_on_floor": 40,
+ "extraction_keys": 0,
+ "extraction_miss_streak": 0,
+ "forge_miss_streak": 0,
+ "gems": [
+  {
+   "gem_type": "Esmeralda",
+   "level": 7
+  },
+  {
+   "gem_type": "Rubi",
+   "level": 7
+  },
+  {
+   "gem_type": "Topázio",
+   "level": 8
+  },
+  {
+   "gem_type": "Ametista",
+   "level": 8
+  },
+  {
+   "gem_type": "Safira",
+   "level": 9
+  }
+ ],
+ "hp": 43358,
+ "initial_skills_learned": 1,
+ "inventory": [
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Mana Média"
+  },
+  {
+   "name": "Elixir de Pedra"
+  },
+  {
+   "name": "Poção de Cura Pequena"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "name": "Pedra Fantasma"
+  },
+  {
+   "name": "Poção de Cura Grande"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "crit_chance",
+     "value": 5.0
+    }
+   ],
+   "gems": [
+    {
+     "gem_type": "Esmeralda",
+     "level": 8
+    }
+   ],
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Arco Composto",
+   "socket_count": 1
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Porrete"
+  },
+  {
+   "name": "Espada de Aço",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado de Cristal",
+   "socket_count": 1
+  },
+  {
+   "name": "Pá de Batalha"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Ametista",
+     "level": 5
+    },
+    {
+     "gem_type": "Ônix",
+     "level": 5
+    },
+    null
+   ],
+   "name": "Cajado da Galáxia",
+   "socket_count": 3
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "enchantments": [
+    {
+     "effect": "life_steal",
+     "value": 7.0
+    }
+   ],
+   "name": "Cajado do Vazio",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "enhancement_level": 1,
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Cajado de Aprendiz"
+  },
+  {
+   "name": "Anel de Bronze"
+  },
+  {
+   "name": "Cajado do Equilíbrio",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel do Rubi",
+   "socket_count": 1
+  },
+  {
+   "name": "Cajado Arcano",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel da Esmeralda",
+   "socket_count": 1
+  },
+  {
+   "gems": [
+    {
+     "gem_type": "Rubi",
+     "level": 3
+    },
+    {
+     "gem_type": "Esmeralda",
+     "level": 3
+    }
+   ],
+   "name": "Espada de Aço",
+   "socket_count": 2
+  },
+  {
+   "name": "Cajado de Aprendiz"
+  },
+  {
+   "name": "Faca de Caça"
+  },
+  {
+   "name": "Anel de Diamante",
+   "socket_count": 2
+  },
+  {
+   "name": "Machado de Guerra",
+   "socket_count": 1
+  },
+  {
+   "name": "Amuleto de Concha"
+  },
+  {
+   "name": "Peitoral de Ferro",
+   "socket_count": 1
+  },
+  {
+   "name": "Anel Vegetal"
+  },
+  {
+   "name": "Gibão de Couro"
+  },
+  {
+   "name": "Martelo de Mão"
+  },
+  {
+   "name": "Sapatos de Couro"
+  },
+  {
+   "name": "Punhos de Lona"
+  },
+  {
+   "name": "Escudo de Madeira"
+  }
+ ],
+ "last_interest_floor": 39,
+ "ledger": {
+  "extraction_keys_found": 1,
+  "extraction_keys_spent": 1,
+  "gems_found": 21,
+  "gold_earned": 600744,
+  "gold_from_combat": 312649,
+  "gold_from_interest": 30357,
+  "gold_from_sale": 257738,
+  "gold_spent": 481094,
+  "gold_spent_on_consumable": 930,
+  "gold_spent_on_enchant": 34705,
+  "gold_spent_on_enhancement": 8763,
+  "gold_spent_on_exit_fee": 83983,
+  "gold_spent_on_gear": 326787,
+  "gold_spent_on_recovery": 1681,
+  "gold_spent_on_socket": 24245,
+  "interest_payments": 39,
+  "items_dropped": 129,
+  "items_equipped": 244,
+  "items_sold": 104,
+  "max_gold_held": 128635,
+  "paid_exits": 39,
+  "purchases": 112
+ },
+ "level": 43,
+ "map_state": null,
+ "mp": 31374,
+ "passives": [
+  "olho_de_cacador",
+  "olho_aguia",
+  "instinto_frio",
+  "odio_baixo",
+  "lamina_afiada",
+  "olho_de_cacador",
+  "olho_de_cacador",
+  "coracao_ferro",
+  "furia_berserker",
+  "odio_baixo",
+  "sangue_de_vidente",
+  "escudo_fe",
+  "pulso_certeiro",
+  "pulso_certeiro",
+  "odio_baixo",
+  "odio_baixo",
+  "olho_aguia",
+  "passo_de_corca",
+  "odio_baixo",
+  "unha_suja",
+  "olho_de_cacador",
+  "voz_no_escuro",
+  "instinto_frio",
+  "essencia_fluida",
+  "olho_aguia",
+  "lamina_afiada",
+  "olho_aguia",
+  "passo_de_corca",
+  "agulha_no_osso",
+  "olho_de_cacador",
+  "passos_leves",
+  "fio_serrilhado",
+  "sangue_de_vidente",
+  "heranca_do_abismo",
+  "passo_de_corca",
+  "pele_adamantio",
+  "oraculo_partido",
+  "toque_dragao",
+  "sangue_de_vidente",
+  "furia_berserker",
+  "coracao_ferro",
+  "alma_eterna"
+ ],
+ "player_class": "Mage",
+ "player_name": "Referencia",
+ "seen_skill_ids": [
+  "apocalipse",
+  "barreira_arcana",
+  "bola_fogo",
+  "dissonancia",
+  "dividendo_de_mana",
+  "drenar_vida",
+  "escudo_magico",
+  "explosao_arcana",
+  "grilhoes_de_gelo",
+  "hora_parada",
+  "lancar_pedra",
+  "lasca_de_gelo",
+  "lente_de_obsidiana",
+  "marca_ardente",
+  "missil_magico",
+  "n_amuleto_rachado",
+  "n_areia_no_chao",
+  "n_couro_batido",
+  "n_curativo_de_campo",
+  "n_disciplina_de_forja",
+  "n_encarar",
+  "n_estocada_seca",
+  "n_gancho_e_corda",
+  "n_grito_curto",
+  "n_guarda_alta",
+  "n_guarda_cruzada",
+  "n_mira_calma",
+  "n_olho_treinado",
+  "n_pancada_na_nuca",
+  "n_passo_lateral",
+  "n_pausa_util",
+  "n_respirar_fundo",
+  "n_ritmo_de_duelo",
+  "n_travar_o_pulso",
+  "n_voto_de_silencio",
+  "palavra_de_pavor",
+  "palavra_de_torpor",
+  "passo_borrado",
+  "pele_de_quartzo",
+  "prisma_de_devastacao",
+  "relampago",
+  "reserva_profunda",
+  "veias_de_eter"
+ ],
+ "shop_miss_streak": 0,
+ "skill_cooldowns": {
+  "bola_fogo": 2
+ },
+ "skills": {
+  "1": "bola_fogo",
+  "2": "hora_parada",
+  "3": "lasca_de_gelo",
+  "4": "passo_borrado"
+ },
+ "unpaid_exit_streak": 0,
+ "xp": 6191
+}
