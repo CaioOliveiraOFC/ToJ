@@ -227,11 +227,13 @@ rede, conta nem servidor.
   histórico, com os testes e o gate de compatibilidade, mas **fora do fluxo do
   jogo**: o menu não o abre e a Arena não importa `src/multiplayer/`. Os
   contratos dele estão na seção [Multiplayer](#multiplayer--compatibilidade-de-versão).
-- **A Arena Ranqueada** (Fase 6, experimental) dá a cada gladiador um MMR
+- **A Arena Ranqueada** (Fases 6 e 6.1, experimental) dá a cada gladiador um MMR
   dinâmico (Glicko-2), com matchmaking automático, 10 partidas de
-  posicionamento, ranks por percentil e um mundo NPC × NPC que continua jogando.
-  Fila em rede, matchmaking público e relógio de decisão eram da ranked online e
-  saem do escopo do 1.0.
+  posicionamento, 45 divisões de 100 PR de Iron V a Obsidian I, a elite
+  (Master, International Master, Distinguished Master) decidida em atualizações
+  periódicas da leaderboard, empate técnico por impasse e um mundo NPC × NPC que
+  continua jogando. Fila em rede, matchmaking público e relógio de decisão eram
+  da ranked online e saem do escopo do 1.0.
 
 Verificado em `tests/test_pvp_duel.py`, `tests/test_pvp_initiative.py`,
 `tests/test_pvp_references.py`, `tests/test_arena_mode.py`,
@@ -450,7 +452,8 @@ número estão em `tools/ranked_experimentos.py` e `reports/ranked/relatorio.md`
 - Confronto NPC × NPC muda o rating dos dois.
 - O jogador tem um MMR separado para cada gladiador extraído.
 - O OP serve só como estimativa inicial fraca, com incerteza alta.
-- Só vitória ou derrota contam: nada de bônus por duração, HP restante ou dano.
+- Só o resultado conta — vitória, derrota ou, desde a Fase 6.1, empate técnico
+  por impasse: nada de bônus por duração, HP restante ou dano.
 - Equipamento pode ser reorganizado sem mudar a identidade.
 - Matchmaking automático: o jogador não escolhe o adversário.
 - Rank por percentil da população competitiva; os cinco primeiros são os
@@ -460,11 +463,9 @@ número estão em `tools/ranked_experimentos.py` e `reports/ranked/relatorio.md`
 
 **O confronto NPC × NPC** é o duelo canônico, com a IA estratégica nos dois lados
 e o gerador semeado: a mesma dupla com a mesma seed dá o mesmo resultado. O lado
-(p1/p2) sai da seed. Partida que passa de 500 rodadas termina **sem resultado**:
-não muda rating, não conta como partida, entra no histórico (o matchmaking não
-repete a dupla logo) e, no mundo, consome a vaga. Existem duplas que nunca
-terminam — R31 × M33 bateu o limite em todas as seeds testadas —, então ninguém
-insiste na mesma dupla.
+(p1/p2) sai da seed. Na Fase 6, a partida que passava de 500 rodadas terminava
+**sem resultado**; na 6.1 ela virou **empate técnico por impasse** (abaixo), e o
+"sem resultado" da Fase 6 é lido como partida anulada.
 
 **O rating.** Glicko-2, escolhido na comparação com TrueSkill sobre confrontos
 reais (`reports/ranked/relatorio.md`): com 1.631 partidas de treino e 150 duplas
@@ -494,8 +495,9 @@ centro (1500, RD 350), sem priori. A exibição é o rating ± 2 RD.
   cima (no máximo 3); a derrota contra quem não estava mais de meio desvio
   acima, para baixo. Vitórias sobre gladiadores muito mais fracos não endurecem
   o próximo adversário — e o próprio Glicko-2 já sobe pouco com elas.
-- Quem enfrentou o gladiador nas últimas 3 partidas fica de fora enquanto houver
-  alternativa.
+- Na Fase 6, quem enfrentou o gladiador nas últimas 3 partidas ficava de fora
+  enquanto houvesse alternativa; na 6.1 isso virou um custo progressivo de
+  repetição (abaixo).
 - O adversário sorteado fica **reservado** até a partida: sair da tela e voltar
   não troca o oponente.
 
@@ -541,22 +543,189 @@ catálogo ganha registro com a priori; nenhum registro existente é apagado ou
 reiniciado. Uma run nova no slot é outra identidade e não herda nada. O save do
 personagem nunca é tocado: ninguém morre e não há XP nem ouro.
 
+### Arena Ranqueada: progressão competitiva (Fase 6.1, experimental)
+
+Código em `src/ranked/progressao.py` (divisões e PR), `src/ranked/leaderboard.py`
+(atualizações periódicas, candidatura e elite), `src/ranked/impasse.py` (empate
+técnico), `src/ranked/matchmaking.py` (custo de repetição) e
+`src/engine/ranked_mundo.py` (persistência v2 e relógio). Os experimentos
+estão em `tools/ranked_progressao.py` e `reports/ranked/fase61/`.
+
+**Três conceitos, e só um deles é a verdade.**
+
+| | o que é | para que serve |
+|---|---|---|
+| **MMR** | o rating do Glicko-2, com incerteza (RD) | a estimativa competitiva: escolhe adversário e ordena a classificação |
+| **Percentil** | a posição na população competitiva, de 0 a 100 | a base dos limites dos ranks (`ranks.LIMITES`) |
+| **PR** | a barra de 0 a 100 dentro da divisão | a progressão que o jogador vê; anda atrás do MMR e nunca é um segundo MMR |
+
+**As 45 divisões.** Iron, Bronze, Silver, Gold, Platinum, Emerald, Sapphire,
+Diamond e Obsidian têm as divisões V, IV, III, II e I, nessa ordem crescente,
+cada uma com 100 PR. Master, International Master e Distinguished Master são a
+elite, sem divisões: valem a posição na leaderboard e o MMR. Os cinco membros da
+elite mais bem colocados levam a distinção **Definitive Masters**, sem 13º rank.
+Nenhuma divisão precisa ter um número mínimo de gladiadores.
+
+**O alvo.** O percentil vira uma coordenada contínua na régua das divisões: cada
+rank vale 500, e dentro do rank a coordenada é linear no percentil. Iron V 0 PR é
+0, Obsidian I 100 PR é 4.500, e a elite continua a régua (Master de 4.500 a
+5.000, International Master até 5.500, Distinguished Master até 6.000). A
+coordenada VISÍVEL do gladiador é `100 × divisão + PR`.
+
+**A variação de PR** de uma partida:
+
+    ΔPR = K · (S − E) · m        m = e^{+βg} no ganho, e^{−βg} na perda, em [1/M, M]
+
+- `S` é o resultado (1, ½ ou 0) e `E` a chance que o Glicko-2 dava antes dela:
+  vencer o favorito rende mais, perder para o azarão custa mais. Com a chance
+  certa, a média de `S − E` é zero: jogar muito sem melhorar não sobe ninguém.
+- `g = (alvo − visível)/100`, em divisões, com o alvo de ANTES da partida. Quem
+  está abaixo do que o MMR diz ganha mais e perde menos; quem está acima, o
+  contrário. No alvo, `m = 1`. Um gladiador visualmente em Platinum com MMR de
+  Diamond sobe até 3× mais rápido.
+- Vitória rende pelo menos 1 e derrota custa pelo menos 1; uma partida move no
+  máximo 60 PR e no máximo uma divisão.
+
+**Promoção, rebaixamento e escudo.**
+
+- 100 PR promove para a divisão seguinte, e o excedente vai junto.
+- Abaixo de 0 rebaixa: o que faltou sai de 100, mas a divisão de baixo começa no
+  máximo em 75 PR. Voltar exige mais de uma vitória, e a fronteira não vira
+  pisca-pisca.
+- Depois de uma promoção (ou do posicionamento), as 3 partidas seguintes não
+  rebaixam: o PR para em 0. O escudo só vale enquanto o alvo não estiver mais de
+  uma divisão abaixo — ele segura a oscilação, não esconde um gladiador fora do
+  lugar.
+- Iron V não desce de 0. Nenhuma proteção é permanente.
+
+**O posicionamento.** As 10 primeiras partidas não têm PR, mas o MMR já muda
+desde a primeira. Empate conta como partida disputada; partida anulada, não. Na
+10ª, a coordenada visível nasce no alvo (divisão e PR), com escudo, e no máximo
+Obsidian I com 0 PR: a barra de Obsidian I sempre se conquista jogando.
+
+**NPCs e jogadores seguem as mesmas regras.** Toda partida (do jogador ou do
+mundo) mexe no PR dos dois lados. A divisão inicial dos NPCs vem da fundação
+(abaixo); um NPC novo no catálogo recebe a divisão do alvo.
+
+**Candidato a Master.** Obsidian I com 100/100 PR vira **Candidato a Master**.
+O PR para em 100 (não acumula), o MMR continua andando, e o jogador continua
+jogando normalmente. A candidatura vale enquanto ele estiver em Obsidian I; cair
+para Obsidian II a encerra (o evento fica registrado). A promoção NÃO é
+automática: só acontece numa atualização oficial da leaderboard.
+
+**A leaderboard publicada.** O MMR muda a cada partida; a leaderboard publicada
+é um retrato tirado no começo de cada ciclo. O ciclo é de **1 hora**
+(configurável; 24 horas também é testado), alinhado ao relógio (UTC). Nada roda
+com o jogo fechado: ao abrir, depois de cada partida e a cada volta ao painel, o
+jogo confere se o ciclo virou. Depois de muitos ciclos com o jogo fechado, sai
+**um** retrato, o do ciclo atual, com o estado gravado; os ciclos pulados ficam
+registrados. Ao reabrir, o retrato pendente sai antes da inatividade e da fila
+do mundo. O jogador vê quando saiu o último retrato e quando sai o próximo.
+
+**O que um retrato decide, em ordem:**
+
+1. **Integridade.** Ladder com rating inválido, contagem negativa, PR fora da
+   régua, candidato fora de Obsidian I ou competitivo sem divisão adia o retrato.
+   O ciclo continua pendente e o aviso aparece na tela.
+2. **A elite que já existe.** Membro com percentil no mínimo de Master (92) fica.
+   Abaixo dele, mas a menos de 3 pontos, entra **em risco**. Em risco e ainda
+   abaixo no retrato seguinte, ou mais de 3 pontos abaixo de uma vez, sai da
+   elite para a divisão do alvo, como num posicionamento (no máximo Obsidian I
+   com 0 PR) — e tem de reconquistar a barra para ser candidato de novo.
+   Ninguém precisa jogar entre retratos para continuar na elite.
+3. **As candidaturas.** O candidato é promovido se, no retrato, (a) continua
+   candidato e posicionado, (b) o percentil alcança 92 e (c) a classificação é
+   confiável: RD até 150. Senão, a candidatura é **mantida** e reavaliada no
+   próximo retrato, com o motivo registrado e mostrado.
+4. **O nível na elite** é o rank que o percentil dá no retrato (no mínimo
+   Master): quem é promovido com percentil de Distinguished Master entra direto
+   nele. Os cinco membros da elite mais bem colocados são os **Definitive
+   Masters**.
+5. **A variação de posições** é contada entre um retrato e o anterior.
+
+**Partida empatada, anulada e interrompida.**
+
+| desfecho | quando | Glicko-2 | posicionamento | PR | histórico |
+|---|---|---|---|---|---|
+| vitória/derrota | KO ou rendição | 1 / 0 | conta | sim | `vitoria`/`derrota`, motivo `ko`/`surrender` |
+| **empate técnico** | o árbitro de impasse encerrou | ½ para cada | conta | pela expectativa | `empate`, motivo `impasse` ou `teto` |
+| **anulada** | erro técnico, interrupção | nada | não conta | nada | `anulada`, motivo `erro técnico: …`/`interrompida`/`limite` (Fase 6) |
+
+O **árbitro de impasse** (`ranked/impasse.py`) vale para NPC × NPC e para
+jogador × NPC, e não toca no motor nem no PvE:
+
+- **Impasse:** por **150 rodadas** seguidas, nenhum dos dois chegou a um HP ou a
+  um MP mais baixo do que já tinha chegado na partida, com folga de 1% do máximo.
+- **Teto:** **1.000 rodadas**, como rede de segurança.
+
+Nos dois casos, o empate não favorece quem tem mais HP, OP, nível ou MMR. O
+critério saiu de 242 duelos reais refeitos rodada a rodada: nas partidas que
+terminaram em KO com desgaste contínuo, a maior espera por um mínimo novo foi de
+50 rodadas. Uma build de cura ou controle que está ganhando empurra o outro para
+mínimos novos e nunca é encerrada. A interrupção do mundo
+orgânico (o agendador parado) não é registrada: a partida é jogada de novo. A do
+jogador pelo teclado fica no histórico como anulada, e o adversário continua
+reservado. O erro técnico consome a vaga (no mundo) ou libera a reserva (do
+jogador), porque a mesma seed falharia de novo.
+
+**Repetição de adversário.** O matchmaking escolhe entre os candidatos de menor
+custo:
+
+    custo = (distância ao alvo / janela da etapa)² + Σ 8 · ½^((idade − 1)/5)
+
+A soma corre sobre os confrontos com aquele adversário nas últimas 20 partidas do
+gladiador (idade 1 = a última). Pesam a frequência (cada confronto soma), a
+recência (meia-vida de 5 partidas) e a diferença de MMR (o primeiro termo). O
+adversário da partida anterior fica de fora enquanto houver qualquer outro.
+Nunca bloqueia: com poucas alternativas, o custo escolhe entre repetir e
+enfrentar alguém mais distante. Com 5.000 gladiadores a mesma regra vale sem
+mudança: a janela tem dezenas de candidatos e a repetição quase some
+(`reports/ranked/fase61/repeticao.json`).
+
+**Persistência (versão 2).** `saves/ranked.json` ganha, por gladiador, empates,
+divisão, PR, escudo, candidatura, elite, risco, título e os eventos de promoção
+e rebaixamento. Ganha também a leaderboard publicada: período, último ciclo,
+último retrato, posições do anterior e eventos da elite. A escrita continua
+atômica, e uma gravação que falha não estraga o arquivo.
+
+O arquivo da Fase 6 (versão 1) é migrado na leitura. Nada se perde: as vitórias,
+derrotas, ratings, históricos e reservas ficam, e o "sem resultado" vira partida
+anulada. O original fica copiado em `saves/ranked.v1.json`, que nunca é
+sobrescrito. A progressão nasce da **fundação**: o retrato inicial põe na elite
+todo competitivo com percentil de Master e os outros na divisão do alvo. O estado
+inicial publicado (`ladder_inicial.json`, a calibração da Fase 6) passa pela
+mesma fundação.
+
+**Parâmetros propostos, ainda não aprovados:**
+
+| parâmetro | valor | onde |
+|---|---|---|
+| K (PR por unidade de surpresa) | 40 | `progressao.K` |
+| β (força do puxão para o alvo, por divisão) | 0,20 | `progressao.BETA` |
+| multiplicador máximo | 3 | `progressao.MULTIPLICADOR_MAXIMO` |
+| variação máxima por partida | 60 PR | `progressao.VARIACAO_MAXIMA` |
+| escudo depois de promoção ou posicionamento | 3 partidas | `progressao.ESCUDO` |
+| PR depois de rebaixar | no máximo 75 | `progressao.PR_APOS_REBAIXAMENTO` |
+| ciclo da leaderboard | 1 hora (24 h testado) | `leaderboard.PERIODO` |
+| faixa de risco da elite | 3 pontos de percentil | `leaderboard.FAIXA_DE_RISCO` |
+| RD máximo para promover | 150 | `leaderboard.RD_MAXIMO_PARA_PROMOVER` |
+| janela e teto do impasse | 150 rodadas, folga de 1%, teto de 1.000 | `impasse.JANELA`, `MARGEM`, `TETO` |
+| custo de repetição | peso 8, meia-vida 5, memória 20 | `matchmaking.PESO_DA_REPETICAO`, `MEIA_VIDA`, `MEMORIA` |
+| limites percentuais dos ranks | os da Fase 6 | `ranks.LIMITES` |
+
 ### Ainda não validado
 
-- **Partida sem fim contra o jogador.** No duelo do jogador contra a IA não há
-  limite de rodadas: uma dupla que nunca termina só acaba com a rendição dele.
-  No topo isso é frequente — o jogador artificial com o R31 teve 13 de 100
-  partidas sem vencedor contra Magos de topo. O motor não tem empate, e a regra
-  (empate, limite com desempate, derrota de quem não fecha) é decisão de design,
-  ainda não tomada.
-- **Rank piscando na fronteira.** No meio da Ladder um gladiador perto de um
-  limite troca de rank a toda hora (um jogador artificial: 70 trocas em 390
-  partidas). Histerese de rank é proposta, não regra.
-- **Piso da incerteza.** Com uma partida por período o RD para em ~62 (±123 na
+- **Os parâmetros da tabela acima**, com uma população maior e com jogo humano.
+  Os números da Fase 6.1 vêm de 5 jogadores artificiais sobre os 186
+  (`reports/ranked/fase61/relatorio.md`).
+- **Empates em sequência no topo.** Duplas de sustain (R31 × M33) empatam sempre;
+  o custo de repetição afasta a dupla, mas com 186 o topo tem poucos rivais.
+- **Partida longa demais para um humano.** Um impasse real termina perto da
+  rodada 300–420. Um humano leva 30–40 minutos para chegar lá, se não render
+  antes.
+- **Piso da incerteza.** Com uma partida por período, o RD para em ~62 (±123 na
   tela).
-- Os limites percentuais e o comportamento com 5.000 gladiadores.
-- O ritmo do mundo orgânico (2 confrontos por partida, 4 por hora fora) numa
-  sessão longa real.
+- Os limites percentuais e o ritmo do mundo orgânico com 5.000 gladiadores.
 - Rendição na Ranqueada conta como derrota comum.
 
 ## Multiplayer — compatibilidade de versão
