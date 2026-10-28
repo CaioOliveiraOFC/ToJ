@@ -17,7 +17,8 @@ Requer Python 3.10+, `rich` e `pyfiglet`. `main.py` sobe o menu principal e
 encaminha cada escolha (`engine/bootstrap.run_main_loop`). A **Arena** é a opção 3,
 100% offline: um gladiador extraído contra a população da Arena (gladiadores de
 runs PvE reais), controlada pela IA estratégica — no Duelo Livre ou na Arena
-Ranqueada (experimental), com MMR, posicionamento e ranks.
+Ranqueada (experimental), com MMR, posicionamento, 45 divisões de PR, a elite
+decidida em atualizações periódicas da leaderboard e empate técnico por impasse.
 Instalação de desenvolvimento:
 
 ```bash

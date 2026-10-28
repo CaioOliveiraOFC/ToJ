@@ -3,7 +3,11 @@
 Uso:
     python tools/ranked_progressao.py trajetorias [--trabalhadores 4]
     python tools/ranked_progressao.py impasse
-    python tools/ranked_progressao.py carreiras --partidas 40 [--nome carreira]
+    python tools/ranked_progressao.py formula
+    python tools/ranked_progressao.py repeticao
+    python tools/ranked_progressao.py carreiras --partidas 200 [--nome carreira]
+    python tools/ranked_progressao.py progressao
+    python tools/ranked_progressao.py relatorio
 
 Reaproveita os confrontos reais da Fase 6 (`reports/ranked/`). Tudo é
 reprodutível pela semente: um confronto refeito com a mesma semente é o mesmo.
@@ -901,6 +905,59 @@ def medir(carreira: dict) -> dict:
     }
 
 
+def _estabilidade_do_top5(tops: list[list[str]]) -> dict:
+    """Quantas atualizações mudaram os Definitive Masters, e em quantos nomes."""
+    trocas = [len(set(a) - set(b)) for a, b in zip(tops, tops[1:])]
+    return {
+        "atualizacoes": len(tops),
+        "mudaram": sum(1 for t in trocas if t),
+        "nomes_trocados": sum(trocas),
+        "conjuntos_distintos": len({tuple(sorted(t)) for t in tops}),
+    }
+
+
+def _empates_do_mundo(arquivo: Path) -> dict:
+    linhas = [json.loads(x) for x in arquivo.read_text(encoding="utf-8").splitlines()]
+    mundo = [m for x in linhas for m in x["mundo"]]
+    return {
+        "partidas": len(mundo),
+        "empates": sum(1 for m in mundo if m["vencedor"] is None),
+        "rodadas_dos_empates": [m["rodadas"] for m in mundo if m["vencedor"] is None],
+        "cpu_s_do_jogador": round(sum(x["segundos"] for x in linhas), 1),
+        "cpu_s_do_mundo": round(sum(m["segundos"] for m in mundo), 1),
+    }
+
+
+def progressao(nome: str = "carreira") -> dict:
+    """As carreiras refeitas com ciclo de 1 h e de 24 h, e as medidas de cada uma."""
+    resultado: dict = {"periodos": {}, "mundo": {}}
+    PASTA.mkdir(parents=True, exist_ok=True)
+    destino = PASTA / "carreiras"
+    destino.mkdir(parents=True, exist_ok=True)
+    for arquivo in _arquivos_de_carreira(nome):
+        (destino / arquivo.name).write_text(arquivo.read_text(encoding="utf-8"), encoding="utf-8")
+        faixa = arquivo.stem.split("_")[1]
+        resultado["mundo"][faixa] = _empates_do_mundo(arquivo)
+        for rotulo, periodo in PERIODOS.items():
+            carreira = refazer(arquivo, periodo)
+            medidas = medir(carreira)
+            medidas["top5"] = _estabilidade_do_top5(carreira["top5"])
+            medidas["elite_por_atualizacao"] = {
+                "promocoes": sum(e["promocoes"] for e in carreira["elite_por_atualizacao"]),
+                "rebaixamentos": sum(e["rebaixamentos"] for e in carreira["elite_por_atualizacao"]),
+                "em_risco": sum(e["em_risco"] for e in carreira["elite_por_atualizacao"]),
+                "tamanho_da_elite": [
+                    min(carreira["tamanho_da_elite"], default=None),
+                    max(carreira["tamanho_da_elite"], default=None),
+                ],
+            }
+            resultado["periodos"].setdefault(rotulo, {})[faixa] = medidas
+    (PASTA / "progressao.json").write_text(
+        json.dumps(resultado, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
+    return resultado
+
+
 def _exibicao(p: dict) -> str | None:
     from src.ranked import progressao as pg
 
@@ -912,6 +969,309 @@ def _exibicao(p: dict) -> str | None:
     return f"{pg.nome_da_divisao(p['divisao'])} {p['pr_atual']} PR{sufixo}"
 
 
+# --- o relatório (`relatorio`) ---------------------------------------------------------
+
+
+def _n(valor, casas: int = 0) -> str:
+    if valor is None:
+        return "—"
+    return f"{valor:.{casas}f}".replace(".", ",")
+
+
+PROBLEMAS = [
+    '**O "impasse" da Fase 6 não era um só fenômeno.** Refeitos até 1.500 rodadas, 8 dos '
+    "15 confrontos que bateram o limite de 500 terminaram em KO (entre as rodadas 509 e "
+    "1.002) e 7 — todos R31 × M33 — não terminaram nunca. Os dois casos são o mesmo "
+    "equilíbrio: o MP dos dois zera por volta da rodada 100 e o HP passa a oscilar numa "
+    "faixa estável; o KO, quando vem, é sorte. Por isso o critério é de desgaste (mínimo "
+    "novo de HP ou MP) e não de duração.",
+    "**Rebaixamento contínuo fazia pisca-pisca.** Com o PR do rebaixamento contínuo (100 − o "
+    "que faltou), um gladiador na fronteira descia e subia na partida seguinte: 30 "
+    "oscilações em 390 partidas na carreira W26 da Fase 6. Pousar em no máximo 75 PR e o "
+    "escudo de 3 partidas derrubaram isso para 4, sem piorar a distância ao alvo.",
+    "**Sem puxar para o alvo, o PR se descola do MMR.** A variante sem o multiplicador (PR "
+    "puro por resultado contra expectativa) termina a carreira M11 em Diamond V com o MMR "
+    "de Diamond II, e a W26 três divisões acima do alvo: distância média de 93 a 227 PR, "
+    "contra 25 a 76 com β = 0,20.",
+    "**Posicionar em 0 PR rebaixava na primeira derrota.** A primeira versão punha o "
+    "gladiador no começo da divisão do alvo; qualquer derrota logo depois do posicionamento "
+    "descia uma divisão. O posicionamento agora nasce no PR do alvo e com escudo.",
+    "**Repetição no topo é estrutural com 186.** O custo de repetição zera a repetição nas "
+    "faixas baixa, média, alta e na fronteira, mas no topo há poucos rivais: o peso 4 "
+    "deixava 34% de repetição no modelo; o peso 8 deixa 16%, ao custo de partidas um pouco "
+    "menos equilibradas. Com 5.000, a repetição some nas duas políticas.",
+    "**Títulos com população pequena.** Os Definitive Masters são os cinco primeiros DA "
+    "ELITE; com menos de ~60 gladiadores competitivos, a elite (percentil ≥ 92) tem menos "
+    "de cinco membros e sobra título. Com 186 a elite tem 15.",
+]
+
+
+def relatorio() -> str:
+    """O relatório da Fase 6.1, a partir dos JSONs de `reports/ranked/fase61/`."""
+    from src.ranked import impasse as imp
+    from src.ranked import leaderboard as lbm
+    from src.ranked import matchmaking as mm
+    from src.ranked import progressao as pg
+
+    ler = lambda nome: json.loads((PASTA / nome).read_text(encoding="utf-8"))  # noqa: E731
+    impasse_ = ler("impasse.json")
+    formula_ = ler("formula.json")
+    repeticao_ = ler("repeticao.json")
+    prog = ler("progressao.json")
+    md: list[str] = [
+        "# Ranked offline — Fase 6.1: progressão competitiva, elite e correções",
+        "",
+        "Gerado por `python tools/ranked_progressao.py relatorio`, a partir dos JSONs "
+        "desta pasta. Todo confronto é uma partida real do motor PvP com seed; as "
+        "carreiras se refazem sem o motor (`progressao`) com qualquer ciclo de "
+        "leaderboard. O contrato está em `GAMEPLAY_CONTRACTS.md`.",
+        "",
+        "## 1. Empate técnico por impasse",
+        "",
+    ]
+    fase6 = impasse_["partidas_gravadas_da_fase6"]
+    p50, p90, p99, maximo = fase6["rodadas_p50_p90_p99_max"]
+    traj = impasse_["trajetorias"]
+    md += [
+        f"Nos {fase6['com_vencedor']} confrontos com vencedor da Fase 6 (amostra, calibração e "
+        f"holdout), a duração foi de {p50} rodadas na mediana, {p90} no p90, {p99} no p99 e "
+        f"{maximo} no máximo; {fase6['sem_vencedor_em_500']} bateram o limite de 500.",
+        "",
+        f"Refiz {traj['total']} duelos rodada a rodada, guardando HP e MP dos dois lados "
+        f"(`trajetorias.jsonl`): os {traj['por_grupo']['impasse_fase6']} que bateram o limite "
+        f"na Fase 6 (amostra, calibração e as carreiras), os {traj['por_grupo']['longo']} que "
+        f"terminaram em KO depois de {LONGOS} rodadas e {traj['por_grupo']['comum']} comuns, "
+        "até 1.500 rodadas. Todos os refeitos com vencedor repetiram o vencedor e o número "
+        "de rodadas gravados.",
+        "",
+        f'- Dos {traj["por_grupo"]["impasse_fase6"]} "sem resultado" da Fase 6, '
+        f"{traj['impasses_da_fase6_que_terminaram_ate_1500']} terminaram em KO depois da rodada "
+        f"500; {len(traj['sem_fim_em_1500'])} (todos R31 × M33) não terminaram em 1.500.",
+        "- A maior espera por um mínimo novo de HP ou MP (folga de 1%), por partida que "
+        "terminou em KO:",
+        "",
+        "| dupla | rodadas até o KO | maior espera |",
+        "|---|---|---|",
+    ]
+    for e in impasse_["maiores_esperas_em_partidas_terminadas"]:
+        md.append(f"| {e['dupla']} | {e['rodadas']} | {e['espera']} |")
+    md += [
+        "",
+        "Há um vão limpo: as partidas que andam até o fim (desgaste contínuo) esperam no "
+        "máximo 50 rodadas por um mínimo novo; as duplas de sustain em equilíbrio, de 134 "
+        "a 826. A janela escolhida é o triplo de 50:",
+        "",
+        "| janela | KOs que virariam empate | rodada em que as duplas sem fim empatam |",
+        "|---|---|---|",
+    ]
+    for janela, v in impasse_["janelas"].items():
+        md.append(
+            f"| {janela}{' (escolhida)' if int(janela) == imp.JANELA else ''} | "
+            f"{len(v['ko_que_viram_empate'])} | "
+            f"{', '.join(str(x) for x in v['sem_fim_encerradas_em'])} |"
+        )
+    md += [
+        "",
+        f"**Regra:** empate técnico depois de {imp.JANELA} rodadas sem nenhum mínimo novo "
+        f"(folga de {_n(100 * imp.MARGEM)}% do máximo), ou no teto de {imp.TETO} rodadas. "
+        "Os KOs que viram empate com a janela de 150 são todos de duplas que passaram pelo "
+        "menos 150 rodadas sem que ninguém fosse desgastado — R31, M27, M32, M33 e M20 × "
+        "W77 —, e nenhuma partida que terminou com desgaste contínuo é encerrada.",
+        "",
+        "## 2. A fórmula de PR",
+        "",
+        "Antes de jogar qualquer partida nova, a fórmula foi reaplicada às 4 carreiras reais "
+        "da Fase 6 (resultado, chance do Glicko-2 e percentil de cada partida gravados): "
+        "`formula.json`. Oscilação = promoção desfeita em até 3 partidas (ou rebaixamento "
+        "desfeito); distância = |alvo − coordenada visível| média, em PR.",
+        "",
+        "| variante | M03 osc. / trocas de rank / dist. | M11 | W26 | R31 ganho / perda |",
+        "|---|---|---|---|---|",
+    ]
+    for v in formula_:
+        c = v["carreiras"]
+
+        def celula(nome, c=c):
+            r = c[nome]
+            return f"{r['oscilacoes']} / {r['trocas_de_rank']} / {_n(r['distancia_media'])}"
+
+        md.append(
+            f"| {v['variante']['nome']} | {celula('M03')} | {celula('M11')} | {celula('W26')} | "
+            f"{_n(c['R31']['ganho'], 1)} / {_n(c['R31']['perda'], 1)} |"
+        )
+    w26 = formula_[0]["carreiras"]["W26"]
+    md += [
+        "",
+        f"Na W26, o rank por percentil da Fase 6 trocava {w26['trocas_de_rank_por_percentil']} "
+        f"vezes; o rank visível com a proposta, {w26['trocas_de_rank']}. Escolhidos: K = "
+        f"{_n(pg.K)}, β = {_n(pg.BETA, 2)}, multiplicador até {_n(pg.MULTIPLICADOR_MAXIMO)}, "
+        f"escudo de {pg.ESCUDO} partidas, rebaixamento pousando em no máximo "
+        f"{pg.PR_APOS_REBAIXAMENTO} PR. Ganho ~18 e perda ~18 por partida equilibrada no "
+        "lugar certo; o R31, de elite e posicionado no teto (Obsidian I), ganha ~38 e perde "
+        "~4 até virar candidato.",
+        "",
+        "## 3. Repetição de adversário",
+        "",
+        "Por modelo (`repeticao.json`): o resultado sai da chance do Glicko-2 entre as "
+        "forças VERDADEIRAS (as da calibração) e o MMR do jogador artificial começa do "
+        "centro. 300 partidas por jogador com os 186; 100 com uma população sintética de "
+        "5.000 (ratings sorteados da calibrada, com ruído). Repetição = adversário que já "
+        "apareceu nas 10 partidas anteriores; desequilíbrio = |chance − ½| médio.",
+        "",
+        "| população | faixa | Fase 6: repetição / distintos / deseq. | 6.1 |",
+        "|---|---|---|---|",
+    ]
+    for populacao_, faixas in repeticao_.items():
+        for faixa, d in faixas.items():
+            a, b = d["fase6"], d["nova"]
+            md.append(
+                f"| {populacao_} | {faixa} | {_n(100 * a['repeticao'])}% / {a['distintos']} / "
+                f"{_n(a['desequilibrio_medio'], 3)} | {_n(100 * b['repeticao'])}% / "
+                f"{b['distintos']} / {_n(b['desequilibrio_medio'], 3)} |"
+            )
+    ms = [d["nova"]["ms_por_escolha"] for d in repeticao_["5000"].values()]
+    md += [
+        "",
+        f"Custo por escolha com 5.000 NPCs: {_n(min(ms), 1)}–{_n(max(ms), 1)} ms. Parâmetros: "
+        f"peso {_n(mm.PESO_DA_REPETICAO)}, meia-vida {_n(mm.MEIA_VIDA)} partidas, memória "
+        f"{mm.MEMORIA}. **Para 5.000:** a mesma regra serve sem mudança; o que muda é a "
+        "densidade — a janela da etapa passa a ter dezenas de candidatos, e o custo de "
+        "repetição quase nunca decide. A memória de 20 partidas por gladiador já está no "
+        "histórico guardado (50).",
+        "",
+        "## 4. Os jogadores artificiais",
+        "",
+        f"Cinco carreiras reais (`carreiras/`), uma por faixa da Ladder calibrada, com o "
+        f"caminho do jogo: matchmaking 6.1, árbitro de impasse, mundo NPC × NPC "
+        f"(2 confrontos por partida do jogador, mais a fila do retorno) e a leaderboard. "
+        f"Relógio injetado: {SESSAO} partidas por dia (hipótese de "
+        f"{_n(MINUTOS_POR_PARTIDA)} min por partida, {_n(SESSAO * MINUTOS_POR_PARTIDA / 60)} h "
+        f"de jogo), a partir das {HORA_DA_SESSAO}h UTC, e o jogo fechado até o dia "
+        "seguinte. A mesma carreira foi refeita sem o motor com o ciclo de 1 h e com o de "
+        "24 h: o MMR é idêntico nas duas (divergência zero em todas), e muda só o que a "
+        "leaderboard decide.",
+        "",
+    ]
+    um = prog["periodos"]["1h"]
+    md += [
+        "| faixa (gêmeo) | partidas (h) | V-E-D | posicionado em | 2h | 5h | 10h | final "
+        "| MMR final (percentil) |",
+        "|---|---|---|---|---|---|---|---|---|",
+    ]
+    for faixa, m in um.items():
+        pos = m["posicionamento"] or {}
+        marcos = [m["marcos"].get(f"{h}h") for h in (2, 5, 10)]
+        md.append(
+            f"| {faixa} ({m['gemeo']}) | {m['partidas']} ({_n(m['horas'], 1)}) | "
+            f"{m['vitorias']}-{m['empates']}-{m['derrotas']} | "
+            f"{pos.get('exibicao', '—')} (p {_n(pos.get('percentil'), 1)}) | "
+            + " | ".join(x["exibicao"] if x else "—" for x in marcos)
+            + f" | {m['final']['exibicao']} | {_n(m['final']['mmr'])} "
+            f"({_n(m['final']['percentil'], 1)}) |"
+        )
+    md += [
+        "",
+        "| faixa | PR médio vitória / derrota / empate | promoções / rebaixamentos | "
+        "escudo segurou | oscilações | partidas por promoção | distância média (p90) ao alvo "
+        "| rank visível = rank do percentil |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for faixa, m in um.items():
+        pr = m["pr_medio"]
+        igual = m["rank_visivel_igual_ao_do_percentil"]
+        md.append(
+            f"| {faixa} | {_n(pr['vitoria'], 1)} / {_n(pr['derrota'], 1)} / "
+            f"{_n(pr['empate'], 1)} | {m['promocoes']} / {m['rebaixamentos']} | "
+            f"{m['escudo_segurou']} | {m['oscilacoes']} | {_n(m['partidas_por_promocao'], 1)} | "
+            f"{_n(m['distancia_media_ao_alvo'])} ({_n(m['distancia_p90_ao_alvo'])}) | "
+            f"{_n(None if igual is None else 100 * igual)}% |"
+        )
+    md += [
+        "",
+        "**Matchmaking real:**",
+        "",
+        "| faixa | oponentes distintos | repetidos nas últimas 10 | chance média | desequilíbrio |",
+        "|---|---|---|---|---|",
+    ]
+    for faixa, m in um.items():
+        mm_ = m["matchmaking"]
+        md.append(
+            f"| {faixa} | {mm_['oponentes_distintos']} | {mm_['repetidos_nas_ultimas_10']} "
+            f"({_n(100 * mm_['taxa_de_repeticao'], 1)}%) | {_n(mm_['chance_media'], 3)} | "
+            f"{_n(mm_['desequilibrio_medio'], 3)} |"
+        )
+    md += [
+        "",
+        "## 5. Candidatura, elite e a leaderboard: 1 h × 24 h",
+        "",
+        "| ciclo | faixa | 1ª vez candidato | partidas como candidato (h de jogo) | "
+        "avaliações na atualização | entrou na elite | final |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for rotulo, faixas in prog["periodos"].items():
+        for faixa, m in faixas.items():
+            cand = m["candidato"]
+            horas = _n(cand["horas_de_jogo_como_candidato"], 1)
+            avaliacoes = ", ".join(
+                f"{a['evento'].replace('_', ' ')} (n {a['n']})" for a in m["elite"]["avaliacoes"]
+            )
+            md.append(
+                f"| {rotulo} | {faixa} | {cand['primeira_vez_na_partida'] or '—'} | "
+                f"{cand['partidas_como_candidato']} ({horas}) "
+                f"| {avaliacoes or '—'} | {m['elite']['entrada_na_partida'] or '—'} | "
+                f"{m['final']['exibicao']} |"
+            )
+    md += [
+        "",
+        "**A leaderboard inteira** (cada carreira tem o próprio mundo; números somados das 5):",
+        "",
+        "| ciclo | atualizações | Top 5 mudou em | nomes trocados no Top 5 | promoções à elite | "
+        "rebaixamentos da elite | avisos de risco | tamanho da elite |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for rotulo, faixas in prog["periodos"].items():
+        soma = lambda chave, sub: sum(m[sub][chave] for m in faixas.values())  # noqa: E731
+        tamanhos = [
+            t
+            for m in faixas.values()
+            for t in m["elite_por_atualizacao"]["tamanho_da_elite"]
+            if t is not None
+        ]
+        md.append(
+            f"| {rotulo} | {soma('atualizacoes', 'top5')} | {soma('mudaram', 'top5')} | "
+            f"{soma('nomes_trocados', 'top5')} | "
+            f"{soma('promocoes', 'elite_por_atualizacao')} | "
+            f"{soma('rebaixamentos', 'elite_por_atualizacao')} | "
+            f"{soma('em_risco', 'elite_por_atualizacao')} | "
+            f"{min(tamanhos, default='—')}–{max(tamanhos, default='—')} |"
+        )
+    md += [
+        "",
+        f"Regras: promoção com percentil ≥ {_n(lbm.MINIMO_DA_ELITE)} e RD ≤ "
+        f"{_n(lbm.RD_MAXIMO_PARA_PROMOVER)}; risco a menos de {_n(lbm.FAIXA_DE_RISCO)} pontos "
+        "abaixo; rebaixamento no segundo retrato abaixo ou de uma vez além da faixa.",
+        "",
+        "## 6. Empates e custo",
+        "",
+        "| faixa | partidas do mundo | empates do mundo (rodada) | empates do jogador | "
+        "CPU do jogador | CPU do mundo |",
+        "|---|---|---|---|---|---|",
+    ]
+    for faixa, w in prog["mundo"].items():
+        m = um[faixa]
+        md.append(
+            f"| {faixa} | {w['partidas']} | {w['empates']} "
+            f"({', '.join(str(r) for r in w['rodadas_dos_empates']) or '—'}) | "
+            f"{m['empates']} | {_n(w['cpu_s_do_jogador'] / 60, 1)} min | "
+            f"{_n(w['cpu_s_do_mundo'] / 60, 1)} min |"
+        )
+    md += ["", "## 7. Problemas encontrados e correções", ""]
+    md += [f"- {p}" for p in PROBLEMAS]
+    texto = "\n".join(md) + "\n"
+    (PASTA / "relatorio.md").write_text(texto, encoding="utf-8")
+    return texto
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = parser.add_subparsers(dest="comando", required=True)
@@ -920,6 +1280,9 @@ def main() -> int:
     sub.add_parser("impasse")
     sub.add_parser("formula")
     sub.add_parser("repeticao")
+    p = sub.add_parser("progressao")
+    p.add_argument("--nome", default="carreira")
+    sub.add_parser("relatorio")
     p = sub.add_parser("carreiras")
     p.add_argument("--partidas", type=int, required=True)
     p.add_argument("--nome", default="carreira")
@@ -937,6 +1300,13 @@ def main() -> int:
                 print("  ", nome, r)
     elif args.comando == "repeticao":
         print(json.dumps(repeticao(), ensure_ascii=False, indent=1))
+    elif args.comando == "progressao":
+        r = progressao(args.nome)
+        for rotulo, faixas in r["periodos"].items():
+            for faixa, m in faixas.items():
+                print(rotulo, faixa, m["partidas"], m["final"], m["elite"], m["top5"])
+    elif args.comando == "relatorio":
+        print(relatorio())
     elif args.comando == "carreiras":
         for faixa, arquivo in carreiras(args.partidas, args.nome, args.faixas).items():
             print(faixa, arquivo)

@@ -18,8 +18,10 @@
 >   uma população fixa de gladiadores extraídos de runs PvE reais, controlados
 >   pela IA estratégica. A **Arena Ranqueada** `[em calibração]` dá a cada
 >   gladiador um MMR dinâmico (Glicko-2), com matchmaking automático, 10
->   partidas de posicionamento, 12 ranks por percentil e um mundo NPC × NPC que
->   continua jogando; é experimental, validada com os 186 gladiadores. O multiplayer humano × humano em rede foi construído (Fases 3
+>   partidas de posicionamento, 45 divisões de 100 PR de Iron V a Obsidian I,
+>   a elite promovida nas atualizações periódicas da leaderboard e um mundo
+>   NPC × NPC que continua jogando; é experimental, validada com os 186
+>   gladiadores. O multiplayer humano × humano em rede foi construído (Fases 3
 >   e 4) e está preservado no repositório, fora do fluxo do jogo. As regras estão
 >   em [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
 >
@@ -84,9 +86,13 @@ tem dois modos:
   estratégica, quantas vezes quiser. Não mexe em rating.
 - **Arena Ranqueada** `[em calibração]`: o jogo escolhe o adversário. As 10
   primeiras partidas de cada gladiador posicionam (descoberta, nivelamento,
-  validação); depois vem o rank — de Iron a Distinguished Master, por percentil
-  da população — e os cinco primeiros da Ladder são os Definitive Masters. Os
-  NPCs também jogam entre si e sobem e descem.
+  validação); depois vem a divisão — de Iron V a Obsidian I, cada uma com uma
+  barra de 100 PR que anda com o resultado e puxa na direção do MMR. Quem
+  completa Obsidian I vira Candidato a Master e é promovido à elite (Master,
+  International Master, Distinguished Master) na atualização periódica da
+  leaderboard, se a posição dele na Ladder for de Master; os cinco primeiros da
+  elite são os Definitive Masters. Uma partida em que ninguém se desgasta mais
+  termina em empate técnico. Os NPCs também jogam entre si e sobem e descem.
 
 Nos dois, ninguém morre, o save não muda e não há XP, ouro nem recompensa. As
 regras estão em [`GAMEPLAY_CONTRACTS.md`](GAMEPLAY_CONTRACTS.md#arena).
@@ -115,7 +121,7 @@ relógio de decisão. A resposta do 1.0 é outra:
 > pergunta "por que o jogador recomeça depois de morrer". Sem ela, extrair um
 > personagem vivo não leva a lugar nenhum: o gladiador salvo não tem onde provar
 > valor. Com a Arena offline o laço fecha — extrair leva a lutar —, e a
-> Ranqueada guarda o valor provado num número: o rating e o rank do gladiador.
+> Ranqueada guarda o valor provado: o rating, a divisão e, no topo, a elite.
 
 ---
 

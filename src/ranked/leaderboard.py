@@ -112,6 +112,11 @@ class Leaderboard:
         )
 
 
+def _num(valor: float, casas: int = 0) -> str:
+    """Número para o jogador ler: vírgula decimal."""
+    return f"{valor:.{casas}f}".replace(".", ",")
+
+
 def _nivel(percentil: float) -> str:
     return ranks.rank_do_percentil(max(percentil, MINIMO_DA_ELITE))
 
@@ -178,11 +183,11 @@ def publicar(
         if p.candidato:
             motivos = []
             if pct < MINIMO_DA_ELITE:
-                motivos.append(f"percentil {pct:.1f} abaixo de {MINIMO_DA_ELITE:g}")
+                motivos.append(f"percentil {_num(pct, 1)} abaixo de {_num(MINIMO_DA_ELITE)}")
             if ladder.incerteza(r.identidade) > RD_MAXIMO_PARA_PROMOVER:
                 motivos.append(
-                    f"incerteza {ladder.incerteza(r.identidade):.0f} acima de "
-                    f"{RD_MAXIMO_PARA_PROMOVER:g}"
+                    f"incerteza {_num(ladder.incerteza(r.identidade))} acima de "
+                    f"{_num(RD_MAXIMO_PARA_PROMOVER)}"
                 )
             if motivos:
                 evento(r, "candidatura_mantida", percentil=round(pct, 1), motivos=motivos)
