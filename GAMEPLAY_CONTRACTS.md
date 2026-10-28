@@ -720,6 +720,9 @@ mesma fundação.
   (`reports/ranked/fase61/relatorio.md`).
 - **Empates em sequência no topo.** Duplas de sustain (R31 × M33) empatam sempre;
   o custo de repetição afasta a dupla, mas com 186 o topo tem poucos rivais.
+- **Repetição na elite.** Na carreira real de elite (120 partidas), 32,5% dos
+  adversários já tinham aparecido nas 10 anteriores, com chance média de 0,65
+  (o modelo previa 16%). Nas outras quatro faixas, de 0% a 1,7%.
 - **Partida longa demais para um humano.** Um impasse real termina perto da
   rodada 300–420. Um humano leva 30–40 minutos para chegar lá, se não render
   antes.

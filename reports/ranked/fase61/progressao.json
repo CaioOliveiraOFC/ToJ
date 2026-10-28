@@ -1,0 +1,979 @@
+{
+ "periodos": {
+  "1h": {
+   "baixo": {
+    "faixa": "baixo",
+    "gemeo": "R01",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 55,
+    "derrotas": 65,
+    "empates": 0,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Iron III 41 PR",
+     "percentil": 4.8
+    },
+    "pr_medio": {
+     "vitoria": 20.5,
+     "derrota": -16.5,
+     "empate": null
+    },
+    "pr_extremos": [
+     -30,
+     31
+    ],
+    "promocoes": 6,
+    "rebaixamentos": 5,
+    "escudo_segurou": 4,
+    "oscilacoes": 3,
+    "trocas_de_rank_visivel": 0,
+    "partidas_por_promocao": 18.5,
+    "distancia_media_ao_alvo": 37.8,
+    "distancia_p90_ao_alvo": 73.82795698924733,
+    "rank_visivel_igual_ao_do_percentil": 0.991,
+    "candidato": {
+     "primeira_vez_na_partida": null,
+     "partidas_como_candidato": 0,
+     "horas_de_jogo_como_candidato": 0.0
+    },
+    "elite": {
+     "entrada_na_partida": null,
+     "avaliacoes": []
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "Iron III 23 PR",
+      "percentil": 3.8
+     },
+     "5h": {
+      "exibicao": "Iron II 77 PR",
+      "percentil": 9.1
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "Iron II 25 PR",
+     "titulo": null,
+     "mmr": 1033.0,
+     "rd": 62.1,
+     "percentil": 7.5,
+     "rank_do_percentil": "Iron"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 35,
+     "repetidos_nas_ultimas_10": 2,
+     "taxa_de_repeticao": 0.017,
+     "chance_media": 0.463,
+     "desequilibrio_medio": 0.111
+    },
+    "subidas_nas_partidas": [
+     10,
+     19,
+     75,
+     82,
+     96,
+     114,
+     120
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 8,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 0,
+     "rebaixamentos": 0,
+     "em_risco": 1,
+     "tamanho_da_elite": [
+      15,
+      15
+     ]
+    }
+   },
+   "intermediario": {
+    "faixa": "intermediario",
+    "gemeo": "W26",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 61,
+    "derrotas": 59,
+    "empates": 0,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Platinum V 60 PR",
+     "percentil": 49.5
+    },
+    "pr_medio": {
+     "vitoria": 16.6,
+     "derrota": -17.8,
+     "empate": null
+    },
+    "pr_extremos": [
+     -29,
+     28
+    ],
+    "promocoes": 6,
+    "rebaixamentos": 7,
+    "escudo_segurou": 8,
+    "oscilacoes": 4,
+    "trocas_de_rank_visivel": 5,
+    "partidas_por_promocao": 18.5,
+    "distancia_media_ao_alvo": 45.3,
+    "distancia_p90_ao_alvo": 84.21009098428453,
+    "rank_visivel_igual_ao_do_percentil": 0.811,
+    "candidato": {
+     "primeira_vez_na_partida": null,
+     "partidas_como_candidato": 0,
+     "horas_de_jogo_como_candidato": 0.0
+    },
+    "elite": {
+     "entrada_na_partida": null,
+     "avaliacoes": []
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "Platinum V 0 PR",
+      "percentil": 47.8
+     },
+     "5h": {
+      "exibicao": "Gold I 0 PR",
+      "percentil": 45.2
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "Gold I 67 PR",
+     "titulo": null,
+     "mmr": 1518.0,
+     "rd": 62.0,
+     "percentil": 48.4,
+     "rank_do_percentil": "Platinum"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 57,
+     "repetidos_nas_ultimas_10": 0,
+     "taxa_de_repeticao": 0.0,
+     "chance_media": 0.501,
+     "desequilibrio_medio": 0.102
+    },
+    "subidas_nas_partidas": [
+     10,
+     39,
+     45,
+     71,
+     77,
+     98,
+     107
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 8,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 0,
+     "rebaixamentos": 1,
+     "em_risco": 2,
+     "tamanho_da_elite": [
+      14,
+      15
+     ]
+    }
+   },
+   "alto": {
+    "faixa": "alto",
+    "gemeo": "W80",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 62,
+    "derrotas": 58,
+    "empates": 0,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Sapphire I 42 PR",
+     "percentil": 78.0
+    },
+    "pr_medio": {
+     "vitoria": 17.5,
+     "derrota": -16.8,
+     "empate": null
+    },
+    "pr_extremos": [
+     -33,
+     29
+    ],
+    "promocoes": 4,
+    "rebaixamentos": 4,
+    "escudo_segurou": 2,
+    "oscilacoes": 1,
+    "trocas_de_rank_visivel": 4,
+    "partidas_por_promocao": 27.8,
+    "distancia_media_ao_alvo": 58.7,
+    "distancia_p90_ao_alvo": 129.6821983273603,
+    "rank_visivel_igual_ao_do_percentil": 0.82,
+    "candidato": {
+     "primeira_vez_na_partida": null,
+     "partidas_como_candidato": 0,
+     "horas_de_jogo_como_candidato": 0.0
+    },
+    "elite": {
+     "entrada_na_partida": null,
+     "avaliacoes": []
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "Sapphire I 71 PR",
+      "percentil": 79.0
+     },
+     "5h": {
+      "exibicao": "Diamond V 67 PR",
+      "percentil": 78.5
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "Sapphire I 87 PR",
+     "titulo": null,
+     "mmr": 1849.1,
+     "rd": 62.0,
+     "percentil": 78.0,
+     "rank_do_percentil": "Sapphire"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 52,
+     "repetidos_nas_ultimas_10": 0,
+     "taxa_de_repeticao": 0.0,
+     "chance_media": 0.502,
+     "desequilibrio_medio": 0.1
+    },
+    "subidas_nas_partidas": [
+     10,
+     26,
+     50,
+     75,
+     112
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 8,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 0,
+     "rebaixamentos": 0,
+     "em_risco": 2,
+     "tamanho_da_elite": [
+      15,
+      15
+     ]
+    }
+   },
+   "fronteira": {
+    "faixa": "fronteira",
+    "gemeo": "W86",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 63,
+    "derrotas": 57,
+    "empates": 0,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Obsidian V 91 PR",
+     "percentil": 87.1
+    },
+    "pr_medio": {
+     "vitoria": 17.5,
+     "derrota": -18.6,
+     "empate": null
+    },
+    "pr_extremos": [
+     -34,
+     37
+    ],
+    "promocoes": 7,
+    "rebaixamentos": 7,
+    "escudo_segurou": 3,
+    "oscilacoes": 5,
+    "trocas_de_rank_visivel": 6,
+    "partidas_por_promocao": 15.9,
+    "distancia_media_ao_alvo": 46.0,
+    "distancia_p90_ao_alvo": 113.67127496159765,
+    "rank_visivel_igual_ao_do_percentil": 0.928,
+    "candidato": {
+     "primeira_vez_na_partida": null,
+     "partidas_como_candidato": 0,
+     "horas_de_jogo_como_candidato": 0.0
+    },
+    "elite": {
+     "entrada_na_partida": null,
+     "avaliacoes": []
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "Obsidian IV 62 PR",
+      "percentil": 88.7
+     },
+     "5h": {
+      "exibicao": "Obsidian V 0 PR",
+      "percentil": 85.5
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "Obsidian V 23 PR",
+     "titulo": null,
+     "mmr": 1959.5,
+     "rd": 62.2,
+     "percentil": 86.6,
+     "rank_do_percentil": "Obsidian"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 45,
+     "repetidos_nas_ultimas_10": 0,
+     "taxa_de_repeticao": 0.0,
+     "chance_media": 0.519,
+     "desequilibrio_medio": 0.117
+    },
+    "subidas_nas_partidas": [
+     10,
+     11,
+     19,
+     25,
+     42,
+     85,
+     98,
+     106
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 8,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 0,
+     "rebaixamentos": 2,
+     "em_risco": 2,
+     "tamanho_da_elite": [
+      13,
+      15
+     ]
+    }
+   },
+   "elite": {
+    "faixa": "elite",
+    "gemeo": "M32",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 85,
+    "derrotas": 34,
+    "empates": 1,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Obsidian I 0 PR",
+     "percentil": 97.3
+    },
+    "pr_medio": {
+     "vitoria": 41.0,
+     "derrota": -4.5,
+     "empate": null
+    },
+    "pr_extremos": [
+     -6,
+     58
+    ],
+    "promocoes": 0,
+    "rebaixamentos": 0,
+    "escudo_segurou": 0,
+    "oscilacoes": 0,
+    "trocas_de_rank_visivel": 1,
+    "partidas_por_promocao": null,
+    "distancia_media_ao_alvo": null,
+    "distancia_p90_ao_alvo": null,
+    "rank_visivel_igual_ao_do_percentil": 0.0,
+    "candidato": {
+     "primeira_vez_na_partida": 13,
+     "partidas_como_candidato": 7,
+     "horas_de_jogo_como_candidato": 0.3
+    },
+    "elite": {
+     "entrada_na_partida": 20,
+     "avaliacoes": [
+      {
+       "n": 20,
+       "evento": "promocao_a_elite",
+       "para": "International Master"
+      }
+     ]
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "International Master ★",
+      "percentil": 98.4
+     },
+     "5h": {
+      "exibicao": "International Master ★",
+      "percentil": 98.4
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "International Master ★",
+     "titulo": "Definitive Master",
+     "mmr": 2495.1,
+     "rd": 70.2,
+     "percentil": 98.4,
+     "rank_do_percentil": "International Master"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 18,
+     "repetidos_nas_ultimas_10": 39,
+     "taxa_de_repeticao": 0.325,
+     "chance_media": 0.653,
+     "desequilibrio_medio": 0.277
+    },
+    "subidas_nas_partidas": [
+     10
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 8,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 1,
+     "rebaixamentos": 2,
+     "em_risco": 3,
+     "tamanho_da_elite": [
+      14,
+      16
+     ]
+    }
+   }
+  },
+  "24h": {
+   "baixo": {
+    "faixa": "baixo",
+    "gemeo": "R01",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 55,
+    "derrotas": 65,
+    "empates": 0,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Iron III 41 PR",
+     "percentil": 4.8
+    },
+    "pr_medio": {
+     "vitoria": 20.5,
+     "derrota": -16.5,
+     "empate": null
+    },
+    "pr_extremos": [
+     -30,
+     31
+    ],
+    "promocoes": 6,
+    "rebaixamentos": 5,
+    "escudo_segurou": 4,
+    "oscilacoes": 3,
+    "trocas_de_rank_visivel": 0,
+    "partidas_por_promocao": 18.5,
+    "distancia_media_ao_alvo": 37.8,
+    "distancia_p90_ao_alvo": 73.82795698924733,
+    "rank_visivel_igual_ao_do_percentil": 0.991,
+    "candidato": {
+     "primeira_vez_na_partida": null,
+     "partidas_como_candidato": 0,
+     "horas_de_jogo_como_candidato": 0.0
+    },
+    "elite": {
+     "entrada_na_partida": null,
+     "avaliacoes": []
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "Iron III 23 PR",
+      "percentil": 3.8
+     },
+     "5h": {
+      "exibicao": "Iron II 77 PR",
+      "percentil": 9.1
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "Iron II 25 PR",
+     "titulo": null,
+     "mmr": 1033.0,
+     "rd": 62.1,
+     "percentil": 7.5,
+     "rank_do_percentil": "Iron"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 35,
+     "repetidos_nas_ultimas_10": 2,
+     "taxa_de_repeticao": 0.017,
+     "chance_media": 0.463,
+     "desequilibrio_medio": 0.111
+    },
+    "subidas_nas_partidas": [
+     10,
+     19,
+     75,
+     82,
+     96,
+     114,
+     120
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 2,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 0,
+     "rebaixamentos": 0,
+     "em_risco": 0,
+     "tamanho_da_elite": [
+      15,
+      15
+     ]
+    }
+   },
+   "intermediario": {
+    "faixa": "intermediario",
+    "gemeo": "W26",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 61,
+    "derrotas": 59,
+    "empates": 0,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Platinum V 60 PR",
+     "percentil": 49.5
+    },
+    "pr_medio": {
+     "vitoria": 16.6,
+     "derrota": -17.8,
+     "empate": null
+    },
+    "pr_extremos": [
+     -29,
+     28
+    ],
+    "promocoes": 6,
+    "rebaixamentos": 7,
+    "escudo_segurou": 8,
+    "oscilacoes": 4,
+    "trocas_de_rank_visivel": 5,
+    "partidas_por_promocao": 18.5,
+    "distancia_media_ao_alvo": 45.3,
+    "distancia_p90_ao_alvo": 84.21009098428453,
+    "rank_visivel_igual_ao_do_percentil": 0.811,
+    "candidato": {
+     "primeira_vez_na_partida": null,
+     "partidas_como_candidato": 0,
+     "horas_de_jogo_como_candidato": 0.0
+    },
+    "elite": {
+     "entrada_na_partida": null,
+     "avaliacoes": []
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "Platinum V 0 PR",
+      "percentil": 47.8
+     },
+     "5h": {
+      "exibicao": "Gold I 0 PR",
+      "percentil": 45.2
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "Gold I 67 PR",
+     "titulo": null,
+     "mmr": 1518.0,
+     "rd": 62.0,
+     "percentil": 48.4,
+     "rank_do_percentil": "Platinum"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 57,
+     "repetidos_nas_ultimas_10": 0,
+     "taxa_de_repeticao": 0.0,
+     "chance_media": 0.501,
+     "desequilibrio_medio": 0.102
+    },
+    "subidas_nas_partidas": [
+     10,
+     39,
+     45,
+     71,
+     77,
+     98,
+     107
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 2,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 0,
+     "rebaixamentos": 0,
+     "em_risco": 1,
+     "tamanho_da_elite": [
+      15,
+      15
+     ]
+    }
+   },
+   "alto": {
+    "faixa": "alto",
+    "gemeo": "W80",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 62,
+    "derrotas": 58,
+    "empates": 0,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Sapphire I 42 PR",
+     "percentil": 78.0
+    },
+    "pr_medio": {
+     "vitoria": 17.5,
+     "derrota": -16.8,
+     "empate": null
+    },
+    "pr_extremos": [
+     -33,
+     29
+    ],
+    "promocoes": 4,
+    "rebaixamentos": 4,
+    "escudo_segurou": 2,
+    "oscilacoes": 1,
+    "trocas_de_rank_visivel": 4,
+    "partidas_por_promocao": 27.8,
+    "distancia_media_ao_alvo": 58.7,
+    "distancia_p90_ao_alvo": 129.6821983273603,
+    "rank_visivel_igual_ao_do_percentil": 0.82,
+    "candidato": {
+     "primeira_vez_na_partida": null,
+     "partidas_como_candidato": 0,
+     "horas_de_jogo_como_candidato": 0.0
+    },
+    "elite": {
+     "entrada_na_partida": null,
+     "avaliacoes": []
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "Sapphire I 71 PR",
+      "percentil": 79.0
+     },
+     "5h": {
+      "exibicao": "Diamond V 67 PR",
+      "percentil": 78.5
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "Sapphire I 87 PR",
+     "titulo": null,
+     "mmr": 1849.1,
+     "rd": 62.0,
+     "percentil": 78.0,
+     "rank_do_percentil": "Sapphire"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 52,
+     "repetidos_nas_ultimas_10": 0,
+     "taxa_de_repeticao": 0.0,
+     "chance_media": 0.502,
+     "desequilibrio_medio": 0.1
+    },
+    "subidas_nas_partidas": [
+     10,
+     26,
+     50,
+     75,
+     112
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 2,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 0,
+     "rebaixamentos": 0,
+     "em_risco": 0,
+     "tamanho_da_elite": [
+      15,
+      15
+     ]
+    }
+   },
+   "fronteira": {
+    "faixa": "fronteira",
+    "gemeo": "W86",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 63,
+    "derrotas": 57,
+    "empates": 0,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Obsidian V 91 PR",
+     "percentil": 87.1
+    },
+    "pr_medio": {
+     "vitoria": 17.5,
+     "derrota": -18.6,
+     "empate": null
+    },
+    "pr_extremos": [
+     -34,
+     37
+    ],
+    "promocoes": 7,
+    "rebaixamentos": 7,
+    "escudo_segurou": 3,
+    "oscilacoes": 5,
+    "trocas_de_rank_visivel": 6,
+    "partidas_por_promocao": 15.9,
+    "distancia_media_ao_alvo": 46.0,
+    "distancia_p90_ao_alvo": 113.67127496159765,
+    "rank_visivel_igual_ao_do_percentil": 0.928,
+    "candidato": {
+     "primeira_vez_na_partida": null,
+     "partidas_como_candidato": 0,
+     "horas_de_jogo_como_candidato": 0.0
+    },
+    "elite": {
+     "entrada_na_partida": null,
+     "avaliacoes": []
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "Obsidian IV 62 PR",
+      "percentil": 88.7
+     },
+     "5h": {
+      "exibicao": "Obsidian V 0 PR",
+      "percentil": 85.5
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "Obsidian V 23 PR",
+     "titulo": null,
+     "mmr": 1959.5,
+     "rd": 62.2,
+     "percentil": 86.6,
+     "rank_do_percentil": "Obsidian"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 45,
+     "repetidos_nas_ultimas_10": 0,
+     "taxa_de_repeticao": 0.0,
+     "chance_media": 0.519,
+     "desequilibrio_medio": 0.117
+    },
+    "subidas_nas_partidas": [
+     10,
+     11,
+     19,
+     25,
+     42,
+     85,
+     98,
+     106
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 2,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 0,
+     "rebaixamentos": 0,
+     "em_risco": 2,
+     "tamanho_da_elite": [
+      15,
+      15
+     ]
+    }
+   },
+   "elite": {
+    "faixa": "elite",
+    "gemeo": "M32",
+    "partidas": 120,
+    "horas": 6.0,
+    "vitorias": 85,
+    "derrotas": 34,
+    "empates": 1,
+    "anuladas": 0,
+    "posicionamento": {
+     "na_partida": 10,
+     "exibicao": "Obsidian I 0 PR",
+     "percentil": 97.3
+    },
+    "pr_medio": {
+     "vitoria": 31.1,
+     "derrota": -4.3,
+     "empate": null
+    },
+    "pr_extremos": [
+     -6,
+     58
+    ],
+    "promocoes": 0,
+    "rebaixamentos": 0,
+    "escudo_segurou": 0,
+    "oscilacoes": 0,
+    "trocas_de_rank_visivel": 1,
+    "partidas_por_promocao": null,
+    "distancia_media_ao_alvo": null,
+    "distancia_p90_ao_alvo": null,
+    "rank_visivel_igual_ao_do_percentil": 0.0,
+    "candidato": {
+     "primeira_vez_na_partida": 13,
+     "partidas_como_candidato": 28,
+     "horas_de_jogo_como_candidato": 1.4
+    },
+    "elite": {
+     "entrada_na_partida": 41,
+     "avaliacoes": [
+      {
+       "n": 41,
+       "evento": "promocao_a_elite",
+       "para": "International Master"
+      }
+     ]
+    },
+    "marcos": {
+     "2h": {
+      "exibicao": "Obsidian I 100 PR (candidato)",
+      "percentil": 98.4
+     },
+     "5h": {
+      "exibicao": "International Master ★",
+      "percentil": 98.4
+     },
+     "10h": null
+    },
+    "final": {
+     "exibicao": "International Master ★",
+     "titulo": "Definitive Master",
+     "mmr": 2495.1,
+     "rd": 70.2,
+     "percentil": 98.4,
+     "rank_do_percentil": "International Master"
+    },
+    "matchmaking": {
+     "oponentes_distintos": 18,
+     "repetidos_nas_ultimas_10": 39,
+     "taxa_de_repeticao": 0.325,
+     "chance_media": 0.653,
+     "desequilibrio_medio": 0.277
+    },
+    "subidas_nas_partidas": [
+     10
+    ],
+    "divergencias_de_mmr": 0,
+    "top5": {
+     "atualizacoes": 2,
+     "mudaram": 0,
+     "nomes_trocados": 0,
+     "conjuntos_distintos": 1
+    },
+    "elite_por_atualizacao": {
+     "promocoes": 1,
+     "rebaixamentos": 2,
+     "em_risco": 2,
+     "tamanho_da_elite": [
+      14,
+      16
+     ]
+    }
+   }
+  }
+ },
+ "mundo": {
+  "baixo": {
+   "partidas": 288,
+   "empates": 1,
+   "rodadas_dos_empates": [
+    279
+   ],
+   "cpu_s_do_jogador": 474.2,
+   "cpu_s_do_mundo": 1695.6
+  },
+  "intermediario": {
+   "partidas": 288,
+   "empates": 1,
+   "rodadas_dos_empates": [
+    279
+   ],
+   "cpu_s_do_jogador": 698.8,
+   "cpu_s_do_mundo": 1708.9
+  },
+  "alto": {
+   "partidas": 288,
+   "empates": 1,
+   "rodadas_dos_empates": [
+    279
+   ],
+   "cpu_s_do_jogador": 641.5,
+   "cpu_s_do_mundo": 1684.8
+  },
+  "fronteira": {
+   "partidas": 288,
+   "empates": 0,
+   "rodadas_dos_empates": [],
+   "cpu_s_do_jogador": 435.5,
+   "cpu_s_do_mundo": 1648.4
+  },
+  "elite": {
+   "partidas": 288,
+   "empates": 0,
+   "rodadas_dos_empates": [],
+   "cpu_s_do_jogador": 1617.3,
+   "cpu_s_do_mundo": 1544.4
+  }
+ }
+}

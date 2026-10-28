@@ -29,8 +29,11 @@ Resolvido na 6.1, e medido com os 186:
 - **Partida sem fim** → empate técnico por impasse (150 rodadas sem desgaste
   novo, teto de 1.000), para NPC × NPC e para o jogador.
 - **Repetição de adversário** → custo progressivo; a repetição nas últimas 10
-  some fora do topo, e no topo cai de 56% para 16% (modelo). Com 5.000 a mesma
-  regra vale sem mudança.
+  some fora do topo, e no topo cai de 56% para 16% (modelo). Nas carreiras reais
+  da 6.1 (120 partidas por faixa), fica entre 0% e 1,7% nas faixas baixa, média,
+  alta e na fronteira, e em **32,5% na elite**, com chance média de 0,65: com
+  186 gladiadores o topo tem poucos rivais, e o modelo subestimou isso. Com 5.000
+  a mesma regra vale sem mudança.
 - **Rank piscando na fronteira** → a divisão visível anda pelo PR, com escudo e
   rebaixamento pousando em 75: na carreira W26 da Fase 6, de 71 trocas de rank
   por percentil para 5 trocas de rank visível.
