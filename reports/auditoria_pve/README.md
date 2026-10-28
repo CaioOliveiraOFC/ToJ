@@ -316,16 +316,43 @@ altera política.
 - As leis que dependem do HERÓI aplicar a peça disparam pouco, porque ele quase
   não lança carta de status (4.3).
 - O que dispara é, na maioria, o monstro, ou o proc de passiva.
-- Toxicidade (veneno em alvo Frágil) não disparou: `frailty` só vem do suporte e
-  de 4 cartas de herói, e apareceu em 2 runs.
+- **Quebra Gélida (1 disparo)** precisa de alvo congelado + crítico. Na amostra, o
+  congelamento só caiu no HERÓI (49 de 92 tentativas, nas extraídas), lançado por
+  monstro, e monstro quase não crita (61 críticos em 25.897 turnos de monstro,
+  contra 1.481 do herói). O herói nunca congelou um monstro.
+- **Toxicidade (0)** precisa de veneno entrando em alvo Frágil. `frailty` nunca
+  caiu no herói e só caiu no monstro 12 vezes, em 2 runs das extraídas. O herói
+  envenena pouco por carta (4 de 4 tentativas), e o resto vem de proc.
 
-**Status por efeito:** tabela em `status.md`. A contagem por evento `*_applied`
-não enxerga o status PRINCIPAL de uma carta de status, que só aparece no resultado
-da skill. A segunda passada (`resultados.jsonl`) conta os dois caminhos. Frozen,
-sleep, invisible e hexed estão marcados a partir dela; a primeira os mostrava
-como zero, e isso era ausência de instrumentação, não de execução. A prova
-indireta já existia: Emboscada (exige invisível) e Sono e Dor (exige sono)
-dispararam.
+**Status por efeito** — a tabela está em [`status.md`](status.md).
+- A contagem por evento `*_applied` não enxerga o status PRINCIPAL de uma carta de
+  status, que só aparece no resultado da skill. A primeira passada usou só o
+  evento.
+- A segunda passada (`resultados.jsonl`) conta os dois caminhos. Ela corrigiu:
+  - congelado e sono no herói, lançados por monstro;
+  - a invisibilidade que o monstro lança em si mesmo (113 de 113);
+  - um amaldiçoado.
+- Eles apareciam como zero, e isso era ausência de instrumentação, não de
+  execução. A prova indireta já existia: Emboscada (exige invisível) e Sono e Dor
+  (exige sono) dispararam.
+- **Nunca aplicados por nada na amostra:** os 7 efeitos positivos dos pares
+  (`empowered`, `arcane_surge`, `quickened`, `fortified`, `vitality`, `focused`,
+  `precision`).
+- O herói aplica status no monstro quase todo por secundário de carta de dano,
+  `stun` e proc de passiva. Nas extraídas:
+
+  | efeito | aplicações no monstro |
+  |---|---:|
+  | vulnerable | 1.095 |
+  | bleed | 868 |
+  | slowed | 765 |
+  | fear | 561 |
+  | stun | 544 |
+
+  Pela carta de status propriamente dita, foram 30.
+- A segunda passada repetiu as 150 runs. **Todos os outros contadores e a ficha
+  final saíram idênticos aos da primeira**: o determinismo das sondas foi
+  conferido duas vezes.
 
 ### 4.7 Extração e OP
 
@@ -403,7 +430,7 @@ dispararam.
 | Efeito por passiva | **ausência de instrumentação** | — | NÃO MENSURADO (exige A/B por carta) |
 | Efeito do reroll da Loja | **ausência de instrumentação** | — | NÃO MENSURADO |
 | Dano mitigado e dano de cada lei | **ausência de instrumentação** | `Observador` só vê o dano final | NÃO MENSURADO |
-| Status principal de carta de status (1ª passada) | **ausência de instrumentação** (corrigida) | o evento sai só em `COMBAT_SKILL_OUTCOME` | corrigido na 2ª passada |
+| Status principal de carta de status (1ª passada) | **ausência de instrumentação** (corrigida) | o evento sai só em `COMBAT_SKILL_OUTCOME` | corrigido na 2ª passada, 150/150 contadores idênticos |
 
 ---
 
@@ -473,7 +500,9 @@ python reports/auditoria_pve/ferramentas/matriz.py <abs>/resultados.jsonl matriz
   reprodução.
 - A sonda de status principal entrou na segunda passada. Todos os outros
   contadores da segunda passada são idênticos aos da primeira, e o determinismo
-  das sondas foi conferido assim.
+  das sondas foi conferido assim. A conferência é a primeira linha de
+  `status.md`: `python reports/auditoria_pve/ferramentas/status.py
+  <resultados.jsonl> <primeira_passada.jsonl>`.
 
 ---
 
