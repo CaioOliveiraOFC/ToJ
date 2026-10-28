@@ -100,3 +100,5 @@ reports/ranked/*
 
 # Graphify (cache de grafo)
 graphify-out/
+# Auditoria de cobertura PvE das runs geradoras (relatório, matriz, amostra e ferramentas).
+!reports/auditoria_pve/
