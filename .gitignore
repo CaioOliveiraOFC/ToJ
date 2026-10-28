@@ -88,6 +88,9 @@ reports/ranked/*
 !reports/ranked/holdout2.jsonl
 !reports/ranked/comparacao_ampliada.json
 !reports/ranked/grind/
+# A Fase 6.1 (`tools/ranked_progressao.py`): trajetórias, impasse, fórmula de PR,
+# repetição, as carreiras e o relatório. `_trabalho/` (checkpoints) fica de fora.
+!reports/ranked/fase61/
 
 # IDEs
 .idea/

@@ -6,8 +6,9 @@ rende mais. Com dois jogadores, o grafo de fatores tem solução fechada: as
 funções v e w da normal truncada.
 
 `tau` é a dinâmica: antes de cada partida σ² cresce τ², e a incerteza nunca
-zera. Sem empate na Arena: `prob_empate` existe só para conferir a
-implementação contra o exemplo publicado, que usa 10%.
+zera. O empate só existe com `prob_empate` maior que zero (a margem de empate
+do modelo); com zero, o modelo não tem como explicar um empate e recusa. O
+TrueSkill não é o sistema do jogo (`sistema.py`): fica para comparação.
 """
 
 from __future__ import annotations
@@ -38,6 +39,20 @@ def _v(t: float, eps: float) -> float:
 def _w(t: float, eps: float) -> float:
     v = _v(t, eps)
     return v * (v + t - eps)
+
+
+def _v_empate(t: float, eps: float) -> float:
+    a, b = eps - abs(t), -eps - abs(t)
+    den = _NORMAL.cdf(a) - _NORMAL.cdf(b)
+    v = (_NORMAL.pdf(b) - _NORMAL.pdf(a)) / den if den > 1e-300 else a
+    return -v if t < 0 else v
+
+
+def _w_empate(t: float, eps: float) -> float:
+    a, b = eps - abs(t), -eps - abs(t)
+    den = _NORMAL.cdf(a) - _NORMAL.cdf(b)
+    v = _v_empate(abs(t), eps)
+    return v * v + (a * _NORMAL.pdf(a) - b * _NORMAL.pdf(b)) / den
 
 
 class TrueSkill:
@@ -100,15 +115,25 @@ class TrueSkill:
         return _NORMAL.inv_cdf((self.prob_empate + 1.0) / 2.0) * math.sqrt(2.0) * self.beta
 
     def partida(
-        self, a: RatingTrueSkill, b: RatingTrueSkill, a_venceu: bool
+        self, a: RatingTrueSkill, b: RatingTrueSkill, pontos_de_a: float
     ) -> tuple[RatingTrueSkill, RatingTrueSkill]:
+        """`pontos_de_a`: 1 (vitória de `a`), ½ (empate) ou 0; `True`/`False` valem 1 e 0."""
+        pontos = float(pontos_de_a)
+        if pontos not in (0.0, 0.5, 1.0):
+            raise ValueError(f"resultado {pontos_de_a!r}: só 1, ½ ou 0")
+        if pontos == 0.5 and self.prob_empate <= 0:
+            raise ValueError("TrueSkill sem margem de empate (prob_empate = 0)")
+        a_venceu = pontos >= 0.5
         vencedor, perdedor = (a, b) if a_venceu else (b, a)
         var_v = vencedor.sigma**2 + self.tau**2
         var_p = perdedor.sigma**2 + self.tau**2
         c = math.sqrt(2.0 * self.beta**2 + var_v + var_p)
         t = (vencedor.mu - perdedor.mu) / c
         eps = self._margem() / c
-        v, w = _v(t, eps), _w(t, eps)
+        if pontos == 0.5:
+            v, w = _v_empate(t, eps), _w_empate(t, eps)
+        else:
+            v, w = _v(t, eps), _w(t, eps)
         novo_v = RatingTrueSkill(
             vencedor.mu + var_v / c * v, math.sqrt(var_v * max(1e-12, 1.0 - var_v / c**2 * w))
         )

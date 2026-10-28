@@ -1,0 +1,296 @@
+{
+ "parametros": {
+  "janela": 150,
+  "margem": 0.01,
+  "teto": 1000
+ },
+ "partidas_gravadas_da_fase6": {
+  "com_vencedor": 1781,
+  "sem_vencedor_em_500": 2,
+  "rodadas_p50_p90_p99_max": [
+   18,
+   44,
+   124,
+   474
+  ]
+ },
+ "trajetorias": {
+  "total": 242,
+  "por_grupo": {
+   "impasse_fase6": 15,
+   "longo": 27,
+   "comum": 200
+  },
+  "impasses_da_fase6_que_terminaram_ate_1500": 8,
+  "sem_fim_em_1500": [
+   "M33×R31",
+   "R31×M33",
+   "R31×M33",
+   "R31×M33",
+   "R31×M33",
+   "R31×M33",
+   "R31×M33"
+  ]
+ },
+ "maiores_esperas_em_partidas_terminadas": [
+  {
+   "espera": 826,
+   "rodadas": 1002,
+   "dupla": "R31×M32"
+  },
+  {
+   "espera": 293,
+   "rodadas": 786,
+   "dupla": "M33×M27"
+  },
+  {
+   "espera": 285,
+   "rodadas": 957,
+   "dupla": "R31×M32"
+  },
+  {
+   "espera": 242,
+   "rodadas": 649,
+   "dupla": "R31×M32"
+  },
+  {
+   "espera": 227,
+   "rodadas": 441,
+   "dupla": "M32×R31"
+  },
+  {
+   "espera": 189,
+   "rodadas": 509,
+   "dupla": "R31×M27"
+  },
+  {
+   "espera": 177,
+   "rodadas": 696,
+   "dupla": "R31×M32"
+  },
+  {
+   "espera": 173,
+   "rodadas": 474,
+   "dupla": "M27×M33"
+  },
+  {
+   "espera": 167,
+   "rodadas": 811,
+   "dupla": "R31×M32"
+  },
+  {
+   "espera": 159,
+   "rodadas": 304,
+   "dupla": "M20×W77"
+  },
+  {
+   "espera": 134,
+   "rodadas": 540,
+   "dupla": "R31×M32"
+  },
+  {
+   "espera": 50,
+   "rodadas": 242,
+   "dupla": "W05×W44"
+  }
+ ],
+ "janelas": {
+  "100": {
+   "ko_que_viram_empate": [
+    {
+     "dupla": "M33×M27",
+     "ko_na_rodada": 786,
+     "empate_na": 463
+    },
+    {
+     "dupla": "M20×W77",
+     "ko_na_rodada": 304,
+     "empate_na": 243
+    },
+    {
+     "dupla": "M27×M33",
+     "ko_na_rodada": 474,
+     "empate_na": 206
+    },
+    {
+     "dupla": "M32×R31",
+     "ko_na_rodada": 441,
+     "empate_na": 267
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 811,
+     "empate_na": 269
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 1002,
+     "empate_na": 251
+    },
+    {
+     "dupla": "R31×M27",
+     "ko_na_rodada": 509,
+     "empate_na": 418
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 957,
+     "empate_na": 255
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 696,
+     "empate_na": 343
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 649,
+     "empate_na": 423
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 540,
+     "empate_na": 226
+    }
+   ],
+   "sem_fim_encerradas_em": [
+    289,
+    256,
+    308,
+    224,
+    275,
+    371,
+    364
+   ]
+  },
+  "150": {
+   "ko_que_viram_empate": [
+    {
+     "dupla": "M33×M27",
+     "ko_na_rodada": 786,
+     "empate_na": 614
+    },
+    {
+     "dupla": "M20×W77",
+     "ko_na_rodada": 304,
+     "empate_na": 293
+    },
+    {
+     "dupla": "M27×M33",
+     "ko_na_rodada": 474,
+     "empate_na": 256
+    },
+    {
+     "dupla": "M32×R31",
+     "ko_na_rodada": 441,
+     "empate_na": 317
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 811,
+     "empate_na": 620
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 1002,
+     "empate_na": 301
+    },
+    {
+     "dupla": "R31×M27",
+     "ko_na_rodada": 509,
+     "empate_na": 468
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 957,
+     "empate_na": 512
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 696,
+     "empate_na": 598
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 649,
+     "empate_na": 473
+    }
+   ],
+   "sem_fim_encerradas_em": [
+    339,
+    306,
+    358,
+    274,
+    325,
+    421,
+    414
+   ]
+  },
+  "200": {
+   "ko_que_viram_empate": [
+    {
+     "dupla": "M33×M27",
+     "ko_na_rodada": 786,
+     "empate_na": 664
+    },
+    {
+     "dupla": "M32×R31",
+     "ko_na_rodada": 441,
+     "empate_na": 367
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 1002,
+     "empate_na": 351
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 957,
+     "empate_na": 562
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 649,
+     "empate_na": 523
+    }
+   ],
+   "sem_fim_encerradas_em": [
+    389,
+    356,
+    408,
+    774,
+    870,
+    471,
+    464
+   ]
+  },
+  "250": {
+   "ko_que_viram_empate": [
+    {
+     "dupla": "M33×M27",
+     "ko_na_rodada": 786,
+     "empate_na": 714
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 1002,
+     "empate_na": 401
+    },
+    {
+     "dupla": "R31×M32",
+     "ko_na_rodada": 957,
+     "empate_na": 612
+    }
+   ],
+   "sem_fim_encerradas_em": [
+    439,
+    406,
+    458,
+    824,
+    920,
+    521,
+    514
+   ]
+  }
+ }
+}

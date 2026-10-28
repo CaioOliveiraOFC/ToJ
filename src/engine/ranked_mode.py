@@ -7,10 +7,19 @@ não troca o oponente. O duelo é o mesmo da Arena (`arena_mode.duel`, a IA
 estratégica do outro lado), com a semente da partida tirada do mundo.
 
 Depois da partida, a Ladder atualiza os dois lados e grava `saves/ranked.json`.
-As 10 primeiras partidas de cada gladiador são de posicionamento; o rank só
-aparece depois delas. Enquanto o jogador está nos menus, o `AgendadorDoMundo`
-joga a fila de confrontos NPC × NPC em segundo plano; antes de cada duelo do
-jogador, ele para.
+As 10 primeiras partidas de cada gladiador são de posicionamento; a divisão só
+aparece depois delas. Daí em diante o painel mostra a divisão e a barra de PR
+(`ranked/progressao.py`), a candidatura a Master e a elite, e a leaderboard
+publicada (`ranked/leaderboard.py`), atualizada por ciclos: ao abrir, depois de
+cada partida e a cada volta ao painel. Enquanto o jogador está nos menus, o
+`AgendadorDoMundo` joga a fila de confrontos NPC × NPC em segundo plano; antes
+de cada duelo do jogador, ele para.
+
+O duelo do jogador tem o mesmo árbitro de impasse dos NPCs
+(`ranked/impasse.py`): uma partida em que ninguém se desgasta mais vira empate
+técnico. Um erro técnico no duelo anula a partida (nada muda além do
+histórico); uma interrupção pelo teclado também, e o adversário continua
+reservado.
 
 Como no Duelo Livre, ninguém morre, o save do personagem não muda e não há XP
 nem ouro.
@@ -25,8 +34,9 @@ from src.engine import arena_mode, arena_setup
 from src.engine.arena_historico import identidade_do_gladiador
 from src.engine.arena_populacao import Populacao, PopulacaoInvalidaError
 from src.engine.ranked_mundo import AgendadorDoMundo, MundoRanqueado, RankedInvalidaError
-from src.ranked import matchmaking
-from src.ranked.ladder import POSICIONAMENTO
+from src.ranked import leaderboard, matchmaking, progressao
+from src.ranked.impasse import ArbitroDeImpasse
+from src.ranked.ladder import ANULADA, DERROTA, EMPATE, POSICIONAMENTO, VITORIA
 from src.storage.save_manager import load_save_data
 from src.ui import arena_screens, ranked_screens
 from src.ui.prompts import safe_get_key
@@ -42,24 +52,68 @@ def _nome(mundo: MundoRanqueado, identidade: str) -> str:
     return mundo.ladder[identidade].nome
 
 
+def _ciclo(mundo: MundoRanqueado) -> dict:
+    lb = mundo.leaderboard
+    return {
+        "publicada_em": lb.publicada_em,
+        "proxima": lb.proxima(),
+        "periodo": lb.periodo,
+        "adiada": lb.adiada,
+    }
+
+
+def elegibilidade(mundo: MundoRanqueado, identidade: str) -> dict:
+    """O que a próxima atualização vai olhar num Candidato a Master, com os valores de agora."""
+    ladder = mundo.ladder
+    percentil = ladder.percentil(identidade)
+    incerteza = ladder.incerteza(identidade)
+    return {
+        "percentil": percentil,
+        "minimo": leaderboard.MINIMO_DA_ELITE,
+        "percentil_ok": percentil is not None and percentil >= leaderboard.MINIMO_DA_ELITE,
+        "incerteza": incerteza,
+        "incerteza_maxima": leaderboard.RD_MAXIMO_PARA_PROMOVER,
+        "incerteza_ok": incerteza <= leaderboard.RD_MAXIMO_PARA_PROMOVER,
+    }
+
+
+def legivel(evento: dict) -> dict:
+    """O evento com o nome das divisões, para a tela (que não conhece a régua)."""
+    pronto = dict(evento)
+    for chave in ("de", "para"):
+        valor = evento.get(chave)
+        if isinstance(valor, int) and not isinstance(valor, bool):
+            pronto[f"{chave}_nome"] = progressao.nome_da_divisao(valor)
+    return pronto
+
+
+def _linha_do_historico(mundo: MundoRanqueado, e: dict) -> dict:
+    ladder = mundo.ladder
+    resultado = e.get("resultado") or (
+        ANULADA if e["venceu"] is None else (VITORIA if e["venceu"] else DERROTA)
+    )
+    return {
+        "n": e["n"],
+        "oponente": _nome(mundo, e["oponente"]) if e["oponente"] in ladder else e["oponente"],
+        "resultado": resultado,
+        "motivo": e.get("motivo"),
+        "antes": e["antes"],
+        "depois": e["depois"],
+        "pr": e.get("pr"),
+    }
+
+
 def status(mundo: MundoRanqueado, identidade: str) -> dict:
     ladder = mundo.ladder
     registro = ladder[identidade]
-    recentes = [
-        {
-            "n": e["n"],
-            "oponente": _nome(mundo, e["oponente"]) if e["oponente"] in ladder else e["oponente"],
-            "venceu": e["venceu"],
-            "antes": e["antes"],
-            "depois": e["depois"],
-        }
-        for e in reversed(registro.historico[-RECENTES_NO_PAINEL:])
-    ]
+    p = registro.progresso
+    publicada = mundo.leaderboard.linha(identidade)
     return {
         "nome": registro.nome,
         "classe": registro.classe.capitalize(),
         "vitorias": registro.vitorias,
         "derrotas": registro.derrotas,
+        "empates": registro.empates,
         "partidas": registro.partidas,
         "posicionamento": POSICIONAMENTO,
         "posicionado": registro.posicionado,
@@ -69,9 +123,24 @@ def status(mundo: MundoRanqueado, identidade: str) -> dict:
         "posicao": ladder.posicao(identidade),
         "competitivos": ladder.competitivos(),
         "percentil": ladder.percentil(identidade),
-        "rank": ladder.rank(identidade),
-        "titulo": ladder.titulo(identidade),
-        "recentes": recentes,
+        "rank_do_mmr": ladder.rank(identidade),
+        "alvo": None if ladder.alvo(identidade) is None else _nome_do_alvo(ladder.alvo(identidade)),
+        "divisao": None if p.divisao is None else progressao.nome_da_divisao(p.divisao),
+        "pr": p.pr,
+        "escudo": p.escudo,
+        "candidato": p.candidato,
+        "elegibilidade": elegibilidade(mundo, identidade) if p.candidato else None,
+        "elite": p.elite,
+        "risco": p.risco,
+        "titulo": p.titulo,
+        "posicao_publicada": None if publicada is None else publicada["posicao"],
+        "variacao": mundo.leaderboard.variacao(identidade),
+        "ciclo": _ciclo(mundo),
+        "eventos": [legivel(e) for e in reversed(registro.eventos[-3:])],
+        "recentes": [
+            _linha_do_historico(mundo, e)
+            for e in reversed(registro.historico[-RECENTES_NO_PAINEL:])
+        ],
         "mundo": (
             f"Mundo: {mundo.ladder.partidas_jogadas} partidas registradas, "
             f"{mundo.fila} confrontos NPC × NPC na fila"
@@ -79,25 +148,29 @@ def status(mundo: MundoRanqueado, identidade: str) -> dict:
     }
 
 
+def _nome_do_alvo(meta: float) -> str:
+    """A coordenada do alvo em palavras: a divisão, ou o rank de elite que o percentil daria."""
+    if meta >= progressao.TOPO:
+        indice = min(
+            len(progressao.ELITE) - 1, int((meta - progressao.TOPO) // progressao.POR_RANK)
+        )
+        return progressao.ELITE[indice]
+    return progressao.nome_da_divisao(int(meta // progressao.PR_POR_DIVISAO))
+
+
 def linhas_da_classificacao(mundo: MundoRanqueado) -> list[dict]:
-    ladder = mundo.ladder
-    total = ladder.competitivos()
+    """A leaderboard PUBLICADA (o último retrato), com a variação desde o anterior."""
+    lb = mundo.leaderboard
     linhas = []
-    for posicao, registro in enumerate(ladder.classificacao(), start=1):
+    for linha in lb.linhas:
+        identidade = linha["identidade"]
         linhas.append(
             {
-                "posicao": posicao,
-                "identidade": registro.identidade,
-                "nome": registro.nome,
-                "classe": registro.classe.capitalize(),
-                "rank": ladder.rank(registro.identidade),
-                "titulo": ladder.titulo(registro.identidade),
-                "percentil": 100.0 if total == 1 else 100.0 * (total - posicao) / (total - 1),
-                "rating": ladder.valor(registro.identidade),
-                "incerteza": ladder.incerteza(registro.identidade),
-                "vitorias": registro.vitorias,
-                "derrotas": registro.derrotas,
-                "jogador": not registro.npc,
+                **linha,
+                "classe": linha["classe"].capitalize(),
+                "rank": linha["exibicao"],
+                "incerteza": linha["rd"],
+                "variacao": lb.variacao(identidade),
             }
         )
     return linhas
@@ -116,7 +189,11 @@ def mostrar_classificacao(mundo: MundoRanqueado, destaque: str | None = None) ->
     while True:
         inicio = pagina * POR_PAGINA
         ranked_screens.render_leaderboard(
-            linhas[inicio : inicio + POR_PAGINA], pagina + 1, paginas, len(linhas)
+            linhas[inicio : inicio + POR_PAGINA],
+            pagina + 1,
+            paginas,
+            len(linhas),
+            _ciclo(mundo),
         )
         tecla = safe_get_key(valid_keys=["a", "d", "q"])
         if tecla in (None, "q"):
@@ -124,7 +201,7 @@ def mostrar_classificacao(mundo: MundoRanqueado, destaque: str | None = None) ->
         pagina = (pagina + (1 if tecla == "d" else -1)) % paginas
 
 
-def _partida(mundo, identidade, personagem, publish, controlador) -> bool:
+def _partida(mundo, identidade, personagem, publish, controlador, relogio) -> bool:
     """Busca o adversário, mostra, joga e registra. `False` se o jogador voltou."""
     oponente_id = mundo.adversario(identidade)
     oponente = mundo.populacao.get(oponente_id)
@@ -144,7 +221,8 @@ def _partida(mundo, identidade, personagem, publish, controlador) -> bool:
             "nome": oponente.apelido,
             "classe": oponente.nome_da_classe,
             "nivel": oponente.nivel,
-            "rank": ladder.rank(oponente_id),
+            "exibicao": ladder.exibicao(oponente_id),
+            "titulo": ladder.titulo(oponente_id),
             "percentil": ladder.percentil(oponente_id),
             "rating": ladder.valor(oponente_id),
             "fase": matchmaking.fase(ladder[identidade].partidas),
@@ -155,36 +233,86 @@ def _partida(mundo, identidade, personagem, publish, controlador) -> bool:
         return False
     probabilidade = ladder.esperado(identidade, oponente_id)
     rng = random.Random(mundo.semente_da_partida(identidade))
-    duelo = arena_mode.duel(
-        personagem, gladiador, rng=rng, publish=publish, controlador=controlador
-    )
-    venceu = duelo.result.winner == arena_mode.JOGADOR
-    estava_posicionado = ladder[identidade].posicionado
-    atualizacao = mundo.registrar_do_jogador(identidade, oponente_id, venceu)
+    arbitro = ArbitroDeImpasse()
+    registro = ladder[identidade]
+    antes = {
+        "divisao": registro.progresso.divisao,
+        "elite": registro.progresso.elite,
+        "posicionado": registro.posicionado,
+    }
+    try:
+        duelo = arena_mode.duel(
+            personagem,
+            gladiador,
+            rng=rng,
+            publish=publish,
+            controlador=controlador,
+            arbitro=arbitro,
+        )
+    except KeyboardInterrupt:
+        mundo.registrar_do_jogador(identidade, oponente_id, ANULADA, motivo="interrompida")
+        raise
+    except Exception as erro:  # noqa: BLE001 — erro técnico anula a partida
+        motivo = f"erro técnico: {type(erro).__name__}"
+        mundo.registrar_do_jogador(identidade, oponente_id, ANULADA, motivo=motivo)
+        arena_screens.render_notice(
+            f"A partida foi ANULADA por um erro técnico ({type(erro).__name__}). "
+            "Rating, PR e posicionamento não mudaram.",
+            "red",
+        )
+        safe_get_key(allow_escape=False)
+        return True
+    if duelo.finished:
+        venceu = duelo.result.winner == arena_mode.JOGADOR
+        resultado, motivo = (VITORIA if venceu else DERROTA), duelo.result.reason
+    else:
+        resultado, motivo = EMPATE, arbitro.veredito.motivo
+    atualizacao = mundo.registrar_do_jogador(identidade, oponente_id, resultado, motivo=motivo)
+    resumo = mundo.atualizar_leaderboard(relogio())
     registro = ladder[identidade]
     ranked_screens.render_ranked_result(
         {
-            "venceu": venceu,
+            "resultado": resultado,
+            "motivo": motivo,
+            "rodadas": duelo.result.rounds if duelo.finished else arbitro.rodada,
             "antes": atualizacao.antes[identidade],
             "depois": atualizacao.depois[identidade],
             "probabilidade": probabilidade,
-            "acabou_de_posicionar": registro.posicionado and not estava_posicionado,
-            "rank": ladder.rank(identidade),
-            "posicao": ladder.posicao(identidade),
-            "competitivos": ladder.competitivos(),
-            "percentil": ladder.percentil(identidade),
-            "partidas": registro.partidas,
-            "posicionamento": POSICIONAMENTO,
+            "pr": atualizacao.pr.get(identidade),
+            "eventos": [legivel(e) for e in atualizacao.eventos.get(identidade, [])],
+            "acabou_de_posicionar": registro.posicionado and not antes["posicionado"],
+            "status": status(mundo, identidade),
         }
     )
     safe_get_key(allow_escape=False)
+    _avisar_atualizacao(mundo, identidade, resumo)
     return True
 
 
-def _painel(mundo, identidade, personagem, publish, controlador, agente) -> None:
+def _avisar_atualizacao(mundo, identidade, resumo) -> None:
+    """Se a leaderboard acabou de sair, mostra o que ela decidiu sobre este gladiador."""
+    if not resumo:
+        return
+    meus = [legivel(e) for e in resumo.get("eventos", []) if e.get("identidade") == identidade]
+    ranked_screens.render_leaderboard_update(
+        {
+            "publicada_em": mundo.leaderboard.publicada_em,
+            "proxima": mundo.leaderboard.proxima(),
+            "pulados": resumo.get("pulados", 0),
+            "adiada": resumo.get("adiada", []),
+            "eventos": meus,
+            "total": len(resumo.get("eventos", [])),
+        }
+    )
+    safe_get_key(allow_escape=False)
+
+
+def _painel(mundo, identidade, personagem, publish, controlador, agente, relogio) -> None:
     while True:
         if agente is not None:
             agente.coletar()
+        _avisar_atualizacao(mundo, identidade, mundo.atualizar_leaderboard(relogio()))
+        if agente is not None:
             agente.iniciar()
         ranked_screens.render_ranked_panel(status(mundo, identidade))
         tecla = safe_get_key(valid_keys=["enter", "c", "q"])
@@ -195,7 +323,7 @@ def _painel(mundo, identidade, personagem, publish, controlador, agente) -> None
             continue
         if agente is not None:
             agente.parar()
-        _partida(mundo, identidade, personagem, publish, controlador)
+        _partida(mundo, identidade, personagem, publish, controlador, relogio)
 
 
 def run_ranqueada(
@@ -203,10 +331,15 @@ def run_ranqueada(
     populacao: Populacao | None = None,
     mundo: MundoRanqueado | None = None,
     controlador=None,
-    agora: float | None = None,
+    relogio=None,
     mundo_em_segundo_plano: bool = True,
 ) -> None:
-    """A Arena Ranqueada, da escolha do gladiador de volta ao hub."""
+    """A Arena Ranqueada, da escolha do gladiador de volta ao hub.
+
+    `relogio` devolve o instante atual (segundos, como `time.time`); os testes e
+    as simulações injetam o deles.
+    """
+    relogio = time.time if relogio is None else relogio
     publish, limpar = arena_mode._barramento()
     agente = None
     try:
@@ -217,7 +350,11 @@ def run_ranqueada(
             arena_screens.render_population_unavailable(str(erro))
             safe_get_key(allow_escape=False)
             return
-        mundo.ao_retornar(time.time() if agora is None else agora)
+        # A leaderboard que ficou pendente com o jogo fechado sai com o estado
+        # gravado, antes da inatividade e da fila do retorno.
+        agora = relogio()
+        pendente = mundo.atualizar_leaderboard(agora)
+        mundo.ao_retornar(agora)
         agente = AgendadorDoMundo(mundo) if mundo_em_segundo_plano else None
         while True:
             entradas = arena_setup.list_gladiators()
@@ -234,7 +371,9 @@ def run_ranqueada(
             identidade = identidade_do_gladiador(load_save_data(minha.slot), minha.slot)
             mundo.inscrever(identidade, personagem.get_nick_name(), personagem.get_classname())
             mundo.salvar()
-            _painel(mundo, identidade, personagem, publish, controlador, agente)
+            _avisar_atualizacao(mundo, identidade, pendente)
+            pendente = None
+            _painel(mundo, identidade, personagem, publish, controlador, agente, relogio)
     finally:
         if agente is not None:
             agente.parar()
@@ -260,4 +399,5 @@ def run_arena_hub(**kwargs) -> None:
                 arena_screens.render_population_unavailable(str(erro))
                 safe_get_key(allow_escape=False)
                 continue
+            mundo.atualizar_leaderboard((kwargs.get("relogio") or time.time)())
             mostrar_classificacao(mundo)

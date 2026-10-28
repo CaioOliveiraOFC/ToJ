@@ -44,6 +44,40 @@ class TestReferencias:
         assert (perdedor.mu, perdedor.sigma) == pytest.approx((20.604, 7.171), abs=1e-3)
 
 
+class TestEmpate:
+    def test_o_empate_de_iguais_so_reduz_a_incerteza(self):
+        g = Glicko2()
+        a, b = g.partida(RatingGlicko2(1500, 80), RatingGlicko2(1500, 80), 0.5)
+        assert a.rating == pytest.approx(1500) and b.rating == pytest.approx(1500)
+        assert a.rd < 80
+
+    def test_o_favorito_perde_pontos_no_empate_e_o_azarao_ganha(self):
+        g = Glicko2()
+        forte, fraco = g.partida(RatingGlicko2(1700, 80), RatingGlicko2(1400, 80), 0.5)
+        assert forte.rating < 1700 and fraco.rating > 1400
+        # Meio ponto é exatamente a média de vencer e perder, no período.
+        vence = g.atualizar(RatingGlicko2(1700, 80), [(RatingGlicko2(1400, 80), 1.0)])
+        perde = g.atualizar(RatingGlicko2(1700, 80), [(RatingGlicko2(1400, 80), 0.0)])
+        assert perde.rating < forte.rating < vence.rating
+
+    def test_o_empate_do_trueskill_com_margem(self):
+        """A referência da documentação: dois novatos empatam com 10% de empate."""
+        ts = TrueSkill(prob_empate=0.10)
+        a, b = ts.partida(ts.novo(), ts.novo(), 0.5)
+        assert (a.mu, a.sigma) == pytest.approx((25.0, 6.458), abs=1e-3)
+        assert (b.mu, b.sigma) == pytest.approx((25.0, 6.458), abs=1e-3)
+
+    def test_sem_margem_o_trueskill_recusa_empate(self):
+        ts = TrueSkill()
+        with pytest.raises(ValueError):
+            ts.partida(ts.novo(), ts.novo(), 0.5)
+
+    @pytest.mark.parametrize("sistema", SISTEMAS, ids=lambda s: s.nome)
+    def test_resultado_fora_de_1_meio_0_e_recusado(self, sistema):
+        with pytest.raises(ValueError):
+            sistema.partida(sistema.novo(), sistema.novo(), 0.7)
+
+
 @pytest.mark.parametrize("sistema", SISTEMAS, ids=lambda s: s.nome)
 class TestPropriedades:
     def test_a_previsao_e_simetrica_e_igual_entre_iguais(self, sistema):

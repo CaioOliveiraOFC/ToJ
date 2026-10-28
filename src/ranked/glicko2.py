@@ -10,7 +10,8 @@ valores de ANTES da partida — é a prática dos jogos que usam Glicko-2 partid
 partida. A inatividade entra por `inatividade`: φ cresce com o número de
 períodos sem jogar, e a incerteza volta a subir.
 
-Só vitória e derrota: o resultado é 1 ou 0, sem bônus por duração, HP ou dano.
+O resultado é 1 (vitória), ½ (empate técnico por impasse) ou 0 (derrota), sem
+bônus por duração, HP ou dano.
 """
 
 from __future__ import annotations
@@ -40,6 +41,13 @@ class RatingGlicko2:
 
 def _de_interno(mu: float, phi: float, sigma: float) -> RatingGlicko2:
     return RatingGlicko2(CENTRO + ESCALA * mu, ESCALA * phi, sigma)
+
+
+def _pontos(valor) -> float:
+    pontos = float(valor)
+    if pontos not in (0.0, 0.5, 1.0):
+        raise ValueError(f"resultado {valor!r}: só 1, ½ ou 0")
+    return pontos
 
 
 def _g(phi: float) -> float:
@@ -106,7 +114,7 @@ class Glicko2:
     def atualizar(
         self, jogador: RatingGlicko2, resultados: list[tuple[RatingGlicko2, float]]
     ) -> RatingGlicko2:
-        """Um período de rating: os resultados (oponente, 1 ou 0) contra valores pré-período."""
+        """Um período de rating: os resultados (oponente, 1, ½ ou 0) contra valores pré-período."""
         mu, phi, sigma = jogador.mu, jogador.phi, jogador.volatilidade
         if not resultados:
             return self.inatividade(jogador, 1)
@@ -155,10 +163,14 @@ class Glicko2:
         return self._limitar(_de_interno(mu_novo, phi_novo, sigma_novo))
 
     def partida(
-        self, a: RatingGlicko2, b: RatingGlicko2, a_venceu: bool
+        self, a: RatingGlicko2, b: RatingGlicko2, pontos_de_a: float
     ) -> tuple[RatingGlicko2, RatingGlicko2]:
-        """Uma partida, um período para cada lado, com os valores de antes."""
-        pontos = 1.0 if a_venceu else 0.0
+        """Uma partida, um período para cada lado, com os valores de antes.
+
+        `pontos_de_a` é 1 (vitória de `a`), ½ (empate) ou 0; `True`/`False`
+        valem 1 e 0.
+        """
+        pontos = _pontos(pontos_de_a)
         return self.atualizar(a, [(b, pontos)]), self.atualizar(b, [(a, 1.0 - pontos)])
 
     def inatividade(self, r: RatingGlicko2, periodos: float) -> RatingGlicko2:

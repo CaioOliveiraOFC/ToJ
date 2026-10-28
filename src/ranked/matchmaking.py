@@ -17,8 +17,27 @@ além disso, mas só conta resultado contra adversário do mesmo nível ou acima
 (vitória) ou do mesmo nível ou abaixo (derrota): três vitórias sobre gladiadores
 muito mais fracos não endurecem o próximo adversário.
 
-Quem enfrentou o gladiador nas últimas `RECENTES` partidas fica de fora enquanto
-houver alternativa. Tudo depende só do estado da Ladder e do gerador recebido.
+## A repetição de adversário
+
+Cada candidato tem um CUSTO, e o adversário sai entre os de menor custo:
+
+    custo = (distância ao alvo / janela da etapa)² + repetição
+
+- A distância mede o equilíbrio: dentro da janela, menos de 1; a duas janelas,
+  4. Um adversário fora da janela não é proibido — só fica caro.
+- A repetição soma, por confronto com aquele adversário nas últimas
+  `MEMORIA` partidas do gladiador, `PESO_DA_REPETICAO · ½^((idade − 1)/MEIA_VIDA)`,
+  com a idade contada em partidas (1 = a última). Pesa a FREQUÊNCIA (cada
+  confronto soma) e a RECÊNCIA (o peso cai pela metade a cada `MEIA_VIDA`).
+  Repetir o adversário de duas partidas atrás custa ~7 — tanto quanto enfrentar
+  alguém a 2,6 janelas de distância; o de dez partidas atrás, ~2,3.
+- Quem jogou a última partida contra o gladiador fica de fora enquanto houver
+  qualquer outro candidato.
+
+Com muitas alternativas perto do alvo, a repetição quase nunca vence; com
+poucas (o topo da Ladder), o custo decide entre repetir e enfrentar alguém mais
+distante. Nunca bloqueia: sempre há um adversário. Tudo depende só do estado da
+Ladder e do gerador recebido.
 """
 
 from __future__ import annotations
@@ -35,9 +54,13 @@ RANQUEADA = "ranqueada"
 
 JANELA = {DESCOBERTA: 1.0, NIVELAMENTO: 0.5, VALIDACAO: 0.25, RANQUEADA: 0.35}
 MAIS_PROXIMOS = {DESCOBERTA: 1, NIVELAMENTO: 4, VALIDACAO: 2, RANQUEADA: 5}
+# A calibração da Fase 6 (`rodada_suica`) ainda usa a exclusão simples.
 RECENTES = 3
 EMPURRAO_POR_RESULTADO = 0.15
 SEQUENCIA_MAXIMA = 3
+MEMORIA = 20
+PESO_DA_REPETICAO = 8.0
+MEIA_VIDA = 5.0
 
 
 def fase(partidas_jogadas: int) -> str:
@@ -65,20 +88,40 @@ def desvio_da_populacao(ladder: Ladder, candidatos: list[str]) -> float:
     return math.sqrt(sum((v - media) ** 2 for v in valores) / len(valores)) or 1.0
 
 
+def _resultado(entrada: dict) -> str:
+    """O desfecho de uma entrada do histórico (as da Fase 6 não tinham o campo)."""
+    if "resultado" in entrada:
+        return entrada["resultado"]
+    if entrada["venceu"] is None:
+        return "anulada"
+    return "vitoria" if entrada["venceu"] else "derrota"
+
+
+def custo_de_repeticao(ladder: Ladder, identidade: str) -> dict[str, float]:
+    """A repetição acumulada de cada adversário recente de `identidade`."""
+    custos: dict[str, float] = {}
+    recentes = ladder[identidade].historico[-MEMORIA:]
+    for idade, entrada in enumerate(reversed(recentes), start=1):
+        peso = PESO_DA_REPETICAO * 0.5 ** ((idade - 1) / MEIA_VIDA)
+        custos[entrada["oponente"]] = custos.get(entrada["oponente"], 0.0) + peso
+    return custos
+
+
 def empurrao_da_sequencia(ladder: Ladder, identidade: str, desvio: float) -> float:
     """Quanto a sequência atual empurra o alvo, contando só resultados que dizem algo.
 
     Vitória conta se o derrotado não estava muito abaixo (mais de meio desvio);
     derrota conta se o vencedor não estava muito acima. A sequência para no
-    primeiro resultado do outro tipo.
+    primeiro resultado do outro tipo — empate inclusive. Partida anulada não
+    conta nem quebra a sequência.
     """
-    historico = [e for e in ladder[identidade].historico if e["venceu"] is not None]
-    if not historico:
+    historico = [e for e in ladder[identidade].historico if _resultado(e) != "anulada"]
+    if not historico or _resultado(historico[-1]) == "empate":
         return 0.0
     sinal = 1 if historico[-1]["venceu"] else -1
     conta = 0
     for entrada in reversed(historico):
-        if entrada["venceu"] != (sinal > 0):
+        if _resultado(entrada) == "empate" or entrada["venceu"] != (sinal > 0):
             break
         diferenca = entrada["oponente_antes"] - entrada["antes"]
         if (sinal > 0 and diferenca >= -0.5 * desvio) or (sinal < 0 and diferenca <= 0.5 * desvio):
@@ -97,20 +140,17 @@ def escolher_oponente(ladder: Ladder, identidade: str, rng, *, excluir=()) -> Es
     alvo = ladder.valor(identidade) + empurrao_da_sequencia(ladder, identidade, desvio)
     if etapa == DESCOBERTA:
         alvo += rng.uniform(-1.0, 1.0) * JANELA[DESCOBERTA] * desvio
-    recentes = {e["oponente"] for e in ladder[identidade].historico[-RECENTES:]}
     janela = JANELA[etapa] * desvio
-    escolhidos: list[str] = []
-    for _ in range(8):
-        escolhidos = [
-            c for c in candidatos if c not in recentes and abs(ladder.valor(c) - alvo) <= janela
-        ]
-        if escolhidos:
-            break
-        janela *= 2
-    if not escolhidos:
-        # Só sobraram recentes: repetir é melhor do que não jogar.
-        escolhidos = candidatos
-    escolhidos.sort(key=lambda c: (abs(ladder.valor(c) - alvo), c))
+    historico = ladder[identidade].historico
+    anterior = historico[-1]["oponente"] if historico else None
+    if anterior in candidatos and len(candidatos) > 1:
+        candidatos = [c for c in candidatos if c != anterior]
+    repeticao = custo_de_repeticao(ladder, identidade)
+
+    def custo(c: str) -> float:
+        return ((ladder.valor(c) - alvo) / janela) ** 2 + repeticao.get(c, 0.0)
+
+    escolhidos = sorted(candidatos, key=lambda c: (custo(c), c))
     oponente = rng.choice(escolhidos[: MAIS_PROXIMOS[etapa]])
     return Escolha(oponente, etapa, alvo, desvio)
 

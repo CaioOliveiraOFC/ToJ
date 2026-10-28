@@ -3,8 +3,10 @@
 - o desenho da amostra é determinístico e tem os estratos pedidos;
 - confrontos registrados (da amostra e da calibração) se repetem pela seed;
 - a Ladder calibrada publicada é exatamente a reaplicação dos confrontos
-  guardados, na ordem em que aconteceram;
-- o estado inicial do jogo é a calibração, com o histórico aparado.
+  guardados, na ordem em que aconteceram (comparada no formato da Fase 6: a 6.1
+  acrescentou empates, progressão e o desfecho explícito no histórico);
+- o estado inicial do jogo é a calibração, com o histórico aparado, e continua
+  no formato da Fase 6 — o jogo o migra na leitura.
 """
 
 from __future__ import annotations
@@ -27,6 +29,35 @@ from src.ranked import sistema  # noqa: E402
 from src.ranked.ladder import Ladder  # noqa: E402
 
 PASTA = ROOT / "reports" / "ranked"
+
+
+CAMPOS_DA_FASE6 = (
+    "identidade",
+    "nome",
+    "classe",
+    "npc",
+    "rating",
+    "vitorias",
+    "derrotas",
+    "historico",
+    "forca_de_referencia",
+)
+
+
+def _no_formato_da_fase6(ladder: dict) -> dict:
+    """A Ladder sem o que a Fase 6.1 acrescentou."""
+    return {
+        "partidas_jogadas": ladder["partidas_jogadas"],
+        "registros": [
+            {
+                **{k: r[k] for k in CAMPOS_DA_FASE6},
+                "historico": [
+                    {k: v for k, v in e.items() if k != "resultado"} for e in r["historico"]
+                ],
+            }
+            for r in ladder["registros"]
+        ],
+    }
 
 
 def _jsonl(nome: str) -> list[dict]:
@@ -72,13 +103,13 @@ def test_a_calibracao_publicada_e_a_reaplicacao_dos_confrontos(populacao):
         # O pareamento suíço refeito a partir do estado: a mesma rodada sai igual.
         pares = x.partidas_da_rodada(ladder, rodada)
         x._aplicar(ladder, [feitas[(p["a"], p["b"], p["semente"])] for p in pares], "calibracao")
-    assert ladder.para_dict() == estado["ladder"]
+    assert _no_formato_da_fase6(ladder.para_dict()) == estado["ladder"]
 
 
 def test_o_estado_inicial_do_jogo_e_a_calibracao(populacao):
     estado = json.loads((PASTA / "calibracao.json").read_text(encoding="utf-8"))
     inicial = json.loads(ranked_mundo.INICIAL.read_text(encoding="utf-8"))
-    assert inicial["versao"] == ranked_mundo.VERSAO
+    assert inicial["versao"] == 1 and inicial["versao"] in ranked_mundo.VERSOES_LIDAS
     assert (inicial["algoritmo"], inicial["parametros"]) == (
         estado["algoritmo"],
         estado["parametros"],

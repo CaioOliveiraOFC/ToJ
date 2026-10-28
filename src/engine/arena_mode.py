@@ -46,6 +46,7 @@ from src.engine.arena_populacao import (
 )
 from src.engine.events import EventBus
 from src.engine.game_logic import CLASS_MAP
+from src.engine.ranked_partidas import maximos_do_duelo, observar
 from src.mechanics.pvp_duel import SIDES, Duel, DuelAction, run_round
 from src.shared import combat_topics as topics
 from src.shared.types import GameEvent
@@ -318,7 +319,15 @@ def _ficha_do_oponente(populacao: Populacao, oponente: Oponente):
     return None
 
 
-def duel(personagem, adversario, *, rng: random.Random, publish=None, controlador=None) -> Duel:
+def duel(
+    personagem,
+    adversario,
+    *,
+    rng: random.Random,
+    publish=None,
+    controlador=None,
+    arbitro=None,
+) -> Duel:
     """Um duelo completo: o jogador contra o adversário automático.
 
     `controlador` recebe o herói do adversário NO DUELO e devolve o
@@ -326,18 +335,47 @@ def duel(personagem, adversario, *, rng: random.Random, publish=None, controlado
     pelo motor: `run_round` pede as duas ações e chama `play_round`. Durante a
     resolução a voz do combate chega pelo bus, na ordem em que as ações
     acontecem; depois, o resumo da rodada.
+
+    `arbitro` é o da Ranqueada (`ranked/impasse.py`): ele lê o fim de cada
+    rodada e pode encerrar o duelo em empate técnico — aí o duelo volta SEM
+    resultado (`finished` falso) e o veredito fica em `arbitro.veredito`. O
+    Duelo Livre não passa árbitro e não muda.
     """
     meu = prepare_gladiator(personagem)
     duelo = Duel(meu, adversario, rng=rng, publish=publish)
     humano = HumanDuelController(meu.hero)
     fabrica = controlador if controlador is not None else IAEstrategica
     controladores = {JOGADOR: humano, ADVERSARIO: fabrica(adversario.hero)}
+    maximos = maximos_do_duelo(duelo, SIDES) if arbitro is not None else None
     while not duelo.finished:
         registro = run_round(duelo, controladores)
         humano.log = round_lines(registro, duelo)
+        veredito = None
+        if arbitro is not None and not duelo.finished:
+            veredito = observar(arbitro, duelo, registro, SIDES, maximos)
+            humano.log += linhas_do_impasse(arbitro, veredito)
         arena_screens.render_round_summary(humano.log)
         safe_get_key(allow_escape=False)
+        if veredito is not None:
+            break
     return duelo
+
+
+def linhas_do_impasse(arbitro, veredito) -> list[str]:
+    """O aviso do árbitro no resumo da rodada: só quando o impasse se aproxima."""
+    if veredito is not None:
+        if veredito.motivo == "teto":
+            return [f"EMPATE TÉCNICO: a partida chegou ao teto de {arbitro.teto} rodadas."]
+        return [
+            f"EMPATE TÉCNICO: por {arbitro.janela} rodadas ninguém chegou a um HP ou MP "
+            "mais baixo do que já tinha chegado."
+        ]
+    if arbitro.sem_desgaste >= arbitro.janela // 2:
+        return [
+            f"Impasse: {arbitro.sem_desgaste} rodadas sem desgaste novo. Empate técnico em "
+            f"{arbitro.faltam} rodada(s), se ninguém chegar a um HP ou MP mais baixo."
+        ]
+    return []
 
 
 def resultado_da_partida(duelo: Duel, identidade: str, oponente: Oponente) -> ResultadoDaPartida:

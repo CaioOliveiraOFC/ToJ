@@ -21,6 +21,18 @@ calibração publicada (`src/data/arena_ranked/ladder_inicial.json`).
   só enquanto o jogador está nos menus.
 - **Reprodutível.** As duplas do mundo saem do gerador semeado por (semente,
   relógio do mundo), e cada confronto da sua própria semente.
+- **A leaderboard publicada** (`ranked/leaderboard.py`) sai em ciclos
+  (`Leaderboard.periodo`, 1 hora por padrão). Nada roda com o jogo fechado: ao
+  abrir, depois de cada partida e em cada volta ao painel, quem conduz chama
+  `atualizar_leaderboard(agora)`, e um atraso de muitos ciclos publica UM
+  retrato só.
+- **Versões do arquivo.** A versão 2 guarda também a progressão visível
+  (divisão, PR, candidatura, elite), os empates e a leaderboard publicada. Um
+  arquivo da versão 1 (Fase 6) é migrado na leitura: nada é perdido, a
+  progressão nasce da FUNDAÇÃO (o retrato inicial: elite pelo percentil, os
+  outros na divisão do alvo), e o arquivo antigo fica copiado em
+  `ranked.v1.json` antes da primeira gravação. O estado inicial publicado
+  (`ladder_inicial.json`) é a calibração da Fase 6 e passa pela mesma migração.
 """
 
 from __future__ import annotations
@@ -37,12 +49,15 @@ from pathlib import Path
 from src.data import loader
 from src.engine import ranked_partidas
 from src.engine.arena_populacao import Populacao
-from src.ranked import matchmaking, sistema
-from src.ranked.ladder import Ladder, Registro
+from src.ranked import leaderboard, matchmaking, sistema
+from src.ranked.ladder import ANULADA, DERROTA, EMPATE, VITORIA, Ladder, Registro
+from src.ranked.leaderboard import Leaderboard
 from src.storage import save_manager
 
 ARQUIVO = "ranked.json"
-VERSAO = 1
+COPIA_DA_V1 = "ranked.v1.json"
+VERSAO = 2
+VERSOES_LIDAS = (1, 2)
 INICIAL = Path(loader.__file__).resolve().parent / "arena_ranked" / "ladder_inicial.json"
 
 PARTIDAS_DO_MUNDO_POR_PARTIDA = 2
@@ -54,7 +69,52 @@ SEGUNDOS_POR_DIA = 86_400
 
 
 class RankedInvalidaError(RuntimeError):
-    """O arquivo da Ranked não é legível nem desta versão: nada é sobrescrito."""
+    """O arquivo da Ranked não é legível nem de uma versão conhecida: nada é sobrescrito."""
+
+
+def migrar_v1(dados: dict) -> dict:
+    """O estado da Fase 6 na versão 2, sem perder nada.
+
+    Os registros ganham `empates` (zero) e o desfecho explícito no histórico: a
+    partida que bateu o limite técnico na Fase 6 não mudou rating nem contou
+    como partida — é exatamente uma partida ANULADA. A progressão visível e a
+    leaderboard nascem depois, na fundação (`MundoRanqueado.fundar`).
+    """
+    novo = json.loads(json.dumps(dados))
+    novo["versao"] = VERSAO
+    for registro in novo["ladder"]["registros"]:
+        registro.setdefault("empates", 0)
+        for entrada in registro.get("historico") or []:
+            if "resultado" in entrada:
+                continue
+            if entrada.get("venceu") is None:
+                entrada["resultado"] = ANULADA
+                entrada.setdefault("motivo", "limite")
+            else:
+                entrada["resultado"] = VITORIA if entrada["venceu"] else DERROTA
+    novo.pop("leaderboard", None)
+    return novo
+
+
+def _gravar(caminho: str, texto: str) -> None:
+    """Escrita atômica: arquivo temporário na mesma pasta e `os.replace`."""
+    pasta = os.path.dirname(caminho) or "."
+    os.makedirs(pasta, exist_ok=True)
+    fd, temporario = tempfile.mkstemp(dir=pasta, prefix=".ranked-", suffix=".json")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(texto)
+        os.replace(temporario, caminho)
+    except BaseException:
+        Path(temporario).unlink(missing_ok=True)
+        raise
+
+
+class Anulada:
+    """Um confronto do mundo que terminou em erro técnico: vira partida anulada."""
+
+    def __init__(self, a: str, b: str, motivo: str) -> None:
+        self.a, self.b, self.motivo = a, b, motivo
 
 
 def _semente(*partes) -> int:
@@ -78,8 +138,10 @@ class MundoRanqueado:
         ultima_sessao: float | None = None,
         reservas: dict | None = None,
         caminho: str | None = None,
+        leaderboard: Leaderboard | None = None,
     ) -> None:
         self.ladder = ladder
+        self.leaderboard = leaderboard if leaderboard is not None else Leaderboard()
         self.populacao = populacao
         self.semente = semente
         self.relogio = relogio
@@ -93,34 +155,59 @@ class MundoRanqueado:
     @classmethod
     def carregar(cls, populacao: Populacao, caminho: str | None = None) -> MundoRanqueado:
         caminho = caminho or caminho_padrao()
-        if os.path.exists(caminho):
+        existente = os.path.exists(caminho)
+        if existente:
             try:
                 with open(caminho, encoding="utf-8") as f:
-                    dados = json.load(f)
+                    texto = f.read()
+                dados = json.loads(texto)
             except (OSError, json.JSONDecodeError) as erro:
                 raise RankedInvalidaError(f"{caminho}: ilegível ({erro})") from erro
-            if dados.get("versao") != VERSAO:
-                raise RankedInvalidaError(f"{caminho}: versão {dados.get('versao')!r}")
+            if not isinstance(dados, dict) or dados.get("versao") not in VERSOES_LIDAS:
+                versao = dados.get("versao") if isinstance(dados, dict) else None
+                raise RankedInvalidaError(f"{caminho}: versão {versao!r}")
         else:
             try:
                 dados = json.loads(INICIAL.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError) as erro:
                 raise RankedInvalidaError(f"estado inicial da Ranked ilegível: {erro}") from erro
-            if dados.get("versao") != VERSAO:
+            if dados.get("versao") not in VERSOES_LIDAS:
                 raise RankedInvalidaError("estado inicial da Ranked de outra versão")
-        sis = sistema.criar(dados["algoritmo"], dados["parametros"])
-        mundo = cls(
-            Ladder.de_dict(sis, dados["ladder"]),
-            populacao,
-            semente=int(dados["semente"]),
-            relogio=int(dados.get("relogio", 0)),
-            fila=int(dados.get("fila", 0)),
-            ultima_sessao=dados.get("ultima_sessao"),
-            reservas=dados.get("reservas"),
-            caminho=caminho,
-        )
+        migrado = dados["versao"] == 1
+        if migrado:
+            dados = migrar_v1(dados)
+        try:
+            sis = sistema.criar(dados["algoritmo"], dados["parametros"])
+            mundo = cls(
+                Ladder.de_dict(sis, dados["ladder"]),
+                populacao,
+                semente=int(dados["semente"]),
+                relogio=int(dados.get("relogio", 0)),
+                fila=int(dados.get("fila", 0)),
+                ultima_sessao=dados.get("ultima_sessao"),
+                reservas=dados.get("reservas"),
+                caminho=caminho,
+                leaderboard=Leaderboard.de_dict(dados.get("leaderboard")),
+            )
+        except (KeyError, TypeError, ValueError) as erro:
+            raise RankedInvalidaError(f"{caminho}: estado incompleto ({erro})") from erro
+        if migrado:
+            mundo.fundar()
         mundo.sincronizar_populacao()
+        if migrado and existente:
+            copia = os.path.join(os.path.dirname(caminho) or ".", COPIA_DA_V1)
+            if not os.path.exists(copia):
+                _gravar(copia, texto)
+            mundo.salvar()
         return mundo
+
+    def fundar(self) -> dict:
+        """O retrato inicial: elite pelo percentil, os outros na divisão do alvo."""
+        resumo = leaderboard.publicar(
+            self.ladder, self.leaderboard, None, numero=None, fundacao=True
+        )
+        self.leaderboard.ciclo = None
+        return resumo
 
     def sincronizar_populacao(self) -> list[str]:
         """Inscreve quem entrou no catálogo; não apaga nem reinicia ninguém."""
@@ -138,6 +225,8 @@ class MundoRanqueado:
                     )
                 )
                 novos.append(o.id)
+        for identidade in novos:
+            self.ladder.posicionar_npc(identidade)
         return novos
 
     def para_dict(self) -> dict:
@@ -150,21 +239,12 @@ class MundoRanqueado:
             "fila": self.fila,
             "ultima_sessao": self.ultima_sessao,
             "reservas": self.reservas,
+            "leaderboard": self.leaderboard.para_dict(),
             "ladder": self.ladder.para_dict(),
         }
 
     def salvar(self) -> None:
-        caminho = self.caminho or caminho_padrao()
-        pasta = os.path.dirname(caminho) or "."
-        os.makedirs(pasta, exist_ok=True)
-        fd, temporario = tempfile.mkstemp(dir=pasta, prefix=".ranked-", suffix=".json")
-        try:
-            with os.fdopen(fd, "w", encoding="utf-8") as f:
-                json.dump(self.para_dict(), f, ensure_ascii=False)
-            os.replace(temporario, caminho)
-        except BaseException:
-            Path(temporario).unlink(missing_ok=True)
-            raise
+        _gravar(self.caminho or caminho_padrao(), json.dumps(self.para_dict(), ensure_ascii=False))
 
     # -- o gladiador do jogador --
 
@@ -193,15 +273,65 @@ class MundoRanqueado:
     def semente_da_partida(self, identidade: str) -> int:
         return _semente(self.semente, "partida", identidade, self.ladder[identidade].partidas)
 
-    def registrar_do_jogador(self, identidade: str, oponente: str, venceu: bool):
-        """O resultado da partida do jogador, e a fila do mundo cresce."""
-        atualizacao = self.ladder.registrar(
-            identidade, oponente, identidade if venceu else oponente, origem="ranqueada"
-        )
+    def registrar_do_jogador(
+        self, identidade: str, oponente: str, resultado, *, motivo: str | None = None
+    ):
+        """O resultado da partida do jogador, e a fila do mundo cresce.
+
+        `resultado`: `vitoria`, `derrota`, `empate` (com o `motivo`, impasse ou
+        teto) ou `anulada` (interrupção ou erro técnico); `True`/`False` valem
+        vitória e derrota. A anulada não muda nada além do histórico; a
+        interrompida mantém o adversário reservado (a partida volta igual), a
+        de erro técnico libera a reserva.
+        """
+        if isinstance(resultado, bool):
+            resultado = VITORIA if resultado else DERROTA
+        if resultado == ANULADA:
+            self.ladder.registrar_anulada(
+                identidade, oponente, origem="ranqueada", motivo=motivo or "interrompida"
+            )
+            if motivo != "interrompida":
+                self.reservas.pop(identidade, None)
+            self.salvar()
+            return None
+        if resultado == EMPATE:
+            atualizacao = self.ladder.registrar_empate(
+                identidade, oponente, origem="ranqueada", motivo=motivo or "impasse"
+            )
+        elif resultado in (VITORIA, DERROTA):
+            vencedor = identidade if resultado == VITORIA else oponente
+            atualizacao = self.ladder.registrar(identidade, oponente, vencedor, origem="ranqueada")
+        else:
+            raise ValueError(f"resultado desconhecido: {resultado!r}")
         self.reservas.pop(identidade, None)
         self.fila = min(FILA_MAXIMA, self.fila + PARTIDAS_DO_MUNDO_POR_PARTIDA)
         self.salvar()
         return atualizacao
+
+    # -- a leaderboard publicada --
+
+    def atualizar_leaderboard(self, agora: float) -> dict | None:
+        """Publica o retrato do ciclo atual, se ele ainda não saiu. No máximo um por chamada.
+
+        Na primeira sessão, só marca o ciclo: o retrato que vale é o da
+        fundação. Depois de muitos ciclos sem abrir o jogo, publica UM retrato,
+        o do ciclo atual, com o estado gravado — os ciclos perdidos ficam
+        registrados como pulados.
+        """
+        lb = self.leaderboard
+        atual = leaderboard.ciclo(agora, lb.periodo, lb.origem)
+        if lb.ciclo is None:
+            lb.ciclo = atual
+            lb.publicada_em = agora if lb.publicada_em is None else lb.publicada_em
+            self.salvar()
+            return None
+        if atual <= lb.ciclo:
+            return None
+        pulados = atual - lb.ciclo - 1
+        resumo = leaderboard.publicar(self.ladder, lb, agora, numero=atual)
+        resumo["pulados"] = pulados
+        self.salvar()
+        return resumo
 
     # -- o mundo --
 
@@ -238,10 +368,20 @@ class MundoRanqueado:
             for i, (a, b) in enumerate(pares)
         ]
 
-    def aplicar_do_mundo(self, confronto: ranked_partidas.Confronto) -> None:
-        """O resultado entra na Ladder; sem vencedor, só no histórico. A vaga é consumida."""
-        if confronto.vencedor is None:
-            self.ladder.registrar_sem_resultado(confronto.a, confronto.b, origem="mundo")
+    def aplicar_do_mundo(self, confronto) -> None:
+        """O resultado entra na Ladder (vitória ou empate técnico) e a vaga é consumida.
+
+        Um erro técnico (`Anulada`) também consome a vaga — a mesma dupla com a
+        mesma semente falharia de novo —, e fica no histórico como anulada.
+        """
+        if isinstance(confronto, Anulada):
+            self.ladder.registrar_anulada(
+                confronto.a, confronto.b, origem="mundo", motivo=confronto.motivo
+            )
+        elif confronto.vencedor is None:
+            self.ladder.registrar_empate(
+                confronto.a, confronto.b, origem="mundo", motivo=confronto.motivo
+            )
         else:
             self.ladder.registrar(confronto.a, confronto.b, confronto.vencedor, origem="mundo")
         self.relogio += 1
@@ -282,7 +422,11 @@ class AgendadorDoMundo:
         for a, b, semente in plano:
             if self._parar.is_set():
                 return
-            confronto = self._jogar(self.mundo.populacao, a, b, semente, parar=self._parar)
+            try:
+                confronto = self._jogar(self.mundo.populacao, a, b, semente, parar=self._parar)
+            except Exception as erro:  # noqa: BLE001 — o erro vira partida anulada
+                self._resultados.put(Anulada(a, b, f"erro técnico: {type(erro).__name__}"))
+                continue
             if confronto is None:
                 return
             self._resultados.put(confronto)

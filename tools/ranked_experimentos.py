@@ -959,16 +959,18 @@ HISTORICO_PUBLICADO = 10
 
 
 def publicar() -> dict:
-    """A Ladder calibrada como o mundo inicial de toda instalação."""
-    from src.engine.ranked_mundo import VERSAO
+    """A Ladder calibrada como o mundo inicial de toda instalação.
 
+    Fica no formato da Fase 6 (versão 1): o jogo migra na leitura e faz a
+    fundação da progressão visível (`MundoRanqueado.carregar`).
+    """
     estado = json.loads((PASTA / "calibracao.json").read_text(encoding="utf-8"))
     ladder = estado["ladder"]
     for registro in ladder["registros"]:
         registro["historico"] = registro["historico"][-HISTORICO_PUBLICADO:]
         registro["rating"] = {k: round(v, 6) for k, v in registro["rating"].items()}
     dados = {
-        "versao": VERSAO,
+        "versao": 1,
         "aviso": (
             "Gerado por tools/ranked_experimentos.py publicar, a partir da calibração "
             "(reports/ranked/calibracao.json). Não edite à mão."

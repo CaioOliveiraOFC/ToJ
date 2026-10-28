@@ -16,7 +16,9 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from src.ranked import leaderboard as lb  # noqa: E402
 from src.ranked import matchmaking as mm  # noqa: E402
+from src.ranked import progressao as pg  # noqa: E402
 from src.ranked import ranks  # noqa: E402
 from src.ranked.glicko2 import Glicko2  # noqa: E402
 from src.ranked.ladder import POSICIONAMENTO, Ladder, Registro  # noqa: E402
@@ -56,7 +58,11 @@ class TestLadder:
         assert ladder.percentil("npc:39") == 100.0 and ladder.percentil("npc:00") == 0.0
         assert ladder.rank("npc:39") == "Distinguished Master"
         assert ladder.rank("npc:00") == "Iron"
-        assert [ladder.titulo(r.identidade) for r in ordem[:6]] == [ranks.TITULO_DEFINITIVO] * 5 + [
+        # O título é da leaderboard publicada, não da posição de agora: os cinco
+        # primeiros DA ELITE. Com 40, a elite (percentil ≥ 92) tem só 4.
+        assert ladder.titulo("npc:39") is None
+        lb.publicar(ladder, lb.Leaderboard(), None, numero=None, fundacao=True)
+        assert [ladder.titulo(r.identidade) for r in ordem[:5]] == [ranks.TITULO_DEFINITIVO] * 4 + [
             None
         ]
 
@@ -66,9 +72,12 @@ class TestLadder:
         mudou = ladder.registrar("npc:10", "npc:30", "npc:10", origem="npc")
         assert ladder.valor("npc:10") > antes_a and ladder.valor("npc:30") < antes_b
         assert mudou.vencedor == "npc:10" and mudou.probabilidade_do_vencedor < 0.5
+        assert mudou.perdedor == "npc:30" and not mudou.empate
         assert (ladder["npc:10"].vitorias, ladder["npc:30"].derrotas) == (1, 1)
         entrada = ladder["npc:10"].historico[-1]
         assert entrada["oponente"] == "npc:30" and entrada["venceu"] and entrada["origem"] == "npc"
+        assert entrada["resultado"] == "vitoria"
+        assert ladder["npc:30"].historico[-1]["resultado"] == "derrota"
 
     def test_dez_partidas_posicionam_o_jogador(self, sistema):
         ladder = _ladder(sistema)
@@ -87,21 +96,94 @@ class TestLadder:
             r.identidade for r in ladder.classificacao()
         ]
 
-    def test_sem_resultado_entra_no_historico_e_nao_no_rating(self, sistema):
+    def test_anulada_entra_no_historico_e_nao_no_rating(self, sistema):
         ladder = _ladder(sistema)
         antes = (ladder.valor("npc:10"), ladder.valor("jogador:1"))
-        ladder.registrar_sem_resultado("npc:10", "jogador:1", origem="mundo")
+        ladder.registrar_anulada("npc:10", "jogador:1", origem="mundo", motivo="erro técnico: X")
+        ladder.registrar_sem_resultado("npc:10", "jogador:1", origem="mundo")  # o da Fase 6
         assert (ladder.valor("npc:10"), ladder.valor("jogador:1")) == antes
         assert ladder["jogador:1"].partidas == 0 and ladder["npc:10"].vitorias == 0
-        entrada = ladder["jogador:1"].historico[-1]
+        entrada = ladder["jogador:1"].historico[-2]
+        assert (entrada["resultado"], entrada["motivo"]) == ("anulada", "erro técnico: X")
         assert entrada["venceu"] is None and entrada["oponente"] == "npc:10"
+        assert ladder["jogador:1"].historico[-1]["motivo"] == "limite"
         copia = Ladder.de_dict(sistema, ladder.para_dict())
         assert copia["jogador:1"].historico == ladder["jogador:1"].historico
+
+    def test_identidade_repetida_e_recusada_e_resultado_incoerente_tambem(self, sistema):
+        ladder = _ladder(sistema)
+        with pytest.raises(ValueError):
+            ladder.registrar("npc:01", "npc:02", "npc:03", origem="x")
+        with pytest.raises(ValueError):
+            ladder.registrar_empate("npc:01", "npc:01", origem="x", motivo="impasse")
 
     def test_identidade_repetida_e_recusada(self, sistema):
         ladder = _ladder(sistema)
         with pytest.raises(ValueError):
             ladder.adicionar(Registro("npc:01", "x", "mage", True, sistema.novo()))
+
+
+class TestEmpateEProgressao:
+    """Empate e PR, no sistema do jogo (o TrueSkill só empata com margem de empate)."""
+
+    def test_empate_vale_meio_ponto_e_conta_como_partida(self):
+        sistema = Glicko2()
+        ladder = _ladder(sistema)
+        antes_forte, antes_fraco = ladder.valor("npc:30"), ladder.valor("npc:10")
+        mudou = ladder.registrar_empate("npc:30", "npc:10", origem="mundo", motivo="impasse")
+        assert mudou.empate and mudou.vencedor is None and mudou.perdedor is None
+        assert ladder.valor("npc:30") < antes_forte and ladder.valor("npc:10") > antes_fraco
+        r = ladder["npc:30"]
+        assert (r.vitorias, r.derrotas, r.empates, r.partidas) == (0, 0, 1, 1)
+        entrada = r.historico[-1]
+        assert (entrada["resultado"], entrada["motivo"], entrada["venceu"]) == (
+            "empate",
+            "impasse",
+            None,
+        )
+
+    def test_empates_contam_no_posicionamento_e_a_divisao_nasce_no_alvo(self):
+        sistema = Glicko2()
+        ladder = _ladder(sistema)
+        for k in range(POSICIONAMENTO - 1):
+            ladder.registrar_empate("jogador:1", f"npc:{20 + k:02d}", origem="r", motivo="impasse")
+        assert ladder["jogador:1"].progresso.divisao is None and ladder.posicao("jogador:1") is None
+        mudou = ladder.registrar("jogador:1", "npc:30", "jogador:1", origem="r")
+        eu = ladder["jogador:1"]
+        assert eu.posicionado and eu.progresso.divisao is not None
+        assert mudou.eventos["jogador:1"][0]["evento"] == "posicionamento"
+        assert mudou.pr["jogador:1"] is None  # a partida que posiciona não dá PR
+        assert eu.progresso.coordenada == min(4400, int(ladder.alvo("jogador:1")))
+        assert eu.eventos[-1]["evento"] == "posicionamento"
+        assert ladder.exibicao("jogador:1").endswith("PR")
+
+    def test_depois_de_posicionado_cada_partida_mexe_no_pr_dos_dois(self):
+        sistema = Glicko2()
+        ladder = _ladder(sistema)
+        lb.publicar(ladder, lb.Leaderboard(), None, numero=None, fundacao=True)
+        a, b = "npc:10", "npc:12"
+        pr_a, pr_b = ladder[a].progresso.coordenada, ladder[b].progresso.coordenada
+        mudou = ladder.registrar(a, b, a, origem="mundo")
+        assert mudou.pr[a] > 0 > mudou.pr[b]
+        assert ladder[a].progresso.coordenada == pr_a + mudou.pr[a] or mudou.eventos[a]
+        assert ladder[b].historico[-1]["pr"] == mudou.pr[b]
+        assert ladder[b].progresso.coordenada <= pr_b
+
+    def test_a_elite_nao_tem_pr(self):
+        sistema = Glicko2()
+        ladder = _ladder(sistema)
+        lb.publicar(ladder, lb.Leaderboard(), None, numero=None, fundacao=True)
+        mudou = ladder.registrar("npc:39", "npc:38", "npc:38", origem="mundo")
+        assert mudou.pr["npc:39"] is None and ladder["npc:39"].progresso.elite in pg.ELITE
+
+    def test_ida_e_volta_com_progresso_e_eventos(self):
+        sistema = Glicko2()
+        ladder = _ladder(sistema)
+        lb.publicar(ladder, lb.Leaderboard(), None, numero=None, fundacao=True)
+        ladder.registrar_empate("npc:05", "npc:06", origem="mundo", motivo="teto")
+        copia = Ladder.de_dict(sistema, ladder.para_dict())
+        assert copia.para_dict() == ladder.para_dict()
+        assert copia["npc:05"].empates == 1
 
 
 class TestRanks:
@@ -154,16 +236,34 @@ class TestMatchmaking:
             ladder, [r.identidade for r in ladder.npcs()]
         )
 
-    def test_quem_jogou_agora_fica_de_fora(self, sistema):
+    def test_quem_jogou_agora_fica_de_fora_e_os_recentes_custam(self, sistema):
         ladder = _ladder(sistema)
         rng = random.Random(3)
         vistos = []
-        for _ in range(mm.RECENTES):
+        for k in range(30):
             escolha = mm.escolher_oponente(ladder, "jogador:1", rng)
+            assert not vistos or escolha.oponente != vistos[-1]
             vistos.append(escolha.oponente)
-            ladder.registrar("jogador:1", escolha.oponente, escolha.oponente, origem="teste")
-        proxima = mm.escolher_oponente(ladder, "jogador:1", rng)
-        assert proxima.oponente not in vistos[-mm.RECENTES :]
+            vencedor = "jogador:1" if k % 2 else escolha.oponente
+            ladder.registrar("jogador:1", escolha.oponente, vencedor, origem="teste")
+        # No meio de 40 NPCs, nenhum adversário volta dentro de 5 partidas.
+        assert all(o not in vistos[max(0, i - 5) : i] for i, o in enumerate(vistos))
+
+    def test_o_custo_de_repeticao_pesa_frequencia_e_recencia(self, sistema):
+        ladder = _ladder(sistema)
+        for oponente in ("npc:01", "npc:02", "npc:01", "npc:03"):
+            ladder.registrar("jogador:1", oponente, oponente, origem="teste")
+        custo = mm.custo_de_repeticao(ladder, "jogador:1")
+        peso, meia = mm.PESO_DA_REPETICAO, mm.MEIA_VIDA
+        assert custo["npc:03"] == pytest.approx(peso)
+        assert custo["npc:01"] == pytest.approx(peso * (0.5 ** (1 / meia) + 0.5 ** (3 / meia)))
+        assert custo["npc:01"] > custo["npc:02"] and "npc:04" not in custo
+
+    def test_sem_alternativa_o_matchmaking_repete_e_nao_trava(self, sistema):
+        ladder = _ladder(sistema, n=2)
+        ladder.registrar("jogador:1", "npc:00", "npc:00", origem="teste")
+        escolha = mm.escolher_oponente(ladder, "jogador:1", random.Random(1), excluir={"npc:01"})
+        assert escolha.oponente == "npc:00"
 
     def test_a_sequencia_so_conta_contra_quem_nao_e_muito_mais_fraco(self, sistema):
         ladder = _ladder(sistema)
@@ -186,9 +286,18 @@ class TestMatchmaking:
         # Derrota só conta se o vencedor não estava muito acima.
         assert historico((False, 80), (False, 10)) == pytest.approx(-passo)
         assert historico() == 0.0
-        # Confronto sem resultado não conta nem quebra a sequência.
+        # Partida anulada (ou sem resultado, da Fase 6) não conta nem quebra a sequência.
         assert historico((True, 0), (None, 0), (True, 0)) == pytest.approx(2 * passo)
         assert historico((None, 0)) == 0.0
+        # O empate quebra a sequência.
+        ladder["jogador:1"].historico = [
+            {"venceu": True, "resultado": "vitoria", "antes": 1000.0, "oponente_antes": 1000.0},
+            {"venceu": None, "resultado": "empate", "antes": 1000.0, "oponente_antes": 1000.0},
+            {"venceu": True, "resultado": "vitoria", "antes": 1000.0, "oponente_antes": 1000.0},
+        ]
+        assert mm.empurrao_da_sequencia(ladder, "jogador:1", desvio) == pytest.approx(passo)
+        ladder["jogador:1"].historico.pop()
+        assert mm.empurrao_da_sequencia(ladder, "jogador:1", desvio) == 0.0
 
     def test_o_proprio_gladiador_e_excluidos_nunca_saem(self, sistema):
         ladder = _ladder(sistema, n=6)

@@ -1,0 +1,450 @@
+[
+ {
+  "variante": {
+   "nome": "proposta",
+   "K": 40.0,
+   "BETA": 0.2,
+   "MULTIPLICADOR_MAXIMO": 3.0,
+   "ESCUDO": 3,
+   "PR_APOS_REBAIXAMENTO": 75
+  },
+  "carreiras": {
+   "M03": {
+    "ganho": 18.6,
+    "perda": -17.6,
+    "promocoes": 24,
+    "rebaixamentos": 22,
+    "oscilacoes": 10,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": 25,
+    "final": "Bronze III 45 PR"
+   },
+   "M11": {
+    "ganho": 18.4,
+    "perda": -17.1,
+    "promocoes": 20,
+    "rebaixamentos": 16,
+    "oscilacoes": 6,
+    "trocas_de_rank": 1,
+    "trocas_de_rank_por_percentil": 1,
+    "distancia_media": 37,
+    "final": "Diamond II 30 PR"
+   },
+   "R31": {
+    "ganho": 37.8,
+    "perda": -4.2,
+    "promocoes": 0,
+    "rebaixamentos": 0,
+    "oscilacoes": 0,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": null,
+    "final": "Obsidian I 100 PR"
+   },
+   "W26": {
+    "ganho": 17.1,
+    "perda": -18.4,
+    "promocoes": 13,
+    "rebaixamentos": 18,
+    "oscilacoes": 4,
+    "trocas_de_rank": 5,
+    "trocas_de_rank_por_percentil": 71,
+    "distancia_media": 76,
+    "final": "Gold I 73 PR"
+   }
+  }
+ },
+ {
+  "variante": {
+   "nome": "K 30",
+   "K": 30.0,
+   "BETA": 0.2,
+   "MULTIPLICADOR_MAXIMO": 3.0,
+   "ESCUDO": 3,
+   "PR_APOS_REBAIXAMENTO": 75
+  },
+  "carreiras": {
+   "M03": {
+    "ganho": 14.0,
+    "perda": -13.1,
+    "promocoes": 13,
+    "rebaixamentos": 11,
+    "oscilacoes": 5,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": 28,
+    "final": "Bronze III 34 PR"
+   },
+   "M11": {
+    "ganho": 14.1,
+    "perda": -12.5,
+    "promocoes": 16,
+    "rebaixamentos": 12,
+    "oscilacoes": 6,
+    "trocas_de_rank": 1,
+    "trocas_de_rank_por_percentil": 1,
+    "distancia_media": 47,
+    "final": "Diamond II 47 PR"
+   },
+   "R31": {
+    "ganho": 28.4,
+    "perda": -3.2,
+    "promocoes": 0,
+    "rebaixamentos": 0,
+    "oscilacoes": 0,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": null,
+    "final": "Obsidian I 100 PR"
+   },
+   "W26": {
+    "ganho": 12.7,
+    "perda": -13.9,
+    "promocoes": 9,
+    "rebaixamentos": 14,
+    "oscilacoes": 2,
+    "trocas_de_rank": 3,
+    "trocas_de_rank_por_percentil": 71,
+    "distancia_media": 84,
+    "final": "Gold I 86 PR"
+   }
+  }
+ },
+ {
+  "variante": {
+   "nome": "K 50",
+   "K": 50.0,
+   "BETA": 0.2,
+   "MULTIPLICADOR_MAXIMO": 3.0,
+   "ESCUDO": 3,
+   "PR_APOS_REBAIXAMENTO": 75
+  },
+  "carreiras": {
+   "M03": {
+    "ganho": 22.8,
+    "perda": -22.6,
+    "promocoes": 26,
+    "rebaixamentos": 24,
+    "oscilacoes": 9,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": 21,
+    "final": "Bronze III 56 PR"
+   },
+   "M11": {
+    "ganho": 22.9,
+    "perda": -21.8,
+    "promocoes": 26,
+    "rebaixamentos": 23,
+    "oscilacoes": 8,
+    "trocas_de_rank": 3,
+    "trocas_de_rank_por_percentil": 1,
+    "distancia_media": 36,
+    "final": "Diamond III 98 PR"
+   },
+   "R31": {
+    "ganho": 46.4,
+    "perda": -5.3,
+    "promocoes": 0,
+    "rebaixamentos": 0,
+    "oscilacoes": 0,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": null,
+    "final": "Obsidian I 100 PR"
+   },
+   "W26": {
+    "ganho": 21.3,
+    "perda": -23.1,
+    "promocoes": 18,
+    "rebaixamentos": 23,
+    "oscilacoes": 8,
+    "trocas_de_rank": 7,
+    "trocas_de_rank_por_percentil": 71,
+    "distancia_media": 64,
+    "final": "Gold I 74 PR"
+   }
+  }
+ },
+ {
+  "variante": {
+   "nome": "β 0,12",
+   "K": 40.0,
+   "BETA": 0.12,
+   "MULTIPLICADOR_MAXIMO": 3.0,
+   "ESCUDO": 3,
+   "PR_APOS_REBAIXAMENTO": 75
+  },
+  "carreiras": {
+   "M03": {
+    "ganho": 18.5,
+    "perda": -17.8,
+    "promocoes": 24,
+    "rebaixamentos": 22,
+    "oscilacoes": 9,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": 28,
+    "final": "Bronze III 47 PR"
+   },
+   "M11": {
+    "ganho": 18.5,
+    "perda": -17.0,
+    "promocoes": 21,
+    "rebaixamentos": 17,
+    "oscilacoes": 10,
+    "trocas_de_rank": 1,
+    "trocas_de_rank_por_percentil": 1,
+    "distancia_media": 50,
+    "final": "Diamond II 50 PR"
+   },
+   "R31": {
+    "ganho": 32.9,
+    "perda": -4.6,
+    "promocoes": 0,
+    "rebaixamentos": 0,
+    "oscilacoes": 0,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": null,
+    "final": "Obsidian I 100 PR"
+   },
+   "W26": {
+    "ganho": 16.9,
+    "perda": -18.7,
+    "promocoes": 18,
+    "rebaixamentos": 23,
+    "oscilacoes": 8,
+    "trocas_de_rank": 9,
+    "trocas_de_rank_por_percentil": 71,
+    "distancia_media": 88,
+    "final": "Gold I 96 PR"
+   }
+  }
+ },
+ {
+  "variante": {
+   "nome": "β 0,30",
+   "K": 40.0,
+   "BETA": 0.3,
+   "MULTIPLICADOR_MAXIMO": 3.0,
+   "ESCUDO": 3,
+   "PR_APOS_REBAIXAMENTO": 75
+  },
+  "carreiras": {
+   "M03": {
+    "ganho": 18.7,
+    "perda": -17.5,
+    "promocoes": 22,
+    "rebaixamentos": 20,
+    "oscilacoes": 7,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": 22,
+    "final": "Bronze III 43 PR"
+   },
+   "M11": {
+    "ganho": 18.6,
+    "perda": -17.0,
+    "promocoes": 22,
+    "rebaixamentos": 18,
+    "oscilacoes": 8,
+    "trocas_de_rank": 1,
+    "trocas_de_rank_por_percentil": 1,
+    "distancia_media": 35,
+    "final": "Diamond II 18 PR"
+   },
+   "R31": {
+    "ganho": 37.8,
+    "perda": -4.2,
+    "promocoes": 0,
+    "rebaixamentos": 0,
+    "oscilacoes": 0,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": null,
+    "final": "Obsidian I 100 PR"
+   },
+   "W26": {
+    "ganho": 17.0,
+    "perda": -18.5,
+    "promocoes": 19,
+    "rebaixamentos": 24,
+    "oscilacoes": 8,
+    "trocas_de_rank": 11,
+    "trocas_de_rank_por_percentil": 71,
+    "distancia_media": 63,
+    "final": "Gold I 69 PR"
+   }
+  }
+ },
+ {
+  "variante": {
+   "nome": "sem escudo",
+   "K": 40.0,
+   "BETA": 0.2,
+   "MULTIPLICADOR_MAXIMO": 3.0,
+   "ESCUDO": 0,
+   "PR_APOS_REBAIXAMENTO": 75
+  },
+  "carreiras": {
+   "M03": {
+    "ganho": 19.4,
+    "perda": -16.9,
+    "promocoes": 27,
+    "rebaixamentos": 26,
+    "oscilacoes": 25,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": 37,
+    "final": "Bronze IV 86 PR"
+   },
+   "M11": {
+    "ganho": 19.2,
+    "perda": -16.4,
+    "promocoes": 23,
+    "rebaixamentos": 20,
+    "oscilacoes": 17,
+    "trocas_de_rank": 1,
+    "trocas_de_rank_por_percentil": 1,
+    "distancia_media": 47,
+    "final": "Diamond III 85 PR"
+   },
+   "R31": {
+    "ganho": 37.8,
+    "perda": -4.2,
+    "promocoes": 1,
+    "rebaixamentos": 1,
+    "oscilacoes": 1,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": null,
+    "final": "Obsidian I 100 PR"
+   },
+   "W26": {
+    "ganho": 17.9,
+    "perda": -17.7,
+    "promocoes": 23,
+    "rebaixamentos": 28,
+    "oscilacoes": 25,
+    "trocas_de_rank": 21,
+    "trocas_de_rank_por_percentil": 71,
+    "distancia_media": 76,
+    "final": "Gold I 58 PR"
+   }
+  }
+ },
+ {
+  "variante": {
+   "nome": "rebaixa contínuo",
+   "K": 40.0,
+   "BETA": 0.2,
+   "MULTIPLICADOR_MAXIMO": 3.0,
+   "ESCUDO": 3,
+   "PR_APOS_REBAIXAMENTO": 100
+  },
+  "carreiras": {
+   "M03": {
+    "ganho": 17.7,
+    "perda": -18.5,
+    "promocoes": 26,
+    "rebaixamentos": 24,
+    "oscilacoes": 14,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": 26,
+    "final": "Bronze III 19 PR"
+   },
+   "M11": {
+    "ganho": 17.9,
+    "perda": -17.7,
+    "promocoes": 24,
+    "rebaixamentos": 20,
+    "oscilacoes": 13,
+    "trocas_de_rank": 1,
+    "trocas_de_rank_por_percentil": 1,
+    "distancia_media": 39,
+    "final": "Diamond II 32 PR"
+   },
+   "R31": {
+    "ganho": 37.8,
+    "perda": -4.2,
+    "promocoes": 0,
+    "rebaixamentos": 0,
+    "oscilacoes": 0,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": null,
+    "final": "Obsidian I 100 PR"
+   },
+   "W26": {
+    "ganho": 16.6,
+    "perda": -19.0,
+    "promocoes": 18,
+    "rebaixamentos": 22,
+    "oscilacoes": 15,
+    "trocas_de_rank": 6,
+    "trocas_de_rank_por_percentil": 71,
+    "distancia_media": 80,
+    "final": "Platinum V 24 PR"
+   }
+  }
+ },
+ {
+  "variante": {
+   "nome": "sem puxar para o alvo",
+   "K": 40.0,
+   "BETA": 0.0,
+   "MULTIPLICADOR_MAXIMO": 1.0,
+   "ESCUDO": 0,
+   "PR_APOS_REBAIXAMENTO": 100
+  },
+  "carreiras": {
+   "M03": {
+    "ganho": 18.2,
+    "perda": -18.2,
+    "promocoes": 34,
+    "rebaixamentos": 34,
+    "oscilacoes": 46,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": 93,
+    "final": "Bronze V 94 PR"
+   },
+   "M11": {
+    "ganho": 17.9,
+    "perda": -17.8,
+    "promocoes": 37,
+    "rebaixamentos": 36,
+    "oscilacoes": 51,
+    "trocas_de_rank": 21,
+    "trocas_de_rank_por_percentil": 1,
+    "distancia_media": 193,
+    "final": "Diamond V 59 PR"
+   },
+   "R31": {
+    "ganho": 12.6,
+    "perda": -12.8,
+    "promocoes": 1,
+    "rebaixamentos": 1,
+    "oscilacoes": 1,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 0,
+    "distancia_media": null,
+    "final": "Obsidian I 78 PR"
+   },
+   "W26": {
+    "ganho": 17.9,
+    "perda": -18.1,
+    "promocoes": 30,
+    "rebaixamentos": 32,
+    "oscilacoes": 41,
+    "trocas_de_rank": 0,
+    "trocas_de_rank_por_percentil": 71,
+    "distancia_media": 227,
+    "final": "Platinum III 96 PR"
+   }
+  }
+ }
+]
