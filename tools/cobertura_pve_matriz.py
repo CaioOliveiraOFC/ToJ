@@ -370,10 +370,12 @@ sistema(
     "combate",
     lambda r: conta(r, "heroi.acao:skill"),
     lambda r: soma(r, "skill_heroi_status:"),
+    # Efeito pela porta única (KI-015): o evento `status_aplicado` não conta o
+    # ramo principal das skills de status.
     lambda r: sum(
         v
         for k, v in r["n"].items()
-        if k.startswith("status_aplicado:") and k.endswith(":em_monstro")
+        if k.startswith("status.aplicado:") and k.endswith(":em_monstro")
     ),
 )
 sistema(
@@ -382,7 +384,7 @@ sistema(
     lambda r: soma(r, "ia.turnos:"),
     lambda r: soma(r, "skill_monstro:"),
     lambda r: sum(
-        v for k, v in r["n"].items() if k.startswith("status_aplicado:") and k.endswith(":em_heroi")
+        v for k, v in r["n"].items() if k.startswith("status.aplicado:") and k.endswith(":em_heroi")
     ),
 )
 sistema(
@@ -509,6 +511,47 @@ saida = {
 }
 
 
+def status_porta_unica(universo) -> dict:
+    """As tentativas de status contadas na porta única (KI-015).
+
+    Chave da sonda: `status.<medida>:<status>:<origem>:em_<lado>`. Devolve, por
+    (status, lado), as medidas somadas e o número de runs com ao menos uma
+    tentativa; e, por origem, tentativas e aplicações.
+    """
+    por_status: dict = collections.defaultdict(collections.Counter)
+    runs_com: collections.Counter = collections.Counter()
+    por_origem: dict = collections.defaultdict(collections.Counter)
+    for r in universo:
+        vistos = set()
+        for k, v in r["n"].items():
+            if not k.startswith("status."):
+                continue
+            medida, _, resto = k[len("status.") :].partition(":")
+            status, origem, lado = resto.split(":")
+            chave = (status, lado[len("em_") :])
+            por_status[chave][medida] += v
+            if medida == "tentativa":
+                vistos.add(chave)
+                por_origem[origem]["tentativa"] += v
+            elif medida == "aplicado":
+                por_origem[origem]["aplicado"] += v
+        for chave in vistos:
+            runs_com[chave] += 1
+    return {
+        "por_status": {
+            f"{s}:{lado}": dict(m, runs=runs_com[(s, lado)])
+            for (s, lado), m in sorted(por_status.items())
+        },
+        "por_origem": {o: dict(m) for o, m in sorted(por_origem.items())},
+    }
+
+
+saida["status_porta_unica"] = {
+    "completas": status_porta_unica(COMPLETAS),
+    "extraidas": status_porta_unica(EXTRAIDAS),
+}
+
+
 # --- Detalhes: leis, status, skills, papéis --------------------------------------
 def contagem(universo, prefixo):
     c = collections.Counter()
@@ -559,7 +602,33 @@ for rot, uni in (("COMPLETAS", COMPLETAS), ("EXTRAIDAS", EXTRAIDAS)):
             f"runs={runs_lei.get(i.id, 0)}"
         )
     print("  por ator:", dict(c1), dict(c2))
-    print(f"\n#### Status — {rot}")
+    print(f"\n#### Status — porta única (KI-015) — {rot}")
+    print(
+        "  esperado = soma das probabilidades das rolagens (o piso da chance efetiva); "
+        "imune = resistência levou a chance a zero (não rola)"
+    )
+    print(
+        "  | status | alvo | runs | tentativas | aplicados | esperado | falhou rolagem "
+        "| imune | recusado pelo núcleo | resistência parcial |"
+    )
+    print("  |---|---|---:|---:|---:|---:|---:|---:|---:|---:|")
+    pu = status_porta_unica(uni)
+    for chave, m in pu["por_status"].items():
+        s, lado = chave.split(":")
+        esperado = m.get("chance_centesimos", 0) / 10000
+        print(
+            f"  | {s} | {lado} | {m['runs']} | {m.get('tentativa', 0)} | "
+            f"{m.get('aplicado', 0)} | {esperado:.1f} | {m.get('falhou_rolagem', 0)} | "
+            f"{m.get('imune', 0)} | {m.get('recusado_nucleo', 0)} | "
+            f"{m.get('resistencia_parcial', 0)} |"
+        )
+    print("  por origem (tentativas → aplicados):")
+    for origem, m in pu["por_origem"].items():
+        print(f"    {origem:18s} {m.get('tentativa', 0):6d} → {m.get('aplicado', 0)}")
+    print(
+        f"\n#### Status — eventos publicados (subconta as skills de status primárias; "
+        f"ver KI-015) — {rot}"
+    )
     c, rc = contagem(uni, "status_aplicado:")
     for e in sorted(core.CATALOG):
         h = c.get(f"{e}:em_heroi", 0)
