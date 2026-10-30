@@ -365,7 +365,9 @@ Dados: [`baselines/progression/97965ae/rng/`](../../baselines/progression/97965a
 
 | o quê | onde | resultado |
 |---|---|---|
-| Suíte padrão (`pytest -q`) | local, Python 3.13 | 3196 passed, 3 skipped, 118 deselected (`balance`), 6 xfailed (5 desta etapa + o custo × recarga anterior) |
+| Suíte padrão (`pytest -q`) | local, Python 3.13, `phase/game-core` (`04f50ea`) | 3196 passed, 3 skipped, 118 deselected (`balance`), 6 xfailed (5 desta etapa + o custo × recarga anterior) |
+| Suíte padrão (`pytest -q`) | local, Python 3.13, `fix/etapa0-fechamento` | 3194 passed, 3 skipped, 118 deselected, 8 xfailed. Os 2 testes de "reservado inerte" saíram, e `true_damage` e `armageddon` viraram `xfail` |
+| CI completa | GitHub Actions, run `41089878567` | success, 9/9 jobs; 118 testes de balanceamento verdes (seção 5) |
 | `tests/test_cobertura_de_efeitos.py` | local, `fix/etapa0-fechamento` | 90 passed, 7 xfailed (5 bugs e 2 pendências de design), em ~12 s |
 | `ruff check` e `ruff format --check` | `src/`, `tests/` e as ferramentas novas | limpo |
 | `-m balance` | só na CI, por fatias | ver seção 5 |
