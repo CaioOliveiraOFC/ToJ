@@ -79,6 +79,105 @@ class _Ctx:
             C["ctx"].pop()
 
 
+# Quem chamou `try_apply_status` diz de onde o status veio. São os quatro
+# chamadores de `src/mechanics/combat.py`; qualquer outro aparece pelo nome, e
+# não some numa categoria genérica.
+ORIGENS_DE_STATUS = {
+    "apply_skill": "skill_principal",
+    "_aplicar_secundario": "skill_secundario",
+    "_try_apply_stun": "atordoamento",
+    "_aplicar_procs_on_hit": "proc_de_acerto",
+}
+
+# Os desfechos de uma tentativa, na ordem em que `try_apply_status` decide:
+DESFECHOS_DE_STATUS = (
+    "sem_alvo",  # o alvo não carrega efeitos
+    "chance_zero",  # a chance base já era zero
+    "imune",  # a resistência levou a chance efetiva a zero; não rola
+    "falhou_rolagem",  # rolou e não pegou
+    "recusado_nucleo",  # pegou na rolagem e o núcleo não aplicou
+    "aplicado",
+)
+
+
+def sonda_de_status(registrar, lado_do_alvo):
+    """Mede cada tentativa de status na porta única do combate (KI-015).
+
+    A sonda anterior contava o evento `<status>_applied`. Esse evento só é
+    publicado quando quem chama passa `applied_kind`, e o ramo principal das
+    skills de status não passa, então `frozen`, `sleep` e `invisible` apareciam
+    com zero aplicações enquanto as leis que dependem deles disparavam.
+
+    Aqui a contagem é por CHAMADA. Antes de chamar a original, a sonda calcula a
+    chance efetiva com as mesmas funções puras que o combate usa
+    (`status_resistance` e `effective_status_chance`); dentro da chamada,
+    observa se `effect_core.apply_effect` foi alcançado e o que devolveu. Nada
+    disso sorteia nem altera argumento ou retorno: o combate segue idêntico.
+
+    `lado_do_alvo(alvo)` devolve "heroi", "monstro" ou `None` (não conta).
+    `registrar(chave, valor)` soma. Devolve a função que desinstala.
+    """
+    from src.mechanics import combat as cmb
+    from src.shared import effect_core as core
+    from src.shared import effects as fx
+
+    orig_tentar = cmb.try_apply_status
+    orig_aplicar = core.apply_effect
+    em_curso: list[dict] = []
+
+    def aplicar(entity, effect_id, *a, **k):
+        instancia = orig_aplicar(entity, effect_id, *a, **k)
+        if em_curso:
+            em_curso[-1]["nucleo"] = instancia is not None
+        return instancia
+
+    def tentar(target, status, base_chance, duration, r, publish=None, **k):
+        lado = lado_do_alvo(target)
+        if lado is None:
+            return orig_tentar(target, status, base_chance, duration, r, publish, **k)
+        chamador = sys._getframe(1).f_code.co_name
+        origem = ORIGENS_DE_STATUS.get(chamador, f"outro_{chamador}")
+        tem_efeitos = hasattr(target, "active_effects")
+        resistencia = fx.status_resistance(target, status) if tem_efeitos else 0.0
+        chance = fx.effective_status_chance(base_chance, resistencia) if tem_efeitos else 0.0
+        moldura = {"nucleo": None}
+        em_curso.append(moldura)
+        try:
+            pegou = orig_tentar(target, status, base_chance, duration, r, publish, **k)
+        finally:
+            em_curso.pop()
+        if not tem_efeitos:
+            desfecho = "sem_alvo"
+        elif chance <= 0:
+            desfecho = "imune" if base_chance > 0 else "chance_zero"
+        elif moldura["nucleo"] is None:
+            desfecho = "falhou_rolagem"
+        elif not moldura["nucleo"]:
+            desfecho = "recusado_nucleo"
+        else:
+            desfecho = "aplicado"
+        sufixo = f"{status}:{origem}:em_{lado}"
+        registrar(f"status.tentativa:{sufixo}", 1)
+        registrar(f"status.{desfecho}:{sufixo}", 1)
+        if chance > 0:
+            # A chance que rolou, em centésimos de ponto percentual: a soma
+            # dividida por 10.000 é o número ESPERADO de aplicações, a régua
+            # contra a qual o aplicado se compara.
+            registrar(f"status.chance_centesimos:{sufixo}", int(round(chance * 100)))
+            if 0 < resistencia < 100:
+                registrar(f"status.resistencia_parcial:{sufixo}", 1)
+        return pegou
+
+    cmb.try_apply_status = tentar
+    core.apply_effect = aplicar
+
+    def desinstalar():
+        cmb.try_apply_status = orig_tentar
+        core.apply_effect = orig_aplicar
+
+    return desinstalar
+
+
 def instalar() -> None:
     """Instala as sondas. Chamado uma vez por processo trabalhador."""
     import tools.bot_padrao as bp
@@ -293,6 +392,20 @@ def instalar() -> None:
         return saiu
 
     core.break_on_damage = quebrar
+
+    # --- status: a porta única (KI-015) ----------------------------------------
+    def lado_no_encontro(alvo):
+        # Só a batalha real conta. Fora do encontro, o que roda pelo mesmo motor
+        # são os duelos de benchmark do OP, e eles não são jornada.
+        if C is None or C.get("encerrada") or C["monstro"] is None or C["bot"] is None:
+            return None
+        if alvo is C["bot"].hero:
+            return "heroi"
+        if alvo is C["monstro"]:
+            return "monstro"
+        return None
+
+    sonda_de_status(n, lado_no_encontro)
 
     # --- a IA do monstro -----------------------------------------------------
     orig_pick = mai._pick_skill
