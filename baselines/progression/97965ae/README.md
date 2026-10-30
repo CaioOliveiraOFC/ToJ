@@ -90,8 +90,31 @@ As demais linhas estão na saída completa do agregador e são todas iguais às 
 
 ---
 
+## A passada instrumentada
+
+Uma segunda coleta do mesmo protocolo, com as sondas de cobertura PvE
+(`tools/cobertura_pve.py`, portadas da auditoria da `phase/pvp-arena` sem
+merge), mede três coisas por sistema: se ele esteve disponível na run, se o
+bot o usou e se o uso deixou efeito.
+
+```
+python tools/cobertura_pve.py rodar --saida cobertura.jsonl --workers 4
+python tools/cobertura_pve.py conferir cobertura.jsonl baselines/progression/d3105edc/depois.jsonl
+runs medidas 300, de referência 300, não medidas 0, divergentes 0
+python tools/cobertura_pve_matriz.py cobertura.jsonl matriz_cobertura.json > matriz_cobertura.md
+```
+
+A conferência é a prova de não interferência: com as sondas instaladas, as 300
+runs continuam idênticas à `d3105edc`. As sondas só observam. A leitura da
+matriz está no relatório da Etapa 0.
+
+---
+
 ## Arquivos
 
 | Arquivo | Conteúdo |
 |---|---|
 | `b0.jsonl` | As 300 runs da B0. 396.396 bytes, sha256 `c92e85f7611f8c9485da96ee586f4c64f762a60735a12ce29e98815da1c0d01d`. Difere de `../d3105edc/depois.jsonl` só no campo `segundos` |
+| `cobertura.jsonl.gz` | A passada instrumentada: o registro do coletor mais a chave `cobertura`, por run. Comprimido com `gzip -9 -n` (330.695 bytes, sha256 `512e2b97feec7b0908cea41b644c40dbccef38f0baee96419c3aa486ea908285`); descomprimido, 3.262.098 bytes, sha256 `a1dd3cbb7e6828823d334eccf8da339fa209e4cc686aa361e59603cf680fe090` |
+| `matriz_cobertura.md` | A matriz por sistema: runs com oportunidade, com uso e com efeito, para todas as runs e para as extraídas, mais leis, status, passivas, encontros e complementos |
+| `matriz_cobertura.json` | A mesma matriz, em JSON |
