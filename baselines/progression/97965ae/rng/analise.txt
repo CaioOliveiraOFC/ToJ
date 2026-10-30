@@ -1,0 +1,33 @@
+controle × baseline publicada: 60/60 idênticas
+
+braço global (um sorteio a mais no andar 2), 60 pares
+  runs que chegaram ao andar 2: 55
+  mapa diferente já no andar 2: 16/55
+  mapa diferente em algum andar: 16/55
+  estado diferente em algum andar: 15/55 (mediana do 1º andar: 2)
+  desfecho final igual (desfecho, andar): 45/60
+  Δandar final: média +0.42, |Δ| médio 2.65, desvio 6.27
+  correlação do andar final, controle × global: ρ = 0.66
+
+braço global_pos_mapa (um sorteio a mais no andar 2), 60 pares
+  runs que chegaram ao andar 2: 55
+  mapa diferente já no andar 2: 0/55
+  mapa diferente em algum andar: 24/55
+  estado diferente em algum andar: 26/55 (mediana do 1º andar: 2.0)
+  desfecho final igual (desfecho, andar): 39/60
+  Δandar final: média +1.85, |Δ| médio 3.15, desvio 6.50
+  correlação do andar final, controle × global_pos_mapa: ρ = 0.70
+
+braço run (um sorteio a mais no andar 2), 60 pares
+  runs que chegaram ao andar 2: 55
+  mapa diferente já no andar 2: 0/55
+  mapa diferente em algum andar: 41/55
+  estado diferente em algum andar: 47/55 (mediana do 1º andar: 2)
+  desfecho final igual (desfecho, andar): 23/60
+  Δandar final: média +3.03, |Δ| médio 5.37, desvio 8.24
+  correlação do andar final, controle × run: ρ = 0.51
+
+tamanho de amostra por braço (poder 80%, α 5%), variância da baseline:
+  mage: σ(andar) = 8.42; Δ1 andar: não pareado 1115, pareado ideal (ρ=0,9) 112; extração 32%, Δ10 p.p.: 366
+  rogue: σ(andar) = 7.29; Δ1 andar: não pareado 835, pareado ideal (ρ=0,9) 84; extração 15%, Δ10 p.p.: 252
+  warrior: σ(andar) = 7.76; Δ1 andar: não pareado 946, pareado ideal (ρ=0,9) 95; extração 26%, Δ10 p.p.: 336

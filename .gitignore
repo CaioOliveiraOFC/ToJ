@@ -24,6 +24,10 @@ reports/*
 !reports/BASELINE_PRE_BALANCE.md
 !reports/baseline_pre_balance_agregados.json
 !reports/baseline_pre_balance_completo.txt
+!reports/etapa0_fundacao_pve/
+reports/etapa0_fundacao_pve/*
+!reports/etapa0_fundacao_pve/README.md
+!reports/etapa0_fundacao_pve/matriz_efeitos.md
 
 # IDEs
 .idea/
