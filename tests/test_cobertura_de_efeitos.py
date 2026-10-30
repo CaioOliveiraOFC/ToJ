@@ -1,4 +1,4 @@
-"""Efeito declarado no conteúdo tem de mudar o jogo, ou estar registrado como reservado.
+"""Efeito declarado no conteúdo tem de mudar o jogo, ou estar registrado como pendência.
 
 `test_placebo.py` prova carta a carta que passivas e skills mexem no boneco. Este
 arquivo faz a pergunta transversal, por FONTE: para cada par (fonte, efeito) que
@@ -16,16 +16,20 @@ o combate lê. Foi assim que os buffs de vida e mana máxima apareceram — a sk
 grava `{"stat": "hp"}`, o teste de placebo vê o dicionário mudar, e nada no motor
 soma esse buff ao teto de HP do herói.
 
-Três desfechos, e só três:
+Dois desfechos, e só dois:
 
 - funcional: a assinatura muda;
-- reservado: o conteúdo declara de propósito algo que o motor ainda não tem.
-  Fica em `RESERVADOS`, com o motivo, e o teste exige que continue inerte — no
-  dia em que ganhar mecânica, sai do registro numa mudança que mede o impacto;
-- defeito conhecido: `xfail(strict=True)` com o identificador do débito. Quando a
-  correção chegar, o XPASS reprova e obriga a tirar a marca.
+- pendência conhecida: em `PENDENCIAS`, com o tipo e o identificador do débito,
+  e marcada `xfail(strict=True)`. Quando a correção chegar, o XPASS reprova e
+  obriga a tirar a marca. Os tipos são dois:
+  - `bug`: a mecânica existe e o caminho até ela está quebrado;
+  - `design`: o conteúdo promete algo que o motor não tem, e falta decidir o que
+    é.
 
-Qualquer outro efeito inerte reprova: é um placebo novo.
+Não existe "inerte de propósito". Um item que o jogador pode obter e que declara
+um efeito tem de entregá-lo; deixá-lo inerte seria uma decisão de design, e
+nenhuma foi tomada. Qualquer efeito inerte fora do registro reprova: é um placebo
+novo.
 
 Os valores são INFLADOS para isolar o canal: o teste pergunta se o efeito chega
 a algum lugar, não quanto ele vale. Balanceamento é do `-m balance`.
@@ -69,42 +73,49 @@ SEEDS_GOLPE = range(24)
 SEEDS_LUTA = range(3)
 PAPEIS_LUTA = ("bruiser", "controller")
 
-# Declarado no conteúdo, inerte de propósito. Cada entrada diz POR QUE está aqui;
-# sem motivo, é placebo com outro nome.
-RESERVADOS = {
-    ("equipamento", "true_damage"): (
-        "Espada do Universo. Nenhuma mecânica de dano verdadeiro existe; reservado "
-        "até a decisão de design (N4)."
-    ),
-    ("equipamento", "armageddon"): (
-        "Cajado da Galáxia. Nenhuma mecânica de armageddon existe; reservado até a "
-        "decisão de design (N4)."
-    ),
-}
-
-# Declarado, prometido ao jogador e sem efeito: defeito. Fica visível como
+# Declarado, ao alcance do jogador e sem efeito. Cada entrada fica visível como
 # `xfail` estrito até a correção, que transforma o XPASS em reprovação.
-DEFEITOS = {
+BUG = "bug"
+DESIGN = "design"
+PENDENCIAS = {
     ("evento", "altar"): (
-        "PVE-01: a bênção é gravada sem `stat`, e nem `LEGACY_BUFF_STATS` a reconhece. "
-        "O jogador paga 30% do HP máximo por nada."
+        BUG,
+        "PVE-01 / KI-007: a bênção é gravada sem `stat`, e nem `LEGACY_BUFF_STATS` a "
+        "reconhece. O jogador paga 30% do HP máximo por nada.",
     ),
     ("skill-heroi", "buff:hp"): (
-        "N10: o buff `{stat: hp}` vai para `active_buffs`, e o teto de HP do herói "
-        "(`_scaled`) só lê `resource_percent`. 'Vida máxima +40%' não muda nada."
+        BUG,
+        "N10 / KI-008: o buff `{stat: hp}` vai para `active_buffs`, e o teto de HP do "
+        "herói (`_scaled`) só lê `resource_percent`. 'Vida máxima +40%' não muda nada.",
     ),
     ("skill-heroi", "buff:mp"): (
-        "N10: o buff `{stat: mp}` vai para `active_buffs`, e o teto de MP do herói "
-        "(`_scaled`) só lê `resource_percent`. 'Mana máxima +30%' não muda nada."
+        BUG,
+        "N10 / KI-008: o buff `{stat: mp}` vai para `active_buffs`, e o teto de MP do "
+        "herói (`_scaled`) só lê `resource_percent`. 'Mana máxima +30%' não muda nada.",
     ),
     ("skill-monstro", "buff:hp"): (
-        "N10: no monstro o buff `{stat: hp}` sobe `get_stat('hp')`, que o combate não "
-        "lê; teto e cura usam `base_hp`. 'Raízes Fundas' e 'Fôlego Emprestado' são inertes."
+        BUG,
+        "N10 / KI-008: no monstro o buff `{stat: hp}` sobe `get_stat('hp')`, que o "
+        "combate não lê; teto e cura usam `base_hp`. 'Raízes Fundas' e 'Fôlego "
+        "Emprestado' são inertes.",
     ),
     ("equipamento", "defense"): (
-        "N11: `equipment_percent` lê `defense_bonus` para `df` e o `elif` nunca chega "
-        "ao `effect_type: defense`. O Amuleto de Argila mostra 'defense +3' e entrega "
-        "só o `defense_bonus` 1."
+        BUG,
+        "N11 / KI-009: `equipment_percent` lê `defense_bonus` para `df` e o `elif` "
+        "nunca chega ao `effect_type: defense`. O Amuleto de Argila mostra 'defense "
+        "+3' e entrega só o `defense_bonus` 1.",
+    ),
+    ("equipamento", "true_damage"): (
+        DESIGN,
+        "N4 / KI-013: a Espada do Universo (lendária, cai como drop) mostra "
+        "'true_damage +20', e não existe mecânica de dano verdadeiro. Falta decidir "
+        "o que o efeito é.",
+    ),
+    ("equipamento", "armageddon"): (
+        DESIGN,
+        "N4 / KI-013: o Cajado da Galáxia (lendário, cai como drop) mostra "
+        "'armageddon +50', e não existe mecânica de armageddon. Falta decidir o que "
+        "o efeito é.",
     ),
 }
 
@@ -518,19 +529,16 @@ CASOS = _casos()
 
 def _marcas(fonte, efeito):
     chave = (fonte, efeito)
-    if chave in DEFEITOS:
-        return [pytest.mark.xfail(strict=True, reason=DEFEITOS[chave])]
+    if chave in PENDENCIAS:
+        tipo, motivo = PENDENCIAS[chave]
+        return [pytest.mark.xfail(strict=True, reason=f"[{tipo}] {motivo}")]
     return []
 
 
 class TestEfeitoDeclaradoMudaOJogo:
     @pytest.mark.parametrize(
         "fonte,efeito,caso,papel",
-        [
-            pytest.param(f, e, c, p, id=f"{f}:{e}", marks=_marcas(f, e))
-            for f, e, c, p in CASOS
-            if (f, e) not in RESERVADOS
-        ],
+        [pytest.param(f, e, c, p, id=f"{f}:{e}", marks=_marcas(f, e)) for f, e, c, p in CASOS],
     )
     def test_o_efeito_chega_a_um_consumidor(self, fonte, efeito, caso, papel):
         mudou = _sondas_que_mudaram(lambda: caso(False), lambda: caso(True), papel)
@@ -539,25 +547,12 @@ class TestEfeitoDeclaradoMudaOJogo:
             "efeito sem implementação funcional"
         )
 
-    @pytest.mark.parametrize(
-        "fonte,efeito,caso,papel",
-        [pytest.param(f, e, c, p, id=f"{f}:{e}") for f, e, c, p in CASOS if (f, e) in RESERVADOS],
-    )
-    def test_o_reservado_continua_inerte(self, fonte, efeito, caso, papel):
-        """Reservado que passou a mudar o jogo ganhou mecânica sem medição."""
-        mudou = _sondas_que_mudaram(lambda: caso(False), lambda: caso(True), papel)
-        assert not mudou, (
-            f"{fonte}:{efeito} está em RESERVADOS e agora muda {mudou}. Tire do "
-            "registro na mesma mudança que mede o impacto."
-        )
-
-    def test_os_registros_apontam_para_conteudo_que_existe(self):
+    def test_o_registro_aponta_para_conteudo_que_existe(self):
         """Uma entrada de registro sem caso é lixo: esconde o próximo efeito
         com o mesmo nome."""
         existentes = {(f, e) for f, e, _c, _p in CASOS}
-        assert set(RESERVADOS) <= existentes
-        assert set(DEFEITOS) <= existentes
-        assert not set(RESERVADOS) & set(DEFEITOS)
+        assert set(PENDENCIAS) <= existentes
+        assert {tipo for tipo, _motivo in PENDENCIAS.values()} <= {BUG, DESIGN}
 
     def test_a_assinatura_e_deterministica(self):
         """Sem isto, A ≠ B poderia ser só ruído, e todo placebo passaria."""
@@ -597,7 +592,9 @@ EXIGE: dict[str, frozenset[str]] = {
 # Os sete efeitos positivos dos pares opostos. O núcleo os implementa e as leis
 # de par dependem deles, mas nenhuma carta, item, passiva ou monstro os aplica.
 # A passiva `precision` é MODIFICADOR de acerto, não o efeito do catálogo.
-SEM_FONTE_RESERVADOS = frozenset(
+# Pendência sem decisão (PVE-02): o conjunto fica travado para que uma mudança
+# nele seja notada, e não porque alguém tenha decidido que deve ficar assim.
+SEM_FONTE_PVE02 = frozenset(
     {"empowered", "arcane_surge", "quickened", "fortified", "vitality", "focused", "precision"}
 )
 
@@ -632,11 +629,11 @@ def _efeitos_com_fonte() -> set[str]:
 
 
 class TestFontesDoCatalogo:
-    def test_os_efeitos_sem_fonte_sao_os_sete_positivos_reservados(self):
+    def test_os_efeitos_sem_fonte_sao_os_sete_positivos_do_pve02(self):
         sem_fonte = set(core.CATALOG) - _efeitos_com_fonte()
-        assert sem_fonte == SEM_FONTE_RESERVADOS, (
+        assert sem_fonte == SEM_FONTE_PVE02, (
             f"sem fonte: {sorted(sem_fonte)}. Um efeito novo sem conteúdo que o aplique "
-            "é mecânica morta; um reservado que ganhou fonte sai do registro."
+            "é mecânica morta; um efeito do PVE-02 que ganhou fonte sai do registro."
         )
 
     def test_a_tabela_de_exigencias_cobre_todas_as_leis(self):
