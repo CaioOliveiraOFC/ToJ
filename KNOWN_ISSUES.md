@@ -96,6 +96,31 @@ Os identificadores entre parênteses são os do diagnóstico da fundação PvE
   sockets somem junto, sem aviso, tanto para o jogador quanto para o bot.
 - O preço de venda também ignora o `+N` e os encantamentos da peça.
 
+### KI-011 — O BotPadrão não exercita boa parte dos sistemas (BOT-01, BOT-03, N1, N2, N6)
+
+**Classificação:** comportamento do bot.
+
+Medido na passada instrumentada da B0 (300 runs,
+[`matriz_cobertura.md`](baselines/progression/97965ae/matriz_cobertura.md)):
+
+- **Skills.** Escolhe dano quase sempre. Buff foi escolhido 10 vezes em 17.408
+  turnos disponíveis; cura, 40 em 18.086; status, 16 em 9.973.
+- **Equipamento.**
+  - Troca a peça na posição errada em 76 runs, 72 delas com perda líquida, e
+    em 69 das 73 builds extraídas (BOT-01).
+  - Arma de duas mãos é comparada só com a `Weapon1` (N2).
+- **Recursos nunca usados.** Poção de mana, recuperação paga de MP, retirar
+  gema, reencantar e reroll de oferta. Elixires, 2 usos em 68 runs com
+  oportunidade.
+- **Eventos.**
+  - O Mercador é tratado como uma segunda Loja (N1).
+  - O Altar é aceito em 56 runs, sem efeito (KI-007).
+- **Avaliador de combate.** Ignora `mana_restored` (BOT-03) e o desgaste entre
+  lutas: HP e MP poupados não contam para a luta seguinte (N6).
+
+Consequência para a régua: uma correção de mecânica que o bot não usa não
+aparece na progressão medida.
+
 ---
 
 ## Reservado: declarado e inerte de propósito
@@ -128,6 +153,11 @@ Registrados onde vivem, e listados aqui só para não se perderem:
   - É um defeito de preço de carta, anterior à reforma.
 - **O smoke "jogando sozinho" de `tools/audit_interactions.py`** faz spawn sem
   semente, então duas rodadas podem diferir. A seção dirigida já é determinística.
+- **O gate de balanceamento da CI na `master` nunca terminou.** No push da
+  `v0.3-pve` (`97965ae`), o job único estourou os 25 minutos e saiu como falha
+  sem rodar inteiro.
+  - Na `phase/game-core` ele roda em quatro fatias, sem mudar threshold.
+  - A `master` fica como está até a próxima integração.
 - **As decisões de design pendentes** D2, D4 e D6, em
   [`GAME_DESIGN.md`](GAME_DESIGN.md). São escolhas ainda não ratificadas, e não
   defeitos.
