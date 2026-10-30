@@ -11,7 +11,8 @@ que cada uma mede e quando ela pode ser comparada**.
 | Progression real | `fb321d4e` | jornada real: BotPadrão conservador + Starter Kit, seeds 1–100 × 3 classes, teto técnico 200 | **histórica** — o "antes" do instrumento | [`baselines/progression/fb321d4e/README.md`](baselines/progression/fb321d4e/README.md) |
 | Auditoria do instrumento | `0ab837b9` | o mesmo protocolo da `fb321d4e`, com o BotPadrão corrigido | **histórica** — o "antes" da dungeon | [`baselines/progression/0ab837b9/README.md`](baselines/progression/0ab837b9/README.md) |
 | Auditoria da dungeon | `4d0a9a0a` | o mesmo protocolo, com o BotPadrão congelado e a dungeon alterada | **histórica** — o "antes" do primeiro level-up | [`baselines/progression/4d0a9a0a/README.md`](baselines/progression/4d0a9a0a/README.md) |
-| Auditoria do primeiro level-up | `d3105edc` | o mesmo protocolo, com o BotPadrão congelado e só o custo do primeiro level-up alterado | **referência atual** — `-m balance` verde no `82ff73ea` | [`baselines/progression/d3105edc/README.md`](baselines/progression/d3105edc/README.md) |
+| Auditoria do primeiro level-up | `d3105edc` | o mesmo protocolo, com o BotPadrão congelado e só o custo do primeiro level-up alterado | **referência** — `-m balance` verde no `82ff73ea`; reproduzida pela B0 | [`baselines/progression/d3105edc/README.md`](baselines/progression/d3105edc/README.md) |
+| B0 da fundação PvE | `97965ae` | o mesmo protocolo e o mesmo coletor da `d3105edc`, sem mudança de gameplay | **referência atual** da `phase/game-core` — 300/300 runs idênticas à `d3105edc` | [`baselines/progression/97965ae/README.md`](baselines/progression/97965ae/README.md) |
 | Alvo de extração | remedido em `bc815fcd` | `overall_power` do snapshot de um Rogue real, `PODER_ESPERADO` | **instrumento** — alarme de deslocamento | `tools/arena_alvo.py`, `src/data/arena_benchmark_v1.json`, `tests/test_arena_alvo.py` |
 
 ---
@@ -67,6 +68,14 @@ primeiro level-up mudou.
 - O "antes" é cópia byte a byte do `depois.jsonl` da auditoria da dungeon.
 - O agregador ganhou o nível ao entrar em cada andar.
 
+**B0 da fundação PvE.** É a mesma régua rodada na ponta da `master`
+(`97965ae`), antes de qualquer correção da `phase/game-core`.
+- Usa o coletor da `d3105edc` sem cópia e sem edição.
+- Nenhum arquivo de jogo ou do bot muda entre os dois commits. Por isso o
+  critério é igualdade campo a campo, e as 300 runs saem idênticas.
+- Os números são os da `d3105edc`. O que a B0 acrescenta é a garantia de que o
+  ponto de partida da `phase/game-core` é aquele retrato, medido de novo.
+
 **Alvo de extração.** É o poder de referência contra o qual o BotPadrão decide
 se a build "superou a Arena" e vale extrair.
 - Não é baseline de balance, e não é a Arena como modo de jogo.
@@ -76,11 +85,15 @@ se a build "superou a Arena" e vale extrair.
 
 ## Quando comparar
 
-- **A auditoria `d3105edc` é a referência atual para qualquer mudança de
-  progressão.**
+- **A B0 (`97965ae`) é a referência atual para qualquer mudança de progressão
+  na `phase/game-core`.** Ela é idêntica à `d3105edc`, que continua valendo para
+  quem compara contra a `master`.
   - Uma mudança se compara rodando o mesmo protocolo no commit novo e agregando
     com o mesmo script: `run_auditoria.py` e `agrega_auditoria.py` do diretório
-    dela, com o `depois.jsonl` como o novo "antes".
+    da `d3105edc`, com o `b0.jsonl` como o "antes".
+  - Uma mudança que consuma sorteio a mais desloca as runs seguintes. Antes de
+    ler um delta run a run, veja o experimento de pareamento em
+    [`reports/etapa0_fundacao_pve/README.md`](reports/etapa0_fundacao_pve/README.md).
   - A `0ab837b9` mede o jogo de antes do bloco da dungeon. Ela só se compara com
     a `4d0a9a0a`, e isso já está feito.
   - A `4d0a9a0a` mede o jogo de antes do primeiro level-up. Ela só se compara
