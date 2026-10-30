@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import collections
 import json
+import math
 import multiprocessing as mp
 import os
 import pathlib
@@ -118,6 +119,7 @@ def sonda_de_status(registrar, lado_do_alvo):
     `registrar(chave, valor)` soma. Devolve a função que desinstala.
     """
     from src.mechanics import combat as cmb
+    from src.shared import constants as K
     from src.shared import effect_core as core
     from src.shared import effects as fx
 
@@ -160,10 +162,16 @@ def sonda_de_status(registrar, lado_do_alvo):
         registrar(f"status.tentativa:{sufixo}", 1)
         registrar(f"status.{desfecho}:{sufixo}", 1)
         if chance > 0:
-            # A chance que rolou, em centésimos de ponto percentual: a soma
-            # dividida por 10.000 é o número ESPERADO de aplicações, a régua
-            # contra a qual o aplicado se compara.
-            registrar(f"status.chance_centesimos:{sufixo}", int(round(chance * 100)))
+            # A probabilidade que rolou, em centésimos de ponto percentual: a
+            # soma dividida por 10.000 é o número ESPERADO de aplicações, a
+            # régua contra a qual o aplicado se compara. A rolagem é inteira
+            # (`randrange(MIN, MAX)`, que pega com `rolagem <= chance`), então
+            # uma chance fracionária vale o piso dela: 37,5% pega como 37%, e
+            # 0,5% não pega nunca.
+            faces = K.PERCENTAGE_RANGE_MAX - K.PERCENTAGE_RANGE_MIN
+            pegam = min(math.floor(chance), K.PERCENTAGE_RANGE_MAX - 1)
+            pegam = max(0, pegam - K.PERCENTAGE_RANGE_MIN + 1)
+            registrar(f"status.chance_centesimos:{sufixo}", round(pegam * 10000 / faces))
             if 0 < resistencia < 100:
                 registrar(f"status.resistencia_parcial:{sufixo}", 1)
         return pegou

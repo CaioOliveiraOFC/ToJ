@@ -154,6 +154,27 @@ class TestContagemExata:
         # 80% de base contra 50% de resistência: 40% efetivos, em centésimos.
         assert sonda.contagem[f"status.chance_centesimos:{sufixo}"] == 4000
 
+    def test_chance_fracionaria_vale_o_piso_da_rolagem_inteira(self, sonda):
+        """A rolagem é `randrange(1, 101)` e pega com `rolagem <= chance`.
+
+        75% contra 50% de resistência são 37,5% efetivos, e pegam como 37%. 1%
+        contra 50% são 0,5%: rola, e não pega nunca. O esperado precisa ser o
+        da rolagem, ou a calibração da matriz discorda do combate que mede.
+        """
+        heroi = make_hero("Warrior", NIVEL, "naked")
+        heroi.resistances = {"poison": 50, "bleed": 50}
+        sonda.marcar(heroi, "heroi")
+        combat.try_apply_status(heroi, "poison", 75, 3, random.Random(2), None)
+        r = random.Random(3)
+        antes = r.getstate()
+        assert not combat.try_apply_status(heroi, "bleed", 1, 3, r, None)
+        assert r.getstate() != antes, "0,5% é chance positiva: a rolagem acontece"
+        origem = "outro_test_chance_fracionaria_vale_o_piso_da_rolagem_inteira"
+        c = sonda.contagem
+        assert c[f"status.chance_centesimos:poison:{origem}:em_heroi"] == 3700
+        assert c[f"status.chance_centesimos:bleed:{origem}:em_heroi"] == 0
+        assert c[f"status.falhou_rolagem:bleed:{origem}:em_heroi"] == 1
+
 
 class TestNaoInterferencia:
     def test_alvo_fora_do_filtro_nao_conta(self, sonda):
