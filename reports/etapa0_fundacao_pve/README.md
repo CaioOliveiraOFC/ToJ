@@ -31,7 +31,11 @@ nada. As etapas seguintes vão se medir contra isto.
   posição errada aparece em 76 runs, 72 delas com perda líquida, e em 69 das 73
   builds extraídas. Poção de mana, recuperação de MP, retirar gema e reencantar
   nunca foram usados.
-- **RNG:** <!-- RNG-RESUMO -->
+- **RNG:** a reprodução é exata (mesma seed, mesmo código, mesma run). O
+  pareamento entre versões é frágil. Um único sorteio a mais, que não muda regra
+  nenhuma, altera o desfecho de 25% a 62% das runs, e em 60 pares produziu um
+  Δ médio de +3,0 andares (erro padrão 1,1). Com 100 seeds por classe, o efeito
+  mínimo detectável fica em ~2 a 3 andares por classe. Nada foi refatorado.
 - **CI:** a `phase/game-core` e os PRs para ela passam a ser validados. O
   balanceamento roda em quatro fatias, porque num job só ele estourou os 25
   minutos na `master` (`97965ae`) e o gate nunca chegou a verificar nada.
@@ -185,7 +189,80 @@ ler também o resultado da skill (`COMBAT_SKILL_OUTCOME`).
 
 ## 4. RNG compartilhado e pareamento entre versões
 
-<!-- RNG-SECAO -->
+O jogo sorteia por duas fontes:
+- **o gerador da run** (`BotPadrao.rng`): combate e decisões;
+- **o `random` global:** mapa, vitrine da Loja, loot, gema, chave, encanto e
+  nomes.
+
+Uma mudança de código que consome um sorteio a mais desloca tudo o que vem
+depois na mesma fonte. Isso não quebra a reprodução, mas quebra o pareamento:
+"a seed 42 na versão nova" deixa de ser a mesma run da seed 42 na antiga.
+
+**Experimento** (`tools/rng_pareamento.py`, só medição, nada refatorado).
+- **Protocolo:** o histórico, em seeds 1–20 × 3 classes (60 runs por braço).
+- **Braços:** quatro, que só diferem num sorteio a mais no andar 2:
+  - **controle:** nada muda;
+  - **`global`:** um `random.random()` antes de gerar o mapa;
+  - **`global_pos_mapa`:** o mesmo sorteio logo depois do mapa. É onde cai uma
+    mudança típica de versão: um sorteio a mais no loot, na Loja ou num evento;
+  - **`run`:** um sorteio a mais no gerador da run, como faria uma mudança no
+    combate ou numa decisão.
+
+O controle reproduz a baseline publicada em **60/60**, então as sondas do
+experimento não interferem.
+
+| braço | mapa diverge (das 55 que chegam ao andar 2) | estado do herói diverge | desfecho final igual | Δ andar: média (EP) · mediana | ρ do andar final |
+|---|---:|---:|---:|---|---:|
+| `global` (antes do mapa) | 16/55 | 15/55 | 45/60 | +0,42 (0,82) · 0 | 0,66 |
+| `global_pos_mapa` | 24/55 | 26/55 | 39/60 | +1,85 (0,85) · 0 | 0,70 |
+| `run` | 41/55 | 47/55 | 23/60 | +3,03 (1,07) · 0 | 0,51 |
+
+**Leitura.**
+- **A reprodução é exata.** B0, passada instrumentada e controle repetem as
+  runs publicadas campo a campo.
+- **O gerador de mapa absorve parte da perturbação global.** O gerador é uma
+  caminhada aleatória com rejeição na borda. Dois trajetos deslocados acoplam
+  ao bater nas mesmas paredes, e o mapa sai idêntico, com o gerador global no
+  mesmo estado.
+  - Antes do mapa, 39 das 55 perturbações foram absorvidas assim (71%).
+  - Depois do mapa, mais da metade é absorvida no andar seguinte.
+
+  Isso é sorte do algoritmo, e não uma garantia: ninguém deve contar com isso.
+- **Quando a perturbação escapa, o efeito é tudo ou nada.** O Δ de andar por
+  run é 0 na maioria dos pares e de ±16 a ±22 andares no resto: uma run que
+  morria cedo passa a ir fundo, ou o contrário. O gerador da run é o mais
+  sensível: o desfecho muda em 37 de 60 runs.
+- **Um sorteio a mais já parece um efeito.** No braço `run`, que por
+  construção não muda regra nenhuma, a média subiu +3,0 andares com t ≈ 2,8
+  em 60 pares. Lido sem cuidado, isso seria uma "melhoria".
+
+**Quanto custa comparar versões.** Usa a variância da B0. O efeito mínimo
+detectável tem poder de 80% e α de 5%, no protocolo atual de 100 seeds por
+classe:
+
+| | σ(andar) | não pareado | pareado com o ρ medido (0,51–0,70) | pareado ideal (ρ = 0,9) |
+|---|---:|---:|---:|---:|
+| warrior | 7,76 | 3,1 andares | 1,7–2,2 | 1,0 |
+| mage | 8,42 | 3,3 andares | 1,8–2,3 | 1,1 |
+| rogue | 7,29 | 2,9 andares | 1,6–2,0 | 0,9 |
+| todas (n=300) | 7,96 | 1,8 andares | 1,0–1,3 | 0,6 |
+
+Para a taxa de extração, o efeito mínimo detectável sem pareamento é de 14 a 18
+p.p. por classe e 9,8 p.p. no total. Para detectar Δ = 1 andar por classe sem
+pareamento seriam 835 a 1.115 runs por classe e por braço.
+
+**Implicações para as próximas etapas. Nenhuma foi implementada.**
+- Comparação run a run entre versões ("a seed 42 piorou") não é evidência
+  depois do primeiro sorteio divergente. Só agregados valem.
+- Com 100 seeds por classe, mudanças menores que ~2 andares por classe, ou
+  ~1 andar no total, não aparecem. Uma correção pequena precisa de mais seeds
+  ou de uma métrica mais sensível que o andar final.
+- Separar as fontes por subsistema (N5) aumentaria o ρ. Pelo efeito mínimo
+  detectável, levar o ρ de ~0,6 para ~0,9 reduz a amostra necessária em 3 a 4
+  vezes. Isso também precisa ser medido antes da refatoração, com este mesmo
+  experimento.
+
+Dados: [`baselines/progression/97965ae/rng/`](../../baselines/progression/97965ae/README.md#arquivos).
 
 ---
 
@@ -210,7 +287,9 @@ ler também o resultado da skill (`COMBAT_SKILL_OUTCOME`).
   sem ter rodado inteiro. Localmente, a suíte inteira leva 34 minutos num
   processo.
 
-<!-- CI-ESTADO -->
+O resultado da execução remota fica no GitHub Actions: workflow `CI`, push na
+`phase/game-core`. Este relatório não o afirma, porque foi escrito antes dessa
+execução.
 
 ---
 
@@ -238,7 +317,7 @@ ler também o resultado da skill (`COMBAT_SKILL_OUTCOME`).
 | 4 | Vender peça engastada destrói as gemas; o preço ignora `+N` e encantos | bug/integração | KI-010 |
 | 5 | O gate de balanceamento da CI na `master` nunca terminou (timeout em `97965ae`) | infraestrutura | corrigido na `phase/game-core`; a `master` continua como está |
 | 6 | A sonda de status aplicados subconta as skills de status primárias | limite da instrumentação | seção 3 |
-| 7 | <!-- RNG-PROBLEMA --> | | |
+| 7 | Um sorteio a mais muda o desfecho de 25% a 62% das runs; com 100 seeds por classe, o efeito mínimo detectável é de ~2 a 3 andares por classe | medição/instrumento | KI-012, seção 4 |
 | 8 | O `test_placebo` aceita "o `active_buffs` mudou" como prova de efeito | lacuna de teste | coberto pelo teste novo |
 
 ---

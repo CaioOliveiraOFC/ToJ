@@ -121,6 +121,23 @@ Medido na passada instrumentada da B0 (300 runs,
 Consequência para a régua: uma correção de mecânica que o bot não usa não
 aparece na progressão medida.
 
+### KI-012 — O RNG compartilhado limita a comparação entre versões (N5)
+
+**Classificação:** inconclusivo (instrumento de medição).
+
+- A reprodução é exata: mesma seed e mesmo código dão a mesma run.
+- O pareamento entre versões não é. Um único sorteio a mais no andar 2, que
+  não muda regra nenhuma, muda o desfecho:
+  - no gerador global: de 15 a 21 de 60 runs;
+  - no gerador da run: 37 de 60.
+- Num braço sem mudança de regra, a média subiu +3,0 andares (erro padrão 1,1)
+  em 60 pares.
+- Com 100 seeds por classe, o efeito mínimo detectável no andar final é de
+  ~2 a 3 andares por classe.
+- **Evidência:** [`reports/etapa0_fundacao_pve/README.md`](reports/etapa0_fundacao_pve/README.md#4-rng-compartilhado-e-pareamento-entre-versões)
+  e `baselines/progression/97965ae/rng/`. A separação das fontes de RNG não foi
+  feita: primeiro mede-se o ganho.
+
 ---
 
 ## Reservado: declarado e inerte de propósito

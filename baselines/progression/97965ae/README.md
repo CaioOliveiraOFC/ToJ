@@ -118,3 +118,12 @@ matriz está no relatório da Etapa 0.
 | `cobertura.jsonl.gz` | A passada instrumentada: o registro do coletor mais a chave `cobertura`, por run. Comprimido com `gzip -9 -n` (330.695 bytes, sha256 `512e2b97feec7b0908cea41b644c40dbccef38f0baee96419c3aa486ea908285`); descomprimido, 3.262.098 bytes, sha256 `a1dd3cbb7e6828823d334eccf8da339fa209e4cc686aa361e59603cf680fe090` |
 | `matriz_cobertura.md` | A matriz por sistema: runs com oportunidade, com uso e com efeito, para todas as runs e para as extraídas, mais leis, status, passivas, encontros e complementos |
 | `matriz_cobertura.json` | A mesma matriz, em JSON |
+| `rng/controle.jsonl.gz` | Experimento de pareamento (`tools/rng_pareamento.py`): seeds 1–20 × 3 classes, nenhuma perturbação. As 60 runs são idênticas às da `d3105edc` |
+| `rng/global.jsonl.gz` | O mesmo, com um `random.random()` a mais antes de gerar o mapa do andar 2 |
+| `rng/global_pos_mapa.jsonl.gz` | O mesmo, com o sorteio a mais logo depois de gerar o mapa do andar 2 |
+| `rng/run.jsonl.gz` | O mesmo, com um sorteio a mais no gerador da run no início do andar 2 |
+| `rng/analise.txt` | A saída de `tools/rng_pareamento.py analisar` sobre os quatro braços, com a `d3105edc` como baseline |
+
+Os arquivos `.gz` foram gerados com `gzip -9 -n`. As ferramentas leem JSONL
+puro: descomprima com `gunzip -k` antes de rodar `conferir`, `analisar` ou o
+agregador da matriz.
