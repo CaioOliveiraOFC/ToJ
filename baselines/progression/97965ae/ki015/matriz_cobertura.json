@@ -1361,7 +1361,7 @@
     "bleed:heroi": {
      "tentativa": 3184,
      "falhou_rolagem": 2191,
-     "chance_centesimos": 10080250,
+     "chance_centesimos": 10019800,
      "aplicado": 993,
      "resistencia_parcial": 1357,
      "runs": 274
@@ -1376,7 +1376,7 @@
     "clouded:heroi": {
      "tentativa": 43,
      "falhou_rolagem": 18,
-     "chance_centesimos": 253200,
+     "chance_centesimos": 253000,
      "aplicado": 25,
      "resistencia_parcial": 9,
      "runs": 35
@@ -1384,7 +1384,7 @@
     "fear:heroi": {
      "tentativa": 353,
      "falhou_rolagem": 186,
-     "chance_centesimos": 1709120,
+     "chance_centesimos": 1699100,
      "aplicado": 167,
      "resistencia_parcial": 158,
      "runs": 115
@@ -1405,7 +1405,7 @@
     "frozen:heroi": {
      "tentativa": 113,
      "falhou_rolagem": 47,
-     "chance_centesimos": 638640,
+     "chance_centesimos": 637000,
      "resistencia_parcial": 66,
      "aplicado": 66,
      "runs": 60
@@ -1427,7 +1427,7 @@
     "poison:heroi": {
      "tentativa": 282,
      "falhou_rolagem": 159,
-     "chance_centesimos": 1158570,
+     "chance_centesimos": 1147900,
      "resistencia_parcial": 196,
      "aplicado": 123,
      "runs": 74
@@ -1442,7 +1442,7 @@
     "sleep:heroi": {
      "tentativa": 128,
      "falhou_rolagem": 59,
-     "chance_centesimos": 644710,
+     "chance_centesimos": 640800,
      "resistencia_parcial": 83,
      "aplicado": 69,
      "runs": 65
@@ -1450,7 +1450,7 @@
     "slowed:heroi": {
      "tentativa": 408,
      "aplicado": 199,
-     "chance_centesimos": 2024060,
+     "chance_centesimos": 2014400,
      "falhou_rolagem": 209,
      "resistencia_parcial": 185,
      "runs": 153
@@ -1465,7 +1465,7 @@
     "stun:heroi": {
      "tentativa": 1060,
      "falhou_rolagem": 780,
-     "chance_centesimos": 2695700,
+     "chance_centesimos": 2692000,
      "aplicado": 280,
      "resistencia_parcial": 535,
      "runs": 122
@@ -1480,7 +1480,7 @@
     "vulnerable:heroi": {
      "tentativa": 246,
      "aplicado": 156,
-     "chance_centesimos": 1538660,
+     "chance_centesimos": 1534900,
      "resistencia_parcial": 115,
      "falhou_rolagem": 90,
      "runs": 117
@@ -1495,7 +1495,7 @@
     "weakened:heroi": {
      "tentativa": 150,
      "aplicado": 83,
-     "chance_centesimos": 902900,
+     "chance_centesimos": 898400,
      "resistencia_parcial": 99,
      "falhou_rolagem": 67,
      "runs": 57
@@ -1528,7 +1528,7 @@
     "bleed:heroi": {
      "tentativa": 2354,
      "falhou_rolagem": 1650,
-     "chance_centesimos": 7520290,
+     "chance_centesimos": 7467300,
      "aplicado": 704,
      "resistencia_parcial": 1208,
      "runs": 73
@@ -1543,7 +1543,7 @@
     "clouded:heroi": {
      "tentativa": 22,
      "aplicado": 13,
-     "chance_centesimos": 127680,
+     "chance_centesimos": 127500,
      "falhou_rolagem": 9,
      "resistencia_parcial": 8,
      "runs": 17
@@ -1551,7 +1551,7 @@
     "fear:heroi": {
      "tentativa": 281,
      "falhou_rolagem": 149,
-     "chance_centesimos": 1379480,
+     "chance_centesimos": 1371700,
      "aplicado": 132,
      "resistencia_parcial": 126,
      "runs": 70
@@ -1572,7 +1572,7 @@
     "frozen:heroi": {
      "tentativa": 108,
      "falhou_rolagem": 47,
-     "chance_centesimos": 610560,
+     "chance_centesimos": 609000,
      "resistencia_parcial": 64,
      "aplicado": 61,
      "runs": 56
@@ -1594,7 +1594,7 @@
     "poison:heroi": {
      "tentativa": 275,
      "falhou_rolagem": 154,
-     "chance_centesimos": 1130310,
+     "chance_centesimos": 1120000,
      "resistencia_parcial": 189,
      "aplicado": 121,
      "runs": 70
@@ -1609,7 +1609,7 @@
     "sleep:heroi": {
      "tentativa": 127,
      "falhou_rolagem": 59,
-     "chance_centesimos": 640090,
+     "chance_centesimos": 636200,
      "resistencia_parcial": 82,
      "aplicado": 68,
      "runs": 64
@@ -1617,7 +1617,7 @@
     "slowed:heroi": {
      "tentativa": 274,
      "aplicado": 122,
-     "chance_centesimos": 1320380,
+     "chance_centesimos": 1312500,
      "falhou_rolagem": 152,
      "resistencia_parcial": 153,
      "runs": 70
@@ -1632,7 +1632,7 @@
     "stun:heroi": {
      "tentativa": 962,
      "falhou_rolagem": 715,
-     "chance_centesimos": 2371540,
+     "chance_centesimos": 2367900,
      "aplicado": 247,
      "resistencia_parcial": 497,
      "runs": 73
@@ -1647,7 +1647,7 @@
     "vulnerable:heroi": {
      "tentativa": 193,
      "aplicado": 119,
-     "chance_centesimos": 1199760,
+     "chance_centesimos": 1196700,
      "resistencia_parcial": 106,
      "falhou_rolagem": 74,
      "runs": 68
@@ -1662,7 +1662,7 @@
     "weakened:heroi": {
      "tentativa": 148,
      "aplicado": 82,
-     "chance_centesimos": 888900,
+     "chance_centesimos": 884400,
      "resistencia_parcial": 99,
      "falhou_rolagem": 66,
      "runs": 55

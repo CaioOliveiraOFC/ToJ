@@ -135,28 +135,28 @@ divergências: []
   por ator: {'emboscada:monstro': 79, 'panico:heroi': 8, 'ferida_septica:heroi': 13, 'ferida_aberta:heroi': 3, 'colapso_mental:heroi': 49, 'ferida_septica:monstro': 10, 'ferida_aberta:monstro': 4, 'quebra_gelida:monstro': 3, 'hemorragia_fria:monstro': 2, 'panico:monstro': 3} {'sleep_damage:heroi': 55}
 
 #### Status — porta única (KI-015) — COMPLETAS
-  esperado = soma das chances efetivas que rolaram; imune = resistência levou a chance a zero (não rola)
+  esperado = soma das probabilidades das rolagens (o piso da chance efetiva); imune = resistência levou a chance a zero (não rola)
   | status | alvo | runs | tentativas | aplicados | esperado | falhou rolagem | imune | recusado pelo núcleo | resistência parcial |
   |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-  | bleed | heroi | 274 | 3184 | 993 | 1008.0 | 2191 | 0 | 0 | 1357 |
+  | bleed | heroi | 274 | 3184 | 993 | 1002.0 | 2191 | 0 | 0 | 1357 |
   | bleed | monstro | 72 | 11683 | 684 | 704.1 | 10999 | 0 | 0 | 0 |
   | clouded | heroi | 35 | 43 | 25 | 25.3 | 18 | 0 | 0 | 9 |
-  | fear | heroi | 115 | 353 | 167 | 170.9 | 186 | 0 | 0 | 158 |
+  | fear | heroi | 115 | 353 | 167 | 169.9 | 186 | 0 | 0 | 158 |
   | fear | monstro | 23 | 3208 | 505 | 494.6 | 2703 | 0 | 0 | 0 |
   | frailty | monstro | 1 | 2 | 0 | 1.4 | 2 | 0 | 0 | 0 |
-  | frozen | heroi | 60 | 113 | 66 | 63.9 | 47 | 0 | 0 | 66 |
+  | frozen | heroi | 60 | 113 | 66 | 63.7 | 47 | 0 | 0 | 66 |
   | invisible | monstro | 121 | 202 | 202 | 202.0 | 0 | 0 | 0 | 0 |
   | mana_burn | heroi | 64 | 103 | 68 | 62.1 | 35 | 0 | 0 | 51 |
-  | poison | heroi | 74 | 282 | 123 | 115.9 | 159 | 0 | 0 | 196 |
+  | poison | heroi | 74 | 282 | 123 | 114.8 | 159 | 0 | 0 | 196 |
   | poison | monstro | 27 | 3833 | 540 | 518.2 | 3293 | 0 | 0 | 0 |
-  | sleep | heroi | 65 | 128 | 69 | 64.5 | 59 | 0 | 0 | 83 |
-  | slowed | heroi | 153 | 408 | 199 | 202.4 | 209 | 0 | 0 | 185 |
+  | sleep | heroi | 65 | 128 | 69 | 64.1 | 59 | 0 | 0 | 83 |
+  | slowed | heroi | 153 | 408 | 199 | 201.4 | 209 | 0 | 0 | 185 |
   | slowed | monstro | 31 | 2744 | 1364 | 1351.8 | 1380 | 0 | 0 | 0 |
-  | stun | heroi | 122 | 1060 | 280 | 269.6 | 780 | 0 | 0 | 535 |
+  | stun | heroi | 122 | 1060 | 280 | 269.2 | 780 | 0 | 0 | 535 |
   | stun | monstro | 88 | 14214 | 888 | 857.8 | 13326 | 0 | 0 | 0 |
-  | vulnerable | heroi | 117 | 246 | 156 | 153.9 | 90 | 0 | 0 | 115 |
+  | vulnerable | heroi | 117 | 246 | 156 | 153.5 | 90 | 0 | 0 | 115 |
   | vulnerable | monstro | 50 | 2595 | 1043 | 1047.0 | 1552 | 0 | 0 | 0 |
-  | weakened | heroi | 57 | 150 | 83 | 90.3 | 67 | 0 | 0 | 99 |
+  | weakened | heroi | 57 | 150 | 83 | 89.8 | 67 | 0 | 0 | 99 |
   | weakened | monstro | 20 | 1489 | 548 | 536.3 | 941 | 0 | 0 | 0 |
   por origem (tentativas → aplicados):
     proc_de_acerto      30696 → 1862
@@ -212,28 +212,28 @@ divergências: []
   por ator: {'emboscada:monstro': 40, 'panico:heroi': 8, 'ferida_septica:heroi': 13, 'ferida_aberta:heroi': 3, 'colapso_mental:heroi': 25, 'ferida_septica:monstro': 9, 'ferida_aberta:monstro': 4, 'quebra_gelida:monstro': 3, 'hemorragia_fria:monstro': 2, 'panico:monstro': 3} {'sleep_damage:heroi': 54}
 
 #### Status — porta única (KI-015) — EXTRAIDAS
-  esperado = soma das chances efetivas que rolaram; imune = resistência levou a chance a zero (não rola)
+  esperado = soma das probabilidades das rolagens (o piso da chance efetiva); imune = resistência levou a chance a zero (não rola)
   | status | alvo | runs | tentativas | aplicados | esperado | falhou rolagem | imune | recusado pelo núcleo | resistência parcial |
   |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-  | bleed | heroi | 73 | 2354 | 704 | 752.0 | 1650 | 0 | 0 | 1208 |
+  | bleed | heroi | 73 | 2354 | 704 | 746.7 | 1650 | 0 | 0 | 1208 |
   | bleed | monstro | 52 | 10922 | 626 | 651.2 | 10296 | 0 | 0 | 0 |
   | clouded | heroi | 17 | 22 | 13 | 12.8 | 9 | 0 | 0 | 8 |
-  | fear | heroi | 70 | 281 | 132 | 137.9 | 149 | 0 | 0 | 126 |
+  | fear | heroi | 70 | 281 | 132 | 137.2 | 149 | 0 | 0 | 126 |
   | fear | monstro | 17 | 3173 | 493 | 484.4 | 2680 | 0 | 0 | 0 |
   | frailty | monstro | 1 | 2 | 0 | 1.4 | 2 | 0 | 0 | 0 |
-  | frozen | heroi | 56 | 108 | 61 | 61.1 | 47 | 0 | 0 | 64 |
+  | frozen | heroi | 56 | 108 | 61 | 60.9 | 47 | 0 | 0 | 64 |
   | invisible | monstro | 59 | 116 | 116 | 116.0 | 0 | 0 | 0 | 0 |
   | mana_burn | heroi | 44 | 78 | 47 | 43.4 | 31 | 0 | 0 | 50 |
-  | poison | heroi | 70 | 275 | 121 | 113.0 | 154 | 0 | 0 | 189 |
+  | poison | heroi | 70 | 275 | 121 | 112.0 | 154 | 0 | 0 | 189 |
   | poison | monstro | 25 | 3739 | 532 | 511.5 | 3207 | 0 | 0 | 0 |
-  | sleep | heroi | 64 | 127 | 68 | 64.0 | 59 | 0 | 0 | 82 |
-  | slowed | heroi | 70 | 274 | 122 | 132.0 | 152 | 0 | 0 | 153 |
+  | sleep | heroi | 64 | 127 | 68 | 63.6 | 59 | 0 | 0 | 82 |
+  | slowed | heroi | 70 | 274 | 122 | 131.2 | 152 | 0 | 0 | 153 |
   | slowed | monstro | 23 | 2657 | 1321 | 1304.7 | 1336 | 0 | 0 | 0 |
-  | stun | heroi | 73 | 962 | 247 | 237.2 | 715 | 0 | 0 | 497 |
+  | stun | heroi | 73 | 962 | 247 | 236.8 | 715 | 0 | 0 | 497 |
   | stun | monstro | 63 | 13240 | 798 | 774.2 | 12442 | 0 | 0 | 0 |
-  | vulnerable | heroi | 68 | 193 | 119 | 120.0 | 74 | 0 | 0 | 106 |
+  | vulnerable | heroi | 68 | 193 | 119 | 119.7 | 74 | 0 | 0 | 106 |
   | vulnerable | monstro | 28 | 2386 | 965 | 963.4 | 1421 | 0 | 0 | 0 |
-  | weakened | heroi | 55 | 148 | 82 | 88.9 | 66 | 0 | 0 | 99 |
+  | weakened | heroi | 55 | 148 | 82 | 88.4 | 66 | 0 | 0 | 99 |
   | weakened | monstro | 11 | 1393 | 515 | 502.7 | 878 | 0 | 0 | 0 |
   por origem (tentativas → aplicados):
     proc_de_acerto      29120 → 1760

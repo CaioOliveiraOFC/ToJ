@@ -40,10 +40,10 @@ exceções intencionais:
 
 **Os status que a sonda antiga não via** (n = 300):
 
-| status | alvo | tentativas | aplicados | esperado (Σ chance) | antes (evento) |
+| status | alvo | tentativas | aplicados | esperado (Σ probabilidade da rolagem) | antes (evento) |
 |---|---|---:|---:|---:|---:|
-| `frozen` | herói | 113 | 66 | 63,9 | 0 |
-| `sleep` | herói | 128 | 69 | 64,5 | 0 |
+| `frozen` | herói | 113 | 66 | 63,7 | 0 |
+| `sleep` | herói | 128 | 69 | 64,1 | 0 |
 | `invisible` | monstro | 202 | 202 | 202,0 | 0 |
 | `mana_burn` | herói | 103 | 68 | 62,1 | 25 |
 | `clouded` | herói | 43 | 25 | 25,3 | 25 |
@@ -56,9 +56,17 @@ Agora as leis que dependem desses status têm a contrapartida medida:
 
 **Calibração.** Em todo status, o aplicado fica perto do esperado pela soma
 das chances efetivas, por exemplo `stun` no monstro com 888 contra 857,8 e
-`bleed` no herói com 993 contra 1.008. É uma checagem estatística, não um
+`bleed` no herói com 993 contra 1.002. É uma checagem estatística, não um
 invariante, e ela confirma que a chance calculada pela sonda é a mesma que o
 combate rolou.
+
+O esperado usa a probabilidade da rolagem inteira: o combate rola
+`randrange(1, 101)` e o status pega com `rolagem <= chance`, então uma chance
+fracionária vale o piso dela (37,5% pega como 37%). A primeira versão desta
+validação somava a chance contínua e superestimava o esperado no lado do herói,
+onde a resistência parcial produz chances fracionárias. A correção veio da
+revisão do PR #8, e as 300 runs foram refeitas com ela: só a coluna "esperado"
+mudou, e a não interferência continua 300/300.
 
 **Por origem:**
 - skill principal: 1.315 tentativas e 887 aplicações;
@@ -79,6 +87,6 @@ vem da IA do monstro, não da sonda.
 
 | Arquivo | Conteúdo |
 |---|---|
-| `cobertura.jsonl.gz` | A passada com a sonda nova. `gzip -9 -n`: 385.420 bytes, sha256 `920f67fa788bbb53245c20577a6228c2e1631675bd03e306f4428460abe6c6e6`; descomprimido, 3.706.755 bytes, sha256 `0fbca3e05b182976cbeaebe556c683ccdea1f973d2dc71caa0802b6cb388f0f7` |
+| `cobertura.jsonl.gz` | A passada com a sonda nova. `gzip -9 -n`: 385.050 bytes, sha256 `a7c00fed0870a95fdb788f95147ee465363c0cbe10f32802b6581a58d963248f`; descomprimido, 3.706.752 bytes, sha256 `447f985e5a7586ccc81ef77c0e1494323b3d878b8a7a15508dab5cddfe4961cd` |
 | `matriz_cobertura.md` | A matriz com a seção "Status — porta única (KI-015)" |
 | `matriz_cobertura.json` | A mesma matriz, com a chave `status_porta_unica` |

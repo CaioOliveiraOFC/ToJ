@@ -604,8 +604,8 @@ for rot, uni in (("COMPLETAS", COMPLETAS), ("EXTRAIDAS", EXTRAIDAS)):
     print("  por ator:", dict(c1), dict(c2))
     print(f"\n#### Status — porta única (KI-015) — {rot}")
     print(
-        "  esperado = soma das chances efetivas que rolaram; imune = resistência levou a "
-        "chance a zero (não rola)"
+        "  esperado = soma das probabilidades das rolagens (o piso da chance efetiva); "
+        "imune = resistência levou a chance a zero (não rola)"
     )
     print(
         "  | status | alvo | runs | tentativas | aplicados | esperado | falhou rolagem "
