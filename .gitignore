@@ -28,6 +28,9 @@ reports/*
 reports/etapa0_fundacao_pve/*
 !reports/etapa0_fundacao_pve/README.md
 !reports/etapa0_fundacao_pve/matriz_efeitos.md
+!reports/etapa1_plano/
+reports/etapa1_plano/*
+!reports/etapa1_plano/README.md
 
 # IDEs
 .idea/
