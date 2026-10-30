@@ -337,9 +337,27 @@ Dados: [`baselines/progression/97965ae/rng/`](../../baselines/progression/97965a
   sem ter rodado inteiro. Localmente, a suíte inteira leva 34 minutos num
   processo.
 
-O resultado da execução remota fica no GitHub Actions: workflow `CI`, push na
-`phase/game-core`. Este relatório não o afirma, porque foi escrito antes dessa
-execução.
+**Execução verificada:** run `41089878567`, push do merge `04f50ea` na
+`phase/game-core`. Conclusão `success`, 9 de 9 jobs verdes:
+
+| job | resultado | duração da suíte |
+|---|---|---|
+| Testes (3.10 · 3.11 · 3.12) | success | 5m44 · 7m40 · 7m54 |
+| Lint | success | — |
+| Fatias cobrem todo o balanceamento | success | — |
+| Balanceamento (bandas) | 45 passed | 35m11 |
+| Balanceamento (scout) | 40 passed | 1m51 |
+| Balanceamento (pick_skill) | 26 passed | 0,24 s |
+| Balanceamento (arena) | 7 passed (46 deselected) | 2m20 |
+
+- As quatro fatias somam 118 testes de balanceamento, o mesmo total do gate
+  final do `82ff73ea`. Nenhum se perdeu no fatiamento, e nenhum threshold mudou.
+- A fatia `bandas` usa 35 dos 60 minutos. Ela concentra 12 chamadas a
+  `simulate_run` (`TestRunCompleta` e `TestPesoDaSorte`, sem cache entre si).
+  Se crescer, o próximo corte é por classe de teste, e não por threshold.
+- **Aviso a acompanhar:** `PytestRemovedIn10Warning`. O fixture `runs` de
+  `TestRunCompleta` é de escopo de classe e está escrito como método de
+  instância. O pytest 10 deixa de aceitar isso. O aviso é anterior à Etapa 0.
 
 ---
 
@@ -348,7 +366,7 @@ execução.
 | o quê | onde | resultado |
 |---|---|---|
 | Suíte padrão (`pytest -q`) | local, Python 3.13 | 3196 passed, 3 skipped, 118 deselected (`balance`), 6 xfailed (5 desta etapa + o custo × recarga anterior) |
-| `tests/test_cobertura_de_efeitos.py` | local | 92 passed, 5 xfailed, em ~12 s |
+| `tests/test_cobertura_de_efeitos.py` | local, `fix/etapa0-fechamento` | 90 passed, 7 xfailed (5 bugs e 2 pendências de design), em ~12 s |
 | `ruff check` e `ruff format --check` | `src/`, `tests/` e as ferramentas novas | limpo |
 | `-m balance` | só na CI, por fatias | ver seção 5 |
 | B0 (300 runs) | `run_auditoria.py` da `d3105edc` | 300/300 idênticas |
