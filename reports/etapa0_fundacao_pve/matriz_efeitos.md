@@ -2,7 +2,7 @@
 
 Gerada a partir de `tests/test_cobertura_de_efeitos.py` na Etapa 0, sobre o jogo de `97965ae` (nenhum arquivo de `src/` mudou). Para cada par (fonte, efeito) que o conteúdo declara, o estado e as sondas da assinatura que mudam quando o efeito é aplicado (valor inflado, mesmas seeds).
 
-Estados: **funcional** (alguma sonda muda), **reservado** (inerte de propósito, em `RESERVADOS`), **DEFEITO** (inerte e prometido, `xfail` estrito).
+Estados: **funcional** (alguma sonda muda) e **PENDÊNCIA** (inerte e ao alcance do jogador, em `PENDENCIAS`, `xfail` estrito), do tipo **bug** (a mecânica existe e o caminho está quebrado) ou **design** (o motor não tem a mecânica e falta decidir o que ela é). Nenhum efeito é tratado como inerte de propósito.
 
 | fonte | efeito | estado | consumidores que mudam |
 |---|---|---|---|
@@ -30,13 +30,13 @@ Estados: **funcional** (alguma sonda muda), **reservado** (inerte de propósito,
 | passiva | `strength` | funcional | lutas, perfil |
 | passiva | `stun_chance` | funcional | golpes_dados, lutas |
 | equipamento | `agility` | funcional | funil, golpes_dados, golpes_recebidos, lutas, perfil |
-| equipamento | `armageddon` | reservado | — |
+| equipamento | `armageddon` | PENDÊNCIA design N4 | — |
 | equipamento | `bleed` | funcional | golpes_dados, lutas |
 | equipamento | `crit_chance` | funcional | golpes_dados, lutas |
 | equipamento | `crit_damage` | funcional | funil |
 | equipamento | `damage_reduction` | funcional | golpes_recebidos, lutas |
 | equipamento | `death_ignore` | funcional | golpe_letal, lutas |
-| equipamento | `defense` | DEFEITO N11 | — |
+| equipamento | `defense` | PENDÊNCIA bug N11 | — |
 | equipamento | `evasion` | funcional | funil, golpe_letal, golpes_recebidos, lutas |
 | equipamento | `fear` | funcional | golpes_dados, lutas |
 | equipamento | `life_steal` | funcional | golpes_dados, lutas |
@@ -48,7 +48,7 @@ Estados: **funcional** (alguma sonda muda), **reservado** (inerte de propósito,
 | equipamento | `speed` | funcional | funil, golpes_dados, golpes_recebidos, lutas, perfil |
 | equipamento | `strength` | funcional | lutas, perfil |
 | equipamento | `stun` | funcional | golpes_dados, lutas |
-| equipamento | `true_damage` | reservado | — |
+| equipamento | `true_damage` | PENDÊNCIA design N4 | — |
 | consumivel | `agility` | funcional | funil, golpes_dados, golpes_recebidos, lutas, perfil |
 | consumivel | `crit_chance` | funcional | golpes_dados, lutas |
 | consumivel | `damage_reduction` | funcional | golpes_recebidos, lutas |
@@ -82,21 +82,21 @@ Estados: **funcional** (alguma sonda muda), **reservado** (inerte de propósito,
 | skill-heroi | `buff:damage_reduction` | funcional | golpes_recebidos |
 | skill-heroi | `buff:df` | funcional | golpes_recebidos, lutas, perfil |
 | skill-heroi | `buff:evasion` | funcional | funil, golpes_recebidos, lutas |
-| skill-heroi | `buff:hp` | DEFEITO N10 | — |
+| skill-heroi | `buff:hp` | PENDÊNCIA bug N10 | — |
 | skill-heroi | `buff:life_steal` | funcional | golpes_dados, lutas |
 | skill-heroi | `buff:mana_regen` | funcional | inicio_de_turno |
 | skill-heroi | `buff:mg` | funcional | lutas, perfil |
-| skill-heroi | `buff:mp` | DEFEITO N10 | — |
+| skill-heroi | `buff:mp` | PENDÊNCIA bug N10 | — |
 | skill-heroi | `buff:st` | funcional | lutas, perfil |
 | skill-heroi | `damage_reduction` | funcional | golpes_recebidos, lutas |
 | skill-monstro | `buff:crit_chance` | funcional | golpes_dados, lutas |
 | skill-monstro | `buff:df` | funcional | golpes_recebidos, lutas, perfil |
-| skill-monstro | `buff:hp` | DEFEITO N10 | — |
+| skill-monstro | `buff:hp` | PENDÊNCIA bug N10 | — |
 | skill-monstro | `buff:mg` | funcional | lutas, perfil |
 | skill-monstro | `buff:st` | funcional | lutas, perfil |
 | skill-monstro | `damage_reduction` | funcional | golpes_recebidos, lutas |
 | passiva-monstro | `controller:crit_chance` | funcional | golpes_dados, lutas |
-| evento | `altar` | DEFEITO PVE-01 | — |
+| evento | `altar` | PENDÊNCIA bug PVE-01 | — |
 | evento | `fonte` | funcional | inicio_de_turno, lutas, perfil |
 
 ## Totais por fonte
@@ -105,15 +105,15 @@ Estados: **funcional** (alguma sonda muda), **reservado** (inerte de propósito,
 |---|---|---:|
 | consumivel | funcional | 10 |
 | encanto | funcional | 11 |
-| equipamento | DEFEITO | 1 |
+| equipamento | PENDÊNCIA bug | 1 |
 | equipamento | funcional | 17 |
-| equipamento | reservado | 2 |
-| evento | DEFEITO | 1 |
+| equipamento | PENDÊNCIA design | 2 |
+| evento | PENDÊNCIA bug | 1 |
 | evento | funcional | 1 |
 | gema | funcional | 6 |
 | passiva | funcional | 23 |
 | passiva-monstro | funcional | 1 |
-| skill-heroi | DEFEITO | 2 |
+| skill-heroi | PENDÊNCIA bug | 2 |
 | skill-heroi | funcional | 11 |
-| skill-monstro | DEFEITO | 1 |
+| skill-monstro | PENDÊNCIA bug | 1 |
 | skill-monstro | funcional | 5 |
