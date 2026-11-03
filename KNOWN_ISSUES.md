@@ -140,23 +140,55 @@ aparece na progressão medida.
 
 ---
 
-## Reservado: declarado e inerte de propósito
+### KI-013 — Duas armas lendárias declaram efeitos que o motor não tem (N4)
 
-Não são defeitos. O conteúdo declara algo que o motor ainda não tem, e o teste
-exige que continue inerte até a decisão de design. Um reservado que ganhar
-mecânica sai do registro na mesma mudança que mede o impacto.
+**Classificação:** pendência de design e implementação, não resolvida.
 
-- **`true_damage` (Espada do Universo) e `armageddon` (Cajado da Galáxia)
-  (N4).** Nenhuma mecânica existe para eles. Registrados em `RESERVADOS`, em
-  `tests/test_cobertura_de_efeitos.py`.
-- **Os sete efeitos positivos dos pares opostos e as sete leis de par
-  (PVE-02).**
-  - Os efeitos são `empowered`, `arcane_surge`, `quickened`, `fortified`,
-    `vitality`, `focused` e `precision`.
-  - O núcleo os implementa, mas nenhuma carta, item, passiva ou monstro os
-    aplica. Por isso as leis de par não disparam em jogo.
-  - A passiva `precision` é modificador de acerto, não o efeito do catálogo.
-  - Os testes de `TestFontesDoCatalogo` travam os dois conjuntos.
+- A Espada do Universo (`true_damage` 20) e o Cajado da Galáxia
+  (`armageddon` 50) estão no jogo:
+  - são lendárias e `droppable`;
+  - a tela mostra o efeito ao jogador.
+- Não existe mecânica de dano verdadeiro nem de armageddon. Hoje o jogador recebe
+  só o `damage_bonus` da peça.
+- Não há decisão aprovada de que fiquem inertes. Falta definir:
+  - o que cada efeito é;
+  - ou se as peças saem do drop até a mecânica existir.
+- **Evidência:** `tests/test_cobertura_de_efeitos.py`, casos
+  `equipamento:true_damage` e `equipamento:armageddon`, em `xfail` estrito do
+  tipo `design`.
+
+### KI-014 — Os sete efeitos positivos dos pares opostos não têm fonte (PVE-02)
+
+**Classificação:** pendência de design e conteúdo, não resolvida.
+
+- Os efeitos são `empowered`, `arcane_surge`, `quickened`, `fortified`,
+  `vitality`, `focused` e `precision`.
+- O núcleo os implementa, mas nenhuma carta, item, passiva ou monstro os
+  aplica. Por isso as sete leis de par nunca disparam: zero em 300 runs na
+  passada instrumentada.
+- A passiva `precision` é modificador de acerto, não o efeito do catálogo.
+- Não há decisão registrada de que isso seja intencional. Os testes de
+  `TestFontesDoCatalogo` travam os dois conjuntos para que qualquer mudança neles
+  seja notada, e não para validá-los.
+
+### KI-015 — A sonda de cobertura subconta os status aplicados por skills primárias
+
+**Classificação:** limitação de instrumentação. Não é defeito do jogo.
+
+- A tabela de status de `tools/cobertura_pve.py` conta o evento
+  `<status>_applied`.
+- `combat.try_apply_status` só publica esse evento quando quem chama passa
+  `applied_kind`, e o ramo principal das skills de status não passa. Os
+  secundários, os procs de acerto e o atordoamento passam.
+- Na passada instrumentada da B0, `frozen`, `sleep` e `invisible` aparecem com
+  zero aplicações. Mesmo assim, `quebra_gelida` (que exige alvo congelado),
+  `sleep_damage` e `emboscada` (que exige atacante invisível) disparam 3, 55 e
+  79 vezes.
+- O contador de leis lê outro evento e é confiável. A contagem de status não
+  serve para avaliar o uso de skills de status. A correção da medição está
+  proposta no
+  [relatório da Etapa 0](reports/etapa0_fundacao_pve/README.md#limite-conhecido-da-instrumentação-e-proposta-de-correção)
+  e precisa vir antes das melhorias da IA de combate.
 
 ---
 

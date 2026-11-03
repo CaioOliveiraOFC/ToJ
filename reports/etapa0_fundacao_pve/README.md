@@ -21,11 +21,11 @@ nada. As etapas seguintes vão se medir contra isto.
 - **Efeitos declarados:** 92 pares (fonte, efeito), testados A/B pelos
   consumidores do motor:
   - 85 funcionais;
-  - 2 reservados de propósito;
-  - 5 sem efeito e prometidos ao jogador, em `xfail` estrito.
+  - 7 sem efeito e ao alcance do jogador, todos em `xfail` estrito.
 
-  Dois desses cinco defeitos são novos: os buffs de vida e mana máxima (KI-008)
-  e o efeito `defense` de equipamento (KI-009).
+  Dos sete, 5 são bugs; dois deles são novos: os buffs de vida e mana máxima
+  (KI-008) e o efeito `defense` de equipamento (KI-009). Os outros 2 são
+  pendências de design: `true_damage` e `armageddon` (KI-013).
 - **Cobertura do bot:** o BotPadrão quase só usa skills de dano. De 17.408
   turnos com buff disponível, escolheu buff 10 vezes. A troca de equipamento na
   posição errada aparece em 76 runs, 72 delas com perda líquida, e em 69 das 73
@@ -84,31 +84,33 @@ compara o que os consumidores do motor devolvem:
 A diferença para o `test_placebo` é o critério de prova: lá basta o
 `active_buffs` mudar; aqui o combate precisa ler o efeito.
 
-| fonte | funcional | reservado | defeito |
+| fonte | funcional | pendência: bug | pendência: design |
 |---|---:|---:|---:|
 | passiva | 23 | | |
-| equipamento | 17 | 2 | 1 |
+| equipamento | 17 | 1 | 2 |
 | consumível | 10 | | |
 | encantamento | 11 | | |
 | gema | 6 | | |
-| skill de herói (canal) | 11 | | 2 |
-| skill de monstro (canal) | 5 | | 1 |
+| skill de herói (canal) | 11 | 2 | |
+| skill de monstro (canal) | 5 | 1 | |
 | passiva de monstro | 1 | | |
-| evento do mapa | 1 | | 1 |
-| **total (92)** | **85** | **2** | **5** |
+| evento do mapa | 1 | 1 | |
+| **total (92)** | **85** | **5** | **2** |
 
-**Defeitos** (`xfail` estrito: a correção transforma o XPASS em reprovação):
+**Pendências** (`PENDENCIAS`, todas em `xfail` estrito: a correção transforma o
+XPASS em reprovação):
 
-| caso | id | o que acontece |
-|---|---|---|
-| `evento:altar` | PVE-01 / KI-007 | a bênção é gravada sem `stat`; o jogador paga 30% do HP máximo por nada |
-| `skill-heroi:buff:hp` e `buff:mp` | N10 / KI-008 | seis skills de herói ("+40% de vida máxima" e afins) gravam um buff que o teto de HP/MP não lê |
-| `skill-monstro:buff:hp` | N10 / KI-008 | `mob_raizes_fundas` e `mob_folego_emprestado`: mesmo defeito no monstro |
-| `equipamento:defense` | N11 / KI-009 | o `elif` de `equipment_percent` nunca lê `effect_type: defense`; o Amuleto de Argila mostra "+3" e entrega o `defense_bonus` 1 |
+| caso | tipo | id | o que acontece |
+|---|---|---|---|
+| `evento:altar` | bug | PVE-01 / KI-007 | a bênção é gravada sem `stat`; o jogador paga 30% do HP máximo por nada |
+| `skill-heroi:buff:hp` e `buff:mp` | bug | N10 / KI-008 | seis skills de herói ("+40% de vida máxima" e afins) gravam um buff que o teto de HP/MP não lê |
+| `skill-monstro:buff:hp` | bug | N10 / KI-008 | `mob_raizes_fundas` e `mob_folego_emprestado`: mesmo defeito no monstro |
+| `equipamento:defense` | bug | N11 / KI-009 | o `elif` de `equipment_percent` nunca lê `effect_type: defense`; o Amuleto de Argila mostra "+3" e entrega o `defense_bonus` 1 |
+| `equipamento:true_damage` | design | N4 / KI-013 | a Espada do Universo (lendária, cai como drop) mostra "true_damage +20"; não existe mecânica de dano verdadeiro |
+| `equipamento:armageddon` | design | N4 / KI-013 | o Cajado da Galáxia (lendário, cai como drop) mostra "armageddon +50"; não existe mecânica de armageddon |
 
-**Reservados** (`RESERVADOS`: o teste exige que continuem inertes):
-- `true_damage` (Espada do Universo);
-- `armageddon` (Cajado da Galáxia).
+Nenhum efeito ao alcance do jogador é tratado como inerte de propósito. Deixar
+um deles assim exigiria uma decisão de design, e nenhuma foi tomada.
 
 **Fontes do catálogo** (`TestFontesDoCatalogo`):
 - **Efeitos sem fonte:** são exatamente os sete efeitos positivos dos pares
@@ -117,6 +119,8 @@ A diferença para o `test_placebo` é o critério de prova: lá basta o
 - **Leis inalcançáveis pelo conteúdo:** são exatamente as sete leis de par
   (PVE-02).
 - Os dois conjuntos ficam travados: um efeito ou uma lei a mais reprova.
+- O travamento serve para notar mudança, e não para validar o estado atual.
+  Nenhuma decisão registrada diz que isso é intencional (KI-014).
 
 A matriz completa, com o consumidor que muda em cada caso, está em
 [`matriz_efeitos.md`](matriz_efeitos.md).
@@ -177,13 +181,59 @@ leis de interação que dependem do herói mal aparecem.
 - 48 runs acabaram com gema na bolsa e socket vazio equipado.
 - A mediana do ouro parado no fim é 26% do que foi ganho.
 
-**Limite conhecido da instrumentação.** A tabela de status aplicados conta o
-evento `<status>_applied`. `try_apply_status` só o publica quando quem chama
-passa `applied_kind`, e o ramo principal das skills de status não passa. Por
-isso `frozen`, `sleep` e `invisible` aparecem com zero aplicações, embora as
-leis que dependem deles disparem. O contador de leis lê outro evento e é
-confiável. Antes de tirar conclusão sobre status aplicados, a sonda precisa
-ler também o resultado da skill (`COMBAT_SKILL_OUTCOME`).
+### Limite conhecido da instrumentação e proposta de correção
+
+Registrado como KI-015. Não é defeito do jogo, é defeito da medição.
+
+**O problema.**
+- A tabela de status aplicados conta o evento `<status>_applied`.
+- `combat.try_apply_status` só publica esse evento quando quem chama passa
+  `applied_kind`. Os secundários de skill, os procs de acerto e o atordoamento
+  passam; o ramo principal das skills de status (`effect_type == "status"`) não.
+- Na passada da B0, `frozen`, `sleep` e `invisible` aparecem com zero
+  aplicações, embora `quebra_gelida`, `sleep_damage` e `emboscada`, que dependem
+  deles, disparem 3, 55 e 79 vezes.
+- O contador de leis lê o evento `interaction` e é confiável. A contagem de
+  status não é, e justo para o que a IA de combate vai mudar: o uso de skills de
+  status, hoje 16 escolhas em 9.973 turnos disponíveis.
+
+**A proposta.** Só ferramenta: nada em `src/` muda.
+
+1. **Contar na porta única.** A sonda passa a embrulhar
+   `effect_core.apply_effect`, o único ponto por onde um status entra numa
+   entidade. Em `src/`, o único chamador é `try_apply_status`.
+   - Conta cada aplicação que devolveu instância, por efeito, por lado (herói ou
+     monstro) e por origem.
+   - A origem é a skill (primária ou secundária), o proc de acerto ou outra.
+     Ela vem do `source_id` e de qual chamador do `try_apply_status` está ativo.
+   - Usa o mesmo filtro das outras sondas: só o monstro da batalha real, fora
+     dos duelos de benchmark do OP e antes do fim da run.
+2. **Contar também as tentativas.** Embrulhar o próprio `try_apply_status` dá
+   tentativas, aplicações e resistências por status. Com isso, a taxa de acerto
+   de cada carta fica medida: o número de que a IA de combate precisa para
+   valer uma skill de status.
+3. **Manter o contador antigo ao lado**, rotulado como "eventos publicados",
+   para que a diferença entre os dois fique visível na matriz.
+4. **Conferência de consistência no agregador.** Em toda run em que uma lei
+   disparou, cada efeito que ela exige precisa ter ao menos uma aplicação
+   contada (`quebra_gelida` ⇒ `frozen`, `emboscada` ⇒ `invisible`…). Qualquer
+   violação é erro de instrumentação e reprova a matriz.
+5. **Validação.**
+   - Um teste em `tests/` roda uma luta dirigida com uma skill de status
+     primária (por exemplo `mob_teia_de_gelo`) e exige que a sonda conte o
+     `frozen`.
+   - A passada de 300 runs é refeita: `conferir` precisa continuar dando 0
+     divergentes contra a B0 (não interferência), e a matriz nova só pode
+     mudar na seção de status.
+
+**A alternativa descartada por ora.** Fazer o motor publicar
+`<status>_applied` em toda aplicação, com `applied_kind` padrão no
+`try_apply_status`. Isso muda `src/` e o fluxo de eventos que a interface
+recebe. É uma decisão de produto, e não de medição.
+
+**Por que antes da IA de combate.** As melhorias do bot em skills de status e
+buff vão ser julgadas pela matriz. Com o contador atual, uma IA que passasse a
+congelar e adormecer bem apareceria com zero aplicações dos dois status.
 
 ---
 
@@ -287,9 +337,27 @@ Dados: [`baselines/progression/97965ae/rng/`](../../baselines/progression/97965a
   sem ter rodado inteiro. Localmente, a suíte inteira leva 34 minutos num
   processo.
 
-O resultado da execução remota fica no GitHub Actions: workflow `CI`, push na
-`phase/game-core`. Este relatório não o afirma, porque foi escrito antes dessa
-execução.
+**Execução verificada:** run `41089878567`, push do merge `04f50ea` na
+`phase/game-core`. Conclusão `success`, 9 de 9 jobs verdes:
+
+| job | resultado | duração da suíte |
+|---|---|---|
+| Testes (3.10 · 3.11 · 3.12) | success | 5m44 · 7m40 · 7m54 |
+| Lint | success | — |
+| Fatias cobrem todo o balanceamento | success | — |
+| Balanceamento (bandas) | 45 passed | 35m11 |
+| Balanceamento (scout) | 40 passed | 1m51 |
+| Balanceamento (pick_skill) | 26 passed | 0,24 s |
+| Balanceamento (arena) | 7 passed (46 deselected) | 2m20 |
+
+- As quatro fatias somam 118 testes de balanceamento, o mesmo total do gate
+  final do `82ff73ea`. Nenhum se perdeu no fatiamento, e nenhum threshold mudou.
+- A fatia `bandas` usa 35 dos 60 minutos. Ela concentra 12 chamadas a
+  `simulate_run` (`TestRunCompleta` e `TestPesoDaSorte`, sem cache entre si).
+  Se crescer, o próximo corte é por classe de teste, e não por threshold.
+- **Aviso a acompanhar:** `PytestRemovedIn10Warning`. O fixture `runs` de
+  `TestRunCompleta` é de escopo de classe e está escrito como método de
+  instância. O pytest 10 deixa de aceitar isso. O aviso é anterior à Etapa 0.
 
 ---
 
@@ -297,8 +365,10 @@ execução.
 
 | o quê | onde | resultado |
 |---|---|---|
-| Suíte padrão (`pytest -q`) | local, Python 3.13 | 3196 passed, 3 skipped, 118 deselected (`balance`), 6 xfailed (5 desta etapa + o custo × recarga anterior) |
-| `tests/test_cobertura_de_efeitos.py` | local | 92 passed, 5 xfailed, em ~12 s |
+| Suíte padrão (`pytest -q`) | local, Python 3.13, `phase/game-core` (`04f50ea`) | 3196 passed, 3 skipped, 118 deselected (`balance`), 6 xfailed (5 desta etapa + o custo × recarga anterior) |
+| Suíte padrão (`pytest -q`) | local, Python 3.13, `fix/etapa0-fechamento` | 3194 passed, 3 skipped, 118 deselected, 8 xfailed. Os 2 testes de "reservado inerte" saíram, e `true_damage` e `armageddon` viraram `xfail` |
+| CI completa | GitHub Actions, run `41089878567` | success, 9/9 jobs; 118 testes de balanceamento verdes (seção 5) |
+| `tests/test_cobertura_de_efeitos.py` | local, `fix/etapa0-fechamento` | 90 passed, 7 xfailed (5 bugs e 2 pendências de design), em ~12 s |
 | `ruff check` e `ruff format --check` | `src/`, `tests/` e as ferramentas novas | limpo |
 | `-m balance` | só na CI, por fatias | ver seção 5 |
 | B0 (300 runs) | `run_auditoria.py` da `d3105edc` | 300/300 idênticas |
@@ -315,10 +385,12 @@ execução.
 | 2 | `effect_type: defense` de equipamento nunca é lido | bug/mecânica, **novo** | KI-009, `xfail` |
 | 3 | Bênção do Altar sem efeito | bug/mecânica | KI-007, `xfail` |
 | 4 | Vender peça engastada destrói as gemas; o preço ignora `+N` e encantos | bug/integração | KI-010 |
-| 5 | O gate de balanceamento da CI na `master` nunca terminou (timeout em `97965ae`) | infraestrutura | corrigido na `phase/game-core`; a `master` continua como está |
-| 6 | A sonda de status aplicados subconta as skills de status primárias | limite da instrumentação | seção 3 |
-| 7 | Um sorteio a mais muda o desfecho de 25% a 62% das runs; com 100 seeds por classe, o efeito mínimo detectável é de ~2 a 3 andares por classe | medição/instrumento | KI-012, seção 4 |
-| 8 | O `test_placebo` aceita "o `active_buffs` mudou" como prova de efeito | lacuna de teste | coberto pelo teste novo |
+| 5 | `true_damage` e `armageddon`: armas lendárias que caem como drop e mostram efeitos sem mecânica | pendência de design e implementação | KI-013, `xfail` |
+| 6 | Os sete efeitos positivos dos pares opostos não têm fonte; as sete leis de par nunca disparam | pendência de design e conteúdo | KI-014 |
+| 7 | O gate de balanceamento da CI na `master` nunca terminou (timeout em `97965ae`) | infraestrutura | fatiado na `phase/game-core` (resultado na seção 5); a `master` continua como está |
+| 8 | A sonda de status aplicados subconta as skills de status primárias | limite da instrumentação | KI-015; proposta na seção 3 |
+| 9 | Um sorteio a mais muda o desfecho de 25% a 62% das runs; com 100 seeds por classe, o efeito mínimo detectável é de ~2 a 3 andares por classe | medição/instrumento | KI-012, seção 4 |
+| 10 | O `test_placebo` aceita "o `active_buffs` mudou" como prova de efeito | lacuna de teste | coberto pelo teste novo |
 
 ---
 
@@ -327,7 +399,8 @@ execução.
 - A linha de partida (B0) e o instrumento que vai medir cada correção: a
   cobertura por sistema e os casos `xfail` que viram reprovação quando o
   defeito for corrigido.
-- Uma lista fechada de defeitos mecânicos, separada do que é reservado.
+- Uma lista fechada de efeitos sem função, separada em bugs e pendências de
+  design.
 - Um retrato do que o BotPadrão não exercita. As correções de mecânica das
   etapas seguintes só aparecem na régua se o bot as usar.
 - O custo do RNG compartilhado para comparar versões.
