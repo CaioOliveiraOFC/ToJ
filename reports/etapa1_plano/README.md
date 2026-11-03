@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Estado** | **proposta, não implementada.** Nenhuma linha de gameplay muda antes da aprovação. Revisão 3: D3 aprovado; D2 comparado (seção 3); hipótese do D1 medida (seção 4); fidelidade da régua do `-m balance` (seção 5) |
+| **Estado** | **proposta, não implementada.** Nenhuma linha de gameplay muda antes da aprovação. Revisão 4: decisões consolidadas (D2, D3 e D4 aprovados; D5 e D6 definidos; D1 em aberto). A primeira correção é o KI-009, depois da integração dos PRs #7 e #8 |
 | **Base** | `phase/game-core` em `04f50ea`, B0 em [`baselines/progression/97965ae/`](../../baselines/progression/97965ae/README.md) |
 | **Escopo** | KI-007 (Altar), KI-008 (buffs de HP/MP), KI-009 (Amuleto de Argila) e a divergência do Mercador entre jogo e simulação |
 | **Fora do escopo** | a inteligência do bot (etapa própria), KI-010 (gemas na venda, etapa própria), KI-013 e KI-014 (pendências de design e conteúdo), a refatoração do RNG, a `phase/pvp-arena` e a Ranked |
@@ -27,24 +27,36 @@
   só as três bandas globais podem ser remedidas, por decisão, com o registro em
   `tests/balance/thresholds.py`.
 - **"Mudar o bot é mudar o instrumento"** ([contrato do BotPadrão](../../GAMEPLAY_CONTRACTS.md#botpadrão)).
-  O KI-009 é medido contra a B0, com o mesmo instrumento. A fidelidade das
-  réguas (passo 2) muda os instrumentos e abre baselines novas; o KI-008 e o
-  KI-007 são medidos contra elas.
+  O KI-009 e o KI-008 são medidos contra a B0 e contra a régua original do
+  `-m balance`, com os mesmos instrumentos. A correção do Mercador no
+  BotPadrão (D4) muda o instrumento e abre uma baseline nova.
+- **As duas réguas continuam separadas**
+  ([`GAMEPLAY_CONTRACTS.md`](../../GAMEPLAY_CONTRACTS.md#duas-réguas-de-balanceamento)).
+  - O `-m balance` é o benchmark sintético de combate e classe.
+  - O BotPadrão joga a jornada real.
+  - Uma não é calibrada pela outra, e a régua original do `-m balance` não é
+    substituída (D6).
 
 ---
 
 ## 1. Ordem e dependências
 
-A revisão 3 põe a fidelidade das réguas antes das correções que dependem
-delas. Corrigir um mecanismo enquanto a simulação joga uma jornada diferente
-da do jogador mede a correção na jornada errada.
+A revisão 4 começa pelas correções comprovadas, cada uma em branch própria e
+com PR sem merge automático. A fidelidade da régua sai do caminho crítico: ela
+vira uma variante experimental, avaliada sem substituir a régua original (D6).
 
-| # | passo | por que nesta posição | depende de | decisão necessária |
+| # | passo | natureza | depende de | decisão |
 |---|---|---|---|---|
-| 1 | KI-009: `defense` do Amuleto | isolado e pequeno; independe das réguas | 0 | D3 (aprovado) |
-| 2 | Fidelidade das réguas: eventos e serviços no meio do andar no `-m balance` (seção 5) e Mercador por ofertas na régua e no BotPadrão (seção 6) | muda os dois instrumentos; abre baselines novas, contra as quais as correções seguintes são medidas | 0 | D4, D5, D6 |
-| 3 | KI-008: buffs de HP/MP | mecânica de núcleo; o modelo depende de D2 | 0, 2 | D2 |
-| 4 | KI-007: Bênção do Altar | o efeito depende de D1; só é medível no `-m balance` depois do passo 2 | 0, 2, D1 | D1 |
+| 1 | KI-009: `defense` do Amuleto de Argila | gameplay, isolado e pequeno | PRs #7 → #8 integrados | D3 (aprovado) |
+| 2 | KI-008: buffs de HP/MP pelo M1 | gameplay, mecânica de núcleo | 1 | D2 (aprovado) |
+| 3 | Mercador por ofertas no BotPadrão | instrumento; abre baseline nova | 2 | D4 (direção aprovada) |
+| 4 | Variante F2 da régua, experimental | instrumento; não substitui a régua original | 0 | D6 (avaliar) |
+| 5 | KI-007: Bênção do Altar | gameplay | 2, D1 | D1 (em aberto) |
+
+- **KI-008 antes do Mercador:** assim ele é medido contra a B0, com o mesmo
+  instrumento.
+- **A variante F2 não bloqueia nenhuma correção.** Ela pode correr em paralelo,
+  só em código de simulação, quando for autorizada.
 
 ## 2. KI-009 — o efeito `defense` do Amuleto de Argila
 
@@ -91,25 +103,83 @@ uma base de defesa do slot e um efeito de especialidade.
 
 | opção | valor | como | leitura |
 |---|---:|---|---|
-| **b. As duas vias somam** (recomendada) | 4 | código: em `equipment_percent`, o `elif` volta a `if` para `df`; o dado não muda | restaura o molde; só o Argila é afetado (é o único item com `defense` nas duas vias) |
+| **b. As duas vias somam** (aprovada) | 4 | código: em `equipment_percent`, o `elif` volta a `if` para `df`; o dado não muda | restaura o molde; só o Argila é afetado (é o único item com `defense` nas duas vias) |
 | a. Uma via só, no dado | 4 | dado: `defense_bonus` 4 e sem `effect_type` | o mesmo número, mas quebra o molde "base + especialidade" e muda a tela |
 | c. Manter +1 | 1 | nenhuma | o item continua dominado e a tela continua mentindo; exigiria mudar o texto |
 | d. Só a especialidade | 3 | código: o efeito prevalece | perde a base do slot; duas regras de leitura para o mesmo atributo |
 
-**Contrato proposto.** Uma peça entrega a soma das vias que declara, inclusive
+**Contrato aprovado.** Uma peça entrega a soma das vias que declara, inclusive
 quando a base e a especialidade são o mesmo atributo. O `+N` aprimora as duas,
 como já aprimora `defense_bonus` e `effect_value` hoje.
 
+### Execução preparada (aguarda a integração dos PRs #7 e #8)
+
+**Branch.** `fix/ki009-amuleto-argila`, criada da `phase/game-core` depois dos
+dois merges, com PR próprio para a `phase/game-core` e sem merge automático.
+
+**A mudança.**
+- Em `src/entities/heroes.py`, `Player.equipment_percent`, o `elif` volta a ser
+  `if`.
+- O comentário passa a descrever o contrato: a peça entrega a soma das vias
+  que declara.
+- Nenhum dado muda, e nenhum outro arquivo de `src/`.
+
+**Conferido no código atual, sem alterar nada.**
+- `EQUIP_STAT_SOURCES["df"]` é `("defense",)`.
+- Entre as peças equipáveis, só o `amuleto_argila` tem `effect_type: defense`.
+  O `elixir_pedra` também declara `defense` 50, mas é consumível (`slot` nulo):
+  nunca entra no equipamento e não é afetado.
+- O multiplicador de raridade Common é 1,0. Com `+N`, cada via é aprimorada e
+  arredondada por conta própria:
+
+  | rank | base | especialidade | total |
+  |---|---:|---:|---:|
+  | +0 | 1 | 3 | 4 |
+  | +5 | 1 | 4 | 5 |
+  | +20 | 2 | 5 | 7 |
+
 **Testes.**
-- `equipamento:defense` passa de `xfail` a aprovado.
-- Um teste dirigido: `equipment_percent("df")` do Argila é 4, e com `+N` é o
-  valor aprimorado de cada via, somado.
-- Um teste de dados: todo amuleto Common declara base 1 mais uma especialidade.
-  Se o molde mudar, a mudança precisa ser deliberada.
+- Sai de `PENDENCIAS` a entrada `equipamento:defense`. O `xfail` estrito
+  reprovaria pelo XPASS.
+- Testes dirigidos de `equipment_percent("df")`:
+  - o Argila dá 4;
+  - com `+N`, dá a soma das vias aprimoradas, como na tabela;
+  - as gemas continuam somando à parte, pelo `gem_percent`;
+  - para todo o catálogo, os outros atributos (`st`, `ag` e os de recurso)
+    seguem a regra de hoje: só a especialidade, quando o `effect_type` é deles.
+- Testes de dados:
+  - o conjunto de peças equipáveis com `defense` nas duas vias é exatamente
+    `{amuleto_argila}`;
+  - todo amuleto Common declara base 1 e uma especialidade;
+  - se algum desses conjuntos mudar, a mudança precisa ser deliberada.
+
+**Avaliação de impacto.**
+1. **Suíte padrão e `ruff`.** Um teste com número exato de DF que mude é
+   relatado como achado, e não ajustado em silêncio.
+2. **`-m balance` na CI do PR**, com os thresholds intactos (D5); não roda
+   localmente. A exposição é pequena:
+   - o equipamento esperado (`apply_loadout`) escolhe o Argila nos níveis 2 a 4,
+     nas três classes;
+   - as bandas de `simulate` usam os níveis 1, 5, 8, 10, 12, 15 e 20;
+   - `simulate_run` começa com o equipamento do nível 1 (Amuleto de Ferro);
+   - então o Argila só entra se a Loja da régua o comprar.
+
+   O esperado é nenhuma banda se mover além do ruído. Se alguma se mover, é
+   achado, com os números, antes de qualquer decisão.
+3. **BotPadrão, protocolo da B0** (300 runs, coletor instrumentado):
+   - `conferir` contra a B0 dá as runs que divergem. O esperado é que sejam só
+     as runs em que o Argila esteve equipado (ele termina equipado em 3 das 300);
+   - na matriz, `equipamento:defense` sai de zero;
+   - os agregados vêm com o efeito mínimo detectável (seção 7). Com essa
+     exposição, o resultado agregado deve sair "inconclusivo", e isso é o
+     esperado.
+4. **Registro.**
+   - A medição vai para um diretório novo, e a B0 não é tocada.
+   - `KNOWN_ISSUES.md` marca o KI-009 como resolvido, no mesmo PR.
 
 ---
 
-## 3. KI-008 — buffs de vida e mana máxima (decisão D2 em aberto)
+## 3. KI-008 — buffs de vida e mana máxima (D2: M1 aprovado)
 
 **Causa raiz.**
 - Seis skills de herói declaram buff de `hp` ou `mp`:
@@ -123,7 +193,7 @@ como já aprimora `defense_bonus` e `effect_value` hoje.
     catálogo;
   - no monstro, `Monster.base_hp` faz o mesmo.
 
-**O que está em decisão.** Duas famílias de correção:
+**Decisão D2: aprovado o M1.** As duas famílias comparadas:
 - **M1 — preservar a semântica.** Aumento temporário do máximo, com expiração
   correta. Entrega o que a carta já diz: "+X% de vida máxima".
 - **M2 — mecânica nova.** Recurso temporário: pontos que absorvem dano (e, no
@@ -133,7 +203,7 @@ A regra da primeira versão do plano (subir teto e HP atual e só limitar no
 vencimento) continua descartada: 20/100 → 60/140 → vence → 60/100 transforma
 bônus temporário em cura permanente.
 
-### M1 em detalhe
+### M1 em detalhe (o contrato aprovado)
 
 1. **Ao lançar.** O teto sobe `B` pontos, com `B` calculado sobre o teto sem
    buffs de recurso, para relançar não compor sobre si mesmo. O HP atual não
@@ -193,16 +263,16 @@ existe se veio de cura durante o buff, e ela se perde no vencimento.
   que as cartas parecem querer (aguentar mais), mas muda texto, regras e o
   equilíbrio do `tank`.
 - **O preço do M1 é a utilidade.** Sem cura no mesmo intervalo, várias cartas
-  continuam fracas, o `tank` principalmente. Isso seria tratado depois como
-  conteúdo (valores, textos ou kit), e não como motor.
-- **Recomendação para a Etapa 1: M1**, com o limite na queda de teto valendo
-  para todo efeito de recurso. O M2 fica registrado como evolução de design,
-  se a medição mostrar que as cartas continuam sem papel.
-- **Medição antes do PR, em qualquer modelo:** TTK e dano recebido contra
-  `tank_solo` e `support_solo`, e o uso das cartas do herói com poção, em
-  simulação pareada (seção 7).
+  continuam fracas, o `tank` principalmente. A utilidade delas é avaliada
+  depois, como conteúdo (valores, textos ou kit), e não como motor.
+- **Aprovado para a Etapa 1: M1**, com o limite na queda de teto valendo
+  para todo efeito de recurso. A semântica das cartas é preservada. O M2 fica
+  só registrado, sem plano.
+- **Medição antes do PR:** TTK e dano recebido contra `tank_solo` e
+  `support_solo`, e o uso das cartas do herói com poção, em simulação pareada
+  (seção 7).
 
-### Testes (para M1)
+### Testes
 
 - Os três `xfail` passam a aprovados. O teste A/B já detecta a mudança, porque
   `base_hp` e `base_mp` entram na assinatura.
@@ -215,7 +285,7 @@ existe se veio de cura durante o buff, e ela se perde no vencimento.
   - o MP segue as mesmas regras;
   - o monstro segue as mesmas regras.
 - Propriedade: em qualquer sequência semeada de lançamento, dano, cura e
-  vencimento, o HP fica abaixo do teto em todo passo em que o teto caiu.
+  vencimento, o HP nunca fica acima do teto depois de uma queda de teto.
 
 ## 4. KI-007 — a Bênção do Altar (precisa da decisão D1)
 
@@ -250,9 +320,8 @@ do andar. A alternativa é "o próximo combate inteiro". O texto da tela muda
 junto e passa a ser montado a partir das constantes, para não divergir de novo.
 
 **O que não muda nesta etapa.**
-- O custo de 30% do HP. Se o modelo escolhido no D2 tiver saldo temporário, o
-  custo do Altar é sacrifício e se paga com HP real. No M1, o custo é 30% do
-  teto vigente, como qualquer leitor do máximo.
+- O custo de 30% do HP. Com o M1 aprovado, ele é 30% do teto vigente, como
+  qualquer leitor do máximo.
 - A política do bot. Hoje o avaliador do `?` (`_avaliar_evento`) só soma o
   risco do Altar, nunca o benefício. Valorizar a bênção é inteligência do bot e
   fica para a etapa do bot. Até lá, o efeito da correção na régua do bot é um
@@ -266,9 +335,9 @@ junto e passa a ser montado a partir das constantes, para não divergir de novo.
 - Um teste de que o texto da tela sai das mesmas constantes que a mecânica.
 - Um teste de que jogo, bot e régua passam pela mesma `apply_altar_blessing`.
 
-**Impacto.** Na B0, o Altar foi aceito 69 vezes em 56 das 300 runs. No `-m
-balance`, a bênção nunca chega a um combate (seção 5). Corrigir o efeito não
-aparece nessa régua antes da correção de fidelidade.
+**Impacto.** Na B0, o Altar foi aceito 69 vezes em 56 das 300 runs. Na régua
+original do `-m balance`, a bênção nunca chega a um combate (seção 5). A
+correção é medida no BotPadrão e, se a variante F2 for avaliada, também nela.
 
 ### Hipótese em avaliação: +15% de dano por 5 turnos
 
@@ -305,11 +374,13 @@ Medida por simulação pareada, sem tocar `src/`. A bênção é um buff
   alcança (de -1,9% a +3,7%, conforme classe e andar). O custo é 30%.
 - **Um B − A positivo não é ganho.** Com menos HP, a política toma poção ou cura
   mais cedo e termina mais alto; o consumo não entra na conta.
-- **Mortes (A/B/C, nos andares 3 e 8):** Warrior 3: 1/1/1; Warrior 8: 0/1/1; Mage 3: 1/1/1; Mage 8: 0/3/0; Rogue 3: 2/1/2; Rogue 8: 2/3/1.
-- **Conclusão para o D1.** Com +15% de dano por 5 turnos, o Altar continua uma
-  troca ruim, mesmo corrigido. A decisão de design precisa mexer na magnitude,
-  na duração (por exemplo, até o fim do andar) ou no custo, e não só escolher o
-  canal. Nada disso está decidido.
+- **Mortes (A/B/C, de 300; só nos andares 3 e 8):**
+  - Warrior: 1/1/1 e 0/1/1;
+  - Mage: 1/1/1 e 0/3/0;
+  - Rogue: 2/1/2 e 2/3/1.
+- **O que isso diz ao D1.** Nas duas lutas medidas, o retorno de +15% por 5
+  turnos é baixo diante do custo de 30%. O resultado informa a decisão sobre
+  magnitude, duração e custo, mas não a encerra: o D1 continua aberto.
 - **Reprodução.** `reports/etapa1_plano/altar_hipotese.py`, sobre o jogo deste
   commit.
 
@@ -355,29 +426,42 @@ viraram casas do mapa, o jogo mudou e a régua não.
   que foram encontrados.
 - O Mercador ainda é uma segunda Loja (seção 6).
 
-**Opções de correção (decisão D6; nenhuma implementada):**
+**Opções avaliadas (nenhuma implementada):**
 
 | opção | como | fidelidade | custo | observação |
 |---|---|---|---|---|
-| F1. Posição sorteada | o evento (e os serviços, se D6 incluir) acontece antes da luta `k`, com `k` sorteado pelo `rng` da régua entre 0 e o número de lutas | boa no agregado | baixo | simples e reprodutível; a distribuição uniforme é uma hipótese |
-| F2. Posição calibrada | como F1, mas `k` segue a distribuição medida no jogo: em que ponto do andar o jogador chega à casa, medido nos mapas reais por uma sonda do BotPadrão | melhor | médio | exige uma medição nova, só de observação, antes da mudança |
+| F1. Posição sorteada | o evento (e os serviços) acontece antes da luta `k`, com `k` sorteado pelo `rng` da régua entre 0 e o número de lutas | boa no agregado | baixo | simples e reprodutível; a distribuição uniforme é uma hipótese |
+| F2. Posição calibrada | como F1, mas `k` segue a distribuição medida nos mapas que o gerador do jogo produz, sem a política do BotPadrão | melhor | médio | exige uma medição nova, só de observação, antes da variante |
 | F3. A régua joga o mapa | a régua passa a percorrer o mapa, como o BotPadrão | máxima | alto | desfaz a régua sintética e deixa o `-m balance` muito mais lento |
 
-**Recomendação: F2.** É a F1 com a distribuição medida, aplicada ao evento e
-aos serviços, numa mudança só de régua e com baseline própria do `-m balance`,
-antes de qualquer correção que dependa dela (Altar, Fonte, Mercador).
-- **A decisão de ir ao evento** também muda de lugar. `_bot_visita_evento`
-  passa a olhar o HP do momento da casa, e não o do fim do andar.
-- **Impacto esperado.** A Fonte e a cura paga passam a servir às lutas
-  seguintes, o que torna a régua mais fácil. O Altar passa a ter custo e efeito
-  dentro do andar.
-  - As três bandas globais podem se mover (D5).
-  - As congeladas precisam continuar verdes. Se não ficarem, é achado de
-    balanceamento, não ajuste de limite.
-- **É mudança de instrumento.** Não é implementada sem aprovação, e vem com
-  baseline própria.
+**Decisão D6: a régua original não é substituída.** A F2 é avaliada como
+variante experimental, e os resultados e contratos atuais ficam preservados.
+- **Opt-in.**
+  - A variante é um modo da régua, desligado por padrão.
+  - As bandas do `-m balance` continuam rodando a régua original.
+  - Um teste de não interferência garante que, com o modo desligado, a saída
+    fica idêntica à de hoje.
+- **Calibrada pelo jogo, não pelo bot.**
+  - A posição da casa entre as lutas sai dos mapas que o gerador do jogo
+    produz: quantas casas de luta ficam no caminho até a casa do evento ou do
+    serviço.
+  - Ela não vem da política do BotPadrão, e assim a régua sintética não passa
+    a depender do instrumento de progressão.
+- **O que entra na variante.**
+  - O evento, a Loja, o Ferreiro e o Mercador por ofertas (seção 6).
+  - A decisão de ir ao evento (`_bot_visita_evento`) passa a olhar o HP do
+    momento da casa.
+- **Resultado lado a lado.** Cada banda é rodada na régua original e na
+  variante, sem mudar threshold (D5). Uma diferença é achado de fidelidade,
+  não ajuste.
+- **Substituir a régua** é decisão posterior, tomada com esses resultados.
 
-## 6. Mercador: a mesma regra no jogo, no bot e na régua
+**Impacto esperado na variante.**
+- A Fonte e a cura paga passam a servir às lutas seguintes, o que deixa a
+  jornada mais fácil.
+- O Altar passa a ter custo e efeito dentro do andar.
+
+## 6. Mercador: a mesma regra no jogo e no bot (D4)
 
 **Causa raiz.** Três implementações para o mesmo evento:
 
@@ -394,34 +478,37 @@ O bot e a régua tratam o Mercador como uma segunda Loja, que o jogador não tem
    gasto com categoria no livro-caixa e item no inventário. A UI passa a chamá-la,
    e o comportamento do jogo fica idêntico.
 2. **`progression.visit_merchant(hero, floor, rng, policy)`.** Gera as ofertas
-   por `get_merchant_offers` e compra só entre elas, pela função do item 1. A
-   régua e o bot a usam no lugar da Loja.
-3. **Política de compra do bot (D4).** O avaliador de equipamento que o bot já
-   usa na Loja, sobre as ofertas, com a mesma reserva da taxa de saída. Sem
-   avaliador novo: a política "melhor" é da etapa do bot.
+   por `get_merchant_offers` e compra só entre elas, pela função do item 1.
+   - O BotPadrão a usa no lugar da Loja.
+   - Na régua do `-m balance`, ela entra só na variante experimental (D6); a
+     régua original continua como está.
+3. **Política de compra do bot (D4, direção aprovada).** O avaliador de
+   equipamento que o bot já usa na Loja, limitado às ofertas reais, com a mesma
+   reserva da taxa de saída. Sem avaliador novo: a política "melhor" é da etapa
+   do bot.
 4. **RNG.**
    - O jogo sorteia as ofertas pelo `random` global, e o bot faz o mesmo, por
      paridade.
-   - A régua passa o próprio `rng`, como já faz com a Loja.
+   - Na variante, a régua passa o próprio `rng`, como já faz com a Loja.
    - O consumo de sorteio muda, então só as comparações agregadas valem
      (KI-012).
 
 **Testes.**
-- Teste de paridade: com o mesmo estado, a visita do bot e a da régua só compram
-  itens que `get_merchant_offers` ofereceu, aos preços dele. Nenhuma cura paga,
-  poção avulsa ou reroll.
+- Teste de paridade: com o mesmo estado, a visita do bot e a da variante só
+  compram itens que `get_merchant_offers` ofereceu, aos preços dele. Nenhuma
+  cura paga, poção avulsa ou reroll.
 - A UI e a simulação passam pela mesma função de compra.
 - Categorias do livro-caixa iguais às do jogo.
 
 **Impacto e medição.**
-- **Instrumento.** É uma mudança de instrumento e de régua. Na B0, o Mercador
+- **Instrumento.** É uma mudança de instrumento (BotPadrão). Na B0, o Mercador
   foi visitado 66 vezes em 51 runs, e o bot comprava cura paga e poções nele.
   Tirar isso deve tornar as runs do bot mais difíceis, e isso é a medição sendo
   corrigida, não o jogo ficando mais difícil.
 - **Baseline nova.** Logo depois do merge, uma baseline nova do instrumento, com
   o mesmo protocolo, vira o "antes" das etapas seguintes.
-- **Régua do `-m balance`.** As bandas globais podem se mover, e remedi-las é
-  decisão (D5). As demais são congeladas.
+- **Régua do `-m balance`.** A original não muda. Na variante, o movimento das
+  bandas é relatado lado a lado, sem mudar threshold (D5).
 
 ---
 
@@ -457,28 +544,28 @@ camadas, da mais forte para a mais fraca:
 
 ---
 
-## 8. Decisões pendentes
+## 8. Decisões
 
-| | decisão | estado | quem decide | bloqueia |
-|---|---|---|---|---|
-| D1 | o efeito da Bênção do Altar: magnitude, duração, custo e texto. A hipótese de +15% por 5 turnos foi medida (seção 4) | em aberto | design | KI-007 |
-| D2 | M1 (teto temporário com expiração correta, recomendado) ou M2 (recurso temporário), seção 3 | em aberto | design | KI-008 |
-| D3 | +4% de DF no Amuleto de Argila, as duas vias somam | **aprovado** | — | — |
-| D4 | a política de compra do bot no Mercador, sobre as ofertas (proposta: o avaliador de equipamento existente) | em aberto | técnica, com aprovação, porque muda o instrumento | fidelidade |
-| D5 | remedir ou não as bandas globais do `-m balance`, se as réguas corrigidas as moverem | em aberto | usuário | fidelidade e merges que movam bandas |
-| D6 | a correção da ordem do andar na régua (F1, F2 ou F3) e se os serviços entram junto com o evento | em aberto | técnica, com aprovação | fidelidade |
+| | decisão | estado |
+|---|---|---|
+| D1 | o efeito da Bênção do Altar: magnitude, duração, custo e texto | **em aberto.** A hipótese de +15% por 5 turnos mostrou retorno baixo nas duas lutas medidas (seção 4), sem encerrar a decisão |
+| D2 | o modelo do KI-008 | **aprovado: M1.** Aumento temporário do máximo de HP/MP, sem conceder recurso no lançamento, com limite correto em toda queda de teto e a semântica das cartas preservada. A utilidade das cartas é avaliada depois |
+| D3 | o valor do Amuleto de Argila | **aprovado: +4% de DF**, as duas vias somam |
+| D4 | a compra do bot no Mercador | **direção técnica aprovada:** o avaliador de equipamento existente, limitado às ofertas reais. A implementação passa por PR próprio e abre baseline nova |
+| D5 | thresholds | **nenhum muda sem avaliação dos resultados.** Movimento de banda é relatado como achado, com os números |
+| D6 | a fidelidade da régua do `-m balance` | **a régua original não é substituída.** A F2 é avaliada como variante experimental, opt-in, calibrada pelos mapas do jogo e com resultado lado a lado. O Mercador por ofertas só entra na régua por essa variante |
 
 ## 9. Riscos
 
-- **Corrigir mecanismos numa jornada diferente da do jogador.** Enquanto a
-  régua do `-m balance` resolver eventos e serviços depois das lutas, as
-  correções do Altar, da Fonte e do Mercador não aparecem nela. Por isso a
-  fidelidade (passo 2) vem antes do KI-008 e do KI-007.
+- **A régua original não vê eventos nem serviços dentro do andar.** As
+  correções do Altar, da Fonte e do Mercador não aparecem nela. A medição
+  delas vem do BotPadrão e, quando avaliada, da variante F2, e cada leitura de
+  resultado diz qual régua foi usada.
 - **Bandas congeladas reprovando** depois do KI-008: duração do `tank_solo` ou
   `support_solo`. A resposta é medir e decidir, não mexer no limite.
-- **Interação entre correções.** Se D1 escolher um buff de atributo e D2 mudar
-  a leitura de buffs, a ordem 3 → 4 evita que a medição de uma contamine a da
-  outra.
+- **Interação entre correções.** O M1 muda a leitura dos buffs de recurso. Se
+  o D1 escolher um buff de atributo, a ordem KI-008 → KI-007 evita que a
+  medição de uma correção contamine a da outra.
 - **PvP.** As correções mudam `src/` da `phase/game-core`, e a
   `phase/pvp-arena` não é tocada. Uma integração futura entre as duas vai exigir
   remedir o benchmark da Arena e a calibração da Ranked, porque o combate dos
