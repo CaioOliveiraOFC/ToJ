@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Estado** | **proposta, não implementada.** Nenhuma linha de gameplay muda antes da aprovação. Revisão 2: contrato de HP/MP temporário (seção 3) e valor do Amuleto (seção 2) |
+| **Estado** | **proposta, não implementada.** Nenhuma linha de gameplay muda antes da aprovação. Revisão 3: D3 aprovado; D2 comparado (seção 3); hipótese do D1 medida (seção 4); fidelidade da régua do `-m balance` (seção 5) |
 | **Base** | `phase/game-core` em `04f50ea`, B0 em [`baselines/progression/97965ae/`](../../baselines/progression/97965ae/README.md) |
 | **Escopo** | KI-007 (Altar), KI-008 (buffs de HP/MP), KI-009 (Amuleto de Argila) e a divergência do Mercador entre jogo e simulação |
 | **Fora do escopo** | a inteligência do bot (etapa própria), KI-010 (gemas na venda, etapa própria), KI-013 e KI-014 (pendências de design e conteúdo), a refatoração do RNG, a `phase/pvp-arena` e a Ranked |
@@ -14,8 +14,8 @@
 - **Pré-requisitos.** Antes da primeira correção, precisam estar integrados, com
   autorização:
   - o fechamento da Etapa 0 (PR #7);
-  - a correção da sonda de status (KI-015, PR #8, validada em 300 runs). Sem ela, a matriz não enxerga o que
-    as correções de status e de buff mudam.
+  - a correção da sonda de status (KI-015, PR #8, validada em 300 runs). Sem
+    ela, a matriz não enxerga o que as correções de status e de buff mudam.
 - **Uma branch por correção** (`fix/ki009-…`, `fix/ki008-…`…), cada uma com PR
   próprio para a `phase/game-core`. A CI do PR precisa ficar verde, e nenhum
   merge acontece sem autorização.
@@ -27,21 +27,24 @@
   só as três bandas globais podem ser remedidas, por decisão, com o registro em
   `tests/balance/thresholds.py`.
 - **"Mudar o bot é mudar o instrumento"** ([contrato do BotPadrão](../../GAMEPLAY_CONTRACTS.md#botpadrão)).
-  As correções de mecânica são medidas contra a B0 com o mesmo instrumento. A
-  correção do Mercador muda o instrumento e abre uma baseline nova.
+  O KI-009 é medido contra a B0, com o mesmo instrumento. A fidelidade das
+  réguas (passo 2) muda os instrumentos e abre baselines novas; o KI-008 e o
+  KI-007 são medidos contra elas.
 
 ---
 
 ## 1. Ordem e dependências
 
-| # | correção | por que nesta posição | depende de | decisão necessária |
-|---|---|---|---|---|
-| 1 | KI-009: `defense` do Amuleto | menor e isolada; testa o fluxo inteiro (PR, CI, medição) com risco mínimo | 0 | D3 |
-| 2 | KI-008: buffs de HP/MP | mecânica de núcleo, afeta herói e monstro; maior impacto no balanceamento das quatro; o contrato de pontos temporários (seção 3) é fechado antes | 0 | D2, D2b |
-| 3 | KI-007: Bênção do Altar | só depois da decisão de design; a mecânica escolhida pode usar o canal de buff que a KI-008 define | 0, D1 e, conforme a opção, 2 | D1 |
-| 4 | Mercador: paridade jogo × simulação | muda o instrumento e a régua do `-m balance`; por último, para não misturar a mudança do instrumento com as correções de mecânica | 0, 1–3 medidas | D4, D5 |
+A revisão 3 põe a fidelidade das réguas antes das correções que dependem
+delas. Corrigir um mecanismo enquanto a simulação joga uma jornada diferente
+da do jogador mede a correção na jornada errada.
 
----
+| # | passo | por que nesta posição | depende de | decisão necessária |
+|---|---|---|---|---|
+| 1 | KI-009: `defense` do Amuleto | isolado e pequeno; independe das réguas | 0 | D3 (aprovado) |
+| 2 | Fidelidade das réguas: eventos e serviços no meio do andar no `-m balance` (seção 5) e Mercador por ofertas na régua e no BotPadrão (seção 6) | muda os dois instrumentos; abre baselines novas, contra as quais as correções seguintes são medidas | 0 | D4, D5, D6 |
+| 3 | KI-008: buffs de HP/MP | mecânica de núcleo; o modelo depende de D2 | 0, 2 | D2 |
+| 4 | KI-007: Bênção do Altar | o efeito depende de D1; só é medível no `-m balance` depois do passo 2 | 0, 2, D1 | D1 |
 
 ## 2. KI-009 — o efeito `defense` do Amuleto de Argila
 
@@ -84,7 +87,7 @@ uma base de defesa do slot e um efeito de especialidade.
   coerente com o papel de especialista, e o efeito no balanceamento é
   desprezível: ele termina equipado em 3 das 300 runs da B0.
 
-**Opções, para a decisão D3:**
+**Decisão D3: aprovada** (+4% de DF, as duas vias somam). As opções consideradas:
 
 | opção | valor | como | leitura |
 |---|---:|---|---|
@@ -106,7 +109,7 @@ como já aprimora `defense_bonus` e `effect_value` hoje.
 
 ---
 
-## 3. KI-008 — buffs de vida e mana máxima
+## 3. KI-008 — buffs de vida e mana máxima (decisão D2 em aberto)
 
 **Causa raiz.**
 - Seis skills de herói declaram buff de `hp` ou `mp`:
@@ -114,142 +117,105 @@ como já aprimora `defense_bonus` e `effect_value` hoje.
   - `reserva_profunda`, `bolso_do_alfaiate` e `n_amuleto_rachado`.
 - Duas de monstro declaram buff de `hp`: `mob_raizes_fundas` (`tank`) e
   `mob_folego_emprestado` (`support`).
-- `apply_skill` grava `{"stat": "hp", "value": buff_value(...)}` em
-  `active_buffs`. O valor já sai em pontos: `buff_value` converte o percentual
-  sobre a base no momento do lançamento.
-- Nenhum leitor do teto soma esse buff:
-  - no herói, `Player._scaled` aplica só o `effect_core.resource_percent` dos
-    efeitos de catálogo;
-  - no monstro, `Monster.base_hp` faz o mesmo, e só `get_stat("hp")` soma o
-    buff, mas o combate usa `base_hp`.
+- O buff vai para `active_buffs` com o valor já em pontos (`buff_value`), e
+  nenhum leitor do teto o soma:
+  - no herói, `Player._scaled` lê só o `resource_percent` dos efeitos de
+    catálogo;
+  - no monstro, `Monster.base_hp` faz o mesmo.
 
-### A regra descartada
+**O que está em decisão.** Duas famílias de correção:
+- **M1 — preservar a semântica.** Aumento temporário do máximo, com expiração
+  correta. Entrega o que a carta já diz: "+X% de vida máxima".
+- **M2 — mecânica nova.** Recurso temporário: pontos que absorvem dano (e, no
+  MP, pagam habilidades) e somem no vencimento.
 
-A primeira versão deste plano propunha subir o teto e o HP atual juntos e, ao
-vencer, só limitar o HP ao teto. **Isso transforma bônus temporário em cura
-permanente:** 20/100 → buff de +40 → 60/140 → vence → **60/100**. Os 40 pontos
-concedidos viram HP real. A regra está descartada.
+A regra da primeira versão do plano (subir teto e HP atual e só limitar no
+vencimento) continua descartada: 20/100 → 60/140 → vence → 60/100 transforma
+bônus temporário em cura permanente.
 
-### Modelos considerados
+### M1 em detalhe
 
-| modelo | o que o buff faz | conserva? | serve em combate? |
-|---|---|---|---|
-| M1. Teto temporário | só o teto sobe; o HP atual não muda; ao vencer, o HP atual desce ao teto real | sim: o buff nunca concede HP | pouco: sem cura durante o buff, o teto maior não protege de nada |
-| **M2. Pontos temporários** (recomendado) | concede um saldo de pontos temporários, separado do HP real, que o dano consome primeiro e que some ao vencer | sim, por construção | sim: absorve dano, que é o que "aguentar mais" significa nas cartas |
-| ~~M3. Teto e atual sobem, limite ao vencer~~ | a regra descartada acima | **não** | — |
+1. **Ao lançar.** O teto sobe `B` pontos, com `B` calculado sobre o teto sem
+   buffs de recurso, para relançar não compor sobre si mesmo. O HP atual não
+   muda.
+2. **Durante o buff, todo leitor do máximo lê o teto elevado.** É o que "vida
+   máxima" significa no motor:
+   - cura percentual: poção, skill de cura, Fonte, descanso e o limite de
+     `heal()`;
+   - dano por turno: sangramento e veneno são percentuais do máximo de quem
+     sofre;
+   - custo do Altar: 30% do máximo;
+   - razões de vida: a IA do monstro (`_hp_ratio`) e as condições
+     `target_wounded` e `caster_wounded` (`_fracao_de_vida`).
+3. **Qualquer queda de teto limita o atual.** Vencimento, `frailty`, troca de
+   equipamento: `HP = min(HP, teto novo)`. Hoje só a troca de equipamento faz
+   isso (`heroes.py:674`). O vencimento de `vitality` e a aplicação de
+   `frailty` deixam HP acima do teto, um defeito latente que o M1 corrige junto.
+4. **Relançar.** Renova o buff (a chave é o nome da carta). Cartas diferentes
+   somam no teto.
+5. **MP pela mesma regra.** O custo das skills percentuais usa a mana de
+   referência do nível (`skill_mana_cost`), não o máximo de quem lança, e não
+   muda. Regeneração e poção podem encher até o teto elevado, e o vencimento
+   limita o MP atual.
+6. **Monstro.** A mesma regra (`Monster.base_hp` e `base_mp` somam o buff).
+7. **Save e load.** `active_buffs` já é salvo, e o load limita o HP ao teto já
+   com o buff.
 
-O M2 também lê melhor os textos das cartas: "toma emprestado do amanhã o que
-precisa agora", "uma segunda gaveta de mana", "uma última carga", "tira de si e
-dá a quem ainda vai lutar".
+**Conservação em M1.** O buff nunca concede HP. Vida acima do teto real só
+existe se veio de cura durante o buff, e ela se perde no vencimento.
 
-### Contrato proposto (M2), caso a caso
-
-Notação: `HP` é o HP real, `teto` é o máximo real (`base_hp`) e `T` é o saldo
-temporário do buff.
-
-1. **Concessão.** Ao lançar, `T = ⌊% da carta × teto no momento do lançamento⌋`.
-   `HP` e `teto` não mudam.
-2. **Dano.** Golpe, DoT (`tick_effects`) e qualquer outra perda por dano
-   consomem `T` primeiro, depois `HP`. A morte só acontece com `HP ≤ 0`. O
-   `death_ignore` continua olhando o `HP` real.
-3. **Sacrifício e custo não são dano.** O Altar cobra `HP` real e nunca `T`.
-   Sem isso, um buff lançado em combate pagaria o Altar de graça no mapa,
-   porque o buff atravessa as lutas do andar. Hoje o Altar cobra por
-   `take_damage`, o mesmo caminho do dano, então a correção separa "pagar com
-   vida" de "levar dano".
-4. **Cura.** Skill de cura, poção, Fonte, roubo de vida, regeneração e
-   recuperação paga restauram só `HP`, até o `teto`. Nada recarrega `T`.
-5. **Razões de vida usam o real.** `HP / teto` é o que decide:
-   - execução e `target_wounded`;
-   - `caster_wounded`;
-   - a IA do monstro (`_hp_ratio`);
-   - a cura percentual.
-
-   `T` não conta. Um herói com 10/100 (+40) continua ferido.
-6. **Vencimento.** O `T` restante some, e `HP` e `teto` não mudam. O buff vence
-   no início do turno de combate, como todo buff. No fim do andar, `recover()`
-   limpa `active_buffs`, e `T` vai junto.
-7. **Relançar a mesma carta.** Não empilha: `T = max(T restante, novo T)`, e a
-   duração renova. A chave do buff é o nome da carta, como hoje.
-8. **Cartas diferentes.** Cada uma tem o próprio `T`, e os saldos somam. O dano
-   consome primeiro o saldo que vence antes, para nenhum ponto vencer intacto
-   enquanto outro é gasto.
-9. **Save e load.** `T` mora no buff, e `active_buffs` já vai para o save. O
-   load limita `HP` ao `teto` real, como já faz.
-10. **MP, pela mesma regra.** `T_mp` é concedido do mesmo jeito.
-    - Todo GASTO de MP consome `T_mp` primeiro: custo de skill, Égide de Mana e
-      dreno de `mana_burn`.
-    - Toda RESTAURAÇÃO vai só para o MP real, até o teto: regeneração por turno,
-      poção e recuperação paga.
-    - O custo percentual das skills é calculado sobre o teto real.
-    - Hoje a regeneração passa por `reduce_mp(-regen)`, com sinal negativo, e a
-      correção precisa separar "gastar" de "restaurar".
-11. **Monstro.** A mesma regra, sem exceção por entidade: `mob_raizes_fundas`
-    e `mob_folego_emprestado`.
-12. **Tela e texto (decisão D2b).**
-    - A barra passa a mostrar `HP/teto (+T)`.
-    - O texto das cartas troca "+X% de vida máxima" por "+X% de vida temporária
-      por N turnos", e o mesmo para mana.
-    - O texto sai das mesmas constantes que a mecânica.
-
-**O invariante de conservação.** Em qualquer sequência de eventos, o `HP` real
-ao fim do buff é exatamente o que seria sem o buff, mais a vida que o `T`
-poupou do dano. O buff nunca soma vida real; ele só absorve.
-
-**O caso do exemplo, sob o M2.**
-
-| passo | sem buff | com buff de +40 |
+| passo | sem cura | com cura de 100 durante o buff |
 |---|---|---|
-| início | 20/100 | 20/100 (+40) |
-| leva 30 de dano | morre | 20/100 (+10) |
-| cura de 50 | — | 70/100 (+10) |
-| vence o buff | — | 70/100 |
+| início | 20/100 | 20/100 |
+| buff de +40 | 20/140 | 20/140 |
+| cura | — | 120/140 |
+| vence | 20/100 | 100/100 (os 20 acima do teto real se perdem) |
 
-Os 70 de vida vieram da cura, e não do buff. O buff só impediu a morte.
+### Comparação
 
-### Alternativa não recomendada agora
+| critério | M1: teto temporário | M2: recurso temporário |
+|---|---|---|
+| texto atual das cartas | cumprido literalmente | precisa mudar ("vida temporária") |
+| profundidade | correção: os buffs alimentam o teto que já existe | mecânica nova: saldo separado, ordem de consumo, regras para custo e sacrifício |
+| código tocado | o teto (`_scaled`, `Monster.base_hp` e `base_mp`) e o limite na queda de teto | perda de HP e MP (`reduce_hp`, `reduce_mp`), separação entre gasto e regeneração, custo do Altar, barra da tela |
+| coerência com o motor | a mesma semântica dos efeitos de recurso do catálogo (`vitality`, `frailty`) | uma segunda semântica de "vida extra", ao lado da do catálogo |
+| conservação | sim, com o limite na queda | sim, por construção |
+| utilidade em combate | só com cura no mesmo intervalo; sem cura, o teto maior não protege | absorve dano direto |
+| efeitos colaterais | cura percentual maior; dano por turno maior no portador; razão de vida menor (a IA e as condições o veem mais ferido); Altar mais caro se pago com o buff ativo | nenhum nos leitores de percentual; a ordem de consumo precisa ser especificada |
+| por carta | herói, HP: vale com poção ou cura; herói, MP: quase nada, porque o MP raramente enche no combate; `tank` (sem cura no kit): quase inerte, e o dano por turno fica maior; `support` (tem `mob_regenerar`, 30%): sinergia real | todas absorvem: herói, `tank` e `support` |
+| risco de balanceamento | baixo; maior no `support` | maior: o `tank` ganha absorção real e lançou buff 2.004 vezes na B0 |
+| testes | dirigidos por regra, mais a propriedade "HP nunca acima do teto depois de uma queda" | dirigidos por regra, mais a propriedade de conservação por sequência |
 
-Migrar as oito skills para os efeitos de catálogo `vitality` e `focused`, com
-intensidade por carta. Isso daria fonte a dois dos sete efeitos do PVE-02 e
-tornaria alcançáveis as leis `vitality_frailty` e `focused_clouded`, o que
-contraria a decisão de manter o KI-014 parado. Além disso, a semântica de
-recurso do catálogo sobe o teto (como o M1) e hoje não limita o HP no
-vencimento: `get_hp()` devolve o `_hp` cru. Esse ponto também precisa ser
-revisto se um dia esses efeitos ganharem fonte.
+### Leitura
 
-### Testes (quando a regra for aprovada)
+- **M1 corrige o defeito; M2 redesenha a mecânica.** O M1 entrega o que a
+  carta promete e usa a mecânica de teto que o motor já tem. O M2 entrega o
+  que as cartas parecem querer (aguentar mais), mas muda texto, regras e o
+  equilíbrio do `tank`.
+- **O preço do M1 é a utilidade.** Sem cura no mesmo intervalo, várias cartas
+  continuam fracas, o `tank` principalmente. Isso seria tratado depois como
+  conteúdo (valores, textos ou kit), e não como motor.
+- **Recomendação para a Etapa 1: M1**, com o limite na queda de teto valendo
+  para todo efeito de recurso. O M2 fica registrado como evolução de design,
+  se a medição mostrar que as cartas continuam sem papel.
+- **Medição antes do PR, em qualquer modelo:** TTK e dano recebido contra
+  `tank_solo` e `support_solo`, e o uso das cartas do herói com poção, em
+  simulação pareada (seção 7).
 
-- Os três `xfail` passam a aprovados: `skill-heroi:buff:hp`,
-  `skill-heroi:buff:mp` e `skill-monstro:buff:hp`.
-- Um teste dirigido por regra, de 1 a 11, com valores exatos. Entre eles:
-  - o dano consome `T` antes do `HP`;
-  - o Altar não toca o `T`;
-  - a cura não recarrega o `T`;
-  - a razão de vida ignora o `T`;
-  - o vencimento não muda o `HP`;
-  - relançar faz `max`, não soma;
-  - a regeneração de MP não vira `T_mp`.
-- **Teste de propriedade do invariante.** Sequências aleatórias semeadas de
-  dano, cura, custo, relançamento e vencimento, aplicadas com e sem o buff. O
-  `HP` real final nunca é maior que o sem buff mais o dano absorvido. É exato
-  por sequência, não agregado.
-- O `test_placebo` continua valendo, sem mudança.
+### Testes (para M1)
 
-### Impacto
-
-- **No herói, pelo bot: pequeno.** As skills estão no deck final de 9 das 300
-  runs, e o bot quase não lança buff (10 escolhas em 17.408 turnos disponíveis).
-- **No jogador humano: real.** A carta passa a absorver dano.
-- **No monstro: relevante.** O `tank` lançou buff 2.004 vezes e o `support`
-  186 na B0, contando todos os buffs desses papéis. Como pontos temporários, o
-  efeito é absorção, e não cura.
-  - A banda `TestEncontros.test_duracao_dentro_da_banda[tank_solo]` é
-    congelada e pode reprovar. Isso seria um achado de balanceamento, não um
-    ajuste de limite.
-  - Antes do PR, mede-se TTK e dano recebido contra `tank_solo` e
-    `support_solo`, em simulação pareada (seção 6).
-
----
+- Os três `xfail` passam a aprovados. O teste A/B já detecta a mudança, porque
+  `base_hp` e `base_mp` entram na assinatura.
+- Testes dirigidos:
+  - o teto sobe exatamente `B`, e o HP atual não muda no lançamento;
+  - a cura enche até o teto elevado;
+  - o vencimento limita o HP atual;
+  - relançar não compõe;
+  - `frailty` limita;
+  - o MP segue as mesmas regras;
+  - o monstro segue as mesmas regras.
+- Propriedade: em qualquer sequência semeada de lançamento, dano, cura e
+  vencimento, o HP fica abaixo do teto em todo passo em que o teto caiu.
 
 ## 4. KI-007 — a Bênção do Altar (precisa da decisão D1)
 
@@ -284,16 +250,13 @@ do andar. A alternativa é "o próximo combate inteiro". O texto da tela muda
 junto e passa a ser montado a partir das constantes, para não divergir de novo.
 
 **O que não muda nesta etapa.**
-- O custo de 30% do HP. Pela regra 3 do contrato de pontos temporários (seção 3),
-  esse custo é sacrifício e é pago com HP real, nunca com pontos temporários.
-  Se o KI-008 entrar antes, o Altar já chega com o caminho "pagar com vida"
-  separado de "levar dano".
+- O custo de 30% do HP. Se o modelo escolhido no D2 tiver saldo temporário, o
+  custo do Altar é sacrifício e se paga com HP real. No M1, o custo é 30% do
+  teto vigente, como qualquer leitor do máximo.
 - A política do bot. Hoje o avaliador do `?` (`_avaliar_evento`) só soma o
-  risco do Altar, nunca o benefício. Depois da correção, o bot continua sem
-  valorizar a bênção ao escolher ir ao evento.
-- Valorizar a bênção é inteligência do bot e fica para a etapa do bot. Isso
-  precisa ser lembrado ao ler a medição: o efeito da correção na régua do bot
-  será um limite inferior.
+  risco do Altar, nunca o benefício. Valorizar a bênção é inteligência do bot e
+  fica para a etapa do bot. Até lá, o efeito da correção na régua do bot é um
+  limite inferior.
 
 **Testes.**
 - `evento:altar` passa de `xfail` a aprovado.
@@ -303,13 +266,118 @@ junto e passa a ser montado a partir das constantes, para não divergir de novo.
 - Um teste de que o texto da tela sai das mesmas constantes que a mecânica.
 - Um teste de que jogo, bot e régua passam pela mesma `apply_altar_blessing`.
 
-**Impacto.** Na B0, o Altar foi aceito 69 vezes em 56 das 300 runs. A régua do
-`-m balance` também aceita o Altar, então as bandas podem se mover, conforme a
-opção escolhida.
+**Impacto.** Na B0, o Altar foi aceito 69 vezes em 56 das 300 runs. No `-m
+balance`, a bênção nunca chega a um combate (seção 5). Corrigir o efeito não
+aparece nessa régua antes da correção de fidelidade.
+
+### Hipótese em avaliação: +15% de dano por 5 turnos
+
+Medida por simulação pareada, sem tocar `src/`. A bênção é um buff
+`damage_percent` de 15 no `+MULT`, por 5 turnos.
+- O herói (equipamento esperado, nível igual ao andar) passa por duas lutas
+  seguidas do plano do andar, que é o trecho que a bênção alcança.
+- 300 seeds por classe e andar.
+- Três braços:
+  - **A:** sem Altar;
+  - **B:** paga 30% do HP e recebe a bênção;
+  - **C:** recebe sem pagar, para isolar o benefício.
+- Valores em % do HP máximo ao fim das duas lutas (uma morte conta como 0),
+  com o intervalo de 95% da diferença pareada.
+
+**Benefício puro (C − A):**
+
+| classe | andar 3 | andar 8 | andar 14 | andar 20 |
+|---|---:|---:|---:|---:|
+| Warrior | +1,6 (±1,9) | +0,9 (±2,1) | +1,8 (±0,8) | +1,0 (±0,4) |
+| Mage | +2,1 (±1,4) | +0,3 (±1,4) | +3,3 (±1,3) | +2,5 (±0,9) |
+| Rogue | +3,7 (±1,7) | -1,9 (±2,2) | +2,0 (±1,5) | +1,1 (±0,9) |
+
+**A decisão real do jogador (B − A):**
+
+| classe | andar 3 | andar 8 | andar 14 | andar 20 |
+|---|---:|---:|---:|---:|
+| Warrior | -7,9 (±3,2) | +8,8 (±3,5) | -18,1 (±2,4) | -25,6 (±0,5) |
+| Mage | -6,4 (±3,4) | +5,7 (±3,5) | -14,2 (±2,5) | -21,0 (±2,1) |
+| Rogue | -3,7 (±3,3) | +3,5 (±3,9) | -15,2 (±3,0) | -21,6 (±1,3) |
+
+**Leitura.**
+- **A bênção, sozinha, poupa no máximo 3,7% do HP máximo** nas duas lutas que
+  alcança (de -1,9% a +3,7%, conforme classe e andar). O custo é 30%.
+- **Um B − A positivo não é ganho.** Com menos HP, a política toma poção ou cura
+  mais cedo e termina mais alto; o consumo não entra na conta.
+- **Mortes (A/B/C, nos andares 3 e 8):** Warrior 3: 1/1/1; Warrior 8: 0/1/1; Mage 3: 1/1/1; Mage 8: 0/3/0; Rogue 3: 2/1/2; Rogue 8: 2/3/1.
+- **Conclusão para o D1.** Com +15% de dano por 5 turnos, o Altar continua uma
+  troca ruim, mesmo corrigido. A decisão de design precisa mexer na magnitude,
+  na duração (por exemplo, até o fim do andar) ou no custo, e não só escolher o
+  canal. Nada disso está decidido.
+- **Reprodução.** `reports/etapa1_plano/altar_hipotese.py`, sobre o jogo deste
+  commit.
 
 ---
 
-## 5. Mercador: a mesma regra no jogo, no bot e na régua
+## 5. Fidelidade da régua do `-m balance`: o evento acontece depois das lutas
+
+**O achado, confirmado por execução.** Em cada andar, `simulate_run` faz, nesta
+ordem:
+1. todas as lutas;
+2. `_apply_random_event`;
+3. Loja e Ferreiro;
+4. a saída;
+5. `recover()`, que limpa `active_buffs`.
+
+A execução real, com 3 classes × 250 runs (o tamanho do teste de bandas) e
+contadores que só observam (`reports/etapa1_plano/altar_na_regua.py`), deu:
+
+| medida | valor |
+|---|---:|
+| combates | 73.888 |
+| bênçãos do Altar aplicadas | 792 |
+| combates iniciados com a bênção ativa | **0** |
+| visitas à Fonte (todas depois da última luta do andar) | 711, com 247.524 de HP curado |
+
+**No jogo.**
+- O evento é uma casa do mapa (`EventTile`), resolvida quando o jogador pisa
+  nela (`engine/loop.py`).
+- O fim do andar é só `FIM_DE_ANDAR = ("saida", "descanso", "juros")`.
+- As lutas depois da casa herdam a bênção, e a cura da Fonte serve às lutas
+  seguintes do andar.
+
+**No BotPadrão, que joga o mapa:** 69 bênçãos aceitas na B0, e 36 combates
+iniciados com a bênção ativa, em 27 runs.
+
+**Por que a régua ficou assim.** O comentário do `simulate_run` cita a ordem
+antiga do fim de andar (evento, descanso, loja). Quando eventos e serviços
+viraram casas do mapa, o jogo mudou e a régua não.
+
+**O mesmo vale para os serviços.**
+- Loja e Ferreiro também são casas do mapa no jogo, e na régua rodam no fim do
+  andar: a cura paga e o equipamento comprado não servem às lutas do andar em
+  que foram encontrados.
+- O Mercador ainda é uma segunda Loja (seção 6).
+
+**Opções de correção (decisão D6; nenhuma implementada):**
+
+| opção | como | fidelidade | custo | observação |
+|---|---|---|---|---|
+| F1. Posição sorteada | o evento (e os serviços, se D6 incluir) acontece antes da luta `k`, com `k` sorteado pelo `rng` da régua entre 0 e o número de lutas | boa no agregado | baixo | simples e reprodutível; a distribuição uniforme é uma hipótese |
+| F2. Posição calibrada | como F1, mas `k` segue a distribuição medida no jogo: em que ponto do andar o jogador chega à casa, medido nos mapas reais por uma sonda do BotPadrão | melhor | médio | exige uma medição nova, só de observação, antes da mudança |
+| F3. A régua joga o mapa | a régua passa a percorrer o mapa, como o BotPadrão | máxima | alto | desfaz a régua sintética e deixa o `-m balance` muito mais lento |
+
+**Recomendação: F2.** É a F1 com a distribuição medida, aplicada ao evento e
+aos serviços, numa mudança só de régua e com baseline própria do `-m balance`,
+antes de qualquer correção que dependa dela (Altar, Fonte, Mercador).
+- **A decisão de ir ao evento** também muda de lugar. `_bot_visita_evento`
+  passa a olhar o HP do momento da casa, e não o do fim do andar.
+- **Impacto esperado.** A Fonte e a cura paga passam a servir às lutas
+  seguintes, o que torna a régua mais fácil. O Altar passa a ter custo e efeito
+  dentro do andar.
+  - As três bandas globais podem se mover (D5).
+  - As congeladas precisam continuar verdes. Se não ficarem, é achado de
+    balanceamento, não ajuste de limite.
+- **É mudança de instrumento.** Não é implementada sem aprovação, e vem com
+  baseline própria.
+
+## 6. Mercador: a mesma regra no jogo, no bot e na régua
 
 **Causa raiz.** Três implementações para o mesmo evento:
 
@@ -357,7 +425,7 @@ O bot e a régua tratam o Mercador como uma segunda Loja, que o jogador não tem
 
 ---
 
-## 6. Como medir correções pequenas (KI-012)
+## 7. Como medir correções pequenas (KI-012)
 
 Pela decisão de não refatorar o RNG agora, a evidência de cada correção vem em
 camadas, da mais forte para a mais fraca:
@@ -389,25 +457,27 @@ camadas, da mais forte para a mais fraca:
 
 ---
 
-## 7. Decisões pendentes
+## 8. Decisões pendentes
 
-| | decisão | quem decide | bloqueia |
-|---|---|---|---|
-| D1 | o efeito da Bênção do Altar (A–E), a duração e o texto | design | KI-007 |
-| D2 | o modelo do buff de recurso (recomendado: M2, pontos temporários) e as regras 1–11 da seção 3 | design | KI-008 |
-| D2b | o texto das cartas e da barra ("+X% de vida temporária", `HP/teto (+T)`) | design | KI-008 |
-| D3 | o valor do Amuleto de Argila (recomendado: +4% de DF, as duas vias somam) e o contrato "a peça entrega a soma das vias que declara" | design | KI-009 |
-| D4 | a política de compra do bot no Mercador, sobre as ofertas (proposta: o avaliador de equipamento existente) | técnica, com aprovação, porque muda o instrumento | Mercador |
-| D5 | remedir ou não as bandas globais do `-m balance`, se a régua corrigida do Mercador ou do Altar as mover | decisão do usuário | merges que movam bandas |
+| | decisão | estado | quem decide | bloqueia |
+|---|---|---|---|---|
+| D1 | o efeito da Bênção do Altar: magnitude, duração, custo e texto. A hipótese de +15% por 5 turnos foi medida (seção 4) | em aberto | design | KI-007 |
+| D2 | M1 (teto temporário com expiração correta, recomendado) ou M2 (recurso temporário), seção 3 | em aberto | design | KI-008 |
+| D3 | +4% de DF no Amuleto de Argila, as duas vias somam | **aprovado** | — | — |
+| D4 | a política de compra do bot no Mercador, sobre as ofertas (proposta: o avaliador de equipamento existente) | em aberto | técnica, com aprovação, porque muda o instrumento | fidelidade |
+| D5 | remedir ou não as bandas globais do `-m balance`, se as réguas corrigidas as moverem | em aberto | usuário | fidelidade e merges que movam bandas |
+| D6 | a correção da ordem do andar na régua (F1, F2 ou F3) e se os serviços entram junto com o evento | em aberto | técnica, com aprovação | fidelidade |
 
----
+## 9. Riscos
 
-## 8. Riscos
-
+- **Corrigir mecanismos numa jornada diferente da do jogador.** Enquanto a
+  régua do `-m balance` resolver eventos e serviços depois das lutas, as
+  correções do Altar, da Fonte e do Mercador não aparecem nela. Por isso a
+  fidelidade (passo 2) vem antes do KI-008 e do KI-007.
 - **Bandas congeladas reprovando** depois do KI-008: duração do `tank_solo` ou
   `support_solo`. A resposta é medir e decidir, não mexer no limite.
 - **Interação entre correções.** Se D1 escolher um buff de atributo e D2 mudar
-  a leitura de buffs, a ordem 2 → 3 evita que a medição de uma contamine a da
+  a leitura de buffs, a ordem 3 → 4 evita que a medição de uma contamine a da
   outra.
 - **PvP.** As correções mudam `src/` da `phase/game-core`, e a
   `phase/pvp-arena` não é tocada. Uma integração futura entre as duas vai exigir

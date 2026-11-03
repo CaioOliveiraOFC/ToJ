@@ -31,6 +31,8 @@ reports/etapa0_fundacao_pve/*
 !reports/etapa1_plano/
 reports/etapa1_plano/*
 !reports/etapa1_plano/README.md
+!reports/etapa1_plano/altar_hipotese.py
+!reports/etapa1_plano/altar_na_regua.py
 
 # IDEs
 .idea/
