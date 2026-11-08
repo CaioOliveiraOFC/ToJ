@@ -28,9 +28,13 @@ python -m pytest -q -m balance      # invariantes de balanceamento
 ruff check . && ruff format --check .
 ```
 
-Os três rodam na CI como **jobs bloqueantes**, em Python 3.10, 3.11 e 3.12. A CI
-usa `-m "balance or balance_full"` no job de balanceamento; `balance_full` está
-reservado para medições longas e hoje nenhum teste o declara.
+Os três rodam na CI como **jobs bloqueantes** (`.github/workflows/ci.yml`), no
+push em `master` e `phase/game-core` e nos PRs para elas:
+- a suíte funcional, em Python 3.10, 3.11 e 3.12;
+- o `ruff` sobre `src/` e `tests/`;
+- o `-m balance` em quatro fatias por arquivo (`bandas`, `scout`, `pick_skill`
+  e `arena`), mais um job que reprova se algum teste `balance` ficar fora delas.
+  Num job só, o balanceamento estourava o tempo da CI.
 
 A separação entre as duas suítes é deliberada, e não é "uma bloqueia, a outra
 não". A suíte padrão protege comportamento e propriedades estruturais: se ela
@@ -49,9 +53,14 @@ python -m src.sim.runner scout                       # destaques por sistema
 python -m src.sim.runner progression --max-floor 500 # nível do herói × encontro
 ```
 
-Auditorias pontuais ficam em `tools/`: acessibilidade das interações
-(`audit_interactions.py`), geometria do andar (`measure_map.py`) e o laço de
-serviços, saída e punição (`measure_floor_loop.py`).
+Auditorias pontuais ficam em `tools/`:
+- acessibilidade das interações (`audit_interactions.py`);
+- geometria do andar (`measure_map.py`);
+- o laço de serviços, saída e punição (`measure_floor_loop.py`);
+- a jornada real jogada pelo BotPadrão (`bot_padrao.py`);
+- a cobertura por sistema dessa jornada (`cobertura_pve.py` e
+  `cobertura_pve_matriz.py`);
+- o pareamento de RNG entre versões (`rng_pareamento.py`).
 
 ## Estrutura
 
@@ -82,5 +91,9 @@ isso por AST — a regra está em [`ARCHITECTURE.md`](ARCHITECTURE.md).
   fundação, desde `v0.2-prebalance`.
 - [`BASELINES.md`](BASELINES.md) — o índice das medições de referência.
 - [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) — os problemas abertos.
-- [`NEXT_PHASE.md`](NEXT_PHASE.md) — o trabalho atual: a decisão de release
-  da fase PvE.
+- [`NEXT_PHASE.md`](NEXT_PHASE.md) — o trabalho atual: a recuperação da
+  fundação PvE na `phase/game-core`.
+- [`reports/etapa0_fundacao_pve/README.md`](reports/etapa0_fundacao_pve/README.md)
+  — a Etapa 0: a B0, a cobertura do BotPadrão e os efeitos sem função.
+- [`reports/etapa1_plano/README.md`](reports/etapa1_plano/README.md) — o plano
+  aprovado das correções da Etapa 1.

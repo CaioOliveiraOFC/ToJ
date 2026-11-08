@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Branch** | `phase/game-core`, criada da `master` em `97965ae` (`v0.3-pve`) |
-| **Trabalho** | `feature/etapa0-instrumentacao`, integrada à `phase/game-core` com `--no-ff` |
+| **Trabalho** | `feature/etapa0-instrumentacao`, integrada à `phase/game-core` com `--no-ff` (`04f50ea`); o fechamento, pelo PR #7 (`0552259`); a correção da sonda de status (KI-015), pelo PR #8, validado e aguardando integração |
 | **Gameplay** | nenhum arquivo de `src/`, `tools/bot_padrao.py` ou `tools/arena_alvo.py` mudou |
 | **Fora do escopo** | correções do Altar, do Mercador, de equipamento, de gemas e da inteligência do bot; refatoração do RNG; `master`, `phase/pvp-arena`, os 186 gladiadores e a calibração da Ranked |
 
@@ -197,6 +197,16 @@ Registrado como KI-015. Não é defeito do jogo, é defeito da medição.
   status não é, e justo para o que a IA de combate vai mudar: o uso de skills de
   status, hoje 16 escolhas em 9.973 turnos disponíveis.
 
+**Situação: implementada no PR #8, ainda não integrado.**
+- A `sonda_de_status` de `tools/cobertura_pve.py` segue os itens 1, 2, 3 e 5
+  abaixo.
+- O item 4 foi trocado por testes dirigidos e exatos, porque uma conferência
+  agregada daria falso positivo. A contrapartida entre leis e status é
+  conferida na validação.
+- Validação: 300 runs idênticas à B0, e `frozen`, `sleep` e `invisible` passam
+  a ser contados
+  ([`baselines/progression/97965ae/ki015/README.md`](../../baselines/progression/97965ae/ki015/README.md)).
+
 **A proposta.** Só ferramenta: nada em `src/` muda.
 
 1. **Contar na porta única.** A sonda passa a embrulhar
@@ -355,6 +365,9 @@ Dados: [`baselines/progression/97965ae/rng/`](../../baselines/progression/97965a
 - A fatia `bandas` usa 35 dos 60 minutos. Ela concentra 12 chamadas a
   `simulate_run` (`TestRunCompleta` e `TestPesoDaSorte`, sem cache entre si).
   Se crescer, o próximo corte é por classe de teste, e não por threshold.
+- **Execuções seguintes, verificadas na CI:**
+  - run `41704831496`, push do merge do PR #7 (`0552259`): success, 9/9 jobs;
+  - run `41706548498`, PR #8 sobre essa base (`1276d47`): success, 9/9 jobs.
 - **Aviso a acompanhar:** `PytestRemovedIn10Warning`. O fixture `runs` de
   `TestRunCompleta` é de escopo de classe e está escrito como método de
   instância. O pytest 10 deixa de aceitar isso. O aviso é anterior à Etapa 0.
@@ -368,6 +381,8 @@ Dados: [`baselines/progression/97965ae/rng/`](../../baselines/progression/97965a
 | Suíte padrão (`pytest -q`) | local, Python 3.13, `phase/game-core` (`04f50ea`) | 3196 passed, 3 skipped, 118 deselected (`balance`), 6 xfailed (5 desta etapa + o custo × recarga anterior) |
 | Suíte padrão (`pytest -q`) | local, Python 3.13, `fix/etapa0-fechamento` | 3194 passed, 3 skipped, 118 deselected, 8 xfailed. Os 2 testes de "reservado inerte" saíram, e `true_damage` e `armageddon` viraram `xfail` |
 | CI completa | GitHub Actions, run `41089878567` | success, 9/9 jobs; 118 testes de balanceamento verdes (seção 5) |
+| Suíte padrão (`pytest -q`) | local, Python 3.13, PR #8 sobre a base com o PR #7 (`1276d47`) | 3204 passed, 3 skipped, 118 deselected, 8 xfailed: os 3194 do fechamento mais os 10 testes da sonda de status |
+| CI completa | GitHub Actions, runs `41704831496` (`0552259`) e `41706548498` (`1276d47`) | success, 9/9 jobs em cada uma |
 | `tests/test_cobertura_de_efeitos.py` | local, `fix/etapa0-fechamento` | 90 passed, 7 xfailed (5 bugs e 2 pendências de design), em ~12 s |
 | `ruff check` e `ruff format --check` | `src/`, `tests/` e as ferramentas novas | limpo |
 | `-m balance` | só na CI, por fatias | ver seção 5 |
@@ -388,7 +403,7 @@ Dados: [`baselines/progression/97965ae/rng/`](../../baselines/progression/97965a
 | 5 | `true_damage` e `armageddon`: armas lendárias que caem como drop e mostram efeitos sem mecânica | pendência de design e implementação | KI-013, `xfail` |
 | 6 | Os sete efeitos positivos dos pares opostos não têm fonte; as sete leis de par nunca disparam | pendência de design e conteúdo | KI-014 |
 | 7 | O gate de balanceamento da CI na `master` nunca terminou (timeout em `97965ae`) | infraestrutura | fatiado na `phase/game-core` (resultado na seção 5); a `master` continua como está |
-| 8 | A sonda de status aplicados subconta as skills de status primárias | limite da instrumentação | KI-015; proposta na seção 3 |
+| 8 | A sonda de status aplicados subconta as skills de status primárias | limite da instrumentação | KI-015; proposta na seção 3, corrigida no PR #8 |
 | 9 | Um sorteio a mais muda o desfecho de 25% a 62% das runs; com 100 seeds por classe, o efeito mínimo detectável é de ~2 a 3 andares por classe | medição/instrumento | KI-012, seção 4 |
 | 10 | O `test_placebo` aceita "o `active_buffs` mudou" como prova de efeito | lacuna de teste | coberto pelo teste novo |
 
@@ -405,4 +420,7 @@ Dados: [`baselines/progression/97965ae/rng/`](../../baselines/progression/97965a
   etapas seguintes só aparecem na régua se o bot as usar.
 - O custo do RNG compartilhado para comparar versões.
 
-A Etapa 1 não foi iniciada.
+A Etapa 1 está planejada e não começou: nenhuma linha de gameplay mudou. O
+[plano](../etapa1_plano/README.md), aprovado na revisão 4, traz a ordem, as
+decisões e a primeira correção, o KI-009. Na preparação dele apareceu um achado
+de fidelidade da régua do `-m balance`, registrado como KI-016.

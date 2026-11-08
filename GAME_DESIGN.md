@@ -90,7 +90,9 @@ a saída.
 
 **`[implementado]`** Evento aleatório a 25% por andar: Mercador Errante (1-3 itens
 com 10% de desconto), Altar (sacrifica 30% do HP máximo por um buff) ou Fonte
-(cura 50% do HP máximo). **O evento é uma CASA do mapa, marcada com `?`**, e é
+(cura 50% do HP máximo). **`[defeito]`** O buff do Altar não tem efeito hoje
+(KI-007, em [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md)): o custo é cobrado e nada é
+somado. **O evento é uma CASA do mapa, marcada com `?`**, e é
 OPCIONAL: ele só acontece se o jogador andar até lá. Chegar à saída não dispara
 nada.
 
@@ -468,7 +470,9 @@ diferiam em 30/45/50, três curas do Mago, `cutelada`/`golpe_duplo`,
 foram **redesenhados no lugar, com o ID preservado**: nenhum save quebrou e
 nenhuma carta sumiu. `Fortalecimento` virou o atordoamento do Guerreiro,
 `Cortina de Fumaça` passou a embaralhar a mana do inimigo, `Cura Menor` virou um
-empréstimo de vida máxima, e assim por diante.
+empréstimo de vida máxima, e assim por diante. **`[defeito]`** Os buffs de vida
+e mana máxima, o de `Cura Menor` incluído, não têm efeito hoje (KI-008). A
+correção aprovada é o aumento temporário do teto.
 
 **`[implementado]`** **A descrição diz a verdade.** Uma auditoria semântica das
 150 cartas encontrou promessas que o motor não cumpre — "nunca erra o lugar"

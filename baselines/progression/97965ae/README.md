@@ -108,6 +108,10 @@ A conferência é a prova de não interferência: com as sondas instaladas, as 3
 runs continuam idênticas à `d3105edc`. As sondas só observam. A leitura da
 matriz está no relatório da Etapa 0.
 
+A contagem de status desta passada subconta as skills de status primárias
+(KI-015). A passada refeita com a sonda corrigida (PR #8) fica em
+[`ki015/`](ki015/README.md), sem tocar os arquivos deste diretório.
+
 ---
 
 ## Arquivos

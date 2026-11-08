@@ -75,6 +75,11 @@ primeiro level-up mudou.
   critério é igualdade campo a campo, e as 300 runs saem idênticas.
 - Os números são os da `d3105edc`. O que a B0 acrescenta é a garantia de que o
   ponto de partida da `phase/game-core` é aquele retrato, medido de novo.
+- **Passadas instrumentadas.** As sondas de cobertura também rodaram sobre ela,
+  e as 300 runs continuam idênticas.
+  - `matriz_cobertura.md` é a passada da Etapa 0.
+  - `ki015/` é a passada refeita com a sonda de status corrigida (PR #8). Ela
+    não reescreve a B0 e muda só a contagem de status.
 
 **Alvo de extração.** É o poder de referência contra o qual o BotPadrão decide
 se a build "superou a Arena" e vale extrair.

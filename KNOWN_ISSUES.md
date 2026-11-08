@@ -18,7 +18,9 @@ A evidência numérica está nas auditorias de progressão, em ordem:
 - [`baselines/progression/4d0a9a0a/README.md`](baselines/progression/4d0a9a0a/README.md):
   a auditoria da dungeon;
 - [`baselines/progression/d3105edc/README.md`](baselines/progression/d3105edc/README.md):
-  a auditoria do primeiro level-up, que é o retrato atual.
+  a auditoria do primeiro level-up;
+- [`baselines/progression/97965ae/README.md`](baselines/progression/97965ae/README.md):
+  a B0 da fundação PvE, que reproduz a `d3105edc` e é o retrato atual.
 
 > **Fechados.** A resolução de cada um está no changelog. A numeração não é
 > reaproveitada.
@@ -36,6 +38,9 @@ A evidência numérica está nas auditorias de progressão, em ordem:
 > A progressão continua sem item aberto. O que voltou a abrir são mecânicas
 > declaradas sem efeito e a cobertura do BotPadrão, abaixo. A medição está em
 > [`reports/etapa0_fundacao_pve/README.md`](reports/etapa0_fundacao_pve/README.md).
+> As correções seguem o [plano da Etapa 1](reports/etapa1_plano/README.md) (aprovado na revisão 4). Nenhuma
+> mudança de gameplay foi feita ainda. Os "D1" a "D6" deste arquivo são as
+> decisões desse plano, e não as de `GAME_DESIGN.md`.
 
 ---
 
@@ -53,9 +58,15 @@ Os identificadores entre parênteses são os do diagnóstico da fundação PvE
   O buff não soma em atributo nem em modificador nenhum.
 - O jogador paga 30% do HP máximo, e a tela promete "+15 dano por 5 turnos".
 - A régua do `-m balance` (`src/sim/harness.py`) também aceita o Altar, então
-  as bandas foram medidas pagando esse custo sem retorno.
+  as bandas foram medidas pagando esse custo sem retorno. Na régua, o evento
+  acontece depois das lutas do andar, então nem uma bênção corrigida chegaria a
+  um combate (KI-016).
 - **Evidência:** `tests/test_cobertura_de_efeitos.py`, caso `evento:altar`, em
   `xfail` estrito.
+- **Decisão D1, em aberto:** magnitude, duração, custo e texto da bênção. A
+  conversão automática de +15 em +15% está descartada. A hipótese de +15% de
+  dano por 5 turnos foi medida e mostrou retorno baixo nas duas lutas
+  alcançadas, sem encerrar a decisão ([plano da Etapa 1](reports/etapa1_plano/README.md), seção 4).
 
 ### KI-008 — Buffs de vida e mana máxima não fazem nada (N10)
 
@@ -74,6 +85,13 @@ Os identificadores entre parênteses são os do diagnóstico da fundação PvE
 - **Evidência:** `tests/test_cobertura_de_efeitos.py`, casos
   `skill-heroi:buff:hp`, `skill-heroi:buff:mp` e `skill-monstro:buff:hp`, em
   `xfail` estrito.
+- **Decisão D2, aprovada: M1.**
+  - O buff aumenta temporariamente o máximo de HP/MP, sem conceder recurso no
+    lançamento.
+  - Toda queda de teto limita o valor atual.
+  - A semântica das cartas é preservada, e a utilidade delas é avaliada
+    depois.
+  - O contrato está no [plano da Etapa 1](reports/etapa1_plano/README.md), seção 3. Ainda não implementado.
 
 ### KI-009 — O efeito `defense` de equipamento não é lido (N11)
 
@@ -87,6 +105,12 @@ Os identificadores entre parênteses são os do diagnóstico da fundação PvE
   tela mostra "defense +3", e ele entrega o `defense_bonus` 1.
 - **Evidência:** `tests/test_cobertura_de_efeitos.py`, caso
   `equipamento:defense`, em `xfail` estrito.
+- **Decisão D3, aprovada: +4% de DF**, com as duas vias somando. É a primeira
+  correção da Etapa 1, preparada no [plano da Etapa 1](reports/etapa1_plano/README.md) (seção 2):
+  - testes de contrato sobre o catálogo inteiro, sem congelar lista de itens;
+  - impacto medido pela exposição à peça durante a jornada.
+
+  Começa depois da integração do PR #8.
 
 ### KI-010 — Vender uma peça engastada destrói as gemas (N3)
 
@@ -95,6 +119,10 @@ Os identificadores entre parênteses são os do diagnóstico da fundação PvE
 - `Shop.sell_item` tira a peça do inventário e paga o preço. As gemas nos
   sockets somem junto, sem aviso, tanto para o jogador quanto para o bot.
 - O preço de venda também ignora o `+N` e os encantamentos da peça.
+- **Direção decidida, ainda não implementada:**
+  - nenhuma perda silenciosa de gema;
+  - a retirada paga no Ferreiro é preservada;
+  - o valor de revenda não muda por enquanto.
 
 ### KI-011 — O BotPadrão não exercita boa parte dos sistemas (BOT-01, BOT-03, N1, N2, N6)
 
@@ -113,7 +141,10 @@ Medido na passada instrumentada da B0 (300 runs,
   gema, reencantar e reroll de oferta. Elixires, 2 usos em 68 runs com
   oportunidade.
 - **Eventos.**
-  - O Mercador é tratado como uma segunda Loja (N1).
+  - O Mercador é tratado como uma segunda Loja (N1). Direção técnica
+    aprovada (D4): o avaliador de equipamento existente, limitado às ofertas
+    reais do Mercador. É uma mudança de instrumento, com baseline nova
+    ([plano da Etapa 1](reports/etapa1_plano/README.md), seção 6).
   - O Altar é aceito em 56 runs, sem efeito (KI-007).
 - **Avaliador de combate.** Ignora `mana_restored` (BOT-03) e o desgaste entre
   lutas: HP e MP poupados não contam para a luta seguinte (N6).
@@ -137,6 +168,13 @@ aparece na progressão medida.
 - **Evidência:** [`reports/etapa0_fundacao_pve/README.md`](reports/etapa0_fundacao_pve/README.md#4-rng-compartilhado-e-pareamento-entre-versões)
   e `baselines/progression/97965ae/rng/`. A separação das fontes de RNG não foi
   feita: primeiro mede-se o ganho.
+- **Decisão:** o RNG não é refatorado agora. Cada correção é medida em camadas:
+  - testes dirigidos e exatos;
+  - cobertura funcional;
+  - simulação pareada de mecanismo;
+  - estatística sobre as runs, com o efeito mínimo detectável declarado.
+
+  Comparação run a run entre versões não é usada.
 
 ---
 
@@ -153,6 +191,8 @@ aparece na progressão medida.
 - Não há decisão aprovada de que fiquem inertes. Falta definir:
   - o que cada efeito é;
   - ou se as peças saem do drop até a mecânica existir.
+- **Por decisão**, o item continua como pendência de design: nada é
+  implementado e nada sai do catálogo até essa definição.
 - **Evidência:** `tests/test_cobertura_de_efeitos.py`, casos
   `equipamento:true_damage` e `equipamento:armageddon`, em `xfail` estrito do
   tipo `design`.
@@ -170,6 +210,7 @@ aparece na progressão medida.
 - Não há decisão registrada de que isso seja intencional. Os testes de
   `TestFontesDoCatalogo` travam os dois conjuntos para que qualquer mudança neles
   seja notada, e não para validá-los.
+- **Por decisão**, fica como pendência de conteúdo e não bloqueia a Etapa 1.
 
 ### KI-015 — A sonda de cobertura subconta os status aplicados por skills primárias
 
@@ -185,10 +226,43 @@ aparece na progressão medida.
   `sleep_damage` e `emboscada` (que exige atacante invisível) disparam 3, 55 e
   79 vezes.
 - O contador de leis lê outro evento e é confiável. A contagem de status não
-  serve para avaliar o uso de skills de status. A correção da medição está
-  proposta no
-  [relatório da Etapa 0](reports/etapa0_fundacao_pve/README.md#limite-conhecido-da-instrumentação-e-proposta-de-correção)
-  e precisa vir antes das melhorias da IA de combate.
+  serve para avaliar o uso de skills de status.
+- **Corrigido no PR #8, ainda não integrado.**
+  - A `sonda_de_status` conta na porta única (`effect_core.apply_effect`),
+    com tentativas, desfechos e origem.
+  - As 300 runs saem idênticas à B0 (não interferência).
+  - `frozen`, `sleep` e `invisible` passam a ser contados.
+  - Validação em
+    [`baselines/progression/97965ae/ki015/README.md`](baselines/progression/97965ae/ki015/README.md).
+  - O item sai desta lista quando o PR #8 for integrado. A proposta original
+    está no
+    [relatório da Etapa 0](reports/etapa0_fundacao_pve/README.md#limite-conhecido-da-instrumentação-e-proposta-de-correção).
+
+### KI-016 — A régua do `-m balance` resolve eventos e serviços depois das lutas do andar
+
+**Classificação:** inconclusivo (fidelidade do instrumento). Não é defeito do
+jogo.
+
+- **Na régua.** Em cada andar, `simulate_run` faz nesta ordem:
+  1. todas as lutas;
+  2. o evento aleatório;
+  3. a Loja e o Ferreiro;
+  4. a saída;
+  5. o `recover()`, que limpa `active_buffs`.
+- **No jogo.** O evento e os serviços são casas do mapa (`EventTile`), e as
+  lutas depois da casa herdam o que ela deu.
+- **Medido no tamanho do teste de bandas** (3 classes × 250 runs):
+  - 792 bênçãos do Altar e 0 de 73.888 combates com a bênção ativa;
+  - 711 visitas à Fonte, todas depois da última luta do andar.
+- **No BotPadrão, que joga o mapa:** 36 combates com a bênção ativa, em 27
+  runs da B0.
+- **Consequência.** As correções do Altar, da Fonte e do Mercador não aparecem
+  na régua original. A medição delas vem do BotPadrão.
+- **Decisão D6.** A régua original não é substituída. A ordem calibrada pelos
+  mapas do jogo (F2) será avaliada como variante experimental, opt-in, com
+  resultado lado a lado e sem mudar threshold (D5).
+- **Evidência:** [plano da Etapa 1](reports/etapa1_plano/README.md), seção 5, e
+  `reports/etapa1_plano/altar_na_regua.py`.
 
 ---
 
@@ -207,9 +281,9 @@ Registrados onde vivem, e listados aqui só para não se perderem:
   sem rodar inteiro.
   - Na `phase/game-core` ele roda em quatro fatias, sem mudar threshold.
   - A `master` fica como está até a próxima integração.
-- **As decisões de design pendentes** D2, D4 e D6, em
-  [`GAME_DESIGN.md`](GAME_DESIGN.md). São escolhas ainda não ratificadas, e não
-  defeitos.
+- **As decisões de design pendentes** D2, D4 e D6 de
+  [`GAME_DESIGN.md`](GAME_DESIGN.md), que são outras que não as do plano da
+  Etapa 1. São escolhas ainda não ratificadas, e não defeitos.
 
 ## O que NÃO é known issue
 
@@ -230,4 +304,5 @@ Registrados onde vivem, e listados aqui só para não se perderem:
   e para `phase/game-core`, e para os PRs contra elas. As branches `fix/*` e
   `feature/*` são validadas pelo PR, e não pelo push.
 - **Arquivos experimentais fora do repositório.**
-- **O que as Etapas 1 a 8 corrigiram.**
+- **O que as Etapas 1 a 8 da reforma de fundação corrigiram.** Não confundir
+  com as etapas da recuperação da fundação PvE (Etapa 0, Etapa 1…).

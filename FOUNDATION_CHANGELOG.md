@@ -32,6 +32,7 @@ As outras fontes ficam onde estão:
 | — | `9ef74639`…`0ab837b9` | Bloco do instrumento: BotPadrão corrigido e auditado |
 | — | `dfa1ebcc`…`eb52b105` | Bloco da dungeon: Run Progression |
 | — | `32a0a5d9`…`be032157` | O primeiro level-up |
+| — | `b9f7419`…`0552259` | Recuperação da fundação PvE: Etapa 0 (`phase/game-core`) |
 
 ---
 
@@ -509,3 +510,42 @@ KI-005 fechou.
 
 **`Run/Progression Balance` calibrado na jornada real.** Nenhum problema de
 progressão PvE está aberto, e a fase está pronta para a decisão de release.
+
+---
+
+## Recuperação da fundação PvE — Etapa 0 (`phase/game-core`)
+
+Uma auditoria da fundação PvE, feita depois do gate final, achou mecânicas
+declaradas que não fazem nada e sistemas que o BotPadrão nunca exercita. A
+recuperação acontece na `phase/game-core`, criada da `master` em `97965ae`
+(`v0.3-pve`). A Etapa 0 **não mudou gameplay**: nenhum arquivo de `src/`, de
+`tools/bot_padrao.py` ou de `tools/arena_alvo.py`. O relatório completo está em
+[`reports/etapa0_fundacao_pve/README.md`](reports/etapa0_fundacao_pve/README.md).
+
+**O que mudou na fundação.**
+- **CI** (`b9f7419`).
+  - A `phase/game-core` e os PRs para ela passam a ser validados.
+  - O `-m balance` roda em quatro fatias por arquivo. Num job só, ele estourava
+    o tempo na `master`, e o gate nunca chegava a verificar nada.
+  - Um job reprova se algum teste `balance` ficar fora das fatias.
+  - Nenhum threshold mudou, e as fatias somam os mesmos 118 testes do gate
+    final.
+- **B0** (`baselines/progression/97965ae/`). É a régua da `d3105edc` rodada de
+  novo, com 300 de 300 runs idênticas. É a referência da `phase/game-core`.
+- **Instrumentação**, só observação:
+  - `tools/cobertura_pve.py` e `tools/cobertura_pve_matriz.py` medem, por
+    sistema, se ele esteve disponível, se o bot o usou e se o uso deixou efeito;
+  - `tools/rng_pareamento.py` mede quanto um sorteio a mais desfaz o pareamento
+    entre versões.
+- **Testes de efeito declarado** (`tests/test_cobertura_de_efeitos.py`).
+  - Cada par (fonte, efeito) é testado A/B pelos consumidores do motor.
+  - Os efeitos ao alcance do jogador e sem função ficam num registro único de
+    pendências (`PENDENCIAS`), em `xfail` estrito. Nenhum fica "inerte de
+    propósito".
+- **Known issues reabertos:** de KI-007 a KI-015, em
+  [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md). O fechamento (PR #7, `0552259`)
+  reclassificou `true_damage` e `armageddon` como pendência de design e
+  registrou o limite da sonda de status (KI-015).
+
+O próximo passo é o [plano da Etapa 1](reports/etapa1_plano/README.md),
+aprovado, que começa pelo KI-009.
