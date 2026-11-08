@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| **Estado** | **proposta, não implementada.** Nenhuma linha de gameplay muda antes da aprovação. Revisão 4: decisões consolidadas (D2, D3 e D4 aprovados; D5 e D6 definidos; D1 em aberto). A primeira correção é o KI-009, depois da integração dos PRs #7 e #8 |
-| **Base** | `phase/game-core` em `04f50ea`, B0 em [`baselines/progression/97965ae/`](../../baselines/progression/97965ae/README.md) |
+| **Estado** | **aprovado na revisão 4, em execução.** Nenhuma linha de gameplay mudou até aqui. Decisões: D2, D3 e D4 aprovados; D5 e D6 definidos; D1 em aberto. O PR #7 está integrado; o PR #8 está validado sobre a nova base e aguarda autorização. A primeira correção é o KI-009 |
+| **Base** | `phase/game-core`: `04f50ea` quando o plano foi escrito, `0552259` depois do PR #7. B0 em [`baselines/progression/97965ae/`](../../baselines/progression/97965ae/README.md) |
 | **Escopo** | KI-007 (Altar), KI-008 (buffs de HP/MP), KI-009 (Amuleto de Argila) e a divergência do Mercador entre jogo e simulação |
 | **Fora do escopo** | a inteligência do bot (etapa própria), KI-010 (gemas na venda, etapa própria), KI-013 e KI-014 (pendências de design e conteúdo), a refatoração do RNG, a `phase/pvp-arena` e a Ranked |
 
@@ -13,9 +13,12 @@
 
 - **Pré-requisitos.** Antes da primeira correção, precisam estar integrados, com
   autorização:
-  - o fechamento da Etapa 0 (PR #7);
+  - o fechamento da Etapa 0 (PR #7): **integrado** em `0552259`, com a CI do
+    push 9/9 verde;
   - a correção da sonda de status (KI-015, PR #8, validada em 300 runs). Sem
     ela, a matriz não enxerga o que as correções de status e de buff mudam.
+    **Validado sobre a nova base** (`1276d47`, CI 9/9 verde), aguardando
+    autorização.
 - **Uma branch por correção** (`fix/ki009-…`, `fix/ki008-…`…), cada uma com PR
   próprio para a `phase/game-core`. A CI do PR precisa ficar verde, e nenhum
   merge acontece sem autorização.
@@ -96,8 +99,10 @@ uma base de defesa do slot e um efeito de especialidade.
 - **Com +4%, a tela atual passa a ser verdadeira** ("+1" e "+3"), sem mudar
   texto nem dado.
 - **O Argila vira o amuleto de defesa pura**, o mais barato do andar 1. Isso é
-  coerente com o papel de especialista, e o efeito no balanceamento é
-  desprezível: ele termina equipado em 3 das 300 runs da B0.
+  coerente com o papel de especialista, e o efeito no balanceamento deve ser
+  pequeno. Ele termina equipado em 3 das 300 builds finais da B0, mas a build
+  final subestima a exposição: o PR mede quantas runs e lutas tiveram a peça
+  equipada ao longo da jornada.
 
 **Decisão D3: aprovada** (+4% de DF, as duas vias somam). As opções consideradas:
 
@@ -112,7 +117,7 @@ uma base de defesa do slot e um efeito de especialidade.
 quando a base e a especialidade são o mesmo atributo. O `+N` aprimora as duas,
 como já aprimora `defense_bonus` e `effect_value` hoje.
 
-### Execução preparada (aguarda a integração dos PRs #7 e #8)
+### Execução preparada (aguarda a integração do PR #8)
 
 **Branch.** `fix/ki009-amuleto-argila`, criada da `phase/game-core` depois dos
 dois merges, com PR próprio para a `phase/game-core` e sem merge automático.
@@ -144,14 +149,17 @@ dois merges, com PR próprio para a `phase/game-core` e sem merge automático.
 - Testes dirigidos de `equipment_percent("df")`:
   - o Argila dá 4;
   - com `+N`, dá a soma das vias aprimoradas, como na tabela;
-  - as gemas continuam somando à parte, pelo `gem_percent`;
-  - para todo o catálogo, os outros atributos (`st`, `ag` e os de recurso)
-    seguem a regra de hoje: só a especialidade, quando o `effect_type` é deles.
-- Testes de dados:
-  - o conjunto de peças equipáveis com `defense` nas duas vias é exatamente
-    `{amuleto_argila}`;
-  - todo amuleto Common declara base 1 e uma especialidade;
-  - se algum desses conjuntos mudar, a mudança precisa ser deliberada.
+  - as gemas continuam somando à parte, pelo `gem_percent`.
+- **Contrato, como invariante sobre o catálogo inteiro.** Ajuste da aprovação:
+  nenhuma lista fixa de itens é congelada.
+  - Para cada peça equipável e cada atributo, `equipment_percent` é a soma das
+    vias que a peça declara para ele: a base (`defense_bonus`, no `df`) e a
+    especialidade, quando o `effect_type` é daquele atributo. Cada via entra
+    com o próprio `+N`.
+  - Nenhuma via declarada é descartada, inclusive quando a base e a
+    especialidade são o mesmo atributo.
+  - Uma peça nova com duas fontes de defesa entra no contrato sem mudar o
+    teste.
 
 **Avaliação de impacto.**
 1. **Suíte padrão e `ruff`.** Um teste com número exato de DF que mude é
@@ -166,13 +174,20 @@ dois merges, com PR próprio para a `phase/game-core` e sem merge automático.
 
    O esperado é nenhuma banda se mover além do ruído. Se alguma se mover, é
    achado, com os números, antes de qualquer decisão.
-3. **BotPadrão, protocolo da B0** (300 runs, coletor instrumentado):
-   - `conferir` contra a B0 dá as runs que divergem. O esperado é que sejam só
-     as runs em que o Argila esteve equipado (ele termina equipado em 3 das 300);
-   - na matriz, `equipamento:defense` sai de zero;
-   - os agregados vêm com o efeito mínimo detectável (seção 7). Com essa
-     exposição, o resultado agregado deve sair "inconclusivo", e isso é o
-     esperado.
+3. **BotPadrão, protocolo da B0** (300 runs, coletor instrumentado). A
+   exposição é medida durante a jornada, e não só nas builds finais (ajuste da
+   aprovação):
+   - **Exposição.** Uma sonda que só observa registra, em cada luta, se o herói
+     tinha equipada uma peça cuja DF muda com a correção. Hoje é o Argila, em
+     qualquer rank. Saem as runs, as lutas e os andares expostos, na B0 e na
+     versão corrigida.
+   - **Divergência.** `conferir` contra a B0 dá as runs que divergem, e a
+     leitura cruza divergência com exposição. Uma run divergente sem exposição
+     precisa de explicação antes do PR.
+   - Na matriz, `equipamento:defense` sai de zero.
+   - **Agregados.** Vêm com o efeito mínimo detectável (seção 7), para todas as
+     runs e só para as expostas. Com pouca exposição, o resultado agregado deve
+     sair "inconclusivo", e isso é o esperado.
 4. **Registro.**
    - A medição vai para um diretório novo, e a B0 não é tocada.
    - `KNOWN_ISSUES.md` marca o KI-009 como resolvido, no mesmo PR.
